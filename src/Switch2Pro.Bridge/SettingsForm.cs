@@ -46,6 +46,8 @@ internal sealed class SettingsForm : Form
     }
 
     private const string CaptureKeys = "\u0001capture";
+    private const string ChooseTurbo = "\u0001turbo";
+    private const string ChooseMacro = "\u0001macro";
     private static readonly Choice KeyboardChoice = new("⌨  Andere Taste / Tastenkombination aufnehmen …", CaptureKeys);
 
     /// <summary>Sonderaktionen und fertige Windows-Tastenkürzel.</summary>
@@ -58,6 +60,10 @@ internal sealed class SettingsForm : Form
         yield return new Choice("🎯  Gyro-Maus ein/aus", nameof(SpecialAction.GyroMouseToggle));
         if (!shiftLayer)
             yield return new Choice("⇧  Shift-Ebene (solange gehalten)", nameof(SpecialAction.Shift));
+        yield return new Choice("🎯  Gyro als rechter Stick (solange gehalten)", nameof(SpecialAction.GyroStick));
+        yield return new Choice("🎯  Gyro als rechter Stick ein/aus", nameof(SpecialAction.GyroStickToggle));
+        yield return new Choice("🔁  Turbo / Dauerfeuer …", ChooseTurbo);
+        yield return new Choice("⏯  Makro (Tastenfolge) …", ChooseMacro);
         yield return new Choice("📷  Bildschirmfoto speichern (Win+Druck)", "Key:Win+Print");
         yield return new Choice("📷  Bildschirmausschnitt (Win+Umschalt+S)", "Key:Win+Shift+S");
         yield return new Choice("⏺  Letzte 30 Sekunden aufnehmen (Win+Alt+G)", "Key:Win+Alt+G");
@@ -98,6 +104,17 @@ internal sealed class SettingsForm : Form
     private readonly List<int> _inactivityValues = [];
     private readonly ComboBox _gyroSource = new() { DropDownStyle = ComboBoxStyle.DropDownList, Width = 200 };
     private readonly TrackBar _gyroMouseSpeed = new() { Minimum = 2, Maximum = 80, TickFrequency = 10, Width = 200 };
+
+    private readonly ComboBox _gyroStickMode = new() { DropDownStyle = ComboBoxStyle.DropDownList, Width = 330 };
+    private readonly TrackBar _gyroStickSpeed = new() { Minimum = 40, Maximum = 400, TickFrequency = 40, Width = 200 };
+    private readonly TrackBar _gyroStickMin = new() { Minimum = 0, Maximum = 40, TickFrequency = 5, Width = 160 };
+    private readonly CheckBox _gyroStickInvert = new() { Text = "hoch/runter umkehren", AutoSize = true };
+    private readonly TrackBar _stickCurve = new() { Minimum = 50, Maximum = 250, TickFrequency = 25, Width = 200 };
+    private readonly TrackBar _triggerDeadzone = new() { Minimum = 0, Maximum = 50, TickFrequency = 5, Width = 160 };
+    private readonly TrackBar _triggerFull = new() { Minimum = 50, Maximum = 100, TickFrequency = 5, Width = 160 };
+    private readonly TrackBar _turboRate = new() { Minimum = 2, Maximum = 30, TickFrequency = 2, Width = 160 };
+    private readonly ToolTip _tips = new();
+    private readonly Label _aimInfo = new() { AutoSize = true, ForeColor = SystemColors.GrayText, Padding = new Padding(0, 6, 0, 0) };
 
     private readonly ComboBox _profileSelect = new() { DropDownStyle = ComboBoxStyle.DropDownList, Width = 300 };
     private readonly Button _profileNew = new() { Text = "Neu …", AutoSize = true };
@@ -191,6 +208,40 @@ internal sealed class SettingsForm : Form
         });
         root.Controls.Add(WrapGroup("4. Joy-Con", joyCon));
 
+        var aim = Flow();
+        _gyroStickMode.Items.AddRange(["aus (nur per Taste „Gyro-Stick“)", "immer", "beim Zielen (solange ZL / linker Trigger gedrückt)"]);
+        aim.Controls.Add(new Label { Text = "Gyro als rechter Stick:", AutoSize = true, Padding = new Padding(0, 6, 0, 0) });
+        aim.Controls.Add(_gyroStickMode);
+        aim.Controls.Add(_gyroStickInvert);
+        aim.SetFlowBreak(_gyroStickInvert, true);
+        aim.Controls.Add(new Label { Text = "Empfindlichkeit:", AutoSize = true, Padding = new Padding(0, 6, 0, 0) });
+        aim.Controls.Add(_gyroStickSpeed);
+        aim.Controls.Add(new Label { Text = "Mindestausschlag:", AutoSize = true, Padding = new Padding(12, 6, 0, 0) });
+        aim.Controls.Add(_gyroStickMin);
+        aim.SetFlowBreak(_gyroStickMin, true);
+        aim.Controls.Add(new Label { Text = "Stick-Kennlinie:", AutoSize = true, Padding = new Padding(0, 6, 0, 0) });
+        aim.Controls.Add(_stickCurve);
+        aim.Controls.Add(new Label { Text = "Turbo (pro Sekunde):", AutoSize = true, Padding = new Padding(12, 6, 0, 0) });
+        aim.Controls.Add(_turboRate);
+        aim.SetFlowBreak(_turboRate, true);
+        aim.Controls.Add(new Label { Text = "Analoge Trigger (GameCube) – Totzone:", AutoSize = true, Padding = new Padding(0, 6, 0, 0) });
+        aim.Controls.Add(_triggerDeadzone);
+        aim.Controls.Add(new Label { Text = "voll gedrückt ab:", AutoSize = true, Padding = new Padding(12, 6, 0, 0) });
+        aim.Controls.Add(_triggerFull);
+        aim.SetFlowBreak(_triggerFull, true);
+        aim.Controls.Add(_aimInfo);
+        root.Controls.Add(WrapGroup("5. Zielen, Sticks, Trigger, Turbo", aim));
+        foreach (var (bar, tip) in new (Control, string)[]
+                 {
+                     (_gyroStickSpeed, "Links = empfindlicher (kleine Drehung, großer Ausschlag), rechts = ruhiger."),
+                     (_gyroStickMin, "Mindestausschlag des Sticks bei Bewegung – überwindet die Totzone des Spiels."),
+                     (_stickCurve, "Mitte = linear. Rechts = feiner um die Mitte (präzises Zielen), links = schneller."),
+                     (_triggerDeadzone, "So weit lässt sich ein analoger Trigger drücken, bevor er wirkt."),
+                     (_triggerFull, "Ab hier gilt der Trigger als ganz gedrückt (100 = erst am Anschlag)."),
+                     (_turboRate, "Wie oft pro Sekunde Tasten mit „Turbo“ auslösen."),
+                 })
+            _tips.SetToolTip(bar, tip);
+
         var profileRow = Flow();
         profileRow.Controls.Add(new Label { Text = "Profil:", AutoSize = true, Padding = new Padding(0, 6, 0, 0) });
         profileRow.Controls.AddRange([_profileSelect, _profileNew, _profileRename, _profileDelete, _profileExport, _profileImport]);
@@ -218,7 +269,7 @@ internal sealed class SettingsForm : Form
         _grid.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 260));
         _grid.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         profile.Controls.Add(_grid);
-        root.Controls.Add(WrapGroup("5. Tastenbelegung und Profile  (Taste → Gamepad, Tastatur, Maus, Gyro-Maus, Shift-Ebene)", profile));
+        root.Controls.Add(WrapGroup("6. Tastenbelegung und Profile  (Taste → Gamepad, Tastatur, Maus, Gyro-Maus, Shift-Ebene)", profile));
 
         var buttons = new FlowLayoutPanel { AutoSize = true, FlowDirection = FlowDirection.LeftToRight };
         var reset = new Button { Text = "Alles auf Standard", AutoSize = true };
@@ -299,6 +350,14 @@ internal sealed class SettingsForm : Form
         _gyroSource.SelectedIndexChanged += (_, _) =>
             Apply(() => _settings.PairGyroSource = _gyroSource.SelectedIndex == 1 ? GyroSource.Left : GyroSource.Right);
         _gyroMouseSpeed.ValueChanged += (_, _) => Apply(() => _settings.GyroMouseSpeed = _gyroMouseSpeed.Value);
+        _gyroStickMode.SelectedIndexChanged += (_, _) => Apply(() => _settings.GyroStick = (GyroStickMode)Math.Max(0, _gyroStickMode.SelectedIndex));
+        _gyroStickSpeed.ValueChanged += (_, _) => { Apply(() => _settings.GyroStickFullSpeed = _gyroStickSpeed.Value); ShowAimInfo(); };
+        _gyroStickMin.ValueChanged += (_, _) => { Apply(() => _settings.GyroStickAntiDeadzone = _gyroStickMin.Value / 100f); ShowAimInfo(); };
+        _gyroStickInvert.CheckedChanged += (_, _) => Apply(() => _settings.GyroStickInvertY = _gyroStickInvert.Checked);
+        _stickCurve.ValueChanged += (_, _) => { Apply(() => _settings.StickCurve = _stickCurve.Value / 100f); ShowAimInfo(); };
+        _triggerDeadzone.ValueChanged += (_, _) => { Apply(() => _settings.TriggerDeadzone = _triggerDeadzone.Value / 100f); ShowAimInfo(); };
+        _triggerFull.ValueChanged += (_, _) => { Apply(() => _settings.TriggerFullAt = _triggerFull.Value / 100f); ShowAimInfo(); };
+        _turboRate.ValueChanged += (_, _) => { Apply(() => _settings.TurboRate = _turboRate.Value); ShowAimInfo(); };
 
         _profileSelect.SelectedIndexChanged += (_, _) => { if (!_loading) LoadProfileEditor(); };
         _profileNew.Click += (_, _) => NewProfile();
@@ -345,11 +404,27 @@ internal sealed class SettingsForm : Form
         _inactivity.SelectedIndex = _inactivityValues.IndexOf(_settings.InactivityMinutes);
         _gyroSource.SelectedIndex = _settings.PairGyroSource == GyroSource.Left ? 1 : 0;
         _gyroMouseSpeed.Value = Math.Clamp((int)MathF.Round(_settings.GyroMouseSpeed), _gyroMouseSpeed.Minimum, _gyroMouseSpeed.Maximum);
+        static int Bar(TrackBar bar, float value) => Math.Clamp((int)MathF.Round(value), bar.Minimum, bar.Maximum);
+        _gyroStickMode.SelectedIndex = (int)_settings.GyroStick;
+        _gyroStickSpeed.Value = Bar(_gyroStickSpeed, _settings.GyroStickFullSpeed);
+        _gyroStickMin.Value = Bar(_gyroStickMin, _settings.GyroStickAntiDeadzone * 100);
+        _gyroStickInvert.Checked = _settings.GyroStickInvertY;
+        _stickCurve.Value = Bar(_stickCurve, _settings.StickCurve * 100);
+        _triggerDeadzone.Value = Bar(_triggerDeadzone, _settings.TriggerDeadzone * 100);
+        _triggerFull.Value = Bar(_triggerFull, _settings.TriggerFullAt * 100);
+        _turboRate.Value = Bar(_turboRate, _settings.TurboRate);
+        ShowAimInfo();
         FillProfileKinds();
         FillProfiles(_editProfile);
         _loading = false;
         LoadProfileEditor();
     }
+
+    /// <summary>Aktuelle Werte der Regler in Klartext (Regler zeigen keine Zahlen).</summary>
+    private void ShowAimInfo() =>
+        _aimInfo.Text = $"Gyro-Stick: voller Ausschlag bei {_gyroStickSpeed.Value} °/s, mindestens {_gyroStickMin.Value} %   ·   " +
+                        $"Kennlinie {_stickCurve.Value / 100f:0.00}   ·   Trigger: ab {_triggerDeadzone.Value} %, voll ab {_triggerFull.Value} %   ·   " +
+                        $"Turbo {_turboRate.Value}× pro Sekunde";
 
     /// <summary>Nach dem Neuladen der Datei (von außen geändert) alle Felder neu befüllen.</summary>
     public void ReloadValues()
@@ -679,11 +754,19 @@ internal sealed class SettingsForm : Form
         {
             string normalized = ButtonAction.Parse(text).ToString();
             selected = combo.Items.Cast<Choice>().ToList()
-                .FindIndex(c => c.Action is not null && string.Equals(ButtonAction.Parse(c.Action).ToString(), normalized, StringComparison.OrdinalIgnoreCase));
+                .FindIndex(c => c.Action is not null && !c.Action.StartsWith('\u0001')
+                                && string.Equals(ButtonAction.Parse(c.Action).ToString(), normalized, StringComparison.OrdinalIgnoreCase));
             if (selected < 0)
             {
                 var action = ButtonAction.Parse(text);
-                combo.Items.Add(new Choice(action.IsKeyboard ? $"⌨  Taste: {action.Keys}" : normalized, normalized));
+                string label = action switch
+                {
+                    { IsMacro: true } => $"⏯  Makro: {action.Macro}",
+                    { Turbo: true } => $"🔁  Turbo: {(action.IsKeyboard ? $"Taste {action.Keys}" : TargetNames.GetValueOrDefault(action.Target, action.Target.ToString()))}",
+                    { IsKeyboard: true } => $"⌨  Taste: {action.Keys}",
+                    _ => normalized,
+                };
+                combo.Items.Add(new Choice(label, normalized));
                 selected = combo.Items.Count - 1;
             }
         }
@@ -709,6 +792,21 @@ internal sealed class SettingsForm : Form
                 return;
             }
             action = ButtonAction.Keyboard(dialog.Combo).ToString();
+        }
+        else if (action is ChooseTurbo or ChooseMacro)
+        {
+            // Vorhandene Belegung als Vorschlag übernehmen.
+            string? current = EditedMaps.TryGetValue(kind, out var m) && m.TryGetValue(button, out var t) ? t : null;
+            string label = ControllerButtons.Label(button, kind);
+            string? result = action == ChooseTurbo ? TurboDialog.Ask(this, label, current) : MacroDialog.Ask(this, label, current);
+            if (result is null)
+            {
+                _loading = true;
+                combo.SelectedIndex = combo.Tag is int previous ? previous : 0;
+                _loading = false;
+                return;
+            }
+            action = result;
         }
 
         Apply(() =>
@@ -775,6 +873,7 @@ internal sealed class SettingsForm : Form
     protected override void OnFormClosed(FormClosedEventArgs e)
     {
         _liveTimer.Dispose();
+        _tips.Dispose();
         base.OnFormClosed(e);
     }
 }
@@ -875,6 +974,122 @@ internal sealed class KeyCaptureDialog : Form
         Keys.MediaPlayPause => "PlayPause",
         _ => null,
     };
+}
+
+/// <summary>Turbo festlegen: welche Gamepad-Taste bzw. Tastaturtaste im Dauerfeuer ausgelöst wird.</summary>
+internal static class TurboDialog
+{
+    private static readonly ExtraButtonTarget[] Targets =
+    [
+        ExtraButtonTarget.A, ExtraButtonTarget.B, ExtraButtonTarget.X, ExtraButtonTarget.Y, ExtraButtonTarget.LB, ExtraButtonTarget.RB,
+        ExtraButtonTarget.LT, ExtraButtonTarget.RT, ExtraButtonTarget.Up, ExtraButtonTarget.Down, ExtraButtonTarget.Left,
+        ExtraButtonTarget.Right, ExtraButtonTarget.LS, ExtraButtonTarget.RS, ExtraButtonTarget.Start, ExtraButtonTarget.Back,
+    ];
+
+    /// <summary>Ergebnis als Aktionstext („Turbo:A“, „Turbo:Key:Space“) oder null bei Abbruch.</summary>
+    public static string? Ask(IWin32Window owner, string button, string? current)
+    {
+        using var form = new Form
+        {
+            Text = "Turbo / Dauerfeuer", StartPosition = FormStartPosition.CenterParent, FormBorderStyle = FormBorderStyle.FixedDialog,
+            MinimizeBox = false, MaximizeBox = false, ShowInTaskbar = false, ClientSize = new Size(440, 170),
+            Font = new Font("Segoe UI", 9.5f),
+        };
+        var info = new Label
+        {
+            Text = $"Solange „{button}“ gehalten wird, wird diese Taste schnell wiederholt gedrückt\n(Geschwindigkeit unter 5. „Turbo“):",
+            AutoSize = true, Location = new Point(12, 12),
+        };
+        var target = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Location = new Point(12, 60), Width = 416 };
+        foreach (var t in Targets)
+            target.Items.Add($"Gamepad: {t}");
+        target.Items.Add("Tastatur-Taste aufnehmen …");
+        var old = ButtonAction.Parse(current);
+        string? keys = old.Turbo && old.IsKeyboard ? old.Keys : null;
+        if (keys is not null)
+        {
+            target.Items.Insert(target.Items.Count - 1, $"Tastatur: {keys}");
+            target.SelectedIndex = target.Items.Count - 2;
+        }
+        else
+        {
+            target.SelectedIndex = Math.Max(0, Array.IndexOf(Targets, old.Turbo ? old.Target : ExtraButtonTarget.A));
+        }
+        target.SelectedIndexChanged += (_, _) =>
+        {
+            if (target.SelectedIndex != target.Items.Count - 1)
+                return;
+            using var capture = new KeyCaptureDialog(button);
+            if (capture.ShowDialog(form) == DialogResult.OK && capture.Combo is { } combo)
+            {
+                keys = combo;
+                if (target.Items[target.Items.Count - 2] is string s && s.StartsWith("Tastatur:", StringComparison.Ordinal))
+                    target.Items.RemoveAt(target.Items.Count - 2);
+                target.Items.Insert(target.Items.Count - 1, $"Tastatur: {keys}");
+                target.SelectedIndex = target.Items.Count - 2;
+            }
+            else
+            {
+                target.SelectedIndex = 0;
+            }
+        };
+        var ok = new Button { Text = "OK", DialogResult = DialogResult.OK, Location = new Point(256, 120), AutoSize = true };
+        var cancel = new Button { Text = "Abbrechen", DialogResult = DialogResult.Cancel, Location = new Point(342, 120), AutoSize = true };
+        form.Controls.AddRange([info, target, ok, cancel]);
+        form.AcceptButton = ok;
+        form.CancelButton = cancel;
+        if (form.ShowDialog(owner) != DialogResult.OK)
+            return null;
+        int i = target.SelectedIndex;
+        if (i < Targets.Length)
+            return ButtonAction.Gamepad(Targets[i]) with { Turbo = true } is var a ? a.ToString() : null;
+        return keys is null ? null : (ButtonAction.Keyboard(keys) with { Turbo = true }).ToString();
+    }
+}
+
+/// <summary>Makro festlegen: Tastenfolge als Text mit Prüfung und Beispielen.</summary>
+internal static class MacroDialog
+{
+    public static string? Ask(IWin32Window owner, string button, string? current)
+    {
+        using var form = new Form
+        {
+            Text = "Makro (Tastenfolge)", StartPosition = FormStartPosition.CenterParent, FormBorderStyle = FormBorderStyle.FixedDialog,
+            MinimizeBox = false, MaximizeBox = false, ShowInTaskbar = false, ClientSize = new Size(560, 300),
+            Font = new Font("Segoe UI", 9.5f),
+        };
+        var info = new Label
+        {
+            AutoSize = true, MaximumSize = new Size(536, 0), Location = new Point(12, 10),
+            Text = $"Beim Drücken von „{button}“ wird diese Folge einmal abgespielt. Schritte durch Komma trennen, je Schritt " +
+                   "was gehalten wird und wie lange (ms). Gamepad: A B X Y LB RB LT RT Up Down Left Right LS RS Start Back Guide, " +
+                   "mehrere gleichzeitig mit +. Tastatur: Key:Ctrl+C. Warten: Pause.\n" +
+                   "Beispiele:  „A 80, Pause 60, A 80“ (Doppeltipp)  ·  „Down+B 150“  ·  „Key:Ctrl+S 50“",
+        };
+        var old = ButtonAction.Parse(current);
+        var box = new TextBox
+        {
+            Location = new Point(12, 120), Width = 536, Height = 80, Multiline = true, ScrollBars = ScrollBars.Vertical,
+            Text = old.IsMacro ? old.Macro : "A 80, Pause 60, A 80",
+        };
+        var status = new Label { AutoSize = true, Location = new Point(12, 210) };
+        var ok = new Button { Text = "OK", DialogResult = DialogResult.OK, Location = new Point(376, 255), AutoSize = true };
+        var cancel = new Button { Text = "Abbrechen", DialogResult = DialogResult.Cancel, Location = new Point(462, 255), AutoSize = true };
+        void Check()
+        {
+            bool valid = MacroScript.TryParse((box.Text ?? "").Replace("\r", "").Replace('\n', ','), out var script);
+            ok.Enabled = valid;
+            status.ForeColor = valid ? SystemColors.ControlText : Color.Firebrick;
+            status.Text = valid ? $"✓ {script.Steps.Count} Schritte, Dauer {script.TotalMs} ms" : "Ungültig – bitte Schreibweise prüfen (siehe oben).";
+        }
+        box.TextChanged += (_, _) => Check();
+        Check();
+        form.Controls.AddRange([info, box, status, ok, cancel]);
+        form.CancelButton = cancel;
+        if (form.ShowDialog(owner) != DialogResult.OK)
+            return null;
+        return ButtonAction.Play((box.Text ?? "").Replace("\r", "").Replace('\n', ',').Trim()).ToString();
+    }
 }
 
 /// <summary>Einfache Texteingabe (Profilname).</summary>

@@ -12,32 +12,60 @@ public enum SpecialAction
     GyroMouseToggle = 16,
     /// <summary>Shift-Ebene, solange die Taste gehalten wird (andere Tasten bekommen ihre zweite Belegung).</summary>
     Shift = 32,
+    /// <summary>Gyro steuert den rechten Stick, solange die Taste gehalten wird.</summary>
+    GyroStick = 64,
+    /// <summary>Gyro-Stick ein/aus (bei jedem Drücken).</summary>
+    GyroStickToggle = 128,
 }
 
 /// <summary>
 /// Was eine Controller-Taste auslösen soll: eine Taste des virtuellen Gamepads, eine Tastaturtaste bzw.
-/// Tastenkombination (Hotkey), eine Sonderaktion (Maus, Gyro-Maus, Shift) oder nichts. Gespeichert als Text,
-/// z. B. "A", "LT", "None", "Key:F5", "Key:Ctrl+Shift+S", "Key:Win+Print", "MouseLeft", "GyroMouse", "Shift".
+/// Tastenkombination (Hotkey), eine Sonderaktion (Maus, Gyro, Shift), ein Makro (Tastenfolge) oder nichts.
+/// Gamepad- und Tastatur-Aktionen lassen sich mit „Turbo:“ zu Dauerfeuer machen. Gespeichert als Text, z. B.
+/// "A", "LT", "None", "Key:F5", "Key:Ctrl+Shift+S", "MouseLeft", "GyroStick", "Shift", "Turbo:A",
+/// "Turbo:Key:Space", "Macro:A 80, Pause 40, A 80".
 /// </summary>
-public readonly record struct ButtonAction(ExtraButtonTarget Target, string? Keys, SpecialAction Special = SpecialAction.None)
+public readonly record struct ButtonAction(ExtraButtonTarget Target, string? Keys, SpecialAction Special = SpecialAction.None,
+    bool Turbo = false, string? Macro = null)
 {
     public const string KeyPrefix = "Key:";
+    public const string TurboPrefix = "Turbo:";
+    public const string MacroPrefix = "Macro:";
 
     public static ButtonAction Gamepad(ExtraButtonTarget target) => new(target, null);
     public static ButtonAction Keyboard(string keys) => new(ExtraButtonTarget.None, keys);
     public static ButtonAction Do(SpecialAction special) => new(ExtraButtonTarget.None, null, special);
+    public static ButtonAction Play(string macro) => new(ExtraButtonTarget.None, null, Macro: macro);
     public static ButtonAction Nothing { get; } = new(ExtraButtonTarget.None, null);
 
     public bool IsKeyboard => Keys is not null;
     public bool IsSpecial => Special != SpecialAction.None;
+    public bool IsMacro => Macro is not null;
 
-    public override string ToString() => IsKeyboard ? KeyPrefix + Keys : IsSpecial ? Special.ToString() : Target.ToString();
+    public override string ToString()
+    {
+        if (IsMacro)
+            return MacroPrefix + Macro;
+        string inner = IsKeyboard ? KeyPrefix + Keys : IsSpecial ? Special.ToString() : Target.ToString();
+        return Turbo ? TurboPrefix + inner : inner;
+    }
 
     public static ButtonAction Parse(string? text)
     {
         if (string.IsNullOrWhiteSpace(text))
             return Nothing;
         text = text.Trim();
+        if (text.StartsWith(MacroPrefix, StringComparison.OrdinalIgnoreCase))
+        {
+            var script = text[MacroPrefix.Length..].Trim();
+            return MacroScript.TryParse(script, out _) ? Play(script) : Nothing;
+        }
+        if (text.StartsWith(TurboPrefix, StringComparison.OrdinalIgnoreCase))
+        {
+            // Turbo nur für Gamepad- und Tastatur-Aktionen (Sonderaktionen wie Shift ergeben als Dauerfeuer keinen Sinn).
+            var inner = Parse(text[TurboPrefix.Length..]);
+            return inner.IsSpecial || inner.IsMacro || inner.Turbo || inner == Nothing ? Nothing : inner with { Turbo = true };
+        }
         if (text.StartsWith(KeyPrefix, StringComparison.OrdinalIgnoreCase))
         {
             var keys = text[KeyPrefix.Length..].Trim();

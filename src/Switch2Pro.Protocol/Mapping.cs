@@ -199,15 +199,25 @@ public static class Mapping
     private static readonly ProButtons[] AllButtons =
         Enum.GetValues<ProButtons>().Where(b => b != ProButtons.None).ToArray();
 
-    /// <summary>Ergebnis der Belegung: Gamepad-Zustand, gehaltene Tastenkombinationen und Sonderaktionen.</summary>
-    public sealed record Output(GamepadState Gamepad, HashSet<string> Keys, SpecialAction Specials, bool ShiftActive);
+    /// <summary>
+    /// Ergebnis der Belegung: Gamepad-Zustand, gehaltene Tastenkombinationen, Sonderaktionen und die Makros
+    /// der gerade gedrückten Tasten (der Spieler startet sie bei jedem neuen Drücken).
+    /// </summary>
+    public sealed record Output(GamepadState Gamepad, HashSet<string> Keys, SpecialAction Specials, bool ShiftActive,
+        IReadOnlyList<string> Macros);
 
     /// <summary>
     /// Wendet die Belegung an: geltendes Profil (Standard oder benannt), Shift-Ebene (solange eine Taste mit der
-    /// Aktion „Shift“ gehalten wird), Totzone der Controller-Art.
+    /// Aktion „Shift“ gehalten wird), Turbo (im Takt von <see cref="Settings.TurboRate"/>), Totzone und Kennlinie
+    /// der Sticks, Schwelle der analogen Trigger. <paramref name="nowMs"/> = Uhrzeit für den Turbo-Takt.
     /// </summary>
-    public static Output Evaluate(PadInput p, Settings settings)
+    public static Output Evaluate(PadInput p, Settings settings, long nowMs = -1)
     {
+        if (nowMs < 0)
+            nowMs = Environment.TickCount64;
+        // Turbo: abwechselnd an/aus, beginnend mit „an“ (Halbperiode = 1000 / (2 × Rate) ms).
+        bool turboOn = (long)(nowMs * settings.TurboRate * 2 / 1000) % 2 == 0;
+        var macros = new List<string>();
         var profile = settings.CurrentProfile();
         bool shift = false;
         foreach (var button in AllButtons)
@@ -228,6 +238,13 @@ public static class Mapping
             if (!p.Has(button))
                 continue;
             var action = ActionFor(button, p.Kind, settings, profile, shift);
+            if (action.IsMacro)
+            {
+                macros.Add(action.Macro!);
+                continue;
+            }
+            if (action.Turbo && !turboOn)
+                continue; // Dauerfeuer: in der „aus“-Hälfte gilt die Taste als losgelassen
             if (action.IsKeyboard)
                 keys.Add(action.Keys!);
             specials |= action.Special;
@@ -242,13 +259,57 @@ public static class Mapping
         }
 
         byte TriggerByte(bool digital, float? analog) =>
-            digital ? (byte)255 : analog is { } a ? (byte)MathF.Round(Math.Clamp(a, 0f, 1f) * 255f) : (byte)0;
+            digital ? (byte)255 : analog is { } a ? AnalogTrigger(a, settings.TriggerDeadzone, settings.TriggerFullAt) : (byte)0;
 
         float deadzone = settings.DeadzoneFor(p.Kind);
-        var (lx, ly) = Stick(p.LeftX, p.LeftY, deadzone);
-        var (rx, ry) = Stick(p.RightX, p.RightY, deadzone);
+        var (lx, ly) = Stick(p.LeftX, p.LeftY, deadzone, settings.StickCurve);
+        var (rx, ry) = Stick(p.RightX, p.RightY, deadzone, settings.StickCurve);
         var gamepad = new GamepadState(b, TriggerByte(lt, p.LeftTrigger), TriggerByte(rt, p.RightTrigger), lx, ly, rx, ry, touchpad);
-        return new Output(gamepad, keys, specials, shift);
+        return new Output(gamepad, keys, specials, shift, macros);
+    }
+
+    /// <summary>Eine Gamepad-Taste zusätzlich drücken (z. B. aus einem Makro).</summary>
+    public static GamepadState Press(GamepadState g, ExtraButtonTarget target) => target switch
+    {
+        ExtraButtonTarget.None => g,
+        ExtraButtonTarget.LT => g with { LeftTrigger = 255 },
+        ExtraButtonTarget.RT => g with { RightTrigger = 255 },
+        ExtraButtonTarget.Touchpad => g with { Touchpad = true },
+        _ => g with { Buttons = g.Buttons | Enum.Parse<XButtons>(target.ToString()) },
+    };
+
+    /// <summary>Analoger Trigger 0…1 → 0…255 mit Totzone am Anfang und „voll ab“-Schwelle.</summary>
+    public static byte AnalogTrigger(float value, float deadzone, float fullAt)
+    {
+        value = Math.Clamp(value, 0f, 1f);
+        if (value <= deadzone)
+            return 0;
+        float range = Math.Max(0.01f, fullAt - deadzone);
+        return (byte)MathF.Round(Math.Clamp((value - deadzone) / range, 0f, 1f) * 255f);
+    }
+
+    /// <summary>
+    /// Gyro → rechter Stick (Drehgeschwindigkeit wird zu Ausschlag, wie „Gyro als Joystick“ in Steam):
+    /// Gieren (links/rechts drehen) = X, Nicken (kippen) = Y. Ab einer kleinen Drehung gilt mindestens der
+    /// Mindestausschlag, damit die Totzone des Spiels überwunden wird. Ergebnis wird zum echten Stick addiert.
+    /// </summary>
+    public static (short X, short Y) GyroToStick(Motion m, Settings s, short stickX, short stickY)
+    {
+        const float DegPerRaw = 2000f / 32767f;
+        const float RestDegPerSec = 1.5f; // darunter: Sensorrauschen, keine Bewegung
+        float yaw = -m.GyroZ * DegPerRaw, pitch = m.GyroX * DegPerRaw;
+        if (s.GyroStickInvertY)
+            pitch = -pitch;
+        float Axis(float rate)
+        {
+            float mag = MathF.Abs(rate);
+            if (mag < RestDegPerSec)
+                return 0f;
+            float v = s.GyroStickAntiDeadzone + (1f - s.GyroStickAntiDeadzone) * Math.Min(1f, mag / s.GyroStickFullSpeed);
+            return MathF.CopySign(Math.Min(1f, v), rate);
+        }
+        float x = stickX / 32767f + Axis(yaw), y = stickY / 32767f + Axis(pitch);
+        return (ToShort(Math.Clamp(x, -1f, 1f)), ToShort(Math.Clamp(y, -1f, 1f)));
     }
 
     /// <summary>Einheitliche Eingabe → Xbox-Schema (gilt auch als Grundlage für DualShock 4).</summary>
@@ -288,13 +349,15 @@ public static class Mapping
     public static (short X, short Y) Stick(int rawX, int rawY, StickCalibration cal, float deadzone) =>
         Stick(cal.X.Normalize(rawX), cal.Y.Normalize(rawY), deadzone);
 
-    /// <summary>Radiale Totzone mit weichem Übergang, auf den Kreis begrenzt.</summary>
-    public static (short X, short Y) Stick(float x, float y, float deadzone)
+    /// <summary>Radiale Totzone mit weichem Übergang, auf den Kreis begrenzt; Kennlinie als Exponent (1 = linear).</summary>
+    public static (short X, short Y) Stick(float x, float y, float deadzone, float curve = 1f)
     {
         float mag = MathF.Sqrt(x * x + y * y);
         if (mag <= deadzone || mag == 0f)
             return (0, 0);
         float scaled = Math.Min(1f, (mag - deadzone) / (1f - deadzone));
+        if (curve != 1f)
+            scaled = MathF.Pow(scaled, curve);
         float k = scaled / mag;
         return (ToShort(x * k), ToShort(y * k));
     }

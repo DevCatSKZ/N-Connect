@@ -509,6 +509,82 @@ public class DsuTests
     }
 
     [Fact]
+    public void MacroScriptParsesStepsAndTiming()
+    {
+        Assert.True(MacroScript.TryParse("A 80, Pause 40, Down+B 100ms, Key:Ctrl+C 50, X", out var m));
+        Assert.Equal(5, m.Steps.Count);
+        Assert.Equal(80 + 40 + 100 + 50 + MacroScript.DefaultStepMs, m.TotalMs);
+        Assert.Equal([ExtraButtonTarget.A], m.StepAt(0)!.Buttons);
+        Assert.Empty(m.StepAt(100)!.Buttons);                                   // Pause
+        Assert.Equal([ExtraButtonTarget.Down, ExtraButtonTarget.B], m.StepAt(130)!.Buttons);
+        Assert.Equal("Ctrl+C", m.StepAt(225)!.Keys);
+        Assert.Null(m.StepAt(m.TotalMs));                                       // zu Ende
+        Assert.False(MacroScript.TryParse("Q 50", out _));
+        Assert.False(MacroScript.TryParse("A 0", out _));
+        Assert.False(MacroScript.TryParse("A 99999", out _));
+        Assert.False(MacroScript.TryParse("", out _));
+    }
+
+    [Fact]
+    public void TurboAndMacroActionsRoundTrip()
+    {
+        foreach (var text in new[] { "Turbo:A", "Turbo:Key:Space", "Macro:A 80, Pause 40, A 80", "GyroStick", "GyroStickToggle" })
+            Assert.Equal(text, ButtonAction.Parse(text).ToString());
+        Assert.Equal(ButtonAction.Nothing, ButtonAction.Parse("Turbo:Shift"));   // Sonderaktion nicht als Turbo
+        Assert.Equal(ButtonAction.Nothing, ButtonAction.Parse("Turbo:Turbo:A"));
+        Assert.Equal(ButtonAction.Nothing, ButtonAction.Parse("Macro:Unsinn 50"));
+    }
+
+    [Fact]
+    public void TurboAlternatesAndMacrosAreReported()
+    {
+        var s = new Settings
+        {
+            TurboRate = 10, // Halbperiode 50 ms
+            Profiles = new() { [ControllerKind.Pro2] = new() { [ProButtons.A] = "Turbo:A", [ProButtons.C] = "Macro:X 50" } },
+            Layout = FaceButtonLayout.Switch2,
+        };
+        var p = new PadInput { Kind = ControllerKind.Pro2, Buttons = ProButtons.A | ProButtons.C };
+        Assert.Equal(XButtons.A, Mapping.Evaluate(p, s, nowMs: 1000).Gamepad.Buttons);
+        Assert.Equal(XButtons.None, Mapping.Evaluate(p, s, nowMs: 1060).Gamepad.Buttons);
+        Assert.Equal(XButtons.A, Mapping.Evaluate(p, s, nowMs: 1110).Gamepad.Buttons);
+        Assert.Equal(["X 50"], Mapping.Evaluate(p, s, nowMs: 1000).Macros);
+    }
+
+    [Fact]
+    public void AnalogTriggerUsesDeadzoneAndFullPoint()
+    {
+        Assert.Equal(0, Mapping.AnalogTrigger(0.04f, 0.05f, 1f));
+        Assert.Equal(255, Mapping.AnalogTrigger(0.8f, 0.05f, 0.8f));
+        Assert.InRange(Mapping.AnalogTrigger(0.425f, 0.05f, 0.8f), 125, 130); // Mitte des Bereichs
+    }
+
+    [Fact]
+    public void StickCurveMakesCenterFiner()
+    {
+        var (linear, _) = Mapping.Stick(0.5f, 0f, 0f, 1f);
+        var (fine, _) = Mapping.Stick(0.5f, 0f, 0f, 2f);
+        var (full, _) = Mapping.Stick(1f, 0f, 0f, 2f);
+        Assert.InRange(linear, 16000, 16800);
+        Assert.InRange(fine, 8000, 8400);    // 0,5² = 0,25
+        Assert.Equal(32767, full);           // Vollausschlag bleibt
+    }
+
+    [Fact]
+    public void GyroStickTurnsRotationIntoStickDeflection()
+    {
+        var s = new Settings { GyroStickFullSpeed = 100, GyroStickAntiDeadzone = 0.1f };
+        short Raw(float dps) => (short)(dps * 32767f / 2000f);
+        Assert.Equal((0, 0), Mapping.GyroToStick(new Motion(0, 0, 0, 0, 0, 0), s, 0, 0));       // Ruhe
+        var (x, _) = Mapping.GyroToStick(new Motion(0, 0, 0, 0, 0, Raw(-50)), s, 0, 0);          // nach rechts drehen
+        Assert.InRange(x / 32767f, 0.53f, 0.57f);                                               // 0,1 + 0,9 × 0,5
+        var (_, y) = Mapping.GyroToStick(new Motion(0, 0, 0, Raw(400), 0, 0), s, 0, 0);          // nach oben kippen, schnell
+        Assert.Equal(32767, y);
+        var (sx, _) = Mapping.GyroToStick(new Motion(0, 0, 0, 0, 0, Raw(-50)), s, 32767, 0);    // plus echter Stick: begrenzt
+        Assert.Equal(32767, sx);
+    }
+
+    [Fact]
     public void GameCubeIgnoresLegacyRemap()
     {
         var s = new Settings(); // Standard-Remap enthält C = None (Pro Controller)

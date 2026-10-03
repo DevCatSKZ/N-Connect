@@ -249,7 +249,7 @@ internal sealed class ControllerOverview : Panel
         {
             _player = player;
             var links = player.Links;
-            _title.Text = $"Spieler {player.Index + 1}  ·  {player.Kind.DisplayName()}" + (player.GyroMouseActive ? "  ·  Gyro-Maus" : "");
+            _title.Text = $"Spieler {player.Index + 1}  ·  {player.Kind.DisplayName()}" + (player.GyroMouseActive ? "  ·  Gyro-Maus" : "") + (player.GyroStickActive ? "  ·  Gyro-Stick" : "");
 
             var (input, gamepad) = Live(player, settings);
             bool joyCon = links.Count > 0 && links.All(l => l.Kind.IsJoyCon());

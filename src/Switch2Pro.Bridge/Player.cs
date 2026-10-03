@@ -232,6 +232,23 @@ internal sealed class Player : IDisposable
                 return;
             if (++_updates == 1)
                 Log.Info($"Spieler {Index + 1}: erste Eingabe am virtuellen Controller ({Kind.DisplayName()})");
+            var keys = output.Keys;
+            gamepad = ApplyMacros(gamepad, output.Macros, keys);
+            UpdateSpecials(output.Specials, motionFresh ? input.Motion : null, settings);
+            // Gyro als rechter Stick: immer, beim Zielen (linker Trigger) oder per Taste (halten/ein-aus).
+            bool gyroStick = settings.GyroStick == GyroStickMode.Always
+                             || settings.GyroStick == GyroStickMode.WhileAiming && gamepad.LeftTrigger > 40
+                             || output.Specials.HasFlag(SpecialAction.GyroStick) || _gyroStickToggled;
+            if (gyroStick != GyroStickActive)
+            {
+                GyroStickActive = gyroStick;
+                ThreadPool.QueueUserWorkItem(_ => Changed?.Invoke());
+            }
+            if (gyroStick && input.Motion is { } motion)
+            {
+                var (gx, gy) = Mapping.GyroToStick(motion, settings, gamepad.RightX, gamepad.RightY);
+                gamepad = gamepad with { RightX = gx, RightY = gy };
+            }
             try
             {
                 _pad?.Update(gamepad, input);
@@ -240,8 +257,7 @@ internal sealed class Player : IDisposable
             {
                 Log.Error($"Spieler {Index + 1}: virtueller Controller", e);
             }
-            UpdateHotkeys(output.Keys);
-            UpdateSpecials(output.Specials, motionFresh ? input.Motion : null, settings);
+            UpdateHotkeys(keys);
             DsuServer.Instance?.Publish(Index, mac, gamepad, input);
             // Vibration abgeschaltet, während ein Spiel vibrieren lässt: sofort stoppen.
             if (_rumbling && !settings.RumbleEnabled)
@@ -358,6 +374,47 @@ internal sealed class Player : IDisposable
     /// <summary>Ist die Gyro-Maus gerade aktiv (gehalten oder eingeschaltet)?</summary>
     public bool GyroMouseActive { get; private set; }
 
+    private bool _gyroStickToggled;
+
+    /// <summary>Steuert der Gyro gerade den rechten Stick?</summary>
+    public bool GyroStickActive { get; private set; }
+
+    // ---------- Makros ----------
+
+    /// <summary>Laufende Makros (Skript, Startzeit) und die Makros, deren Taste gerade gehalten wird.</summary>
+    private readonly List<(MacroScript Script, long Start)> _macros = [];
+    private HashSet<string> _macroButtons = [];
+
+    /// <summary>
+    /// Startet Makros beim Drücken ihrer Taste (nicht erneut, solange sie läuft) und fügt den aktuellen Schritt
+    /// aller laufenden Makros zum Gamepad bzw. zu den Tastaturtasten hinzu. Aufruf unter <see cref="_output"/>.
+    /// </summary>
+    private GamepadState ApplyMacros(GamepadState g, IReadOnlyList<string> pressed, HashSet<string> keys)
+    {
+        long now = Environment.TickCount64;
+        foreach (var text in pressed)
+        {
+            if (_macroButtons.Contains(text) || !MacroScript.TryParse(text, out var script))
+                continue;
+            _macros.Add((script, now));
+        }
+        _macroButtons = [.. pressed];
+        for (int i = _macros.Count - 1; i >= 0; i--)
+        {
+            var (script, start) = _macros[i];
+            if (script.StepAt(now - start) is not { } step)
+            {
+                _macros.RemoveAt(i);
+                continue;
+            }
+            if (step.Keys is { } combo)
+                keys.Add(combo);
+            foreach (var target in step.Buttons)
+                g = Mapping.Press(g, target);
+        }
+        return g;
+    }
+
     /// <summary>Maustasten nach Flanken drücken/lösen, Gyro-Maus bewegen. Aufruf unter <see cref="_output"/>.</summary>
     private void UpdateSpecials(SpecialAction wanted, Motion? motion, Settings settings)
     {
@@ -374,6 +431,8 @@ internal sealed class Player : IDisposable
         }
         if (wanted.HasFlag(SpecialAction.GyroMouseToggle) && !_heldSpecials.HasFlag(SpecialAction.GyroMouseToggle))
             _gyroMouseToggled = !_gyroMouseToggled;
+        if (wanted.HasFlag(SpecialAction.GyroStickToggle) && !_heldSpecials.HasFlag(SpecialAction.GyroStickToggle))
+            _gyroStickToggled = !_gyroStickToggled;
         _heldSpecials = wanted;
 
         bool active = wanted.HasFlag(SpecialAction.GyroMouse) || _gyroMouseToggled;
@@ -409,6 +468,8 @@ internal sealed class Player : IDisposable
     {
         UpdateSpecials(SpecialAction.None, null, _settings());
         _gyroMouseToggled = false;
+        _gyroStickToggled = false;
+        _macros.Clear();
         GyroMouseActive = false;
         _gyroMouse.Reset();
     }

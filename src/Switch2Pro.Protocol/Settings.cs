@@ -32,6 +32,17 @@ public enum ExtraButtonTarget
 /// <summary>Welcher Joy-Con eines Paars die Bewegungsdaten liefert.</summary>
 public enum GyroSource { Right, Left }
 
+/// <summary>Wann der Gyro den rechten Stick steuert (zusätzlich zu den Tasten-Aktionen „Gyro-Stick“).</summary>
+public enum GyroStickMode
+{
+    /// <summary>Nur über eine Taste mit „Gyro-Stick (halten)“ bzw. „ein/aus“.</summary>
+    Off,
+    /// <summary>Immer.</summary>
+    Always,
+    /// <summary>Solange der linke Trigger (Zielen, ZL) gedrückt ist – wie in vielen Shootern üblich.</summary>
+    WhileAiming,
+}
+
 /// <summary>
 /// Benanntes Tastenprofil, z. B. für ein bestimmtes Spiel. Wird automatisch aktiv, solange eines der
 /// <see cref="Programs"/> (EXE-Name, z. B. "Cemu.exe") im Vordergrund ist. Unveränderlich behandeln.
@@ -139,6 +150,29 @@ public sealed class Settings
     /// <summary>Nach so vielen Minuten ohne Eingabe trennen (spart Akku); 0 = nie.</summary>
     public int InactivityMinutes { get; set; }
 
+    /// <summary>Gyro als rechter Stick (Zielen per Bewegung in Spielen ohne Mausunterstützung).</summary>
+    public GyroStickMode GyroStick { get; set; } = GyroStickMode.Off;
+    /// <summary>Drehgeschwindigkeit (°/s), bei der der Stick voll ausschlägt.</summary>
+    public float GyroStickFullSpeed { get; set; } = 150f;
+    /// <summary>Mindestausschlag, sobald sich der Controller dreht (überwindet die Totzone des Spiels), 0–0,4.</summary>
+    public float GyroStickAntiDeadzone { get; set; } = 0.12f;
+    public bool GyroStickInvertY { get; set; }
+
+    /// <summary>Stick-Kennlinie: 1 = linear, &gt; 1 = feiner in der Mitte, &lt; 1 = schneller.</summary>
+    public float StickCurve { get; set; } = 1f;
+    /// <summary>Analoge Trigger (GameCube): Totzone am Anfang, 0–0,5.</summary>
+    public float TriggerDeadzone { get; set; } = 0.05f;
+    /// <summary>Analoge Trigger: ab diesem Anteil gilt der Trigger als voll gedrückt, 0,5–1.</summary>
+    public float TriggerFullAt { get; set; } = 1f;
+
+    /// <summary>Dauerfeuer: Wechsel pro Sekunde für Tasten mit „Turbo“.</summary>
+    public float TurboRate { get; set; } = 12f;
+
+    /// <summary>Beim Start auf GitHub nach einer neuen Version suchen.</summary>
+    public bool CheckForUpdates { get; set; } = true;
+    /// <summary>Sprache der Oberfläche: null = wie Windows, sonst "de" oder "en".</summary>
+    public string? Language { get; set; }
+
     /// <summary>Joy-Con 2 als Maus, sobald er auf einer Fläche liegt (wie an der Switch 2).</summary>
     public bool JoyConMouse { get; set; } = true;
     /// <summary>Mausgeschwindigkeit (Bildpunkte je Sensorschritt).</summary>
@@ -231,6 +265,16 @@ public sealed class Settings
         PairGyroSource = other.PairGyroSource;
         GyroMouseSpeed = other.GyroMouseSpeed;
         InactivityMinutes = other.InactivityMinutes;
+        GyroStick = other.GyroStick;
+        GyroStickFullSpeed = other.GyroStickFullSpeed;
+        GyroStickAntiDeadzone = other.GyroStickAntiDeadzone;
+        GyroStickInvertY = other.GyroStickInvertY;
+        StickCurve = other.StickCurve;
+        TriggerDeadzone = other.TriggerDeadzone;
+        TriggerFullAt = other.TriggerFullAt;
+        TurboRate = other.TurboRate;
+        CheckForUpdates = other.CheckForUpdates;
+        Language = other.Language;
         UprightJoyCons = [.. other.UprightJoyCons];
         HiddenDevices = [.. other.HiddenDevices];
         JoyConMouse = other.JoyConMouse;
@@ -320,6 +364,17 @@ public sealed class Settings
             : new Dictionary<string, GyroBias>(GyroCalibration, StringComparer.OrdinalIgnoreCase);
         GyroMouseSpeed = float.IsFinite(GyroMouseSpeed) ? Math.Clamp(GyroMouseSpeed, 1f, 100f) : 20f;
         InactivityMinutes = Math.Clamp(InactivityMinutes, 0, 240);
+        static float Fin(float v, float min, float max, float fallback) => float.IsFinite(v) ? Math.Clamp(v, min, max) : fallback;
+        GyroStickFullSpeed = Fin(GyroStickFullSpeed, 20f, 1000f, 150f);
+        GyroStickAntiDeadzone = Fin(GyroStickAntiDeadzone, 0f, 0.4f, 0.12f);
+        StickCurve = Fin(StickCurve, 0.3f, 3f, 1f);
+        TriggerDeadzone = Fin(TriggerDeadzone, 0f, 0.5f, 0.05f);
+        TriggerFullAt = Fin(TriggerFullAt, 0.5f, 1f, 1f);
+        TurboRate = Fin(TurboRate, 2f, 30f, 12f);
+        if (Language is not (null or "de" or "en"))
+            Language = null;
+        if (!Enum.IsDefined(GyroStick))
+            GyroStick = GyroStickMode.Off;
         UprightJoyCons.RemoveAll(a => a is null);
         NamedProfiles.RemoveAll(p => p is null || string.IsNullOrWhiteSpace(p.Name));
         NamedProfiles = NamedProfiles.Select(p => p with
