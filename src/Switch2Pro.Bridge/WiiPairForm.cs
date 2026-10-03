@@ -32,18 +32,19 @@ internal sealed class WiiPairForm : Form
         Controls.Add(hint);
         Controls.Add(close);
         Shown += async (_, _) => await RunAsync();
+        Tr.Apply(this);
     }
 
     private async Task RunAsync()
     {
-        _status.Text = "Suche …";
+        _status.Text = Tr.T("Suche …");
         var paired = await Task.Run(() => WiiPairing.ScanAndPair(TimeSpan.FromSeconds(60),
-            message => BeginInvokeSafe(() => _status.Text = message), _cts.Token));
+            message => BeginInvokeSafe(() => _status.Text = Tr.T(message)), _cts.Token));
         if (IsDisposed)
             return;
-        _status.Text = paired.Count > 0
+        _status.Text = Tr.T(paired.Count > 0
             ? $"Gekoppelt: {string.Join(", ", paired)}\nDer Controller erscheint gleich in der Übersicht."
-            : "Kein Wii-Controller gefunden. SYNC-Taste drücken und erneut versuchen.";
+            : "Kein Wii-Controller gefunden. SYNC-Taste drücken und erneut versuchen.");
     }
 
     private void BeginInvokeSafe(Action action)

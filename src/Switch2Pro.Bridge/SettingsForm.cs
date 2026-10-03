@@ -42,7 +42,7 @@ internal sealed class SettingsForm : Form
     /// <summary>Eintrag in der Belegungs-Auswahl: angezeigter Text und gespeicherte Aktion.</summary>
     private sealed record Choice(string Text, string? Action)
     {
-        public override string ToString() => Text;
+        public override string ToString() => Tr.T(Text);
     }
 
     private const string CaptureKeys = "\u0001capture";
@@ -95,6 +95,7 @@ internal sealed class SettingsForm : Form
     private readonly CheckBox _autostart = new() { Text = "Automatisch mit Windows starten", AutoSize = true };
     private readonly CheckBox _dsu = new() { Text = "Gyro für Emulatoren bereitstellen (Cemuhook/DSU, Port 26760 – wirkt nach Neustart)", AutoSize = true };
     private readonly CheckBox _updates = new() { Text = "Beim Start nach neuer Version suchen (GitHub)", AutoSize = true };
+    private readonly ComboBox _language = new() { DropDownStyle = ComboBoxStyle.DropDownList, Width = 190 };
 
     private readonly CheckBox _combine = new() { Text = "Zwei Joy-Con automatisch zu einem Controller zusammenfassen", AutoSize = true };
     private readonly CheckBox _mouse = new() { Text = "Joy-Con 2 als Maus, wenn er auf dem Tisch liegt", AutoSize = true };
@@ -181,12 +182,15 @@ internal sealed class SettingsForm : Form
         misc.Controls.Add(_autostart);
         misc.Controls.Add(_dsu);
         misc.Controls.Add(_updates);
+        misc.Controls.Add(new Label { Text = "Sprache / Language:", AutoSize = true, Padding = new Padding(12, 6, 0, 0) });
+        misc.Controls.Add(_language);
         misc.Controls.Add(new Label { Text = "Ohne Eingabe automatisch trennen nach:", AutoSize = true, Padding = new Padding(0, 6, 0, 0) });
         misc.Controls.Add(_inactivity);
         misc.Controls.Add(new Label { Text = "Gyro-Maus-Geschwindigkeit:", AutoSize = true, Padding = new Padding(12, 6, 0, 0) });
         misc.Controls.Add(_gyroMouseSpeed);
         misc.SetFlowBreak(_deadzone, true);
-        misc.SetFlowBreak(_updates, true);
+        misc.SetFlowBreak(_language, true);
+        _language.Items.AddRange(["Automatisch (wie Windows)", "Deutsch", "English"]);
         root.Controls.Add(WrapGroup("3. Vibration, Sticks, Verbinden, Gyro-Maus", misc));
 
         _gyroSource.Items.AddRange(["rechter Joy-Con (wie Switch)", "linker Joy-Con"]);
@@ -244,7 +248,7 @@ internal sealed class SettingsForm : Form
                      (_triggerFull, "Ab hier gilt der Trigger als ganz gedrückt (100 = erst am Anschlag)."),
                      (_turboRate, "Wie oft pro Sekunde Tasten mit „Turbo“ auslösen."),
                  })
-            _tips.SetToolTip(bar, tip);
+            _tips.SetToolTip(bar, Tr.T(tip));
 
         var profileRow = Flow();
         profileRow.Controls.Add(new Label { Text = "Profil:", AutoSize = true, Padding = new Padding(0, 6, 0, 0) });
@@ -287,6 +291,7 @@ internal sealed class SettingsForm : Form
         WireEvents();
         NoWheel(root);
         LoadValues();
+        Tr.Apply(this);
         _liveTimer.Tick += (_, _) => _overview.UpdateView();
         _liveTimer.Start();
         _overview.UpdateView();
@@ -344,6 +349,7 @@ internal sealed class SettingsForm : Form
         _autostart.CheckedChanged += (_, _) => { if (!_loading) Autostart.Set(_autostart.Checked); };
         _dsu.CheckedChanged += (_, _) => Apply(() => _settings.DsuServer = _dsu.Checked);
         _updates.CheckedChanged += (_, _) => Apply(() => _settings.CheckForUpdates = _updates.Checked);
+        _language.SelectedIndexChanged += (_, _) => ChangeLanguage();
         _combine.CheckedChanged += (_, _) => Apply(() => _settings.CombineJoyCons = _combine.Checked);
         _mouse.CheckedChanged += (_, _) => Apply(() => _settings.JoyConMouse = _mouse.Checked);
         _mouseSpeed.ValueChanged += (_, _) => Apply(() => _settings.MouseSpeed = _mouseSpeed.Value / 10f);
@@ -394,6 +400,7 @@ internal sealed class SettingsForm : Form
         _autostart.Enabled = !Autostart.IsEnabledForAllUsers; // vom Installer für alle Benutzer eingetragen
         _dsu.Checked = _settings.DsuServer;
         _updates.Checked = _settings.CheckForUpdates;
+        _language.SelectedIndex = _settings.Language switch { "de" => 1, "en" => 2, _ => 0 };
         _combine.Checked = _settings.CombineJoyCons;
         _mouse.Checked = _settings.JoyConMouse;
         _mouseSpeed.Value = Math.Clamp((int)MathF.Round(_settings.MouseSpeed * 10), 1, 50);
@@ -408,6 +415,7 @@ internal sealed class SettingsForm : Form
         foreach (int minutes in _inactivityValues)
             _inactivity.Items.Add(minutes == 0 ? "nie" : $"{minutes} Minuten");
         _inactivity.SelectedIndex = _inactivityValues.IndexOf(_settings.InactivityMinutes);
+        Tr.Apply(_inactivity);
         _gyroSource.SelectedIndex = _settings.PairGyroSource == GyroSource.Left ? 1 : 0;
         _gyroMouseSpeed.Value = Math.Clamp((int)MathF.Round(_settings.GyroMouseSpeed), _gyroMouseSpeed.Minimum, _gyroMouseSpeed.Maximum);
         static int Bar(TrackBar bar, float value) => Math.Clamp((int)MathF.Round(value), bar.Minimum, bar.Maximum);
@@ -426,11 +434,30 @@ internal sealed class SettingsForm : Form
         LoadProfileEditor();
     }
 
+    /// <summary>Sprache wechseln: speichern und das Fenster in der neuen Sprache neu öffnen.</summary>
+    private void ChangeLanguage()
+    {
+        if (_loading)
+            return;
+        string? language = _language.SelectedIndex switch { 1 => "de", 2 => "en", _ => null };
+        if (language == _settings.Language)
+            return;
+        _settings.Language = language;
+        _changed(false);
+        Tr.Init(language);
+        // Neu aufbauen: Fenster schließen, die App öffnet es über das Signal sofort wieder.
+        BeginInvoke(() =>
+        {
+            Close();
+            Program.ShowSignal?.Set();
+        });
+    }
+
     /// <summary>Aktuelle Werte der Regler in Klartext (Regler zeigen keine Zahlen).</summary>
     private void ShowAimInfo() =>
-        _aimInfo.Text = $"Gyro-Stick: voller Ausschlag bei {_gyroStickSpeed.Value} °/s, mindestens {_gyroStickMin.Value} %   ·   " +
+        _aimInfo.Text = Tr.T($"Gyro-Stick: voller Ausschlag bei {_gyroStickSpeed.Value} °/s, mindestens {_gyroStickMin.Value} %   ·   " +
                         $"Kennlinie {_stickCurve.Value / 100f:0.00}   ·   Trigger: ab {_triggerDeadzone.Value} %, voll ab {_triggerFull.Value} %   ·   " +
-                        $"Turbo {_turboRate.Value}× pro Sekunde";
+                        $"Turbo {_turboRate.Value}× pro Sekunde");
 
     /// <summary>Nach dem Neuladen der Datei (von außen geändert) alle Felder neu befüllen.</summary>
     public void ReloadValues()
@@ -449,7 +476,7 @@ internal sealed class SettingsForm : Form
         bool was = _loading;
         _loading = true;
         _profileSelect.Items.Clear();
-        _profileSelect.Items.Add("Standard");
+        _profileSelect.Items.Add(Tr.T("Standard"));
         foreach (var p in _settings.NamedProfiles)
             _profileSelect.Items.Add(p.Name);
         int index = select is null ? 0 : _settings.NamedProfiles.FindIndex(p => p.Name == select) + 1;
@@ -469,7 +496,7 @@ internal sealed class SettingsForm : Form
         _loading = true;
         _programs.Text = profile is null ? "" : string.Join(", ", profile.Programs);
         _programs.Enabled = _programAdd.Enabled = _profileRename.Enabled = _profileDelete.Enabled = profile is not null;
-        _programs.PlaceholderText = profile is null ? "Standard gilt immer, wenn kein anderes Profil passt" : "z. B. Cemu.exe, Ryujinx.exe";
+        _programs.PlaceholderText = Tr.T(profile is null ? "Standard gilt immer, wenn kein anderes Profil passt" : "z. B. Cemu.exe, Ryujinx.exe");
         _loading = was;
         LoadKindDeadzone();
         BuildProfileGrid();
@@ -520,7 +547,7 @@ internal sealed class SettingsForm : Form
             return;
         if (_settings.NamedProfiles.Any(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) || name == "Standard")
         {
-            MessageBox.Show(this, "Ein Profil mit diesem Namen gibt es schon.", Text);
+            Tr.Show(this, "Ein Profil mit diesem Namen gibt es schon.", Text);
             return;
         }
         // Startet als Kopie der gerade bearbeiteten Belegung.
@@ -546,7 +573,7 @@ internal sealed class SettingsForm : Form
             return;
         if (_settings.NamedProfiles.Any(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) || name == "Standard")
         {
-            MessageBox.Show(this, "Ein Profil mit diesem Namen gibt es schon.", Text);
+            Tr.Show(this, "Ein Profil mit diesem Namen gibt es schon.", Text);
             return;
         }
         Apply(() =>
@@ -563,7 +590,7 @@ internal sealed class SettingsForm : Form
     {
         if (EditedProfile is not { } profile)
             return;
-        if (MessageBox.Show(this, $"Profil „{profile.Name}“ löschen?", Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+        if (Tr.Show(this, $"Profil „{profile.Name}“ löschen?", Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
             return;
         Apply(() =>
         {
@@ -597,7 +624,7 @@ internal sealed class SettingsForm : Form
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {
-            MessageBox.Show(this, $"Speichern fehlgeschlagen: {e.Message}", Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            Tr.Show(this, $"Speichern fehlgeschlagen: {e.Message}", Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
     }
 
@@ -614,12 +641,12 @@ internal sealed class SettingsForm : Form
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {
-            MessageBox.Show(this, $"Lesen fehlgeschlagen: {e.Message}", Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            Tr.Show(this, $"Lesen fehlgeschlagen: {e.Message}", Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
         if (profile is null)
         {
-            MessageBox.Show(this, "Die Datei enthält kein gültiges Controller-Profil.", Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            Tr.Show(this, "Die Datei enthält kein gültiges Controller-Profil.", Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
         string name = profile.Name, baseName = profile.Name;
@@ -629,7 +656,7 @@ internal sealed class SettingsForm : Form
         Apply(() => _settings.NamedProfiles = [.. _settings.NamedProfiles, imported]);
         FillProfiles(name);
         LoadProfileEditor();
-        MessageBox.Show(this, $"Profil „{name}“ importiert" +
+        Tr.Show(this, $"Profil „{name}“ importiert" +
             (imported.Programs.Count > 0 ? $" – aktiv bei: {string.Join(", ", imported.Programs)}." : "."), Text);
     }
 
@@ -704,7 +731,7 @@ internal sealed class SettingsForm : Form
         _kindOrder.AddRange(ProfileKinds.Where(k => !_kindOrder.Contains(k)));
         _profileKind.Items.Clear();
         foreach (var kind in _kindOrder)
-            _profileKind.Items.Add(kind.DisplayName() + (connected.Contains(kind) ? "  (verbunden)" : ""));
+            _profileKind.Items.Add(Tr.T(kind.DisplayName() + (connected.Contains(kind) ? "  (verbunden)" : "")));
         int index = previous is { } p ? _kindOrder.IndexOf(p) : 0;
         _profileKind.SelectedIndex = Math.Max(0, index);
     }
@@ -733,6 +760,7 @@ internal sealed class SettingsForm : Form
             _grid.Controls.Add(combo);
         }
         NoWheel(_grid);
+        Tr.Apply(_grid);
         _grid.ResumeLayout();
     }
 
@@ -859,7 +887,7 @@ internal sealed class SettingsForm : Form
 
     private void ResetAll()
     {
-        if (MessageBox.Show(this, "Alle Einstellungen und Tastenbelegungen auf Standard zurücksetzen?", Text,
+        if (Tr.Show(this, "Alle Einstellungen und Tastenbelegungen auf Standard zurücksetzen?", Text,
                 MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
             return;
         var defaults = new Settings();
@@ -921,6 +949,7 @@ internal sealed class KeyCaptureDialog : Form
         Controls.Add(hint);
         Controls.Add(bar);
         CancelButton = cancel;
+        Tr.Apply(this);
 
         KeyDown += (_, e) =>
         {
@@ -1044,6 +1073,7 @@ internal static class TurboDialog
         form.Controls.AddRange([info, target, ok, cancel]);
         form.AcceptButton = ok;
         form.CancelButton = cancel;
+        Tr.Apply(form);
         if (form.ShowDialog(owner) != DialogResult.OK)
             return null;
         int i = target.SelectedIndex;
@@ -1086,12 +1116,13 @@ internal static class MacroDialog
             bool valid = MacroScript.TryParse((box.Text ?? "").Replace("\r", "").Replace('\n', ','), out var script);
             ok.Enabled = valid;
             status.ForeColor = valid ? SystemColors.ControlText : Color.Firebrick;
-            status.Text = valid ? $"✓ {script.Steps.Count} Schritte, Dauer {script.TotalMs} ms" : "Ungültig – bitte Schreibweise prüfen (siehe oben).";
+            status.Text = Tr.T(valid ? $"✓ {script.Steps.Count} Schritte, Dauer {script.TotalMs} ms" : "Ungültig – bitte Schreibweise prüfen (siehe oben).");
         }
         box.TextChanged += (_, _) => Check();
         Check();
         form.Controls.AddRange([info, box, status, ok, cancel]);
         form.CancelButton = cancel;
+        Tr.Apply(form);
         if (form.ShowDialog(owner) != DialogResult.OK)
             return null;
         return ButtonAction.Play((box.Text ?? "").Replace("\r", "").Replace('\n', ',').Trim()).ToString();
@@ -1116,6 +1147,7 @@ internal static class Prompt
         form.Controls.AddRange([label, box, ok, cancel]);
         form.AcceptButton = ok;
         form.CancelButton = cancel;
+        Tr.Apply(form);
         if (form.ShowDialog(owner) != DialogResult.OK)
             return null;
         var text = box.Text.Trim();

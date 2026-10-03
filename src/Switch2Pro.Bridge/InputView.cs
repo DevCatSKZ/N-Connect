@@ -460,7 +460,7 @@ internal sealed partial class InputView : Control
         if (motion is not { } m)
         {
             using var format = new StringFormat { Alignment = StringAlignment.Center };
-            g.DrawString("Bewegungssensor: keine Daten", font, label, area, format);
+            g.DrawString(Tr.T("Bewegungssensor: keine Daten"), font, label, area, format);
             return;
         }
         (string Axis, short Value)[] axes = [("Gyro X", m.GyroX), ("Y", m.GyroY), ("Z", m.GyroZ)];

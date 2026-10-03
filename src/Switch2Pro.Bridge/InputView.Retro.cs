@@ -123,7 +123,7 @@ internal sealed partial class InputView
         using var font = new Font("Segoe UI", 8f, FontStyle.Bold);
         using var label = new SolidBrush(Color.FromArgb(150, 155, 166));
         using var format = new StringFormat { Alignment = StringAlignment.Center };
-        g.DrawString(_input.Kind.DisplayName(), font, label, new RectangleF(0, 392, W, 16), format);
+        g.DrawString(Tr.T(_input.Kind.DisplayName()), font, label, new RectangleF(0, 392, W, 16), format);
     }
 
     // ---------- SNES ----------

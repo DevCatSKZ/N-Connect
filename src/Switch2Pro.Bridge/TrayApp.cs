@@ -28,6 +28,7 @@ internal sealed class TrayApp : ApplicationContext
         _ui = SynchronizationContext.Current ?? new WindowsFormsSynchronizationContext();
         bool firstRun = !File.Exists(Paths.SettingsFile);
         _settings = Settings.Load(Paths.SettingsFile);
+        Tr.Init(_settings.Language);
         if (_settings.LoadError is { } err)
             Log.Warn($"settings.json fehlerhaft, nutze Standardwerte: {err}");
 
@@ -45,7 +46,7 @@ internal sealed class TrayApp : ApplicationContext
         if (_factory is null)
         {
             _icon.Text = "Switch 2 Pro: ViGEmBus fehlt";
-            _icon.ShowBalloonTip(10000, "ViGEmBus-Treiber fehlt",
+            Balloon(10000, "ViGEmBus-Treiber fehlt",
                 "Ohne ViGEmBus kann kein virtueller Controller erzeugt werden. Bitte das Setup erneut ausführen " +
                 "oder ViGEmBus installieren (Rechtsklick auf das Symbol → ViGEmBus herunterladen).", ToolTipIcon.Error);
             BuildMenu();
@@ -57,7 +58,7 @@ internal sealed class TrayApp : ApplicationContext
         _manager.Notify += message => _ui.Post(_ =>
         {
             _balloonUrl = null;
-            _icon.ShowBalloonTip(2500, "Nintendo Controller", message, ToolTipIcon.Info);
+            Balloon(2500, "Nintendo Controller", message, ToolTipIcon.Info);
         }, null);
         _manager.ControllerConnected += (address, _) => _ui.Post(_ => RememberController(address), null);
         _manager.JoyConModeChanged += (address, single) => _ui.Post(_ =>
@@ -82,7 +83,7 @@ internal sealed class TrayApp : ApplicationContext
         _settingsWatcher.Changed += (_, _) => _ui.Post(_ => { _reloadTimer.Stop(); _reloadTimer.Start(); }, null);
 
         if (_settings.LoadError is not null)
-            _icon.ShowBalloonTip(5000, "Einstellungen fehlerhaft",
+            Balloon(5000, "Einstellungen fehlerhaft",
                 "settings.json konnte nicht gelesen werden – es gelten die Standardwerte.", ToolTipIcon.Warning);
         UpdateTooltip();
         BuildMenu();
@@ -207,9 +208,14 @@ internal sealed class TrayApp : ApplicationContext
                 : string.Join("\n", players.Select(p => $"P{p.Index + 1} {ShortName(p.Kind)} {Battery(p)}"));
         }
         // NotifyIcon.Text ist auf 127 Zeichen begrenzt.
+        text = Tr.T(text);
         _icon.Text = text.Length > 127 ? text[..127] : text;
         UpdateIcon();
     }
+
+    /// <summary>Einblendung im Infobereich (in der Sprache der Oberfläche).</summary>
+    private void Balloon(int milliseconds, string title, string text, ToolTipIcon icon) =>
+        _icon.ShowBalloonTip(milliseconds, Tr.T(title), Tr.T(text), icon);
 
     private UpdateCheck.Update? _update;
     /// <summary>Ziel beim Klick auf die zuletzt gezeigte Einblendung (nur bei der Update-Meldung gesetzt).</summary>
@@ -226,7 +232,7 @@ internal sealed class TrayApp : ApplicationContext
         _update = update;
         Log.Info($"Neue Version {update.Version} verfügbar (installiert: {UpdateCheck.Current})");
         _balloonUrl = update.Url;
-        _icon.ShowBalloonTip(8000, "Neue Version verfügbar",
+        Balloon(8000, "Neue Version verfügbar",
             $"Version {update.Version} ist erschienen (installiert: {UpdateCheck.Current}). Klicken zum Herunterladen.", ToolTipIcon.Info);
     }
 
@@ -331,6 +337,7 @@ internal sealed class TrayApp : ApplicationContext
             menu.Items.Add(new ToolStripMenuItem($"⬇ Neue Version {update.Version} herunterladen …", null, (_, _) => Open(update.Url)) { Font = _boldFont });
         menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add("Beenden", null, (_, _) => ExitThread());
+        Tr.Apply(menu.Items);
     }
 
     /// <summary>Profil fest wählen ("" = Standard) oder null = automatisch nach Programm.</summary>
@@ -360,7 +367,7 @@ internal sealed class TrayApp : ApplicationContext
         if (_settings.ForcedProfile is null)
         {
             _balloonUrl = null;
-            _icon.ShowBalloonTip(1500, "Nintendo Controller", $"Profil „{detected ?? "Standard"}“ aktiv", ToolTipIcon.None);
+            Balloon(1500, "Nintendo Controller", $"Profil „{detected ?? "Standard"}“ aktiv", ToolTipIcon.None);
         }
     }
 

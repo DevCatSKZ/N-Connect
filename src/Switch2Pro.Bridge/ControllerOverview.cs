@@ -49,6 +49,7 @@ internal sealed class ControllerOverview : Panel
         BackColor = Background;
         Controls.Add(_cards);
         Controls.Add(_empty);
+        Tr.Apply(_empty);
     }
 
     public void UpdateView()
@@ -116,7 +117,7 @@ internal sealed class ControllerOverview : Panel
         {
             var b = new Button
             {
-                Text = text, AutoSize = true, FlatStyle = FlatStyle.Flat, ForeColor = TextColor, BackColor = Color.FromArgb(45, 47, 54),
+                Text = Tr.T(text), AutoSize = true, FlatStyle = FlatStyle.Flat, ForeColor = TextColor, BackColor = Color.FromArgb(45, 47, 54),
                 Font = ButtonFont, Padding = new Padding(6, 1, 6, 1), Margin = new Padding(6, 0, 0, 0),
             };
             b.FlatAppearance.BorderColor = MutedColor;
@@ -152,17 +153,17 @@ internal sealed class ControllerOverview : Panel
                 else
                     _manager.PairWithAnySingle(_player);
             };
-            _tips.SetToolTip(_disconnect, "Verbindung trennen. Der Controller verbindet sich beim nächsten Tastendruck wieder.");
-            _tips.SetToolTip(_identify, "Controller kurz vibrieren lassen – zeigt, welcher Controller dieser Spieler ist.");
-            _tips.SetToolTip(_calibrate, "Controller ruhig auf den Tisch legen und klicken: misst den Gyro-Nullpunkt neu (gegen Abdriften).");
-            _tips.SetToolTip(_orientation, "Einzelnen Joy-Con quer (wie an der Switch) oder hochkant halten – wird je Joy-Con gemerkt. Hochkant gilt die Tastenbelegung von „Joy-Con-Paar“.");
-            _tips.SetToolTip(_hide, "Versteckt den per USB angeschlossenen Controller vor Spielen (HidHide), damit sie nur den virtuellen Xbox-Controller sehen.");
+            _tips.SetToolTip(_disconnect, Tr.T("Verbindung trennen. Der Controller verbindet sich beim nächsten Tastendruck wieder."));
+            _tips.SetToolTip(_identify, Tr.T("Controller kurz vibrieren lassen – zeigt, welcher Controller dieser Spieler ist."));
+            _tips.SetToolTip(_calibrate, Tr.T("Controller ruhig auf den Tisch legen und klicken: misst den Gyro-Nullpunkt neu (gegen Abdriften)."));
+            _tips.SetToolTip(_orientation, Tr.T("Einzelnen Joy-Con quer (wie an der Switch) oder hochkant halten – wird je Joy-Con gemerkt. Hochkant gilt die Tastenbelegung von „Joy-Con-Paar“."));
+            _tips.SetToolTip(_hide, Tr.T("Versteckt den per USB angeschlossenen Controller vor Spielen (HidHide), damit sie nur den virtuellen Xbox-Controller sehen."));
             _hide.Click += async (_, _) => await HideAsync();
-            _tips.SetToolTip(_amiibo, "amiibo mit dem NFC-Leser lesen und als Datei (.bin) speichern – z. B. für Emulatoren.");
+            _tips.SetToolTip(_amiibo, Tr.T("amiibo mit dem NFC-Leser lesen und als Datei (.bin) speichern – z. B. für Emulatoren."));
             _amiibo.Click += async (_, _) => await ReadAmiiboAsync();
-            _tips.SetToolTip(_ringCon, "Ring-Con am rechten Joy-Con ein-/ausschalten: zusammendrücken = rechter Trigger, auseinanderziehen = linker Trigger. Beim Einschalten den Ring nicht berühren.");
+            _tips.SetToolTip(_ringCon, Tr.T("Ring-Con am rechten Joy-Con ein-/ausschalten: zusammendrücken = rechter Trigger, auseinanderziehen = linker Trigger. Beim Einschalten den Ring nicht berühren."));
             _ringCon.Click += async (_, _) => await ToggleRingConAsync();
-            _tips.SetToolTip(_irCamera, "Live-Bild der IR-Kamera im rechten Joy-Con anzeigen.");
+            _tips.SetToolTip(_irCamera, Tr.T("Live-Bild der IR-Kamera im rechten Joy-Con anzeigen."));
             _irCamera.Click += (_, _) =>
             {
                 if (_player?.Links.OfType<Links.Switch1HidLink>().FirstOrDefault(l => l.HasIrCamera) is { } ir)
@@ -190,15 +191,15 @@ internal sealed class ControllerOverview : Panel
                 }
                 else
                 {
-                    _ringCon.Text = "Ring-Con wird gesucht …";
+                    _ringCon.Text = Tr.T("Ring-Con wird gesucht …");
                     if (!await link.EnableRingConAsync(CancellationToken.None))
-                        MessageBox.Show(FindForm(), "Kein Ring-Con gefunden. Den rechten Joy-Con (Switch 1) fest in den Ring-Con " +
+                        Tr.Show(FindForm(), "Kein Ring-Con gefunden. Den rechten Joy-Con (Switch 1) fest in den Ring-Con " +
                             "schieben und erneut versuchen.", "Ring-Con");
                 }
             }
             catch (Exception e) when (e is IOException or OperationCanceledException)
             {
-                MessageBox.Show(FindForm(), $"Ring-Con: {e.Message}", "Ring-Con");
+                Tr.Show(FindForm(), $"Ring-Con: {e.Message}", "Ring-Con");
             }
             finally
             {
@@ -218,11 +219,11 @@ internal sealed class ControllerOverview : Panel
             try
             {
                 var result = await link.ReadAmiiboAsync(TimeSpan.FromSeconds(20),
-                    message => BeginInvoke(() => { if (!IsDisposed) _amiibo.Text = message.Length > 40 ? message[..40] + " …" : message; }),
+                    message => BeginInvoke(() => { if (!IsDisposed) { message = Tr.T(message); _amiibo.Text = message.Length > 40 ? message[..40] + " …" : message; } }),
                     CancellationToken.None);
                 if (result is not { } amiibo)
                 {
-                    MessageBox.Show(FindForm(), "Kein amiibo erkannt. Bitte das amiibo flach an den NFC-Leser halten " +
+                    Tr.Show(FindForm(), "Kein amiibo erkannt. Bitte das amiibo flach an den NFC-Leser halten " +
                         "(Joy-Con: auf den rechten Stick, Pro Controller: auf das NFC-Logo) und erneut versuchen.", "amiibo lesen");
                     return;
                 }
@@ -238,7 +239,7 @@ internal sealed class ControllerOverview : Panel
             }
             catch (Exception e) when (e is IOException or UnauthorizedAccessException or OperationCanceledException)
             {
-                MessageBox.Show(FindForm(), $"amiibo konnte nicht gelesen werden: {e.Message}", "amiibo lesen",
+                Tr.Show(FindForm(), $"amiibo konnte nicht gelesen werden: {e.Message}", "amiibo lesen",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             finally
@@ -259,7 +260,7 @@ internal sealed class ControllerOverview : Panel
                 return;
             if (!HidHide.IsInstalled)
             {
-                if (MessageBox.Show(FindForm(),
+                if (Tr.Show(FindForm(),
                         "Dafür wird das kostenlose Programm HidHide gebraucht (von den Machern von ViGEmBus).\n\n" +
                         "Jetzt die Download-Seite öffnen? Nach der Installation hier erneut klicken.",
                         "Doppelte Controller verhindern", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
@@ -277,7 +278,7 @@ internal sealed class ControllerOverview : Panel
                 }
                 else
                 {
-                    MessageBox.Show(FindForm(), "HidHide konnte nicht eingerichtet werden (abgebrochen oder fehlgeschlagen). Details im Protokoll.",
+                    Tr.Show(FindForm(), "HidHide konnte nicht eingerichtet werden (abgebrochen oder fehlgeschlagen). Details im Protokoll.",
                         "Doppelte Controller verhindern", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }
@@ -293,14 +294,14 @@ internal sealed class ControllerOverview : Panel
             if (_player is null || _calibrating)
                 return;
             _calibrating = true;
-            _calibrate.Text = "Ruhig liegen lassen …";
+            _calibrate.Text = Tr.T("Ruhig liegen lassen …");
             _calibrate.Enabled = false;
             try
             {
                 var result = await _player.CalibrateGyroAsync(TimeSpan.FromSeconds(2));
                 if (result is null)
                 {
-                    MessageBox.Show(FindForm(), "Der Controller hat sich bewegt oder keine Bewegungsdaten geliefert.\n" +
+                    Tr.Show(FindForm(), "Der Controller hat sich bewegt oder keine Bewegungsdaten geliefert.\n" +
                         "Bitte flach auf den Tisch legen, nicht berühren und erneut versuchen.", "Gyro kalibrieren",
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
@@ -311,7 +312,7 @@ internal sealed class ControllerOverview : Panel
                     map[address] = bias;
                 s.GyroCalibration = map; // neue Kopie: der Bluetooth-Thread liest gleichzeitig
                 _manager.RequestSave();
-                _calibrate.Text = "Kalibriert ✓";
+                _calibrate.Text = Tr.T("Kalibriert ✓");
                 await Task.Delay(1500);
             }
             finally
@@ -320,7 +321,7 @@ internal sealed class ControllerOverview : Panel
                 if (!IsDisposed)
                 {
                     _calibrate.Enabled = true;
-                    _calibrate.Text = "Gyro kalibrieren";
+                    _calibrate.Text = Tr.T("Gyro kalibrieren");
                 }
             }
         }
@@ -344,7 +345,7 @@ internal sealed class ControllerOverview : Panel
         {
             _player = player;
             var links = player.Links;
-            _title.Text = $"Spieler {player.Index + 1}  ·  {player.Kind.DisplayName()}" + (player.GyroMouseActive ? "  ·  Gyro-Maus" : "") + (player.GyroStickActive ? "  ·  Gyro-Stick" : "");
+            _title.Text = Tr.T($"Spieler {player.Index + 1}  ·  {player.Kind.DisplayName()}" + (player.GyroMouseActive ? "  ·  Gyro-Maus" : "") + (player.GyroStickActive ? "  ·  Gyro-Stick" : ""));
 
             var (input, gamepad) = Live(player, settings);
             bool joyCon = links.Count > 0 && links.All(l => l.Kind.IsJoyCon());
@@ -383,8 +384,8 @@ internal sealed class ControllerOverview : Panel
         private static void SetButton(Button button, string? text)
         {
             button.Visible = text is not null;
-            if (text is not null && button.Text != text)
-                button.Text = text;
+            if (text is not null && button.Text != Tr.T(text))
+                button.Text = Tr.T(text);
         }
 
         private static (PadInput? Input, GamepadState Gamepad) Live(Player player, Settings settings)
@@ -441,7 +442,7 @@ internal sealed class ControllerOverview : Panel
             {
                 if (_links.Count > 1)
                 {
-                    Draw(g, link.Kind.DisplayName(), 0, y, Accent, Heading);
+                    Draw(g, Tr.T(link.Kind.DisplayName()), 0, y, Accent, Heading);
                     y += 24;
                 }
                 var st = link.LastState;
@@ -468,9 +469,9 @@ internal sealed class ControllerOverview : Panel
 
         private void Row(Graphics g, ref float y, string label, string? value)
         {
-            Draw(g, label, 0, y, MutedColor, Body);
+            Draw(g, Tr.T(label), 0, y, MutedColor, Body);
             if (value is not null)
-                Draw(g, value, 110, y, TextColor, Body);
+                Draw(g, Tr.T(value), 110, y, TextColor, Body);
             y += 22;
         }
 
@@ -499,7 +500,7 @@ internal sealed class ControllerOverview : Panel
             string text = percent < 0 ? "unbekannt"
                 : $"{percent} %{(st!.BatteryMillivolts > 0 ? $"  ({st.BatteryMillivolts / 1000.0:F2} V)" : "")}{(st.Charging ? "  ⚡ lädt" : "")}";
             using var brush = new SolidBrush(TextColor);
-            g.DrawString(text, Body, brush, x + 56, y);
+            g.DrawString(Tr.T(text), Body, brush, x + 56, y);
         }
 
         private static string Transport(Transport t) => t switch

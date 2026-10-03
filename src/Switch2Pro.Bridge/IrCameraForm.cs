@@ -35,6 +35,7 @@ internal sealed class IrCameraForm : Form
         Controls.Add(bar);
         _resolution.SelectedIndexChanged += async (_, _) => await RestartAsync();
         Shown += async (_, _) => await RestartAsync();
+        Tr.Apply(this);
     }
 
     private async Task RestartAsync()
@@ -42,7 +43,7 @@ internal sealed class IrCameraForm : Form
         if (_running)
             await _link.StopIrAsync();
         _running = false;
-        _status.Text = "Kamera startet …";
+        _status.Text = Tr.T("Kamera startet …");
         var resolution = (IrResolution)_resolution.SelectedIndex;
         bool ok = await _link.StartIrAsync(resolution, OnFrame, CancellationToken.None);
         if (IsDisposed)
@@ -54,7 +55,7 @@ internal sealed class IrCameraForm : Form
         _running = ok;
         _frames = 0;
         _since = DateTime.UtcNow;
-        _status.Text = ok ? "läuft – Joy-Con auf eine Lichtquelle oder die Hand richten" : "Kamera startet nicht (Details im Protokoll)";
+        _status.Text = Tr.T(ok ? "läuft – Joy-Con auf eine Lichtquelle oder die Hand richten" : "Kamera startet nicht (Details im Protokoll)");
     }
 
     /// <summary>Kommt auf dem Lese-Thread: Bild bauen und im UI-Thread anzeigen.</summary>
@@ -91,7 +92,7 @@ internal sealed class IrCameraForm : Form
             _frames++;
             double seconds = (DateTime.UtcNow - _since).TotalSeconds;
             if (seconds > 1)
-                _status.Text = $"{width} × {height} · {_frames / seconds:F1} Bilder/s";
+                _status.Text = Tr.T($"{width} × {height} · {_frames / seconds:F1} Bilder/s");
         });
     }
 

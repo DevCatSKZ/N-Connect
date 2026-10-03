@@ -10,6 +10,48 @@ namespace Switch2Pro.Bridge;
 /// </summary>
 internal static class RenderCheck
 {
+    /// <summary>Alle sichtbaren Texte der Fenster (Steuerelemente, Listen) in eine Datei schreiben – je Zeile ein Text.</summary>
+    public static void DumpTexts(string file)
+    {
+        var texts = new SortedSet<string>(StringComparer.Ordinal);
+        void Walk(Control c)
+        {
+            if (!string.IsNullOrWhiteSpace(c.Text))
+                texts.Add(c.Text);
+            if (c is ComboBox combo)
+                foreach (var item in combo.Items)
+                    if (item?.ToString() is { Length: > 0 } s)
+                        texts.Add(s);
+            foreach (Control child in c.Controls)
+                Walk(child);
+        }
+        var settings = new Settings();
+        using (var form = new SettingsForm(settings, _ => { }, null))
+            Walk(form);
+        foreach (var kind in Enum.GetValues<ControllerKind>())
+        {
+            texts.Add(kind.DisplayName());
+            foreach (var b in ControllerButtons.For(kind))
+                texts.Add(ControllerButtons.Label(b, kind));
+        }
+        using (var welcome = new WelcomeForm())
+            Walk(welcome);
+        using (var capture = new KeyCaptureDialog("X"))
+            Walk(capture);
+        using (var wii = new WiiPairForm())
+            Walk(wii);
+        // Bei englischer Oberfläche: nur noch Texte ausgeben, die nach der Übersetzung deutsch aussehen.
+        var lines = texts.Select(t => Tr.T(t)).Distinct();
+        if (Tr.English)
+            lines = lines.Where(LooksGerman);
+        File.WriteAllLines(file, lines.Select(t => t.Replace("\r", "").Replace("\n", "\\n")));
+    }
+
+    private static bool LooksGerman(string t) =>
+        t.IndexOfAny(['ä', 'ö', 'ü', 'Ä', 'Ö', 'Ü', 'ß']) >= 0
+        || new[] { " und ", " der ", " die ", " das ", "Taste", "Spieler", " mit ", " nach ", "Belegung", "Einstellung" }
+            .Any(w => t.Contains(w, StringComparison.Ordinal));
+
     public static void Run(string folder)
     {
         Directory.CreateDirectory(folder);
