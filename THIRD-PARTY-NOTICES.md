@@ -26,5 +26,12 @@ KIND, EXPRESS OR IMPLIED.
 ## SDL (Kalibrierungsformat, Achsenzuordnung des Gyros)
 Copyright (C) 1997-2026 Sam Lantinga. zlib-Lizenz. Switch-2-Treiberlogik beigetragen von Valve Corporation.
 
+## Weitere Protokollinformationen (nur als Dokumentation, kein übernommener Code)
+- Linux-Kernel `hid-nintendo` (Gerätetypen und Tastenbits der Nintendo-Switch-Online-Controller) und `hid-wiimote`
+- WiiBrew (Wii-Fernbedienung, Erweiterungen, Wii U Pro Controller); Dolphin (Kopplung mit binärer PIN)
+- Emulatoren yuzu/Citron: Ablauf und Konstanten für NFC (amiibo), IR-Kamera und Ring-Con
+- dekuNukem/Nintendo_Switch_Reverse_Engineering (Switch-1-Unterbefehle)
+- Switch2Connect (Funktionsideen; kein Code übernommen)
+
 ## Protokoll-Dokumentation
 ndeadly/switch2_controller_research – Reverse-Engineering-Dokumentation des Switch-2-Controller-Protokolls.
