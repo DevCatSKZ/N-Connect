@@ -14,7 +14,8 @@ internal sealed partial class InputView
     /// <summary>Was an der Wii-Fernbedienung steckt (für die richtige Zeichnung).</summary>
     public WiiExtension WiiExtension { get; set; }
 
-    private static bool IsRetro(ControllerKind k) => k.IsClassic() || k is ControllerKind.WiiRemote or ControllerKind.WiiUPro;
+    private static bool IsRetro(ControllerKind k) =>
+        k.IsClassic() || k is ControllerKind.WiiRemote or ControllerKind.WiiUPro or ControllerKind.GameCube2;
 
     private void PaintRetro(Graphics g, ControllerKind kind)
     {
@@ -27,6 +28,7 @@ internal sealed partial class InputView
             case ControllerKind.N64Controller: PaintN64(g, On); break;
             case ControllerKind.MegaDrive: PaintMegaDrive(g, On); break;
             case ControllerKind.WiiUPro: PaintWiiUPro(g, On); break;
+            case ControllerKind.GameCube2: PaintGameCube(g, On); break;
             default: PaintWiiRemote(g, On); break;
         }
     }
@@ -275,7 +277,7 @@ internal sealed partial class InputView
         // Steuerkreuz: Eingaben sind beim Querhalten schon gedreht – für die Anzeige zurückdrehen.
         bool up = on(ProButtons.Up), down = on(ProButtons.Down), left = on(ProButtons.Left), right = on(ProButtons.Right);
         if (!nunchuk)
-            (up, down, left, right) = (on(ProButtons.Right), on(ProButtons.Left), on(ProButtons.Up), on(ProButtons.Down));
+            (up, down, left, right) = (on(ProButtons.Left), on(ProButtons.Right), on(ProButtons.Down), on(ProButtons.Up));
         var state = g.Save();
         g.TranslateTransform(cx, 92);
         g.ScaleTransform(0.62f, 0.62f);
@@ -307,7 +309,7 @@ internal sealed partial class InputView
         {
             using var font = new Font("Segoe UI", 8f);
             using var label = new SolidBrush(Color.FromArgb(150, 155, 166));
-            g.DrawString("quer halten: Steuerkreuz links,\n1 und 2 rechts", font, label, cx + 60, 270);
+            g.DrawString(Tr.T("quer halten: Steuerkreuz links,\n1 und 2 rechts"), font, label, cx + 60, 270);
         }
     }
 
@@ -331,6 +333,75 @@ internal sealed partial class InputView
         Stick(g, new PointF(W / 2 - 64, 252), _gamepad.LeftX, _gamepad.LeftY, false, 28, 17);
         Stick(g, new PointF(W / 2 + 64, 252), _gamepad.RightX, _gamepad.RightY, false, 28, 17);
         Batt(g);
+    }
+
+    // ---------- GameCube-Controller (Switch 2) ----------
+
+    /// <summary>
+    /// GameCube-Controller: großes grünes A, rotes B, nierenförmige X/Y, gelber C-Stick, analoge L/R (füllen sich),
+    /// Z rechts oben. Tastennamen nach Position (siehe ControllerButtons.Label): B-Bit = A, Y-Bit = B, A-Bit = X, X-Bit = Y.
+    /// </summary>
+    private void PaintGameCube(Graphics g, Func<ProButtons, bool> on)
+    {
+        var body = Color.FromArgb(0x4A, 0x4B, 0x8C);
+        var grey = Color.FromArgb(0xC8, 0xC8, 0xD2);
+        // Analoge Trigger L/R als Laschen, die sich mit dem Druck füllen.
+        AnalogTab(g, new RectangleF(60, 78, 150, 30), _input?.LeftTrigger ?? 0, on(ProButtons.L), "L", grey);
+        AnalogTab(g, new RectangleF(W - 210, 78, 150, 30), _input?.RightTrigger ?? 0, on(ProButtons.R), "R", grey);
+        Tab(g, new RectangleF(W - 190, 60, 100, 22), on(ProButtons.ZR), "Z", Color.FromArgb(0x6E, 0x5C, 0xC8));
+        Tab(g, new RectangleF(90, 60, 100, 22), on(ProButtons.ZL), "ZL", Color.FromArgb(0x6E, 0x5C, 0xC8));
+        using (var path = new GraphicsPath { FillMode = FillMode.Winding })
+        {
+            path.AddBeziers(
+            [
+                new PointF(110, 100), new PointF(220, 92), new PointF(360, 92), new PointF(W - 110, 100),
+                new PointF(W - 40, 104), new PointF(W - 15, 190), new PointF(W - 45, 300),
+                new PointF(W - 65, 380), new PointF(W - 150, 375), new PointF(W - 165, 300),
+                new PointF(W - 185, 270), new PointF(185, 270), new PointF(165, 300),
+                new PointF(150, 375), new PointF(65, 380), new PointF(45, 300),
+                new PointF(15, 190), new PointF(40, 104), new PointF(110, 100),
+            ]);
+            BodyShape(g, path, body);
+        }
+        Stick(g, new PointF(130, 170), _gamepad.LeftX, _gamepad.LeftY, false, 36, 22);
+        var state = g.Save();
+        g.TranslateTransform(205, 262);
+        g.ScaleTransform(0.55f, 0.55f);
+        DPad(g, new PointF(0, 0), on(ProButtons.Up), on(ProButtons.Down), on(ProButtons.Left), on(ProButtons.Right));
+        g.Restore(state);
+        // C-Stick gelb
+        var cs = new PointF(W - 205, 262);
+        using (var yellow = new SolidBrush(Color.FromArgb(0xE8, 0xC2, 0x1C)))
+            g.FillEllipse(yellow, cs.X - 24, cs.Y - 24, 48, 48);
+        Stick(g, cs, _gamepad.RightX, _gamepad.RightY, false, 20, 12);
+        // Tasten: A groß grün, B rot links unten, X rechts, Y oben (nierenförmig angedeutet)
+        var a = new PointF(W - 150, 175);
+        ColorKey(g, a, on(ProButtons.B), "A", Color.FromArgb(0x1E, 0xA0, 0x5A), 30);
+        ColorKey(g, new PointF(a.X - 50, a.Y + 38), on(ProButtons.Y), "B", Color.FromArgb(0xD0, 0x2A, 0x2A), 16);
+        PillKey(g, new PointF(a.X + 50, a.Y - 8), on(ProButtons.A), "X", grey, 75, 44, 20, Color.FromArgb(220, 220, 230));
+        PillKey(g, new PointF(a.X - 6, a.Y - 50), on(ProButtons.X), "Y", grey, -15, 44, 20, Color.FromArgb(220, 220, 230));
+        // Mitte: START, darüber HOME, Aufnahme, C (Switch-2-Version)
+        ColorKey(g, new PointF(W / 2, 182), on(ProButtons.Plus), "", Color.FromArgb(0x30, 0x30, 0x40), 11);
+        Caption(g, new RectangleF(W / 2 - 40, 194, 80, 14), "START/PAUSE", 6.5f, Color.FromArgb(200, 200, 215));
+        ColorKey(g, new PointF(W / 2 - 34, 132), on(ProButtons.Capture), "●", Color.FromArgb(0x30, 0x30, 0x40), 9);
+        ColorKey(g, new PointF(W / 2, 132), on(ProButtons.Home), "⌂", Color.FromArgb(0x30, 0x30, 0x40), 9);
+        ColorKey(g, new PointF(W / 2 + 34, 132), on(ProButtons.C), "C", Color.FromArgb(0x30, 0x30, 0x40), 9);
+        Batt(g);
+    }
+
+    /// <summary>Lasche mit Füllstand (analoger Trigger), leuchtet beim ganz durchgedrückten Klick.</summary>
+    private void AnalogTab(Graphics g, RectangleF r, float value, bool click, string text, Color color)
+    {
+        Tab(g, r, click, text, color);
+        if (value <= 0.02f || click)
+            return;
+        using var path = Rounded(r, 8);
+        var state = g.Save();
+        g.SetClip(path);
+        using (var fill = new SolidBrush(Color.FromArgb(170, Accent)))
+            g.FillRectangle(fill, r.X, r.Y, r.Width * Math.Clamp(value, 0f, 1f), r.Height);
+        g.Restore(state);
+        Caption(g, new RectangleF(r.X, r.Y + 1, r.Width, 16), text, 8.5f, Color.White);
     }
 
     // ---------- Wii U Pro Controller ----------

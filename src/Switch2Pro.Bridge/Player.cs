@@ -382,7 +382,7 @@ internal sealed class Player : IDisposable
     // ---------- Makros ----------
 
     /// <summary>Laufende Makros (Skript, Startzeit) und die Makros, deren Taste gerade gehalten wird.</summary>
-    private readonly List<(MacroScript Script, long Start)> _macros = [];
+    private readonly List<(string Text, MacroScript Script, long Start)> _macros = [];
     private HashSet<string> _macroButtons = [];
 
     /// <summary>
@@ -394,14 +394,14 @@ internal sealed class Player : IDisposable
         long now = Environment.TickCount64;
         foreach (var text in pressed)
         {
-            if (_macroButtons.Contains(text) || !MacroScript.TryParse(text, out var script))
+            if (_macroButtons.Contains(text) || _macros.Any(m => m.Text == text) || !MacroScript.TryParse(text, out var script))
                 continue;
-            _macros.Add((script, now));
+            _macros.Add((text, script, now));
         }
         _macroButtons = [.. pressed];
         for (int i = _macros.Count - 1; i >= 0; i--)
         {
-            var (script, start) = _macros[i];
+            var (_, script, start) = _macros[i];
             if (script.StepAt(now - start) is not { } step)
             {
                 _macros.RemoveAt(i);

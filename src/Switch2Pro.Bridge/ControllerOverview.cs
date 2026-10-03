@@ -167,7 +167,7 @@ internal sealed class ControllerOverview : Panel
             _irCamera.Click += (_, _) =>
             {
                 if (_player?.Links.OfType<Links.Switch1HidLink>().FirstOrDefault(l => l.HasIrCamera) is { } ir)
-                    new IrCameraForm(ir).Show(FindForm());
+                    IrCameraForm.ShowFor(ir, FindForm());
             };
             _actions.Controls.AddRange([_disconnect, _identify, _calibrate, _orientation, _joyConButton, _hide, _amiibo, _ringCon, _irCamera]);
 
@@ -197,7 +197,7 @@ internal sealed class ControllerOverview : Panel
                             "schieben und erneut versuchen.", "Ring-Con");
                 }
             }
-            catch (Exception e) when (e is IOException or OperationCanceledException)
+            catch (Exception e) when (e is IOException or OperationCanceledException or ObjectDisposedException)
             {
                 Tr.Show(FindForm(), $"Ring-Con: {e.Message}", "Ring-Con");
             }
@@ -219,7 +219,13 @@ internal sealed class ControllerOverview : Panel
             try
             {
                 var result = await link.ReadAmiiboAsync(TimeSpan.FromSeconds(20),
-                    message => BeginInvoke(() => { if (!IsDisposed) { message = Tr.T(message); _amiibo.Text = message.Length > 40 ? message[..40] + " …" : message; } }),
+                    message =>
+                    {
+                        if (IsDisposed || !IsHandleCreated)
+                            return;
+                        try { BeginInvoke(() => { if (!IsDisposed) { message = Tr.T(message); _amiibo.Text = message.Length > 40 ? message[..40] + " …" : message; } }); }
+                        catch (InvalidOperationException) { /* Karte geschlossen */ }
+                    },
                     CancellationToken.None);
                 if (result is not { } amiibo)
                 {
@@ -237,7 +243,7 @@ internal sealed class ControllerOverview : Panel
                 if (dialog.ShowDialog(FindForm()) == DialogResult.OK)
                     await File.WriteAllBytesAsync(dialog.FileName, amiibo.Data);
             }
-            catch (Exception e) when (e is IOException or UnauthorizedAccessException or OperationCanceledException)
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException or OperationCanceledException or ObjectDisposedException)
             {
                 Tr.Show(FindForm(), $"amiibo konnte nicht gelesen werden: {e.Message}", "amiibo lesen",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);

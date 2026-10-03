@@ -77,9 +77,8 @@ public static class Mapping
         if (s.Kind.IsClassic())
             return NormalizeClassic(s.Kind, input);
 
-        // Wii Classic Controller: analoge Trigger (0–255); ohne Classic Controller kommen −1 = keine.
-        if (s.Kind == ControllerKind.WiiRemote && s.LeftTrigger >= 0 && s.RightTrigger >= 0)
-            return input with { LeftTrigger = s.LeftTrigger / 255f, RightTrigger = s.RightTrigger / 255f };
+        // Wii Classic Controller: Die analogen L/R-Werte werden nicht weitergegeben – L/R sind schon LB/RB und
+        // ZL/ZR die Trigger; sonst löste L zugleich LB und LT aus (beim Classic Controller Pro bei jedem Druck).
 
         if (!sideways || !s.Kind.IsJoyCon())
             return input;
@@ -279,7 +278,8 @@ public static class Mapping
         if (nowMs < 0)
             nowMs = Environment.TickCount64;
         // Turbo: abwechselnd an/aus, beginnend mit „an“ (Halbperiode = 1000 / (2 × Rate) ms).
-        bool turboOn = (long)(nowMs * settings.TurboRate * 2 / 1000) % 2 == 0;
+        // In double rechnen: float (24 Bit) wird bei Tagen Laufzeit zu ungenau, der Takt bliebe stehen.
+        bool turboOn = (long)(nowMs * (double)settings.TurboRate * 2 / 1000) % 2 == 0;
         var macros = new List<string>();
         var profile = settings.CurrentProfile();
         bool shift = false;

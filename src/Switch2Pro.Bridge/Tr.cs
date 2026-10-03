@@ -13,6 +13,9 @@ internal static partial class Tr
     /// <summary>Englische Oberfläche aktiv?</summary>
     public static bool English { get; private set; }
 
+    /// <summary>Kennzeichen (Tag) für Steuerelemente/Menüeinträge mit Benutzerdaten (z. B. Profilnamen): nicht übersetzen.</summary>
+    public const string UserData = "user-data";
+
     /// <summary>Sprache festlegen: "de", "en" oder null = wie Windows (Deutsch nur bei deutscher Windows-Sprache).</summary>
     public static void Init(string? language) =>
         English = language switch
@@ -48,7 +51,7 @@ internal static partial class Tr
             return;
         if (root.Text is { Length: > 0 } text && root is not TextBox)
             root.Text = T(text);
-        if (root is ComboBox combo)
+        if (root is ComboBox combo && !Equals(combo.Tag, UserData))
         {
             for (int i = 0; i < combo.Items.Count; i++)
                 if (combo.Items[i] is string s)
@@ -64,7 +67,8 @@ internal static partial class Tr
             return;
         foreach (ToolStripItem item in items)
         {
-            item.Text = T(item.Text);
+            if (!Equals(item.Tag, UserData))
+                item.Text = T(item.Text);
             if (item is ToolStripMenuItem { HasDropDownItems: true } menu)
                 Apply(menu.DropDownItems);
         }
@@ -84,7 +88,6 @@ internal static partial class Tr
         (Re(@"^  ·  Gyro-Stick$"), _ => "  ·  Gyro stick"),
         (Re(@"^Spieler (?<n>\d+) · (?<k>.+?) (?<b>\d+ %.*)?$"), m => $"Player {m.Groups["n"]} · {N(m, "k")} {m.Groups["b"]}"),
         (Re(@"^(?<k>.+) verbunden \(Spieler (?<n>\d+)\)$"), m => $"{N(m, "k")} connected (player {m.Groups["n"]})"),
-        (Re(@"^(?<k>.+) getrennt$"), m => $"{N(m, "k")} disconnected"),
         (Re(@"^Joy-Con zusammengefasst \(Spieler (?<n>\d+)\)$"), m => $"Joy-Cons combined (player {m.Groups["n"]})"),
         (Re(@"^Joy-Con getrennt – (?<k>.+) ist jetzt Spieler (?<n>\d+)$"), m => $"Joy-Con split – {N(m, "k")} is now player {m.Groups["n"]}"),
         (Re(@"^Spieler (?<n>\d+): Akku (?<k>.+) fast leer \((?<p>\d+) %\) – bitte aufladen$"),
@@ -93,8 +96,8 @@ internal static partial class Tr
             m => $"Player {m.Groups["n"]}: disconnected after {m.Groups["m"]} min without input"),
         (Re(@"^(?<k>.+) per USB verbunden\. Sieht ein Spiel ihn doppelt\? Im Fenster „Doppelt angezeigt\? Verstecken“ klicken\.$"),
             m => $"{N(m, "k")} connected via USB. Does a game see it twice? Click “Shown twice? Hide” in the window."),
-        (Re(@"^Profil „(?<p>.+)“ aktiv$"), m => $"Profile “{T(m.Groups["p"].Value)}” active"),
-        (Re(@"^Profil: (?<p>.+)$"), m => $"Profile: {T(m.Groups["p"].Value)}"),
+        (Re(@"^Profil „(?<p>.+)“ aktiv$"), m => $"Profile “{ProfileName(m.Groups["p"].Value)}” active"),
+        (Re(@"^Profil: (?<p>.+)$"), m => $"Profile: {ProfileName(m.Groups["p"].Value)}"),
         (Re(@"^Profil „(?<p>.+)“ löschen\?$"), m => $"Delete profile “{m.Groups["p"]}”?"),
         (Re(@"^Profil „(?<p>.+)“ importiert(?<r>.*)$"), m => $"Profile “{m.Groups["p"]}” imported" + m.Groups["r"].Value.Replace("aktiv bei:", "active for:")),
         (Re(@"^⬇ Neue Version (?<v>.+) herunterladen …$"), m => $"⬇ Download new version {m.Groups["v"]} …"),
@@ -104,7 +107,7 @@ internal static partial class Tr
         (Re(@"^(?<p>\d+ %)(?<v>  \(.*\))?  ⚡ lädt$"), m => $"{m.Groups["p"]}{m.Groups["v"]}  ⚡ charging"),
         (Re(@"^Speichern fehlgeschlagen: (?<e>.*)$"), m => $"Saving failed: {m.Groups["e"]}"),
         (Re(@"^Lesen fehlgeschlagen: (?<e>.*)$"), m => $"Reading failed: {m.Groups["e"]}"),
-        (Re(@"^amiibo konnte nicht gelesen werden: (?<e>.*)$"), m => $"Could not read amiibo: {m.Groups["e"]}"),
+        (Re(@"^amiibo konnte nicht gelesen werden: (?<e>.*)$"), m => $"Could not read amiibo: {T(m.Groups["e"].Value)}"),
         (Re(@"^Gekoppelt: (?<k>.+)\nDer Controller erscheint gleich in der Übersicht\.$"),
             m => $"Paired: {m.Groups["k"]}\nThe controller will appear in the overview shortly."),
         (Re(@"^Gekoppelt: (?<k>.+)$"), m => $"Paired: {m.Groups["k"]}"),
@@ -121,7 +124,7 @@ internal static partial class Tr
             m => $"Pressing “{T(m.Groups["b"].Value)}” plays this sequence once. Separate steps with commas; for each step what is held and " +
                  "for how long (ms). Gamepad: A B X Y LB RB LT RT Up Down Left Right LS RS Start Back Guide, several at once with +. " +
                  "Keyboard: Key:Ctrl+C. Wait: Pause.\nExamples:  “A 80, Pause 60, A 80” (double tap)  ·  “Down+B 150”  ·  “Key:Ctrl+S 50”"),
-        (Re(@"^Ring-Con: (?<e>.*)$"), m => $"Ring-Con: {m.Groups["e"]}"),
+        (Re(@"^Ring-Con: (?<e>.*)$"), m => $"Ring-Con: {T(m.Groups["e"].Value)}"),
         (Re(@"^Gyro-Stick: voller Ausschlag bei (?<s>\d+) °/s, mindestens (?<m>\d+) %   ·   Kennlinie (?<c>[\d.,]+)   ·   Trigger: ab (?<d>\d+) %, voll ab (?<f>\d+) %   ·   Turbo (?<t>\d+)× pro Sekunde$"),
             m => $"Gyro stick: full deflection at {m.Groups["s"]} °/s, at least {m.Groups["m"]} %   ·   curve {m.Groups["c"]}   ·   " +
                  $"triggers: from {m.Groups["d"]} %, full at {m.Groups["f"]} %   ·   turbo {m.Groups["t"]}× per second"),
@@ -133,7 +136,12 @@ internal static partial class Tr
         (Re(@"^Gamepad: (?<k>.+)$"), m => $"Gamepad: {m.Groups["k"]}"),
         (Re(@"^(?<k>.+)  \(verbunden\)$"), m => $"{N(m, "k")}  (connected)"),
         (Re(@"^P(?<n>\d+) (?<k>.+)$"), m => m.Value),
+        // Allgemein zuletzt, sonst würde es speziellere Meldungen mit „getrennt“ am Ende verschlucken.
+        (Re(@"^(?<k>.+) getrennt$"), m => $"{N(m, "k")} disconnected"),
     ];
+
+    /// <summary>Profilname: nur „Standard“ übersetzen, eigene Namen bleiben, wie der Benutzer sie geschrieben hat.</summary>
+    private static string ProfileName(string name) => name == "Standard" ? T(name) : name;
 
     private static Regex Re(string pattern, RegexOptions options = RegexOptions.None) => new(pattern, options | RegexOptions.CultureInvariant);
 }

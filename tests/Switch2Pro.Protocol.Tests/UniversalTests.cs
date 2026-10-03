@@ -552,6 +552,48 @@ public class DsuTests
     }
 
     [Fact]
+    public void TurboStillAlternatesAfterLongUptime()
+    {
+        var s = new Settings
+        {
+            TurboRate = 12,
+            Profiles = new() { [ControllerKind.Pro2] = new() { [ProButtons.A] = "Turbo:A" } },
+        };
+        var p = new PadInput { Kind = ControllerKind.Pro2, Buttons = ProButtons.A };
+        long start = 30L * 24 * 3600 * 1000; // 30 Tage Laufzeit
+        int on = 0;
+        for (int ms = 0; ms < 1000; ms += 5)
+            if (Mapping.Evaluate(p, s, start + ms).Gamepad.Buttons != XButtons.None)
+                on++;
+        Assert.InRange(on, 90, 110); // etwa die Hälfte der 200 Proben
+    }
+
+    [Fact]
+    public void AmiiboPacketsOutOfOrderAndDuplicates()
+    {
+        byte[] Packet(byte n, int length, byte fill)
+        {
+            var d = new byte[320];
+            d[1] = 0x07; d[2] = n;
+            int payload = n == 1 ? length + 60 : length;
+            d[4] = (byte)(payload >> 8); d[5] = (byte)payload;
+            int offset = n == 1 ? 66 : 6;
+            for (int i = 0; i < length; i++) d[offset + i] = fill;
+            return d;
+        }
+        var asm = new AmiiboAssembler();
+        Assert.True(asm.Add(Nfc.ReportNfcRead, Packet(2, 295, 0xBB)));
+        Assert.False(asm.Complete);                                   // Paket 1 fehlt noch
+        Assert.True(asm.Add(Nfc.ReportNfcRead, Packet(1, 245, 0xAA)));
+        Assert.False(asm.Add(Nfc.ReportNfcRead, Packet(1, 245, 0xCC))); // doppelt: ignoriert
+        Assert.True(asm.Complete);
+        var data = asm.ToArray();
+        Assert.Equal(0xAA, data[0]);
+        Assert.Equal(0xAA, data[244]);
+        Assert.Equal(0xBB, data[245]);
+    }
+
+    [Fact]
     public void AnalogTriggerUsesDeadzoneAndFullPoint()
     {
         Assert.Equal(0, Mapping.AnalogTrigger(0.04f, 0.05f, 1f));

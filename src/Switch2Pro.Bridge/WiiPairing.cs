@@ -117,6 +117,10 @@ internal static class WiiPairing
                     var info = device;
                     if (info.fConnected != 0 && info.fAuthenticated != 0)
                         continue;
+                    // Gemerkte Fernbedienungen nur anfassen, wenn sie gerade in Reichweite sichtbar sind (SYNC gedrückt);
+                    // sonst ginge die Kopplung einer anderen, nur ausgeschalteten Fernbedienung verloren.
+                    if (info.fRemembered != 0 && !SeenRecently(info.stLastSeen))
+                        continue;
                     // Alte, nicht verbundene Kopplung entfernen (sonst verweigert Windows die neue).
                     if (info.fRemembered != 0 && info.fConnected == 0)
                     {
@@ -140,6 +144,24 @@ internal static class WiiPairing
             CloseHandle(radio);
         }
         return paired;
+    }
+
+    /// <summary>Zuletzt gesehen (UTC) innerhalb der letzten 20 Sekunden?</summary>
+    private static bool SeenRecently(SYSTEMTIME t)
+    {
+        if (t.Year < 2000)
+            return false;
+        try
+        {
+            // Windows liefert UTC; zur Sicherheit auch Ortszeit zulassen.
+            var seen = new DateTime(t.Year, t.Month, t.Day, t.Hour, t.Minute, t.Second);
+            var window = TimeSpan.FromSeconds(20);
+            return (DateTime.UtcNow - seen).Duration() < window || (DateTime.Now - seen).Duration() < window;
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            return false;
+        }
     }
 
     /// <summary>Eine Suche (≈ 2,5 s) nach Geräten in Reichweite.</summary>

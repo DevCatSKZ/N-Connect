@@ -38,8 +38,20 @@ internal sealed class WiiPairForm : Form
     private async Task RunAsync()
     {
         _status.Text = Tr.T("Suche …");
-        var paired = await Task.Run(() => WiiPairing.ScanAndPair(TimeSpan.FromSeconds(60),
-            message => BeginInvokeSafe(() => _status.Text = Tr.T(message)), _cts.Token));
+        List<string> paired;
+        try
+        {
+            paired = await Task.Run(() => WiiPairing.ScanAndPair(TimeSpan.FromSeconds(60),
+                message => BeginInvokeSafe(() => _status.Text = Tr.T(message)), _cts.Token));
+        }
+        catch (Exception e) when (e is DllNotFoundException or EntryPointNotFoundException or InvalidOperationException
+                                      or System.ComponentModel.Win32Exception or ObjectDisposedException)
+        {
+            Log.Error("Wii-Kopplung", e);
+            if (!IsDisposed)
+                _status.Text = Tr.T("Kopplung fehlgeschlagen – Details im Protokoll.");
+            return;
+        }
         if (IsDisposed)
             return;
         _status.Text = Tr.T(paired.Count > 0
@@ -49,8 +61,15 @@ internal sealed class WiiPairForm : Form
 
     private void BeginInvokeSafe(Action action)
     {
-        if (!IsDisposed && IsHandleCreated)
-            BeginInvoke(action);
+        try
+        {
+            if (!IsDisposed && IsHandleCreated)
+                BeginInvoke(action);
+        }
+        catch (InvalidOperationException)
+        {
+            // Fenster wurde gerade geschlossen.
+        }
     }
 
     protected override void OnFormClosed(FormClosedEventArgs e)

@@ -219,6 +219,8 @@ internal sealed class Switch1HidLink : IControllerLink
     /// </summary>
     public async Task<(byte[] Uid, byte[] Data)?> ReadAmiiboAsync(TimeSpan timeout, Action<string> progress, CancellationToken ct)
     {
+        if (_ir is not null || _ringActive)
+            throw new IOException("Erst IR-Kamera bzw. Ring-Con ausschalten (sie nutzen denselben Zusatzprozessor wie der NFC-Leser).");
         if (!HasNfc)
             return null;
         await _nfcLock.WaitAsync(ct);
@@ -255,8 +257,10 @@ internal sealed class Switch1HidLink : IControllerLink
 
             progress($"amiibo erkannt ({Convert.ToHexString(uid)}) – lese …");
             var assembler = new AmiiboAssembler();
-            await McuAsync(Nfc.McuReadDeviceMode, Nfc.ReadNtag215(), token);
-            byte packet = 0;
+            // Schon die Antwort auf die Leseanfrage kann das erste Datenpaket enthalten.
+            if (await McuAsync(Nfc.McuReadDeviceMode, Nfc.ReadNtag215(), token) is { } first)
+                assembler.Add(first.Kind, first.Data);
+            byte packet = (byte)assembler.PacketCount;
             for (int i = 0; i < 60 && !assembler.Complete; i++)
             {
                 if (await McuAsync(Nfc.McuReadDeviceMode, Nfc.NextPacket(packet), token) is not { } r)
@@ -305,6 +309,8 @@ internal sealed class Switch1HidLink : IControllerLink
     /// </summary>
     public async Task<bool> EnableRingConAsync(CancellationToken ct)
     {
+        if (_ir is not null)
+            throw new IOException("Erst die IR-Kamera schließen (Ring-Con und IR-Kamera nutzen denselben Zusatzprozessor).");
         if (Kind != ControllerKind.JoyCon1Right)
             return false;
         await _nfcLock.WaitAsync(ct);
@@ -372,6 +378,8 @@ internal sealed class Switch1HidLink : IControllerLink
     /// </summary>
     public async Task<bool> StartIrAsync(IrResolution resolution, Action<byte[], int, int> onFrame, CancellationToken ct)
     {
+        if (_ringActive)
+            throw new IOException("Erst den Ring-Con ausschalten (Ring-Con und IR-Kamera nutzen denselben Zusatzprozessor).");
         if (!HasIrCamera)
             return false;
         await _nfcLock.WaitAsync(ct);

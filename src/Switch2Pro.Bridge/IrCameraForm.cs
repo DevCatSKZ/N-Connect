@@ -18,7 +18,23 @@ internal sealed class IrCameraForm : Form
     private DateTime _since = DateTime.UtcNow;
     private bool _running;
 
-    public IrCameraForm(Switch1HidLink link)
+    /// <summary>Höchstens ein Fenster je Joy-Con (zwei würden sich die Kamera gegenseitig abschalten).</summary>
+    private static readonly Dictionary<Switch1HidLink, IrCameraForm> Open = [];
+
+    public static void ShowFor(Switch1HidLink link, IWin32Window? owner)
+    {
+        if (Open.TryGetValue(link, out var existing) && !existing.IsDisposed)
+        {
+            existing.Activate();
+            return;
+        }
+        var form = new IrCameraForm(link);
+        Open[link] = form;
+        form.FormClosed += (_, _) => Open.Remove(link);
+        form.Show(owner);
+    }
+
+    private IrCameraForm(Switch1HidLink link)
     {
         _link = link;
         Text = "IR-Kamera (Joy-Con R)";
@@ -45,7 +61,17 @@ internal sealed class IrCameraForm : Form
         _running = false;
         _status.Text = Tr.T("Kamera startet …");
         var resolution = (IrResolution)_resolution.SelectedIndex;
-        bool ok = await _link.StartIrAsync(resolution, OnFrame, CancellationToken.None);
+        bool ok;
+        try
+        {
+            ok = await _link.StartIrAsync(resolution, OnFrame, CancellationToken.None);
+        }
+        catch (Exception e) when (e is IOException or ObjectDisposedException or OperationCanceledException)
+        {
+            if (!IsDisposed)
+                _status.Text = Tr.T(e.Message); // z. B. „Erst den Ring-Con ausschalten …“
+            return;
+        }
         if (IsDisposed)
         {
             if (ok)

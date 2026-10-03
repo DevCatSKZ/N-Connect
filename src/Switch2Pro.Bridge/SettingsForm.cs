@@ -120,7 +120,7 @@ internal sealed class SettingsForm : Form
     private readonly ToolTip _tips = new();
     private readonly Label _aimInfo = new() { AutoSize = true, ForeColor = SystemColors.GrayText, Padding = new Padding(0, 6, 0, 0) };
 
-    private readonly ComboBox _profileSelect = new() { DropDownStyle = ComboBoxStyle.DropDownList, Width = 300 };
+    private readonly ComboBox _profileSelect = new() { DropDownStyle = ComboBoxStyle.DropDownList, Width = 300, Tag = Tr.UserData };
     private readonly Button _profileNew = new() { Text = "Neu …", AutoSize = true };
     private readonly Button _profileRename = new() { Text = "Umbenennen …", AutoSize = true };
     private readonly Button _profileDelete = new() { Text = "Löschen", AutoSize = true };
@@ -1058,9 +1058,11 @@ internal static class TurboDialog
             if (capture.ShowDialog(form) == DialogResult.OK && capture.Combo is { } combo)
             {
                 keys = combo;
-                if (target.Items[target.Items.Count - 2] is string s && s.StartsWith("Tastatur:", StringComparison.Ordinal))
+                // Liste: Gamepad-Ziele, ggf. ein Eintrag „Tastatur: …“, zuletzt „aufnehmen …“ – nach Anzahl erkennen
+                // (nicht am Text: der ist in der englischen Oberfläche übersetzt).
+                if (target.Items.Count == Targets.Length + 2)
                     target.Items.RemoveAt(target.Items.Count - 2);
-                target.Items.Insert(target.Items.Count - 1, $"Tastatur: {keys}");
+                target.Items.Insert(target.Items.Count - 1, Tr.T($"Tastatur: {keys}"));
                 target.SelectedIndex = target.Items.Count - 2;
             }
             else
@@ -1077,6 +1079,8 @@ internal static class TurboDialog
         if (form.ShowDialog(owner) != DialogResult.OK)
             return null;
         int i = target.SelectedIndex;
+        if (i == target.Items.Count - 1)
+            return null; // „aufnehmen …“ ohne Ergebnis
         if (i < Targets.Length)
             return ButtonAction.Gamepad(Targets[i]) with { Turbo = true } is var a ? a.ToString() : null;
         return keys is null ? null : (ButtonAction.Keyboard(keys) with { Turbo = true }).ToString();

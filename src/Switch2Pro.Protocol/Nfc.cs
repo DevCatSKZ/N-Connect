@@ -164,31 +164,48 @@ public sealed class RingFlexCalibration
 /// <summary>Setzt die gelesenen Pakete (Art 0x3A) zum 540-Byte-Abbild zusammen.</summary>
 public sealed class AmiiboAssembler
 {
-    private readonly byte[] _data = new byte[Nfc.AmiiboSize];
-    private int _position;
+    /// <summary>Pakete nach Nummer (Byte 2, ab 1) – doppelt oder verspätet eintreffende Pakete stören so nicht.</summary>
+    private readonly SortedDictionary<byte, byte[]> _packets = [];
 
-    public int PacketCount { get; private set; }
-    public bool Complete => _position >= Nfc.AmiiboSize;
+    public int PacketCount => _packets.Count;
+
+    /// <summary>Fertig, wenn die Pakete 1…n lückenlos vorliegen und zusammen mindestens 540 Byte ergeben.</summary>
+    public bool Complete
+    {
+        get
+        {
+            int total = 0;
+            byte expected = 1;
+            foreach (var (number, data) in _packets)
+            {
+                if (number != expected++)
+                    return false;
+                total += data.Length;
+            }
+            return total >= Nfc.AmiiboSize;
+        }
+    }
 
     /// <summary>
-    /// Ein Lesepaket übernehmen (Byte 1 = 0x07; Byte 4–5 = Nutzlänge). Das erste Paket (Byte 2 = 1) enthält vorn
-    /// 60 Byte Kopf, die Daten beginnen bei Byte 66; folgende Pakete ab Byte 6.
+    /// Ein Lesepaket übernehmen (Byte 1 = 0x07; Byte 2 = Paketnummer; Byte 4–5 = Nutzlänge). Das erste Paket enthält
+    /// vorn 60 Byte Kopf, die Daten beginnen bei Byte 66; folgende Pakete ab Byte 6. true, wenn das Paket neu war.
     /// </summary>
     public bool Add(byte kind, ReadOnlySpan<byte> d)
     {
-        if (kind != Nfc.ReportNfcRead || d.Length < 8 || d[1] != 0x07)
+        if (kind != Nfc.ReportNfcRead || d.Length < 8 || d[1] != 0x07 || d[2] == 0 || _packets.ContainsKey(d[2]))
             return false;
         int payload = (d[4] << 8 | d[5]) & 0x7FF;
         int offset = d[2] == 0x01 ? 66 : 6;
-        int length = d[2] == 0x01 ? payload - 60 : payload;
-        length = Math.Min(length, Math.Min(d.Length - offset, Nfc.AmiiboSize - _position));
+        int length = Math.Min(d[2] == 0x01 ? payload - 60 : payload, d.Length - offset);
         if (length <= 0)
             return false;
-        d.Slice(offset, length).CopyTo(_data.AsSpan(_position));
-        _position += length;
-        PacketCount++;
+        _packets[d[2]] = d.Slice(offset, length).ToArray();
         return true;
     }
 
-    public byte[] ToArray() => _data[..Math.Min(_position, Nfc.AmiiboSize)];
+    public byte[] ToArray()
+    {
+        var all = _packets.Values.SelectMany(p => p).Take(Nfc.AmiiboSize).ToArray();
+        return all;
+    }
 }

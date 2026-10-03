@@ -315,7 +315,9 @@ internal sealed class TrayApp : ApplicationContext
             foreach (var p in _settings.NamedProfiles)
             {
                 string name = p.Name;
-                profiles.DropDownItems.Add(Radio(name, _settings.ForcedProfile == name, () => ForceProfile(name)));
+                var item = Radio(name, _settings.ForcedProfile == name, () => ForceProfile(name));
+                item.Tag = Tr.UserData; // Profilname nicht übersetzen
+                profiles.DropDownItems.Add(item);
             }
             menu.Items.Add(profiles);
         }

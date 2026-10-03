@@ -204,7 +204,13 @@ internal sealed class WiimoteHidLink : IControllerLink
                 // Nach jedem Statusbericht sendet die Fernbedienung nur noch Tasten: Format neu setzen,
                 // bei geänderter Erweiterung diese neu erkennen.
                 if (Volatile.Read(ref _closed) == 0 && LastState is not null)
-                    SetupExtensionAsync(_cts.Token).Forget($"{Id}: Erweiterung {(changed ? "erkennen" : "Format setzen")}");
+                {
+                    if (changed)
+                        SetupExtensionAsync(_cts.Token).Forget($"{Id}: Erweiterung erkennen");
+                    else
+                        SendAsync(Wii.SetMode(_extension == WiiExtension.WiiUPro ? Wii.ModeButtonsExt19 : Wii.ModeButtonsAccelExt, _rumble), _cts.Token)
+                            .Forget($"{Id}: Datenformat setzen");
+                }
                 return;
             }
             case Wii.InputRead when Wii.TryParseRead(r, out int error, out _, out var data):

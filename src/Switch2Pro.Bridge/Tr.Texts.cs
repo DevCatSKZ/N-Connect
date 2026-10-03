@@ -275,5 +275,15 @@ internal static partial class Tr
         ["Verstanden"] = "Got it",
         ["Einstellungen öffnen"] = "Open settings",
         ["Willkommen"] = "Welcome",
+        ["Erst IR-Kamera bzw. Ring-Con ausschalten (sie nutzen denselben Zusatzprozessor wie der NFC-Leser)."] =
+            "Turn off the IR camera or Ring-Con first (they use the same co-processor as the NFC reader).",
+        ["Erst die IR-Kamera schließen (Ring-Con und IR-Kamera nutzen denselben Zusatzprozessor)."] =
+            "Close the IR camera first (Ring-Con and IR camera use the same co-processor).",
+        ["Erst den Ring-Con ausschalten (Ring-Con und IR-Kamera nutzen denselben Zusatzprozessor)."] =
+            "Turn off the Ring-Con first (Ring-Con and IR camera use the same co-processor).",
+        ["amiibo zu früh entfernt"] = "amiibo removed too early",
+        ["MCU startet nicht"] = "co-processor does not start",
+        ["NFC-Modus nicht aktiv"] = "NFC mode not active",
+        ["Kopplung fehlgeschlagen – Details im Protokoll."] = "Pairing failed – details in the log.",
     };
 }
