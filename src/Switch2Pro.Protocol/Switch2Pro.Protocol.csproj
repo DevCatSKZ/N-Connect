@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Reines Protokoll ohne Windows-Abhängigkeiten: auf jedem Betriebssystem testbar. -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Switch2Pro.Protocol.Tests" />
+  </ItemGroup>
+</Project>
