@@ -29,7 +29,7 @@ internal sealed class Switch1HidLink : IControllerLink
     private int _closed, _lostRaised;
     private Task? _reader;
 
-    public ControllerKind Kind { get; }
+    public ControllerKind Kind { get; private set; }
     public Transport Transport { get; }
     public string Id { get; }
     public string? Address { get; private set; }
@@ -85,6 +85,13 @@ internal sealed class Switch1HidLink : IControllerLink
             // Byte 4–9: MAC (big-endian).
             Address = string.Join(':', info.Skip(4).Take(6).Select(b => b.ToString("X2")));
             Info = Info with { Firmware = $"{info[0]}.{info[1]:D2}" };
+            // Byte 2: Gerätetyp – NES-Controller geben sich per Produkt-ID als Joy-Con aus.
+            var detected = ControllerKinds.FromSwitch1DeviceType(info[2], Kind);
+            if (detected != Kind)
+            {
+                Log.Info($"{Id}: Gerätetyp 0x{info[2]:X2} → {detected.DisplayName()}");
+                Kind = detected;
+            }
         }
         else
         {

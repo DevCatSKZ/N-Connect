@@ -128,6 +128,33 @@ public static class ControllerButtons
             .. Face, ProButtons.ZR, ProButtons.ZL, ProButtons.L, ProButtons.R, ProButtons.Plus, ProButtons.Home,
             ProButtons.Capture, ProButtons.C, .. Dpad,
         ],
+        ControllerKind.NesController => [ProButtons.A, ProButtons.B, ProButtons.L, ProButtons.R, ProButtons.Minus, ProButtons.Plus, .. Dpad],
+        ControllerKind.SnesController =>
+        [
+            .. Face, ProButtons.L, ProButtons.R, ProButtons.ZL, ProButtons.ZR, ProButtons.Minus, ProButtons.Plus, .. Dpad,
+        ],
+        // N64 nach NormalizeClassic: A = B-Position, B = Y-Position; C-Tasten sind der rechte Stick.
+        ControllerKind.N64Controller =>
+        [
+            ProButtons.B, ProButtons.Y, ProButtons.ZL, ProButtons.ZR, ProButtons.L, ProButtons.R, ProButtons.Plus,
+            ProButtons.Home, ProButtons.Capture, .. Dpad,
+        ],
+        ControllerKind.MegaDrive =>
+        [
+            ProButtons.Y, ProButtons.B, ProButtons.A, ProButtons.L, ProButtons.X, ProButtons.R, ProButtons.Minus, ProButtons.Plus,
+            ProButtons.Home, ProButtons.Capture, .. Dpad,
+        ],
+        // Wii-Fernbedienung (siehe WiiReports): quer gehalten 1/2 = Y/B-Position, A, B (Abzug), +/−, HOME;
+        // mit Nunchuk C/Z, mit Classic Controller alle Tasten wie beim Pro Controller.
+        ControllerKind.WiiRemote =>
+        [
+            .. Face, ProButtons.L, ProButtons.R, ProButtons.ZL, ProButtons.ZR, ProButtons.Minus, ProButtons.Plus, ProButtons.Home, .. Dpad,
+        ],
+        ControllerKind.WiiUPro =>
+        [
+            .. Face, ProButtons.L, ProButtons.R, ProButtons.ZL, ProButtons.ZR, ProButtons.Minus, ProButtons.Plus,
+            ProButtons.LeftStick, ProButtons.RightStick, ProButtons.Home, .. Dpad,
+        ],
         _ => Enum.GetValues<ProButtons>().Where(b => b != ProButtons.None).ToArray(),
     };
 
@@ -149,6 +176,31 @@ public static class ControllerButtons
                 case ProButtons.R: return "R (ganz durchgedrückt)";
                 case ProButtons.Plus: return "START/PAUSE";
             }
+        }
+        switch (kind, button)
+        {
+            case (ControllerKind.NesController or ControllerKind.SnesController, ProButtons.Minus): return "SELECT";
+            case (ControllerKind.NesController or ControllerKind.SnesController, ProButtons.Plus): return "START";
+            case (ControllerKind.N64Controller, ProButtons.B): return "A";
+            case (ControllerKind.N64Controller, ProButtons.Y): return "B";
+            case (ControllerKind.N64Controller, ProButtons.ZL): return "Z";
+            case (ControllerKind.N64Controller, ProButtons.Plus): return "START";
+            case (ControllerKind.MegaDrive, ProButtons.Y): return "A";
+            case (ControllerKind.MegaDrive, ProButtons.B): return "B";
+            case (ControllerKind.MegaDrive, ProButtons.A): return "C";
+            case (ControllerKind.MegaDrive, ProButtons.L): return "X";
+            case (ControllerKind.MegaDrive, ProButtons.X): return "Y";
+            case (ControllerKind.MegaDrive, ProButtons.R): return "Z";
+            case (ControllerKind.MegaDrive, ProButtons.Minus): return "MODE";
+            case (ControllerKind.MegaDrive, ProButtons.Plus): return "START";
+            case (ControllerKind.WiiRemote, ProButtons.Y): return "1 (quer) / Classic Y";
+            case (ControllerKind.WiiRemote, ProButtons.B): return "2 (quer) / Classic B";
+            case (ControllerKind.WiiRemote, ProButtons.A): return "A";
+            case (ControllerKind.WiiRemote, ProButtons.ZR): return "B (Abzug) / Classic ZR";
+            case (ControllerKind.WiiRemote, ProButtons.ZL): return "Nunchuk Z / Classic ZL";
+            case (ControllerKind.WiiRemote, ProButtons.L): return "Nunchuk C / Classic L";
+            case (ControllerKind.WiiRemote, ProButtons.R): return "Classic R";
+            case (ControllerKind.WiiRemote, ProButtons.X): return "Classic X";
         }
         if (kind.IsJoyCon() && kind != ControllerKind.JoyConPair)
         {

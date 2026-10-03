@@ -192,6 +192,10 @@ internal static class UsbNative
     [DllImport("hid.dll")]
     private static extern int HidP_GetCaps(IntPtr preparsed, out HIDP_CAPS caps);
 
+    /// <summary>Ausgabebericht über den Steuerkanal (für Geräte, die WriteFile ablehnen, z. B. manche Wii-Fernbedienungen).</summary>
+    [DllImport("hid.dll", SetLastError = true)]
+    public static extern bool HidD_SetOutputReport(SafeFileHandle device, byte[] report, int length);
+
     public static HIDP_CAPS GetHidCaps(SafeFileHandle device)
     {
         if (!HidD_GetPreparsedData(device, out var preparsed))

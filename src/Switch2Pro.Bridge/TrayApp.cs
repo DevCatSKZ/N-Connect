@@ -54,7 +54,11 @@ internal sealed class TrayApp : ApplicationContext
 
         _manager = new ControllerManager(() => _settings, _factory);
         _manager.Changed += () => _ui.Post(_ => UpdateTooltip(), null);
-        _manager.Notify += message => _ui.Post(_ => _icon.ShowBalloonTip(2500, "Nintendo Controller", message, ToolTipIcon.Info), null);
+        _manager.Notify += message => _ui.Post(_ =>
+        {
+            _balloonUrl = null;
+            _icon.ShowBalloonTip(2500, "Nintendo Controller", message, ToolTipIcon.Info);
+        }, null);
         _manager.ControllerConnected += (address, _) => _ui.Post(_ => RememberController(address), null);
         _manager.JoyConModeChanged += (address, single) => _ui.Post(_ =>
         {
@@ -65,7 +69,7 @@ internal sealed class TrayApp : ApplicationContext
         if (_settings.DsuServer)
             _dsu = DsuServer.Start();
         _manager.StartAsync().Forget("Controller-Suche starten");
-        if (Environment.GetCommandLineArgs().Contains("--demo"))
+        if (Environment.GetCommandLineArgs().Any(a => a.StartsWith("--demo", StringComparison.Ordinal)))
             _manager.StartDemo();
 
         _settingsWatcher = new FileSystemWatcher(Paths.SettingsDir, Path.GetFileName(Paths.SettingsFile))
@@ -84,6 +88,13 @@ internal sealed class TrayApp : ApplicationContext
         BuildMenu();
         _profileTimer.Tick += (_, _) => DetectProfile();
         _profileTimer.Start();
+        _icon.BalloonTipClicked += (_, _) =>
+        {
+            if (_balloonUrl is { } url)
+                Open(url);
+        };
+        _icon.BalloonTipClosed += (_, _) => _balloonUrl = null;
+        CheckForUpdateAsync().Forget("Update-Prüfung");
 
         if (Program.ShowSignal is { } signal)
         {
@@ -101,6 +112,20 @@ internal sealed class TrayApp : ApplicationContext
             return;
         _settings.KnownControllers = [.. _settings.KnownControllers, address];
         SaveSettings();
+    }
+
+    private WiiPairForm? _wiiPairing;
+
+    /// <summary>Wii-Fernbedienung / Wii U Pro Controller mit Windows koppeln (einmalig).</summary>
+    internal void ShowWiiPairing()
+    {
+        if (_wiiPairing is { IsDisposed: false })
+        {
+            _wiiPairing.Activate();
+            return;
+        }
+        _wiiPairing = new WiiPairForm();
+        _wiiPairing.Show();
     }
 
     private void ShowWelcome()
@@ -183,6 +208,26 @@ internal sealed class TrayApp : ApplicationContext
         }
         // NotifyIcon.Text ist auf 127 Zeichen begrenzt.
         _icon.Text = text.Length > 127 ? text[..127] : text;
+        UpdateIcon();
+    }
+
+    private UpdateCheck.Update? _update;
+    /// <summary>Ziel beim Klick auf die zuletzt gezeigte Einblendung (nur bei der Update-Meldung gesetzt).</summary>
+    private string? _balloonUrl;
+
+    private async Task CheckForUpdateAsync()
+    {
+        await Task.Delay(TimeSpan.FromSeconds(10));
+        if (!_settings.CheckForUpdates)
+            return;
+        var update = await UpdateCheck.FindAsync(CancellationToken.None);
+        if (update is null)
+            return;
+        _update = update;
+        Log.Info($"Neue Version {update.Version} verfügbar (installiert: {UpdateCheck.Current})");
+        _balloonUrl = update.Url;
+        _icon.ShowBalloonTip(8000, "Neue Version verfügbar",
+            $"Version {update.Version} ist erschienen (installiert: {UpdateCheck.Current}). Klicken zum Herunterladen.", ToolTipIcon.Info);
     }
 
     private static string Battery(Player p)
@@ -204,6 +249,12 @@ internal sealed class TrayApp : ApplicationContext
         ControllerKind.JoyCon1Right => "Joy-Con R",
         ControllerKind.JoyConPair => "Joy-Con L+R",
         ControllerKind.GameCube2 => "GameCube",
+        ControllerKind.NesController => "NES",
+        ControllerKind.SnesController => "SNES",
+        ControllerKind.N64Controller => "N64",
+        ControllerKind.MegaDrive => "Mega Drive",
+        ControllerKind.WiiRemote => "Wii",
+        ControllerKind.WiiUPro => "Wii U Pro",
         _ => "Controller",
     };
 
@@ -273,8 +324,11 @@ internal sealed class TrayApp : ApplicationContext
 
         menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add(new ToolStripMenuItem("Einstellungen …", null, (_, _) => ShowSettings()) { Font = _boldFont ??= new Font(menu.Font, FontStyle.Bold) });
+        menu.Items.Add("Wii-Controller koppeln …", null, (_, _) => ShowWiiPairing());
         menu.Items.Add("Kurzanleitung", null, (_, _) => ShowWelcome());
         menu.Items.Add("Protokoll öffnen", null, (_, _) => Open(Paths.LogFile));
+        if (_update is { } update)
+            menu.Items.Add(new ToolStripMenuItem($"⬇ Neue Version {update.Version} herunterladen …", null, (_, _) => Open(update.Url)) { Font = _boldFont });
         menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add("Beenden", null, (_, _) => ExitThread());
     }
@@ -304,7 +358,10 @@ internal sealed class TrayApp : ApplicationContext
         _settings.DetectedProfile = detected;
         Log.Info($"Programm im Vordergrund: {exe} → Profil {detected ?? "Standard"}");
         if (_settings.ForcedProfile is null)
+        {
+            _balloonUrl = null;
             _icon.ShowBalloonTip(1500, "Nintendo Controller", $"Profil „{detected ?? "Standard"}“ aktiv", ToolTipIcon.None);
+        }
     }
 
     [System.Runtime.InteropServices.DllImport("user32.dll")]
@@ -356,25 +413,79 @@ internal sealed class TrayApp : ApplicationContext
     }
 
     /// <summary>Symbol zur Laufzeit zeichnen (stilisierter Controller), damit keine Binärdatei nötig ist.</summary>
-    private static Icon CreateIcon()
+    private static Icon CreateIcon() => DrawIcon(null, false);
+
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern bool DestroyIcon(IntPtr handle);
+
+    /// <summary>
+    /// Controller-Symbol, mit Akku: unten ein Balken in der Farbe des Ladestands (grün/gelb/rot) des schwächsten
+    /// Controllers, beim Laden mit Blitz. So sieht man den Akku, ohne das Fenster zu öffnen.
+    /// </summary>
+    private static Icon DrawIcon(int? battery, bool charging)
     {
         using var bmp = new Bitmap(32, 32);
         using (var g = Graphics.FromImage(bmp))
         {
             g.SmoothingMode = SmoothingMode.AntiAlias;
             g.Clear(Color.Transparent);
+            float top = battery is null ? 8 : 2; // mit Akkuanzeige rückt der Controller nach oben
             using var body = new SolidBrush(Color.FromArgb(45, 45, 50));
             using var path = new GraphicsPath();
             path.FillMode = FillMode.Winding;
-            path.AddEllipse(1, 8, 14, 20);
-            path.AddEllipse(17, 8, 14, 20);
-            path.AddRectangle(new Rectangle(8, 8, 16, 13));
+            path.AddEllipse(1, top, 14, 20);
+            path.AddEllipse(17, top, 14, 20);
+            path.AddRectangle(new RectangleF(8, top, 16, 13));
             g.FillPath(body, path);
             using var red = new SolidBrush(Color.FromArgb(230, 0, 18));
-            g.FillEllipse(red, 5, 11, 6, 6);
-            g.FillEllipse(red, 20, 15, 6, 6);
+            g.FillEllipse(red, 5, top + 3, 6, 6);
+            g.FillEllipse(red, 20, top + 7, 6, 6);
+            if (battery is { } percent)
+            {
+                var frame = new RectangleF(1, 23, 27, 8);
+                using (var back = new SolidBrush(Color.FromArgb(230, 20, 20, 24)))
+                    g.FillRectangle(back, frame.X - 1, frame.Y - 1, frame.Width + 5, frame.Height + 2);
+                using (var pen = new Pen(Color.White, 1.2f))
+                    g.DrawRectangle(pen, frame.X, frame.Y, frame.Width, frame.Height);
+                using (var tip = new SolidBrush(Color.White))
+                    g.FillRectangle(tip, frame.Right + 1, frame.Y + 2, 2, 4);
+                var level = percent < 15 ? Color.FromArgb(235, 70, 60) : percent < 35 ? Color.FromArgb(245, 185, 40) : Color.FromArgb(80, 210, 110);
+                using (var fill = new SolidBrush(level))
+                    g.FillRectangle(fill, frame.X + 1.5f, frame.Y + 1.5f, Math.Max(2f, (frame.Width - 3) * percent / 100f), frame.Height - 3);
+                if (charging)
+                {
+                    using var bolt = new SolidBrush(Color.White);
+                    g.FillPolygon(bolt, [new PointF(16, 22), new PointF(11, 28), new PointF(15, 28), new PointF(13, 33), new PointF(19, 26), new PointF(15, 26)]);
+                }
+            }
         }
-        return Icon.FromHandle(bmp.GetHicon());
+        // Kopie anlegen und das Windows-Handle sofort freigeben (sonst wächst der Handle-Verbrauch bei jeder Änderung).
+        IntPtr handle = bmp.GetHicon();
+        try
+        {
+            using var temp = Icon.FromHandle(handle);
+            return (Icon)temp.Clone();
+        }
+        finally
+        {
+            DestroyIcon(handle);
+        }
+    }
+
+    private (int? Battery, bool Charging) _shownBattery = (null, false);
+
+    /// <summary>Symbol nur neu zeichnen, wenn sich die angezeigte Akkustufe ändert (5-%-Schritte).</summary>
+    private void UpdateIcon()
+    {
+        var states = _manager?.Players.SelectMany(p => p.Links).Select(l => l.LastState).Where(s => s is { BatteryPercent: >= 0 }).ToList() ?? [];
+        var low = states.MinBy(s => s!.BatteryPercent);
+        (int?, bool) wanted = low is null ? (null, false) : (low.BatteryPercent / 5 * 5, low.Charging);
+        if (wanted == _shownBattery)
+            return;
+        _shownBattery = wanted;
+        var old = _icon.Icon;
+        _icon.Icon = DrawIcon(wanted.Item1, wanted.Item2);
+        old?.Dispose();
     }
 
     protected override void ExitThreadCore()

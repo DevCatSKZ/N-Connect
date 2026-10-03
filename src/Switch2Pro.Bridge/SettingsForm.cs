@@ -79,6 +79,8 @@ internal sealed class SettingsForm : Form
     [
         ControllerKind.Pro2, ControllerKind.JoyConPair, ControllerKind.JoyCon2Left, ControllerKind.JoyCon2Right,
         ControllerKind.GameCube2, ControllerKind.Pro1, ControllerKind.JoyCon1Left, ControllerKind.JoyCon1Right,
+        ControllerKind.NesController, ControllerKind.SnesController, ControllerKind.N64Controller, ControllerKind.MegaDrive,
+        ControllerKind.WiiRemote, ControllerKind.WiiUPro,
     ];
 
     private readonly RadioButton _xbox360 = new() { Text = "Xbox-360-Controller  (empfohlen – läuft mit fast allen Spielen)", AutoSize = true };
@@ -92,6 +94,7 @@ internal sealed class SettingsForm : Form
     private readonly CheckBox _autoReconnect = new() { Text = "Gekoppelte Controller per Tastendruck verbinden (ohne SYNC)", AutoSize = true };
     private readonly CheckBox _autostart = new() { Text = "Automatisch mit Windows starten", AutoSize = true };
     private readonly CheckBox _dsu = new() { Text = "Gyro für Emulatoren bereitstellen (Cemuhook/DSU, Port 26760 – wirkt nach Neustart)", AutoSize = true };
+    private readonly CheckBox _updates = new() { Text = "Beim Start nach neuer Version suchen (GitHub)", AutoSize = true };
 
     private readonly CheckBox _combine = new() { Text = "Zwei Joy-Con automatisch zu einem Controller zusammenfassen", AutoSize = true };
     private readonly CheckBox _mouse = new() { Text = "Joy-Con 2 als Maus, wenn er auf dem Tisch liegt", AutoSize = true };
@@ -177,12 +180,13 @@ internal sealed class SettingsForm : Form
         misc.Controls.Add(_autoReconnect);
         misc.Controls.Add(_autostart);
         misc.Controls.Add(_dsu);
+        misc.Controls.Add(_updates);
         misc.Controls.Add(new Label { Text = "Ohne Eingabe automatisch trennen nach:", AutoSize = true, Padding = new Padding(0, 6, 0, 0) });
         misc.Controls.Add(_inactivity);
         misc.Controls.Add(new Label { Text = "Gyro-Maus-Geschwindigkeit:", AutoSize = true, Padding = new Padding(12, 6, 0, 0) });
         misc.Controls.Add(_gyroMouseSpeed);
         misc.SetFlowBreak(_deadzone, true);
-        misc.SetFlowBreak(_dsu, true);
+        misc.SetFlowBreak(_updates, true);
         root.Controls.Add(WrapGroup("3. Vibration, Sticks, Verbinden, Gyro-Maus", misc));
 
         _gyroSource.Items.AddRange(["rechter Joy-Con (wie Switch)", "linker Joy-Con"]);
@@ -339,6 +343,7 @@ internal sealed class SettingsForm : Form
         _autoReconnect.CheckedChanged += (_, _) => Apply(() => _settings.AutoReconnect = _autoReconnect.Checked);
         _autostart.CheckedChanged += (_, _) => { if (!_loading) Autostart.Set(_autostart.Checked); };
         _dsu.CheckedChanged += (_, _) => Apply(() => _settings.DsuServer = _dsu.Checked);
+        _updates.CheckedChanged += (_, _) => Apply(() => _settings.CheckForUpdates = _updates.Checked);
         _combine.CheckedChanged += (_, _) => Apply(() => _settings.CombineJoyCons = _combine.Checked);
         _mouse.CheckedChanged += (_, _) => Apply(() => _settings.JoyConMouse = _mouse.Checked);
         _mouseSpeed.ValueChanged += (_, _) => Apply(() => _settings.MouseSpeed = _mouseSpeed.Value / 10f);
@@ -388,6 +393,7 @@ internal sealed class SettingsForm : Form
         _autostart.Checked = Autostart.IsEnabled || Autostart.IsEnabledForAllUsers;
         _autostart.Enabled = !Autostart.IsEnabledForAllUsers; // vom Installer für alle Benutzer eingetragen
         _dsu.Checked = _settings.DsuServer;
+        _updates.Checked = _settings.CheckForUpdates;
         _combine.Checked = _settings.CombineJoyCons;
         _mouse.Checked = _settings.JoyConMouse;
         _mouseSpeed.Value = Math.Clamp((int)MathF.Round(_settings.MouseSpeed * 10), 1, 50);

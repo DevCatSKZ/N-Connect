@@ -203,6 +203,21 @@ internal sealed class HidChannel : IDisposable
         }
     }
 
+    /// <summary>
+    /// Ausgabebericht über den Steuerkanal statt über WriteFile (synchron). Ausweg für Bluetooth-Geräte, deren
+    /// Treiber WriteFile ablehnt. false bei Fehler.
+    /// </summary>
+    public bool SetOutputReport(byte[] report)
+    {
+        var buffer = report;
+        if (OutputLength > 0 && report.Length != OutputLength)
+        {
+            buffer = new byte[OutputLength];
+            report.AsSpan(0, Math.Min(report.Length, OutputLength)).CopyTo(buffer);
+        }
+        return HidD_SetOutputReport(_file, buffer, buffer.Length);
+    }
+
     public void Dispose()
     {
         _stream.Dispose();

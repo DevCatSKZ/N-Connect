@@ -83,6 +83,11 @@ internal sealed partial class InputView : Control
             PaintJoyCons(g, parts);
             return;
         }
+        if (_input is { Kind: var kind } && IsRetro(kind))
+        {
+            PaintRetro(g, kind);
+            return;
+        }
         var controller = g.Save();
         g.TranslateTransform(X0, 0);
 

@@ -70,6 +70,13 @@ public static class Mapping
             };
         }
 
+        if (s.Kind.IsClassic())
+            return NormalizeClassic(s.Kind, input);
+
+        // Wii Classic Controller: analoge Trigger (0–255); ohne Classic Controller kommen −1 = keine.
+        if (s.Kind == ControllerKind.WiiRemote && s.LeftTrigger >= 0 && s.RightTrigger >= 0)
+            return input with { LeftTrigger = s.LeftTrigger / 255f, RightTrigger = s.RightTrigger / 255f };
+
         if (!sideways || !s.Kind.IsJoyCon())
             return input;
 
@@ -113,6 +120,53 @@ public static class Mapping
             BatteryPercent = battery,
             Charging = l.Charging && r.Charging,
         };
+    }
+
+    /// <summary>
+    /// Nintendo-Switch-Online-Controller in die einheitliche Anordnung bringen (Bits wie hid-nintendo, Linux):
+    /// NES/SNES wie beschriftet (A rechts, B unten …), ohne Sticks. N64: A unten, B links, Z = ZL, ZR = ZR,
+    /// C-Tasten werden der rechte Stick (wie in Emulatoren üblich). Mega Drive nach Position: A links, B unten,
+    /// C rechts, Y oben, X/Z = Schultertasten, MODE = −.
+    /// </summary>
+    private static PadInput NormalizeClassic(ControllerKind kind, PadInput input)
+    {
+        var b = input.Buttons;
+        switch (kind)
+        {
+            case ControllerKind.NesController:
+            case ControllerKind.SnesController:
+                return input with { LeftX = 0, LeftY = 0, RightX = 0, RightY = 0, Motion = null };
+            case ControllerKind.N64Controller:
+            {
+                // Rohbits: Y = C-hoch, ZR = C-runter, X = C-links, − = C-rechts, linker Stickklick = ZR.
+                float cx = (b.HasFlag(ProButtons.Minus) ? 1 : 0) - (b.HasFlag(ProButtons.X) ? 1 : 0);
+                float cy = (b.HasFlag(ProButtons.Y) ? 1 : 0) - (b.HasFlag(ProButtons.ZR) ? 1 : 0);
+                var t = Translate(b,
+                [
+                    (ProButtons.A, ProButtons.B), (ProButtons.B, ProButtons.Y), (ProButtons.ZL, ProButtons.ZL),
+                    (ProButtons.LeftStick, ProButtons.ZR), (ProButtons.L, ProButtons.L), (ProButtons.R, ProButtons.R),
+                    (ProButtons.Plus, ProButtons.Plus), (ProButtons.Home, ProButtons.Home), (ProButtons.Capture, ProButtons.Capture),
+                    (ProButtons.Up, ProButtons.Up), (ProButtons.Down, ProButtons.Down), (ProButtons.Left, ProButtons.Left),
+                    (ProButtons.Right, ProButtons.Right),
+                ]);
+                return input with { Buttons = t, RightX = cx, RightY = cy, Motion = null };
+            }
+            case ControllerKind.MegaDrive:
+            {
+                var t = Translate(b,
+                [
+                    (ProButtons.A, ProButtons.Y), (ProButtons.B, ProButtons.B), (ProButtons.R, ProButtons.A),
+                    (ProButtons.Y, ProButtons.X), (ProButtons.X, ProButtons.L), (ProButtons.L, ProButtons.R),
+                    (ProButtons.ZR, ProButtons.Minus), (ProButtons.Plus, ProButtons.Plus), (ProButtons.Home, ProButtons.Home),
+                    (ProButtons.Capture, ProButtons.Capture),
+                    (ProButtons.Up, ProButtons.Up), (ProButtons.Down, ProButtons.Down), (ProButtons.Left, ProButtons.Left),
+                    (ProButtons.Right, ProButtons.Right),
+                ]);
+                return input with { Buttons = t, LeftX = 0, LeftY = 0, RightX = 0, RightY = 0, Motion = null };
+            }
+            default:
+                return input;
+        }
     }
 
     private static readonly (ProButtons From, ProButtons To)[] LeftSideways =
@@ -161,6 +215,9 @@ public static class Mapping
     {
         // GameCube: Tasten nach Position (die Beschriftung passt zu keinem Schema), Z = RB,
         // ZL = LB, die digitalen Trigger-Klicks sind durch die analogen Trigger abgedeckt.
+        // N64 und Mega Drive: Tasten sind schon nach Position angeordnet (siehe NormalizeClassic).
+        if (kind is ControllerKind.N64Controller or ControllerKind.MegaDrive)
+            layout = FaceButtonLayout.Xbox;
         if (kind == ControllerKind.GameCube2)
         {
             layout = FaceButtonLayout.Xbox;

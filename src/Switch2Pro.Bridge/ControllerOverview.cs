@@ -35,7 +35,8 @@ internal sealed class ControllerOverview : Panel
         ForeColor = MutedColor, BackColor = Background, Font = EmptyFont,
         Text = "Kein Controller verbunden\n\n" +
                "Switch-2-Controller: kurz die SYNC-Taste drücken – danach reicht ein beliebiger Tastendruck.\n" +
-               "Switch-1-Controller: einmal in Windows unter „Bluetooth“ koppeln – die App erkennt ihn dann automatisch.",
+               "Switch-1- und NSO-Controller (NES, SNES, N64, Mega Drive): einmal in Windows unter „Bluetooth“ koppeln.\n" +
+               "Wii-Fernbedienung / Wii U Pro: Rechtsklick auf das Symbol im Infobereich → „Wii-Controller koppeln …“.",
     };
     private readonly Dictionary<Player, Card> _byPlayer = [];
 
@@ -265,6 +266,7 @@ internal sealed class ControllerOverview : Panel
                 var first = links.FirstOrDefault();
                 if (first is not null)
                     _view.SetColors(first.Info.BodyColor, first.Info.ButtonColor, first.Info.GripColor);
+                _view.WiiExtension = first is Links.WiimoteHidLink wii ? wii.Extension : WiiExtension.None;
                 _view.Show(input, gamepad);
             }
             _view.PlayerIndex = player.Index;

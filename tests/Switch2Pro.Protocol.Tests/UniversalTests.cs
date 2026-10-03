@@ -585,6 +585,103 @@ public class DsuTests
     }
 
     [Fact]
+    public void NsoControllersAreDetectedByDeviceType()
+    {
+        Assert.Equal(ControllerKind.NesController, ControllerKinds.FromSwitch1DeviceType(0x09, ControllerKind.JoyCon1Right));
+        Assert.Equal(ControllerKind.SnesController, ControllerKinds.FromSwitch1DeviceType(0x0B, ControllerKind.Unknown));
+        Assert.Equal(ControllerKind.N64Controller, ControllerKinds.FromSwitch1DeviceType(0x0C, ControllerKind.Unknown));
+        Assert.Equal(ControllerKind.MegaDrive, ControllerKinds.FromSwitch1DeviceType(0x0D, ControllerKind.Unknown));
+        Assert.Equal(ControllerKind.JoyCon1Right, ControllerKinds.FromSwitch1DeviceType(0x02, ControllerKind.JoyCon1Right));
+    }
+
+    [Fact]
+    public void N64CButtonsBecomeRightStickAndAIsBottom()
+    {
+        // Rohbits (hid-nintendo): A = A, Y = C-hoch, − = C-rechts, linker Stickklick = ZR.
+        var raw = new ControllerState
+        {
+            Kind = ControllerKind.N64Controller,
+            Buttons = ProButtons.A | ProButtons.Y | ProButtons.Minus | ProButtons.LeftStick,
+            LeftX = 2048, LeftY = 2048, RightX = 0, RightY = 0,
+        };
+        var p = Mapping.Normalize(raw, new DeviceCalibration());
+        Assert.Equal(1f, p.RightX);
+        Assert.Equal(1f, p.RightY);
+        Assert.True(p.Has(ProButtons.B));        // N64 A sitzt unten
+        Assert.True(p.Has(ProButtons.ZR));
+        Assert.False(p.Has(ProButtons.Minus));
+        var g = Mapping.ToGamepad(p, new Settings { Layout = FaceButtonLayout.Switch2 });
+        Assert.True(g.Buttons.HasFlag(XButtons.A)); // nach Position, auch bei Nintendo-Belegung
+        Assert.Equal(255, g.RightTrigger);
+    }
+
+    [Fact]
+    public void MegaDriveButtonsByPosition()
+    {
+        var raw = new ControllerState { Kind = ControllerKind.MegaDrive, Buttons = ProButtons.A | ProButtons.R | ProButtons.ZR };
+        var p = Mapping.Normalize(raw, new DeviceCalibration());
+        Assert.True(p.Has(ProButtons.Y));    // MD A links
+        Assert.True(p.Has(ProButtons.A));    // MD C rechts
+        Assert.True(p.Has(ProButtons.Minus)); // MODE
+        Assert.Equal(0f, p.LeftX);           // kein Stick
+    }
+
+    [Fact]
+    public void WiiRemoteSidewaysAndNunchuk()
+    {
+        // 0x35: Tasten (Hoch + 2), Beschleunigung, Nunchuk (Stick rechts, Z gedrückt)
+        var r = new byte[22];
+        r[0] = 0x35; r[1] = 0x08; r[2] = 0x01;
+        r[3] = 0x80; r[4] = 0x80; r[5] = 0x80 + 26;
+        r[6] = 0xE0; r[7] = 0x80; r[11] = 0x02; // C nicht gedrückt (1), Z gedrückt (0)
+        Assert.True(Wii.TryParseData(r, WiiExtension.None, 80, out var alone));
+        Assert.True(alone.Has(ProButtons.Left));  // quer: Hoch → Links
+        Assert.True(alone.Has(ProButtons.B));     // 2
+        Assert.Equal(4096, alone.Motion!.Value.AccelZ);
+        Assert.True(Wii.TryParseData(r, WiiExtension.Nunchuk, 80, out var nun));
+        Assert.True(nun.Has(ProButtons.Up));
+        Assert.True(nun.Has(ProButtons.ZL));
+        Assert.False(nun.Has(ProButtons.L));
+        Assert.Equal(0xE0 << 4, nun.LeftX);
+    }
+
+    [Fact]
+    public void WiiUProParsesSticksButtonsBattery()
+    {
+        var e = new byte[11];
+        void U12(int o, int v) { e[o] = (byte)v; e[o + 1] = (byte)(v >> 8); }
+        U12(0, 3000); U12(2, 2048); U12(4, 1000); U12(6, 2048);
+        e[8] = 0xFF & ~0x10; // Minus gedrückt
+        e[9] = 0xFF & ~0x10; // A gedrückt
+        e[10] = 0x40 | 0x01 | 0x08; // Akku-Stufe 4, rechter Stick nicht, linker Stick gedrückt (Bit1 = 0), lädt (Bit2 = 0)
+        Assert.True(Wii.TryParseWiiUPro(e, out var s));
+        Assert.Equal(3000, s.LeftX);
+        Assert.Equal(1000, s.LeftY);
+        Assert.True(s.Has(ProButtons.Minus));
+        Assert.True(s.Has(ProButtons.A));
+        Assert.True(s.Has(ProButtons.LeftStick));
+        Assert.False(s.Has(ProButtons.RightStick));
+        Assert.Equal(100, s.BatteryPercent);
+        Assert.True(s.Charging);
+    }
+
+    [Fact]
+    public void WiiExtensionIdsAndReports()
+    {
+        Assert.Equal(WiiExtension.Nunchuk, Wii.ExtensionFromId([0, 0, 0xA4, 0x20, 0, 0]));
+        Assert.Equal(WiiExtension.Classic, Wii.ExtensionFromId([1, 0, 0xA4, 0x20, 1, 1]));
+        Assert.Equal(WiiExtension.WiiUPro, Wii.ExtensionFromId([0, 0, 0xA4, 0x20, 1, 0x20]));
+        Assert.Equal(WiiExtension.Other, Wii.ExtensionFromId([0, 0, 0xA4, 0x20, 4, 5]));
+        Assert.Equal([0x11, 0x21], Wii.Leds(1, true));                 // Spieler 2, Vibration an
+        Assert.Equal([0x12, 0x04, 0x35], Wii.SetMode(0x35, false));
+        var w = Wii.WriteRegister(0xA400F0, [0x55], false);
+        Assert.Equal([0x16, 0x04, 0xA4, 0x00, 0xF0, 0x01, 0x55], w[..7]);
+        Assert.True(Wii.TryParseStatus([0x20, 0, 0, 0x02, 0, 0, 200], out bool ext, out int bat));
+        Assert.True(ext);
+        Assert.Equal(100, bat);
+    }
+
+    [Fact]
     public void GameCubeIgnoresLegacyRemap()
     {
         var s = new Settings(); // Standard-Remap enthält C = None (Pro Controller)

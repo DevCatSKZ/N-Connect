@@ -362,7 +362,9 @@ internal sealed class ControllerManager : IAsyncDisposable
         {
             using var timeout = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token);
             timeout.CancelAfter(TimeSpan.FromSeconds(15));
-            var link = await Switch1HidLink.ConnectAsync(path, kind, timeout.Token);
+            IControllerLink link = kind == ControllerKind.WiiRemote
+                ? await WiimoteHidLink.ConnectAsync(path, timeout.Token)
+                : await Switch1HidLink.ConnectAsync(path, kind, timeout.Token);
             Attach(link);
         }
         catch (OperationCanceledException) when (_disposed)
@@ -670,6 +672,17 @@ internal sealed class ControllerManager : IAsyncDisposable
     public void StartDemo()
     {
         Log.Info("Demo-Modus: simulierte Controller werden hinzugefügt");
+        if (Environment.GetCommandLineArgs().Contains("--demo-retro"))
+        {
+            int n = 10;
+            foreach (var kind in new[]
+                     {
+                         ControllerKind.SnesController, ControllerKind.NesController, ControllerKind.N64Controller,
+                         ControllerKind.MegaDrive, ControllerKind.WiiRemote, ControllerKind.WiiUPro,
+                     })
+                Attach(new DemoLink(kind, n++));
+            return;
+        }
         Attach(new DemoLink(ControllerKind.Pro2, 1));
         Attach(new DemoLink(ControllerKind.JoyCon2Left, 2));
         Attach(new DemoLink(ControllerKind.JoyCon2Right, 3));
@@ -738,7 +751,12 @@ internal static class Switch1Devices
                  {
                      ("2009", ControllerKind.Pro1),
                      ("2006", ControllerKind.JoyCon1Left),
-                     ("2007", ControllerKind.JoyCon1Right),
+                     ("2007", ControllerKind.JoyCon1Right),   // auch NES-Controller (Typ aus der Geräteinfo)
+                     ("2017", ControllerKind.SnesController),
+                     ("2019", ControllerKind.N64Controller),
+                     ("201e", ControllerKind.MegaDrive),
+                     ("0306", ControllerKind.WiiRemote),
+                     ("0330", ControllerKind.WiiRemote),       // Fernbedienung Plus oder Wii U Pro (Erweiterungskennung)
                  })
         {
             if (p.Contains($"pid&{pid}") || p.Contains($"pid_{pid}"))

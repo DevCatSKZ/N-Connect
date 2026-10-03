@@ -47,6 +47,18 @@ public enum ControllerKind
     JoyCon1Right,
     /// <summary>Zwei Joy-Con, zu einem Controller zusammengefasst.</summary>
     JoyConPair,
+    /// <summary>Nintendo Switch Online: NES-Controller (L oder R, auch Famicom).</summary>
+    NesController,
+    /// <summary>Nintendo Switch Online: SNES-Controller.</summary>
+    SnesController,
+    /// <summary>Nintendo Switch Online: Nintendo-64-Controller.</summary>
+    N64Controller,
+    /// <summary>Nintendo Switch Online: SEGA Mega Drive / Genesis-Controller.</summary>
+    MegaDrive,
+    /// <summary>Wii-Fernbedienung (auch Plus), ggf. mit Nunchuk oder Classic Controller.</summary>
+    WiiRemote,
+    /// <summary>Wii U Pro Controller.</summary>
+    WiiUPro,
 }
 
 public static class ControllerKinds
@@ -87,7 +99,30 @@ public static class ControllerKinds
         ControllerKind.JoyCon1Left => "Nintendo Switch Joy-Con (L)",
         ControllerKind.JoyCon1Right => "Nintendo Switch Joy-Con (R)",
         ControllerKind.JoyConPair => "Nintendo Joy-Con (L+R)",
+        ControllerKind.NesController => "NES Controller (Nintendo Switch Online)",
+        ControllerKind.SnesController => "SNES Controller (Nintendo Switch Online)",
+        ControllerKind.N64Controller => "Nintendo 64 Controller (Nintendo Switch Online)",
+        ControllerKind.MegaDrive => "SEGA Mega Drive Controller (Nintendo Switch Online)",
+        ControllerKind.WiiRemote => "Wii-Fernbedienung",
+        ControllerKind.WiiUPro => "Wii U Pro Controller",
         _ => "Nintendo Controller",
+    };
+
+    /// <summary>Nintendo-Switch-Online-Controller (Switch-1-Protokoll, eigene Tastenanordnung).</summary>
+    public static bool IsClassic(this ControllerKind k) =>
+        k is ControllerKind.NesController or ControllerKind.SnesController or ControllerKind.N64Controller or ControllerKind.MegaDrive;
+
+    /// <summary>
+    /// Art aus dem Gerätetyp der Antwort auf „Geräteinfo“ (Switch-1-Protokoll, Byte 2): NES-Controller melden
+    /// sich mit der Produkt-ID eines Joy-Con und sind nur hieran zu erkennen. Typen nach hid-nintendo (Linux).
+    /// </summary>
+    public static ControllerKind FromSwitch1DeviceType(byte type, ControllerKind fallback) => type switch
+    {
+        0x07 or 0x08 or 0x09 or 0x0A => ControllerKind.NesController, // Famicom/NES links/rechts
+        0x0B => ControllerKind.SnesController,
+        0x0C => ControllerKind.N64Controller,
+        0x0D => ControllerKind.MegaDrive,
+        _ => fallback,
     };
 }
 

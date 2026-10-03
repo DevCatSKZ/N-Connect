@@ -8,6 +8,16 @@ internal static class Program
     [STAThread]
     private static void Main()
     {
+        // Prüfhilfe: alle Controller-Grafiken als PNG speichern (ohne Controller, ohne Fenster).
+        var args = Environment.GetCommandLineArgs();
+        int render = Array.IndexOf(args, "--render");
+        if (render >= 0 && render + 1 < args.Length)
+        {
+            ApplicationConfiguration.Initialize();
+            RenderCheck.Run(args[render + 1]);
+            return;
+        }
+
         // Nur eine Instanz pro Benutzer: zwei Programme würden um denselben Controller streiten.
         using var mutex = new Mutex(true, @"Local\Switch2ProBridge", out bool first);
         using var showSignal = new EventWaitHandle(false, EventResetMode.AutoReset, @"Local\Switch2ProBridge.Show");
