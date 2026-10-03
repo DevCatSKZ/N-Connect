@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Diagnose-Werkzeug: prüft die USB-Verbindung zum Controller ohne virtuellen Controller. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RootNamespace>Switch2Pro.Bridge</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\src\Switch2Pro.Bridge\Usb\UsbNative.cs" Link="Usb\UsbNative.cs" />
+    <Compile Include="..\..\src\Switch2Pro.Bridge\Usb\UsbChannels.cs" Link="Usb\UsbChannels.cs" />
+    <Compile Include="..\..\src\Switch2Pro.Bridge\Log.cs" Link="Log.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Switch2Pro.Protocol\Switch2Pro.Protocol.csproj" />
+  </ItemGroup>
+</Project>

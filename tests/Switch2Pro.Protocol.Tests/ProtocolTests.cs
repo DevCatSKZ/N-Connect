@@ -148,9 +148,21 @@ public class InputReportTests
 
 public class RumbleTests
 {
+    /// <summary>Bitweise gleich wie SDL EncodeHDRumble(hf, ha &lt;&lt; 6, lf, la &lt;&lt; 6).</summary>
     [Fact]
-    public void Neutraler_Frame_wie_in_der_Referenz() =>
-        Assert.Equal(Commands.Hex("E1 00 10 1E 00"), Rumble.EncodeFrame(0x0E1, 0, 0x1E1, 0));
+    public void Frame_wie_SDL()
+    {
+        static byte[] Sdl(int hf, int ha16, int lf, int la16) =>
+        [
+            (byte)(hf & 0xFF),
+            (byte)(((ha16 >> 4) & 0xFC) | ((hf >> 8) & 0x03)),
+            (byte)((ha16 >> 12) | (lf << 4)),
+            (byte)((la16 & 0xC0) | ((lf >> 4) & 0x3F)),
+            (byte)(la16 >> 8),
+        ];
+        Assert.Equal(Sdl(0x187, 300 << 6, 0x112, 453 << 6), Rumble.EncodeFrame(0x187, 300, 0x112, 453));
+        Assert.Equal(Sdl(0x187, 0, 0x112, 0), Rumble.EncodeFrame(0x187, 0, 0x112, 0));
+    }
 
     [Fact]
     public void Paket_hat_Zaehler_auf_beiden_Seiten()
@@ -160,12 +172,24 @@ public class RumbleTests
         Assert.Equal(0, p[0]);
         Assert.Equal(0x53, p[1]);
         Assert.Equal(0x53, p[17]);
-        Assert.NotEqual(Rumble.EncodeFrame(0x0E1, 0, 0x1E1, 0), p[2..7]);
+        Assert.Equal(p[2..7], p[18..23]);
+        Assert.Equal(Rumble.EncodeFrame(0x187, Rumble.MaxAmplitude, 0x112, Rumble.MaxAmplitude), p[2..7]);
     }
 
     [Fact]
-    public void Stopp_Paket_ist_neutral() =>
-        Assert.Equal(Rumble.EncodeFrame(0x0E1, 0, 0x1E1, 0), Rumble.StopPacket(0)[2..7]);
+    public void Usb_Bericht_wie_SDL()
+    {
+        var r = Rumble.BuildUsbReport(0, 255, 1, strength: 227f / Rumble.MaxAmplitude);
+        Assert.Equal(64, r.Length);
+        Assert.Equal(0x02, r[0]);
+        Assert.Equal(0x51, r[1]);
+        Assert.Equal(0x51, r[0x11]);
+        Assert.Equal(Rumble.EncodeFrame(0x187, 227, 0x112, 0), r[2..7]);
+    }
+
+    [Fact]
+    public void Stopp_Paket_ohne_Amplitude() =>
+        Assert.Equal(Rumble.EncodeFrame(0x187, 0, 0x112, 0), Rumble.StopPacket(0)[2..7]);
 }
 
 public class MappingTests
@@ -234,7 +258,7 @@ public class MappingTests
     public void Ds4_Bericht_Grundzustand()
     {
         byte counter = 0;
-        var r = Mapping.ToDs4Report(default, new ControllerState(), default, 0, ref counter);
+        var r = Mapping.ToDs4Report(default, new PadInput(), 0, ref counter);
         Assert.Equal(63, r.Length);
         Assert.Equal(128, r[0]);
         Assert.Equal(128, r[1]);
@@ -247,7 +271,7 @@ public class MappingTests
     {
         byte counter = 0;
         var g = new GamepadState(XButtons.Up | XButtons.Right | XButtons.A, 0, 255, 0, 32767, 0, 0, false);
-        var r = Mapping.ToDs4Report(g, new ControllerState(), default, 0, ref counter);
+        var r = Mapping.ToDs4Report(g, new PadInput(), 0, ref counter);
         Assert.Equal(1, r[4] & 0x0F);         // oben rechts
         Assert.NotEqual(0, r[4] & (1 << 5));  // Kreuz
         Assert.NotEqual(0, r[5] & (1 << 3));  // R2
@@ -259,8 +283,8 @@ public class MappingTests
     public void Ds4_Gyro_Umrechnung()
     {
         byte counter = 0;
-        var s = new ControllerState { Motion = new Motion(0, 0, 4096, 1000, 0, 0) };
-        var r = Mapping.ToDs4Report(default, s, default, 0, ref counter);
+        var s = new PadInput { Motion = new Motion(0, 0, 4096, 1000, 0, 0) };
+        var r = Mapping.ToDs4Report(default, s, 0, ref counter);
         short gyroX = (short)(r[12] | (r[13] << 8));
         short accelY = (short)(r[20] | (r[21] << 8));
         Assert.InRange(gyroX, 975, 978);  // 1000 LSB ≈ 61 °/s ≈ 977 DS4-LSB

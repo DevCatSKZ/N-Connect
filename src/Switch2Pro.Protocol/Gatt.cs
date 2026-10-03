@@ -26,6 +26,20 @@ public static class Gatt
     /// <summary>Ausgabebericht 0x02: HD-Rumble links + rechts (Schreiben ohne Antwort).</summary>
     public static readonly Guid ProRumbleOutput = new("cc483f51-9258-427d-a939-630c31f72b05");
 
+    /// <summary>Vibration linker Joy-Con 2.</summary>
+    public static readonly Guid JoyConLeftRumbleOutput = new("289326cb-a471-485d-a8f4-240c14f18241");
+
+    /// <summary>Vibration rechter Joy-Con 2.</summary>
+    public static readonly Guid JoyConRightRumbleOutput = new("fa19b0fb-cd1f-46a7-84a1-bbb09e00c149");
+
+    /// <summary>Vibrationskanal je Controller-Art (GameCube: wie Pro, falls vorhanden).</summary>
+    public static Guid RumbleOutput(ControllerKind kind) => kind switch
+    {
+        ControllerKind.JoyCon2Left => JoyConLeftRumbleOutput,
+        ControllerKind.JoyCon2Right => JoyConRightRumbleOutput,
+        _ => ProRumbleOutput,
+    };
+
     /// <summary>Befehlskanal (Schreiben ohne Antwort).</summary>
     public static readonly Guid CommandOutput = new("649d4ac9-8eb7-4e6c-af44-1ea54fe5f005");
 

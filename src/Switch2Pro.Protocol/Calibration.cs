@@ -65,3 +65,17 @@ public readonly record struct GyroBias(float X, float Y, float Z)
         return true;
     }
 }
+
+/// <summary>Alle Kalibrierwerte eines Controllers.</summary>
+public sealed record DeviceCalibration
+{
+    public StickCalibration Left { get; init; } = StickCalibration.Default;
+    public StickCalibration Right { get; init; } = StickCalibration.Default;
+    /// <summary>Gyro-Nullpunkt in Switch-2-Rohwerten (Switch 1: bereits in den Bewegungsdaten verrechnet).</summary>
+    public GyroBias Gyro { get; init; }
+    /// <summary>Ruhewert der analogen Trigger (GameCube-Controller, Block 0x13140).</summary>
+    public int TriggerZeroLeft { get; init; } = 30;
+    public int TriggerZeroRight { get; init; } = 30;
+
+    public static DeviceCalibration Default { get; } = new();
+}

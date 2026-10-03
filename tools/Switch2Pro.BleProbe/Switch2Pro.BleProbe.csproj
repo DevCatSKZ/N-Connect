@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Diagnose-Werkzeug: prüft die Bluetooth-LE-Verbindung zu Switch-2-Controllern ohne virtuellen Controller. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows10.0.22621.0</TargetFramework>
+    <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Switch2Pro.Protocol\Switch2Pro.Protocol.csproj" />
+  </ItemGroup>
+</Project>

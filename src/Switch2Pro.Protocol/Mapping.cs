@@ -16,64 +16,281 @@ public readonly record struct GamepadState(
     short LeftX, short LeftY, short RightX, short RightY,
     bool Touchpad);
 
+/// <summary>
+/// Eingabe eines (virtuellen) Controllers nach Kalibrierung und Ausrichtung – für alle Controller-Arten gleich:
+/// Tasten im Schema eines Pro Controllers (B unten, A rechts, Y links, X oben), Sticks −1…1 (Y oben positiv),
+/// analoge Trigger 0…1 (oder null), Bewegungsdaten ohne Nullpunktfehler in Switch-2-Rohachsen.
+/// </summary>
+public sealed record PadInput
+{
+    public ControllerKind Kind { get; init; }
+    public ProButtons Buttons { get; init; }
+    public float LeftX { get; init; }
+    public float LeftY { get; init; }
+    public float RightX { get; init; }
+    public float RightY { get; init; }
+    public float? LeftTrigger { get; init; }
+    public float? RightTrigger { get; init; }
+    public Motion? Motion { get; init; }
+    public int BatteryPercent { get; init; } = -1;
+    public bool Charging { get; init; }
+
+    public bool Has(ProButtons b) => (Buttons & b) != 0;
+}
+
 public static class Mapping
 {
-    /// <summary>Standardziel jeder Controller-Taste je nach Belegung (ohne freie Umbelegung).</summary>
-    public static ExtraButtonTarget DefaultTarget(ProButtons button, FaceButtonLayout layout) => button switch
+    // ---------- 1. Normalisieren: jede Controller-Art → einheitliche Eingabe ----------
+
+    /// <summary>
+    /// Kalibriert und richtet aus. Ein einzelner Joy-Con wird quer gehalten (wie an der Konsole):
+    /// Stick und Tasten werden gedreht, SL/SR werden zu L/R. Geometrie wie SDL (Switch 1, erprobt).
+    /// </summary>
+    public static PadInput Normalize(ControllerState s, DeviceCalibration cal, bool sideways = true)
     {
-        ProButtons.A => layout == FaceButtonLayout.Xbox ? ExtraButtonTarget.B : ExtraButtonTarget.A,
-        ProButtons.B => layout == FaceButtonLayout.Xbox ? ExtraButtonTarget.A : ExtraButtonTarget.B,
-        ProButtons.X => layout == FaceButtonLayout.Xbox ? ExtraButtonTarget.Y : ExtraButtonTarget.X,
-        ProButtons.Y => layout == FaceButtonLayout.Xbox ? ExtraButtonTarget.X : ExtraButtonTarget.Y,
-        ProButtons.L => ExtraButtonTarget.LB,
-        ProButtons.R => ExtraButtonTarget.RB,
-        ProButtons.ZL => ExtraButtonTarget.LT,
-        ProButtons.ZR => ExtraButtonTarget.RT,
-        ProButtons.Minus => ExtraButtonTarget.Back,
-        ProButtons.Plus => ExtraButtonTarget.Start,
-        ProButtons.Home => ExtraButtonTarget.Guide,
-        ProButtons.LeftStick => ExtraButtonTarget.LS,
-        ProButtons.RightStick => ExtraButtonTarget.RS,
-        ProButtons.Up => ExtraButtonTarget.Up,
-        ProButtons.Down => ExtraButtonTarget.Down,
-        ProButtons.Left => ExtraButtonTarget.Left,
-        ProButtons.Right => ExtraButtonTarget.Right,
-        ProButtons.Capture => ExtraButtonTarget.Touchpad,
-        _ => ExtraButtonTarget.None, // C, GL, GR, Headset
-    };
+        float lx = cal.Left.X.Normalize(s.LeftX), ly = cal.Left.Y.Normalize(s.LeftY);
+        float rx = cal.Right.X.Normalize(s.RightX), ry = cal.Right.Y.Normalize(s.RightY);
+        var motion = s.Motion is { } m ? Unbias(m, cal.Gyro) : (Motion?)null;
+        var input = new PadInput
+        {
+            Kind = s.Kind,
+            Buttons = s.Buttons,
+            LeftX = lx, LeftY = ly, RightX = rx, RightY = ry,
+            Motion = motion,
+            BatteryPercent = s.BatteryPercent,
+            Charging = s.Charging,
+        };
+
+        if (s.Kind == ControllerKind.GameCube2 && s.LeftTrigger >= 0 && s.RightTrigger >= 0)
+        {
+            return input with
+            {
+                LeftTrigger = Trigger(s.LeftTrigger, cal.TriggerZeroLeft),
+                RightTrigger = Trigger(s.RightTrigger, cal.TriggerZeroRight),
+            };
+        }
+
+        if (!sideways || !s.Kind.IsJoyCon())
+            return input;
+
+        if (s.Kind.IsLeftJoyCon())
+        {
+            // Quer, Schiene oben: Gerät +X zeigt nach oben, +Y nach links.
+            return input with
+            {
+                Buttons = Translate(s.Buttons, LeftSideways),
+                LeftX = -ly, LeftY = lx, RightX = 0, RightY = 0,
+                Motion = motion is { } lm ? lm with { AccelX = Neg(lm.AccelY), AccelY = lm.AccelX, GyroX = Neg(lm.GyroY), GyroY = lm.GyroX } : null,
+            };
+        }
+        // Rechter Joy-Con quer: Gerät +X zeigt nach unten, +Y nach rechts. Sein Stick wird der linke Stick.
+        return input with
+        {
+            Buttons = Translate(s.Buttons, RightSideways),
+            LeftX = ry, LeftY = -rx, RightX = 0, RightY = 0,
+            Motion = motion is { } rm ? rm with { AccelX = rm.AccelY, AccelY = Neg(rm.AccelX), GyroX = rm.GyroY, GyroY = Neg(rm.GyroX) } : null,
+        };
+    }
+
+    /// <summary>
+    /// Zwei Joy-Con zu einem Controller: linker Stick vom linken, rechter vom rechten, Gyro vom gewählten
+    /// Joy-Con (Standard wie an der Switch: rechts; fehlen dessen Daten, vom anderen).
+    /// </summary>
+    public static PadInput Merge(ControllerState left, DeviceCalibration leftCal, ControllerState right, DeviceCalibration rightCal,
+        GyroSource gyro = GyroSource.Right)
+    {
+        var l = Normalize(left, leftCal, sideways: false);
+        var r = Normalize(right, rightCal, sideways: false);
+        const ProButtons rails = ProButtons.SLLeft | ProButtons.SRLeft | ProButtons.SLRight | ProButtons.SRRight;
+        int battery = l.BatteryPercent < 0 ? r.BatteryPercent : r.BatteryPercent < 0 ? l.BatteryPercent : Math.Min(l.BatteryPercent, r.BatteryPercent);
+        return new PadInput
+        {
+            Kind = ControllerKind.JoyConPair,
+            Buttons = (l.Buttons | r.Buttons) & ~rails,
+            LeftX = l.LeftX, LeftY = l.LeftY,
+            RightX = r.RightX, RightY = r.RightY,
+            Motion = gyro == GyroSource.Left ? l.Motion ?? r.Motion : r.Motion ?? l.Motion,
+            BatteryPercent = battery,
+            Charging = l.Charging && r.Charging,
+        };
+    }
+
+    private static readonly (ProButtons From, ProButtons To)[] LeftSideways =
+    [
+        (ProButtons.Left, ProButtons.B), (ProButtons.Down, ProButtons.A),
+        (ProButtons.Up, ProButtons.Y), (ProButtons.Right, ProButtons.X),
+        (ProButtons.SLLeft, ProButtons.L), (ProButtons.SRLeft, ProButtons.R),
+        (ProButtons.L, ProButtons.ZL), (ProButtons.ZL, ProButtons.ZR),
+        (ProButtons.Minus, ProButtons.Plus), (ProButtons.Capture, ProButtons.Home),
+        (ProButtons.LeftStick, ProButtons.LeftStick),
+    ];
+
+    private static readonly (ProButtons From, ProButtons To)[] RightSideways =
+    [
+        (ProButtons.A, ProButtons.B), (ProButtons.X, ProButtons.A),
+        (ProButtons.B, ProButtons.Y), (ProButtons.Y, ProButtons.X),
+        (ProButtons.SLRight, ProButtons.L), (ProButtons.SRRight, ProButtons.R),
+        (ProButtons.R, ProButtons.ZL), (ProButtons.ZR, ProButtons.ZR),
+        (ProButtons.Plus, ProButtons.Plus), (ProButtons.Home, ProButtons.Home),
+        (ProButtons.RightStick, ProButtons.LeftStick), (ProButtons.C, ProButtons.C),
+    ];
+
+    private static ProButtons Translate(ProButtons buttons, (ProButtons From, ProButtons To)[] table)
+    {
+        var result = ProButtons.None;
+        foreach (var (from, to) in table)
+            if ((buttons & from) != 0)
+                result |= to;
+        return result;
+    }
+
+    private static float Trigger(int raw, int zero) => Math.Clamp((raw - zero) / (232f - zero), 0f, 1f);
+
+    private static short Neg(short v) => v == short.MinValue ? short.MaxValue : (short)-v;
+
+    private static Motion Unbias(Motion m, GyroBias bias)
+    {
+        static short C(float v) => (short)Math.Clamp(MathF.Round(v), -32768f, 32767f);
+        return m with { GyroX = C(m.GyroX - bias.X), GyroY = C(m.GyroY - bias.Y), GyroZ = C(m.GyroZ - bias.Z) };
+    }
+
+    // ---------- 2. Belegung: einheitliche Eingabe → Xbox-Schema ----------
+
+    /// <summary>Standardziel jeder Taste je nach Belegung (ohne freie Umbelegung).</summary>
+    public static ExtraButtonTarget DefaultTarget(ProButtons button, FaceButtonLayout layout, ControllerKind kind = ControllerKind.Pro2)
+    {
+        // GameCube: Tasten nach Position (die Beschriftung passt zu keinem Schema), Z = RB,
+        // ZL = LB, die digitalen Trigger-Klicks sind durch die analogen Trigger abgedeckt.
+        if (kind == ControllerKind.GameCube2)
+        {
+            layout = FaceButtonLayout.Xbox;
+            switch (button)
+            {
+                case ProButtons.ZR: return ExtraButtonTarget.RB;
+                case ProButtons.ZL: return ExtraButtonTarget.LB;
+                case ProButtons.R or ProButtons.L: return ExtraButtonTarget.None;
+                case ProButtons.C: return ExtraButtonTarget.Back;
+            }
+        }
+        return button switch
+        {
+            ProButtons.A => layout == FaceButtonLayout.Xbox ? ExtraButtonTarget.B : ExtraButtonTarget.A,
+            ProButtons.B => layout == FaceButtonLayout.Xbox ? ExtraButtonTarget.A : ExtraButtonTarget.B,
+            ProButtons.X => layout == FaceButtonLayout.Xbox ? ExtraButtonTarget.Y : ExtraButtonTarget.X,
+            ProButtons.Y => layout == FaceButtonLayout.Xbox ? ExtraButtonTarget.X : ExtraButtonTarget.Y,
+            ProButtons.L => ExtraButtonTarget.LB,
+            ProButtons.R => ExtraButtonTarget.RB,
+            ProButtons.ZL => ExtraButtonTarget.LT,
+            ProButtons.ZR => ExtraButtonTarget.RT,
+            ProButtons.Minus => ExtraButtonTarget.Back,
+            ProButtons.Plus => ExtraButtonTarget.Start,
+            ProButtons.Home => ExtraButtonTarget.Guide,
+            ProButtons.LeftStick => ExtraButtonTarget.LS,
+            ProButtons.RightStick => ExtraButtonTarget.RS,
+            ProButtons.Up => ExtraButtonTarget.Up,
+            ProButtons.Down => ExtraButtonTarget.Down,
+            ProButtons.Left => ExtraButtonTarget.Left,
+            ProButtons.Right => ExtraButtonTarget.Right,
+            ProButtons.Capture => ExtraButtonTarget.Touchpad,
+            _ => ExtraButtonTarget.None, // C, GL, GR, Headset, SL/SR
+        };
+    }
 
     private static readonly ProButtons[] AllButtons =
         Enum.GetValues<ProButtons>().Where(b => b != ProButtons.None).ToArray();
 
-    /// <summary>Switch-Zustand → Xbox-Schema (gilt auch als Grundlage für DualShock 4).</summary>
-    public static GamepadState ToGamepad(ControllerState s, Settings settings, StickCalibration left, StickCalibration right)
+    /// <summary>Ergebnis der Belegung: Gamepad-Zustand, gehaltene Tastenkombinationen und Sonderaktionen.</summary>
+    public sealed record Output(GamepadState Gamepad, HashSet<string> Keys, SpecialAction Specials, bool ShiftActive);
+
+    /// <summary>
+    /// Wendet die Belegung an: geltendes Profil (Standard oder benannt), Shift-Ebene (solange eine Taste mit der
+    /// Aktion „Shift“ gehalten wird), Totzone der Controller-Art.
+    /// </summary>
+    public static Output Evaluate(PadInput p, Settings settings)
     {
-        var b = XButtons.None;
-        bool lt = false, rt = false, touchpad = false;
+        var profile = settings.CurrentProfile();
+        bool shift = false;
         foreach (var button in AllButtons)
         {
-            if (!s.Has(button))
+            if (p.Has(button) && ActionFor(button, p.Kind, settings, profile, shift: false).Special.HasFlag(SpecialAction.Shift))
+            {
+                shift = true;
+                break;
+            }
+        }
+
+        var b = XButtons.None;
+        bool lt = false, rt = false, touchpad = false;
+        var keys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var specials = SpecialAction.None;
+        foreach (var button in AllButtons)
+        {
+            if (!p.Has(button))
                 continue;
-            var target = settings.Remap.TryGetValue(button, out var custom) ? custom : DefaultTarget(button, settings.Layout);
-            switch (target)
+            var action = ActionFor(button, p.Kind, settings, profile, shift);
+            if (action.IsKeyboard)
+                keys.Add(action.Keys!);
+            specials |= action.Special;
+            switch (action.Target)
             {
                 case ExtraButtonTarget.None: break;
                 case ExtraButtonTarget.LT: lt = true; break;
                 case ExtraButtonTarget.RT: rt = true; break;
                 case ExtraButtonTarget.Touchpad: touchpad = true; break;
-                default: b |= Enum.Parse<XButtons>(target.ToString()); break;
+                default: b |= Enum.Parse<XButtons>(action.Target.ToString()); break;
             }
         }
 
-        var (lx, ly) = Stick(s.LeftX, s.LeftY, left, settings.StickDeadzone);
-        var (rx, ry) = Stick(s.RightX, s.RightY, right, settings.StickDeadzone);
-        return new GamepadState(b, (byte)(lt ? 255 : 0), (byte)(rt ? 255 : 0), lx, ly, rx, ry, touchpad);
+        byte TriggerByte(bool digital, float? analog) =>
+            digital ? (byte)255 : analog is { } a ? (byte)MathF.Round(Math.Clamp(a, 0f, 1f) * 255f) : (byte)0;
+
+        float deadzone = settings.DeadzoneFor(p.Kind);
+        var (lx, ly) = Stick(p.LeftX, p.LeftY, deadzone);
+        var (rx, ry) = Stick(p.RightX, p.RightY, deadzone);
+        var gamepad = new GamepadState(b, TriggerByte(lt, p.LeftTrigger), TriggerByte(rt, p.RightTrigger), lx, ly, rx, ry, touchpad);
+        return new Output(gamepad, keys, specials, shift);
     }
 
-    /// <summary>Kalibrieren, radiale Totzone mit weichem Übergang, Kreis begrenzen.</summary>
-    public static (short X, short Y) Stick(int rawX, int rawY, StickCalibration cal, float deadzone)
+    /// <summary>Einheitliche Eingabe → Xbox-Schema (gilt auch als Grundlage für DualShock 4).</summary>
+    public static GamepadState ToGamepad(PadInput p, Settings settings) => Evaluate(p, settings).Gamepad;
+
+    /// <summary>Tastenkombinationen (Hotkeys), die gerade gehalten werden sollen.</summary>
+    public static HashSet<string> KeyboardActions(PadInput p, Settings settings) => Evaluate(p, settings).Keys;
+
+    /// <summary>Aktion einer Taste im gerade geltenden Profil (normale Ebene).</summary>
+    public static ButtonAction ActionFor(ProButtons button, ControllerKind kind, Settings settings) =>
+        ActionFor(button, kind, settings, settings.CurrentProfile(), shift: false);
+
+    /// <summary>
+    /// Aktion einer Taste: auf der Shift-Ebene zuerst deren Belegung; dann die Belegung des Profils
+    /// (benanntes Profil oder Standard) für die Controller-Art; sonst freie Umbelegung; sonst Standard.
+    /// </summary>
+    public static ButtonAction ActionFor(ProButtons button, ControllerKind kind, Settings settings, NamedProfile? profile, bool shift)
     {
-        float x = cal.X.Normalize(rawX), y = cal.Y.Normalize(rawY);
+        if (shift && Lookup(profile?.ShiftButtons ?? settings.ShiftProfiles, kind, button) is { } shifted)
+            return shifted;
+        if (Lookup(profile?.Buttons ?? settings.Profiles, kind, button) is { } mapped)
+            return mapped;
+        // Die alte freie Umbelegung gilt nicht für den GameCube-Controller (eigene Standardbelegung, z. B. C = Back).
+        if (kind != ControllerKind.GameCube2 && settings.Remap.TryGetValue(button, out var custom))
+            return ButtonAction.Gamepad(custom);
+        return ButtonAction.Gamepad(DefaultTarget(button, settings.Layout, kind));
+    }
+
+    private static ButtonAction? Lookup(Dictionary<ControllerKind, Dictionary<ProButtons, string>> maps, ControllerKind kind, ProButtons button) =>
+        maps.TryGetValue(kind, out var map) && map.TryGetValue(button, out var text) ? ButtonAction.Parse(text) : null;
+
+    /// <summary>Kurzform für einen einzelnen Controller (z. B. Pro Controller).</summary>
+    public static GamepadState ToGamepad(ControllerState s, Settings settings, StickCalibration left, StickCalibration right) =>
+        ToGamepad(Normalize(s, new DeviceCalibration { Left = left, Right = right }), settings);
+
+    /// <summary>Rohwerte kalibrieren und mit radialer Totzone abbilden.</summary>
+    public static (short X, short Y) Stick(int rawX, int rawY, StickCalibration cal, float deadzone) =>
+        Stick(cal.X.Normalize(rawX), cal.Y.Normalize(rawY), deadzone);
+
+    /// <summary>Radiale Totzone mit weichem Übergang, auf den Kreis begrenzt.</summary>
+    public static (short X, short Y) Stick(float x, float y, float deadzone)
+    {
         float mag = MathF.Sqrt(x * x + y * y);
         if (mag <= deadzone || mag == 0f)
             return (0, 0);
@@ -84,12 +301,15 @@ public static class Mapping
 
     private static short ToShort(float v) => (short)Math.Clamp(MathF.Round(v * 32767f), -32768f, 32767f);
 
+    // ---------- 3. DualShock-4-Bericht ----------
+
     /// <summary>
     /// Baut den 63-Byte-Bericht DS4_REPORT_EX für ViGEmBus (DualShock 4 ohne Report-ID).
-    /// Bewegungsdaten: Switch-Rohachsen → SDL-/DS4-Achsen wie in SDL (x, z, −y),
+    /// Bewegungsdaten: Switch-2-Rohachsen → SDL-/DS4-Achsen wie in SDL (x, z, −y),
     /// Gyro 2000 °/s ≙ 32767 → DS4 16 LSB pro °/s; Beschleunigung 4096 → 8192 LSB pro g.
+    /// <paramref name="timestamp"/> in DS4-Einheiten (5,33 µs).
     /// </summary>
-    public static byte[] ToDs4Report(GamepadState g, ControllerState s, GyroBias bias, ushort timestamp, ref byte touchCounter)
+    public static byte[] ToDs4Report(GamepadState g, PadInput p, ushort timestamp, ref byte touchCounter)
     {
         var r = new byte[63];
         r[0] = AxisToByte(g.LeftX, invert: false);
@@ -119,12 +339,12 @@ public static class Mapping
         r[10] = (byte)(timestamp >> 8);
         r[11] = 0xFF; // Temperatur/Batterie: unbenutzt
 
-        if (s.Motion is { } m)
+        if (p.Motion is { } m)
         {
             const float gyroScale = 16f * 2000f / 32767f;
-            Put16(r, 12, (m.GyroX - bias.X) * gyroScale);
-            Put16(r, 14, (m.GyroZ - bias.Z) * gyroScale);
-            Put16(r, 16, -(m.GyroY - bias.Y) * gyroScale);
+            Put16(r, 12, m.GyroX * gyroScale);
+            Put16(r, 14, m.GyroZ * gyroScale);
+            Put16(r, 16, -m.GyroY * gyroScale);
             Put16(r, 18, m.AccelX * 2f);
             Put16(r, 20, m.AccelZ * 2f);
             Put16(r, 22, -m.AccelY * 2f);
@@ -135,8 +355,8 @@ public static class Mapping
         }
 
         // Akkuanzeige (Bit 4 = Kabel, Rest = Stufe 0–10 bzw. 0–11 beim Laden).
-        int level = s.BatteryPercent < 0 ? 10 : Math.Clamp(s.BatteryPercent / 10, 0, 10);
-        r[29] = (byte)(s.Charging ? 0x10 | Math.Min(11, level) : level);
+        int level = p.BatteryPercent < 0 ? 10 : Math.Clamp(p.BatteryPercent / 10, 0, 10);
+        r[29] = (byte)(p.Charging ? 0x10 | Math.Min(11, level) : level);
 
         // Touchpad: kein Finger (Bit 7 gesetzt), sonst sehen Spiele Phantom-Berührungen.
         r[32] = 1;

@@ -4,6 +4,13 @@
 Copyright (c) Nefarius Software Solutions e.U. und Mitwirkende. BSD-3-Clause-Lizenz (ViGEmBus) bzw.
 MIT-Lizenz (ViGEm.Client). https://github.com/nefarius/ViGEmBus
 
+## HidHide (optional mitinstalliert)
+Copyright (c) Nefarius Software Solutions e.U. und Mitwirkende. Unverändert weitergegebener, signierter
+Original-Installer; es gilt die Lizenz des Projekts. https://github.com/nefarius/HidHide
+
+## SDL (USB-Start-Sequenz, Berichts- und Vibrationsformat per USB)
+Siehe Abschnitt „SDL“ unten (zlib-Lizenz).
+
 ## NS2Pro-Bridge-Windows (Start-Sequenz, Vibrationsformat)
 MIT License, Copyright (c) 2026 NS2 Pro Compatibility contributors.
 Die Bluetooth-Start-Sequenz und das HD-Rumble-2-Paketformat in `Commands.cs` und `Rumble.cs` beruhen darauf.

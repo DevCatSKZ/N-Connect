@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using Switch2Pro.Protocol;
@@ -17,6 +17,11 @@ internal sealed class TrayApp : ApplicationContext
     private readonly FileSystemWatcher? _settingsWatcher;
     private Settings _settings;
     private SettingsForm? _settingsForm;
+    private Font? _boldFont;
+    private DsuServer? _dsu;
+    private readonly System.Windows.Forms.Timer _reloadTimer = new() { Interval = 300 };
+    /// <summary>Prüft jede Sekunde das Programm im Vordergrund und wählt das passende Profil.</summary>
+    private readonly System.Windows.Forms.Timer _profileTimer = new() { Interval = 1000 };
 
     public TrayApp()
     {
@@ -26,7 +31,7 @@ internal sealed class TrayApp : ApplicationContext
         if (_settings.LoadError is { } err)
             Log.Warn($"settings.json fehlerhaft, nutze Standardwerte: {err}");
 
-        _icon = new NotifyIcon { Icon = CreateIcon(), Visible = true, Text = "Switch 2 Pro Controller" };
+        _icon = new NotifyIcon { Icon = CreateIcon(), Visible = true, Text = "Nintendo Controller" };
         _icon.ContextMenuStrip = new ContextMenuStrip();
         _icon.ContextMenuStrip.Opening += (_, _) => BuildMenu();
         // Linksklick = Einstellungen, Rechtsklick = Menü.
@@ -49,29 +54,45 @@ internal sealed class TrayApp : ApplicationContext
 
         _manager = new ControllerManager(() => _settings, _factory);
         _manager.Changed += () => _ui.Post(_ => UpdateTooltip(), null);
-        _manager.Notify += message => _ui.Post(_ => _icon.ShowBalloonTip(2500, "Switch 2 Pro Controller", message, ToolTipIcon.Info), null);
-        _manager.ControllerConnected += address => _ui.Post(_ => RememberController(address), null);
-        _ = _manager.StartAsync();
+        _manager.Notify += message => _ui.Post(_ => _icon.ShowBalloonTip(2500, "Nintendo Controller", message, ToolTipIcon.Info), null);
+        _manager.ControllerConnected += (address, _) => _ui.Post(_ => RememberController(address), null);
+        _manager.JoyConModeChanged += (address, single) => _ui.Post(_ =>
+        {
+            if (_settings.SetSingleJoyCon(address, single))
+                SaveSettings();
+        }, null);
+        _manager.SaveRequested += () => _ui.Post(_ => SaveSettings(), null);
+        if (_settings.DsuServer)
+            _dsu = DsuServer.Start();
+        _manager.StartAsync().Forget("Controller-Suche starten");
+        if (Environment.GetCommandLineArgs().Contains("--demo"))
+            _manager.StartDemo();
 
         _settingsWatcher = new FileSystemWatcher(Paths.SettingsDir, Path.GetFileName(Paths.SettingsFile))
         {
             NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size,
             EnableRaisingEvents = true,
         };
-        _settingsWatcher.Changed += (_, _) => _ui.Post(_ => ReloadSettings(), null);
+        // Editoren speichern oft in mehreren Schritten: entprellen statt die Oberfläche zu blockieren.
+        _reloadTimer.Tick += (_, _) => { _reloadTimer.Stop(); ReloadSettings(); };
+        _settingsWatcher.Changed += (_, _) => _ui.Post(_ => { _reloadTimer.Stop(); _reloadTimer.Start(); }, null);
 
         if (_settings.LoadError is not null)
             _icon.ShowBalloonTip(5000, "Einstellungen fehlerhaft",
                 "settings.json konnte nicht gelesen werden – es gelten die Standardwerte.", ToolTipIcon.Warning);
         UpdateTooltip();
         BuildMenu();
+        _profileTimer.Tick += (_, _) => DetectProfile();
+        _profileTimer.Start();
 
-        // Der Installer startet uns nach der Installation mit --autostart (im Kontext des
-        // angemeldeten Benutzers), damit der Autostart für genau diesen Benutzer eingetragen wird.
-        if (Environment.GetCommandLineArgs().Contains("--autostart") && !Autostart.IsEnabled)
-            Autostart.Set(true);
+        if (Program.ShowSignal is { } signal)
+        {
+            ThreadPool.RegisterWaitForSingleObject(signal, (_, _) => _ui.Post(_ => ShowSettings(), null), null, -1, executeOnlyOnce: false);
+        }
         if (firstRun)
             _ui.Post(_ => ShowWelcome(), null);
+        else if (!Environment.GetCommandLineArgs().Contains("--autostart"))
+            _ui.Post(_ => ShowSettings(), null); // von Hand gestartet: Fenster gleich zeigen
     }
 
     private void RememberController(string address)
@@ -102,15 +123,15 @@ internal sealed class TrayApp : ApplicationContext
             SaveSettings();
             if (outputChanged)
                 _manager?.ApplyOutputMode(_settings.OutputMode);
-        }, () => _manager?.Sessions.FirstOrDefault());
+        }, _manager);
         _settingsForm.Show();
         _settingsForm.Activate();
     }
 
     private void ReloadSettings()
     {
-        // Editor speichern oft in mehreren Schritten: kurz warten.
-        Thread.Sleep(150);
+        if (!File.Exists(Paths.SettingsFile))
+            return; // gelöscht: aktuelle Werte behalten statt alles auf Standard zu setzen
         var fresh = Settings.Load(Paths.SettingsFile);
         if (fresh.LoadError is not null)
         {
@@ -122,6 +143,8 @@ internal sealed class TrayApp : ApplicationContext
         _settings.CopyFrom(fresh);
         if (fresh.OutputMode != oldMode)
             _manager?.ApplyOutputMode(fresh.OutputMode);
+        if (_settingsForm is { IsDisposed: false } form)
+            form.ReloadValues(); // sonst arbeitet das Fenster mit veralteten Profilen weiter
         Log.Info("Einstellungen neu geladen");
     }
 
@@ -148,29 +171,48 @@ internal sealed class TrayApp : ApplicationContext
     {
         string text;
         if (_manager is null)
-            text = "Switch 2 Pro: ViGEmBus fehlt";
+            text = "Nintendo Controller: ViGEmBus fehlt";
         else if (_manager.AdapterProblem is { } problem)
-            text = $"Switch 2 Pro: {problem}";
+            text = $"Nintendo Controller: {problem}";
         else
         {
-            var sessions = _manager.Sessions;
-            text = sessions.Count == 0
-                ? "Switch 2 Pro: warte auf Controller (SYNC drücken)"
-                : "Switch 2 Pro: " + string.Join(", ", sessions.Select(s => $"P{s.PlayerIndex + 1} {Battery(s)}"));
+            var players = _manager.Players;
+            text = players.Count == 0
+                ? "Nintendo Controller: warte auf Controller (SYNC drücken)"
+                : string.Join("\n", players.Select(p => $"P{p.Index + 1} {ShortName(p.Kind)} {Battery(p)}"));
         }
         // NotifyIcon.Text ist auf 127 Zeichen begrenzt.
         _icon.Text = text.Length > 127 ? text[..127] : text;
     }
 
-    private static string Battery(ControllerSession s) => s.LastState is { BatteryPercent: >= 0 } st
-        ? $"{st.BatteryPercent} %{(st.Charging ? " ⚡" : "")}"
-        : "";
+    private static string Battery(Player p)
+    {
+        var states = p.Links.Select(l => l.LastState).Where(s => s is { BatteryPercent: >= 0 }).ToList();
+        if (states.Count == 0)
+            return "";
+        var low = states.MinBy(s => s!.BatteryPercent)!;
+        return $"{low.BatteryPercent} %{(low.Charging ? " ⚡" : "")}";
+    }
+
+    private static string ShortName(ControllerKind kind) => kind switch
+    {
+        ControllerKind.Pro2 => "Pro 2",
+        ControllerKind.Pro1 => "Pro",
+        ControllerKind.JoyCon2Left => "Joy-Con 2 L",
+        ControllerKind.JoyCon2Right => "Joy-Con 2 R",
+        ControllerKind.JoyCon1Left => "Joy-Con L",
+        ControllerKind.JoyCon1Right => "Joy-Con R",
+        ControllerKind.JoyConPair => "Joy-Con L+R",
+        ControllerKind.GameCube2 => "GameCube",
+        _ => "Controller",
+    };
 
     private void BuildMenu()
     {
         var menu = _icon.ContextMenuStrip!;
-        menu.Items.Clear();
-        menu.Items.Add(new ToolStripMenuItem("Switch 2 Pro Controller") { Enabled = false, Font = new Font(menu.Font, FontStyle.Bold) });
+        foreach (var item in menu.Items.Cast<ToolStripItem>().ToList())
+            item.Dispose(); // entfernt das Element zugleich aus dem Menü
+        menu.Items.Add(new ToolStripMenuItem("Nintendo Controller für Windows") { Enabled = false, Font = _boldFont ??= new Font(menu.Font, FontStyle.Bold) });
 
         if (_manager is null)
         {
@@ -183,13 +225,13 @@ internal sealed class TrayApp : ApplicationContext
         }
         else
         {
-            var sessions = _manager.Sessions;
-            if (sessions.Count == 0)
+            var players = _manager.Players;
+            if (players.Count == 0)
                 menu.Items.Add(new ToolStripMenuItem(_manager.IsConnecting
                     ? "Verbinde …"
-                    : "Kein Controller – SYNC-Taste oben am Controller kurz drücken") { Enabled = false });
-            foreach (var s in sessions)
-                menu.Items.Add(new ToolStripMenuItem($"Spieler {s.PlayerIndex + 1} · {s.AddressText} {Battery(s)}") { Enabled = false });
+                    : "Kein Controller – SYNC-Taste am Controller kurz drücken") { Enabled = false });
+            foreach (var p in players)
+                menu.Items.Add(new ToolStripMenuItem($"Spieler {p.Index + 1} · {p.Kind.DisplayName()} {Battery(p)}") { Enabled = false });
         }
 
         menu.Items.Add(new ToolStripSeparator());
@@ -207,16 +249,84 @@ internal sealed class TrayApp : ApplicationContext
             () => { _settings.Layout = FaceButtonLayout.Switch2; SaveSettings(); }));
         menu.Items.Add(layout);
 
+        if (_settings.NamedProfiles.Count > 0)
+        {
+            var profiles = new ToolStripMenuItem($"Profil: {_settings.CurrentProfile()?.Name ?? "Standard"}");
+            profiles.DropDownItems.Add(Radio("Automatisch (nach Spiel/Programm)", _settings.ForcedProfile is null, () => ForceProfile(null)));
+            profiles.DropDownItems.Add(new ToolStripSeparator());
+            profiles.DropDownItems.Add(Radio("Standard", _settings.ForcedProfile == "", () => ForceProfile("")));
+            foreach (var p in _settings.NamedProfiles)
+            {
+                string name = p.Name;
+                profiles.DropDownItems.Add(Radio(name, _settings.ForcedProfile == name, () => ForceProfile(name)));
+            }
+            menu.Items.Add(profiles);
+        }
+
         menu.Items.Add(new ToolStripMenuItem("Vibration", null, (_, _) => { _settings.RumbleEnabled = !_settings.RumbleEnabled; SaveSettings(); })
             { Checked = _settings.RumbleEnabled });
-        menu.Items.Add(new ToolStripMenuItem("Mit Windows starten", null, (_, _) => Autostart.Set(!Autostart.IsEnabled)) { Checked = Autostart.IsEnabled });
+        menu.Items.Add(new ToolStripMenuItem("Mit Windows starten", null, (_, _) => Autostart.Set(!Autostart.IsEnabled))
+        {
+            Checked = Autostart.IsEnabled || Autostart.IsEnabledForAllUsers,
+            Enabled = !Autostart.IsEnabledForAllUsers, // vom Installer für alle Benutzer eingetragen
+        });
 
         menu.Items.Add(new ToolStripSeparator());
-        menu.Items.Add(new ToolStripMenuItem("Einstellungen …", null, (_, _) => ShowSettings()) { Font = new Font(menu.Font, FontStyle.Bold) });
+        menu.Items.Add(new ToolStripMenuItem("Einstellungen …", null, (_, _) => ShowSettings()) { Font = _boldFont ??= new Font(menu.Font, FontStyle.Bold) });
         menu.Items.Add("Kurzanleitung", null, (_, _) => ShowWelcome());
         menu.Items.Add("Protokoll öffnen", null, (_, _) => Open(Paths.LogFile));
         menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add("Beenden", null, (_, _) => ExitThread());
+    }
+
+    /// <summary>Profil fest wählen ("" = Standard) oder null = automatisch nach Programm.</summary>
+    private void ForceProfile(string? name)
+    {
+        _settings.ForcedProfile = name;
+        SaveSettings();
+        Log.Info($"Profil: {(name is null ? "automatisch" : name == "" ? "Standard (fest)" : $"{name} (fest)")}");
+    }
+
+    /// <summary>Profil zum Programm im Vordergrund suchen (nur wenn es benannte Profile gibt).</summary>
+    private void DetectProfile()
+    {
+        if (_settings.NamedProfiles.Count == 0)
+        {
+            _settings.DetectedProfile = null;
+            return;
+        }
+        string? exe = ForegroundProgram();
+        if (exe is null || exe.Equals(Path.GetFileName(Environment.ProcessPath), StringComparison.OrdinalIgnoreCase))
+            return; // eigenes Fenster (z. B. beim Bearbeiten der Profile): Profil beibehalten
+        string? detected = _settings.NamedProfiles.FirstOrDefault(p => p.MatchesProgram(exe))?.Name;
+        if (detected == _settings.DetectedProfile)
+            return;
+        _settings.DetectedProfile = detected;
+        Log.Info($"Programm im Vordergrund: {exe} → Profil {detected ?? "Standard"}");
+        if (_settings.ForcedProfile is null)
+            _icon.ShowBalloonTip(1500, "Nintendo Controller", $"Profil „{detected ?? "Standard"}“ aktiv", ToolTipIcon.None);
+    }
+
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern IntPtr GetForegroundWindow();
+
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern uint GetWindowThreadProcessId(IntPtr window, out uint processId);
+
+    private static string? ForegroundProgram()
+    {
+        try
+        {
+            var window = GetForegroundWindow();
+            if (window == IntPtr.Zero || GetWindowThreadProcessId(window, out uint pid) == 0)
+                return null;
+            using var process = Process.GetProcessById((int)pid);
+            return process.ProcessName + ".exe";
+        }
+        catch (Exception e) when (e is ArgumentException or InvalidOperationException or System.ComponentModel.Win32Exception)
+        {
+            return null; // Prozess schon beendet oder geschützt
+        }
     }
 
     private static ToolStripMenuItem Radio(string text, bool selected, Action onClick) =>
@@ -255,6 +365,7 @@ internal sealed class TrayApp : ApplicationContext
             g.Clear(Color.Transparent);
             using var body = new SolidBrush(Color.FromArgb(45, 45, 50));
             using var path = new GraphicsPath();
+            path.FillMode = FillMode.Winding;
             path.AddEllipse(1, 8, 14, 20);
             path.AddEllipse(17, 8, 14, 20);
             path.AddRectangle(new Rectangle(8, 8, 16, 13));
@@ -271,11 +382,15 @@ internal sealed class TrayApp : ApplicationContext
         _icon.Visible = false;
         _settingsForm?.Close();
         _settingsWatcher?.Dispose();
+        _reloadTimer.Dispose();
+        _profileTimer.Dispose();
         if (_manager is not null)
         {
             // Sitzungen sauber beenden (Vibration stoppen, virtuelle Controller entfernen).
-            Task.Run(async () => await _manager.DisposeAsync()).Wait(TimeSpan.FromSeconds(3));
+            // Der Manager wartet laufende Verbindungsversuche ab; erst danach den ViGEm-Client freigeben.
+            Task.Run(async () => await _manager.DisposeAsync()).Wait(TimeSpan.FromSeconds(8));
         }
+        _dsu?.Dispose();
         _factory?.Dispose();
         _icon.Dispose();
         base.ExitThreadCore();

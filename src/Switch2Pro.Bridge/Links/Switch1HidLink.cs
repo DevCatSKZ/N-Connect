@@ -1,0 +1,323 @@
+using Switch2Pro.Bridge.Usb;
+using Switch2Pro.Protocol;
+
+namespace Switch2Pro.Bridge.Links;
+
+/// <summary>
+/// Switch-1-Controller (Pro Controller, Joy-Con L/R), in Windows per Bluetooth gekoppelt.
+/// Windows stellt ihn als HID-Gerät bereit; wir schalten ihn in den Vollbericht 0x30 (60 Hz, mit Gyro),
+/// lesen die Kalibrierung aus dem SPI-Flash und senden HD-Rumble. Ablauf wie SDL (SDL_hidapi_switch.c).
+/// </summary>
+internal sealed class Switch1HidLink : IControllerLink
+{
+    private const int ReplyTimeoutMs = 300;
+    private const int InputTimeoutMs = 3000;
+    private const int RumbleIntervalMs = 30;   // SDL: höchstens alle 30 ms schreiben
+    private const int RumbleRefreshMs = 50;    // und laufende Vibration alle 50 ms auffrischen
+
+    private readonly HidChannel _hid;
+    private readonly CancellationTokenSource _cts = new();
+    private readonly RateMeter _rate = new();
+    private readonly SemaphoreSlim _commandLock = new(1, 1);
+    private readonly object _replyGate = new();
+    private (byte Subcommand, uint Address, TaskCompletionSource<byte[]> Reply)? _pending;
+    private int _counter;
+    private ImuCalibration _imu = ImuCalibration.Default;
+    private long _lastInputTicks = Environment.TickCount64;
+    private volatile int _rumbleLarge, _rumbleSmall;
+    private float _rumbleStrength = 1f;
+    private int _closed, _lostRaised;
+    private Task? _reader;
+
+    public ControllerKind Kind { get; }
+    public Transport Transport { get; }
+    public string Id { get; }
+    public string? Address { get; private set; }
+    public DeviceCalibration Calibration { get; private set; } = DeviceCalibration.Default;
+    public ControllerInfo Info { get; private set; } = new();
+    public ControllerState? LastState { get; private set; }
+    public double ReportRate => _rate.Rate;
+    public bool IsLost => Volatile.Read(ref _lostRaised) == 1;
+
+    public event Action<IControllerLink, ControllerState>? StateReceived;
+    public event Action<IControllerLink>? Lost;
+
+    private Switch1HidLink(ControllerKind kind, string path, HidChannel hid, Transport transport)
+    {
+        Kind = kind;
+        Id = path;
+        _hid = hid;
+        Transport = transport;
+    }
+
+    public static async Task<Switch1HidLink> ConnectAsync(string hidPath, ControllerKind kind, CancellationToken ct)
+    {
+        var hid = new HidChannel(hidPath);
+        bool usb = hidPath.Contains("vid_057e&pid", StringComparison.OrdinalIgnoreCase);
+        var link = new Switch1HidLink(kind, hidPath, hid, usb ? Transport.Usb : Transport.Bluetooth);
+        try
+        {
+            await link.StartAsync(usb, ct);
+            return link;
+        }
+        catch
+        {
+            await link.DisposeAsync();
+            throw;
+        }
+    }
+
+    private async Task StartAsync(bool usb, CancellationToken ct)
+    {
+        _reader = Task.Run(() => ReadLoopAsync(_cts.Token));
+        if (usb)
+        {
+            // USB: Handshake, hohe Geschwindigkeit, Handshake, nur noch über USB senden (wie SDL).
+            foreach (byte cmd in new byte[] { 0x02, 0x03, 0x02, 0x04 })
+            {
+                await _hid.WriteAsync([0x80, cmd], ct);
+                await Task.Delay(30, ct);
+            }
+        }
+
+        if (await SubcommandAsync(Switch1.SubDeviceInfo, [], ct) is { Length: >= 10 } info)
+        {
+            // Byte 4–9: MAC (big-endian).
+            Address = string.Join(':', info.Skip(4).Take(6).Select(b => b.ToString("X2")));
+            Info = Info with { Firmware = $"{info[0]}.{info[1]:D2}" };
+        }
+        else
+        {
+            // Keine Antwort: kein (bereiter) Switch-1-Controller – später erneut versuchen.
+            throw new IOException($"{Id}: keine Geräte-Antwort");
+        }
+
+        await ReadCalibrationAsync(ct);
+        await SubcommandAsync(Switch1.SubSetInputMode, [Switch1.InputFull], ct);
+        await SubcommandAsync(Switch1.SubEnableImu, [0x01], ct);
+        await SubcommandAsync(Switch1.SubEnableVibration, [0x01], ct);
+        _lastInputTicks = Environment.TickCount64;
+        _ = Task.Run(() => WatchdogAsync(_cts.Token));
+        _ = Task.Run(() => RumbleLoopAsync(_cts.Token));
+        Log.Info($"{Id}: {Kind.DisplayName()} bereit ({Address ?? "?"})");
+    }
+
+    private async Task ReadCalibrationAsync(CancellationToken ct)
+    {
+        var cal = new DeviceCalibration();
+        async Task<StickCalibration?> Stick(uint user, uint factory, bool left)
+        {
+            if (await SpiReadAsync(user, 11, ct) is { } u && Switch1.HasUserMagic(u) && Switch1.TryParseStick(u.AsSpan(2), left, out var uc))
+                return uc;
+            if (await SpiReadAsync(factory, 9, ct) is { } f && Switch1.TryParseStick(f, left, out var fc))
+                return fc;
+            return null;
+        }
+        if (Kind != ControllerKind.JoyCon1Right && await Stick(Switch1.SpiUserStickLeft, Switch1.SpiFactoryStickLeft, true) is { } l)
+            cal = cal with { Left = l };
+        if (Kind != ControllerKind.JoyCon1Left && await Stick(Switch1.SpiUserStickRight, Switch1.SpiFactoryStickRight, false) is { } r)
+            cal = cal with { Right = r };
+
+        if (await SpiReadAsync(Switch1.SpiUserImu, 26, ct) is { } ui && Switch1.HasUserMagic(ui) && Switch1.TryParseImu(ui.AsSpan(2), out var uimu))
+            _imu = uimu;
+        else if (await SpiReadAsync(Switch1.SpiFactoryImu, 24, ct) is { } fi && Switch1.TryParseImu(fi, out var fimu))
+            _imu = fimu;
+
+        if (await SpiReadAsync(Switch1.SpiBodyColor, 12, ct) is { Length: 12 } color)
+        {
+            int C(int o) => color[o] << 16 | color[o + 1] << 8 | color[o + 2];
+            // Gehäuse, Tasten, Griff links, Griff rechts (Griffe nur beim Pro Controller belegt).
+            Info = Info with { BodyColor = C(0), ButtonColor = C(3), GripColor = Kind == ControllerKind.Pro1 ? C(6) : null };
+        }
+        Calibration = cal;
+        Log.Info($"{Id}: Kalibrierung L={cal.Left} R={cal.Right} IMU={_imu}");
+    }
+
+    private Task<byte[]?> SpiReadAsync(uint address, byte length, CancellationToken ct) =>
+        SubcommandAsync(Switch1.SubSpiRead, Switch1.SpiReadArgs(address, length), ct, address);
+
+    /// <summary>Unterbefehl senden (bis zu 3 Versuche) und Antwort 0x21 abwarten.</summary>
+    private async Task<byte[]?> SubcommandAsync(byte subcommand, byte[] data, CancellationToken ct, uint spiAddress = 0)
+    {
+        await _commandLock.WaitAsync(ct);
+        try
+        {
+            for (int attempt = 0; attempt < 3; attempt++)
+            {
+                var reply = new TaskCompletionSource<byte[]>(TaskCreationOptions.RunContinuationsAsynchronously);
+                lock (_replyGate)
+                    _pending = (subcommand, spiAddress, reply);
+                var rumble = CurrentRumble();
+                await _hid.WriteAsync(Switch1.Subcommand(Interlocked.Increment(ref _counter), subcommand, data, rumble), ct);
+                if (await Task.WhenAny(reply.Task, Task.Delay(ReplyTimeoutMs, ct)) == reply.Task)
+                    return await reply.Task;
+            }
+            Log.Warn($"{Id}: keine Antwort auf Unterbefehl {subcommand:X2}");
+            return null;
+        }
+        finally
+        {
+            lock (_replyGate)
+                _pending = null;
+            _commandLock.Release();
+        }
+    }
+
+    public Task SetPlayerAsync(int playerIndex) =>
+        Volatile.Read(ref _closed) == 1
+            ? Task.CompletedTask
+            : SubcommandAsync(Switch1.SubPlayerLights, [Commands.PlayerLedMask(playerIndex)], _cts.Token);
+
+    /// <summary>Unterbefehl 0x06 (HCI-Zustand) mit 0x00: Controller trennt die Verbindung und schläft.</summary>
+    public Task SleepAsync() =>
+        Volatile.Read(ref _closed) == 1 ? Task.CompletedTask : SubcommandAsync(Switch1.SubSetHciState, [0x00], _cts.Token);
+
+    // ---------- Eingaben ----------
+
+    private async Task ReadLoopAsync(CancellationToken ct)
+    {
+        var buffer = new byte[Math.Max(64, _hid.InputLength)];
+        try
+        {
+            while (!ct.IsCancellationRequested)
+            {
+                int n = await _hid.ReadAsync(buffer, ct);
+                if (n == 0)
+                {
+                    RaiseLost();
+                    return;
+                }
+                HandleReport(buffer.AsSpan(0, n));
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception e)
+        {
+            if (Volatile.Read(ref _closed) == 0)
+                Log.Warn($"{Id}: Lesen beendet: {e.Message}");
+            RaiseLost();
+        }
+    }
+
+    private void HandleReport(ReadOnlySpan<byte> report)
+    {
+        if (report[0] == Switch1.InputSubcommandReply)
+        {
+            lock (_replyGate)
+            {
+                if (_pending is { } p && Switch1.TryParseReply(report, p.Subcommand, out var data, p.Address))
+                    p.Reply.TrySetResult(data);
+            }
+        }
+        if (report[0] == Switch1.InputFull && Switch1.TryParseFull(report, Kind, _imu, out var state))
+        {
+            _lastInputTicks = Environment.TickCount64;
+            _rate.Tick();
+            LastState = state;
+            try
+            {
+                StateReceived?.Invoke(this, state);
+            }
+            catch (Exception e)
+            {
+                Log.Error($"{Id}: Eingabe verarbeiten", e);
+            }
+        }
+    }
+
+    private async Task WatchdogAsync(CancellationToken ct)
+    {
+        try
+        {
+            while (!ct.IsCancellationRequested)
+            {
+                await Task.Delay(500, ct);
+                if (Environment.TickCount64 - _lastInputTicks > InputTimeoutMs)
+                {
+                    Log.Warn($"{Id}: keine Eingaben mehr – getrennt");
+                    RaiseLost();
+                    return;
+                }
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+    }
+
+    // ---------- Vibration ----------
+
+    public void SetRumble(byte large, byte small, float strength)
+    {
+        _rumbleLarge = large;
+        _rumbleSmall = small;
+        _rumbleStrength = strength;
+    }
+
+    private byte[] CurrentRumble()
+    {
+        var frame = Switch1Rumble.Frame((byte)_rumbleLarge, (byte)_rumbleSmall, _rumbleStrength);
+        return [.. frame, .. frame];
+    }
+
+    private async Task RumbleLoopAsync(CancellationToken ct)
+    {
+        bool wasActive = false;
+        long lastSent = 0;
+        try
+        {
+            while (!ct.IsCancellationRequested)
+            {
+                bool active = (_rumbleLarge | _rumbleSmall) != 0;
+                long now = Environment.TickCount64;
+                if (active || wasActive)
+                {
+                    if (active != wasActive || now - lastSent >= RumbleRefreshMs || active)
+                    {
+                        await _hid.WriteAsync(Switch1.RumbleReport(Interlocked.Increment(ref _counter), CurrentRumble()), ct);
+                        lastSent = now;
+                    }
+                }
+                wasActive = active;
+                await Task.Delay(RumbleIntervalMs, ct);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception e)
+        {
+            Log.Warn($"{Id}: Vibration abgeschaltet: {e.Message}");
+        }
+    }
+
+    private void RaiseLost()
+    {
+        if (Interlocked.Exchange(ref _lostRaised, 1) == 0)
+            Lost?.Invoke(this);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (Interlocked.Exchange(ref _closed, 1) == 1)
+            return;
+        try
+        {
+            _rumbleLarge = _rumbleSmall = 0;
+            await _hid.WriteAsync(Switch1.RumbleReport(Interlocked.Increment(ref _counter), CurrentRumble()), CancellationToken.None)
+                .WaitAsync(TimeSpan.FromMilliseconds(200));
+        }
+        catch (Exception)
+        {
+            // Controller schon weg.
+        }
+        _cts.Cancel();
+        _hid.Dispose();
+        if (_reader is not null)
+        {
+            try { await _reader.WaitAsync(TimeSpan.FromSeconds(1)); } catch (Exception) { /* beendet */ }
+        }
+    }
+}

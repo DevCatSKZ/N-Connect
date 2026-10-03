@@ -18,7 +18,7 @@ internal static class Log
     public static void Info(string message) => Write("INFO ", message);
     public static void Warn(string message) => Write("WARN ", message);
     public static void Error(string message, Exception? e = null) =>
-        Write("ERROR", e is null ? message : $"{message}: {e.GetType().Name}: {e.Message}");
+        Write("ERROR", e is null ? message : $"{message}: {e}");
 
     private static void Write(string level, string message)
     {
