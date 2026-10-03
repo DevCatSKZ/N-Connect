@@ -682,6 +682,53 @@ public class DsuTests
     }
 
     [Fact]
+    public void NfcCrcAndRequests()
+    {
+        Assert.Equal(0xF4, Nfc.Crc8("123456789"u8)); // Prüfwert CRC-8 (Polynom 0x07)
+        var config = Nfc.McuConfig(Nfc.ModeNfc);
+        Assert.Equal(38, config.Length);
+        Assert.Equal([0x21, 0x00, 0x04], config[..3]);
+        Assert.Equal(Nfc.Crc8(config.AsSpan(1, 36)), config[37]);
+        var read = Nfc.ReadNtag215();
+        Assert.Equal(Nfc.CmdReadNtag, read[0]);
+        Assert.Equal(19, read[4]);                                 // Datenlänge
+        Assert.Equal([0x03, 0x00, 0x3B, 0x3C, 0x77, 0x78, 0x86], read[15..22]);
+        Assert.Equal(Nfc.Crc8(read.AsSpan(0, 36)), read[36]);
+        var report = Nfc.McuReport(1, Nfc.McuReadDeviceMode, read, default);
+        Assert.Equal(0x11, report[0]);
+        Assert.Equal(0x02, report[10]);
+        Assert.Equal(read, report[11..49]);
+    }
+
+    [Fact]
+    public void NfcTagDetectionAndAssembly()
+    {
+        var found = new byte[60];
+        found[0] = 0x00; found[1] = 0x05; found[5] = 0x31; found[6] = Nfc.StatusTagFound;
+        found[14] = 7;
+        new byte[] { 1, 2, 3, 4, 5, 6, 7 }.CopyTo(found, 15);
+        Assert.True(Nfc.TryGetTag(Nfc.ReportNfcState, found, out var uid));
+        Assert.Equal([1, 2, 3, 4, 5, 6, 7], uid);
+        Assert.False(Nfc.TryGetTag(Nfc.ReportNfcRead, found, out _));
+
+        var asm = new AmiiboAssembler();
+        var first = new byte[320];
+        first[1] = 0x07; first[2] = 0x01; first[4] = (60 + 245) >> 8; first[5] = (60 + 245) & 0xFF;
+        for (int i = 0; i < 245; i++) first[66 + i] = (byte)i;
+        var second = new byte[320];
+        second[1] = 0x07; second[2] = 0x02; second[4] = 295 >> 8; second[5] = 295 & 0xFF;
+        for (int i = 0; i < 295; i++) second[6 + i] = (byte)(i + 7);
+        Assert.True(asm.Add(Nfc.ReportNfcRead, first));
+        Assert.False(asm.Complete);
+        Assert.True(asm.Add(Nfc.ReportNfcRead, second));
+        Assert.True(asm.Complete);
+        var data = asm.ToArray();
+        Assert.Equal(540, data.Length);
+        Assert.Equal(244, data[244]);
+        Assert.Equal(7, data[245]);
+    }
+
+    [Fact]
     public void GameCubeIgnoresLegacyRemap()
     {
         var s = new Settings(); // Standard-Remap enthält C = None (Pro Controller)

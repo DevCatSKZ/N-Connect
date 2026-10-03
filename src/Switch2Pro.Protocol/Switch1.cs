@@ -154,7 +154,7 @@ public static class Switch1
     public static bool TryParseFull(ReadOnlySpan<byte> r, ControllerKind kind, in ImuCalibration imu, out ControllerState state)
     {
         state = new ControllerState();
-        if (r.Length < 25 || r[0] != InputFull && r[0] != InputSubcommandReply)
+        if (r.Length < 25 || r[0] != InputFull && r[0] != InputSubcommandReply && r[0] != Nfc.InputMcu)
             return false;
 
         byte power = r[2];
@@ -172,7 +172,7 @@ public static class Switch1
         var (rx, ry) = StickCalibration.Unpack12(r.Slice(9, 3));
 
         Motion? motion = null;
-        if (r[0] == InputFull && r.Length >= 49)
+        if (r[0] is InputFull or Nfc.InputMcu && r.Length >= 49)
         {
             // Neueste der drei Proben (Byte 37–48).
             var s = r.Slice(37, 12);

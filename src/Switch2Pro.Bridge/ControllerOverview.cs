@@ -104,6 +104,7 @@ internal sealed class ControllerOverview : Panel
         private readonly Button _orientation = ActionButton("");
         private readonly Button _joyConButton = ActionButton("");
         private readonly Button _hide = ActionButton("Doppelt angezeigt? Verstecken");
+        private readonly Button _amiibo = ActionButton("amiibo lesen");
         private readonly ControllerManager _manager;
         private readonly Func<Settings> _settings;
         private Player? _player;
@@ -155,12 +156,58 @@ internal sealed class ControllerOverview : Panel
             _tips.SetToolTip(_orientation, "Einzelnen Joy-Con quer (wie an der Switch) oder hochkant halten – wird je Joy-Con gemerkt. Hochkant gilt die Tastenbelegung von „Joy-Con-Paar“.");
             _tips.SetToolTip(_hide, "Versteckt den per USB angeschlossenen Controller vor Spielen (HidHide), damit sie nur den virtuellen Xbox-Controller sehen.");
             _hide.Click += async (_, _) => await HideAsync();
-            _actions.Controls.AddRange([_disconnect, _identify, _calibrate, _orientation, _joyConButton, _hide]);
+            _tips.SetToolTip(_amiibo, "amiibo mit dem NFC-Leser lesen und als Datei (.bin) speichern – z. B. für Emulatoren.");
+            _amiibo.Click += async (_, _) => await ReadAmiiboAsync();
+            _actions.Controls.AddRange([_disconnect, _identify, _calibrate, _orientation, _joyConButton, _hide, _amiibo]);
 
             Controls.Add(_title);
             Controls.Add(_view);
             Controls.Add(_info);
             Controls.Add(_actions);
+        }
+
+        /// <summary>amiibo über den NFC-Leser lesen und als .bin speichern (Rohabbild, 540 Byte).</summary>
+        private async Task ReadAmiiboAsync()
+        {
+            var link = _player?.Links.OfType<Links.Switch1HidLink>().FirstOrDefault(l => l.HasNfc);
+            if (link is null)
+                return;
+            _amiibo.Enabled = false;
+            string original = _amiibo.Text;
+            try
+            {
+                var result = await link.ReadAmiiboAsync(TimeSpan.FromSeconds(20),
+                    message => BeginInvoke(() => { if (!IsDisposed) _amiibo.Text = message.Length > 40 ? message[..40] + " …" : message; }),
+                    CancellationToken.None);
+                if (result is not { } amiibo)
+                {
+                    MessageBox.Show(FindForm(), "Kein amiibo erkannt. Bitte das amiibo flach an den NFC-Leser halten " +
+                        "(Joy-Con: auf den rechten Stick, Pro Controller: auf das NFC-Logo) und erneut versuchen.", "amiibo lesen");
+                    return;
+                }
+                string folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "amiibo");
+                Directory.CreateDirectory(folder);
+                using var dialog = new SaveFileDialog
+                {
+                    Title = "amiibo speichern", Filter = "amiibo-Abbild (*.bin)|*.bin", InitialDirectory = folder,
+                    FileName = $"amiibo_{Convert.ToHexString(amiibo.Uid)}.bin",
+                };
+                if (dialog.ShowDialog(FindForm()) == DialogResult.OK)
+                    await File.WriteAllBytesAsync(dialog.FileName, amiibo.Data);
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException or OperationCanceledException)
+            {
+                MessageBox.Show(FindForm(), $"amiibo konnte nicht gelesen werden: {e.Message}", "amiibo lesen",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            finally
+            {
+                if (!IsDisposed)
+                {
+                    _amiibo.Text = original;
+                    _amiibo.Enabled = true;
+                }
+            }
         }
 
         /// <summary>USB-Controller per HidHide vor Spielen verstecken (einmal Adminrechte).</summary>
@@ -275,6 +322,7 @@ internal sealed class ControllerOverview : Panel
             SetButton(_joyConButton, player.IsPair ? "Joy-Con trennen" : joyCon && _manager.HasPartner(player) ? "Zum Paar verbinden" : null);
             SetButton(_orientation, links.Count == 1 && joyCon ? upright ? "Quer halten" : "Hochkant halten" : null);
             _hide.Visible = links.OfType<Links.Switch2UsbLink>().Any(l => l.HidInstanceId is { } id && !settings.IsHidden(id));
+            _amiibo.Visible = links.OfType<Links.Switch1HidLink>().Any(l => l.HasNfc);
             _calibrate.Visible = links.Any(l => l.LastState?.Motion is not null) && links.All(l => l.Address is not null);
             PlaceActions();
 

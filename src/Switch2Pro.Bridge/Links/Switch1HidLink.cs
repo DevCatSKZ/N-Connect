@@ -179,6 +179,118 @@ internal sealed class Switch1HidLink : IControllerLink
     public Task SleepAsync() =>
         Volatile.Read(ref _closed) == 1 ? Task.CompletedTask : SubcommandAsync(Switch1.SubSetHciState, [0x00], _cts.Token);
 
+    // ---------- amiibo (NFC) ----------
+
+    /// <summary>Hat dieser Controller einen NFC-Leser? (rechter Joy-Con und Pro Controller der Switch 1)</summary>
+    public bool HasNfc => Kind is ControllerKind.JoyCon1Right or ControllerKind.Pro1;
+
+    private TaskCompletionSource<(byte Kind, byte[] Data)>? _mcuWaiter;
+    private readonly SemaphoreSlim _nfcLock = new(1, 1);
+
+    /// <summary>MCU-Anfrage (Bericht 0x11) senden und die nächste MCU-Antwort aus Bericht 0x31 abwarten.</summary>
+    private async Task<(byte Kind, byte[] Data)?> McuAsync(byte mcuSubcommand, byte[] data, CancellationToken ct)
+    {
+        for (int attempt = 0; attempt < 3; attempt++)
+        {
+            var waiter = new TaskCompletionSource<(byte, byte[])>(TaskCreationOptions.RunContinuationsAsynchronously);
+            _mcuWaiter = waiter;
+            await _hid.WriteAsync(Nfc.McuReport(Interlocked.Increment(ref _counter), mcuSubcommand, data, CurrentRumble()), ct);
+            if (await Task.WhenAny(waiter.Task, Task.Delay(250, ct)) == waiter.Task)
+                return await waiter.Task;
+        }
+        return null;
+    }
+
+    /// <summary>Solange MCU-Anfragen senden, bis die Antwort passt (oder die Versuche aufgebraucht sind).</summary>
+    private async Task<(byte Kind, byte[] Data)?> McuUntilAsync(byte sub, Func<byte[]> request, Func<byte, byte[], bool> done,
+        int tries, CancellationToken ct)
+    {
+        for (int i = 0; i < tries; i++)
+        {
+            if (await McuAsync(sub, request(), ct) is { } r && done(r.Kind, r.Data))
+                return r;
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Wartet bis zu <paramref name="timeout"/> auf ein amiibo am NFC-Leser und liest es (540 Byte). null bei
+    /// Zeitablauf oder Fehler. Währenddessen sendet der Controller größere Berichte (0x31), die Eingaben laufen weiter.
+    /// </summary>
+    public async Task<(byte[] Uid, byte[] Data)?> ReadAmiiboAsync(TimeSpan timeout, Action<string> progress, CancellationToken ct)
+    {
+        if (!HasNfc)
+            return null;
+        await _nfcLock.WaitAsync(ct);
+        using var linked = CancellationTokenSource.CreateLinkedTokenSource(ct, _cts.Token);
+        var token = linked.Token;
+        try
+        {
+            progress("NFC-Leser wird eingeschaltet …");
+            await SubcommandAsync(Switch1.SubSetInputMode, [Nfc.InputMcu], token);
+            await SubcommandAsync(Nfc.SubMcuState, [0x01], token);
+            if (await McuUntilAsync(Nfc.McuSetDeviceMode, () => [], (k, d) => Nfc.IsMcuMode(k, d, Nfc.ModeStandby), 16, token) is null)
+                throw new IOException("MCU startet nicht");
+            await SubcommandAsync(Nfc.SubMcuConfig, Nfc.McuConfig(Nfc.ModeNfc), token);
+            if (await McuUntilAsync(Nfc.McuSetDeviceMode, () => [], (k, d) => Nfc.IsMcuMode(k, d, Nfc.ModeNfc), 16, token) is null)
+                throw new IOException("NFC-Modus nicht aktiv");
+            bool Status(byte k, byte[] d, byte s) => Nfc.TryGetNfcStatus(k, d, out byte st) && st == s;
+            await McuUntilAsync(Nfc.McuReadDeviceMode, () => Nfc.NextPacket(), (k, d) => Status(k, d, Nfc.StatusReady), 10, token);
+            await McuAsync(Nfc.McuReadDeviceMode, Nfc.StopPolling(), token);
+            await McuUntilAsync(Nfc.McuReadDeviceMode, () => Nfc.NextPacket(), (k, d) => Status(k, d, Nfc.StatusReady), 10, token);
+
+            await McuAsync(Nfc.McuReadDeviceMode, Nfc.StartPolling(), token);
+            progress("amiibo an den Leser halten (rechter Stick des Joy-Con bzw. NFC-Logo des Pro Controllers) …");
+            byte[]? uid = null;
+            var until = DateTime.UtcNow + timeout;
+            while (uid is null && DateTime.UtcNow < until)
+            {
+                if (await McuAsync(Nfc.McuReadDeviceMode, Nfc.NextPacket(), token) is { } r && Nfc.TryGetTag(r.Kind, r.Data, out var found))
+                    uid = found;
+                else
+                    await Task.Delay(40, token);
+            }
+            if (uid is null)
+                return null;
+
+            progress($"amiibo erkannt ({Convert.ToHexString(uid)}) – lese …");
+            var assembler = new AmiiboAssembler();
+            await McuAsync(Nfc.McuReadDeviceMode, Nfc.ReadNtag215(), token);
+            byte packet = 0;
+            for (int i = 0; i < 60 && !assembler.Complete; i++)
+            {
+                if (await McuAsync(Nfc.McuReadDeviceMode, Nfc.NextPacket(packet), token) is not { } r)
+                    continue;
+                if (Nfc.TryGetNfcStatus(r.Kind, r.Data, out byte st) && st == Nfc.StatusTagLost)
+                    throw new IOException("amiibo zu früh entfernt");
+                if (assembler.Add(r.Kind, r.Data))
+                    packet++;
+                else if (st == Nfc.StatusLastPacket && r.Kind == Nfc.ReportNfcState && assembler.PacketCount > 0)
+                    break;
+            }
+            if (!assembler.Complete)
+                throw new IOException($"amiibo unvollständig gelesen ({assembler.ToArray().Length} von {Nfc.AmiiboSize} Byte)");
+            Log.Info($"{Id}: amiibo {Convert.ToHexString(uid)} gelesen ({assembler.PacketCount} Pakete)");
+            return (uid, assembler.ToArray());
+        }
+        finally
+        {
+            // Aufräumen: Abfrage stoppen, MCU schlafen legen, zurück zum normalen Vollbericht.
+            try
+            {
+                await McuAsync(Nfc.McuReadDeviceMode, Nfc.StopPolling(), CancellationToken.None).WaitAsync(TimeSpan.FromSeconds(1));
+                await SubcommandAsync(Nfc.SubMcuState, [0x00], CancellationToken.None).WaitAsync(TimeSpan.FromSeconds(1));
+                await SubcommandAsync(Switch1.SubSetInputMode, [Switch1.InputFull], CancellationToken.None).WaitAsync(TimeSpan.FromSeconds(1));
+            }
+            catch (Exception)
+            {
+                // Controller getrennt o. Ä.
+            }
+            _mcuWaiter = null;
+            _nfcLock.Release();
+        }
+    }
+
     // ---------- Eingaben ----------
 
     private async Task ReadLoopAsync(CancellationToken ct)
@@ -218,7 +330,9 @@ internal sealed class Switch1HidLink : IControllerLink
                     p.Reply.TrySetResult(data);
             }
         }
-        if (report[0] == Switch1.InputFull && Switch1.TryParseFull(report, Kind, _imu, out var state))
+        if (report[0] == Nfc.InputMcu && _mcuWaiter is { } waiter && Nfc.TryGetMcu(report, out byte mcuKind, out var mcuData))
+            waiter.TrySetResult((mcuKind, mcuData.ToArray()));
+        if (report[0] is Switch1.InputFull or Nfc.InputMcu && Switch1.TryParseFull(report, Kind, _imu, out var state))
         {
             _lastInputTicks = Environment.TickCount64;
             _rate.Tick();
