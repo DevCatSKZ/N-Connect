@@ -144,6 +144,8 @@ public sealed record ControllerState
     public Motion? Motion { get; init; }
     /// <summary>Maussensor der Joy-Con 2 (sonst null).</summary>
     public OpticalMouse? Mouse { get; init; }
+    /// <summary>Ring-Con (am rechten Joy-Con der Switch 1): Biegung −1 (auseinanderziehen) … +1 (zusammendrücken).</summary>
+    public float? RingFlex { get; init; }
     /// <summary>Akkuspannung in mV (nur Switch 2), sonst 0.</summary>
     public int BatteryMillivolts { get; init; }
     /// <summary>Akkustand 0–100 % oder −1, wenn unbekannt.</summary>

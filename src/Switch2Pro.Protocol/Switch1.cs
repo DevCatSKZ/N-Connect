@@ -151,6 +151,41 @@ public static class Switch1
     /// der Switch-2-Controller umgerechnet (Gyro 2000 °/s ≙ 32767, Beschl. 4096 ≙ 1 g), damit der
     /// Rest der Kette (DS4-Ausgabe) für alle Controller gleich ist.
     /// </summary>
+    public const byte SubExternalDeviceInfo = 0x59, SubEnableExternalPolling = 0x5A, SubExternalFormat = 0x5C;
+    public const ushort ExternalRingCon = 0x2000;
+
+    /// <summary>Format-Einstellung für den Ring-Con (37 Byte, unverändert aus der öffentlichen Protokolldokumentation).</summary>
+    public static ReadOnlySpan<byte> RingConFormat =>
+    [
+        0x06, 0x03, 0x25, 0x06, 0x00, 0x00, 0x00, 0x00, 0x1C, 0x16, 0xED, 0x34, 0x36,
+        0x00, 0x00, 0x00, 0x0A, 0x64, 0x0B, 0xE6, 0xA9, 0x22, 0x00, 0x00, 0x04, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x90, 0xA8, 0xE1, 0x34, 0x36,
+    ];
+
+    public static ReadOnlySpan<byte> RingConPolling => [0x04, 0x01, 0x01, 0x02];
+
+    /// <summary>Rohwert des Ring-Con im Vollbericht (Byte 39–40, int16) – nur gültig, solange die Abfrage läuft.</summary>
+    public static short RingRaw(ReadOnlySpan<byte> r) => r.Length >= 41 ? (short)(r[39] | r[40] << 8) : (short)0;
+
+    /// <summary>
+    /// Vollbericht 0x30 (mit Report-ID). Läuft der Ring-Con, belegt er die dritte Bewegungsprobe – dann wird die
+    /// zweite verwendet (<paramref name="ringActive"/>).
+    /// </summary>
+    public static bool TryParseFull(ReadOnlySpan<byte> r, ControllerKind kind, in ImuCalibration imu, out ControllerState state, bool ringActive)
+    {
+        if (!TryParseFull(r, kind, imu, out state))
+            return false;
+        if (ringActive && r.Length >= 37)
+        {
+            var s = r.Slice(25, 12);
+            state = state with
+            {
+                Motion = imu.ToSwitch2Axes(S16(s, 0), S16(s, 1), S16(s, 2), S16(s, 3), S16(s, 4), S16(s, 5), kind == ControllerKind.JoyCon1Right),
+            };
+        }
+        return true;
+    }
+
     public static bool TryParseFull(ReadOnlySpan<byte> r, ControllerKind kind, in ImuCalibration imu, out ControllerState state)
     {
         state = new ControllerState();

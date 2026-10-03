@@ -729,6 +729,56 @@ public class DsuTests
     }
 
     [Fact]
+    public void IrCameraRequestsAndAssembly()
+    {
+        var cfg = IrCamera.Configure(IrResolution.Size40x30);
+        Assert.Equal([0x23, 0x01, 0x07, 0x03, 0x00, 0x05, 0x00, 0x18], cfg[..8]);
+        Assert.Equal(Nfc.Crc8(cfg.AsSpan(1, 36)), cfg[37]);
+        var regs = IrCamera.RegistersStep1(IrResolution.Size40x30);
+        Assert.Equal([0x23, 0x04, 9, 0x00, 0x2E, 0x69], regs[..6]);   // Auflösung 40×30
+        var ack = IrCamera.Acknowledge(2);
+        Assert.Equal(2, ack[3]);
+        Assert.Equal(0xFF, ack[37]);
+
+        var asm = new IrFrameAssembler(IrResolution.Size40x30);
+        byte[] Fragment(byte n)
+        {
+            var r = new byte[362];
+            r[0] = 0x31; r[49] = 0x03; r[52] = n;
+            for (int i = 0; i < 300; i++) r[59 + i] = (byte)(n * 10);
+            return r;
+        }
+        byte[]? image = null;
+        for (byte n = 0; n <= 3; n++)
+        {
+            var (request, done) = asm.Handle(Fragment(n));
+            Assert.Equal(n, request[3]);           // Quittung für das erhaltene Stück
+            image = done ?? image;
+        }
+        Assert.NotNull(image);
+        Assert.Equal(1200, image!.Length);
+        Assert.Equal(30, image[3 * 300]);
+        var (resend, _) = asm.Handle(Fragment(2));  // Stück außer der Reihe → Neuanforderung des erwarteten
+        Assert.Equal(0x01, resend[1]);
+        Assert.Equal(0, resend[2]);
+    }
+
+    [Fact]
+    public void RingConCalibratesRestPositionFirst()
+    {
+        var ring = new RingFlexCalibration();
+        for (int i = 0; i < 29; i++)
+            Assert.Null(ring.Update(1000));
+        Assert.Null(ring.Update(1000));             // 30. Wert: Ruhelage fertig
+        Assert.Equal(0f, ring.Update(1010));        // kleine Abweichung = Ruhe
+        Assert.Equal(1f, ring.Update(1600));        // +600 = voll gedrückt
+        Assert.Equal(-0.5f, ring.Update(700));
+        var p = Mapping.Normalize(new ControllerState { Kind = ControllerKind.JoyCon1Right, RingFlex = 0.75f }, new DeviceCalibration());
+        Assert.Equal(0.75f, p.RightTrigger);
+        Assert.Equal(0f, p.LeftTrigger);
+    }
+
+    [Fact]
     public void GameCubeIgnoresLegacyRemap()
     {
         var s = new Settings(); // Standard-Remap enthält C = None (Pro Controller)

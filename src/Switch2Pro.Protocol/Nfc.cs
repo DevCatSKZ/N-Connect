@@ -131,6 +131,36 @@ public static class Nfc
     }
 }
 
+/// <summary>
+/// Ring-Con-Rohwert → Biegung −1…+1. Ruhelage = Mittel der ersten Werte nach dem Einschalten (Ring nicht
+/// berühren); der Ausschlag passt sich dem größten gemessenen Ausschlag an (mindestens 600 Rohschritte).
+/// </summary>
+public sealed class RingFlexCalibration
+{
+    private const int CalibrationSamples = 30;
+    private const float MinimumRange = 600f;
+    private long _sum;
+    private int _count;
+    private float _range = MinimumRange;
+
+    public float? Neutral { get; private set; }
+
+    public float? Update(short raw)
+    {
+        if (Neutral is null)
+        {
+            _sum += raw;
+            if (++_count >= CalibrationSamples)
+                Neutral = _sum / (float)_count;
+            return null;
+        }
+        float delta = raw - Neutral.Value;
+        _range = Math.Max(_range, Math.Abs(delta));
+        float v = delta / _range;
+        return Math.Abs(v) < 0.04f ? 0f : Math.Clamp(v, -1f, 1f);
+    }
+}
+
 /// <summary>Setzt die gelesenen Pakete (Art 0x3A) zum 540-Byte-Abbild zusammen.</summary>
 public sealed class AmiiboAssembler
 {

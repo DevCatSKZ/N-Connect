@@ -70,6 +70,10 @@ public static class Mapping
             };
         }
 
+        // Ring-Con: zusammendrücken = rechter Trigger, auseinanderziehen = linker Trigger (analog).
+        if (s.RingFlex is { } flex)
+            input = input with { RightTrigger = Math.Max(0f, flex), LeftTrigger = Math.Max(0f, -flex) };
+
         if (s.Kind.IsClassic())
             return NormalizeClassic(s.Kind, input);
 
@@ -117,6 +121,8 @@ public static class Mapping
             LeftX = l.LeftX, LeftY = l.LeftY,
             RightX = r.RightX, RightY = r.RightY,
             Motion = gyro == GyroSource.Left ? l.Motion ?? r.Motion : r.Motion ?? l.Motion,
+            LeftTrigger = r.LeftTrigger,   // Ring-Con am rechten Joy-Con
+            RightTrigger = r.RightTrigger,
             BatteryPercent = battery,
             Charging = l.Charging && r.Charging,
         };

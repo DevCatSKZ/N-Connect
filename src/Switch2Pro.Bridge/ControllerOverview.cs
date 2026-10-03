@@ -95,7 +95,7 @@ internal sealed class ControllerOverview : Panel
         private readonly InfoPanel _info = new() { Location = new Point(556, 52) };
         private readonly FlowLayoutPanel _actions = new()
         {
-            AutoSize = true, FlowDirection = FlowDirection.RightToLeft, WrapContents = false, BackColor = Color.Transparent,
+            AutoSize = true, FlowDirection = FlowDirection.RightToLeft, WrapContents = true, BackColor = Color.Transparent,
         };
         private readonly ToolTip _tips = new();
         private readonly Button _disconnect = ActionButton("Trennen");
@@ -105,6 +105,8 @@ internal sealed class ControllerOverview : Panel
         private readonly Button _joyConButton = ActionButton("");
         private readonly Button _hide = ActionButton("Doppelt angezeigt? Verstecken");
         private readonly Button _amiibo = ActionButton("amiibo lesen");
+        private readonly Button _ringCon = ActionButton("Ring-Con");
+        private readonly Button _irCamera = ActionButton("IR-Kamera");
         private readonly ControllerManager _manager;
         private readonly Func<Settings> _settings;
         private Player? _player;
@@ -158,12 +160,51 @@ internal sealed class ControllerOverview : Panel
             _hide.Click += async (_, _) => await HideAsync();
             _tips.SetToolTip(_amiibo, "amiibo mit dem NFC-Leser lesen und als Datei (.bin) speichern – z. B. für Emulatoren.");
             _amiibo.Click += async (_, _) => await ReadAmiiboAsync();
-            _actions.Controls.AddRange([_disconnect, _identify, _calibrate, _orientation, _joyConButton, _hide, _amiibo]);
+            _tips.SetToolTip(_ringCon, "Ring-Con am rechten Joy-Con ein-/ausschalten: zusammendrücken = rechter Trigger, auseinanderziehen = linker Trigger. Beim Einschalten den Ring nicht berühren.");
+            _ringCon.Click += async (_, _) => await ToggleRingConAsync();
+            _tips.SetToolTip(_irCamera, "Live-Bild der IR-Kamera im rechten Joy-Con anzeigen.");
+            _irCamera.Click += (_, _) =>
+            {
+                if (_player?.Links.OfType<Links.Switch1HidLink>().FirstOrDefault(l => l.HasIrCamera) is { } ir)
+                    new IrCameraForm(ir).Show(FindForm());
+            };
+            _actions.Controls.AddRange([_disconnect, _identify, _calibrate, _orientation, _joyConButton, _hide, _amiibo, _ringCon, _irCamera]);
 
             Controls.Add(_title);
             Controls.Add(_view);
             Controls.Add(_info);
             Controls.Add(_actions);
+        }
+
+        private async Task ToggleRingConAsync()
+        {
+            var link = _player?.Links.OfType<Links.Switch1HidLink>().FirstOrDefault(l => l.Kind == ControllerKind.JoyCon1Right);
+            if (link is null)
+                return;
+            _ringCon.Enabled = false;
+            try
+            {
+                if (link.RingConActive)
+                {
+                    await link.DisableRingConAsync();
+                }
+                else
+                {
+                    _ringCon.Text = "Ring-Con wird gesucht …";
+                    if (!await link.EnableRingConAsync(CancellationToken.None))
+                        MessageBox.Show(FindForm(), "Kein Ring-Con gefunden. Den rechten Joy-Con (Switch 1) fest in den Ring-Con " +
+                            "schieben und erneut versuchen.", "Ring-Con");
+                }
+            }
+            catch (Exception e) when (e is IOException or OperationCanceledException)
+            {
+                MessageBox.Show(FindForm(), $"Ring-Con: {e.Message}", "Ring-Con");
+            }
+            finally
+            {
+                if (!IsDisposed)
+                    _ringCon.Enabled = true;
+            }
         }
 
         /// <summary>amiibo über den NFC-Leser lesen und als .bin speichern (Rohabbild, 540 Byte).</summary>
@@ -291,7 +332,13 @@ internal sealed class ControllerOverview : Panel
             PlaceActions();
         }
 
-        private void PlaceActions() => _actions.Location = new Point(Width - _actions.Width - 16, 12);
+        private void PlaceActions()
+        {
+            // Knöpfe rechts oben, bei Platzmangel in mehreren Zeilen; die Eigenschaften rücken darunter.
+            _actions.MaximumSize = new Size(Math.Max(300, Width - _title.Right - 40), 0);
+            _actions.Location = new Point(Width - _actions.Width - 16, 12);
+            _info.Top = Math.Max(52, _actions.Bottom + 10);
+        }
 
         public void Show(Player player, Settings settings)
         {
@@ -323,6 +370,9 @@ internal sealed class ControllerOverview : Panel
             SetButton(_orientation, links.Count == 1 && joyCon ? upright ? "Quer halten" : "Hochkant halten" : null);
             _hide.Visible = links.OfType<Links.Switch2UsbLink>().Any(l => l.HidInstanceId is { } id && !settings.IsHidden(id));
             _amiibo.Visible = links.OfType<Links.Switch1HidLink>().Any(l => l.HasNfc);
+            var ringLink = links.OfType<Links.Switch1HidLink>().FirstOrDefault(l => l.Kind == ControllerKind.JoyCon1Right);
+            SetButton(_ringCon, ringLink is null ? null : ringLink.RingConActive ? "Ring-Con aus" : "Ring-Con ein");
+            _irCamera.Visible = ringLink is { HasIrCamera: true };
             _calibrate.Visible = links.Any(l => l.LastState?.Motion is not null) && links.All(l => l.Address is not null);
             PlaceActions();
 

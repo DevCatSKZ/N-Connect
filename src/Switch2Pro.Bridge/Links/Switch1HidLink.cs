@@ -291,6 +291,189 @@ internal sealed class Switch1HidLink : IControllerLink
         }
     }
 
+    // ---------- Ring-Con ----------
+
+    private volatile bool _ringActive;
+    private RingFlexCalibration _ring = new();
+
+    /// <summary>Ring-Con am rechten Joy-Con eingeschaltet?</summary>
+    public bool RingConActive => _ringActive;
+
+    /// <summary>
+    /// Ring-Con einschalten: MCU in Bereitschaft, externes Gerät erkennen (Kennung 0x2000), Format setzen und
+    /// Abfrage starten. Den Ring dabei nicht berühren (Ruhelage wird gemessen). false, wenn kein Ring-Con steckt.
+    /// </summary>
+    public async Task<bool> EnableRingConAsync(CancellationToken ct)
+    {
+        if (Kind != ControllerKind.JoyCon1Right)
+            return false;
+        await _nfcLock.WaitAsync(ct);
+        try
+        {
+            await SubcommandAsync(Nfc.SubMcuState, [0x01], ct);
+            var config = new byte[38];
+            config[0] = 0x21;   // MCU konfigurieren
+            config[1] = 0x01;   // Gerätemodus
+            config[2] = Nfc.ModeStandby;
+            config[37] = Nfc.Crc8(config.AsSpan(1, 36));
+            await SubcommandAsync(Nfc.SubMcuConfig, config, ct);
+            bool found = false;
+            for (int i = 0; i < 42 && !found; i++)
+            {
+                if (await SubcommandAsync(Switch1.SubExternalDeviceInfo, [], ct) is { Length: >= 2 } info
+                    && (info[0] | info[1] << 8) == Switch1.ExternalRingCon)
+                    found = true;
+                else
+                    await Task.Delay(50, ct);
+            }
+            if (!found)
+            {
+                await SubcommandAsync(Nfc.SubMcuState, [0x00], ct);
+                return false;
+            }
+            await SubcommandAsync(Switch1.SubExternalFormat, Switch1.RingConFormat.ToArray(), ct);
+            await SubcommandAsync(Switch1.SubEnableExternalPolling, Switch1.RingConPolling.ToArray(), ct);
+            _ring = new RingFlexCalibration();
+            _ringActive = true;
+            Log.Info($"{Id}: Ring-Con eingeschaltet");
+            return true;
+        }
+        finally
+        {
+            _nfcLock.Release();
+        }
+    }
+
+    public async Task DisableRingConAsync()
+    {
+        _ringActive = false;
+        try
+        {
+            await SubcommandAsync(Nfc.SubMcuState, [0x00], _cts.Token);
+        }
+        catch (Exception e) when (e is OperationCanceledException or IOException)
+        {
+        }
+        Log.Info($"{Id}: Ring-Con ausgeschaltet");
+    }
+
+    // ---------- IR-Kamera ----------
+
+    private IrFrameAssembler? _ir;
+    private Action<byte[], int, int>? _irFrame;
+    private int _irWriting;
+
+    /// <summary>Hat dieser Controller eine IR-Kamera? (nur der rechte Joy-Con der Switch 1)</summary>
+    public bool HasIrCamera => Kind == ControllerKind.JoyCon1Right;
+
+    /// <summary>
+    /// IR-Kamera einschalten und Bilder liefern (Graustufen, Breite × Höhe) bis <see cref="StopIrAsync"/>.
+    /// false, wenn die Kamera nicht startet.
+    /// </summary>
+    public async Task<bool> StartIrAsync(IrResolution resolution, Action<byte[], int, int> onFrame, CancellationToken ct)
+    {
+        if (!HasIrCamera)
+            return false;
+        await _nfcLock.WaitAsync(ct);
+        try
+        {
+            await SubcommandAsync(Switch1.SubSetInputMode, [Nfc.InputMcu], ct);
+            await SubcommandAsync(Nfc.SubMcuState, [0x01], ct);
+            if (await McuUntilAsync(Nfc.McuSetDeviceMode, () => [], (k, d) => Nfc.IsMcuMode(k, d, Nfc.ModeStandby), 16, ct) is null)
+                throw new IOException("MCU startet nicht");
+            await SubcommandAsync(Nfc.SubMcuConfig, Nfc.McuConfig(IrCamera.ModeIr), ct);
+            if (await McuUntilAsync(Nfc.McuSetDeviceMode, () => [], (k, d) => Nfc.IsMcuMode(k, d, IrCamera.ModeIr), 16, ct) is null)
+                throw new IOException("IR-Modus nicht aktiv");
+
+            bool configured = false;
+            for (int i = 0; i < 28 && !configured; i++)
+                configured = await SubcommandAsync(Nfc.SubMcuConfig, IrCamera.Configure(resolution), ct) is [0x0B, ..];
+            if (!configured)
+                throw new IOException("IR-Bildübertragung nicht einstellbar");
+
+            bool step1 = false;
+            for (int i = 0; i < 28 && !step1; i++)
+            {
+                var reply = await SubcommandAsync(Nfc.SubMcuConfig, IrCamera.RegistersStep1(resolution), ct);
+                if (i == 0)
+                    await _hid.WriteAsync(Nfc.McuReport(Interlocked.Increment(ref _counter), Switch1.SubSetInputMode,
+                        IrCamera.Acknowledge(0, start: true), CurrentRumble()), ct);
+                step1 = reply is [0x13, _, 0x07, ..] or [0x23, ..];
+            }
+            bool step2 = false;
+            for (int i = 0; i < 28 && !step2; i++)
+                step2 = await SubcommandAsync(Nfc.SubMcuConfig, IrCamera.RegistersStep2(), ct) is [0x13, ..] or [0x23, ..];
+            if (!step1 || !step2)
+                throw new IOException("IR-Kameraregister nicht gesetzt");
+
+            _irFrame = onFrame;
+            _ir = new IrFrameAssembler(resolution);
+            Log.Info($"{Id}: IR-Kamera an ({resolution})");
+            return true;
+        }
+        catch (IOException e)
+        {
+            Log.Warn($"{Id}: IR-Kamera: {e.Message}");
+            await StopIrCoreAsync();
+            return false;
+        }
+        finally
+        {
+            _nfcLock.Release();
+        }
+    }
+
+    public async Task StopIrAsync()
+    {
+        await _nfcLock.WaitAsync();
+        try
+        {
+            await StopIrCoreAsync();
+        }
+        finally
+        {
+            _nfcLock.Release();
+        }
+    }
+
+    private async Task StopIrCoreAsync()
+    {
+        _ir = null;
+        _irFrame = null;
+        try
+        {
+            await SubcommandAsync(Nfc.SubMcuState, [0x00], CancellationToken.None).WaitAsync(TimeSpan.FromSeconds(1));
+            await SubcommandAsync(Switch1.SubSetInputMode, [Switch1.InputFull], CancellationToken.None).WaitAsync(TimeSpan.FromSeconds(1));
+        }
+        catch (Exception)
+        {
+            // Controller getrennt.
+        }
+        Log.Info($"{Id}: IR-Kamera aus");
+    }
+
+    /// <summary>Bericht 0x31 während der IR-Übertragung: Stück übernehmen, Quittung senden (nicht blockierend).</summary>
+    private void HandleIr(ReadOnlySpan<byte> report)
+    {
+        if (_ir is not { } assembler)
+            return;
+        var (request, image) = assembler.Handle(report);
+        if (image is not null)
+        {
+            try { _irFrame?.Invoke(image, assembler.Width, assembler.Height); }
+            catch (Exception e) { Log.Error($"{Id}: IR-Bild anzeigen", e); }
+        }
+        // Höchstens eine Quittung gleichzeitig unterwegs (Schreiben ist asynchron).
+        if (Interlocked.Exchange(ref _irWriting, 1) == 1)
+            return;
+        _hid.WriteAsync(Nfc.McuReport(Interlocked.Increment(ref _counter), Switch1.SubSetInputMode, request, CurrentRumble()), _cts.Token)
+            .ContinueWith(t =>
+            {
+                Volatile.Write(ref _irWriting, 0);
+                _ = t.Exception; // beobachtet
+            }, TaskScheduler.Default);
+    }
+
     // ---------- Eingaben ----------
 
     private async Task ReadLoopAsync(CancellationToken ct)
@@ -332,8 +515,13 @@ internal sealed class Switch1HidLink : IControllerLink
         }
         if (report[0] == Nfc.InputMcu && _mcuWaiter is { } waiter && Nfc.TryGetMcu(report, out byte mcuKind, out var mcuData))
             waiter.TrySetResult((mcuKind, mcuData.ToArray()));
-        if (report[0] is Switch1.InputFull or Nfc.InputMcu && Switch1.TryParseFull(report, Kind, _imu, out var state))
+        if (report[0] == Nfc.InputMcu && _ir is not null)
+            HandleIr(report);
+        bool ring = _ringActive && report[0] == Switch1.InputFull;
+        if (report[0] is Switch1.InputFull or Nfc.InputMcu && Switch1.TryParseFull(report, Kind, _imu, out var state, ring))
         {
+            if (ring)
+                state = state with { RingFlex = _ring.Update(Switch1.RingRaw(report)) };
             _lastInputTicks = Environment.TickCount64;
             _rate.Tick();
             LastState = state;
