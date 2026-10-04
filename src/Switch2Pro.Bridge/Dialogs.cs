@@ -243,7 +243,7 @@ internal static class Prompt
         var box = new TextBox { Text = initial, Location = new Point(12, 40), Width = 396 };
         var ok = new Button { Text = "OK", DialogResult = DialogResult.OK, Location = new Point(236, 88), AutoSize = true };
         var cancel = new Button { Text = "Abbrechen", DialogResult = DialogResult.Cancel, Location = new Point(322, 88), AutoSize = true };
-        form.Controls.AddRange([label, box, ok, cancel]);
+        form.Controls.AddRange([label, new TextField(box), ok, cancel]);
         form.AcceptButton = ok;
         form.CancelButton = cancel;
         Theme.Apply(form);
