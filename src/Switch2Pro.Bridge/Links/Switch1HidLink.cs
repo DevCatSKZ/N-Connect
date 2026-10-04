@@ -38,6 +38,11 @@ internal sealed class Switch1HidLink : IControllerLink
     public ControllerState? LastState { get; private set; }
     public double ReportRate => _rate.Rate;
     public bool IsLost => Volatile.Read(ref _lostRaised) == 1;
+    /// <summary>
+    /// HID-Instanz (Bluetooth und USB): Steam und viele Spiele (SDL) unterstützen Switch-1- und NSO-Controller selbst
+    /// und sähen sie sonst doppelt – zum Verstecken per HidHide. Ändert sich bei Bluetooth nach jedem Neukoppeln.
+    /// </summary>
+    public string? HidInstanceId { get; }
 
     public event Action<IControllerLink, ControllerState>? StateReceived;
     public event Action<IControllerLink>? Lost;
@@ -48,6 +53,7 @@ internal sealed class Switch1HidLink : IControllerLink
         Id = path;
         _hid = hid;
         Transport = transport;
+        HidInstanceId = UsbNative.GetInstanceId(path);
     }
 
     public static async Task<Switch1HidLink> ConnectAsync(string hidPath, ControllerKind kind, CancellationToken ct)

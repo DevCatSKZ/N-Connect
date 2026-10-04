@@ -637,6 +637,15 @@ public class DsuTests
     }
 
     [Fact]
+    public void ChargingGripJoyConsAreDetectedByDeviceType()
+    {
+        // Im Ladegriff (057E:200E) melden beide Joy-Con dieselbe Produkt-ID – die Seite kommt aus dem Gerätetyp.
+        Assert.Equal(ControllerKind.JoyCon1Left, ControllerKinds.FromSwitch1DeviceType(0x01, ControllerKind.JoyCon1Left));
+        Assert.Equal(ControllerKind.JoyCon1Right, ControllerKinds.FromSwitch1DeviceType(0x02, ControllerKind.JoyCon1Left));
+        Assert.Equal(ControllerKind.Pro1, ControllerKinds.FromSwitch1DeviceType(0x03, ControllerKind.JoyCon1Left));
+    }
+
+    [Fact]
     public void N64CButtonsBecomeRightStickAndAIsBottom()
     {
         // Rohbits (hid-nintendo): A = A, Y = C-hoch, − = C-rechts, linker Stickklick = ZR.

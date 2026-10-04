@@ -245,10 +245,34 @@ public sealed class Settings
     /// Trennen (quer + SL/SR oder Knopf) trägt ein, Zusammenfügen (L + R oder Knopf) trägt aus.
     /// </summary>
     public List<string> SingleJoyCons { get; set; } = [];
-    /// <summary>Per HidHide versteckte USB-Controller (HID-Instanz-IDs) – damit nicht erneut gefragt wird.</summary>
+    /// <summary>Per HidHide versteckte Controller (HID-Instanz-IDs) – damit nicht erneut gefragt wird.</summary>
     public List<string> HiddenDevices { get; set; } = [];
 
     public bool IsHidden(string instanceId) => Contains(HiddenDevices, instanceId);
+
+    /// <summary>
+    /// Original-Controller automatisch per HidHide vor Spielen und Steam verstecken (Switch 1, NSO, USB, Kabel-Pads) –
+    /// sonst sehen Steam und viele Spiele sie doppelt (Original + virtueller Controller).
+    /// </summary>
+    public bool HideFromGames { get; set; } = true;
+
+    /// <summary>Ausgabeart je Controller (Adresse → Xbox 360 / DualShock 4); fehlt der Eintrag, gilt <see cref="OutputMode"/>.</summary>
+    public Dictionary<string, OutputMode> ControllerOutputs { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>Eigene Ausgabeart eines Controllers (null = wie allgemein eingestellt).</summary>
+    public OutputMode? OutputFor(string? address) =>
+        address is not null && ControllerOutputs.TryGetValue(address, out var mode) ? mode : null;
+
+    /// <summary>Ausgabeart eines Controllers setzen; null = allgemeine Einstellung. Neue Kopie (andere Threads lesen).</summary>
+    public void SetOutput(string address, OutputMode? mode)
+    {
+        var copy = new Dictionary<string, OutputMode>(ControllerOutputs, StringComparer.OrdinalIgnoreCase);
+        if (mode is { } m)
+            copy[address] = m;
+        else
+            copy.Remove(address);
+        ControllerOutputs = copy;
+    }
 
     /// <summary>Einzelne Joy-Con, die hochkant statt quer gehalten werden (Bluetooth-Adressen).</summary>
     public List<string> UprightJoyCons { get; set; } = [];
@@ -388,6 +412,8 @@ public sealed class Settings
         Language = other.Language;
         UprightJoyCons = [.. other.UprightJoyCons];
         HiddenDevices = [.. other.HiddenDevices];
+        HideFromGames = other.HideFromGames;
+        ControllerOutputs = new Dictionary<string, OutputMode>(other.ControllerOutputs, StringComparer.OrdinalIgnoreCase);
         JoyConMouse = other.JoyConMouse;
         MouseSpeed = other.MouseSpeed;
         MouseInvertX = other.MouseInvertX;
@@ -537,6 +563,10 @@ public sealed class Settings
             .ToDictionary(n => n.Key, n => n.Value.Trim(), StringComparer.OrdinalIgnoreCase) ?? new(StringComparer.OrdinalIgnoreCase);
         PlayerSlots = PlayerSlots?.Where(s => s.Key is not null && s.Value is >= 0 and < 8)
             .ToDictionary(s => s.Key, s => s.Value, StringComparer.OrdinalIgnoreCase) ?? new(StringComparer.OrdinalIgnoreCase);
+        ControllerOutputs = ControllerOutputs?.Where(o => o.Key is not null && Enum.IsDefined(o.Value))
+            .ToDictionary(o => o.Key, o => o.Value, StringComparer.OrdinalIgnoreCase) ?? new(StringComparer.OrdinalIgnoreCase);
+        if (!Enum.IsDefined(OutputMode))
+            OutputMode = OutputMode.Xbox360;
         // Nur plausible Kalibrierungen (Mitte im 12-Bit-Bereich, Ausschlag 200–2047) – sonst lieber die Werkswerte.
         static bool Plausible(AxisCalibration a) => a.Neutral is > 0 and < 4095 && a.Max is >= 200 and <= 2047 && a.Min is >= 200 and <= 2047;
         StickCalibrations = StickCalibrations?.Where(c => c.Key is not null && Plausible(c.Value.X) && Plausible(c.Value.Y))

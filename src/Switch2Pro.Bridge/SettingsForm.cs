@@ -31,6 +31,7 @@ internal sealed class SettingsForm : Form
     // ---------- Allgemein ----------
     private readonly ComboBox _output = Combo(260, "Xbox-360-Controller (empfohlen)", "PlayStation DualShock 4");
     private readonly Segmented _layout = new("Xbox", "Nintendo");
+    private readonly ToggleSwitch _hideOriginals = new();
     private readonly ToggleSwitch _autoReconnect = new();
     private readonly ToggleSwitch _autoPair = new();
     private readonly ToggleSwitch _connectFeedback = new();
@@ -311,9 +312,26 @@ internal sealed class SettingsForm : Form
     private Control BuildGeneralPage()
     {
         var page = NewPage("Allgemein", "Wie Spiele die Controller sehen, Verbindung, Darstellung und Programm.");
+        Control hideContent = _hideOriginals;
+        if (!HidHide.IsInstalled)
+        {
+            var install = new GlyphButton("HidHide installieren …", Glyph.Export);
+            install.Click += (_, _) =>
+            {
+                try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(HidHide.Download) { UseShellExecute = true }); }
+                catch (Exception e) when (e is System.ComponentModel.Win32Exception or InvalidOperationException) { Log.Warn($"Öffnen fehlgeschlagen: {e.Message}"); }
+            };
+            hideContent = install;
+        }
         page.AddGroup("Ausgabe",
-            Row("Controller erscheint als", "Xbox 360 läuft mit fast allen Spielen. DualShock 4 bietet Bewegungssteuerung (Steam, Emulatoren).", _output, Glyph.Gamepad),
-            Row("Tastenanordnung A/B/X/Y", "Xbox: nach Position (untere Taste = A). Nintendo: nach Beschriftung (A bleibt A).", _layout, Glyph.Swap));
+            Row("Controller erscheint als", "Xbox 360 läuft mit fast allen Spielen und Steam. DualShock 4 bietet zusätzlich Bewegungssteuerung " +
+                "(Steam, Emulatoren). Gilt für alle Controller ohne eigene Einstellung (Karte → Einstellungen → Tasten).", _output, Glyph.Gamepad),
+            Row("Tastenanordnung A/B/X/Y", "Xbox: nach Position (untere Taste = A). Nintendo: nach Beschriftung (A bleibt A).", _layout, Glyph.Swap),
+            Row("Original-Controller verstecken", HidHide.IsInstalled
+                ? "Empfohlen: Steam und viele Spiele kennen Switch-1-, NSO- und USB-Controller selbst und sähen sie sonst doppelt. " +
+                  "Beim ersten Verbinden fragt Windows einmal nach Adminrechten."
+                : "Steam und viele Spiele sehen Switch-1-, NSO- und USB-Controller sonst doppelt. Dafür wird das kostenlose " +
+                  "HidHide gebraucht (bei der N-Connect-Installation dabei, hier nachträglich).", hideContent, Glyph.Eye));
         var pair = new GlyphButton("Controller koppeln …", Glyph.Bluetooth) { Enabled = _wiiPairing is not null };
         pair.Click += (_, _) => _wiiPairing?.Invoke();
         page.AddGroup("Verbinden",
@@ -420,6 +438,12 @@ internal sealed class SettingsForm : Form
         _connectFeedback.CheckedChanged += (_, _) => Apply(() => _settings.ConnectFeedback = _connectFeedback.Checked);
         _autoReconnect.CheckedChanged += (_, _) => Apply(() => _settings.AutoReconnect = _autoReconnect.Checked);
         _autoPair.CheckedChanged += (_, _) => Apply(() => _settings.AutoPair = _autoPair.Checked);
+        _hideOriginals.CheckedChanged += (_, _) =>
+        {
+            Apply(() => _settings.HideFromGames = _hideOriginals.Checked);
+            if (!_loading && _hideOriginals.Checked)
+                _manager?.HideConnected(); // schon verbundene Controller gleich mit verstecken
+        };
         _autostart.CheckedChanged += (_, _) => { if (!_loading) Autostart.Set(_autostart.Checked); };
         _dsu.CheckedChanged += (_, _) => Apply(() => _settings.DsuServer = _dsu.Checked);
         _updates.CheckedChanged += (_, _) => Apply(() => _settings.CheckForUpdates = _updates.Checked);
@@ -503,6 +527,7 @@ internal sealed class SettingsForm : Form
         _connectFeedback.Checked = _settings.ConnectFeedback;
         _autoReconnect.Checked = _settings.AutoReconnect;
         _autoPair.Checked = _settings.AutoPair;
+        _hideOriginals.Checked = _settings.HideFromGames;
         _autostart.Checked = Autostart.IsEnabled || Autostart.IsEnabledForAllUsers;
         _autostart.Enabled = !Autostart.IsEnabledForAllUsers; // alte Installation: für alle Benutzer eingetragen
         _dsu.Checked = _settings.DsuServer;

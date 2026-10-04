@@ -5,7 +5,7 @@
 ```
 src/Switch2Pro.Protocol     .NET-Bibliothek ohne Windows-Abhängigkeit – das Wissen über die Controller
 src/Switch2Pro.Bridge       Windows-App (WinForms, .NET 8, net8.0-windows10.0.22621): Verbindungen, Ausgabe, Oberfläche
-tests/Switch2Pro.Protocol.Tests   xUnit-Tests für das Protokoll-Projekt (166 Tests)
+tests/Switch2Pro.Protocol.Tests   xUnit-Tests für das Protokoll-Projekt (169 Tests)
 installer/N-Connect.iss     Inno Setup 6 (installiert ViGEmBus, optional HidHide)
 .github/workflows/build.yml Build, Tests, Installer; Tag „v*“ → GitHub-Release mit N-Connect-Setup-*.exe
 ```

@@ -76,6 +76,42 @@ public class ControllerIdentityTests
     }
 
     [Fact]
+    public void Ausgabeart_JeController_SonstAllgemein()
+    {
+        var s = new Settings();
+        Assert.Null(s.OutputFor(Address));
+        Assert.True(s.HideFromGames); // Standard: Originale vor Steam/Spielen verstecken
+        var before = s.ControllerOutputs;
+        s.SetOutput(Address, OutputMode.DualShock4);
+        Assert.NotSame(before, s.ControllerOutputs); // neue Kopie – andere Threads lesen gleichzeitig
+        Assert.Equal(OutputMode.DualShock4, s.OutputFor(Address.ToLowerInvariant()));
+        s.SetOutput(Address, null);
+        Assert.Null(s.OutputFor(Address));
+    }
+
+    [Fact]
+    public void Ausgabeart_SpeichernLadenUndAufraeumen()
+    {
+        string path = Path.Combine(Path.GetTempPath(), $"nconnect-test-{Guid.NewGuid():N}.json");
+        try
+        {
+            File.WriteAllText(path, """{ "ControllerOutputs": { "A": "DualShock4", "B": 7 }, "HideFromGames": false }""");
+            var loaded = Settings.Load(path);
+            Assert.Equal(OutputMode.DualShock4, loaded.OutputFor("a"));
+            Assert.Null(loaded.OutputFor("B")); // ungültiger Wert verworfen
+            Assert.False(loaded.HideFromGames);
+            var copy = new Settings();
+            copy.CopyFrom(loaded);
+            Assert.Equal(OutputMode.DualShock4, copy.OutputFor("A"));
+            Assert.False(copy.HideFromGames);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
     public void CopyFrom_UebernimmtNamenUndPlaetze()
     {
         var a = new Settings();

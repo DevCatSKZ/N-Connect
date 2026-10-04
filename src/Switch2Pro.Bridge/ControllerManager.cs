@@ -526,9 +526,6 @@ internal sealed class ControllerManager : IAsyncDisposable
             if (Attach(link))
             {
                 link.PlayConnectFeedbackAsync().Forget($"{device.DeviceId}: Verbindungs-Vibration");
-                if (link.HidInstanceId is { } hidId && !_settings().IsHidden(hidId))
-                    Notify?.Invoke($"{link.Kind.DisplayName()} per USB verbunden. Sieht ein Spiel ihn doppelt? " +
-                                   "Im Fenster „Doppelt angezeigt? Verstecken“ klicken.");
             }
             else
             {
@@ -621,8 +618,106 @@ internal sealed class ControllerManager : IAsyncDisposable
             OnLinkLost(link);
         Log.Info(message);
         Notify?.Invoke(message);
+        ApplyOutputMode(); // Paar mit eigener Ausgabeart des neuen Joy-Con
+        QueueHide(link);
         Changed?.Invoke();
         return true;
+    }
+
+    // ---------- Originale vor Spielen und Steam verstecken (HidHide) ----------
+
+    private readonly HashSet<string> _hidePending = new(StringComparer.OrdinalIgnoreCase);
+    /// <summary>In dieser Sitzung abgelehnt (UAC abgebrochen) oder fehlgeschlagen – nicht erneut fragen.</summary>
+    private readonly HashSet<string> _hideDeclined = new(StringComparer.OrdinalIgnoreCase);
+    private bool _hideRunning, _hidHideMissingNoted;
+
+    /// <summary>
+    /// Steam und viele Spiele (SDL) unterstützen Switch-1-, NSO- und USB-Controller selbst und sähen sie doppelt
+    /// (Original + virtueller Controller) – dann kommen Eingaben doppelt oder vermischt an. Deshalb jeden solchen
+    /// Controller automatisch per HidHide verstecken (N-Connect bleibt freigegeben). Mehrere Controller (Joy-Con-Paar)
+    /// werden gesammelt und mit einer einzigen Windows-Abfrage (Adminrechte) versteckt.
+    /// </summary>
+    private void QueueHide(IControllerLink link)
+    {
+        var settings = _settings();
+        if (!settings.HideFromGames || link.HidInstanceId is not { } id || settings.IsHidden(id) || _disposed)
+            return;
+        if (!HidHide.IsInstalled)
+        {
+            if (!_hidHideMissingNoted)
+            {
+                _hidHideMissingNoted = true;
+                Log.Warn("HidHide fehlt – Steam/Spiele können Switch-1-, NSO- und USB-Controller doppelt sehen");
+                Notify?.Invoke("Steam und manche Spiele sehen diesen Controller sonst doppelt. Abhilfe: HidHide installieren " +
+                               "(Seite „Allgemein“ → „Original-Controller verstecken“).");
+            }
+            return;
+        }
+        lock (_hidePending)
+        {
+            if (_hideDeclined.Contains(id) || !_hidePending.Add(id) || _hideRunning)
+                return;
+            _hideRunning = true;
+        }
+        Track(HideSoonAsync());
+    }
+
+    /// <summary>Alle verbundenen Controller verstecken (Einstellung eben eingeschaltet); abgelehnte erneut versuchen.</summary>
+    public void HideConnected()
+    {
+        lock (_hidePending)
+            _hideDeclined.Clear();
+        foreach (var link in _links.Values)
+            QueueHide(link);
+    }
+
+    private async Task HideSoonAsync()
+    {
+        try
+        {
+            await Task.Delay(3000, _cts.Token); // zweiten Joy-Con des Paars abwarten – eine Abfrage für beide
+            List<string> ids;
+            lock (_hidePending)
+            {
+                ids = [.. _hidePending];
+                _hidePending.Clear();
+            }
+            if (ids.Count == 0)
+                return;
+            bool ok = await HidHide.HideAsync(ids);
+            if (ok)
+            {
+                var settings = _settings();
+                settings.HiddenDevices = [.. settings.HiddenDevices, .. ids.Where(id => !settings.IsHidden(id))];
+                RequestSave();
+                bool steam = System.Diagnostics.Process.GetProcessesByName("steam").Length > 0;
+                Notify?.Invoke(steam
+                    ? "Original-Controller vor Spielen versteckt. Steam bitte einmal neu starten – danach sieht es nur noch den virtuellen Controller."
+                    : "Original-Controller vor Spielen versteckt – Steam und Spiele sehen nur noch den virtuellen Controller.");
+            }
+            else
+            {
+                lock (_hidePending)
+                    _hideDeclined.UnionWith(ids);
+                Notify?.Invoke("Original-Controller nicht versteckt (Abfrage abgebrochen). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“.");
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        finally
+        {
+            bool again;
+            lock (_hidePending)
+            {
+                _hideRunning = false;
+                again = _hidePending.Count > 0;
+                if (again)
+                    _hideRunning = true;
+            }
+            if (again && !_disposed)
+                Track(HideSoonAsync());
+        }
     }
 
     private void OnLinkLost(IControllerLink link)
@@ -867,6 +962,7 @@ internal sealed class ControllerManager : IAsyncDisposable
         Notify?.Invoke(message);
         if (emptied is not null)
             CompactPlayers();
+        ApplyOutputMode(); // das Paar übernimmt ggf. die eigene Ausgabeart eines Joy-Con
         Changed?.Invoke();
     }
 
@@ -917,20 +1013,43 @@ internal sealed class ControllerManager : IAsyncDisposable
         Attach(new DemoLink(ControllerKind.JoyCon1Right, 4));
     }
 
-    /// <summary>Neue Ausgabeart auf alle Spieler anwenden.</summary>
-    public void ApplyOutputMode(OutputMode mode)
+    /// <summary>
+    /// Ausgabeart (allgemein oder je Controller) geändert: Spieler, deren virtueller Controller nicht mehr passt,
+    /// bekommen einen neuen – dabei werden alle in Spielerreihenfolge neu angelegt, damit Windows und Steam die
+    /// Xbox-Plätze weiter in dieser Reihenfolge vergeben.
+    /// </summary>
+    public void ApplyOutputMode()
     {
-        foreach (var p in Players)
+        var settings = _settings();
+        var ordered = Players;
+        if (ordered.All(p => p.Output == p.DesiredOutput(settings)))
+            return;
+        foreach (var p in ordered)
+            p.ReleasePad();
+        foreach (var p in ordered)
         {
             try
             {
-                p.SwitchOutput(mode);
+                p.RestorePad();
             }
             catch (Exception e)
             {
                 Log.Error($"Spieler {p.Index + 1}: Ausgabeart wechseln", e);
             }
         }
+        Changed?.Invoke();
+    }
+
+    /// <summary>Ausgabeart für die Controller eines Spielers festlegen (null = wie allgemein eingestellt).</summary>
+    public void SetPlayerOutput(Player player, OutputMode? mode)
+    {
+        var settings = _settings();
+        foreach (var link in player.Links)
+            if (link.Address is { } address)
+                settings.SetOutput(address, mode);
+        RequestSave();
+        Log.Info($"Spieler {player.Index + 1}: Ausgabe {(mode?.ToString() ?? "wie allgemein")}");
+        ApplyOutputMode();
     }
 
     public async ValueTask DisposeAsync()
@@ -980,6 +1099,7 @@ internal static class Switch1Devices
                      ("2009", ControllerKind.Pro1),
                      ("2006", ControllerKind.JoyCon1Left),
                      ("2007", ControllerKind.JoyCon1Right),   // auch NES-Controller (Typ aus der Geräteinfo)
+                     ("200e", ControllerKind.JoyCon1Left),    // Ladegriff per USB: je Joy-Con eine Schnittstelle, Seite aus der Geräteinfo
                      ("2017", ControllerKind.SnesController),
                      ("2019", ControllerKind.N64Controller),
                      ("201e", ControllerKind.MegaDrive),

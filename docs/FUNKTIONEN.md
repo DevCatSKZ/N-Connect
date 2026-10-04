@@ -78,6 +78,23 @@ Bis zu **8 Spieler** gleichzeitig (`ControllerManager.MaxPlayers`). Der 9. Contr
 - Gekoppelte Classic-Controller werden alle 2 s über die HID-Geräteliste gesucht und verbunden (Switch 1/NSO:
   Gerätetyp aus der Geräteinfo bestimmt NES/SNES/N64/Mega Drive; Wii: Erweiterung aus dem Register).
 
+- **Joy-Con im Ladegriff per USB** (057E:200E): je Joy-Con eine HID-Schnittstelle; Seite aus dem Gerätetyp der
+  Geräteinfo (0x01 links, 0x02 rechts, 0x03 Pro). USB-Handshake wie beim Pro Controller (0x80 02/03/02/04).
+  Leere Griff-Schnittstellen antworten nicht und werden still alle 5 s erneut versucht.
+
+### 2.4a Originale vor Steam und Spielen verstecken (HidHide)
+- Steam und viele Spiele (SDL) unterstützen Switch-1-, NSO-, Switch-2-USB-Controller und Kabel-Pads **selbst** und
+  sähen sie doppelt (Original + virtueller Controller) – Eingaben kämen doppelt/vermischt an, Steam schickt dem
+  Original außerdem eigene Startbefehle. Wii-Controller sind nicht betroffen.
+- Einstellung **„Original-Controller verstecken“** (`HideFromGames`, Standard an): Jeder solche Controller wird nach
+  dem Verbinden automatisch per HidHide versteckt (`ControllerManager.QueueHide`): 3 s sammeln (Joy-Con-Paar), dann
+  **eine** UAC-Abfrage (`HidHideCLI --app-reg <N-Connect> --dev-hide … --cloak-on`). Erfolg → `HiddenDevices`, Meldung
+  (läuft Steam: „Steam einmal neu starten“ – Steam hält sein schon geöffnetes Handle). Abgebrochen → in dieser
+  Sitzung nicht erneut fragen; Nachholen per Karte → Extras → „Doppelt angezeigt?“ oder Einstellung aus/ein.
+- Bluetooth-Instanz-IDs ändern sich nach jedem Neukoppeln → dann erneut eine Abfrage.
+- HidHide fehlt → einmalige Meldung, auf „Allgemein“ Knopf „HidHide installieren …“. Der Installer bringt HidHide
+  mit (Aufgabe standardmäßig angehakt; Neustart nötig).
+
 ### 2.4 Kabel-Pads und Nachbauten
 - HORI/PowerA/PDP-Kabel-Pads werden an Hersteller-/Produktkennung erkannt (`WiredSwitchPad.Known`) und laufen als
   „Switch Pro Controller“ (gleiche Tasten, Grafik, Belegung) unter eigenem Namen – ohne Gyro/Vibration/LEDs.
@@ -109,6 +126,14 @@ Bis zu **8 Spieler** gleichzeitig (`ControllerManager.MaxPlayers`). Der 9. Contr
   Controller auf): Tasten, Feineinstellung, Gyro, Joy-Con, Extras, Details.
 - Schwache Verbindung (< 20 Berichte/s dauerhaft nach 20 s) → einmalige Einblendung mit Tipp (nicht bei Wii, da sie
   absichtlich nur bei Änderung sendet).
+
+## 3a. Ausgabeart (Xbox 360 / DualShock 4)
+- Allgemein (`Settings.OutputMode`, Standard **Xbox 360** – läuft mit fast allen Spielen und Steam) und **je
+  Controller** (`Settings.ControllerOutputs`, Adresse → Art; Karte → Einstellungen → Tasten → „Erscheint als“: Wie
+  allgemein / Xbox 360 / DualShock 4; ebenso im Infobereich). DualShock 4 bringt Gyro nach Steam/Emulatoren.
+- Paar: gilt die erste eigene Einstellung eines der beiden Joy-Con (`Player.DesiredOutput`).
+- Änderung → `ControllerManager.ApplyOutputMode`: passt ein virtueller Controller nicht mehr, werden **alle** in
+  Spielerreihenfolge neu angelegt (Xbox-Plätze bleiben in Reihenfolge). Auch nach Verbinden/Zusammenfassen geprüft.
 
 ## 4. Spielerplätze und Namen
 - **Platz**: Leiste „Spieler-Reihenfolge“, Klick auf den Kartentitel oder Infobereich → Spieler → Spielerplatz.

@@ -80,8 +80,20 @@ internal sealed class Player : IDisposable
         lock (_output)
             missing = _pad is null && !_disposed;
         if (missing)
-            CreatePad(_settings().OutputMode);
+            CreatePad(DesiredOutput(_settings()));
     }
+
+    /// <summary>Art des virtuellen Controllers, die gerade angelegt ist.</summary>
+    public OutputMode Output { get; private set; }
+
+    /// <summary>
+    /// Gewünschte Ausgabeart: eigene Einstellung eines seiner Controller (Paar: der erste mit eigener Einstellung),
+    /// sonst die allgemeine.
+    /// </summary>
+    public OutputMode DesiredOutput(Settings settings) => DesiredOutput(settings, Links);
+
+    private static OutputMode DesiredOutput(Settings settings, IEnumerable<IControllerLink> links) =>
+        links.Select(l => settings.OutputFor(l.Address)).FirstOrDefault(m => m is not null) ?? settings.OutputMode;
 
     /// <summary>Wird ausgelöst, wenn sich Akku, Ladezustand o. Ä. sichtbar ändert.</summary>
     public event Action? Changed;
@@ -95,7 +107,7 @@ internal sealed class Player : IDisposable
         Index = index;
         _settings = settings;
         _factory = factory;
-        CreatePad(settings().OutputMode); // wirft bei ViGEm-Fehlern – der Manager fängt das ab
+        CreatePad(DesiredOutput(settings(), [first])); // wirft bei ViGEm-Fehlern – der Manager fängt das ab
         Add(first);
     }
 
@@ -656,6 +668,7 @@ internal sealed class Player : IDisposable
             {
                 old = _pad;
                 _pad = pad;
+                Output = mode;
             }
             if (old is not null)
                 StopRumble(); // altes Pad weg – dessen Vibration darf nicht weiterlaufen
@@ -670,8 +683,6 @@ internal sealed class Player : IDisposable
         pad.Dispose();
     }
 
-    /// <summary>Ausgabeart wechseln (Xbox 360 ↔ DualShock 4) ohne neu zu verbinden.</summary>
-    public void SwitchOutput(OutputMode mode) => CreatePad(mode);
 
     private void OnGameRumble(byte large, byte small)
     {
