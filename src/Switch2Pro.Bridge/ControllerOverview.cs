@@ -37,6 +37,8 @@ internal sealed class ControllerOverview : Panel
                "Gezielt suchen: Seite „Allgemein“ → „Controller koppeln …“.",
     };
     private readonly Dictionary<Player, Card> _byPlayer = [];
+    /// <summary>Spieler-Reihenfolge (ab zwei Spielern sichtbar).</summary>
+    private readonly PlayerOrderBar _order;
 
     public ControllerOverview(ControllerManager? manager, Func<Settings> settings, MappingContext mapping, Action save, Action<int> showPage)
     {
@@ -49,6 +51,8 @@ internal sealed class ControllerOverview : Panel
         BackColor = Background;
         Controls.Add(_cards);
         Controls.Add(_empty);
+        _order = new PlayerOrderBar((player, target) => _manager?.MovePlayer(player, target)) { Visible = false };
+        Controls.Add(_order);
         Theme.DarkScroll(_cards);
         Tr.Apply(_empty);
         InitBanner(); // zuletzt hinzugefügt = zuerst angedockt (oben)
@@ -101,6 +105,7 @@ internal sealed class ControllerOverview : Panel
         var players = _manager?.Players ?? [];
         _empty.Visible = players.Count == 0;
         _cards.Visible = players.Count > 0;
+        _order.SetPlayers(players, _settings());
         foreach (var gone in _byPlayer.Keys.Except(players).ToList())
         {
             _cards.Controls.Remove(_byPlayer[gone]);
@@ -741,12 +746,13 @@ internal sealed class ControllerOverview : Panel
             var settings = CurrentSettings;
             var others = Manager.Players.ToDictionary(p => p.Index);
             var menu = new ContextMenuStrip { Renderer = Theme.MenuRenderer(), ForeColor = Theme.Current.Text, ShowCheckMargin = true };
-            for (int i = 0; i < 8; i++)
+            // Nur belegte Plätze (die Spieler rücken immer lückenlos auf): wählen = tauschen.
+            for (int i = 0; i < others.Count; i++)
             {
                 int slot = i;
                 string text = others.TryGetValue(i, out var occupant) && occupant != player
                     ? $"Spieler {i + 1} – tauschen mit {occupant.DisplayName(settings)}"
-                    : i == player.Index ? $"Spieler {i + 1}" : $"Spieler {i + 1} – frei";
+                    : $"Spieler {i + 1}";
                 var item = new ToolStripMenuItem(Tr.T(text)) { Checked = i == player.Index };
                 item.Click += (_, _) => Manager.MovePlayer(player, slot);
                 menu.Items.Add(item);

@@ -500,7 +500,7 @@ internal sealed class TrayApp : ApplicationContext
                 var item = new ToolStripMenuItem($"Spieler {p.Index + 1} · {p.DisplayName(_settings)} {Battery(p)}");
                 item.DropDownItems.Add("Vibrieren", null, (_, _) => player.IdentifyAsync().Forget("Vibrieren"));
                 var slots = new ToolStripMenuItem("Spielerplatz");
-                for (int i = 0; i < 8; i++)
+                for (int i = 0; i < players.Count; i++)
                 {
                     int slot = i;
                     slots.DropDownItems.Add(Radio($"Spieler {i + 1}", player.Index == i, () => _manager.MovePlayer(player, slot)));
