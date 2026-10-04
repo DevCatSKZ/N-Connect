@@ -325,11 +325,11 @@ public static class Mapping
         }
 
         byte TriggerByte(bool digital, float? analog) =>
-            digital ? (byte)255 : analog is { } a ? AnalogTrigger(a, settings.TriggerDeadzone, settings.TriggerFullAt) : (byte)0;
+            digital ? (byte)255 : analog is { } a ? AnalogTrigger(a, settings.TriggerDeadzoneFor(p.Kind), settings.TriggerFullAtFor(p.Kind)) : (byte)0;
 
         float deadzone = settings.DeadzoneFor(p.Kind);
-        var (lx, ly) = Stick(p.LeftX, p.LeftY, deadzone, settings.StickCurve);
-        var (rx, ry) = Stick(p.RightX, p.RightY, deadzone, settings.StickCurve);
+        var (lx, ly) = Stick(p.LeftX, p.LeftY, deadzone, settings.StickCurveFor(p.Kind));
+        var (rx, ry) = Stick(p.RightX, p.RightY, deadzone, settings.StickCurveFor(p.Kind));
         var gamepad = new GamepadState(b, TriggerByte(lt, p.LeftTrigger), TriggerByte(rt, p.RightTrigger), lx, ly, rx, ry, touchpad);
         return new Output(gamepad, keys, specials, shift, macros);
     }

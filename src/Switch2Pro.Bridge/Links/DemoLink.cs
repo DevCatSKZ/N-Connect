@@ -62,7 +62,7 @@ internal sealed class DemoLink : IControllerLink
                     LeftTrigger = Kind == ControllerKind.GameCube2 ? (int)(127 + 100 * Math.Sin(t)) : -1,
                     RightTrigger = Kind == ControllerKind.GameCube2 ? (int)(127 + 100 * Math.Cos(t)) : -1,
                     Motion = new Motion(0, 0, 4096, (short)(3000 * Math.Sin(t)), 0, 0),
-                    BatteryPercent = 50 + seed * 10,
+                    BatteryPercent = 20 + seed * 37 % 80,
                 };
                 LastState = state;
                 _rate.Tick();

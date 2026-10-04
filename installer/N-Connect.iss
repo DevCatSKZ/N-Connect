@@ -40,7 +40,7 @@ WizardImageFile=art\wizard-100.bmp,art\wizard-150.bmp,art\wizard-200.bmp
 WizardSmallImageFile=art\wizard-small-100.bmp,art\wizard-small-150.bmp,art\wizard-small-200.bmp
 WizardImageStretch=no
 WizardImageBackColor=$120D0C
-; Adminrechte für ViGEmBus (Kernel-Treiber), Programme-Ordner und Autostart für alle Benutzer.
+; Adminrechte für ViGEmBus (Kernel-Treiber) und den Programme-Ordner.
 PrivilegesRequired=admin
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
@@ -54,8 +54,6 @@ Name: "german"; MessagesFile: "compiler:Languages\German.isl"
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [CustomMessages]
-german.TaskAutostart=Automatisch mit Windows starten (empfohlen)
-english.TaskAutostart=Start automatically with Windows (recommended)
 german.InstallingViGEm=Installiere ViGEmBus (virtueller Controller-Treiber) …
 english.InstallingViGEm=Installing ViGEmBus (virtual controller driver) …
 german.LaunchNow=Jetzt starten
@@ -69,7 +67,6 @@ german.InstallingHidHide=Installiere HidHide …
 english.InstallingHidHide=Installing HidHide …
 
 [Tasks]
-Name: "autostart"; Description: "{cm:TaskAutostart}"
 #ifdef WithHidHide
 Name: "hidhide"; Description: "{cm:TaskHidHide}"; Check: not HidHideInstalled
 #endif
@@ -90,9 +87,10 @@ Type: files; Name: "{autoprograms}\Nintendo Controller für Windows.lnk"
 
 [Registry]
 Root: HKLM; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: none; ValueName: "Switch2ProBridge"; Flags: deletevalue
-; Autostart für alle Benutzer – unabhängig davon, ob „Jetzt starten“ angehakt bleibt.
+; Autostart richtet N-Connect beim ersten Start selbst ein (für den Benutzer, in der App abschaltbar).
+; Einträge älterer Versionen für alle Benutzer entfernen – sie ließen sich in der App nicht abschalten.
 ; Wird beim Deinstallieren entfernt.
-Root: HKLM; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "N-Connect"; ValueData: """{app}\{#AppExe}"" --autostart"; Flags: uninsdeletevalue; Tasks: autostart
+Root: HKLM; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: none; ValueName: "N-Connect"; Flags: deletevalue
 
 [Icons]
 Name: "{autoprograms}\{#AppName}"; Filename: "{app}\{#AppExe}"

@@ -767,6 +767,18 @@ internal sealed class ControllerManager : IAsyncDisposable
                 Attach(new DemoLink(kind, n++));
             return;
         }
+        if (Environment.GetCommandLineArgs().Contains("--demo-all"))
+        {
+            // Je Art ein Controller (höchstens 8 Spieler): prüft die Karten aller Controller auf einmal.
+            int n = 20;
+            foreach (var kind in new[]
+                     {
+                         ControllerKind.GameCube2, ControllerKind.Pro1, ControllerKind.JoyCon1Left, ControllerKind.JoyCon1Right,
+                         ControllerKind.N64Controller, ControllerKind.WiiRemote, ControllerKind.WiiUPro, ControllerKind.MegaDrive,
+                     })
+                Attach(new DemoLink(kind, n++));
+            return;
+        }
         Attach(new DemoLink(ControllerKind.Pro2, 1));
         Attach(new DemoLink(ControllerKind.JoyCon2Left, 2));
         Attach(new DemoLink(ControllerKind.JoyCon2Right, 3));

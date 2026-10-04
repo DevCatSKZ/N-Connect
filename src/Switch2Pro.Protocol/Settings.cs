@@ -3,6 +3,32 @@ using System.Text.Json.Serialization;
 
 namespace Switch2Pro.Protocol;
 
+/// <summary>Eigene Werte einer Controller-Art; null = allgemeiner Wert gilt.</summary>
+public sealed record ControllerTuning
+{
+    public float? StickCurve { get; init; }
+    public float? TriggerDeadzone { get; init; }
+    public float? TriggerFullAt { get; init; }
+    public float? RumbleStrength { get; init; }
+    public float? GyroMouseSpeed { get; init; }
+
+    [JsonIgnore]
+    public bool IsEmpty => StickCurve is null && TriggerDeadzone is null && TriggerFullAt is null && RumbleStrength is null && GyroMouseSpeed is null;
+
+    internal ControllerTuning Sanitized()
+    {
+        static float? Fin(float? v, float min, float max) => v is { } x && float.IsFinite(x) ? Math.Clamp(x, min, max) : null;
+        return new ControllerTuning
+        {
+            StickCurve = Fin(StickCurve, 0.3f, 3f),
+            TriggerDeadzone = Fin(TriggerDeadzone, 0f, 0.5f),
+            TriggerFullAt = Fin(TriggerFullAt, 0.5f, 1f),
+            RumbleStrength = Fin(RumbleStrength, 0f, 1f),
+            GyroMouseSpeed = Fin(GyroMouseSpeed, 1f, 100f),
+        };
+    }
+}
+
 public enum OutputMode
 {
     /// <summary>Virtueller Xbox-360-Controller (XInput) – funktioniert mit praktisch allen Spielen.</summary>
@@ -141,6 +167,9 @@ public sealed class Settings
     /// <summary>Stick-Totzone je Controller-Art (fehlt eine Art, gilt <see cref="StickDeadzone"/>).</summary>
     public Dictionary<ControllerKind, float> Deadzones { get; set; } = [];
 
+    /// <summary>Eigene Werte je Controller-Art (Kennlinie, Trigger, Vibration, Gyro-Maus); fehlende gelten allgemein.</summary>
+    public Dictionary<ControllerKind, ControllerTuning> Tuning { get; set; } = [];
+
     /// <summary>Gyro-Nullpunkt je Controller (Bluetooth-Adresse), vom Benutzer kalibriert (Rohwerte).</summary>
     public Dictionary<string, GyroBias> GyroCalibration { get; set; } = new(StringComparer.OrdinalIgnoreCase);
     /// <summary>Welcher Joy-Con eines Paars die Bewegungsdaten liefert (an der Switch: rechts).</summary>
@@ -174,6 +203,8 @@ public sealed class Settings
     public bool WiiPointerMouse { get; set; }
     /// <summary>Hinweis „an der Switch 2 neu koppeln“ wurde schon einmal gezeigt.</summary>
     public bool ConsoleHintShown { get; set; }
+    /// <summary>Autostart wurde beim ersten Start eingerichtet (danach entscheidet nur noch der Benutzer).</summary>
+    public bool AutostartConfigured { get; set; }
     /// <summary>Darstellung: "dark" (Standard), "light" oder "system" (wie Windows).</summary>
     public string? Theme { get; set; }
     /// <summary>Durchscheinender Fensterhintergrund (Mica, ab Windows 11).</summary>
@@ -269,6 +300,7 @@ public sealed class Settings
         NamedProfiles = [.. other.NamedProfiles];
         ForcedProfile = other.ForcedProfile;
         Deadzones = new Dictionary<ControllerKind, float>(other.Deadzones);
+        Tuning = new Dictionary<ControllerKind, ControllerTuning>(other.Tuning);
         GyroCalibration = new Dictionary<string, GyroBias>(other.GyroCalibration, StringComparer.OrdinalIgnoreCase);
         PairGyroSource = other.PairGyroSource;
         GyroMouseSpeed = other.GyroMouseSpeed;
@@ -284,6 +316,7 @@ public sealed class Settings
         CheckForUpdates = other.CheckForUpdates;
         WiiPointerMouse = other.WiiPointerMouse;
         ConsoleHintShown = other.ConsoleHintShown;
+        AutostartConfigured = other.AutostartConfigured;
         Theme = other.Theme;
         Transparency = other.Transparency;
         Language = other.Language;
@@ -340,6 +373,26 @@ public sealed class Settings
 
     /// <summary>Totzone für eine Controller-Art (eigene oder die allgemeine).</summary>
     public float DeadzoneFor(ControllerKind kind) => Deadzones.TryGetValue(kind, out float d) ? d : StickDeadzone;
+
+    private ControllerTuning? TuningFor(ControllerKind kind) => Tuning.GetValueOrDefault(kind);
+    public float StickCurveFor(ControllerKind kind) => TuningFor(kind)?.StickCurve ?? StickCurve;
+    public float TriggerDeadzoneFor(ControllerKind kind) => TuningFor(kind)?.TriggerDeadzone ?? TriggerDeadzone;
+    public float TriggerFullAtFor(ControllerKind kind) => TuningFor(kind)?.TriggerFullAt ?? TriggerFullAt;
+    public float RumbleStrengthFor(ControllerKind kind) => TuningFor(kind)?.RumbleStrength ?? RumbleStrength;
+    public float GyroMouseSpeedFor(ControllerKind kind) => TuningFor(kind)?.GyroMouseSpeed ?? GyroMouseSpeed;
+
+    /// <summary>Eigene Werte einer Controller-Art ändern; ohne eigene Werte wird der Eintrag entfernt.</summary>
+    public void SetTuning(ControllerKind kind, Func<ControllerTuning, ControllerTuning> change)
+    {
+        var updated = change(TuningFor(kind) ?? new ControllerTuning());
+        // Neue Kopie statt Änderung: der Bluetooth-Thread liest gleichzeitig.
+        var copy = new Dictionary<ControllerKind, ControllerTuning>(Tuning);
+        if (updated.IsEmpty)
+            copy.Remove(kind);
+        else
+            copy[kind] = updated;
+        Tuning = copy;
+    }
 
     /// <summary>Gerade geltendes benanntes Profil (von Hand gewählt oder per Programm erkannt); null = Standard.</summary>
     public NamedProfile? CurrentProfile()
@@ -398,6 +451,8 @@ public sealed class Settings
             ShiftButtons = Clean(p.ShiftButtons),
         }).ToList();
         ShiftProfiles = Clean(ShiftProfiles);
+        Tuning = Tuning?.Where(t => t.Value is not null && Enum.IsDefined(t.Key))
+            .ToDictionary(t => t.Key, t => t.Value.Sanitized()) ?? [];
         foreach (var kind in Deadzones.Keys.ToList())
             Deadzones[kind] = float.IsFinite(Deadzones[kind]) ? Math.Clamp(Deadzones[kind], 0f, 0.5f) : StickDeadzone;
         // Von Hand bearbeitete Dateien können null-Einträge enthalten ("…": null).

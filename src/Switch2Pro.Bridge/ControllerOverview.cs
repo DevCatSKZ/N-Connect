@@ -1,4 +1,4 @@
-﻿using System.Drawing;
+using System.Drawing;
 using System.Drawing.Drawing2D;
 using Switch2Pro.Bridge.Links;
 using Switch2Pro.Protocol;
@@ -6,50 +6,50 @@ using Switch2Pro.Protocol;
 namespace Switch2Pro.Bridge;
 
 /// <summary>
-/// Übersicht aller verbundenen Controller: je Spieler eine Karte mit gezeichnetem Controller (Live-Eingaben)
-/// und allen Eigenschaften (Typ, Akku, Verbindung, Seriennummer, Firmware …).
+/// Übersicht aller verbundenen Controller: je Spieler eine Karte mit gezeichnetem Controller (Live-Eingaben),
+/// Eigenschaften (Akku, Verbindung …) und aufklappbaren Einstellungen genau für diesen Controller.
 /// </summary>
 internal sealed class ControllerOverview : Panel
 {
-    // Farben aus der Darstellung (dunkel/hell, Mica): Hintergrund durchscheinend, Karten wie Windows-11-Kacheln.
     internal static Color Background => Theme.Backdrop;
     internal static Color CardColor => Theme.Current.Surface;
     internal static Color TextColor => Theme.Current.Text;
     internal static Color MutedColor => Theme.Current.TextMuted;
-    // Schriften einmal für alle Karten (Karten kommen und gehen mit den Controllern).
-    private static readonly Font TitleFont = new("Segoe UI Semibold", 13f);
-    private static readonly Font ButtonFont = new("Segoe UI", 9.5f);
-    private static readonly Font EmptyFont = new("Segoe UI", 11f);
     internal static Color Accent => Theme.Accent;
 
-    private readonly Func<IReadOnlyList<Player>> _players;
     private readonly ControllerManager? _manager;
     private readonly Func<Settings> _settings;
+    private readonly MappingContext _mapping;
+    private readonly Action _save;
+    private readonly Action<int> _showPage;
     private readonly FlowLayoutPanel _cards = new()
     {
         Dock = DockStyle.Fill, FlowDirection = FlowDirection.TopDown, WrapContents = false, AutoScroll = true,
-        BackColor = Background, Padding = new Padding(12),
+        BackColor = Background, Padding = new Padding(12, 4, 12, 12),
     };
     private readonly Label _empty = new()
     {
         AutoSize = false, Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleCenter,
-        ForeColor = MutedColor, BackColor = Background, Font = EmptyFont,
+        ForeColor = MutedColor, BackColor = Background, Font = UiFonts.Body,
         Text = "Kein Controller verbunden\n\n" +
                "Switch-2-Controller: kurz die SYNC-Taste drücken – danach reicht ein beliebiger Tastendruck.\n" +
                "Switch-1- und NSO-Controller (NES, SNES, N64, Mega Drive): einmal in Windows unter „Bluetooth“ koppeln.\n" +
-               "Wii-Fernbedienung / Wii U Pro: Rechtsklick auf das Symbol im Infobereich → „Wii-Controller koppeln …“.",
+               "Wii-Fernbedienung / Wii U Pro: Seite „Joy-Con & Wii“ → „Wii-Controller koppeln“.",
     };
     private readonly Dictionary<Player, Card> _byPlayer = [];
 
-    public ControllerOverview(ControllerManager? manager, Func<Settings> settings)
+    public ControllerOverview(ControllerManager? manager, Func<Settings> settings, MappingContext mapping, Action save, Action<int> showPage)
     {
         _manager = manager;
-        _players = () => manager?.Players ?? [];
         _settings = settings;
+        _mapping = mapping;
+        _save = save;
+        _showPage = showPage;
         Dock = DockStyle.Fill;
         BackColor = Background;
         Controls.Add(_cards);
         Controls.Add(_empty);
+        Theme.DarkScroll(_cards);
         Tr.Apply(_empty);
         InitBanner(); // zuletzt hinzugefügt = zuerst angedockt (oben)
     }
@@ -98,7 +98,7 @@ internal sealed class ControllerOverview : Panel
     public void UpdateView()
     {
         UpdateBanner();
-        var players = _players();
+        var players = _manager?.Players ?? [];
         _empty.Visible = players.Count == 0;
         _cards.Visible = players.Count > 0;
         foreach (var gone in _byPlayer.Keys.Except(players).ToList())
@@ -111,12 +111,26 @@ internal sealed class ControllerOverview : Panel
         {
             if (!_byPlayer.TryGetValue(p, out var card))
             {
-                card = new Card(_manager!, _settings) { Width = CardWidth };
+                card = new Card(this) { Width = CardWidth };
                 _byPlayer[p] = card;
                 _cards.Controls.Add(card);
             }
             card.Show(p, _settings());
         }
+    }
+
+    internal Control? FirstCard => _byPlayer.Values.FirstOrDefault();
+
+    /// <summary>Für die Prüfhilfe: alle Karten (in Spielerreihenfolge) und das Aufklappen eines Reiters.</summary>
+    internal IReadOnlyList<Control> Cards => _cards.Controls.Cast<Control>().ToList();
+
+    internal static bool ExpandCard(Control card, int tab) => ((Card)card).Expand(tab);
+
+    /// <summary>Für die Prüfhilfe: Einstellungen der ersten Karte aufklappen und einen Reiter wählen.</summary>
+    internal void ExpandFirst(int tab)
+    {
+        if (_byPlayer.Values.FirstOrDefault() is { } card)
+            card.Expand(tab);
     }
 
     private int CardWidth => Math.Max(760, _cards.ClientSize.Width - 30);
@@ -128,105 +142,518 @@ internal sealed class ControllerOverview : Panel
             card.Width = CardWidth;
     }
 
-    /// <summary>Eine Karte pro Spieler: Grafik links, Eigenschaften rechts, Aktionen oben rechts.</summary>
+    /// <summary>Live-Eingaben eines Spielers (für Anzeige und Hervorhebung in der Tastenbelegung).</summary>
+    internal static (PadInput? Input, GamepadState Gamepad) LiveInput(Player player, Settings settings)
+    {
+        var links = player.Links;
+        if (links.Count == 0 || links.Any(l => player.EffectiveState(l) is null))
+            return (null, default);
+        var input = Player.Combine(links, player.EffectiveState, settings);
+        return (input, Mapping.ToGamepad(input, settings));
+    }
+
+    /// <summary>
+    /// Eine Karte pro Spieler: oben Titel und Aktionen, darunter Grafik und Eigenschaften; „Einstellungen“ klappt
+    /// Reiter mit Tastenbelegung, Feineinstellung, Gyro, Joy-Con und Extras für genau diesen Controller auf.
+    /// </summary>
     private sealed class Card : Panel
     {
-        private readonly InputView _view = new() { Location = new Point(16, 52), Size = new Size(522, 369) };
-        private readonly Label _title = new()
-        {
-            AutoSize = true, Location = new Point(16, 14), ForeColor = TextColor, BackColor = CardColor,
-            Font = TitleFont,
-        };
-        private readonly InfoPanel _info = new() { Location = new Point(556, 52) };
-        private readonly FlowLayoutPanel _actions = new()
-        {
-            AutoSize = true, FlowDirection = FlowDirection.RightToLeft, WrapContents = true, BackColor = CardColor,
-        };
+        private const int TabMapping = 0, TabTuning = 1, TabGyro = 2, TabJoyCon = 3, TabExtras = 4;
+        private readonly ControllerOverview _owner;
+        private readonly InputView _view = new() { Size = new Size(522, 369) };
+        private readonly InfoPanel _info = new();
+        private readonly GlyphButton _identify = new("Vibrieren", Glyph.Vibrate);
+        private readonly GlyphButton _disconnect = new("Trennen", Glyph.Power);
+        private readonly GlyphButton _settingsButton = new("Einstellungen", Glyph.Settings) { Toggle = true, TrailingGlyph = Glyph.ChevronDown };
         private readonly ToolTip _tips = Theme.CreateToolTip();
-        private readonly Button _disconnect = ActionButton("Trennen");
-        private readonly Button _identify = ActionButton("Vibrieren");
-        private readonly Button _calibrate = ActionButton("Gyro kalibrieren");
-        private readonly Button _orientation = ActionButton("");
-        private readonly Button _joyConButton = ActionButton("");
-        private readonly Button _hide = ActionButton("Doppelt angezeigt? Verstecken");
-        private readonly Button _amiibo = ActionButton("amiibo lesen");
-        private readonly Button _ringCon = ActionButton("Ring-Con");
-        private readonly Button _irCamera = ActionButton("IR-Kamera");
-        private readonly ControllerManager _manager;
-        private readonly Func<Settings> _settings;
+        private readonly PivotTabs _tabs = new();
+        private readonly StackPanel _panel = new() { Spacing = 0 };
+        private readonly Control?[] _tabPages = new Control?[5];
         private Player? _player;
-        private bool _calibrating;
+        private ControllerKind _builtFor = ControllerKind.Unknown;
+        private bool _expanded;
+        private string? _title;
+        private string? _rawTitle;
 
-        private static Button ActionButton(string text)
-        {
-            var b = new Button
-            {
-                Text = Tr.T(text), AutoSize = true, FlatStyle = FlatStyle.Flat, ForeColor = TextColor, BackColor = Theme.Current.SurfaceHover,
-                Font = ButtonFont, Padding = new Padding(6, 1, 6, 1), Margin = new Padding(6, 0, 0, 0),
-            };
-            b.FlatAppearance.BorderColor = Theme.Current.Border;
-            b.FlatAppearance.MouseOverBackColor = Theme.Blend(Theme.Current.SurfaceHover, Theme.Current.Text, 0.08f);
-            return b;
-        }
+        private ControllerManager Manager => _owner._manager!;
+        private Settings CurrentSettings => _owner._settings();
 
-        public Card(ControllerManager manager, Func<Settings> settings)
+        public Card(ControllerOverview owner)
         {
-            _manager = manager;
-            _settings = settings;
+            _owner = owner;
             DoubleBuffered = true;
             ResizeRedraw = true;
-            BackColor = Background; // Ecken außerhalb der abgerundeten Karte: Fensterhintergrund (Mica)
-            Height = 430;
+            BackColor = Background;
             Margin = new Padding(0, 0, 0, 12);
+            Height = 460;
+            foreach (var b in new[] { _identify, _disconnect, _settingsButton })
+                b.BackColor = CardColor;
+            _tabs.BackColor = CardColor;
+            _panel.BackColor = Theme.Backdrop;
+            _tabs.Add("Tasten");
+            _tabs.Add("Feineinstellung");
+            _tabs.Add("Gyro");
+            _tabs.Add("Joy-Con");
+            _tabs.Add("Extras");
+            _tabs.Visible = _panel.Visible = false;
+            _tabs.SelectedIndexChanged += (_, _) => ShowTab();
 
-            _disconnect.Click += (_, _) => { if (_player is not null) _manager.Disconnect(_player); };
-            _identify.Click += (_, _) => { if (_player is not null) _player.IdentifyAsync().Forget("Vibrieren"); };
-            _calibrate.Click += async (_, _) => await CalibrateAsync();
-            _orientation.Click += (_, _) =>
+            _identify.Click += (_, _) => _player?.IdentifyAsync().Forget("Vibrieren");
+            _disconnect.Click += (_, _) => { if (_player is not null) Manager.Disconnect(_player); };
+            _settingsButton.Click += (_, _) => { if (_expanded) Collapse(); else Expand(_tabs.SelectedIndex); };
+            _tips.SetToolTip(_disconnect, Tr.T("Verbindung trennen. Der Controller verbindet sich beim nächsten Tastendruck wieder."));
+            _tips.SetToolTip(_identify, Tr.T("Controller kurz vibrieren lassen – zeigt, welcher Controller dieser Spieler ist."));
+            _tips.SetToolTip(_settingsButton, Tr.T("Tastenbelegung und Einstellungen nur für diesen Controller"));
+
+            Controls.AddRange([_view, _info, _identify, _disconnect, _settingsButton, _tabs, _panel]);
+            Tr.Apply(this);
+        }
+
+        // ---------- Aufklappen ----------
+
+        public bool Expand(int tab)
+        {
+            if (_player is null)
+                return false;
+            _expanded = true;
+            _settingsButton.Checked = true;
+            _settingsButton.TrailingGlyph = Glyph.ChevronUp;
+            _settingsButton.Invalidate();
+            BuildPages();
+            bool shown = _tabs.IsShown(tab);
+            if (!shown)
+                tab = TabMapping;
+            if (tab != _tabs.SelectedIndex)
+                _tabs.SelectedIndex = tab;
+            _tabs.Visible = _panel.Visible = true;
+            ShowTab();
+            return shown;
+        }
+
+        private void Collapse()
+        {
+            _expanded = false;
+            _settingsButton.Checked = false;
+            _settingsButton.TrailingGlyph = Glyph.ChevronDown;
+            _settingsButton.Invalidate();
+            _tabs.Visible = _panel.Visible = false;
+            PerformLayout();
+        }
+
+        /// <summary>Kind, dessen Belegung gilt: hochkant gehaltene einzelne Joy-Con nutzen die des Joy-Con-Paars.</summary>
+        private ControllerKind MappingKind(Player player, Settings settings)
+        {
+            var links = player.Links;
+            if (links is [{ Kind: var k, Address: var address }] && k.IsJoyCon() && settings.IsUprightJoyCon(address))
+                return ControllerKind.JoyConPair;
+            return player.Kind;
+        }
+
+        /// <summary>Reiterseiten für den aktuellen Controller (neu bei anderer Controller-Art).</summary>
+        private void BuildPages()
+        {
+            var player = _player!;
+            var kind = MappingKind(player, CurrentSettings);
+            if (kind == _builtFor)
+                return;
+            _builtFor = kind;
+            // Alte Seiten verwerfen; neue entstehen erst, wenn ihr Reiter gewählt wird (schnelles Aufklappen).
+            foreach (Control c in _panel.Controls.Cast<Control>().ToList())
             {
-                if (_player?.Links is not [{ Address: { } address }])
-                    return;
-                var s = _settings();
-                s.SetUprightJoyCon(address, !s.IsUprightJoyCon(address));
-                _manager.RequestSave();
+                _panel.Controls.Remove(c);
+                c.Dispose();
+            }
+            Array.Clear(_tabPages);
+            if (_profile is not null)
+                _owner._mapping.Changed -= SyncProfile;
+            _profile = null;
+            _layer = null;
+            _editor = null;
+            _calibrate = null;
+            _joyConGroup = null;
+            _extrasGroup = null;
+            var links = player.Links;
+            _tabs.SetShown(TabTuning, KindInfo.HasSticks(kind) || KindInfo.HasAnalogTriggers(kind) || KindInfo.HasRumble(kind));
+            _tabs.SetShown(TabGyro, KindInfo.HasMotion(kind));
+            _tabs.SetShown(TabJoyCon, links.Count > 0 && links.All(l => l.Kind.IsJoyCon()));
+            _tabs.SetShown(TabExtras, ExtrasAvailable(CurrentSettings));
+        }
+
+        private Control? BuildTab(int tab, ControllerKind kind) => tab switch
+        {
+            TabMapping => MappingPage(kind),
+            TabTuning => Column(
+                new TuningEditor(_owner._settings, _owner._save, kind, TuningParts.Sticks | TuningParts.Triggers | TuningParts.Rumble),
+                Hint("Ohne eigenen Wert gilt der allgemeine Wert der Seite „Sticks & Vibration“.")),
+            TabGyro => GyroPage(kind),
+            TabJoyCon => JoyConPage(),
+            TabExtras => ExtrasPage(),
+            _ => null,
+        };
+
+        private void ShowTab()
+        {
+            int selected = _tabs.SelectedIndex;
+            if (_tabPages[selected] is null && BuildTab(selected, _builtFor) is { } built)
+            {
+                _tabPages[selected] = built;
+                Theme.ApplyControls(built);
+                Tr.Apply(built);
+                _panel.Controls.Add(built);
+            }
+            for (int i = 0; i < _tabPages.Length; i++)
+                if (_tabPages[i] is { } page)
+                    _panel.SetShown(page, i == selected);
+            PerformLayout();
+        }
+
+        private static StackPanel Column(params Control[] children)
+        {
+            var column = new StackPanel { Spacing = 8, BackColor = Theme.Backdrop };
+            column.Controls.AddRange(children);
+            return column;
+        }
+
+        private static SettingsGroup Group(params Control[] rows)
+        {
+            var group = new SettingsGroup();
+            group.Controls.AddRange(rows);
+            return group;
+        }
+
+        private static Heading Hint(string text) => new(text, hint: true) { Margin = new Padding(4, 2, 0, 2) };
+
+        private SettingRow Link(string title, string description, int page)
+        {
+            var row = new SettingRow(title, description, null, Glyph.Settings) { Navigates = true };
+            row.Click += (_, _) => _owner._showPage(page);
+            return row;
+        }
+
+        private static SettingRow Row(string title, string? description, Control content, string glyph)
+        {
+            content.BackColor = Theme.Current.Surface;
+            return new SettingRow(title, description, content, glyph);
+        }
+
+        // Tasten: Profil und Ebene (gemeinsam mit der Seite „Tastenbelegung“), darunter alle Tasten.
+        private ComboBox? _profile;
+        private Segmented? _layer;
+        private MappingEditor? _editor;
+
+        private Control MappingPage(ControllerKind kind)
+        {
+            _profile = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Width = 220, Tag = Tr.UserData };
+            _layer = new Segmented("Normal", "Shift-Ebene");
+            var manage = new GlyphButton("Profile", Glyph.Layers);
+            manage.Click += (_, _) => _owner._showPage(SettingsForm.PageMapping);
+            _tips.SetToolTip(manage, Tr.T("Profile anlegen, umbenennen, exportieren …"));
+            var profileBox = new Panel { Size = new Size(_profile.Width + 8 + manage.Width, 32) };
+            _profile.Location = new Point(0, (32 - _profile.Height) / 2);
+            manage.Location = new Point(_profile.Width + 8, 0);
+            profileBox.Controls.AddRange([_profile, manage]);
+            FillProfiles();
+            _profile.SelectedIndexChanged += (_, _) =>
+            {
+                if (!_syncing)
+                    _owner._mapping.SelectProfile(_profile.SelectedIndex <= 0 ? null : _profile.SelectedItem as string);
             };
-            _joyConButton.Click += (_, _) =>
+            _layer.SelectedIndexChanged += (_, _) => { if (!_syncing) _owner._mapping.SetShift(_layer.SelectedIndex == 1); };
+            _owner._mapping.Changed += SyncProfile;
+            _editor = new MappingEditor(_owner._mapping, kind);
+            return Column(
+                Group(Row("Profil", "Belegung für alle Spiele (Standard) oder ein eigenes Profil.", profileBox, Glyph.Layers),
+                      Row("Ebene", "Die Shift-Ebene gilt, solange eine Taste mit „Shift-Ebene“ gehalten wird.", _layer, Glyph.Layers)),
+                Hint("Drück eine Taste am Controller – ihre Zeile leuchtet auf. ⌨ weist eine Tastaturtaste zu, ↺ setzt zurück."),
+                _editor);
+        }
+
+        private bool _syncing;
+
+        private void FillProfiles()
+        {
+            if (_profile is null)
+                return;
+            _syncing = true;
+            var s = CurrentSettings;
+            _profile.Items.Clear();
+            _profile.Items.Add(Tr.T("Standard"));
+            foreach (var p in s.NamedProfiles)
+                _profile.Items.Add(p.Name);
+            int index = _owner._mapping.EditProfile is null ? 0 : s.NamedProfiles.FindIndex(p => p.Name == _owner._mapping.EditProfile) + 1;
+            _profile.SelectedIndex = Math.Max(0, index);
+            if (_layer is not null)
+                _layer.SelectedIndex = _owner._mapping.Shift ? 1 : 0;
+            _syncing = false;
+        }
+
+        private void SyncProfile()
+        {
+            if (!IsDisposed)
+                FillProfiles();
+        }
+
+        // Gyro: Nullpunkt kalibrieren, Gyro-Maus-Tempo dieses Controllers, Verweis auf Gyro-Stick.
+        private GlyphButton? _calibrate;
+        private bool _calibrating;
+
+        private Control? GyroPage(ControllerKind kind)
+        {
+            if (!KindInfo.HasMotion(kind))
+                return null;
+            _calibrate = new GlyphButton("Kalibrieren", Glyph.Gauge);
+            _calibrate.Click += async (_, _) => await CalibrateAsync();
+            return Column(
+                Group(Row("Gyro kalibrieren", "Controller ruhig auf den Tisch legen und klicken: misst den Nullpunkt neu (gegen Abdriften).",
+                    _calibrate, Glyph.Rotate)),
+                new TuningEditor(_owner._settings, _owner._save, kind, TuningParts.GyroMouse),
+                Group(Link("Gyro als rechter Stick und Mausrichtung", "Gilt für alle Controller", SettingsForm.PageGyro)));
+        }
+
+        // Joy-Con: Paar lösen/verbinden, Haltung des einzelnen Joy-Con.
+        private GlyphButton? _pairButton;
+        private Segmented? _orientation;
+        private SettingRow? _pairRow, _orientationRow;
+        private SettingsGroup? _joyConGroup;
+
+        private Control? JoyConPage()
+        {
+            if (_player is not { Links: { Count: > 0 } links } || !links.All(l => l.Kind.IsJoyCon()))
+                return null;
+            _pairButton = new GlyphButton("Joy-Con trennen", Glyph.Swap);
+            _pairButton.Click += (_, _) =>
             {
                 if (_player is null)
                     return;
                 if (_player.IsPair)
-                    _manager.SplitPair(_player);
+                    Manager.SplitPair(_player);
                 else
-                    _manager.PairWithAnySingle(_player);
+                    Manager.PairWithAnySingle(_player);
             };
-            _tips.SetToolTip(_disconnect, Tr.T("Verbindung trennen. Der Controller verbindet sich beim nächsten Tastendruck wieder."));
-            _tips.SetToolTip(_identify, Tr.T("Controller kurz vibrieren lassen – zeigt, welcher Controller dieser Spieler ist."));
-            _tips.SetToolTip(_calibrate, Tr.T("Controller ruhig auf den Tisch legen und klicken: misst den Gyro-Nullpunkt neu (gegen Abdriften)."));
-            _tips.SetToolTip(_orientation, Tr.T("Einzelnen Joy-Con quer (wie an der Switch) oder hochkant halten – wird je Joy-Con gemerkt. Hochkant gilt die Tastenbelegung von „Joy-Con-Paar“."));
-            _tips.SetToolTip(_hide, Tr.T("Versteckt den per USB angeschlossenen Controller vor Spielen (HidHide), damit sie nur den virtuellen Xbox-Controller sehen."));
-            _hide.Click += async (_, _) => await HideAsync();
-            _tips.SetToolTip(_amiibo, Tr.T("amiibo mit dem NFC-Leser lesen und als Datei (.bin) speichern – z. B. für Emulatoren."));
+            _orientation = new Segmented("Quer", "Hochkant");
+            _orientation.SelectedIndexChanged += (_, _) =>
+            {
+                if (_syncing || _player?.Links is not [{ Address: { } address }])
+                    return;
+                CurrentSettings.SetUprightJoyCon(address, _orientation.SelectedIndex == 1);
+                Manager.RequestSave();
+            };
+            _pairRow = Row("Paar", "Wie an der Switch: SL + SR eine Sekunde halten löst das Paar, L + R gleichzeitig verbindet es.", _pairButton, Glyph.Swap);
+            _orientationRow = Row("Haltung", "Quer wie an der Switch oder hochkant – hochkant gilt die Belegung von „Joy-Con-Paar“.", _orientation, Glyph.Rotate);
+            _joyConGroup = Group(_pairRow, _orientationRow);
+            return Column(_joyConGroup, Group(Link("Joy-Con 2 als Maus", "Mausmodus, Geschwindigkeit und Tasten", SettingsForm.PageJoyCon)));
+        }
+
+        // Extras: amiibo, Ring-Con, IR-Kamera, USB-Controller vor Spielen verstecken.
+        private GlyphButton? _amiibo, _ringCon, _irCamera, _hide;
+        private SettingRow? _amiiboRow, _ringRow, _irRow, _hideRow;
+        private SettingsGroup? _extrasGroup;
+
+        private Control ExtrasPage()
+        {
+            _amiibo = new GlyphButton("Lesen …", Glyph.Nfc);
             _amiibo.Click += async (_, _) => await ReadAmiiboAsync();
-            _tips.SetToolTip(_ringCon, Tr.T("Ring-Con am rechten Joy-Con ein-/ausschalten: zusammendrücken = rechter Trigger, auseinanderziehen = linker Trigger. Beim Einschalten den Ring nicht berühren."));
+            _ringCon = new GlyphButton("Einschalten", Glyph.Ring);
             _ringCon.Click += async (_, _) => await ToggleRingConAsync();
-            _tips.SetToolTip(_irCamera, Tr.T("Live-Bild der IR-Kamera im rechten Joy-Con anzeigen."));
+            _irCamera = new GlyphButton("Öffnen", Glyph.Video);
             _irCamera.Click += (_, _) =>
             {
-                if (_player?.Links.OfType<Links.Switch1HidLink>().FirstOrDefault(l => l.HasIrCamera) is { } ir)
+                if (_player?.Links.OfType<Switch1HidLink>().FirstOrDefault(l => l.HasIrCamera) is { } ir)
                     IrCameraForm.ShowFor(ir, FindForm());
             };
-            _actions.Controls.AddRange([_disconnect, _identify, _calibrate, _orientation, _joyConButton, _hide, _amiibo, _ringCon, _irCamera]);
-
-            Controls.Add(_title);
-            Controls.Add(_view);
-            Controls.Add(_info);
-            Controls.Add(_actions);
+            _hide = new GlyphButton("Verstecken", Glyph.Eye);
+            _hide.Click += async (_, _) => await HideAsync();
+            _amiiboRow = Row("amiibo lesen", "amiibo an den NFC-Leser halten und als Datei (.bin) speichern – z. B. für Emulatoren.", _amiibo, Glyph.Nfc);
+            _ringRow = Row("Ring-Con", "Zusammendrücken = rechter Trigger, auseinanderziehen = linker Trigger. Beim Einschalten nicht berühren.", _ringCon, Glyph.Ring);
+            _irRow = Row("IR-Kamera", "Live-Bild der Infrarotkamera im rechten Joy-Con.", _irCamera, Glyph.Video);
+            _hideRow = Row("Doppelt angezeigt?", "Versteckt den USB-Controller vor Spielen (HidHide) – sie sehen dann nur den virtuellen Controller.", _hide, Glyph.Eye);
+            _extrasGroup = Group(_amiiboRow, _ringRow, _irRow, _hideRow);
+            UpdateExtras(CurrentSettings);
+            return Column(_extrasGroup);
         }
+
+        /// <summary>Welche Extras gerade möglich sind (Ring-Con-Zustand, USB …) – günstig, läuft mit der Live-Anzeige.</summary>
+        private (bool Amiibo, Switch1HidLink? Ring, bool Hide) Extras(Settings settings)
+        {
+            var links = _player?.Links ?? [];
+            return (links.OfType<Switch1HidLink>().Any(l => l.HasNfc),
+                links.OfType<Switch1HidLink>().FirstOrDefault(l => l.Kind == ControllerKind.JoyCon1Right),
+                links.OfType<Switch2UsbLink>().Any(l => l.HidInstanceId is { } id && !settings.IsHidden(id)));
+        }
+
+        private bool ExtrasAvailable(Settings settings)
+        {
+            var (amiibo, ring, hide) = Extras(settings);
+            return amiibo || ring is not null || hide;
+        }
+
+        private void UpdateExtras(Settings settings)
+        {
+            if (_player is null)
+                return;
+            var (amiibo, ring, hide) = Extras(settings);
+            _tabs.SetShown(TabExtras, amiibo || ring is not null || hide);
+            if (_extrasGroup is null)
+                return;
+            Show(_extrasGroup, _amiiboRow!, amiibo);
+            Show(_extrasGroup, _ringRow!, ring is not null);
+            Show(_extrasGroup, _irRow!, ring is { HasIrCamera: true });
+            Show(_extrasGroup, _hideRow!, hide);
+            if (ring is not null && _ringCon!.Enabled)
+                SetText(_ringCon, ring.RingConActive ? "Ausschalten" : "Einschalten");
+
+            static void Show(StackPanel group, Control row, bool shown)
+            {
+                if (group.IsShown(row) != shown)
+                    group.SetShown(row, shown);
+            }
+        }
+
+        private void UpdateJoyCon(Settings settings)
+        {
+            if (_joyConGroup is null || _player is null)
+                return;
+            var links = _player.Links;
+            bool single = links.Count == 1;
+            if (_player.IsPair)
+                SetText(_pairButton!, "Joy-Con trennen");
+            else
+                SetText(_pairButton!, "Zum Paar verbinden");
+            _pairButton!.Enabled = _player.IsPair || Manager.HasPartner(_player);
+            if (_joyConGroup.IsShown(_orientationRow!) != single)
+                _joyConGroup.SetShown(_orientationRow!, single);
+            if (single)
+            {
+                _syncing = true;
+                _orientation!.SelectedIndex = settings.IsUprightJoyCon(links[0].Address) ? 1 : 0;
+                _syncing = false;
+            }
+        }
+
+        private static void SetText(Control c, string german)
+        {
+            // Selbst übersetzende Knöpfe bekommen den deutschen Text, alle anderen den übersetzten.
+            string text = c is ISelfTranslating ? german : Tr.T(german);
+            if (c.Text != text)
+                c.Text = text;
+        }
+
+        // ---------- Anordnung ----------
+
+        protected override void OnLayout(LayoutEventArgs levent)
+        {
+            const int pad = 20, top = 64;
+            int x = Width - pad;
+            foreach (var b in new[] { _settingsButton, _disconnect, _identify })
+            {
+                x -= b.Width;
+                b.Location = new Point(x, 16);
+                x -= 8;
+            }
+            _view.Location = new Point(pad - 4, top);
+            _info.Location = new Point(_view.Right + 24, top + 6);
+            _info.Width = Math.Max(240, Width - _info.Left - pad);
+            int bodyBottom = Math.Max(_view.Bottom, _info.Bottom) + 12;
+            int height = bodyBottom;
+            if (_expanded)
+            {
+                _divider = bodyBottom;
+                _tabs.SetBounds(pad - 4, bodyBottom + 6, Width - 2 * pad, 40);
+                _panel.SetBounds(pad, _tabs.Bottom + 8, Width - 2 * pad, _panel.HeightFor(Width - 2 * pad));
+                height = _panel.Bottom + pad;
+            }
+            if (Height != height)
+                Height = height;
+        }
+
+        private int _divider;
+
+        /// <summary>Karte wie eine Windows-11-Kachel; aufgeklappt ist der untere Teil leicht abgesetzt.</summary>
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            var g = e.Graphics;
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+            using var path = Theme.RoundedRect(new RectangleF(0.5f, 0.5f, Width - 1.5f, Height - 1.5f), 8);
+            using (var fill = new SolidBrush(CardColor))
+                g.FillPath(fill, path);
+            if (_expanded)
+            {
+                g.SetClip(path);
+                using (var lower = new SolidBrush(CardColor))
+                    g.FillRectangle(lower, 0, _divider, Width, 52);
+                using (var recess = new SolidBrush(Theme.Backdrop))
+                    g.FillRectangle(recess, 0, _divider + 52, Width, Height - _divider - 52);
+                using (var line = new Pen(Theme.Current.Border))
+                {
+                    g.DrawLine(line, 0, _divider, Width, _divider);
+                    g.DrawLine(line, 0, _divider + 52, Width, _divider + 52);
+                }
+                g.ResetClip();
+            }
+            using var pen = new Pen(Theme.Current.Border, 1f);
+            g.DrawPath(pen, path);
+            TextRenderer.DrawText(g, _title ?? "", UiFonts.Subtitle, new Rectangle(20, 14, Math.Max(100, _identify.Left - 30), 36),
+                TextColor, TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis | TextFormatFlags.NoPrefix);
+        }
+
+        // ---------- Live (~60-mal pro Sekunde) ----------
+
+        public void Show(Player player, Settings settings)
+        {
+            _player = player;
+            var links = player.Links;
+            string title = $"Spieler {player.Index + 1}  ·  {player.Kind.DisplayName()}" + (player.GyroMouseActive ? "  ·  Gyro-Maus" : "") + (player.GyroStickActive ? "  ·  Gyro-Stick" : "");
+            if (title != _rawTitle)
+            {
+                _rawTitle = title;
+                _title = Tr.T(title);
+                Invalidate(new Rectangle(0, 0, Width, 60));
+            }
+
+            var (input, gamepad) = LiveInput(player, settings);
+            bool joyCon = links.Count > 0 && links.All(l => l.Kind.IsJoyCon());
+            bool upright = links.Count == 1 && joyCon && settings.IsUprightJoyCon(links[0].Address);
+            if (joyCon && links.All(l => l.LastState is not null))
+            {
+                var parts = links.Select(l => new InputView.JoyConPart(l.Kind, l.LastState!, l.Calibration, l.Info,
+                    player.MouseActive(l), l.InGrip, upright)).ToList();
+                _view.ShowJoyCons(parts, input);
+            }
+            else
+            {
+                var first = links.FirstOrDefault();
+                if (first is not null)
+                    _view.SetColors(first.Info.BodyColor, first.Info.ButtonColor, first.Info.GripColor);
+                _view.WiiExtension = first is WiimoteHidLink wii ? wii.Extension : WiiExtension.None;
+                _view.Show(input, gamepad);
+            }
+            _view.PlayerIndex = player.Index;
+            _info.Show(links, input, links.Where(player.MouseActive).ToList());
+
+            if (_expanded)
+            {
+                // Anderer Controller in derselben Karte (z. B. Joy-Con-Paar getrennt): Seiten neu bauen.
+                if (MappingKind(player, settings) != _builtFor)
+                {
+                    BuildPages();
+                    ShowTab();
+                }
+                _editor?.Highlight(input?.Buttons ?? ProButtons.None);
+                UpdateExtras(settings);
+                UpdateJoyCon(settings);
+                if (_calibrate is not null && !_calibrating)
+                    _calibrate.Enabled = links.Any(l => l.LastState?.Motion is not null) && links.All(l => l.Address is not null);
+            }
+            if (Height != Math.Max(_view.Bottom, _info.Bottom) + 12 && !_expanded)
+                PerformLayout();
+        }
+
+        // ---------- Aktionen ----------
 
         private async Task ToggleRingConAsync()
         {
-            var link = _player?.Links.OfType<Links.Switch1HidLink>().FirstOrDefault(l => l.Kind == ControllerKind.JoyCon1Right);
-            if (link is null)
+            var link = _player?.Links.OfType<Switch1HidLink>().FirstOrDefault(l => l.Kind == ControllerKind.JoyCon1Right);
+            if (link is null || _ringCon is null)
                 return;
             _ringCon.Enabled = false;
             try
@@ -237,7 +664,7 @@ internal sealed class ControllerOverview : Panel
                 }
                 else
                 {
-                    _ringCon.Text = Tr.T("Ring-Con wird gesucht …");
+                    _ringCon.Text = "Wird gesucht …";
                     if (!await link.EnableRingConAsync(CancellationToken.None))
                         Tr.Show(FindForm(), "Kein Ring-Con gefunden. Den rechten Joy-Con (Switch 1) fest in den Ring-Con " +
                             "schieben und erneut versuchen.", "Ring-Con");
@@ -257,11 +684,11 @@ internal sealed class ControllerOverview : Panel
         /// <summary>amiibo über den NFC-Leser lesen und als .bin speichern (Rohabbild, 540 Byte).</summary>
         private async Task ReadAmiiboAsync()
         {
-            var link = _player?.Links.OfType<Links.Switch1HidLink>().FirstOrDefault(l => l.HasNfc);
-            if (link is null)
+            var link = _player?.Links.OfType<Switch1HidLink>().FirstOrDefault(l => l.HasNfc);
+            if (link is null || _amiibo is null || _amiiboRow is null)
                 return;
             _amiibo.Enabled = false;
-            string original = _amiibo.Text;
+            string? original = _amiiboRow.Description;
             try
             {
                 var result = await link.ReadAmiiboAsync(TimeSpan.FromSeconds(20),
@@ -269,7 +696,7 @@ internal sealed class ControllerOverview : Panel
                     {
                         if (IsDisposed || !IsHandleCreated)
                             return;
-                        try { BeginInvoke(() => { if (!IsDisposed) { message = Tr.T(message); _amiibo.Text = message.Length > 40 ? message[..40] + " …" : message; } }); }
+                        try { BeginInvoke(() => { if (!IsDisposed) _amiiboRow.Description = message; }); }
                         catch (InvalidOperationException) { /* Karte geschlossen */ }
                     },
                     CancellationToken.None);
@@ -283,7 +710,7 @@ internal sealed class ControllerOverview : Panel
                 Directory.CreateDirectory(folder);
                 using var dialog = new SaveFileDialog
                 {
-                    Title = "amiibo speichern", Filter = "amiibo-Abbild (*.bin)|*.bin", InitialDirectory = folder,
+                    Title = Tr.T("amiibo speichern"), Filter = Tr.T("amiibo-Abbild (*.bin)|*.bin"), InitialDirectory = folder,
                     FileName = $"amiibo_{Convert.ToHexString(amiibo.Uid)}.bin",
                 };
                 if (dialog.ShowDialog(FindForm()) == DialogResult.OK)
@@ -298,7 +725,7 @@ internal sealed class ControllerOverview : Panel
             {
                 if (!IsDisposed)
                 {
-                    _amiibo.Text = original;
+                    _amiiboRow.Description = original;
                     _amiibo.Enabled = true;
                 }
             }
@@ -307,8 +734,8 @@ internal sealed class ControllerOverview : Panel
         /// <summary>USB-Controller per HidHide vor Spielen verstecken (einmal Adminrechte).</summary>
         private async Task HideAsync()
         {
-            var ids = _player?.Links.OfType<Links.Switch2UsbLink>().Select(l => l.HidInstanceId).OfType<string>().ToList() ?? [];
-            if (ids.Count == 0)
+            var ids = _player?.Links.OfType<Switch2UsbLink>().Select(l => l.HidInstanceId).OfType<string>().ToList() ?? [];
+            if (ids.Count == 0 || _hide is null)
                 return;
             if (!HidHide.IsInstalled)
             {
@@ -324,9 +751,9 @@ internal sealed class ControllerOverview : Panel
             {
                 if (await HidHide.HideAsync(ids))
                 {
-                    var s = _settings();
+                    var s = CurrentSettings;
                     s.HiddenDevices = [.. s.HiddenDevices, .. ids.Where(id => !s.IsHidden(id))];
-                    _manager.RequestSave();
+                    Manager.RequestSave();
                 }
                 else
                 {
@@ -343,10 +770,10 @@ internal sealed class ControllerOverview : Panel
 
         private async Task CalibrateAsync()
         {
-            if (_player is null || _calibrating)
+            if (_player is null || _calibrating || _calibrate is null)
                 return;
             _calibrating = true;
-            _calibrate.Text = Tr.T("Ruhig liegen lassen …");
+            _calibrate.Text = "Ruhig liegen lassen …";
             _calibrate.Enabled = false;
             try
             {
@@ -358,13 +785,13 @@ internal sealed class ControllerOverview : Panel
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
-                var s = _settings();
+                var s = CurrentSettings;
                 var map = new Dictionary<string, GyroBias>(s.GyroCalibration, StringComparer.OrdinalIgnoreCase);
                 foreach (var (address, bias) in result)
                     map[address] = bias;
                 s.GyroCalibration = map; // neue Kopie: der Bluetooth-Thread liest gleichzeitig
-                _manager.RequestSave();
-                _calibrate.Text = Tr.T("Kalibriert ✓");
+                Manager.RequestSave();
+                _calibrate.Text = "Kalibriert ✓";
                 await Task.Delay(1500);
             }
             finally
@@ -373,114 +800,18 @@ internal sealed class ControllerOverview : Panel
                 if (!IsDisposed)
                 {
                     _calibrate.Enabled = true;
-                    _calibrate.Text = Tr.T("Gyro kalibrieren");
+                    _calibrate.Text = "Kalibrieren";
                 }
             }
-        }
-
-        /// <summary>Karte wie eine Windows-11-Kachel: abgerundet, dünner Rand.</summary>
-        protected override void OnPaint(PaintEventArgs e)
-        {
-            var g = e.Graphics;
-            g.SmoothingMode = SmoothingMode.AntiAlias;
-            using var path = Theme.RoundedRect(new RectangleF(0.5f, 0.5f, Width - 1.5f, Height - 1.5f), 10);
-            using (var fill = new SolidBrush(CardColor))
-                g.FillPath(fill, path);
-            using var pen = new Pen(Theme.Current.Border, 1f);
-            g.DrawPath(pen, path);
-        }
-
-        protected override void OnResize(EventArgs eventargs)
-        {
-            base.OnResize(eventargs);
-            _info.Width = Math.Max(240, Width - _info.Left - 16);
-            PlaceActions();
-        }
-
-        private void PlaceActions()
-        {
-            // Knöpfe rechts oben, bei Platzmangel in mehreren Zeilen; die Eigenschaften rücken darunter.
-            _actions.MaximumSize = new Size(Math.Max(300, Width - _title.Right - 40), 0);
-            _actions.Location = new Point(Width - _actions.Width - 16, 12);
-            _info.Top = Math.Max(52, _actions.Bottom + 10);
-        }
-
-        public void Show(Player player, Settings settings)
-        {
-            _player = player;
-            var links = player.Links;
-            // Läuft ~60-mal pro Sekunde: nur bei Änderungen übersetzen und neu anordnen.
-            string title = $"Spieler {player.Index + 1}  ·  {player.Kind.DisplayName()}" + (player.GyroMouseActive ? "  ·  Gyro-Maus" : "") + (player.GyroStickActive ? "  ·  Gyro-Stick" : "");
-            if (title != _rawTitle)
-            {
-                _rawTitle = title;
-                _title.Text = Tr.T(title);
-            }
-
-            var (input, gamepad) = Live(player, settings);
-            bool joyCon = links.Count > 0 && links.All(l => l.Kind.IsJoyCon());
-            bool upright = links.Count == 1 && joyCon && settings.IsUprightJoyCon(links[0].Address);
-            if (joyCon && links.All(l => l.LastState is not null))
-            {
-                var parts = links.Select(l => new InputView.JoyConPart(l.Kind, l.LastState!, l.Calibration, l.Info,
-                    player.MouseActive(l), l.InGrip, upright)).ToList();
-                _view.ShowJoyCons(parts, input);
-            }
-            else
-            {
-                var first = links.FirstOrDefault();
-                if (first is not null)
-                    _view.SetColors(first.Info.BodyColor, first.Info.ButtonColor, first.Info.GripColor);
-                _view.WiiExtension = first is Links.WiimoteHidLink wii ? wii.Extension : WiiExtension.None;
-                _view.Show(input, gamepad);
-            }
-            _view.PlayerIndex = player.Index;
-
-            // Joy-Con: Paar trennen bzw. einzelnen Joy-Con mit einem passenden Partner verbinden; quer/hochkant
-            SetButton(_joyConButton, player.IsPair ? "Joy-Con trennen" : joyCon && _manager.HasPartner(player) ? "Zum Paar verbinden" : null);
-            SetButton(_orientation, links.Count == 1 && joyCon ? upright ? "Quer halten" : "Hochkant halten" : null);
-            _hide.Visible = links.OfType<Links.Switch2UsbLink>().Any(l => l.HidInstanceId is { } id && !settings.IsHidden(id));
-            _amiibo.Visible = links.OfType<Links.Switch1HidLink>().Any(l => l.HasNfc);
-            var ringLink = links.OfType<Links.Switch1HidLink>().FirstOrDefault(l => l.Kind == ControllerKind.JoyCon1Right);
-            SetButton(_ringCon, ringLink is null ? null : ringLink.RingConActive ? "Ring-Con aus" : "Ring-Con ein");
-            _irCamera.Visible = ringLink is { HasIrCamera: true };
-            _calibrate.Visible = links.Any(l => l.LastState?.Motion is not null) && links.All(l => l.Address is not null);
-            var actions = string.Join("|", _actions.Controls.Cast<Control>().Select(c => c.Visible ? c.Text : ""));
-            if (actions != _shownActions)
-            {
-                _shownActions = actions;
-                PlaceActions();
-            }
-
-            _info.Show(links, input, links.Where(player.MouseActive).ToList());
-            int height = Math.Max(430, _info.Bottom + 16);
-            if (Height != height)
-                Height = height;
-        }
-
-        private string? _rawTitle;
-        private string? _shownActions;
-
-        private static void SetButton(Button button, string? text)
-        {
-            button.Visible = text is not null;
-            if (text is not null && button.Text != Tr.T(text))
-                button.Text = Tr.T(text);
-        }
-
-        private static (PadInput? Input, GamepadState Gamepad) Live(Player player, Settings settings)
-        {
-            var links = player.Links;
-            if (links.Count == 0 || links.Any(l => player.EffectiveState(l) is null))
-                return (null, default);
-            var input = Player.Combine(links, player.EffectiveState, settings);
-            return (input, Mapping.ToGamepad(input, settings));
         }
 
         protected override void Dispose(bool disposing)
         {
             if (disposing)
+            {
+                _owner._mapping.Changed -= SyncProfile;
                 _tips.Dispose();
+            }
             base.Dispose(disposing);
         }
     }
@@ -490,8 +821,7 @@ internal sealed class ControllerOverview : Panel
     {
         private IReadOnlyList<IControllerLink> _links = [];
         private PadInput? _input;
-        private static readonly Font Heading = new("Segoe UI Semibold", 9.5f);
-        private static readonly Font Body = new("Segoe UI", 9.5f);
+        private const int LabelWidth = 120, RowHeight = 24;
 
         public InfoPanel()
         {
@@ -512,8 +842,8 @@ internal sealed class ControllerOverview : Panel
             _links = links;
             _mouse = mouse;
             _input = input;
-            int rows = links.Count * 9 + 3; // je Controller bis zu 8 Zeilen (Überschrift, Akku … Griff, Maus) + Abstand
-            int height = Math.Max(270, rows * 22 + 10);
+            int rows = links.Count * 8 + 2; // je Controller bis zu 8 Zeilen (Überschrift, Akku … Griff, Maus) + „Gedrückt“
+            int height = Math.Max(260, rows * RowHeight + 10);
             if (Height != height)
                 Height = height;
             if (changed)
@@ -528,19 +858,19 @@ internal sealed class ControllerOverview : Panel
         protected override void OnPaint(PaintEventArgs e)
         {
             var g = e.Graphics;
+            g.Clear(BackColor);
             g.SmoothingMode = SmoothingMode.AntiAlias;
-            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
-            float y = 0;
+            int y = 0;
             foreach (var link in _links)
             {
                 if (_links.Count > 1)
                 {
-                    Draw(g, Tr.T(link.Kind.DisplayName()), 0, y, Accent, Heading);
-                    y += 24;
+                    TextRenderer.DrawText(g, Tr.T(link.Kind.DisplayName()), UiFonts.Strong, new Point(0, y), Accent, TextFormatFlags.NoPrefix);
+                    y += RowHeight + 2;
                 }
                 var st = link.LastState;
                 Row(g, ref y, "Akku", null);
-                DrawBattery(g, 110, y - 19, st);
+                DrawBattery(g, LabelWidth, y - RowHeight, st);
                 Row(g, ref y, "Verbindung", $"{Transport(link.Transport)} · {link.ReportRate:F0} Berichte/s");
                 if (link.Address is { } address)
                     Row(g, ref y, "Adresse", address);
@@ -551,7 +881,7 @@ internal sealed class ControllerOverview : Panel
                 if (link.InGrip)
                     Row(g, ref y, "Griff", "Charging Grip – GL/GR aktiv");
                 if (link.Kind is ControllerKind.JoyCon2Left or ControllerKind.JoyCon2Right)
-                    Row(g, ref y, "Maus", _mouse.Contains(link) ? "aktiv (liegt auf dem Tisch)" : "bereit – zum Benutzen auf den Tisch legen");
+                    Row(g, ref y, "Maus", _mouse.Contains(link) ? "aktiv (liegt auf dem Tisch)" : "bereit (auf den Tisch legen)");
                 y += 8;
             }
 
@@ -560,40 +890,34 @@ internal sealed class ControllerOverview : Panel
             Row(g, ref y, "Gedrückt", pressed.Count == 0 ? "–" : string.Join("  ", pressed));
         }
 
-        private void Row(Graphics g, ref float y, string label, string? value)
+        private void Row(Graphics g, ref int y, string label, string? value)
         {
-            Draw(g, Tr.T(label), 0, y, MutedColor, Body);
+            TextRenderer.DrawText(g, Tr.T(label), UiFonts.Body, new Point(0, y), MutedColor, TextFormatFlags.NoPrefix);
             if (value is not null)
-                Draw(g, Tr.T(value), 110, y, TextColor, Body);
-            y += 22;
+                TextRenderer.DrawText(g, Tr.T(value), UiFonts.Body, new Rectangle(LabelWidth, y, Width - LabelWidth, RowHeight),
+                    TextColor, TextFormatFlags.NoPrefix | TextFormatFlags.EndEllipsis);
+            y += RowHeight;
         }
 
-        private static void Draw(Graphics g, string text, float x, float y, Color color, Font font)
+        private static void DrawBattery(Graphics g, int x, int y, ControllerState? st)
         {
-            using var brush = new SolidBrush(color);
-            g.DrawString(text, font, brush, x, y);
-        }
-
-        private static void DrawBattery(Graphics g, float x, float y, ControllerState? st)
-        {
-            var frame = new RectangleF(x, y + 3, 46, 16);
-            using (var pen = new Pen(MutedColor, 1.4f))
-            {
-                g.DrawRectangle(pen, frame.X, frame.Y, frame.Width, frame.Height);
-                using var tip = new SolidBrush(MutedColor);
-                g.FillRectangle(tip, frame.Right + 1, frame.Y + 5, 3, 6);
-            }
-            int percent = st?.BatteryPercent ?? -1;
+            var frame = new RectangleF(x, y + 3, 40, 15);
+            using (var path = Theme.RoundedRect(frame, 3))
+            using (var pen = new Pen(MutedColor, 1.3f))
+                g.DrawPath(pen, path);
+            using (var tip = new SolidBrush(MutedColor))
+                g.FillRectangle(tip, frame.Right + 1, frame.Y + 4.5f, 2.5f, 6);
+            int percent = st?.BatteryPercent is { } raw ? Math.Min(raw, 100) : -1;
             if (percent >= 0)
             {
                 var level = percent < 15 ? Color.FromArgb(235, 80, 70) : percent < 35 ? Color.FromArgb(240, 180, 40) : Color.FromArgb(70, 200, 110);
                 using var fill = new SolidBrush(level);
-                g.FillRectangle(fill, frame.X + 2, frame.Y + 2, (frame.Width - 4) * percent / 100f, frame.Height - 4);
+                using var bar = Theme.RoundedRect(new RectangleF(frame.X + 2.5f, frame.Y + 2.5f, Math.Max(2, (frame.Width - 5) * percent / 100f), frame.Height - 5), 1.5f);
+                g.FillPath(fill, bar);
             }
             string text = percent < 0 ? "unbekannt"
                 : $"{percent} %{(st!.BatteryMillivolts > 0 ? $"  ({st.BatteryMillivolts / 1000.0:F2} V)" : "")}{(st.Charging ? "  ⚡ lädt" : "")}";
-            using var brush = new SolidBrush(TextColor);
-            g.DrawString(Tr.T(text), Body, brush, x + 56, y);
+            TextRenderer.DrawText(g, Tr.T(text), UiFonts.Body, new Point(x + 52, y), TextColor, TextFormatFlags.NoPrefix);
         }
 
         private static string Transport(Transport t) => t switch

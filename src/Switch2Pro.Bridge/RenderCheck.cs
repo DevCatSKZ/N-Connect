@@ -16,11 +16,16 @@ internal static class RenderCheck
     /// <summary>Alle sichtbaren Texte der Fenster (Steuerelemente, Listen) in eine Datei schreiben – je Zeile ein Text.</summary>
     public static void DumpTexts(string file)
     {
+        // Deutsche Originaltexte sammeln (Fenster auf Deutsch aufbauen) und danach einzeln prüfen.
+        bool english = Tr.English;
+        Tr.SetEnglish(false);
         var texts = new SortedSet<string>(StringComparer.Ordinal);
         void Walk(Control c)
         {
             if (!string.IsNullOrWhiteSpace(c.Text))
                 texts.Add(c.Text);
+            if (c is IExtraTexts extra)
+                texts.UnionWith(extra.ExtraTexts.Where(t => t.Length > 0));
             if (c is ComboBox combo)
                 foreach (var item in combo.Items)
                     if (item?.ToString() is { Length: > 0 } s)
@@ -31,7 +36,6 @@ internal static class RenderCheck
         var settings = new Settings();
         using (var form = new SettingsForm(settings, _ => { }, null))
         {
-            form.LoadAllLists(); // Belegungslisten werden sonst erst beim Aufklappen gefüllt
             Walk(form);
         }
         foreach (var kind in Enum.GetValues<ControllerKind>())
@@ -66,12 +70,27 @@ internal static class RenderCheck
             $"Spieler 1  ·  {pro}  ·  Gyro-Maus", "Erst den Ring-Con ausschalten (Ring-Con und IR-Kamera nutzen denselben Zusatzprozessor).",
         ]);
 
-        // Bei englischer Oberfläche: nur noch Texte ausgeben, die nach der Übersetzung deutsch aussehen.
-        var lines = texts.Select(t => Tr.T(t)).Distinct();
-        File.WriteAllLines(file + ".alle.txt", lines);
-        if (Tr.English)
-            lines = lines.Where(LooksGerman);
+        // Bei englischer Oberfläche: nur Texte ausgeben, die keine Übersetzung haben (oder danach noch deutsch aussehen).
+        Tr.SetEnglish(english);
+        File.WriteAllLines(file + ".alle.txt", texts.Select(t => Tr.T(t)).Distinct());
+        var lines = english
+            ? texts.Where(t => (Tr.T(t) == t && NeedsTranslation(t)) || LooksGerman(Tr.T(t)))
+            : texts;
         File.WriteAllLines(file, lines.Select(t => t.Replace("\r", "").Replace("\n", "\\n")));
+    }
+
+    /// <summary>Enthält der Text Wörter (nicht nur Namen, Zahlen, Tasten wie „ZL“ oder Marken)?</summary>
+    private static bool NeedsTranslation(string t)
+    {
+        if (!System.Text.RegularExpressions.Regex.IsMatch(t, "[a-zäöüß]{3}"))
+            return false;
+        string[] sameInEnglish =
+        [
+            "N-Connect", "Xbox", "Nintendo", "linear", "Bluetooth", "Joy-Con", "DualShock", "Normal", "Charging Grip", "Version",
+            "PlayStation", "English", "Deutsch", "Wii", "amiibo", "Ring-Con", "HOME", "Gyro", "Turbo", "Firmware", "Controller",
+        ];
+        return !sameInEnglish.Any(w => t.Equals(w, StringComparison.Ordinal))
+               && !t.StartsWith("Nintendo ", StringComparison.Ordinal) && !t.StartsWith("Version ", StringComparison.Ordinal);
     }
 
     private static bool LooksGerman(string t) =>
@@ -87,18 +106,22 @@ internal static class RenderCheck
     {
         Directory.CreateDirectory(folder);
         string lang = Tr.English ? "en" : "de";
+        string variant = Environment.GetCommandLineArgs().Contains("--demo-all") ? "_alle" : Environment.GetCommandLineArgs().Contains("--demo-retro") ? "_retro" : "";
+        var log = new List<string>();
         using var factory = PadFactory.TryCreate();
         ControllerManager? manager = factory is null ? null : new ControllerManager(() => new Settings(), factory);
         try
         {
             manager?.StartDemo();
             // Als echtes Fenster außerhalb des sichtbaren Bereichs anzeigen, damit alle Steuerelemente entstehen.
+            var sw = System.Diagnostics.Stopwatch.StartNew();
             using var form = new SettingsForm(new Settings(), _ => { }, manager)
             {
                 StartPosition = FormStartPosition.Manual, Location = new Point(-6000, -6000), ShowInTaskbar = false,
-                Size = new Size(1000, 1100),
+                Size = new Size(1220, 900),
             };
             form.Show();
+            log.Add($"Fenster erzeugt und gezeigt: {sw.ElapsedMilliseconds} ms");
             void Pump()
             {
                 for (int i = 0; i < 20; i++)
@@ -107,46 +130,70 @@ internal static class RenderCheck
                     Thread.Sleep(20);
                 }
             }
-            Pump();
-
-            // Übersicht: so wie sie im Fenster erscheint.
-            form.ShowPage(0);
-            Pump();
-            using (var bmp = new Bitmap(form.Width, form.Height))
+            // So, wie Windows das Fenster wirklich zeichnet (DrawToBitmap zeigt manche Steuerelemente nur im Grundzustand).
+            void Window(string name)
             {
-                form.DrawToBitmap(bmp, new Rectangle(0, 0, form.Width, form.Height));
-                bmp.Save(Path.Combine(folder, $"ui_overview_{lang}.png"), ImageFormat.Png);
-            }
-
-            // Einstellungen: den ganzen Inhalt der Seite (länger als das Fenster).
-            form.ShowPage(1);
-            Pump();
-            // Zusätzlich so, wie Windows das Fenster wirklich zeichnet (DrawToBitmap zeigt manche Steuerelemente nur im Grundzustand).
-            using (var bmp = new Bitmap(form.Width, form.Height))
-            {
+                using var bmp = new Bitmap(form.Width, form.Height);
                 using (var g = Graphics.FromImage(bmp))
                 {
                     var hdc = g.GetHdc();
                     PrintWindow(form.Handle, hdc, 2); // PW_RENDERFULLCONTENT
                     g.ReleaseHdc(hdc);
                 }
-                bmp.Save(Path.Combine(folder, $"ui_settings_window_{lang}.png"), ImageFormat.Png);
+                bmp.Save(Path.Combine(folder, $"{name}{variant}_{lang}.png"), ImageFormat.Png);
             }
-            var content = form.SettingsContent;
-            using (var bmp = new Bitmap(Math.Max(1, content.Width), Math.Max(1, content.Height)))
+            static void Full(Control c, string path)
             {
-                content.DrawToBitmap(bmp, new Rectangle(0, 0, content.Width, content.Height));
-                bmp.Save(Path.Combine(folder, $"ui_settings_{lang}.png"), ImageFormat.Png);
+                using var bmp = new Bitmap(Math.Max(1, c.Width), Math.Max(1, c.Height));
+                c.DrawToBitmap(bmp, new Rectangle(0, 0, c.Width, c.Height));
+                bmp.Save(path, ImageFormat.Png);
             }
+            Pump();
+            Window("ui_0_controller");
+
+            // Karte aufgeklappt: jeder Reiter einmal (ganze Karte, auch wenn sie länger als das Fenster ist).
+            // Jede Karte (jeder Controller), jeder Reiter, den dieser Controller hat.
+            var cards = form.Overview.Cards;
+            for (int c = 0; c < cards.Count; c++)
+            {
+                for (int tab = 0; tab < 5; tab++)
+                {
+                    sw.Restart();
+                    bool shown = ControllerOverview.ExpandCard(cards[c], tab);
+                    form.Update();
+                    long ms = sw.ElapsedMilliseconds;
+                    if (!shown)
+                        continue;
+                    log.Add($"Karte {c + 1}, Reiter {tab}: {ms} ms");
+                    Pump();
+                    Full(cards[c], Path.Combine(folder, $"ui_card{c + 1}_{tab}{variant}_{lang}.png"));
+                }
+            }
+            if (cards.Count > 0)
+                ControllerOverview.ExpandCard(cards[0], 0);
+            Pump();
+            Window("ui_0_controller_offen");
+
+            // Übrige Seiten: Fenster und ganzer Inhalt.
+            var pages = form.Pages;
+            for (int i = 1; i < pages.Count; i++)
+            {
+                sw.Restart();
+                form.ShowPage(i);
+                log.Add($"Seite {i} ({pages[i].Name}): {sw.ElapsedMilliseconds} ms");
+                Pump();
+                Window($"ui_{i}_seite");
+                if (pages[i].Page is ScrollPage scroll)
+                    Full(scroll.Content, Path.Combine(folder, $"ui_{i}_inhalt{variant}_{lang}.png"));
+            }
+
             // Meldungsfenster im Design: kurz anzeigen, abfotografieren, schließen.
             var shot = new System.Windows.Forms.Timer { Interval = 400 };
             shot.Tick += (_, _) =>
             {
                 shot.Stop();
                 var message = Application.OpenForms.Cast<Form>().Last();
-                using var bmp = new Bitmap(message.Width, message.Height);
-                message.DrawToBitmap(bmp, new Rectangle(0, 0, message.Width, message.Height));
-                bmp.Save(Path.Combine(folder, $"ui_message_{lang}.png"), ImageFormat.Png);
+                Full(message, Path.Combine(folder, $"ui_message_{lang}.png"));
                 message.Close();
             };
             shot.Start();
@@ -154,8 +201,13 @@ internal static class RenderCheck
             shot.Dispose();
             form.Close();
         }
+        catch (Exception e)
+        {
+            log.Add($"FEHLER: {e}");
+        }
         finally
         {
+            File.WriteAllLines(Path.Combine(folder, $"timing{variant}_{lang}.txt"), log);
             if (manager is not null)
                 Task.Run(async () => await manager.DisposeAsync()).Wait(TimeSpan.FromSeconds(5));
         }

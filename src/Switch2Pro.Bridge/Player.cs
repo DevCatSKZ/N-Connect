@@ -458,8 +458,9 @@ internal sealed class Player : IDisposable
             float yaw = m.GyroZ * DegPerRaw, pitch = m.GyroX * DegPerRaw;
             // Kleines Rauschen unterdrücken (weicher Übergang statt harter Schwelle).
             static float Soft(float v) => MathF.Abs(v) < 1.5f ? v * MathF.Abs(v) / 1.5f : v;
-            float dx = -Soft(yaw) * (float)dt * settings.GyroMouseSpeed;
-            float dy = -Soft(pitch) * (float)dt * settings.GyroMouseSpeed;
+            float speed = settings.GyroMouseSpeedFor(Kind);
+            float dx = -Soft(yaw) * (float)dt * speed;
+            float dy = -Soft(pitch) * (float)dt * speed;
             _gyroMouse.Add(settings.MouseInvertX ? -dx : dx, settings.MouseInvertY ? -dy : dy);
         }
         _lastGyroTicks = now;
@@ -606,7 +607,7 @@ internal sealed class Player : IDisposable
     private void OnGameRumble(byte large, byte small)
     {
         var settings = _settings();
-        float strength = settings.RumbleEnabled ? settings.RumbleStrength : 0f;
+        float strength = settings.RumbleEnabled ? settings.RumbleStrengthFor(Kind) : 0f;
         if (strength <= 0f)
             large = small = 0;
         _rumbling = (large | small) != 0;

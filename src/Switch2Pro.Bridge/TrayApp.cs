@@ -30,6 +30,7 @@ internal sealed class TrayApp : ApplicationContext
         _settings = Settings.Load(Paths.SettingsFile);
         Tr.Init(_settings.Language);
         Theme.Init(_settings.Theme, _settings.Transparency);
+        EnableAutostartOnce();
         if (_settings.LoadError is { } err)
             Log.Warn($"settings.json fehlerhaft, nutze Standardwerte: {err}");
 
@@ -138,6 +139,28 @@ internal sealed class TrayApp : ApplicationContext
             ShowSettings();
     }
 
+    /// <summary>
+    /// Nach der Installation startet N-Connect standardmäßig mit Windows (unsichtbar im Infobereich). Einmalig beim
+    /// ersten Start eingerichtet – danach entscheidet nur noch der Schalter unter „Allgemein“.
+    /// </summary>
+    private void EnableAutostartOnce()
+    {
+        if (_settings.AutostartConfigured || _settings.LoadError is not null)
+            return;
+        try
+        {
+            if (!Autostart.IsEnabled && !Autostart.IsEnabledForAllUsers)
+                Autostart.Set(true);
+            _settings.AutostartConfigured = true;
+            SaveSettings();
+            Log.Info("Autostart eingerichtet");
+        }
+        catch (Exception e) when (e is UnauthorizedAccessException or System.Security.SecurityException or IOException)
+        {
+            Log.Warn($"Autostart nicht eingerichtet: {e.Message}");
+        }
+    }
+
     private void ShowSettings()
     {
         if (_settingsForm is { IsDisposed: false })
@@ -150,7 +173,7 @@ internal sealed class TrayApp : ApplicationContext
             SaveSettings();
             if (outputChanged)
                 _manager?.ApplyOutputMode(_settings.OutputMode);
-        }, _manager);
+        }, _manager, ShowWiiPairing);
         _settingsForm.Show();
         _settingsForm.Activate();
     }

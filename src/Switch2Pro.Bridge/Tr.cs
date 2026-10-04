@@ -13,6 +13,9 @@ internal static partial class Tr
     /// <summary>Englische Oberfläche aktiv?</summary>
     public static bool English { get; private set; }
 
+    /// <summary>Nur für die Prüfhilfe: Texte in der Originalsprache sammeln.</summary>
+    internal static void SetEnglish(bool english) => English = english;
+
     /// <summary>Kennzeichen (Tag) für Steuerelemente/Menüeinträge mit Benutzerdaten (z. B. Profilnamen): nicht übersetzen.</summary>
     public const string UserData = "user-data";
 
@@ -64,7 +67,7 @@ internal static partial class Tr
     {
         if (!English)
             return;
-        if (root.Text is { Length: > 0 } text && root is not TextBox)
+        if (root.Text is { Length: > 0 } text && root is not (TextBox or ISelfTranslating))
             root.Text = T(text);
         if (root is ComboBox combo && !Equals(combo.Tag, UserData))
         {
@@ -98,7 +101,9 @@ internal static partial class Tr
     /// <summary>Meldungen mit Platzhaltern (Spielernummer, Controllername, Prozent …).</summary>
     private static readonly (Regex Pattern, Func<Match, string> Replace)[] Patterns =
     [
-        (Re(@"^Spieler (?<n>\d+)  ·  (?<k>.+?)(?<rest>(  ·  .*)?)$"), m => $"Player {m.Groups["n"]}  ·  {N(m, "k")}{T(m.Groups["rest"].Value)}"),
+        (Re(@"^Allgemeiner Wert \((?<v>.+)\) – Regler verschieben für einen eigenen$"), m => $"General value ({m.Groups["v"]}) – move the slider to set your own"),
+        (Re(@"^Eigener Wert · allgemein: (?<v>.+)$"), m => $"Own value · general: {m.Groups["v"]}"),
+        (Re(@"^Spieler (?<n>\d+)  ·  (?<k>.+?)(?<rest>(  ·  .*)?)$"),m => $"Player {m.Groups["n"]}  ·  {N(m, "k")}{T(m.Groups["rest"].Value)}"),
         (Re(@"^  ·  Gyro-Maus(?<r>.*)$"), m => "  ·  Gyro mouse" + T(m.Groups["r"].Value)),
         (Re(@"^  ·  Gyro-Stick$"), _ => "  ·  Gyro stick"),
         (Re(@"^Spieler (?<n>\d+) · (?<k>.+?) (?<b>\d+ %.*)?$"), m => $"Player {m.Groups["n"]} · {N(m, "k")} {m.Groups["b"]}"),

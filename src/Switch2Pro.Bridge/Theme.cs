@@ -35,6 +35,8 @@ internal static class Theme
     public static Palette Current { get; private set; } = DarkPalette;
     public static bool Dark => Current.Dark;
     public static Color Accent { get; private set; } = Color.FromArgb(0, 120, 212);
+    /// <summary>Text auf Akzentflächen (dunkler Modus: helle Akzentfarbe, daher schwarz – wie in Windows 11).</summary>
+    public static Color OnAccent => Dark ? Color.Black : Color.White;
     /// <summary>Mica-Titelleiste aktiv (Einstellung an und Windows 11).</summary>
     public static bool Mica { get; private set; }
 
