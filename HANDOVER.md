@@ -35,6 +35,16 @@ Commits als **devcatskz** (devcatskz@gmail.com), ohne „Co-Authored-By“-Zeile
   Einstellung `AutoPair`), aber **noch nicht mit echter Hardware getestet**. Switch 1/NSO: Kopplung ohne PIN, Rückfrage
   per `BluetoothRegisterForAuthenticationEx` selbst bestätigt; schlägt das fehl, steht der Fehlercode im Protokoll
   („Kopplung …: Authentifizierung → Fehler …“). Wii: Adress-PIN wie bisher.
+- **Viele Controller auf einem Bluetooth-Stick** (gemessen 04.10.2026, Barrot BT 5.4, USB 33FA:0010): Ab drei bis vier
+  Controllern (z. B. Wii-Fernbedienung + Joy-Con-2-Paar + Pro Controller 2) bekommt jeder nur ~10–11 Berichte/s,
+  die Wii reagiert spürbar verzögert, ein weiterer Controller braucht ~9 s zum Verbinden. N-Connect schaltet ab drei
+  Bluetooth-Controllern die Switch-2-Controller auf das ausgeglichene Intervall (`BleAirtime`), das reicht nicht ganz.
+  Vom Nutzer vorerst so gelassen. Mögliche nächste Schritte: Wii ab drei Controllern ohne Dauersenden (`Wii.SetMode`
+  setzt 0x04 „continuous“; vorher prüfen, dass der Watchdog dann nicht fälschlich trennt), Controller-Suche bei vielen
+  Controllern passiv statt aktiv (`ControllerManager._watcher`) – jeweils vorher/nachher messen. Verlässlichste Lösung:
+  stärkerer Adapter (Intel AX200/AX210, Realtek RTL8761B).
+  Achtung: Nach Herstellerbefehlen an den Stick (fremdes Werkzeug `tools/Switch2Pro.BtIdentityProbe`, nicht Teil von
+  N-Connect) verband sich kein dritter Switch-2-Controller mehr – Ab- und Anstecken des Sticks hat das behoben.
 - Angeboten, noch nicht entschieden: Kopplungsdaten-Fenster (`PairingDataForm`) im Windows-11-Stil;
   Switch-1-Pro-Controller aus dem verschlüsselten Spielstand `8000000000000050.bin` lesen; eigene Controller-Bilder
   (Nano-Banana-Prompts wurden geliefert) statt der gezeichneten Grafiken.
