@@ -12,9 +12,6 @@ namespace Switch2Pro.Bridge;
 /// </summary>
 internal sealed class Player : IDisposable
 {
-    /// <summary>So lange SL + SR halten, um einen Joy-Con aus dem Paar zu lösen.</summary>
-    private const int SplitHoldMs = 1000;
-
     private readonly Func<Settings> _settings;
     private readonly PadFactory _factory;
     private readonly object _gate = new();
@@ -23,7 +20,7 @@ internal sealed class Player : IDisposable
     private readonly Dictionary<IControllerLink, JoyConMouse> _mice = [];
     /// <summary>Letzter Zustand je Joy-Con nach dem Mausmodus (Maustasten entfernt).</summary>
     private readonly Dictionary<IControllerLink, ControllerState> _effective = [];
-    /// <summary>Seit wann SL + SR an einem Joy-Con gehalten werden (je Joy-Con getrennt).</summary>
+    /// <summary>Joy-Con, deren Trenn-Geste (quer + SL/SR) schon ausgelöst hat – bis SL/SR losgelassen wird.</summary>
     private readonly Dictionary<IControllerLink, long> _splitSince = [];
     /// <summary>Gerade gedrückte Tastatur-Tasten (Vereinigung aller aktiven Hotkeys).</summary>
     private readonly List<ushort> _heldKeys = [];
@@ -88,7 +85,7 @@ internal sealed class Player : IDisposable
 
     /// <summary>Wird ausgelöst, wenn sich Akku, Ladezustand o. Ä. sichtbar ändert.</summary>
     public event Action? Changed;
-    /// <summary>Ein Joy-Con soll aus dem Paar gelöst werden (SL + SR gehalten).</summary>
+    /// <summary>Ein Joy-Con soll aus dem Paar gelöst werden (quer gehalten und SL/SR gedrückt).</summary>
     public event Action<Player, IControllerLink>? SplitRequested;
     /// <summary>Ein einzelner Joy-Con möchte sich mit einem anderen verbinden (Schultertaste gedrückt).</summary>
     public event Action<Player>? PairRequested;
@@ -388,38 +385,24 @@ internal sealed class Player : IDisposable
     }
 
     /// <summary>
-    /// Joy-Con aus dem Paar lösen: automatisch, wenn er quer gehalten wird und SL oder SR gedrückt wird (so hält man
-    /// einen einzelnen Joy-Con – im Paar zeigt die Schiene zur Seite, ein versehentlicher Druck trennt dann nichts);
-    /// oder wie an der Switch: SL + SR eine Sekunde halten.
+    /// Joy-Con aus dem Paar lösen – nur, wenn er quer gehalten wird und SL oder SR gedrückt wird (so hält man einen
+    /// einzelnen Joy-Con). Im Paar trennt kein Tastendruck: früher löste auch „SL + SR eine Sekunde halten“ aus, das
+    /// passierte beim Anstecken/Halten versehentlich – der Joy-Con lief dann einzeln mit gedrehter Belegung.
+    /// Bewusst trennen geht weiterhin über das Fenster.
     /// </summary>
     private void CheckSplitGesture(IControllerLink source, ControllerState state)
     {
         var rail = source.Kind.IsLeftJoyCon() ? ProButtons.SLLeft | ProButtons.SRLeft : ProButtons.SLRight | ProButtons.SRRight;
-        if ((state.Buttons & rail) != 0 && state.Motion is { } a && IsHeldSideways(a))
-        {
-            if (!_splitSince.ContainsKey(source))
-            {
-                _splitSince[source] = long.MinValue; // nur einmal auslösen, bis die Taste losgelassen wird
-                Log.Info($"{source.Id}: quer gehalten und SL/SR gedrückt – als einzelner Joy-Con");
-                ThreadPool.QueueUserWorkItem(_ => SplitRequested?.Invoke(this, source));
-            }
-            return;
-        }
-        if ((state.Buttons & rail) != rail)
+        if ((state.Buttons & rail) == 0)
         {
             _splitSince.Remove(source);
             return;
         }
-        long now = Environment.TickCount64;
-        if (!_splitSince.TryGetValue(source, out long since))
-        {
-            _splitSince[source] = now;
-        }
-        else if (now - since >= SplitHoldMs)
-        {
-            _splitSince.Remove(source);
-            ThreadPool.QueueUserWorkItem(_ => SplitRequested?.Invoke(this, source));
-        }
+        if (_splitSince.ContainsKey(source) || state.Motion is not { } a || !IsHeldSideways(a))
+            return;
+        _splitSince[source] = long.MinValue; // nur einmal auslösen, bis die Taste losgelassen wird
+        Log.Info($"{source.Id}: quer gehalten und SL/SR gedrückt – als einzelner Joy-Con");
+        ThreadPool.QueueUserWorkItem(_ => SplitRequested?.Invoke(this, source));
     }
 
     /// <summary>
