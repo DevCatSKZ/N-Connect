@@ -36,6 +36,15 @@ internal static class Log
     public static void Error(string message, Exception? e = null) =>
         Write("ERROR", e is null ? message : $"{message}: {e}");
 
+    /// <summary>
+    /// Kurzer Grund einer Ausnahme fürs Protokoll. Windows-Ausnahmen (COM/WinRT) kommen oft ohne Text –
+    /// dann wenigstens Art und Fehlercode, sonst stünde im Protokoll nur „…: “.
+    /// </summary>
+    public static string Reason(Exception e) =>
+        string.IsNullOrWhiteSpace(e.Message) ? $"{e.GetType().Name} 0x{e.HResult:X8}"
+        : e is System.Runtime.InteropServices.COMException or System.ComponentModel.Win32Exception
+            ? $"{e.Message.Trim()} (0x{e.HResult:X8})" : e.Message.Trim();
+
     private static void Write(string level, string message)
     {
         var line = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} {level} {message}{Environment.NewLine}";

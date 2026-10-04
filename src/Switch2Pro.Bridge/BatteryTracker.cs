@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.Text.Json;
 using Switch2Pro.Protocol;
 
@@ -92,7 +92,7 @@ internal static class BatteryTracker
             }
             catch (Exception e) when (e is IOException or UnauthorizedAccessException)
             {
-                Log.Warn($"Akku-Messwerte speichern: {e.Message}");
+                Log.Warn($"Akku-Messwerte speichern: {Log.Reason(e)}");
             }
         }
     }

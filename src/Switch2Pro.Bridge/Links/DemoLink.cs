@@ -1,4 +1,4 @@
-﻿using Switch2Pro.Protocol;
+using Switch2Pro.Protocol;
 
 namespace Switch2Pro.Bridge.Links;
 

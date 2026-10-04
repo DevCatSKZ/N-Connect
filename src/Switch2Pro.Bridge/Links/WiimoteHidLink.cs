@@ -268,7 +268,7 @@ internal sealed class WiimoteHidLink : IControllerLink
                 }
                 catch (IOException e)
                 {
-                    Log.Info($"{Id}: Schreiben per WriteFile abgelehnt ({e.Message}) – nutze SetOutputReport");
+                    Log.Info($"{Id}: Schreiben per WriteFile abgelehnt ({Log.Reason(e)}) – nutze SetOutputReport");
                     _useSetOutputReport = true;
                 }
             }
@@ -304,7 +304,7 @@ internal sealed class WiimoteHidLink : IControllerLink
         }
         catch (IOException e)
         {
-            Log.Info($"{Id}: Wii-Verbindung beendet ({e.Message})");
+            Log.Info($"{Id}: Wii-Verbindung beendet ({Log.Reason(e)})");
             RaiseLost();
         }
     }

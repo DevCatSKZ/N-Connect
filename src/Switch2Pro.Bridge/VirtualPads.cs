@@ -110,9 +110,9 @@ internal sealed class Xbox360Pad : IVirtualPad
                 return;
             _disposed = true;
             _pad.FeedbackReceived -= OnFeedback;
-            try { _pad.Disconnect(); } catch (Exception e) { Log.Warn($"Xbox-Pad trennen: {e.Message}"); }
+            try { _pad.Disconnect(); } catch (Exception e) { Log.Warn($"Xbox-Pad trennen: {Log.Reason(e)}"); }
             // Ohne Dispose bliebe bei jedem Neuverbinden ein natives ViGEm-Ziel übrig.
-            try { ((IDisposable)_pad).Dispose(); } catch (Exception e) { Log.Warn($"Xbox-Pad freigeben: {e.Message}"); }
+            try { ((IDisposable)_pad).Dispose(); } catch (Exception e) { Log.Warn($"Xbox-Pad freigeben: {Log.Reason(e)}"); }
         }
     }
 }
@@ -158,7 +158,7 @@ internal sealed class Ds4Pad : IVirtualPad
             catch (Exception e)
             {
                 if (!_disposed)
-                    Log.Warn($"DS4-Ausgabe: {e.Message}");
+                    Log.Warn($"DS4-Ausgabe: {Log.Reason(e)}");
                 return;
             }
         }
@@ -185,10 +185,10 @@ internal sealed class Ds4Pad : IVirtualPad
             if (_disposed)
                 return;
             _disposed = true;
-            try { _pad.Disconnect(); } catch (Exception e) { Log.Warn($"DS4-Pad trennen: {e.Message}"); }
+            try { _pad.Disconnect(); } catch (Exception e) { Log.Warn($"DS4-Pad trennen: {Log.Reason(e)}"); }
         }
         // Ausgabe-Thread beenden, bevor das native Ziel freigegeben wird.
         _outputThread.Join(TimeSpan.FromSeconds(1));
-        try { ((IDisposable)_pad).Dispose(); } catch (Exception e) { Log.Warn($"DS4-Pad freigeben: {e.Message}"); }
+        try { ((IDisposable)_pad).Dispose(); } catch (Exception e) { Log.Warn($"DS4-Pad freigeben: {Log.Reason(e)}"); }
     }
 }

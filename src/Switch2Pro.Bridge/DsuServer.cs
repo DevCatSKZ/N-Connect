@@ -54,7 +54,7 @@ internal sealed class DsuServer : IDisposable
         }
         catch (SocketException e)
         {
-            Log.Warn($"DSU-Server nicht gestartet – Port {Dsu.Port} belegt? ({e.Message})");
+            Log.Warn($"DSU-Server nicht gestartet – Port {Dsu.Port} belegt? ({Log.Reason(e)})");
             return null;
         }
     }
@@ -84,7 +84,7 @@ internal sealed class DsuServer : IDisposable
             }
             catch (Exception e)
             {
-                Log.Warn($"DSU: Anfrage nicht verarbeitet: {e.Message}");
+                Log.Warn($"DSU: Anfrage nicht verarbeitet: {Log.Reason(e)}");
             }
         }
     }

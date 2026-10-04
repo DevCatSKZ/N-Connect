@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using Switch2Pro.Protocol;
@@ -45,7 +45,7 @@ internal sealed class TrayApp : ApplicationContext
         }
         catch (System.ComponentModel.Win32Exception e)
         {
-            Log.Warn($"SD-Karten-Erkennung nicht verfügbar: {e.Message}");
+            Log.Warn($"SD-Karten-Erkennung nicht verfügbar: {Log.Reason(e)}");
         }
         // Linksklick = Einstellungen, Rechtsklick = Menü.
         _icon.MouseClick += (_, e) =>
@@ -171,7 +171,7 @@ internal sealed class TrayApp : ApplicationContext
         }
         catch (Exception e) when (e is DllNotFoundException or EntryPointNotFoundException or System.ComponentModel.Win32Exception)
         {
-            Log.Warn($"Automatisches Koppeln nicht verfügbar: {e.Message}");
+            Log.Warn($"Automatisches Koppeln nicht verfügbar: {Log.Reason(e)}");
         }
     }
 
@@ -267,7 +267,7 @@ internal sealed class TrayApp : ApplicationContext
         }
         catch (Exception e) when (e is UnauthorizedAccessException or System.Security.SecurityException or IOException)
         {
-            Log.Warn($"Autostart nicht eingerichtet: {e.Message}");
+            Log.Warn($"Autostart nicht eingerichtet: {Log.Reason(e)}");
         }
     }
 

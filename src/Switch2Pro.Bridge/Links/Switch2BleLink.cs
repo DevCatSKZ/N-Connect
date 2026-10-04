@@ -132,7 +132,7 @@ internal sealed class Switch2BleLink : IControllerLink
         }
         catch (Exception e)
         {
-            Log.Warn($"{id}: Verbindungsparameter nicht gesetzt: {e.Message}");
+            Log.Warn($"{id}: Verbindungsparameter nicht gesetzt: {Log.Reason(e)}");
             return null;
         }
     }
@@ -174,7 +174,7 @@ internal sealed class Switch2BleLink : IControllerLink
             }
             catch (Exception e)
             {
-                Log.Warn($"{Id}: erneute Anfrage nicht möglich: {e.Message}");
+                Log.Warn($"{Id}: erneute Anfrage nicht möglich: {Log.Reason(e)}");
             }
         }
     }
@@ -480,7 +480,7 @@ internal sealed class Switch2BleLink : IControllerLink
         }
         catch (Exception e)
         {
-            Log.Warn($"{Id}: Vibration abgeschaltet: {e.Message}");
+            Log.Warn($"{Id}: Vibration abgeschaltet: {Log.Reason(e)}");
         }
     }
 

@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using Switch2Pro.Bridge.Links;
 using Switch2Pro.Bridge.Usb;
 using Switch2Pro.Protocol;
@@ -369,7 +369,7 @@ internal sealed class ControllerManager : IAsyncDisposable
         }
         catch (Exception e)
         {
-            Log.Warn($"{id}: Windows-Kopplung nicht prüfbar: {e.Message}");
+            Log.Warn($"{id}: Windows-Kopplung nicht prüfbar: {Log.Reason(e)}");
         }
     }
 
@@ -387,7 +387,7 @@ internal sealed class ControllerManager : IAsyncDisposable
                 }
                 catch (Exception e)
                 {
-                    Log.Warn($"HID-Suche: {e.Message}");
+                    Log.Warn($"HID-Suche: {Log.Reason(e)}");
                 }
                 try
                 {
@@ -395,7 +395,7 @@ internal sealed class ControllerManager : IAsyncDisposable
                 }
                 catch (Exception e)
                 {
-                    Log.Warn($"USB-Suche: {e.Message}");
+                    Log.Warn($"USB-Suche: {Log.Reason(e)}");
                 }
                 await Task.Delay(2000, ct);
             }
@@ -445,7 +445,7 @@ internal sealed class ControllerManager : IAsyncDisposable
             // Z. B. gekoppelt, aber ausgeschaltet: Windows zeigt das HID-Gerät trotzdem an. Nur einmal protokollieren,
             // sonst entstünde alle 5 s ein Eintrag, solange der Controller aus ist.
             if (_unreachable.TryAdd(path, 0))
-                Log.Warn($"{kind.DisplayName()}: nicht erreichbar ({e.Message}) – wird still weiter versucht");
+                Log.Warn($"{kind.DisplayName()}: nicht erreichbar ({Log.Reason(e)}) – wird still weiter versucht");
             _retryAfter[path] = Environment.TickCount64 + 5000;
         }
         finally
@@ -517,7 +517,7 @@ internal sealed class ControllerManager : IAsyncDisposable
             // Z. B. von einem anderen Programm (Steam) belegt – einmal melden, dann still weiter versuchen.
             if (_unreachable.TryAdd(device.DeviceId, 0))
             {
-                Log.Warn($"{device.Kind.DisplayName()} per USB: nicht nutzbar ({e.Message})");
+                Log.Warn($"{device.Kind.DisplayName()} per USB: nicht nutzbar ({Log.Reason(e)})");
                 Notify?.Invoke($"{device.Kind.DisplayName()} per USB ist von einem anderen Programm belegt (z. B. Steam). " +
                                "Das Programm schließen oder in Steam die Nintendo-Unterstützung abschalten.");
             }

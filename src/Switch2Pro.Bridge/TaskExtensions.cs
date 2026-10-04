@@ -12,6 +12,6 @@ internal static class TaskExtensions
         {
             var e = t.Exception!.GetBaseException();
             if (e is not (OperationCanceledException or ObjectDisposedException))
-                Log.Warn($"{what}: {e.Message}");
+                Log.Warn($"{what}: {Log.Reason(e)}");
         }, CancellationToken.None, TaskContinuationOptions.OnlyOnFaulted, TaskScheduler.Default);
 }
