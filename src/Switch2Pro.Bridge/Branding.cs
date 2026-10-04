@@ -17,15 +17,17 @@ internal static class Branding
 
     private static Icon? _appIcon;
 
-    /// <summary>Fenstersymbol (aus den Programmressourcen, sonst gezeichnet).</summary>
+    /// <summary>Fenstersymbol mit allen Größen (eingebettete ICO-Datei, sonst gezeichnet).</summary>
     public static Icon AppIcon => _appIcon ??= LoadAppIcon();
 
     private static Icon LoadAppIcon()
     {
         try
         {
-            if (Environment.ProcessPath is { } exe && Icon.ExtractAssociatedIcon(exe) is { } icon)
-                return icon;
+            // Nicht ExtractAssociatedIcon: das liefert nur 32 px, verkleinert auf die Titelleiste wirkt der Rand pixelig.
+            using var stream = typeof(Branding).Assembly.GetManifestResourceStream("N-Connect.ico");
+            if (stream is not null)
+                return new Icon(stream);
         }
         catch (Exception e) when (e is ArgumentException or IOException)
         {
@@ -172,14 +174,20 @@ internal static class Branding
             bmp.Save(path, ImageFormat.Bmp);
     }
 
-    /// <summary>ICO-Datei mit PNG-Einträgen (ab Windows Vista üblich) in allen angegebenen Größen.</summary>
+    /// <summary>
+    /// ICO-Datei in allen angegebenen Größen: 256 px als PNG, kleinere als 32-Bit-Bitmap mit Alphakanal – PNG-Einträge
+    /// in kleinen Größen zeigen manche Lader (z. B. System.Drawing unter .NET Framework) als Pixelrauschen.
+    /// </summary>
     private static void WriteIco(string path, int[] sizes)
     {
         var images = sizes.Select(size =>
         {
             using var bmp = Render(size);
             using var ms = new MemoryStream();
-            bmp.Save(ms, ImageFormat.Png);
+            if (size >= 256)
+                bmp.Save(ms, ImageFormat.Png);
+            else
+                WriteDib(bmp, ms);
             return ms.ToArray();
         }).ToList();
         using var file = File.Create(path);
@@ -202,6 +210,38 @@ internal static class Branding
         }
         foreach (var image in images)
             w.Write(image);
+    }
+
+    /// <summary>Icon-Bild im DIB-Format: BITMAPINFOHEADER (doppelte Höhe), BGRA von unten nach oben, leere UND-Maske.</summary>
+    private static void WriteDib(Bitmap bmp, Stream stream)
+    {
+        int size = bmp.Width;
+        using var w = new BinaryWriter(stream, System.Text.Encoding.UTF8, leaveOpen: true);
+        w.Write(40);
+        w.Write(size);
+        w.Write(size * 2);
+        w.Write((ushort)1);
+        w.Write((ushort)32);
+        w.Write(0); // BI_RGB
+        int maskStride = (size + 31) / 32 * 4;
+        w.Write(size * size * 4 + maskStride * size);
+        w.Write(0L);
+        w.Write(0L);
+        var data = bmp.LockBits(new Rectangle(0, 0, size, size), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+        try
+        {
+            var row = new byte[size * 4];
+            for (int y = size - 1; y >= 0; y--)
+            {
+                System.Runtime.InteropServices.Marshal.Copy(data.Scan0 + y * data.Stride, row, 0, row.Length);
+                w.Write(row);
+            }
+        }
+        finally
+        {
+            bmp.UnlockBits(data);
+        }
+        w.Write(new byte[maskStride * size]);
     }
 }
 
