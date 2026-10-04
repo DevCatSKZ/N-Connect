@@ -102,7 +102,8 @@ internal sealed class ControllerManager : IAsyncDisposable
         long now = Environment.TickCount64;
         foreach (var link in _links.Values)
         {
-            if (link.Transport == Transport.Usb || link is DemoLink)
+            // Wii sendet nur bei Änderung – wenige Berichte im Ruhezustand sind dort kein Zeichen schwachen Funks.
+            if (link.Transport == Transport.Usb || link is DemoLink or WiimoteHidLink)
                 continue;
             long since = _connectedSince.GetOrAdd(link, now);
             if (now - since < 20_000 || link.ReportRate >= 20 || link.ReportRate <= 0 || !_weakWarned.TryAdd(link, 0))

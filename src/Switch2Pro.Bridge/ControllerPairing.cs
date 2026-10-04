@@ -226,27 +226,33 @@ internal static class ControllerPairing
     }
 
     /// <param name="repairRemembered">
-    /// Auch Controller neu koppeln, die Windows schon kennt (alte Kopplung wird entfernt). Nur im Fenster „Controller
-    /// koppeln“, wenn der Nutzer gerade SYNC drückt – im Hintergrund nie: dort lässt sich ein gekoppelter, nur kurz
-    /// sichtbarer Controller nicht sicher von einem im Kopplungsmodus unterscheiden (so ging eine Wii-Kopplung verloren).
+    /// Fenster „Controller koppeln“ (der Nutzer drückt gerade SYNC): bekannte Controller auch dann neu koppeln, wenn sie
+    /// nur kürzlich gesehen wurden. Im Hintergrund nur, wenn der Controller nachweislich während DIESES Suchlaufs
+    /// geantwortet hat – das tut er nur im Kopplungsmodus (SYNC). So wird z. B. ein Joy-Con, der zwischendurch wieder
+    /// mit der Switch gekoppelt war, nach SYNC von selbst neu gekoppelt, ohne dass ein nur ausgeschalteter oder
+    /// verbundener Controller seine Kopplung verliert.
     /// </param>
     private static List<string> ScanOnce(IntPtr radio, ulong radioAddress, Action<string> progress, bool repairRemembered)
     {
         var paired = new List<string>();
+        // „Zuletzt gesehen“ der bekannten Geräte vor der Suche: Windows erneuert den Wert nur, wenn ein Gerät auf die
+        // Suche antwortet (= sichtbar, also im Kopplungsmodus).
+        var before = Remembered(radio).ToDictionary(d => d.Address, d => Stamp(d.stLastSeen));
         foreach (var device in Inquiry(radio))
         {
             bool wii = IsWiiName(device.szName), switch1 = IsSwitch1Name(device.szName);
             if (!wii && !switch1)
                 continue;
             var info = device;
-            if (info.fConnected != 0 && info.fAuthenticated != 0)
-                continue;
-            if (info.fRemembered != 0 && !repairRemembered)
-                continue;
-            // Gemerkte Controller nur anfassen, wenn sie gerade in Reichweite sichtbar sind (SYNC gedrückt);
-            // sonst ginge die Kopplung eines anderen, nur ausgeschalteten Controllers verloren.
-            if (info.fRemembered != 0 && !SeenRecently(info.stLastSeen))
-                continue;
+            if (info.fConnected != 0)
+                continue; // verbunden: läuft bereits
+            if (info.fRemembered != 0)
+            {
+                bool answeredNow = before.TryGetValue(info.Address, out long earlier) && Stamp(info.stLastSeen) > earlier;
+                if (!answeredNow && !(repairRemembered && SeenRecently(info.stLastSeen)))
+                    continue; // nicht im Kopplungsmodus – Kopplung unangetastet lassen
+                Log.Info($"Kopplung: {info.szName} ({info.Address:X12}) ist bekannt, aber im Kopplungsmodus – neu koppeln");
+            }
             // Alte, nicht verbundene Kopplung entfernen (sonst verweigert Windows die neue).
             if (info.fRemembered != 0 && info.fConnected == 0)
             {
@@ -283,14 +289,35 @@ internal static class ControllerPairing
         }
     }
 
+    /// <summary>Zeitpunkt als vergleichbare Zahl (0 = nie).</summary>
+    private static long Stamp(SYSTEMTIME t)
+    {
+        if (t.Year < 2000)
+            return 0;
+        try
+        {
+            return new DateTime(t.Year, t.Month, t.Day, t.Hour, t.Minute, t.Second, t.Milliseconds).Ticks;
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            return 0;
+        }
+    }
+
+    /// <summary>Bekannte Geräte ohne Suche (nur Windows' gespeicherter Stand).</summary>
+    private static List<BLUETOOTH_DEVICE_INFO> Remembered(IntPtr radio) => Find(radio, inquiry: false);
+
     /// <summary>Eine kurze Suche (≈ 1,3 s) nach Geräten in Reichweite – kurz, damit verbundene Controller nicht abreißen.</summary>
-    private static List<BLUETOOTH_DEVICE_INFO> Inquiry(IntPtr radio)
+    private static List<BLUETOOTH_DEVICE_INFO> Inquiry(IntPtr radio) => Find(radio, inquiry: true);
+
+    private static List<BLUETOOTH_DEVICE_INFO> Find(IntPtr radio, bool inquiry)
     {
         var result = new List<BLUETOOTH_DEVICE_INFO>();
         var search = new BLUETOOTH_DEVICE_SEARCH_PARAMS
         {
             dwSize = Marshal.SizeOf<BLUETOOTH_DEVICE_SEARCH_PARAMS>(),
-            fReturnAuthenticated = 1, fReturnRemembered = 1, fReturnUnknown = 1, fReturnConnected = 1, fIssueInquiry = 1,
+            fReturnAuthenticated = 1, fReturnRemembered = 1, fReturnUnknown = inquiry ? 1 : 0, fReturnConnected = 1,
+            fIssueInquiry = inquiry ? 1 : 0,
             cTimeoutMultiplier = 1, hRadio = radio,
         };
         var info = new BLUETOOTH_DEVICE_INFO { dwSize = Marshal.SizeOf<BLUETOOTH_DEVICE_INFO>(), szName = "" };
