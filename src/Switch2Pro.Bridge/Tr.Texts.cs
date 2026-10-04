@@ -463,6 +463,9 @@ internal static partial class Tr
         ["Rechten Joy-Con umbenennen …"] = "Rename right Joy-Con …",
         ["Controller umbenennen"] = "Rename controller",
         ["Spielerplatz"] = "Player slot",
+        ["N-Connect aktualisieren"] = "Update N-Connect",
+        ["Der Download hat nicht geklappt oder die Datei war fehlerhaft. Die Release-Seite im Browser öffnen?"] =
+            "The download failed or the file was damaged. Open the release page in the browser?",
         ["Alle Controller trennen"] = "Disconnect all controllers",
         // Stick-Kalibrierung
         ["Sticks kalibrieren"] = "Calibrate sticks",

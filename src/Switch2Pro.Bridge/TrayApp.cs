@@ -374,9 +374,64 @@ internal sealed class TrayApp : ApplicationContext
             return;
         _update = update;
         Log.Info($"Neue Version {update.Version} verfügbar (installiert: {UpdateCheck.Current})");
-        _balloonUrl = update.Url;
+        if (update.Setup is null)
+        {
+            _balloonUrl = update.Url; // kein Installer im Release: Seite öffnen
+            Balloon(8000, "Neue Version verfügbar",
+                $"Version {update.Version} ist erschienen (installiert: {UpdateCheck.Current}). Klicken zum Herunterladen.", ToolTipIcon.Info);
+            return;
+        }
+        _balloonUrl = null;
         Balloon(8000, "Neue Version verfügbar",
-            $"Version {update.Version} ist erschienen (installiert: {UpdateCheck.Current}). Klicken zum Herunterladen.", ToolTipIcon.Info);
+            $"Version {update.Version} ist erschienen (installiert: {UpdateCheck.Current}). Klicken zum Installieren.", ToolTipIcon.Info,
+            () => InstallUpdateAsync().Forget("Update installieren"));
+    }
+
+    private bool _updating;
+
+    /// <summary>
+    /// Ein-Klick-Update: nachfragen, Installer herunterladen und prüfen, still installieren lassen, N-Connect beenden.
+    /// Der Installer schließt N-Connect ohnehin und startet es danach wieder.
+    /// </summary>
+    private async Task InstallUpdateAsync()
+    {
+        if (_update is not { Setup: { } setup } update || _updating)
+            return;
+        if (Tr.Show(null, $"Version {update.Version} herunterladen und installieren? N-Connect wird dafür kurz beendet und " +
+                          "danach wieder gestartet. Windows fragt dabei nach Administratorrechten.",
+                "N-Connect aktualisieren", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+            return;
+        _updating = true;
+        try
+        {
+            _balloonUrl = null;
+            Balloon(3000, "N-Connect aktualisieren", $"Lade Version {update.Version} herunter …", ToolTipIcon.Info);
+            string? path = await UpdateCheck.DownloadAsync(setup, null, CancellationToken.None);
+            if (path is null)
+            {
+                if (Tr.Show(null, "Der Download hat nicht geklappt oder die Datei war fehlerhaft. Die Release-Seite im Browser öffnen?",
+                        "N-Connect aktualisieren", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+                    Open(update.Url);
+                return;
+            }
+            try
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(path, "/SILENT /SUPPRESSMSGBOXES /NORESTART")
+                    { UseShellExecute = true });
+            }
+            catch (System.ComponentModel.Win32Exception e)
+            {
+                // Administratorrechte abgelehnt o. Ä.: N-Connect läuft einfach weiter.
+                Log.Info($"Update: Installer nicht gestartet: {Log.Reason(e)}");
+                return;
+            }
+            Log.Info($"Update auf {update.Version}: Installer gestartet, N-Connect wird beendet");
+            ExitThread();
+        }
+        finally
+        {
+            _updating = false;
+        }
     }
 
     private static string Battery(Player p)
@@ -507,7 +562,10 @@ internal sealed class TrayApp : ApplicationContext
         menu.Items.Add("Kurzanleitung", null, (_, _) => ShowWelcome());
         menu.Items.Add("Protokoll öffnen", null, (_, _) => Open(Paths.LogFile));
         if (_update is { } update)
-            menu.Items.Add(new ToolStripMenuItem($"⬇ Neue Version {update.Version} herunterladen …", null, (_, _) => Open(update.Url)) { Font = _boldFont });
+            menu.Items.Add(update.Setup is null
+                ? new ToolStripMenuItem($"⬇ Neue Version {update.Version} herunterladen …", null, (_, _) => Open(update.Url)) { Font = _boldFont }
+                : new ToolStripMenuItem($"⬇ Auf Version {update.Version} aktualisieren …", null,
+                    (_, _) => InstallUpdateAsync().Forget("Update installieren")) { Font = _boldFont });
         menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add("Beenden", null, (_, _) => ExitThread());
         Tr.Apply(menu.Items);
