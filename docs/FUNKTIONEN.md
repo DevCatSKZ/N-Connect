@@ -171,7 +171,8 @@ Bis zu **8 Spieler** gleichzeitig (`ControllerManager.MaxPlayers`). Der 9. Contr
 - **Paar automatisch**: Linker + rechter Joy-Con werden ein Spieler (abschaltbar), außer einer wurde zuletzt einzeln
   verwendet (gemerkt je Joy-Con).
 - **Trennen**: quer gehalten (Schwerkraft überwiegend entlang der Schienenachse, |X| > 2500/4096 g und deutlich
-  größer als Y/Z) **und SL oder SR drücken** → sofort eigener Spieler; oder SL + SR **1 s** halten; oder Knopf.
+  größer als Y/Z) **und SL oder SR drücken** → sofort eigener Spieler; oder Knopf. „SL + SR 1 s halten“ trennt bewusst **nicht**
+  mehr (löste beim Anstecken/Halten im Paar versehentlich aus).
 - **Zusammenfügen**: L am linken und R am rechten einzelnen Joy-Con innerhalb von 1 s; oder Knopf.
 - **Einzeln quer** (Standard): Stick und Bewegungsdaten gedreht, Tasten nach Lage benannt:
 

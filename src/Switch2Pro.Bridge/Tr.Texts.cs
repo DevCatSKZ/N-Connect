@@ -347,8 +347,8 @@ internal static partial class Tr
         ["Rechter Joy-Con (wie Switch)"] = "Right Joy-Con (like Switch)",
         ["Linker Joy-Con"] = "Left Joy-Con",
         ["Paar lösen oder verbinden"] = "Split or join a pair",
-        ["SL + SR eine Sekunde halten löst einen Joy-Con aus dem Paar. L am linken und R am rechten Joy-Con gleichzeitig drücken verbindet sie wieder. Die Wahl wird je Joy-Con gemerkt."] =
-            "Holding SL + SR for a second splits a Joy-Con from the pair. Pressing L on the left and R on the right Joy-Con at the same time joins them again. The choice is remembered per Joy-Con.",
+        ["Einen Joy-Con quer halten und SL oder SR drücken löst ihn aus dem Paar. L am linken und R am rechten Joy-Con gleichzeitig drücken verbindet sie wieder. Die Wahl wird je Joy-Con gemerkt."] =
+            "Holding a Joy-Con sideways and pressing SL or SR splits it from the pair. Pressing L on the left and R on the right Joy-Con at the same time joins them again. The choice is remembered per Joy-Con.",
         ["Joy-Con 2 als Maus"] = "Joy-Con 2 as a mouse",
         ["Als Maus, wenn er auf dem Tisch liegt"] = "As a mouse when lying on the table",
         ["Joy-Con 2 auf die Seite legen und wie eine Maus schieben."] = "Lay Joy-Con 2 on its side and slide it like a mouse.",
@@ -414,8 +414,8 @@ internal static partial class Tr
         ["Gyro als rechter Stick und Mausrichtung"] = "Gyro as right stick and mouse direction",
         ["Gilt für alle Controller"] = "Applies to all controllers",
         ["Paar"] = "Pair",
-        ["Wie an der Switch: SL + SR eine Sekunde halten löst das Paar, L + R gleichzeitig verbindet es."] =
-            "Like on the Switch: holding SL + SR for a second splits the pair, L + R at the same time joins it.",
+        ["Joy-Con quer halten und SL oder SR drücken löst das Paar, L + R gleichzeitig verbindet es."] =
+            "Holding a Joy-Con sideways and pressing SL or SR splits the pair, L + R at the same time joins it.",
         ["Haltung"] = "Orientation",
         ["Quer"] = "Sideways",
         ["Hochkant"] = "Upright",

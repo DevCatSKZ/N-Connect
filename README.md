@@ -71,7 +71,7 @@ Die Suche im Hintergrund läuft nur, solange gerade niemand spielt; gezielt such
   gespeichert, der Controller bleibt unverändert.
 - **Gyro-Assistent:** Zielen per Bewegung in drei Schritten einrichten, mit Live-Vorschau.
 - **Joy-Con wie an der Switch:** zwei Joy-Con werden automatisch ein Controller; einen Joy-Con quer halten und SL
-  oder SR drücken (oder SL + SR eine Sekunde halten) macht ihn zum eigenen Spieler, L + R gleichzeitig verbindet
+  oder SR drücken macht ihn zum eigenen Spieler, L + R gleichzeitig verbindet
   wieder. Die Wahl wird je Joy-Con gemerkt.
 - **Joy-Con-2-Mausmodus:** Joy-Con auf die Schienenkante stellen → Maus (R/L = Linksklick, ZR/ZL = Rechtsklick,
   Stick = Scrollen).

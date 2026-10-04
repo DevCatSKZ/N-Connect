@@ -517,7 +517,7 @@ internal sealed class ControllerOverview : Panel
                 CurrentSettings.SetUprightJoyCon(address, _orientation.SelectedIndex == 1);
                 Manager.RequestSave();
             };
-            _pairRow = Row("Paar", "Wie an der Switch: SL + SR eine Sekunde halten löst das Paar, L + R gleichzeitig verbindet es.", _pairButton, Glyph.Swap);
+            _pairRow = Row("Paar", "Joy-Con quer halten und SL oder SR drücken löst das Paar, L + R gleichzeitig verbindet es.", _pairButton, Glyph.Swap);
             _orientationRow = Row("Haltung", "Quer wie an der Switch oder hochkant – hochkant gilt die Belegung von „Joy-Con-Paar“.", _orientation, Glyph.Rotate);
             _joyConGroup = Group(_pairRow, _orientationRow);
             return Column(_joyConGroup, Group(Link("Joy-Con 2 als Maus", "Mausmodus, Geschwindigkeit und Tasten", SettingsForm.PageJoyCon)));

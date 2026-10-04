@@ -242,7 +242,7 @@ public sealed class Settings
     public List<string> AllowedControllers { get; set; } = [];
     /// <summary>
     /// Joy-Con, die einzeln verwendet werden sollen (Bluetooth-Adressen). Wird automatisch gepflegt:
-    /// Trennen (SL + SR oder Knopf) trägt ein, Zusammenfügen (L + R oder Knopf) trägt aus.
+    /// Trennen (quer + SL/SR oder Knopf) trägt ein, Zusammenfügen (L + R oder Knopf) trägt aus.
     /// </summary>
     public List<string> SingleJoyCons { get; set; } = [];
     /// <summary>Per HidHide versteckte USB-Controller (HID-Instanz-IDs) – damit nicht erneut gefragt wird.</summary>

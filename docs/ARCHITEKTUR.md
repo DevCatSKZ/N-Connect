@@ -56,7 +56,7 @@ Funk/Kabel ──► Link (Thread des Links)
                  │  Joy-Con 2: Mausmodus (JoyConMouse) – nimmt Maustasten heraus
                  │  Kalibrierung: Link-Werte + eigene Stick-Kalibrierung + Gyro-Nullpunkt (Player.CalibrationFor)
                  │  Mapping.Normalize (1 Link) bzw. Mapping.Merge (Joy-Con-Paar)
-                 │  Gesten: Paar trennen (SL/SR quer bzw. SL+SR 1 s) / zusammenfügen (L+R)
+                 │  Gesten: Paar trennen (quer gehalten + SL/SR) / zusammenfügen (L+R)
                  ▼
             PadInput (einheitlich: Pro-Schema, Sticks −1…1, Trigger 0…1, Motion ohne Nullpunktfehler)
                  │  Mapping.Evaluate: Profil, Shift, Turbo, Makros, Totzone/Kennlinie, Trigger-Schwelle

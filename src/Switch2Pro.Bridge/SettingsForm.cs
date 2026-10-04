@@ -289,8 +289,8 @@ internal sealed class SettingsForm : Form
             Row("Zu einem Controller zusammenfassen", "Ein linker und ein rechter Joy-Con werden automatisch ein Paar.", _combine, Glyph.Swap),
             Row("Gyro beim Paar vom", null, _gyroSource, Glyph.Rotate),
             new SettingRow("Paar lösen oder verbinden",
-                "SL + SR eine Sekunde halten löst einen Joy-Con aus dem Paar. L am linken und R am rechten Joy-Con gleichzeitig " +
-                "drücken verbindet sie wieder. Die Wahl wird je Joy-Con gemerkt.", null, Glyph.Info));
+                "Einen Joy-Con quer halten und SL oder SR drücken löst ihn aus dem Paar. L am linken und R am rechten Joy-Con " +
+                "gleichzeitig drücken verbindet sie wieder. Die Wahl wird je Joy-Con gemerkt.", null, Glyph.Info));
         page.AddGroup("Joy-Con 2 als Maus",
             Row("Als Maus, wenn er auf dem Tisch liegt", "Joy-Con 2 auf die Seite legen und wie eine Maus schieben.", _mouse, Glyph.Mouse),
             Row("Mausgeschwindigkeit", null, _mouseSpeed, Glyph.Gauge),
