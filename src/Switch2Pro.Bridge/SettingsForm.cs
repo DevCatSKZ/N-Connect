@@ -313,6 +313,7 @@ internal sealed class SettingsForm : Form
                 _overview.UpdateView();
         };
         _liveTimer.Start();
+        Shown += (_, _) => PrepareSettingsPage();
         _overview.UpdateView();
     }
 
@@ -344,14 +345,46 @@ internal sealed class SettingsForm : Form
     internal Control SettingsContent => _settingsContent;
 
     /// <summary>Seite zeigen: 0 = Controller-Übersicht, 1 = Einstellungen.</summary>
+    /// <summary>
+    /// Steuerelemente der Einstellungsseite schon im Voraus erzeugen – je Abschnitt ein kurzer Schritt, damit die
+    /// Übersicht flüssig bleibt. Sonst dauert der erste Klick auf „Einstellungen“ spürbar.
+    /// </summary>
+    private void PrepareSettingsPage()
+    {
+        var pending = new Queue<Control>(_settingsContent.Controls.Cast<Control>());
+        var timer = new System.Windows.Forms.Timer { Interval = 40 };
+        timer.Tick += (_, _) =>
+        {
+            if (IsDisposed || pending.Count == 0)
+            {
+                timer.Dispose();
+                return;
+            }
+            CreateHandles(pending.Dequeue());
+        };
+        timer.Start();
+
+        static void CreateHandles(Control c)
+        {
+            _ = c.Handle;
+            foreach (Control child in c.Controls)
+                CreateHandles(child);
+        }
+    }
+
     internal void ShowPage(int page)
     {
+        long start = Environment.TickCount64;
         _overviewPage.Visible = page == 0;
         _settingsPage.Visible = page == 1;
         _navOverview.Selected = page == 0;
         _navSettings.Selected = page == 1;
         if (page == 0)
             _overview.UpdateView();
+        Update();
+        long ms = Environment.TickCount64 - start;
+        if (ms > 300)
+            Log.Warn($"Seite {page} brauchte {ms} ms zum Anzeigen");
     }
 
     private static FlowLayoutPanel Flow() =>
@@ -806,6 +839,7 @@ internal sealed class SettingsForm : Form
     {
         var kind = SelectedKind;
         _grid.SuspendLayout();
+        _fullLists.Clear();
         foreach (Control c in _grid.Controls.Cast<Control>().ToList())
         {
             _grid.Controls.Remove(c);
@@ -818,6 +852,8 @@ internal sealed class SettingsForm : Form
             var combo = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Width = 380 };
             FillCombo(combo, button, kind);
             combo.SelectedIndexChanged += (_, _) => OnActionChosen(combo, button, kind);
+            combo.DropDown += (_, _) => LoadFullList(combo);
+            combo.Enter += (_, _) => LoadFullList(combo);
             _grid.Controls.Add(new Label { Text = ControllerButtons.Label(button, kind), AutoSize = true, Padding = new Padding(0, 6, 0, 0) });
             _grid.Controls.Add(combo);
         }
@@ -835,21 +871,20 @@ internal sealed class SettingsForm : Form
         bool was = _loading;
         _loading = true;
         bool shift = _layerShift.Checked;
-        combo.Items.Clear();
+        var items = new List<Choice>();
         string standard = shift
             ? "wie normale Belegung"
             : $"Standard: {TargetNames[Mapping.DefaultTarget(button, _settings.Layout, kind)]}";
-        combo.Items.Add(new Choice(standard, null));
+        items.Add(new Choice(standard, null));
         foreach (var (target, name) in TargetNames)
-            combo.Items.Add(new Choice(name, target.ToString()));
-        foreach (var preset in Presets(shift))
-            combo.Items.Add(preset);
+            items.Add(new Choice(name, target.ToString()));
+        items.AddRange(Presets(shift));
 
         int selected = 0;
         if (EditedMaps.TryGetValue(kind, out var map) && map.TryGetValue(button, out var text))
         {
             string normalized = ButtonAction.Parse(text).ToString();
-            selected = combo.Items.Cast<Choice>().ToList()
+            selected = items
                 .FindIndex(c => c.Action is not null && !c.Action.StartsWith('\u0001')
                                 && string.Equals(ButtonAction.Parse(c.Action).ToString(), normalized, StringComparison.OrdinalIgnoreCase));
             if (selected < 0)
@@ -862,13 +897,43 @@ internal sealed class SettingsForm : Form
                     { IsKeyboard: true } => $"⌨  Taste: {action.Keys}",
                     _ => normalized,
                 };
-                combo.Items.Add(new Choice(label, normalized));
-                selected = combo.Items.Count - 1;
+                items.Add(new Choice(label, normalized));
+                selected = items.Count - 1;
             }
         }
-        combo.Items.Add(KeyboardChoice);
-        combo.SelectedIndex = selected;
-        combo.Tag = selected;
+        items.Add(KeyboardChoice);
+        // Nur den gewählten Eintrag sofort einfügen: 20+ Listen mit je ~60 Einträgen zu erzeugen dauert in Windows
+        // mehrere Sekunden. Die volle Liste kommt beim Aufklappen bzw. Anwählen (LoadFullList).
+        combo.BeginUpdate();
+        combo.Items.Clear();
+        combo.Items.Add(items[selected]);
+        combo.SelectedIndex = 0;
+        combo.EndUpdate();
+        combo.Tag = selected; // Index in der vollen Liste
+        _fullLists[combo] = items;
+        _loading = was;
+    }
+
+    private readonly Dictionary<ComboBox, List<Choice>> _fullLists = [];
+
+    /// <summary>Für die Prüfhilfe: alle Belegungslisten vollständig füllen.</summary>
+    internal void LoadAllLists()
+    {
+        foreach (var combo in _fullLists.Keys.ToList())
+            LoadFullList(combo);
+    }
+
+    private void LoadFullList(ComboBox combo)
+    {
+        if (!_fullLists.Remove(combo, out var items))
+            return;
+        bool was = _loading;
+        _loading = true;
+        combo.BeginUpdate();
+        combo.Items.Clear();
+        combo.Items.AddRange(items.ToArray<object>());
+        combo.SelectedIndex = combo.Tag is int selected ? selected : 0;
+        combo.EndUpdate();
         _loading = was;
     }
 

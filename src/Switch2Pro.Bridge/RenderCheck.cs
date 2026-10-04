@@ -30,7 +30,10 @@ internal static class RenderCheck
         }
         var settings = new Settings();
         using (var form = new SettingsForm(settings, _ => { }, null))
+        {
+            form.LoadAllLists(); // Belegungslisten werden sonst erst beim Aufklappen gefüllt
             Walk(form);
+        }
         foreach (var kind in Enum.GetValues<ControllerKind>())
         {
             texts.Add(kind.DisplayName());
