@@ -32,7 +32,7 @@ Bis zu 8 Controller gleichzeitig (Spieler 1–8). Tipp für viele Controller: ei
 2. Setup starten. Es installiert automatisch:
    - das Programm (läuft unauffällig unten rechts im Infobereich),
    - den signierten Treiber **ViGEmBus** für den virtuellen Controller (falls noch nicht vorhanden),
-   - auf Wunsch **HidHide** (verhindert, dass Spiele einen per USB angeschlossenen Controller doppelt sehen).
+   - **HidHide** (standardmäßig angehakt: verhindert, dass Steam und Spiele Switch-1-, NSO- und USB-Controller doppelt sehen).
 3. N-Connect startet danach **automatisch mit Windows** im Hintergrund (abschaltbar unter *Allgemein → Mit Windows starten*).
 4. Beim ersten Start erscheint eine Kurzanleitung.
 
@@ -64,7 +64,11 @@ Die Suche im Hintergrund läuft nur, solange gerade niemand spielt; gezielt such
 - **Oberfläche im Windows-11-Stil:** dunkel (Standard), hell oder wie Windows; Akzentfarbe aus Windows, Mica-Titelleiste.
 - Knöpfe je Controller: **Trennen**, **Vibrieren** (welcher ist welcher Spieler?), **Gyro kalibrieren**,
   Joy-Con **trennen/zusammenfügen**, **hochkant/quer**, **amiibo lesen**, **Ring-Con**, **IR-Kamera**,
-  **„Doppelt angezeigt? Verstecken“** (HidHide, bei USB).
+  **„Doppelt angezeigt? Verstecken“** (HidHide).
+- **Für Steam vorbereitet:** Original-Controller werden automatisch vor Steam und Spielen versteckt (HidHide, einmal
+  bestätigen) – Steam sieht nur den virtuellen Xbox-Controller. **Erscheint als** je Controller wählbar (Xbox 360 oder
+  DualShock 4 mit Gyro), Standard Xbox 360.
+- **Joy-Con im Ladegriff per USB** (Switch 1) werden erkannt.
 - **Spieler-Reihenfolge:** Leiste über den Karten – mit ‹ › festlegen, welcher Controller Spieler 1, 2 … ist
   (Spieler 1 = erster Controller für Windows, Steam und Spiele; Lichter ziehen mit, wird je Controller gemerkt).
   Wird ein Controller getrennt, rücken die anderen automatisch auf. Auch über den Kartentitel (dort auch
@@ -108,7 +112,7 @@ Alle Einstellungen sind optional und gelten sofort (Klick auf das Symbol im Info
 | Switch-2-Controller verbindet sich nicht | SYNC kurz drücken (nicht halten). Ist er in den Windows-Bluetooth-Einstellungen eingetragen → dort **entfernen**. Switch 2 in der Nähe in den Ruhemodus versetzen. |
 | Switch-1-/NSO-/Wii-Controller wird nicht gekoppelt | *Allgemein → Controller koppeln …* öffnen und SYNC drücken, solange gesucht wird (die Hintergrundsuche pausiert, während jemand spielt). Fehlercodes stehen im Protokoll („Kopplung …“). Nach einem Fehlschlag wartet die Hintergrundsuche 90 s, bevor sie es erneut versucht. |
 | Joy-Con ist plötzlich ein eigener Spieler (Tasten/Stick gedreht) | Er wurde vom Paar gelöst (quer halten + SL/SR). L am linken und R am rechten Joy-Con gleichzeitig drücken fügt sie wieder zusammen. |
-| Spiel sieht einen USB-Controller doppelt | Auf der Karte „Doppelt angezeigt? Verstecken“ klicken (HidHide). |
+| Steam/Spiel sieht einen Controller doppelt | „Allgemein → Original-Controller verstecken“ (HidHide) muss an sein; die Windows-Abfrage bestätigen und Steam einmal neu starten. Einzeln: Karte → Extras → „Doppelt angezeigt?“. |
 | Akkuanzeige weicht beim Laden ab | Einmal Kabel abziehen und wieder anstecken – N-Connect misst den Spannungsanstieg dann neu. Werte stehen alle 30 s im Protokoll („Akku …“). |
 | „ViGEmBus-Treiber fehlt“ | Setup erneut ausführen oder ViGEmBus installieren: <https://github.com/nefarius/ViGEmBus/releases> |
 | Etwas anderes | Rechtsklick auf das Symbol → **Protokoll öffnen** und den Inhalt bei einer Fehlermeldung beilegen. |

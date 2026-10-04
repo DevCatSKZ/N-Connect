@@ -118,6 +118,10 @@ public static class ControllerKinds
     /// </summary>
     public static ControllerKind FromSwitch1DeviceType(byte type, ControllerKind fallback) => type switch
     {
+        // Im Ladegriff (USB 057E:200E) melden beide Joy-Con dieselbe Produkt-ID – erst der Typ sagt, welcher es ist.
+        0x01 => ControllerKind.JoyCon1Left,
+        0x02 => ControllerKind.JoyCon1Right,
+        0x03 => ControllerKind.Pro1,
         0x07 or 0x08 or 0x09 or 0x0A => ControllerKind.NesController, // Famicom/NES links/rechts
         0x0B => ControllerKind.SnesController,
         0x0C => ControllerKind.N64Controller,

@@ -435,7 +435,18 @@ internal sealed class ControllerOverview : Panel
             _layer.SelectedIndexChanged += (_, _) => { if (!_syncing) _owner._mapping.SetShift(_layer.SelectedIndex == 1); };
             _owner._mapping.Changed += SyncProfile;
             _editor = new MappingEditor(_owner._mapping, kind);
+            // Ausgabeart nur für diesen Controller (z. B. Pro Controller als DualShock 4 mit Gyro in Steam).
+            var output = new Segmented("Wie allgemein", "Xbox 360", "DualShock 4");
+            var own = _player?.Links.Select(l => CurrentSettings.OutputFor(l.Address)).FirstOrDefault(m => m is not null);
+            output.SelectedIndex = own switch { OutputMode.Xbox360 => 1, OutputMode.DualShock4 => 2, _ => 0 };
+            output.SelectedIndexChanged += (_, _) =>
+            {
+                if (_player is { } p)
+                    Manager.SetPlayerOutput(p, output.SelectedIndex switch { 1 => OutputMode.Xbox360, 2 => OutputMode.DualShock4, _ => null });
+            };
             return Column(
+                Group(Row("Erscheint als", "Nur für diesen Controller. Xbox 360 läuft überall; DualShock 4 bringt zusätzlich Gyro " +
+                          "nach Steam und in Emulatoren. „Wie allgemein“ folgt der Seite „Allgemein“.", output, Glyph.Gamepad)),
                 Group(Row("Profil", "Belegung für alle Spiele (Standard) oder ein eigenes Profil.", profileBox, Glyph.Layers),
                       Row("Ebene", "Die Shift-Ebene gilt, solange eine Taste mit „Shift-Ebene“ gehalten wird.", _layer, Glyph.Layers)),
                 Hint("Drück eine Taste am Controller – ihre Zeile leuchtet auf. ⌨ weist eine Tastaturtaste zu, ↺ setzt zurück."),
@@ -550,7 +561,7 @@ internal sealed class ControllerOverview : Panel
             _amiiboRow = Row("amiibo lesen", "amiibo an den NFC-Leser halten und als Datei (.bin) speichern – z. B. für Emulatoren.", _amiibo, Glyph.Nfc);
             _ringRow = Row("Ring-Con", "Zusammendrücken = rechter Trigger, auseinanderziehen = linker Trigger. Beim Einschalten nicht berühren.", _ringCon, Glyph.Ring);
             _irRow = Row("IR-Kamera", "Live-Bild der Infrarotkamera im rechten Joy-Con.", _irCamera, Glyph.Video);
-            _hideRow = Row("Doppelt angezeigt?", "Versteckt den USB-Controller vor Spielen (HidHide) – sie sehen dann nur den virtuellen Controller.", _hide, Glyph.Eye);
+            _hideRow = Row("Doppelt angezeigt?", "Versteckt den Original-Controller vor Steam und Spielen (HidHide) – sie sehen dann nur den virtuellen Controller.", _hide, Glyph.Eye);
             _extrasGroup = Group(_amiiboRow, _ringRow, _irRow, _hideRow);
             UpdateExtras(CurrentSettings);
             return Column(_extrasGroup);
@@ -926,7 +937,7 @@ internal sealed class ControllerOverview : Panel
             }
         }
 
-        /// <summary>USB-Controller per HidHide vor Spielen verstecken (einmal Adminrechte).</summary>
+        /// <summary>Original-Controller per HidHide vor Steam und Spielen verstecken (einmal Adminrechte).</summary>
         private async Task HideAsync()
         {
             var ids = _player?.Links.Select(l => l.HidInstanceId).OfType<string>().ToList() ?? [];

@@ -282,7 +282,7 @@ internal sealed class TrayApp : ApplicationContext
         {
             SaveSettings();
             if (outputChanged)
-                _manager?.ApplyOutputMode(_settings.OutputMode);
+                _manager?.ApplyOutputMode();
         }, _manager, ShowWiiPairing, () => ShowPairingData(null));
         _settingsForm.Show();
         _settingsForm.Activate();
@@ -298,14 +298,12 @@ internal sealed class TrayApp : ApplicationContext
             Log.Warn($"settings.json fehlerhaft, Änderung ignoriert: {fresh.LoadError}");
             return;
         }
-        var oldMode = _settings.OutputMode;
         // Werte übernehmen statt das Objekt zu ersetzen – das offene Einstellungsfenster arbeitet darauf.
         _settings.CopyFrom(fresh);
         Theme.Init(_settings.Theme, _settings.Transparency);
         _icon.ContextMenuStrip!.Renderer = Theme.MenuRenderer();
         _icon.ContextMenuStrip.ForeColor = Theme.Current.Text;
-        if (fresh.OutputMode != oldMode)
-            _manager?.ApplyOutputMode(fresh.OutputMode);
+        _manager?.ApplyOutputMode(); // allgemein oder je Controller geändert – nur Abweichende werden neu angelegt
         if (_settingsForm is { IsDisposed: false } form)
             form.ReloadValues(); // sonst arbeitet das Fenster mit veralteten Profilen weiter
         Log.Info("Einstellungen neu geladen");
@@ -506,6 +504,12 @@ internal sealed class TrayApp : ApplicationContext
                     slots.DropDownItems.Add(Radio($"Spieler {i + 1}", player.Index == i, () => _manager.MovePlayer(player, slot)));
                 }
                 item.DropDownItems.Add(slots);
+                var own = player.Links.Select(l => _settings.OutputFor(l.Address)).FirstOrDefault(m => m is not null);
+                var appears = new ToolStripMenuItem("Erscheint als");
+                appears.DropDownItems.Add(Radio("Wie allgemein", own is null, () => _manager.SetPlayerOutput(player, null)));
+                appears.DropDownItems.Add(Radio("Xbox 360", own == OutputMode.Xbox360, () => _manager.SetPlayerOutput(player, OutputMode.Xbox360)));
+                appears.DropDownItems.Add(Radio("DualShock 4", own == OutputMode.DualShock4, () => _manager.SetPlayerOutput(player, OutputMode.DualShock4)));
+                item.DropDownItems.Add(appears);
                 item.DropDownItems.Add("Trennen", null, (_, _) => _manager.Disconnect(player));
                 menu.Items.Add(item);
             }
@@ -633,7 +637,7 @@ internal sealed class TrayApp : ApplicationContext
             return;
         _settings.OutputMode = mode;
         SaveSettings();
-        _manager?.ApplyOutputMode(mode);
+        _manager?.ApplyOutputMode();
     }
 
     private static void Open(string target, string? args = null)

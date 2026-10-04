@@ -10,7 +10,7 @@ Was das Programm kann und wie man es baut: siehe [README.md](README.md). Vollst�
 ```powershell
 cd switch2-pro-windows
 dotnet build -c Release                      # Warnungen gelten als Fehler
-dotnet test -c Release --no-build            # aktuell 166 Tests, alle grün
+dotnet test -c Release --no-build            # aktuell 169 Tests, alle grün
 N-Connect.exe --render <Ordner>              # alle Controller-Grafiken prüfen
 N-Connect.exe --render-ui <Ordner> --demo-all --wide   # alle Seiten/Karten prüfen (auch --demo, --demo-retro)
 dotnet publish src\Switch2Pro.Bridge -c Release -r win-x64 --self-contained -p:PublishSingleFile=true `
@@ -49,6 +49,16 @@ Hinweise zur Umgebung:
   Joy-Con lief dann einzeln mit gedrehter Belegung = „im Spiel falsch gemappt“).
 - Spieler-Reihenfolge: Leiste `PlayerOrderBar` über den Karten (‹ › tauschen); Spieler rücken nach Trennen/
   Zusammenfassen lückenlos auf (`CompactPlayers`), Menüs bieten nur belegte Plätze an.
+
+## Danach umgesetzt (Prüfung „Bugs, Referenzen, Benutzerfreundlichkeit“)
+
+- **Steam sah Switch-1/NSO-Controller doppelt** (Steam/SDL unterstützen sie selbst; HidHide griff nur bei USB und
+  von Hand, `Switch1HidLink` hatte keine `HidInstanceId`). Jetzt: automatisches Verstecken (FUNKTIONEN 2.4a).
+  Beim Nutzer war HidHide **nicht installiert** – sehr wahrscheinlich die Ursache für „Joy-Con 1 im Spiel falsch“.
+- **Ausgabeart je Controller** (FUNKTIONEN 3a).
+- **Joy-Con 1 im Ladegriff per USB** (057E:200E, Gerätetyp 0x01/0x02/0x03) – mit echter Hardware **nicht** geprüft.
+- Vorgeschlagen, noch offen (Punkt 4 der Prüfung): Gyro-Extras nach JoyShockMapper (Flick-Stick,
+  Gyro-Beschleunigung, „Ratchet“-Taste); DS4-Lichtleiste/Spieler-LED aus dem Spiel übernehmen.
 
 ## Offen
 

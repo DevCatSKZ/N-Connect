@@ -363,6 +363,26 @@ internal static partial class Tr
         ["Controller erscheint als"] = "Controller appears as",
         ["Xbox 360 läuft mit fast allen Spielen. DualShock 4 bietet Bewegungssteuerung (Steam, Emulatoren)."] =
             "Xbox 360 works with almost all games. DualShock 4 offers motion controls (Steam, emulators).",
+        ["Xbox 360 läuft mit fast allen Spielen und Steam. DualShock 4 bietet zusätzlich Bewegungssteuerung (Steam, Emulatoren). Gilt für alle Controller ohne eigene Einstellung (Karte → Einstellungen → Tasten)."] =
+            "Xbox 360 works with almost all games and Steam. DualShock 4 adds motion controls (Steam, emulators). Applies to all controllers without their own setting (card → Settings → Buttons).",
+        ["Original-Controller verstecken"] = "Hide original controllers",
+        ["HidHide installieren …"] = "Install HidHide …",
+        ["Empfohlen: Steam und viele Spiele kennen Switch-1-, NSO- und USB-Controller selbst und sähen sie sonst doppelt. Beim ersten Verbinden fragt Windows einmal nach Adminrechten."] =
+            "Recommended: Steam and many games support Switch 1, NSO and USB controllers themselves and would otherwise see them twice. On first connection Windows asks once for administrator rights.",
+        ["Steam und viele Spiele sehen Switch-1-, NSO- und USB-Controller sonst doppelt. Dafür wird das kostenlose HidHide gebraucht (bei der N-Connect-Installation dabei, hier nachträglich)."] =
+            "Otherwise Steam and many games see Switch 1, NSO and USB controllers twice. This needs the free HidHide (included in the N-Connect setup, install it here afterwards).",
+        ["Erscheint als"] = "Appears as",
+        ["Wie allgemein"] = "As in General",
+        ["Nur für diesen Controller. Xbox 360 läuft überall; DualShock 4 bringt zusätzlich Gyro nach Steam und in Emulatoren. „Wie allgemein“ folgt der Seite „Allgemein“."] =
+            "Only for this controller. Xbox 360 works everywhere; DualShock 4 adds gyro in Steam and emulators. “As in General” follows the “General” page.",
+        ["Steam und manche Spiele sehen diesen Controller sonst doppelt. Abhilfe: HidHide installieren (Seite „Allgemein“ → „Original-Controller verstecken“)."] =
+            "Otherwise Steam and some games see this controller twice. Fix: install HidHide (“General” page → “Hide original controllers”).",
+        ["Original-Controller vor Spielen versteckt. Steam bitte einmal neu starten – danach sieht es nur noch den virtuellen Controller."] =
+            "Original controllers hidden from games. Please restart Steam once – after that it only sees the virtual controller.",
+        ["Original-Controller vor Spielen versteckt – Steam und Spiele sehen nur noch den virtuellen Controller."] =
+            "Original controllers hidden from games – Steam and games now only see the virtual controller.",
+        ["Original-Controller nicht versteckt (Abfrage abgebrochen). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."] =
+            "Original controllers not hidden (prompt cancelled). To do it later: controller → Settings → Extras → “Shown twice?”.",
         ["Xbox-360-Controller (empfohlen)"] = "Xbox 360 controller (recommended)",
         ["Tastenanordnung A/B/X/Y"] = "A/B/X/Y layout",
         ["Xbox: nach Position (untere Taste = A). Nintendo: nach Beschriftung (A bleibt A)."] = "Xbox: by position (bottom button = A). Nintendo: by label (A stays A).",
@@ -434,8 +454,8 @@ internal static partial class Tr
             "Squeeze = right trigger, pull apart = left trigger. Don't touch it while turning on.",
         ["Live-Bild der Infrarotkamera im rechten Joy-Con."] = "Live image of the infrared camera in the right Joy-Con.",
         ["Doppelt angezeigt?"] = "Shown twice?",
-        ["Versteckt den USB-Controller vor Spielen (HidHide) – sie sehen dann nur den virtuellen Controller."] =
-            "Hides the USB controller from games (HidHide) – they then only see the virtual controller.",
+        ["Versteckt den Original-Controller vor Steam und Spielen (HidHide) – sie sehen dann nur den virtuellen Controller."] =
+            "Hides the original controller from Steam and games (HidHide) – they then only see the virtual controller.",
         ["bereit (auf den Tisch legen)"] = "ready (put it on the table)",
         ["amiibo speichern"] = "Save amiibo",
         ["amiibo-Abbild (*.bin)|*.bin"] = "amiibo image (*.bin)|*.bin",
