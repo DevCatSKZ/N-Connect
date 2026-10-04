@@ -144,8 +144,6 @@ internal static partial class Tr
         ["Wii-Fernbedienung"] = "Wii Remote",
 
         // ---------- Übersicht / Karten ----------
-        ["Kein Controller verbunden\n\nSwitch-2-Controller: kurz die SYNC-Taste drücken – danach reicht ein beliebiger Tastendruck.\nSwitch-1- und NSO-Controller (NES, SNES, N64, Mega Drive): einmal in Windows unter „Bluetooth“ koppeln.\nWii-Fernbedienung / Wii U Pro: Rechtsklick auf das Symbol im Infobereich → „Wii-Controller koppeln …“."] =
-            "No controller connected\n\nSwitch 2 controllers: press the SYNC button briefly – afterwards any button press is enough.\nSwitch 1 and NSO controllers (NES, SNES, N64, Mega Drive): pair once in Windows under “Bluetooth”.\nWii Remote / Wii U Pro: right-click the tray icon → “Pair Wii controller …”.",
         ["Trennen"] = "Disconnect",
         ["Vibrieren"] = "Vibrate",
         ["Gyro kalibrieren"] = "Calibrate gyro",
@@ -215,7 +213,6 @@ internal static partial class Tr
         ["Automatisch (nach Spiel/Programm)"] = "Automatic (by game/program)",
         ["Mit Windows starten"] = "Start with Windows",
         ["Einstellungen …"] = "Settings …",
-        ["Wii-Controller koppeln …"] = "Pair Wii controller …",
         ["Kurzanleitung"] = "Quick guide",
         ["Protokoll öffnen"] = "Open log",
         ["Beenden"] = "Exit",
@@ -244,14 +241,8 @@ internal static partial class Tr
         ["Ein Profil mit diesem Namen gibt es schon."] = "A profile with this name already exists.",
         ["Die Datei enthält kein gültiges Controller-Profil."] = "The file does not contain a valid controller profile.",
         ["Alle Einstellungen und Tastenbelegungen auf Standard zurücksetzen?"] = "Reset all settings and button mappings to default?",
-        ["Wii-Controller koppeln"] = "Pair Wii controller",
-        ["Wii-Fernbedienung: Batteriefach öffnen und die rote SYNC-Taste drücken.\nWii U Pro Controller: die SYNC-Taste auf der Unterseite drücken.\nDanach verbindet sich der Controller künftig per Tastendruck."] =
-            "Wii Remote: open the battery compartment and press the red SYNC button.\nWii U Pro Controller: press the SYNC button on the bottom.\nAfterwards the controller connects with a button press.",
         ["Suche …"] = "Searching …",
-        ["Suche … rote SYNC-Taste der Fernbedienung (im Batteriefach) bzw. des Wii U Pro Controllers drücken."] =
-            "Searching … press the red SYNC button of the remote (in the battery compartment) or of the Wii U Pro Controller.",
         ["Kein Bluetooth-Adapter gefunden."] = "No Bluetooth adapter found.",
-        ["Kein Wii-Controller gefunden. SYNC-Taste drücken und erneut versuchen."] = "No Wii controller found. Press SYNC and try again.",
         ["IR-Kamera (Joy-Con R)"] = "IR camera (Joy-Con R)",
         ["Auflösung:"] = "Resolution:",
         ["40 × 30 (schnell)"] = "40 × 30 (fast)",
@@ -365,9 +356,6 @@ internal static partial class Tr
         ["Tasten im Mausmodus"] = "Buttons in mouse mode",
         ["R/L = Linksklick, ZR/ZL = Rechtsklick, Stick drücken = Mittelklick, Stick hoch/runter = Scrollen."] =
             "R/L = left click, ZR/ZL = right click, press stick = middle click, stick up/down = scroll.",
-        ["Wii-Controller koppeln"] = "Pair Wii controller",
-        ["Koppeln …"] = "Pair …",
-        ["Wii-Fernbedienung und Wii U Pro Controller einmalig mit dem PC koppeln."] = "Pair the Wii Remote and Wii U Pro Controller with the PC once.",
         ["Zeiger steuert die Maus"] = "Pointer controls the mouse",
         ["Wii-Fernbedienung auf die Sensorleiste richten, um den Mauszeiger zu bewegen."] = "Point the Wii Remote at the sensor bar to move the mouse pointer.",
         ["Wie Spiele die Controller sehen, Verbindung, Darstellung und Programm."] = "How games see the controllers, connection, appearance and program.",
@@ -455,12 +443,34 @@ internal static partial class Tr
         ["Programme (*.exe)|*.exe"] = "Programs (*.exe)|*.exe",
         ["Kein Controller verbunden\n\n" +
          "Switch-2-Controller: kurz die SYNC-Taste drücken – danach reicht ein beliebiger Tastendruck.\n" +
-         "Switch-1- und NSO-Controller (NES, SNES, N64, Mega Drive): einmal in Windows unter „Bluetooth“ koppeln.\n" +
-         "Wii-Fernbedienung / Wii U Pro: Seite „Joy-Con & Wii“ → „Wii-Controller koppeln“."] =
+         "Switch-1-, NSO- und Wii-Controller: SYNC-Taste drücken – N-Connect koppelt sie selbst.\n" +
+         "Gezielt suchen: Seite „Allgemein“ → „Controller koppeln …“."] =
             "No controller connected\n\n" +
             "Switch 2 controllers: briefly press the SYNC button – afterwards any button press is enough.\n" +
-            "Switch 1 and NSO controllers (NES, SNES, N64, Mega Drive): pair once in Windows under “Bluetooth”.\n" +
-            "Wii Remote / Wii U Pro: page “Joy-Con & Wii” → “Pair Wii controller”.",
+            "Switch 1, NSO and Wii controllers: press the SYNC button – N-Connect pairs them itself.\n" +
+            "To search on purpose: page “General” → “Pair controller …”.",
+        ["Neue Controller automatisch koppeln"] = "Pair new controllers automatically",
+        ["Joy-Con, Pro Controller, NES/SNES/N64/Mega Drive und Wii: einfach SYNC drücken – " +
+         "kein Umweg über die Windows-Bluetooth-Einstellungen. Gesucht wird nur, solange niemand spielt."] =
+            "Joy-Con, Pro Controller, NES/SNES/N64/Mega Drive and Wii: just press SYNC – no detour via the Windows " +
+            "Bluetooth settings. Searches only while nobody is playing.",
+        ["Gezielt suchen"] = "Search on purpose",
+        ["Sucht eine Minute lang nach Controllern im Kopplungsmodus."] = "Searches for controllers in pairing mode for one minute.",
+        ["Controller koppeln …"] = "Pair controller …",
+        ["Controller koppeln"] = "Pair controller",
+        ["Controller gekoppelt"] = "Controller paired",
+        ["Joy-Con, Pro Controller, NES/SNES/N64/Mega Drive: SYNC-Taste drücken, bis die Lichter laufen.\n" +
+         "Wii-Fernbedienung: Batteriefach öffnen und die rote SYNC-Taste drücken.\n" +
+         "Wii U Pro Controller: die SYNC-Taste auf der Unterseite drücken.\n" +
+         "Danach verbindet sich der Controller künftig per Tastendruck."] =
+            "Joy-Con, Pro Controller, NES/SNES/N64/Mega Drive: press the SYNC button until the lights run.\n" +
+            "Wii Remote: open the battery compartment and press the red SYNC button.\n" +
+            "Wii U Pro Controller: press the SYNC button on the bottom.\n" +
+            "Afterwards the controller connects with a button press.",
+        ["Suche … SYNC-Taste am Controller drücken (Joy-Con: an der Schiene, Wii-Fernbedienung: im Batteriefach)."] =
+            "Searching … press the SYNC button on the controller (Joy-Con: on the rail, Wii Remote: in the battery compartment).",
+        ["Kein Controller im Kopplungsmodus gefunden. SYNC-Taste drücken und erneut versuchen."] =
+            "No controller in pairing mode found. Press SYNC and try again.",
         ["Einstellungen"] = "Settings",
         ["Darstellung:"] = "Appearance:",
         ["Dunkel"] = "Dark",

@@ -231,6 +231,11 @@ public sealed class Settings
     /// verbindet sich ein bekannter Controller dann mit dem PC statt mit der Switch 2.
     /// </summary>
     public bool AutoReconnect { get; set; } = true;
+    /// <summary>
+    /// Switch-1-, Nintendo-Switch-Online- und Wii-Controller im Kopplungsmodus (SYNC) im Hintergrund selbst mit Windows
+    /// koppeln – ohne Umweg über die Windows-Bluetooth-Einstellungen. Sucht nur, solange niemand spielt.
+    /// </summary>
+    public bool AutoPair { get; set; } = true;
     /// <summary>Controller, die schon einmal verbunden waren (wird automatisch gefüllt).</summary>
     public List<string> KnownControllers { get; set; } = [];
     /// <summary>Nur diese Controller annehmen (Bluetooth-Adressen, z. B. "AA:BB:CC:DD:EE:FF"). Leer = alle.</summary>
@@ -339,6 +344,7 @@ public sealed class Settings
         DsuServer = other.DsuServer;
         ConnectFeedback = other.ConnectFeedback;
         AutoReconnect = other.AutoReconnect;
+        AutoPair = other.AutoPair;
         KnownControllers = [.. other.KnownControllers];
         AllowedControllers = [.. other.AllowedControllers];
         SingleJoyCons = [.. other.SingleJoyCons];

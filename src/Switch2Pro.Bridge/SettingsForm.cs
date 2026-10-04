@@ -32,6 +32,7 @@ internal sealed class SettingsForm : Form
     private readonly ComboBox _output = Combo(260, "Xbox-360-Controller (empfohlen)", "PlayStation DualShock 4");
     private readonly Segmented _layout = new("Xbox", "Nintendo");
     private readonly ToggleSwitch _autoReconnect = new();
+    private readonly ToggleSwitch _autoPair = new();
     private readonly ToggleSwitch _connectFeedback = new();
     private readonly ComboBox _inactivity = Combo(160);
     private static readonly int[] InactivityChoices = [0, 5, 10, 15, 30, 60];
@@ -295,10 +296,7 @@ internal sealed class SettingsForm : Form
             Row("Mausgeschwindigkeit", null, _mouseSpeed, Glyph.Gauge),
             new SettingRow("Tasten im Mausmodus",
                 "R/L = Linksklick, ZR/ZL = Rechtsklick, Stick drücken = Mittelklick, Stick hoch/runter = Scrollen.", null, Glyph.Info));
-        var pair = new GlyphButton("Koppeln …", Glyph.Bluetooth) { Enabled = _wiiPairing is not null };
-        pair.Click += (_, _) => _wiiPairing?.Invoke();
         page.AddGroup("Wii",
-            Row("Wii-Controller koppeln", "Wii-Fernbedienung und Wii U Pro Controller einmalig mit dem PC koppeln.", pair, Glyph.Bluetooth),
             Row("Zeiger steuert die Maus", "Wii-Fernbedienung auf die Sensorleiste richten, um den Mauszeiger zu bewegen.", _wiiPointer, Glyph.Pointer));
         var pairing = new GlyphButton("Kopplungsdaten von der Switch übernehmen", Glyph.Import) { Enabled = _pairingData is not null };
         pairing.Click += (_, _) => _pairingData?.Invoke();
@@ -316,7 +314,12 @@ internal sealed class SettingsForm : Form
         page.AddGroup("Ausgabe",
             Row("Controller erscheint als", "Xbox 360 läuft mit fast allen Spielen. DualShock 4 bietet Bewegungssteuerung (Steam, Emulatoren).", _output, Glyph.Gamepad),
             Row("Tastenanordnung A/B/X/Y", "Xbox: nach Position (untere Taste = A). Nintendo: nach Beschriftung (A bleibt A).", _layout, Glyph.Swap));
+        var pair = new GlyphButton("Controller koppeln …", Glyph.Bluetooth) { Enabled = _wiiPairing is not null };
+        pair.Click += (_, _) => _wiiPairing?.Invoke();
         page.AddGroup("Verbinden",
+            Row("Neue Controller automatisch koppeln", "Joy-Con, Pro Controller, NES/SNES/N64/Mega Drive und Wii: einfach SYNC drücken – " +
+                "kein Umweg über die Windows-Bluetooth-Einstellungen. Gesucht wird nur, solange niemand spielt.", _autoPair, Glyph.Bluetooth),
+            Row("Gezielt suchen", "Sucht eine Minute lang nach Controllern im Kopplungsmodus.", pair, Glyph.Bluetooth),
             Row("Per Tastendruck verbinden", "Gekoppelte Controller verbinden sich ohne SYNC-Taste.", _autoReconnect, Glyph.Bluetooth),
             Row("Beim Verbinden kurz vibrieren", null, _connectFeedback, Glyph.Vibrate),
             Row("Ohne Eingabe trennen nach", "Spart Akku, wenn ein Controller liegen bleibt.", _inactivity, Glyph.Timer),
@@ -416,6 +419,7 @@ internal sealed class SettingsForm : Form
         _deadzone.ValueChanged += (_, _) => { Apply(() => _settings.StickDeadzone = _deadzone.Value / 100f); RefreshTuning(); };
         _connectFeedback.CheckedChanged += (_, _) => Apply(() => _settings.ConnectFeedback = _connectFeedback.Checked);
         _autoReconnect.CheckedChanged += (_, _) => Apply(() => _settings.AutoReconnect = _autoReconnect.Checked);
+        _autoPair.CheckedChanged += (_, _) => Apply(() => _settings.AutoPair = _autoPair.Checked);
         _autostart.CheckedChanged += (_, _) => { if (!_loading) Autostart.Set(_autostart.Checked); };
         _dsu.CheckedChanged += (_, _) => Apply(() => _settings.DsuServer = _dsu.Checked);
         _updates.CheckedChanged += (_, _) => Apply(() => _settings.CheckForUpdates = _updates.Checked);
@@ -498,6 +502,7 @@ internal sealed class SettingsForm : Form
         _deadzone.Value = Clamp(_deadzone, _settings.StickDeadzone * 100);
         _connectFeedback.Checked = _settings.ConnectFeedback;
         _autoReconnect.Checked = _settings.AutoReconnect;
+        _autoPair.Checked = _settings.AutoPair;
         _autostart.Checked = Autostart.IsEnabled || Autostart.IsEnabledForAllUsers;
         _autostart.Enabled = !Autostart.IsEnabledForAllUsers; // alte Installation: für alle Benutzer eingetragen
         _dsu.Checked = _settings.DsuServer;

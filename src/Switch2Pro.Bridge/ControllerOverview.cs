@@ -33,8 +33,8 @@ internal sealed class ControllerOverview : Panel
         ForeColor = MutedColor, BackColor = Background, Font = UiFonts.Body,
         Text = "Kein Controller verbunden\n\n" +
                "Switch-2-Controller: kurz die SYNC-Taste drücken – danach reicht ein beliebiger Tastendruck.\n" +
-               "Switch-1- und NSO-Controller (NES, SNES, N64, Mega Drive): einmal in Windows unter „Bluetooth“ koppeln.\n" +
-               "Wii-Fernbedienung / Wii U Pro: Seite „Joy-Con & Wii“ → „Wii-Controller koppeln“.",
+               "Switch-1-, NSO- und Wii-Controller: SYNC-Taste drücken – N-Connect koppelt sie selbst.\n" +
+               "Gezielt suchen: Seite „Allgemein“ → „Controller koppeln …“.",
     };
     private readonly Dictionary<Player, Card> _byPlayer = [];
 

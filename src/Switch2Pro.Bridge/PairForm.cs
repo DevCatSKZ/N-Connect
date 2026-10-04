@@ -1,9 +1,12 @@
-using System.Drawing;
+﻿using System.Drawing;
 
 namespace Switch2Pro.Bridge;
 
-/// <summary>Fenster „Wii-Controller koppeln“: sucht 60 s und zeigt den Fortschritt.</summary>
-internal sealed class WiiPairForm : Form
+/// <summary>
+/// Fenster „Controller koppeln“ (Switch 1, Nintendo Switch Online, Wii): sucht 60 s und zeigt den Fortschritt.
+/// Meist unnötig – N-Connect koppelt solche Controller auch im Hintergrund, sobald SYNC gedrückt wird.
+/// </summary>
+internal sealed class PairForm : Form
 {
     private readonly Label _status = new()
     {
@@ -11,18 +14,19 @@ internal sealed class WiiPairForm : Form
     };
     private readonly CancellationTokenSource _cts = new();
 
-    public WiiPairForm()
+    public PairForm()
     {
-        Text = "Wii-Controller koppeln";
+        Text = "Controller koppeln";
         StartPosition = FormStartPosition.CenterScreen;
         FormBorderStyle = FormBorderStyle.FixedDialog;
         MinimizeBox = MaximizeBox = false;
-        ClientSize = new Size(480, 210);
+        ClientSize = new Size(520, 240);
         Font = new Font("Segoe UI", 9.5f);
         var hint = new Label
         {
-            Dock = DockStyle.Top, Height = 70, Padding = new Padding(12, 10, 12, 0),
-            Text = "Wii-Fernbedienung: Batteriefach öffnen und die rote SYNC-Taste drücken.\n" +
+            Dock = DockStyle.Top, Height = 92, Padding = new Padding(12, 10, 12, 0),
+            Text = "Joy-Con, Pro Controller, NES/SNES/N64/Mega Drive: SYNC-Taste drücken, bis die Lichter laufen.\n" +
+                   "Wii-Fernbedienung: Batteriefach öffnen und die rote SYNC-Taste drücken.\n" +
                    "Wii U Pro Controller: die SYNC-Taste auf der Unterseite drücken.\n" +
                    "Danach verbindet sich der Controller künftig per Tastendruck.",
         };
@@ -42,13 +46,13 @@ internal sealed class WiiPairForm : Form
         List<string> paired;
         try
         {
-            paired = await Task.Run(() => WiiPairing.ScanAndPair(TimeSpan.FromSeconds(60),
+            paired = await Task.Run(() => ControllerPairing.ScanAndPair(TimeSpan.FromSeconds(60),
                 message => BeginInvokeSafe(() => _status.Text = Tr.T(message)), _cts.Token));
         }
         catch (Exception e) when (e is DllNotFoundException or EntryPointNotFoundException or InvalidOperationException
                                       or System.ComponentModel.Win32Exception or ObjectDisposedException)
         {
-            Log.Error("Wii-Kopplung", e);
+            Log.Error("Kopplung", e);
             if (!IsDisposed)
                 _status.Text = Tr.T("Kopplung fehlgeschlagen – Details im Protokoll.");
             return;
@@ -57,7 +61,7 @@ internal sealed class WiiPairForm : Form
             return;
         _status.Text = Tr.T(paired.Count > 0
             ? $"Gekoppelt: {string.Join(", ", paired)}\nDer Controller erscheint gleich in der Übersicht."
-            : "Kein Wii-Controller gefunden. SYNC-Taste drücken und erneut versuchen.");
+            : "Kein Controller im Kopplungsmodus gefunden. SYNC-Taste drücken und erneut versuchen.");
     }
 
     private void BeginInvokeSafe(Action action)
