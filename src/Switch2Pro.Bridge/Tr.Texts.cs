@@ -503,5 +503,116 @@ internal static partial class Tr
         ["MCU startet nicht"] = "co-processor does not start",
         ["NFC-Modus nicht aktiv"] = "NFC mode not active",
         ["Kopplung fehlgeschlagen – Details im Protokoll."] = "Pairing failed – details in the log.",
+
+        // ---------- Kopplungsdaten (Switch-SD-Karte, anderer PC) ----------
+        ["Kopplungsdaten"] = "Pairing data",
+        ["Kopplungen übernehmen oder weitergeben"] = "Take over or pass on pairings",
+        ["Kopplungsdaten von der Switch übernehmen"] = "Take over pairing data from the Switch",
+        ["Von der Switch-SD-Karte (Bluepick_RCM/hekate) oder von einem anderen PC übernehmen, oder für einen anderen PC exportieren."] =
+            "Take over from the Switch SD card (Bluepick_RCM/hekate) or from another PC, or export for another PC.",
+        ["Bei Switch-SD-Karte nachfragen"] = "Offer when a Switch SD card is inserted",
+        ["Steckt eine SD-Karte der Switch im PC (Kartenleser oder hekate „USB Tools“), bietet N-Connect die Übernahme an. Die Karte wird nur gelesen."] =
+            "When a Switch SD card is in the PC (card reader or hekate “USB Tools”), N-Connect offers to take over the data. The card is only read.",
+        ["Switch-SD-Karte erkannt"] = "Switch SD card detected",
+        ["Kopplungsdaten der Controller gefunden – klicken, um sie anzusehen und zu übernehmen."] =
+            "Controller pairing data found – click to view and take it over.",
+        ["Klicken, um Kopplungsdaten der Controller zu übernehmen."] = "Click to take over controller pairing data.",
+        ["Controller-Kopplungen von der Switch-SD-Karte oder von einem anderen PC übernehmen – oder für einen anderen PC exportieren. Es werden nur Einstellungen von N-Connect geändert; Windows und der Bluetooth-Adapter bleiben unverändert."] =
+            "Take over controller pairings from the Switch SD card or from another PC – or export them for another PC. Only N-Connect settings are changed; Windows and the Bluetooth adapter stay untouched.",
+        ["Von der Switch-SD-Karte …"] = "From the Switch SD card …",
+        ["Von einem anderen PC …"] = "From another PC …",
+        ["Für einen anderen PC exportieren …"] = "Export for another PC …",
+        ["Sicherung wiederherstellen …"] = "Restore backup …",
+        ["Sicherung wiederherstellen"] = "Restore backup",
+        ["Bluetooth-Adapter dieses PCs: wird ermittelt …"] = "Bluetooth adapter of this PC: detecting …",
+        ["Bluetooth-Adapter dieses PCs: nicht gefunden"] = "Bluetooth adapter of this PC: not found",
+        ["Bluetooth-Adapter dieses PCs:"] = "Bluetooth adapter of this PC:",
+        ["Quelle wählen: Switch-SD-Karte (mit Bluepick_RCM oder hekate erstellte Kopplungsdaten) oder eine Datei von einem anderen PC."] =
+            "Choose a source: Switch SD card (pairing data created with Bluepick_RCM or hekate) or a file from another PC.",
+        ["Keine Switch-SD-Karte gefunden. SD-Karte in den Kartenleser stecken oder die Switch per hekate („USB Tools“ → „SD Card“) als Laufwerk verbinden.\n\nOrdner selbst auswählen?"] =
+            "No Switch SD card found. Insert the SD card into a card reader or connect the Switch as a drive via hekate (“USB Tools” → “SD Card”).\n\nChoose the folder yourself?",
+        ["Stammordner der Switch-SD-Karte wählen"] = "Choose the root folder of the Switch SD card",
+        ["Switch-SD-Karte:"] = "Switch SD card:",
+        ["Auf der Karte liegen keine Kopplungsdaten (switchroot/joycon_mac.ini)."] = "The card contains no pairing data (switchroot/joycon_mac.ini).",
+        ["So erstellst du sie: Joy-Con an die Switch stecken, Bluepick_RCM starten und „Dump Joy-Con BT pairing → SD“ (oder FULL AUTO) wählen. Alternativ in hekate: Nyx → Konsole → „Dump Joy-Con BT“."] =
+            "How to create it: attach the Joy-Con to the Switch, start Bluepick_RCM and choose “Dump Joy-Con BT pairing → SD” (or FULL AUTO). Alternatively in hekate: Nyx → Console → “Dump Joy-Con BT”.",
+        ["Gefunden wurde eine Bluepick-Sicherung des Bluetooth-Speichers (8000000000000050.bin). Sie ist ein Switch-Speicherabbild und kann hier nicht ausgewertet werden."] =
+            "A Bluepick backup of the Bluetooth save (8000000000000050.bin) was found. It is a Switch save image and cannot be evaluated here.",
+        ["Bluetooth-Adresse der Switch:"] = "Bluetooth address of the Switch:",
+        ["Gefundene Controller:"] = "Controllers found:",
+        ["mit der Switch gekoppelt"] = "paired with the Switch",
+        ["zuletzt mit einem anderen Gerät gekoppelt (nicht der Switch)"] = "last paired with another device (not the Switch)",
+        ["Joy-Con (L)"] = "Joy-Con (L)",
+        ["Joy-Con (R)"] = "Joy-Con (R)",
+        ["HORI-Controller (links)"] = "HORI controller (left)",
+        ["HORI-Controller (rechts)"] = "HORI controller (right)",
+        ["Hinweis: Pro Controller stehen nur im Bluetooth-Speicher der Switch (8000000000000050.bin); dieses Speicherabbild kann N-Connect nicht auswerten."] =
+            "Note: Pro Controllers are only listed in the Switch's Bluetooth save (8000000000000050.bin); N-Connect cannot evaluate this save image.",
+        ["Was diese Daten können – und was nicht:"] = "What this data can do – and what it cannot:",
+        ["Die Daten zeigen, welche Controller mit deiner Switch gekoppelt sind und an welche Bluetooth-Adresse sie gebunden sind."] =
+            "The data shows which controllers are paired with your Switch and which Bluetooth address they are bound to.",
+        ["Ein Switch-1-Controller verbindet sich auf Tastendruck nur mit dem Gerät, dessen Adresse er gespeichert hat – hier mit der Switch. Der Bluetooth-Adapter des PCs hat eine andere Adresse, deshalb kann Windows diese Kopplung nicht einfach weiterverwenden."] =
+            "A Switch 1 controller reconnects at the press of a button only to the device whose address it has stored – here the Switch. The PC's Bluetooth adapter has a different address, so Windows cannot simply reuse this pairing.",
+        ["Die Adresse des PC-Adapters zu ändern, unterstützt N-Connect bewusst nicht (herstellerabhängig, riskant und nicht vorgesehen)."] =
+            "N-Connect deliberately does not support changing the PC adapter's address (vendor-specific, risky and not intended).",
+        ["Windows bietet keinen offiziellen Weg, fremde Kopplungsschlüssel einzutragen: Sie liegen in einem Teil der Registrierung, auf den nur das System zugreifen darf. N-Connect ändert dort nichts."] =
+            "Windows offers no official way to add foreign pairing keys: they are stored in a part of the registry that only the system may access. N-Connect does not change anything there.",
+        ["So klappt der Wechsel am einfachsten: am PC den Controller einmal per SYNC-Taste in den Windows-Bluetooth-Einstellungen koppeln. Zurück an der Switch die Joy-Con an die Konsole stecken bzw. den Pro Controller per USB-Kabel anschließen – dann sind sie ohne Menü wieder mit der Switch gekoppelt."] =
+            "The easiest way to switch: on the PC, pair the controller once with the SYNC button in the Windows Bluetooth settings. Back on the Switch, attach the Joy-Con to the console or connect the Pro Controller with a USB cable – they are paired with the Switch again without any menu.",
+        ["„Übernehmen“ merkt sich diese Controller in N-Connect (Liste bekannter Controller, Zuordnung zur Switch). Kopplungsschlüssel werden nicht gespeichert."] =
+            "“Apply” remembers these controllers in N-Connect (list of known controllers, assignment to the Switch). Pairing keys are not stored.",
+        ["N-Connect-Kopplungsdaten"] = "N-Connect pairing data",
+        ["Kopplungsdaten von einem anderen PC öffnen"] = "Open pairing data from another PC",
+        ["Die Datei ist zu groß."] = "The file is too large.",
+        ["Keine Kopplungsdaten-Datei."] = "Not a pairing data file.",
+        ["Die Datei stammt von einer neueren N-Connect-Version."] = "The file comes from a newer N-Connect version.",
+        ["Die Datei ist mit einem Passwort geschützt."] = "The file is protected with a password.",
+        ["Falsches Passwort oder die Datei wurde verändert."] = "Wrong password or the file has been modified.",
+        ["Die Datei ist beschädigt."] = "The file is damaged.",
+        ["Datei von:"] = "File from:",
+        ["Bluetooth-Adapter dort:"] = "Bluetooth adapter there:",
+        ["Bluetooth-Adapter hier:"] = "Bluetooth adapter here:",
+        ["gekoppelt mit der Switch"] = "paired with the Switch",
+        ["gekoppelt mit dem anderen PC"] = "paired with the other PC",
+        ["Weitere Einstellungen je Controller:"] = "Further per-controller settings:",
+        ["Was du erwarten kannst:"] = "What you can expect:",
+        ["Gleiche Adapter-Adresse (z. B. derselbe USB-Bluetooth-Stick umgesteckt): Switch-2-Controller verbinden sich hier auf Tastendruck wie am anderen PC."] =
+            "Same adapter address (e.g. the same USB Bluetooth dongle moved over): Switch 2 controllers connect here at the press of a button just like on the other PC.",
+        ["Switch-1-Controller (Pro Controller, Joy-Con) brauchen zusätzlich die Kopplung in Windows. Die kann N-Connect nicht übertragen – einmal per SYNC-Taste koppeln."] =
+            "Switch 1 controllers (Pro Controller, Joy-Con) additionally need the pairing in Windows. N-Connect cannot transfer it – pair once with the SYNC button.",
+        ["Anderer Bluetooth-Adapter: Controller verbinden sich auf Tastendruck nur mit dem Gerät, mit dem sie zuletzt gekoppelt wurden. Hier einmal SYNC drücken – danach verbinden sie sich mit diesem PC (am anderen PC dann wieder per SYNC)."] =
+            "Different Bluetooth adapter: controllers reconnect at the press of a button only to the device they were last paired with. Press SYNC here once – afterwards they connect to this PC (on the other PC, use SYNC again).",
+        ["Tipp: Wer denselben USB-Bluetooth-Stick zwischen den PCs umsteckt, nimmt die Adresse mit – Switch-2-Controller verbinden sich dann an beiden PCs ohne SYNC."] =
+            "Tip: moving the same USB Bluetooth dongle between the PCs takes the address along – Switch 2 controllers then connect on both PCs without SYNC.",
+        ["Übernommen werden die Einstellungen je Controller (Joy-Con einzeln/hochkant, Gyro-Kalibrierung) und die Liste bekannter Controller."] =
+            "Taken over are the per-controller settings (Joy-Con single/upright, gyro calibration) and the list of known controllers.",
+        ["Die Datei enthält Kopplungsschlüssel. Windows bietet keinen offiziellen Weg, sie einzutragen – N-Connect übernimmt sie deshalb nicht."] =
+            "The file contains pairing keys. Windows offers no official way to add them – so N-Connect does not take them over.",
+        ["„Übernehmen“ ergänzt die Controller-Listen und Einstellungen von N-Connect (nichts wird gelöscht). Vorher wird eine Sicherung angelegt."] =
+            "“Apply” adds to N-Connect's controller lists and settings (nothing is deleted). A backup is created first.",
+        ["Kopplungsdaten in N-Connect übernehmen? Vorher wird eine Sicherung der Einstellungen angelegt."] =
+            "Take over the pairing data into N-Connect? A backup of the settings is created first.",
+        ["Nichts zu ändern – diese Daten sind schon übernommen."] = "Nothing to change – this data has already been taken over.",
+        ["Übernommen. Die Sicherung lässt sich hier über „Sicherung wiederherstellen“ zurückholen."] =
+            "Done. The backup can be restored here via “Restore backup”.",
+        ["Sicherung der Einstellungen"] = "Settings backup",
+        ["Die Sicherung ist beschädigt und wurde nicht übernommen."] = "The backup is damaged and was not applied.",
+        ["Alle Einstellungen durch diese Sicherung ersetzen?"] = "Replace all settings with this backup?",
+        ["Sicherung wiederhergestellt."] = "Backup restored.",
+        ["Kopplungsdaten für einen anderen PC speichern"] = "Save pairing data for another PC",
+        ["Gespeichert. Die Datei am anderen PC in N-Connect unter „Joy-Con & Wii“ → „Kopplungsdaten“ → „Von einem anderen PC“ öffnen."] =
+            "Saved. On the other PC, open the file in N-Connect under “Joy-Con & Wii” → “Pairing data” → “From another PC”.",
+        ["Kopplungsdaten exportieren"] = "Export pairing data",
+        ["Passwort eingeben"] = "Enter password",
+        ["Passwort (optional). Ohne Passwort steht der Inhalt lesbar in der Datei. Mit Kopplungsschlüsseln ist ein Passwort Pflicht."] =
+            "Password (optional). Without a password the content is readable in the file. With pairing keys a password is required.",
+        ["Passwort"] = "Password",
+        ["Passwort wiederholen"] = "Repeat password",
+        ["Kopplungsschlüssel der Switch-Controller mitnehmen"] = "Include the Switch controllers' pairing keys",
+        ["Kopplungsschlüssel mitnehmen (erst Switch-SD-Karte einlesen)"] = "Include pairing keys (read a Switch SD card first)",
+        ["Die Passwörter stimmen nicht überein."] = "The passwords do not match.",
+        ["Mit Schlüsseln: Passwort mit mindestens 8 Zeichen."] = "With keys: password with at least 8 characters.",
+        ["Mindestens 8 Zeichen."] = "At least 8 characters.",
+        ["Ohne Passwort."] = "Without password.",
     };
 }

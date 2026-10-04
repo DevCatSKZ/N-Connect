@@ -15,6 +15,7 @@ internal sealed class TrayApp : ApplicationContext
     private readonly PadFactory? _factory;
     private readonly ControllerManager? _manager;
     private readonly FileSystemWatcher? _settingsWatcher;
+    private readonly SwitchCardWatcher? _cardWatcher;
     private Settings _settings;
     private SettingsForm? _settingsForm;
     private Font? _boldFont;
@@ -37,6 +38,15 @@ internal sealed class TrayApp : ApplicationContext
         _icon = new NotifyIcon { Icon = CreateIcon(), Visible = true, Text = "N-Connect" };
         _icon.ContextMenuStrip = new ContextMenuStrip { Renderer = Theme.MenuRenderer(), ForeColor = Theme.Current.Text };
         _icon.ContextMenuStrip.Opening += (_, _) => BuildMenu();
+        try
+        {
+            _cardWatcher = new SwitchCardWatcher();
+            _cardWatcher.CardArrived += OnSwitchCard;
+        }
+        catch (System.ComponentModel.Win32Exception e)
+        {
+            Log.Warn($"SD-Karten-Erkennung nicht verfügbar: {e.Message}");
+        }
         // Linksklick = Einstellungen, Rechtsklick = Menü.
         _icon.MouseClick += (_, e) =>
         {
@@ -95,8 +105,11 @@ internal sealed class TrayApp : ApplicationContext
         {
             if (_balloonUrl is { } url)
                 Open(url);
+            else
+                _balloonAction?.Invoke();
+            _balloonAction = null;
         };
-        _icon.BalloonTipClosed += (_, _) => _balloonUrl = null;
+        _icon.BalloonTipClosed += (_, _) => { _balloonUrl = null; _balloonAction = null; };
         CheckForUpdateAsync().Forget("Update-Prüfung");
 
         if (Program.ShowSignal is { } signal)
@@ -129,6 +142,42 @@ internal sealed class TrayApp : ApplicationContext
         }
         _wiiPairing = new WiiPairForm();
         _wiiPairing.Show();
+    }
+
+    private PairingDataForm? _pairingData;
+
+    /// <summary>Fenster „Kopplungsdaten“ (Switch-SD-Karte, anderer PC); mit Karte gleich deren Daten zeigen.</summary>
+    internal void ShowPairingData(SwitchCardInfo? card)
+    {
+        if (_pairingData is { IsDisposed: false })
+        {
+            if (card is null)
+            {
+                _pairingData.Activate();
+                return;
+            }
+            _pairingData.Close(); // neu öffnen, damit die eben eingesteckte Karte gezeigt wird
+        }
+        _pairingData = new PairingDataForm(_settings, () =>
+        {
+            SaveSettings();
+            Theme.Init(_settings.Theme, _settings.Transparency);
+            if (_settingsForm is { IsDisposed: false } form)
+                form.ReloadValues();
+        }, card);
+        _pairingData.Show();
+        _pairingData.Activate();
+    }
+
+    /// <summary>Switch-SD-Karte eingesteckt: Übernahme anbieten (abschaltbar unter „Joy-Con &amp; Wii“).</summary>
+    private void OnSwitchCard(SwitchCardInfo card)
+    {
+        if (!_settings.SwitchCardHint)
+            return;
+        _balloonUrl = null;
+        Balloon(8000, "Switch-SD-Karte erkannt", card.HasPairingExport
+            ? "Kopplungsdaten der Controller gefunden – klicken, um sie anzusehen und zu übernehmen."
+            : "Klicken, um Kopplungsdaten der Controller zu übernehmen.", ToolTipIcon.Info, () => ShowPairingData(card));
     }
 
     private void ShowWelcome()
@@ -173,7 +222,7 @@ internal sealed class TrayApp : ApplicationContext
             SaveSettings();
             if (outputChanged)
                 _manager?.ApplyOutputMode(_settings.OutputMode);
-        }, _manager, ShowWiiPairing);
+        }, _manager, ShowWiiPairing, () => ShowPairingData(null));
         _settingsForm.Show();
         _settingsForm.Activate();
     }
@@ -241,8 +290,14 @@ internal sealed class TrayApp : ApplicationContext
     }
 
     /// <summary>Einblendung im Infobereich (in der Sprache der Oberfläche).</summary>
-    private void Balloon(int milliseconds, string title, string text, ToolTipIcon icon) =>
+    private void Balloon(int milliseconds, string title, string text, ToolTipIcon icon, Action? onClick = null)
+    {
+        _balloonAction = onClick;
         _icon.ShowBalloonTip(milliseconds, Tr.T(title), Tr.T(text), icon);
+    }
+
+    /// <summary>Aktion beim Klick auf die zuletzt gezeigte Einblendung (z. B. Kopplungsdaten der SD-Karte zeigen).</summary>
+    private Action? _balloonAction;
 
     private UpdateCheck.Update? _update;
     /// <summary>Ziel beim Klick auf die zuletzt gezeigte Einblendung (nur bei der Update-Meldung gesetzt).</summary>
@@ -520,6 +575,8 @@ internal sealed class TrayApp : ApplicationContext
         _icon.Visible = false;
         _settingsForm?.Close();
         _settingsWatcher?.Dispose();
+        _cardWatcher?.Dispose();
+        _pairingData?.Close();
         _reloadTimer.Dispose();
         _profileTimer.Dispose();
         if (_manager is not null)

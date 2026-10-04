@@ -50,6 +50,9 @@ internal static class RenderCheck
             Walk(capture);
         using (var wii = new WiiPairForm())
             Walk(wii);
+        using (var pairing = new PairingDataForm(settings, () => { }))
+            Walk(pairing);
+        texts.UnionWith(PairingDataForm.ExplanationTexts);
         // Meldungen, die zur Laufzeit zusammengesetzt werden (alle Fehlerfälle und Hinweise).
         string pro = ControllerKind.Pro2.DisplayName(), jc = ControllerKind.JoyCon2Left.DisplayName();
         foreach (var problem in new[] { "Kein Bluetooth-Adapter gefunden.", "Bluetooth ist ausgeschaltet.", "Dieser Bluetooth-Adapter unterstützt kein Bluetooth LE." })
@@ -187,6 +190,34 @@ internal static class RenderCheck
                 if (pages[i].Page is ScrollPage scroll)
                     Full(scroll.Content, Path.Combine(folder, $"ui_{i}_inhalt{variant}_{lang}.png"));
             }
+
+            // Fenster „Kopplungsdaten“ mit einer nachgebauten Switch-SD-Karte (ausgedachte Daten, Ordner im Temp-Verzeichnis).
+            string sd = Path.Combine(Path.GetTempPath(), "nconnect-render-sd");
+            Directory.CreateDirectory(Path.Combine(sd, "Nintendo"));
+            Directory.CreateDirectory(Path.Combine(sd, "switchroot"));
+            File.WriteAllText(Path.Combine(sd, SwitchCard.IniFile),
+                "[joycon_00]\ntype=1\nmac=AA:BB:CC:00:11:22\nhost=98:B6:E9:01:02:03\nltk=00112233445566778899AABBCCDDEEFF\n\n" +
+                "[joycon_01]\ntype=2\nmac=AA:BB:CC:33:44:55\nhost=98:B6:E9:01:02:03\nltk=FFEEDDCCBBAA99887766554433221100\n");
+            using (var pairing = new PairingDataForm(new Settings(), () => { }, SwitchCard.Inspect(sd))
+                   { StartPosition = FormStartPosition.Manual, Location = new Point(-6000, -6000), ShowInTaskbar = false })
+            {
+                pairing.Show();
+                for (int i = 0; i < 50; i++)
+                {
+                    Application.DoEvents();
+                    Thread.Sleep(20);
+                }
+                using var bmp = new Bitmap(pairing.Width, pairing.Height);
+                using (var g = Graphics.FromImage(bmp))
+                {
+                    var hdc = g.GetHdc();
+                    PrintWindow(pairing.Handle, hdc, 2);
+                    g.ReleaseHdc(hdc);
+                }
+                bmp.Save(Path.Combine(folder, $"ui_kopplungsdaten_{lang}.png"), ImageFormat.Png);
+                pairing.Close();
+            }
+            Directory.Delete(sd, recursive: true);
 
             // Meldungsfenster im Design: kurz anzeigen, abfotografieren, schließen.
             var shot = new System.Windows.Forms.Timer { Interval = 400 };
