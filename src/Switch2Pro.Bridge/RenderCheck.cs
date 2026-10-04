@@ -311,5 +311,33 @@ internal static class RenderCheck
                 bmp.Save(Path.Combine(folder, $"{name}{(pressed ? "_pressed" : "")}.png"), ImageFormat.Png);
             }
         }
+
+        // Joy-Con: einzeln quer, einzeln hochkant, Paar, Charging Grip – je Joy-Con 1 und 2.
+        Links.ControllerInfo Info(ControllerKind k) => k switch
+        {
+            ControllerKind.JoyCon1Left => new() { BodyColor = 0x4AC7EC, ButtonColor = 0x0F1419 },
+            ControllerKind.JoyCon1Right => new() { BodyColor = 0xFF3C28, ButtonColor = 0x0F1419 },
+            ControllerKind.JoyCon2Left => new() { BodyColor = 0x2D2E33, ButtonColor = 0xC8C8C8, GripColor = 0x1CB4DC },
+            _ => new() { BodyColor = 0x2D2E33, ButtonColor = 0xC8C8C8, GripColor = 0xF2593C },
+        };
+        InputView.JoyConPart Part(ControllerKind k, bool grip = false, bool upright = false) =>
+            new(k, new ControllerState(), DeviceCalibration.Default, Info(k), false, grip, upright);
+        foreach (var (l, r, tag) in new[] { (ControllerKind.JoyCon1Left, ControllerKind.JoyCon1Right, "jc1"), (ControllerKind.JoyCon2Left, ControllerKind.JoyCon2Right, "jc2") })
+        {
+            var cases = new (string Name, InputView.JoyConPart[] Parts)[]
+            {
+                ($"{tag}_links_quer", [Part(l)]), ($"{tag}_rechts_quer", [Part(r)]),
+                ($"{tag}_links_hochkant", [Part(l, upright: true)]), ($"{tag}_rechts_hochkant", [Part(r, upright: true)]),
+                ($"{tag}_paar", [Part(l), Part(r)]), ($"{tag}_grip", [Part(l, grip: true), Part(r, grip: true)]),
+            };
+            foreach (var (name, parts) in cases)
+            {
+                using var view = new InputView { Size = new Size(580, 410) };
+                view.ShowJoyCons(parts, null);
+                using var bmp = new Bitmap(580, 410);
+                view.DrawToBitmap(bmp, new Rectangle(0, 0, 580, 410));
+                bmp.Save(Path.Combine(folder, $"{name}.png"), ImageFormat.Png);
+            }
+        }
     }
 }

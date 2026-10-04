@@ -417,6 +417,13 @@ internal sealed partial class InputView : Control
 
     private static void Caption(Graphics g, RectangleF r, string text, float size, Color color)
     {
+        // Pfeile als gleich große Dreiecke statt Schriftzeichen (◀ ▶ sind in Segoe UI kleiner als ▲ ▼). Sie drehen mit dem
+        // Controller mit: am quer gehaltenen Joy-Con zeigt die Taste oben dann nach oben, wie auf dem echten Gerät.
+        if (text is "▲" or "▼" or "◀" or "▶")
+        {
+            Arrow(g, new PointF(r.X + r.Width / 2, r.Y + r.Height / 2), text, size, color);
+            return;
+        }
         if (_captionRotation != 0)
         {
             var state = g.Save();
@@ -432,6 +439,22 @@ internal sealed partial class InputView : Control
         var font = CachedFont(size);
         using var brush = new SolidBrush(color);
         g.DrawString(text, font, brush, r, CenterFormat);
+    }
+
+    /// <summary>Gleichseitiges Dreieck um den Mittelpunkt (Schwerpunkt), Größe wie ein Schriftzeichen der Größe <paramref name="size"/>.</summary>
+    private static void Arrow(Graphics g, PointF c, string direction, float size, Color color)
+    {
+        float h = size * 0.95f, half = h / MathF.Sqrt(3f); // Höhe, halbe Grundseite
+        // Nach oben zeigend; Schwerpunkt bei 2/3 der Höhe von der Spitze.
+        PointF[] up = [new(0, -h * 2 / 3), new(half, h / 3), new(-half, h / 3)];
+        float angle = direction switch { "▶" => 90, "▼" => 180, "◀" => 270, _ => 0 } * MathF.PI / 180;
+        float cos = MathF.Cos(angle), sin = MathF.Sin(angle);
+        var points = up.Select(p => new PointF(c.X + p.X * cos - p.Y * sin, c.Y + p.X * sin + p.Y * cos)).ToArray();
+        var smoothing = g.SmoothingMode;
+        g.SmoothingMode = SmoothingMode.AntiAlias;
+        using (var brush = new SolidBrush(color))
+            g.FillPolygon(brush, points);
+        g.SmoothingMode = smoothing;
     }
 
     private static GraphicsPath Rounded(RectangleF r, float radius)
