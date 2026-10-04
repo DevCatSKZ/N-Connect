@@ -557,7 +557,7 @@ internal sealed class ControllerOverview : Panel
             var links = _player?.Links ?? [];
             return (links.OfType<Switch1HidLink>().Any(l => l.HasNfc),
                 links.OfType<Switch1HidLink>().FirstOrDefault(l => l.Kind == ControllerKind.JoyCon1Right),
-                links.OfType<Switch2UsbLink>().Any(l => l.HidInstanceId is { } id && !settings.IsHidden(id)));
+                links.Any(l => l.HidInstanceId is { } id && !settings.IsHidden(id)));
         }
 
         private bool ExtrasAvailable(Settings settings)
@@ -923,7 +923,7 @@ internal sealed class ControllerOverview : Panel
         /// <summary>USB-Controller per HidHide vor Spielen verstecken (einmal Adminrechte).</summary>
         private async Task HideAsync()
         {
-            var ids = _player?.Links.OfType<Switch2UsbLink>().Select(l => l.HidInstanceId).OfType<string>().ToList() ?? [];
+            var ids = _player?.Links.Select(l => l.HidInstanceId).OfType<string>().ToList() ?? [];
             if (ids.Count == 0 || _hide is null)
                 return;
             if (!HidHide.IsInstalled)

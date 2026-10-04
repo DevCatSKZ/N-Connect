@@ -411,7 +411,9 @@ internal sealed class ControllerManager : IAsyncDisposable
         foreach (var path in UsbNative.GetInterfacePaths(UsbNative.HidInterface))
         {
             var kind = Switch1Devices.KindFromHidPath(path);
-            if (kind == ControllerKind.Unknown || _links.ContainsKey(path) || _connecting.ContainsKey(path))
+            // Lizenzierte Kabel-Gamepads (HORI, PowerA, PDP): eigenes, einfaches Format.
+            string? wiredPad = kind == ControllerKind.Unknown ? WiredSwitchPad.NameFromHidPath(path) : null;
+            if (kind == ControllerKind.Unknown && wiredPad is null || _links.ContainsKey(path) || _connecting.ContainsKey(path))
                 continue;
             if (_retryAfter.TryGetValue(path, out long until) && Environment.TickCount64 < until)
                 continue;
@@ -420,7 +422,30 @@ internal sealed class ControllerManager : IAsyncDisposable
                 continue;
             if (!_connecting.TryAdd(path, 0))
                 continue;
-            Track(ConnectHidAsync(path, kind));
+            Track(wiredPad is not null ? ConnectWiredPadAsync(path, wiredPad) : ConnectHidAsync(path, kind));
+        }
+    }
+
+    private async Task ConnectWiredPadAsync(string path, string name)
+    {
+        Changed?.Invoke();
+        try
+        {
+            var link = await WiredPadLink.OpenAsync(path, name);
+            _unreachable.TryRemove(path, out _);
+            Attach(link);
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or System.ComponentModel.Win32Exception)
+        {
+            // Z. B. von einem anderen Programm exklusiv geöffnet (Steam): nur einmal melden, still weiter versuchen.
+            if (_unreachable.TryAdd(path, 0))
+                Log.Warn($"{name}: nicht verwendbar ({Log.Reason(e)}) – wird still weiter versucht");
+            _retryAfter[path] = Environment.TickCount64 + 5000;
+        }
+        finally
+        {
+            _connecting.TryRemove(path, out _);
+            Changed?.Invoke();
         }
     }
 
