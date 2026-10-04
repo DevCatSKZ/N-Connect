@@ -41,8 +41,23 @@ internal static partial class Tr
             if (m.Success)
                 return replace(m);
         }
+        // Aus mehreren Sätzen zusammengesetzt (z. B. Problem + Tipp): Satz für Satz übersetzen.
+        // Abkürzungen wie „z. B.“ sind kein Satzende.
+        string guarded = german;
+        foreach (var abbreviation in new[] { "z. B. ", "bzw. ", "d. h. ", "ca. ", "u. a. ", "usw. " })
+            guarded = guarded.Replace(abbreviation, abbreviation.Replace(' ', '\u0001'));
+        var sentences = SentenceBreak().Split(guarded).Select(s => s.Replace('\u0001', ' ')).ToArray();
+        if (sentences.Length > 1)
+        {
+            var translated = sentences.Select(T).ToArray();
+            if (!translated.SequenceEqual(sentences))
+                return string.Join(" ", translated);
+        }
         return german;
     }
+
+    [GeneratedRegex(@"(?<=[.!?…])\s+(?=[A-ZÄÖÜ„])")]
+    private static partial Regex SentenceBreak();
 
     /// <summary>Alle Texte eines Fensters bzw. Steuerelements (rekursiv) übersetzen, auch Listeneinträge.</summary>
     public static void Apply(Control root)
@@ -136,6 +151,13 @@ internal static partial class Tr
         (Re(@"^Gamepad: (?<k>.+)$"), m => $"Gamepad: {m.Groups["k"]}"),
         (Re(@"^(?<k>.+)  \(verbunden\)$"), m => $"{N(m, "k")}  (connected)"),
         (Re(@"^P(?<n>\d+) (?<k>.+)$"), m => m.Value),
+        (Re(@"^Bluetooth nicht verfügbar: (?<e>.*)$"), m => $"Bluetooth not available: {m.Groups["e"]}"),
+        (Re(@"^(?<k>.+) per USB ist von einem anderen Programm belegt \(z\. B\. Steam\)\.$"),
+            m => $"{N(m, "k")} via USB is in use by another program (e.g. Steam)."),
+        (Re(@"^Schon (?<n>\d+) Controller verbunden – (?<k>.+) wird nicht verwendet\.$"),
+            m => $"Already {m.Groups["n"]} controllers connected – {N(m, "k")} is not used."),
+        (Re(@"^(?<k>.+): schwache Bluetooth-Verbindung \((?<r>\d+) statt 33–60 Berichte/s\)\.$"),
+            m => $"{N(m, "k")}: weak Bluetooth connection ({m.Groups["r"]} instead of 33–60 reports/s)."),
         // Allgemein zuletzt, sonst würde es speziellere Meldungen mit „getrennt“ am Ende verschlucken.
         (Re(@"^(?<k>.+) getrennt$"), m => $"{N(m, "k")} disconnected"),
     ];

@@ -31,6 +31,10 @@ internal sealed class ControllerManager : IAsyncDisposable
     /// </summary>
     private readonly ConcurrentDictionary<string, long> _suppressed = new(StringComparer.OrdinalIgnoreCase);
     private readonly System.Threading.Timer _inactivityTimer;
+    /// <summary>Geräte, deren Verbindungsfehler schon gemeldet wurde (nicht bei jedem neuen Versuch wieder).</summary>
+    private readonly ConcurrentDictionary<string, byte> _unreachable = new(StringComparer.OrdinalIgnoreCase);
+    /// <summary>Von Hand getrennte USB-Controller (bis das Kabel abgezogen wird).</summary>
+    private readonly ConcurrentDictionary<string, byte> _usbSuppressed = new(StringComparer.OrdinalIgnoreCase);
     private readonly List<Player> _players = [];
     private readonly object _playerGate = new();
     private readonly CancellationTokenSource _cts = new();
@@ -57,7 +61,7 @@ internal sealed class ControllerManager : IAsyncDisposable
         _watcher.Received += OnAdvertisement;
         _watcher.Stopped += OnWatcherStopped;
         _restartTimer = new System.Threading.Timer(_ => StartBluetoothAsync().Forget("Bluetooth-Suche starten"), null, Timeout.Infinite, Timeout.Infinite);
-        _inactivityTimer = new System.Threading.Timer(_ => CheckInactivity(), null, 30_000, 30_000);
+        _inactivityTimer = new System.Threading.Timer(_ => CheckInactivity(), null, 10_000, 10_000);
     }
 
     /// <summary>Einstellungen wurden hier geändert (z. B. Gyro kalibriert) und sollen gespeichert werden.</summary>
@@ -71,6 +75,8 @@ internal sealed class ControllerManager : IAsyncDisposable
         foreach (var link in player.Links)
         {
             _suppressed[link.Id] = Environment.TickCount64;
+            if (link.Transport == Transport.Usb)
+                _usbSuppressed[link.Id] = 0; // am Kabel: erst nach Abziehen und Einstecken wieder verwenden
             Log.Info($"{link.Id}: {reason}");
             Track(Task.Run(async () =>
             {
@@ -83,14 +89,45 @@ internal sealed class ControllerManager : IAsyncDisposable
         }
     }
 
+    /// <summary>Verbindungen, für die schon vor schwachem Bluetooth gewarnt wurde (einmal je Verbindung).</summary>
+    private readonly ConcurrentDictionary<IControllerLink, byte> _weakWarned = new();
+    private readonly ConcurrentDictionary<IControllerLink, long> _connectedSince = new();
+
+    /// <summary>
+    /// Schwache Bluetooth-Verbindung erkennen: Liefert ein Controller nach dem Verbinden dauerhaft weniger als 20 Berichte/s
+    /// (normal: 33–60), stört meist etwas (USB-3-Geräte, Funkkopfhörer, schwacher Adapter) – einmal mit Tipp melden.
+    /// </summary>
+    private void CheckWeakConnections()
+    {
+        long now = Environment.TickCount64;
+        foreach (var link in _links.Values)
+        {
+            if (link.Transport == Transport.Usb || link is DemoLink)
+                continue;
+            long since = _connectedSince.GetOrAdd(link, now);
+            if (now - since < 20_000 || link.ReportRate >= 20 || link.ReportRate <= 0 || !_weakWarned.TryAdd(link, 0))
+                continue;
+            Log.Warn($"{link.Id}: schwache Verbindung ({link.ReportRate:F0} Berichte/s)");
+            Notify?.Invoke($"{link.Kind.DisplayName()}: schwache Bluetooth-Verbindung ({link.ReportRate:F0} statt 33–60 Berichte/s). " +
+                           "Tipp: Bluetooth-Stick per Verlängerung näher an den Controller, weg von USB-3-Anschlüssen und Funkkopfhörern.");
+        }
+        foreach (var gone in _connectedSince.Keys.Where(l => !_links.Values.Contains(l)).ToList())
+        {
+            _connectedSince.TryRemove(gone, out _);
+            _weakWarned.TryRemove(gone, out _);
+        }
+    }
+
     private void CheckInactivity()
     {
+        CheckWeakConnections();
         int minutes = _settings().InactivityMinutes;
         if (minutes <= 0 || _disposed)
             return;
         foreach (var player in Players)
         {
-            if (Environment.TickCount64 - player.LastActivity < minutes * 60_000L)
+            // Am USB-Kabel lädt der Controller ohnehin – dort nicht trennen.
+            if (Environment.TickCount64 - player.LastActivity < minutes * 60_000L || player.Links.Any(l => l.Transport == Transport.Usb))
                 continue;
             Notify?.Invoke($"Spieler {player.Index + 1}: nach {minutes} min ohne Eingabe getrennt");
             Disconnect(player, $"nach {minutes} min ohne Eingabe getrennt");
@@ -125,13 +162,27 @@ internal sealed class ControllerManager : IAsyncDisposable
     {
         if (_disposed)
             return;
-        AdapterProblem = await CheckAdapterAsync();
+        var problem = await CheckAdapterAsync();
         if (_disposed)
             return; // während der Prüfung beendet
+        // Nur bei Änderung melden und protokollieren (die Prüfung läuft alle 5 s, solange ein Problem besteht).
+        if (problem != AdapterProblem)
+        {
+            if (problem is not null)
+            {
+                Log.Warn(problem);
+                Notify?.Invoke(problem + " " + AdapterHint(problem));
+            }
+            else if (AdapterProblem is not null)
+            {
+                Log.Info("Bluetooth-Adapter bereit");
+                Notify?.Invoke("Bluetooth ist bereit – Controller können verbunden werden.");
+            }
+        }
+        AdapterProblem = problem;
         Changed?.Invoke();
         if (AdapterProblem is not null)
         {
-            Log.Warn(AdapterProblem);
             _restartTimer.Change(5000, Timeout.Infinite);
             return;
         }
@@ -151,6 +202,15 @@ internal sealed class ControllerManager : IAsyncDisposable
             _restartTimer.Change(5000, Timeout.Infinite);
         }
     }
+
+    /// <summary>Was der Benutzer bei einem Bluetooth-Problem tun kann (für Einblendung und Hinweisleiste).</summary>
+    public static string AdapterHint(string problem) => problem switch
+    {
+        "Bluetooth ist ausgeschaltet." => "Bluetooth in den Windows-Einstellungen einschalten. Controller per USB funktionieren weiterhin.",
+        "Dieser Bluetooth-Adapter unterstützt kein Bluetooth LE." =>
+            "Für Switch-2-Controller wird ein Adapter mit Bluetooth 4.0 oder neuer gebraucht. Andere Controller und USB funktionieren weiterhin.",
+        _ => "Bluetooth-Adapter (z. B. USB-Stick) einstecken bzw. Bluetooth in Windows aktivieren. Controller per USB funktionieren weiterhin.",
+    };
 
     private async Task<string?> CheckAdapterAsync()
     {
@@ -258,7 +318,16 @@ internal sealed class ControllerManager : IAsyncDisposable
             {
                 try
                 {
-                    await link.PairWithHostAsync(_hostAddress);
+                    bool paired = await link.PairWithHostAsync(_hostAddress);
+                    // Einmalig erklären: Der Controller merkt sich nur einen Host – an der Switch 2 danach einmal neu koppeln.
+                    var settings = _settings();
+                    if (paired && !settings.ConsoleHintShown)
+                    {
+                        settings.ConsoleHintShown = true;
+                        RequestSave();
+                        Notify?.Invoke("Controller mit dem PC gekoppelt – ab jetzt reicht ein Tastendruck. Hinweis: Um ihn wieder " +
+                                       "an der Switch 2 zu nutzen, dort einmal kurz SYNC drücken.");
+                    }
                 }
                 catch (Exception e) when (e is OperationCanceledException or ObjectDisposedException)
                 {
@@ -365,6 +434,7 @@ internal sealed class ControllerManager : IAsyncDisposable
             IControllerLink link = kind == ControllerKind.WiiRemote
                 ? await WiimoteHidLink.ConnectAsync(path, _settings, timeout.Token)
                 : await Switch1HidLink.ConnectAsync(path, kind, timeout.Token);
+            _unreachable.TryRemove(path, out _);
             Attach(link);
         }
         catch (OperationCanceledException) when (_disposed)
@@ -372,8 +442,10 @@ internal sealed class ControllerManager : IAsyncDisposable
         }
         catch (Exception e)
         {
-            // Z. B. gekoppelt, aber ausgeschaltet: Windows zeigt das HID-Gerät trotzdem an.
-            Log.Warn($"{kind.DisplayName()}: nicht erreichbar ({e.Message})");
+            // Z. B. gekoppelt, aber ausgeschaltet: Windows zeigt das HID-Gerät trotzdem an. Nur einmal protokollieren,
+            // sonst entstünde alle 5 s ein Eintrag, solange der Controller aus ist.
+            if (_unreachable.TryAdd(path, 0))
+                Log.Warn($"{kind.DisplayName()}: nicht erreichbar ({e.Message}) – wird still weiter versucht");
             _retryAfter[path] = Environment.TickCount64 + 5000;
         }
         finally
@@ -387,10 +459,15 @@ internal sealed class ControllerManager : IAsyncDisposable
 
     private void ScanUsb()
     {
-        foreach (var device in UsbEnumerator.Find())
+        var devices = UsbEnumerator.Find();
+        // Von Hand getrennte USB-Controller erst wieder verwenden, nachdem das Kabel einmal abgezogen war.
+        foreach (var id in _usbSuppressed.Keys)
+            if (devices.All(d => d.DeviceId != id))
+                _usbSuppressed.TryRemove(id, out _);
+        foreach (var device in devices)
         {
             string id = device.DeviceId;
-            if (_links.ContainsKey(id) || _connecting.ContainsKey(id))
+            if (_links.ContainsKey(id) || _connecting.ContainsKey(id) || _usbSuppressed.ContainsKey(id))
                 continue;
             if (_retryAfter.TryGetValue(id, out long until) && Environment.TickCount64 < until)
                 continue;
@@ -409,6 +486,7 @@ internal sealed class ControllerManager : IAsyncDisposable
             using var timeout = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token);
             timeout.CancelAfter(TimeSpan.FromSeconds(10));
             var link = await Switch2UsbLink.OpenAsync(device, timeout.Token);
+            _unreachable.TryRemove(device.DeviceId, out _);
             // Derselbe Controller noch per Bluetooth verbunden? Dann übernimmt das Kabel (schneller, lädt).
             if (link.Info.SerialNumber is { } serial)
             {
@@ -436,8 +514,13 @@ internal sealed class ControllerManager : IAsyncDisposable
         }
         catch (Exception e)
         {
-            // Z. B. von einem anderen Programm (Steam) belegt.
-            Log.Warn($"{device.Kind.DisplayName()} per USB: nicht nutzbar ({e.Message})");
+            // Z. B. von einem anderen Programm (Steam) belegt – einmal melden, dann still weiter versuchen.
+            if (_unreachable.TryAdd(device.DeviceId, 0))
+            {
+                Log.Warn($"{device.Kind.DisplayName()} per USB: nicht nutzbar ({e.Message})");
+                Notify?.Invoke($"{device.Kind.DisplayName()} per USB ist von einem anderen Programm belegt (z. B. Steam). " +
+                               "Das Programm schließen oder in Steam die Nintendo-Unterstützung abschalten.");
+            }
             _retryAfter[device.DeviceId] = Environment.TickCount64 + 10000;
         }
         finally
@@ -488,6 +571,7 @@ internal sealed class ControllerManager : IAsyncDisposable
                 if (index < 0)
                 {
                     Log.Warn($"{link.Id}: schon {MaxPlayers} Spieler – Controller wird nicht verwendet");
+                    Notify?.Invoke($"Schon {MaxPlayers} Controller verbunden – {link.Kind.DisplayName()} wird nicht verwendet. Erst einen anderen trennen.");
                     _links.TryRemove(link.Id, out _);
                     link.DisposeAsync().AsTask().Forget($"{link.Id}: Trennen");
                     return false;

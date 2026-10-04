@@ -40,8 +40,29 @@ internal static class RenderCheck
             Walk(capture);
         using (var wii = new WiiPairForm())
             Walk(wii);
+        // Meldungen, die zur Laufzeit zusammengesetzt werden (alle Fehlerfälle und Hinweise).
+        string pro = ControllerKind.Pro2.DisplayName(), jc = ControllerKind.JoyCon2Left.DisplayName();
+        foreach (var problem in new[] { "Kein Bluetooth-Adapter gefunden.", "Bluetooth ist ausgeschaltet.", "Dieser Bluetooth-Adapter unterstützt kein Bluetooth LE." })
+            texts.Add(problem + " " + ControllerManager.AdapterHint(problem));
+        texts.UnionWith(
+        [
+            "Bluetooth ist bereit – Controller können verbunden werden.",
+            "ViGEmBus-Treiber fehlt – ohne ihn kann kein virtueller Controller erzeugt werden. Bitte das Setup erneut ausführen.",
+            $"{pro} per USB ist von einem anderen Programm belegt (z. B. Steam). Das Programm schließen oder in Steam die Nintendo-Unterstützung abschalten.",
+            $"Schon 8 Controller verbunden – {jc} wird nicht verwendet. Erst einen anderen trennen.",
+            $"{pro}: schwache Bluetooth-Verbindung (14 statt 33–60 Berichte/s). Tipp: Bluetooth-Stick per Verlängerung näher an den Controller, weg von USB-3-Anschlüssen und Funkkopfhörern.",
+            "Controller mit dem PC gekoppelt – ab jetzt reicht ein Tastendruck. Hinweis: Um ihn wieder an der Switch 2 zu nutzen, dort einmal kurz SYNC drücken.",
+            $"{pro} verbunden (Spieler 1)", $"{jc} getrennt", "Joy-Con zusammengefasst (Spieler 2)",
+            $"Joy-Con getrennt – {jc} ist jetzt Spieler 3", $"Spieler 1: Akku {jc} fast leer (14 %) – bitte aufladen",
+            "Spieler 2: nach 15 min ohne Eingabe getrennt",
+            $"{pro} per USB verbunden. Sieht ein Spiel ihn doppelt? Im Fenster „Doppelt angezeigt? Verstecken“ klicken.",
+            "Profil „Zelda“ aktiv", "Bluetooth LE · 33 Berichte/s", "60 %  (3,70 V)  ⚡ lädt",
+            $"Spieler 1  ·  {pro}  ·  Gyro-Maus", "Erst den Ring-Con ausschalten (Ring-Con und IR-Kamera nutzen denselben Zusatzprozessor).",
+        ]);
+
         // Bei englischer Oberfläche: nur noch Texte ausgeben, die nach der Übersetzung deutsch aussehen.
         var lines = texts.Select(t => Tr.T(t)).Distinct();
+        File.WriteAllLines(file + ".alle.txt", lines);
         if (Tr.English)
             lines = lines.Where(LooksGerman);
         File.WriteAllLines(file, lines.Select(t => t.Replace("\r", "").Replace("\n", "\\n")));

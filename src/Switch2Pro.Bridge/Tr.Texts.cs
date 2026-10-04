@@ -280,6 +280,32 @@ internal static partial class Tr
         ["Verstanden"] = "Got it",
         ["Einstellungen öffnen"] = "Open settings",
         ["Willkommen"] = "Welcome",
+
+        // ---------- Fehlerfälle und Hinweise ----------
+        ["Kein Bluetooth-Adapter gefunden."] = "No Bluetooth adapter found.",
+        ["Bluetooth ist ausgeschaltet."] = "Bluetooth is turned off.",
+        ["Dieser Bluetooth-Adapter unterstützt kein Bluetooth LE."] = "This Bluetooth adapter does not support Bluetooth LE.",
+        ["Bluetooth-Suche konnte nicht starten."] = "Bluetooth search could not start.",
+        ["Bluetooth in den Windows-Einstellungen einschalten."] = "Turn on Bluetooth in the Windows settings.",
+        ["Controller per USB funktionieren weiterhin."] = "Controllers via USB keep working.",
+        ["Für Switch-2-Controller wird ein Adapter mit Bluetooth 4.0 oder neuer gebraucht."] = "Switch 2 controllers need an adapter with Bluetooth 4.0 or newer.",
+        ["Andere Controller und USB funktionieren weiterhin."] = "Other controllers and USB keep working.",
+        ["Bluetooth-Adapter (z. B. USB-Stick) einstecken bzw. Bluetooth in Windows aktivieren."] =
+            "Plug in a Bluetooth adapter (e.g. USB dongle) or enable Bluetooth in Windows.",
+        ["Bluetooth ist bereit – Controller können verbunden werden."] = "Bluetooth is ready – controllers can be connected.",
+        ["Bluetooth-Einstellungen öffnen"] = "Open Bluetooth settings",
+        ["ViGEmBus-Treiber fehlt – ohne ihn kann kein virtueller Controller erzeugt werden."] =
+            "ViGEmBus driver missing – without it no virtual controller can be created.",
+        ["Bitte das Setup erneut ausführen."] = "Please run the setup again.",
+        ["Das Programm schließen oder in Steam die Nintendo-Unterstützung abschalten."] =
+            "Close that program or turn off Nintendo support in Steam.",
+        ["Erst einen anderen trennen."] = "Disconnect another one first.",
+        ["Tipp: Bluetooth-Stick per Verlängerung näher an den Controller, weg von USB-3-Anschlüssen und Funkkopfhörern."] =
+            "Tip: move the Bluetooth dongle closer to the controller with an extension cable, away from USB 3 ports and wireless headphones.",
+        ["Controller mit dem PC gekoppelt – ab jetzt reicht ein Tastendruck."] = "Controller paired with the PC – from now on a button press is enough.",
+        ["Hinweis: Um ihn wieder an der Switch 2 zu nutzen, dort einmal kurz SYNC drücken."] =
+            "Note: to use it on the Switch 2 again, briefly press SYNC there once.",
+        ["Dieser Bluetooth-Adapter unterstützt kein Bluetooth LE"] = "This Bluetooth adapter does not support Bluetooth LE",
         ["Erst IR-Kamera bzw. Ring-Con ausschalten (sie nutzen denselben Zusatzprozessor wie der NFC-Leser)."] =
             "Turn off the IR camera or Ring-Con first (they use the same co-processor as the NFC reader).",
         ["Erst die IR-Kamera schließen (Ring-Con und IR-Kamera nutzen denselben Zusatzprozessor)."] =

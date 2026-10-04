@@ -50,10 +50,53 @@ internal sealed class ControllerOverview : Panel
         Controls.Add(_cards);
         Controls.Add(_empty);
         Tr.Apply(_empty);
+        InitBanner(); // zuletzt hinzugefügt = zuerst angedockt (oben)
+    }
+
+    /// <summary>Hinweisleiste oben bei Problemen (kein Bluetooth, ViGEmBus fehlt) mit passender Aktion.</summary>
+    private readonly Panel _banner = new() { Dock = DockStyle.Top, Height = 54, BackColor = Color.FromArgb(120, 40, 40), Visible = false };
+    private readonly Label _bannerText = new()
+    {
+        Dock = DockStyle.Fill, ForeColor = Color.White, TextAlign = ContentAlignment.MiddleLeft, Padding = new Padding(14, 0, 8, 0),
+    };
+    private readonly Button _bannerAction = new()
+    {
+        Dock = DockStyle.Right, Width = 230, FlatStyle = FlatStyle.Flat, ForeColor = Color.White, BackColor = Color.FromArgb(150, 60, 60),
+    };
+    private string? _bannerShown;
+
+    private void InitBanner()
+    {
+        _bannerAction.FlatAppearance.BorderColor = Color.FromArgb(220, 150, 150);
+        _bannerAction.Click += (_, _) =>
+        {
+            string target = _manager is null ? "https://github.com/nefarius/ViGEmBus/releases" : "ms-settings:bluetooth";
+            try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(target) { UseShellExecute = true }); }
+            catch (Exception e) when (e is System.ComponentModel.Win32Exception or InvalidOperationException) { Log.Warn($"Öffnen fehlgeschlagen: {e.Message}"); }
+        };
+        _banner.Controls.Add(_bannerText);
+        _banner.Controls.Add(_bannerAction);
+        Controls.Add(_banner);
+    }
+
+    private void UpdateBanner()
+    {
+        string? text = _manager is null
+            ? "ViGEmBus-Treiber fehlt – ohne ihn kann kein virtueller Controller erzeugt werden. Bitte das Setup erneut ausführen."
+            : _manager.AdapterProblem is { } problem ? problem + " " + ControllerManager.AdapterHint(problem) : null;
+        if (text == _bannerShown)
+            return;
+        _bannerShown = text;
+        _banner.Visible = text is not null;
+        if (text is null)
+            return;
+        _bannerText.Text = Tr.T(text);
+        _bannerAction.Text = Tr.T(_manager is null ? "ViGEmBus herunterladen …" : "Bluetooth-Einstellungen öffnen");
     }
 
     public void UpdateView()
     {
+        UpdateBanner();
         var players = _players();
         _empty.Visible = players.Count == 0;
         _cards.Visible = players.Count > 0;
