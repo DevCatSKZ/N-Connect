@@ -462,6 +462,8 @@ internal static partial class Tr
         ["Linken Joy-Con umbenennen …"] = "Rename left Joy-Con …",
         ["Rechten Joy-Con umbenennen …"] = "Rename right Joy-Con …",
         ["Controller umbenennen"] = "Rename controller",
+        ["Spielerplatz"] = "Player slot",
+        ["Alle Controller trennen"] = "Disconnect all controllers",
         // Stick-Kalibrierung
         ["Sticks kalibrieren"] = "Calibrate sticks",
         ["Kalibrieren …"] = "Calibrate …",
