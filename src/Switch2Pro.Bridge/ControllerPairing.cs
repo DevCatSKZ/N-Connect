@@ -1,4 +1,6 @@
 using System.Runtime.InteropServices;
+using Windows.Devices.Bluetooth;
+using Windows.Devices.Enumeration;
 
 namespace Switch2Pro.Bridge;
 
@@ -246,6 +248,10 @@ internal static class ControllerPairing
             var info = device;
             if (info.fConnected != 0)
                 continue; // verbunden: läuft bereits
+            // Im Hintergrund nach einem Fehlschlag eine Weile in Ruhe lassen – sonst ist der Controller bei jedem Versuch
+            // belegt und taucht in der Windows-Suche („Gerät hinzufügen“) nicht auf.
+            if (!repairRemembered && FailedRecently(info.Address))
+                continue;
             if (info.fRemembered != 0)
             {
                 bool answeredNow = before.TryGetValue(info.Address, out long earlier) && Stamp(info.stLastSeen) > earlier;
@@ -266,9 +272,27 @@ internal static class ControllerPairing
                 paired.Add(info.szName);
                 progress($"Gekoppelt: {info.szName}");
                 Log.Info($"Kopplung: {info.szName} ({info.Address:X12}) gekoppelt");
+                lock (Failures)
+                    Failures.Remove(info.Address);
+            }
+            else
+            {
+                lock (Failures)
+                    Failures[info.Address] = Environment.TickCount64;
+                Log.Info($"Kopplung: {info.szName} ({info.Address:X12}) fehlgeschlagen – im Hintergrund {FailurePause.TotalSeconds:0} s Pause " +
+                         "(Fenster „Controller koppeln“ und Windows-Einstellungen gehen weiter)");
             }
         }
         return paired;
+    }
+
+    private static readonly TimeSpan FailurePause = TimeSpan.FromSeconds(90);
+    private static readonly Dictionary<ulong, long> Failures = [];
+
+    private static bool FailedRecently(ulong address)
+    {
+        lock (Failures)
+            return Failures.TryGetValue(address, out long at) && Environment.TickCount64 - at < FailurePause.TotalMilliseconds;
     }
 
     /// <summary>Zuletzt gesehen (UTC) innerhalb der letzten 20 Sekunden?</summary>
@@ -376,9 +400,16 @@ internal static class ControllerPairing
     private static IntPtr _callbackRadio;
     private static readonly AuthenticationCallback Callback = OnAuthenticationRequest;
 
-    /// <summary>Switch 1/NSO: Kopplung ohne PIN; die Rückfrage von Windows bestätigt N-Connect selbst (kein Fenster).</summary>
+    /// <summary>
+    /// Switch 1/NSO: Kopplung ohne PIN, ohne Fenster. Zuerst über WinRT (<c>DeviceInformationCustomPairing</c>, Anfrage
+    /// wird sofort bestätigt) – mit der Win32-Rückfrage kam die Bestätigung bei Joy-Con oft erst nach dem Abbruch an
+    /// (Fehler 1244/258, Antwort danach 1167). Win32 nur, wenn WinRT das Gerät gar nicht öffnen kann.
+    /// </summary>
     private static bool PairJustWorks(IntPtr radio, ref BLUETOOTH_DEVICE_INFO info)
     {
+        var winRt = PairWinRt(info.Address, info.szName);
+        if (winRt is not null)
+            return winRt.Value;
         _callbackRadio = radio;
         uint registered = BluetoothRegisterForAuthenticationEx(ref info, out var registration, Callback, IntPtr.Zero);
         try
@@ -393,6 +424,53 @@ internal static class ControllerPairing
             if (registered == 0)
                 BluetoothUnregisterAuthentication(registration);
             _callbackRadio = IntPtr.Zero;
+        }
+    }
+
+    /// <summary>Kopplung über WinRT; null = Gerät nicht zu öffnen (dann Win32 versuchen).</summary>
+    private static bool? PairWinRt(ulong address, string name)
+    {
+        BluetoothDevice? device;
+        try
+        {
+            device = BluetoothDevice.FromBluetoothAddressAsync(address).AsTask().GetAwaiter().GetResult();
+        }
+        catch (Exception e)
+        {
+            Log.Info($"Kopplung {name}: Gerät nicht über WinRT erreichbar ({Log.Reason(e)})");
+            return null;
+        }
+        if (device is null)
+            return null;
+        using (device)
+        {
+            var custom = device.DeviceInformation.Pairing.Custom;
+            void Accept(DeviceInformationCustomPairing sender, DevicePairingRequestedEventArgs args) => args.Accept();
+            custom.PairingRequested += Accept;
+            try
+            {
+                var pairing = custom.PairAsync(DevicePairingKinds.ConfirmOnly | DevicePairingKinds.ConfirmPinMatch,
+                    DevicePairingProtectionLevel.None).AsTask();
+                if (!pairing.Wait(TimeSpan.FromSeconds(20)))
+                {
+                    Log.Info($"Kopplung {name}: keine Antwort in 20 s");
+                    return false;
+                }
+                var status = pairing.Result.Status;
+                if (status is DevicePairingResultStatus.Paired or DevicePairingResultStatus.AlreadyPaired)
+                    return true;
+                Log.Info($"Kopplung {name}: {status}");
+                return false;
+            }
+            catch (Exception e)
+            {
+                Log.Info($"Kopplung {name}: {Log.Reason(e)}");
+                return false;
+            }
+            finally
+            {
+                custom.PairingRequested -= Accept;
+            }
         }
     }
 

@@ -51,9 +51,9 @@ internal static class Branding
             using var tilePath = Theme.RoundedRect(r, s * 0.22f);
             using (var back = new LinearGradientBrush(r, Color.FromArgb(52, 55, 70), Color.FromArgb(22, 23, 30), LinearGradientMode.Vertical))
                 g.FillPath(back, tilePath);
-            if (s >= 24)
+            if (s >= 48) // bei kleinen Größen wirkt der helle Rand wie ein pixeliger weißer Saum
             {
-                using var border = new Pen(Color.FromArgb(70, 255, 255, 255), Math.Max(1f, s / 64f));
+                using var border = new Pen(Color.FromArgb(45, 255, 255, 255), Math.Max(1f, s / 64f));
                 using var inner = Theme.RoundedRect(RectangleF.Inflate(r, -border.Width / 2, -border.Width / 2), s * 0.21f);
                 g.DrawPath(border, inner);
             }
@@ -85,6 +85,7 @@ internal static class Branding
     }
 
     /// <summary>Logo als quadratisches Bild mit transparentem Rand.</summary>
+    /// <remarks>Für die Oberfläche <see cref="LogoView"/> nutzen – ein verkleinertes Bild wird an den Kanten pixelig.</remarks>
     public static Bitmap Render(int size)
     {
         var bmp = new Bitmap(size, size, PixelFormat.Format32bppArgb);
@@ -201,5 +202,22 @@ internal static class Branding
         }
         foreach (var image in images)
             w.Write(image);
+    }
+}
+
+/// <summary>Logo in der Oberfläche: direkt in Zielgröße auf den Fensterhintergrund gezeichnet (scharf, ohne hellen Saum).</summary>
+internal sealed class LogoView : Control
+{
+    public LogoView()
+    {
+        SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint
+                 | ControlStyles.ResizeRedraw, true);
+        TabStop = false;
+    }
+
+    protected override void OnPaint(PaintEventArgs e)
+    {
+        e.Graphics.Clear(Parent?.BackColor ?? Theme.Backdrop);
+        Branding.DrawLogo(e.Graphics, new RectangleF(0.5f, 0.5f, Width - 1f, Height - 1f));
     }
 }

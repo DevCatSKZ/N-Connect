@@ -15,13 +15,10 @@ internal sealed class PairingDataForm : Form
 {
     private readonly Settings _settings;
     private readonly Action _saved;
-    private readonly TextBox _preview = new()
-    {
-        Multiline = true, ReadOnly = true, ScrollBars = ScrollBars.Vertical, Dock = DockStyle.Fill, WordWrap = true,
-        Font = new Font("Segoe UI", 9.5f), Tag = Tr.UserData,
-    };
-    private readonly Label _adapter = new() { AutoSize = true, Padding = new Padding(0, 8, 0, 0) };
-    private readonly Button _apply = new() { Text = "Übernehmen", AutoSize = true, Enabled = false };
+    private readonly Report _preview = new();
+    private readonly SettingRow _adapter = new("Bluetooth-Adapter dieses PCs", "wird ermittelt …", glyph: Glyph.Bluetooth);
+    private readonly GlyphButton _apply = new("Übernehmen", Glyph.Check);
+    private readonly ScrollPage _page = new() { Padding = new Padding(24, 18, 24, 0) };
 
     /// <summary>Gerade angezeigte Daten, die „Übernehmen“ in die Einstellungen schreibt.</summary>
     private PairingExport? _pending;
@@ -37,46 +34,49 @@ internal sealed class PairingDataForm : Form
         StartPosition = FormStartPosition.CenterScreen;
         FormBorderStyle = FormBorderStyle.Sizable;
         MinimizeBox = false;
-        ClientSize = new Size(720, 600);
-        MinimumSize = new Size(560, 460);
-        Font = new Font("Segoe UI", 9.5f);
+        ClientSize = new Size(760, 760);
+        MinimumSize = new Size(600, 520);
+        Font = UiFonts.Body;
+        KeyPreview = true;
 
-        var intro = new Label
+        GlyphButton Action(string text, string glyph, Action click)
         {
-            Dock = DockStyle.Top, AutoSize = false, Height = 64, Padding = new Padding(12, 10, 12, 0),
-            Text = "Controller-Kopplungen von der Switch-SD-Karte oder von einem anderen PC übernehmen – oder für einen anderen " +
-                   "PC exportieren. Es werden nur Einstellungen von N-Connect geändert; Windows und der Bluetooth-Adapter bleiben unverändert.",
-        };
-        var fromSwitch = new Button { Text = "Von der Switch-SD-Karte …", AutoSize = true };
-        var fromPc = new Button { Text = "Von einem anderen PC …", AutoSize = true };
-        var export = new Button { Text = "Für einen anderen PC exportieren …", AutoSize = true };
-        var restore = new Button { Text = "Sicherung wiederherstellen …", AutoSize = true };
-        fromSwitch.Click += (_, _) => LoadFromSwitch(null);
-        fromPc.Click += (_, _) => LoadFromFile();
-        export.Click += (_, _) => Export();
-        restore.Click += (_, _) => Restore();
-        var actions = new FlowLayoutPanel { Dock = DockStyle.Top, AutoSize = true, Padding = new Padding(8, 4, 8, 0), WrapContents = true };
-        actions.Controls.AddRange([fromSwitch, fromPc, export, restore]);
-        var adapterRow = new Panel { Dock = DockStyle.Top, Height = 32, Padding = new Padding(12, 0, 12, 0) };
-        adapterRow.Controls.Add(_adapter);
-        _adapter.Location = new Point(12, 2);
-        _adapter.Text = "Bluetooth-Adapter dieses PCs: wird ermittelt …";
-        var previewHost = new Panel { Dock = DockStyle.Fill, Padding = new Padding(12, 6, 12, 6) };
-        previewHost.Controls.Add(_preview);
+            var b = new GlyphButton(text, glyph);
+            b.Click += (_, _) => click();
+            return b;
+        }
+        var content = _page.Content;
+        content.Controls.Add(new Heading("Kopplungsdaten", page: true,
+            subtitle: "Controller-Kopplungen von der Switch-SD-Karte oder von einem anderen PC übernehmen – oder für einen anderen " +
+                      "PC exportieren. Es werden nur Einstellungen von N-Connect geändert; Windows und der Bluetooth-Adapter bleiben unverändert."));
+        _page.AddGroup("Übernehmen",
+            new SettingRow("Von der Switch-SD-Karte", "Mit Bluepick_RCM oder hekate erstellte Kopplungsdaten (switchroot/joycon_mac.ini)",
+                Action("Einlesen …", Glyph.Folder, () => LoadFromSwitch(null)), Glyph.Gamepad),
+            new SettingRow("Von einem anderen PC", $"Mit N-Connect exportierte Datei (*{PairingTransfer.FileExtension})",
+                Action("Datei öffnen …", Glyph.Import, LoadFromFile), Glyph.Device));
+        _page.AddGroup("Inhalt", _preview);
+        _page.AddGroup("Weitergeben und sichern",
+            new SettingRow("Für einen anderen PC exportieren", "Bekannte Controller und Einstellungen je Controller, optional mit Passwort",
+                Action("Exportieren …", Glyph.Export, Export), Glyph.Export),
+            new SettingRow("Sicherung wiederherstellen", "Vor jedem „Übernehmen“ wird automatisch eine Sicherung angelegt",
+                Action("Wiederherstellen …", Glyph.Undo, Restore), Glyph.Undo),
+            _adapter);
+        _page.Dock = DockStyle.Fill;
 
-        var close = new Button { Text = "Schließen", DialogResult = DialogResult.Cancel, AutoSize = true };
+        var close = new GlyphButton("Schließen");
         close.Click += (_, _) => Close();
         _apply.Click += (_, _) => Apply();
-        var bar = new FlowLayoutPanel { Dock = DockStyle.Bottom, FlowDirection = FlowDirection.RightToLeft, AutoSize = true, Padding = new Padding(8) };
-        bar.Controls.Add(close);
-        bar.Controls.Add(_apply);
+        _apply.EnabledChanged += (_, _) => _apply.Accent = _apply.Enabled; // ausgegraut ohne Akzentfläche
+        _apply.Enabled = false;
+        var footer = new Footer(_apply, close);
 
-        Controls.Add(previewHost);
-        Controls.Add(adapterRow);
-        Controls.Add(actions);
-        Controls.Add(intro);
-        Controls.Add(bar);
-        CancelButton = close;
+        Controls.Add(_page);
+        Controls.Add(footer);
+        KeyDown += (_, e) =>
+        {
+            if (e.KeyCode == Keys.Escape)
+                Close();
+        };
         Theme.Apply(this);
         Tr.Apply(this);
         ShowText(Tr.T("Quelle wählen: Switch-SD-Karte (mit Bluepick_RCM oder hekate erstellte Kopplungsdaten) oder eine Datei von einem anderen PC."));
@@ -85,9 +85,7 @@ internal sealed class PairingDataForm : Form
             _adapterAddress = await AdapterAddressAsync();
             if (IsDisposed)
                 return;
-            _adapter.Text = _adapterAddress is null
-                ? Tr.T("Bluetooth-Adapter dieses PCs: nicht gefunden")
-                : $"{Tr.T("Bluetooth-Adapter dieses PCs:")} {_adapterAddress}";
+            _adapter.Description = _adapterAddress ?? "nicht gefunden";
             if (card is not null)
                 LoadFromSwitch(card);
             else if (_pending is null && _switchData is null)
@@ -112,8 +110,111 @@ internal sealed class PairingDataForm : Form
 
     private void ShowText(string text)
     {
-        _preview.Text = text.Replace("\r", "").Replace("\n", "\r\n");
-        _preview.SelectionStart = 0;
+        _preview.Text = text.Replace("\r", "").TrimEnd('\n');
+        _page.AutoScrollPosition = Point.Empty;
+        _page.PerformLayout(); // Höhe der Gruppe neu berechnen (geschachtelte Stapel melden Größenänderungen nicht weiter)
+    }
+
+    /// <summary>
+    /// Beschreibung der geladenen Daten, selbst gezeichnet und umbrechend: Zeilen mit „:“ am Ende als Zwischenüberschrift,
+    /// „  •  “ als Aufzählung mit hängendem Einzug, Leerzeilen als Absatzabstand. Der Text ist schon übersetzt.
+    /// </summary>
+    private sealed class Report : Control, IHeightForWidth, ISelfTranslating
+    {
+        private const int Pad = 16, Indent = 20, Gap = 8;
+        private const string Bullet = "  •  ";
+        private const TextFormatFlags Flags = TextFormatFlags.WordBreak | TextFormatFlags.NoPrefix;
+
+        public Report()
+        {
+            SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint
+                     | ControlStyles.ResizeRedraw, true);
+            BackColor = Theme.Current.Surface;
+            TabStop = false;
+        }
+
+        protected override void OnTextChanged(EventArgs e)
+        {
+            base.OnTextChanged(e);
+            Invalidate();
+        }
+
+        private IEnumerable<(string Text, Font Font, int Left, bool Bullet, int Height)> Lines(int width)
+        {
+            foreach (var raw in Text.Split('\n'))
+            {
+                if (raw.Length == 0)
+                {
+                    yield return ("", UiFonts.Body, 0, false, Gap);
+                    continue;
+                }
+                bool bullet = raw.StartsWith(Bullet, StringComparison.Ordinal);
+                string text = bullet ? raw[Bullet.Length..] : raw;
+                var font = !bullet && text.EndsWith(':') ? UiFonts.Strong : UiFonts.Body;
+                int left = Pad + (bullet ? Indent : 0);
+                int h = TextRenderer.MeasureText(text, font, new Size(Math.Max(80, width - left - Pad), 0), Flags).Height + 3;
+                yield return (text, font, left, bullet, h);
+            }
+        }
+
+        public int HeightFor(int width) => 2 * 12 + Lines(width).Sum(l => l.Height);
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            var g = e.Graphics;
+            var p = Theme.Current;
+            g.Clear(p.Surface);
+            int y = 12;
+            foreach (var (text, font, left, bullet, h) in Lines(Width))
+            {
+                if (bullet)
+                    TextRenderer.DrawText(g, "•", font, new Point(left - 14, y), p.TextMuted, TextFormatFlags.NoPrefix);
+                if (text.Length > 0)
+                    TextRenderer.DrawText(g, text, font, new Rectangle(left, y, Math.Max(80, Width - left - Pad), h), p.Text, Flags);
+                y += h;
+            }
+        }
+    }
+
+    /// <summary>Fußleiste wie bei Windows-11-Dialogen: abgesetzte Fläche mit Trennlinie, Knöpfe rechts.</summary>
+    private sealed class Footer : Panel
+    {
+        private readonly Control[] _buttons;
+
+        public Footer(params Control[] buttons)
+        {
+            _buttons = buttons;
+            Dock = DockStyle.Bottom;
+            Height = 64;
+            DoubleBuffered = true;
+            ResizeRedraw = true;
+            BackColor = Theme.Current.Surface;
+            foreach (var b in buttons)
+            {
+                b.BackColor = BackColor;
+                if (b is GlyphButton g)
+                    g.Width = Math.Max(g.Width, 110);
+                Controls.Add(b);
+            }
+        }
+
+        protected override void OnLayout(LayoutEventArgs levent)
+        {
+            int x = ClientSize.Width - 24;
+            foreach (var b in _buttons.Reverse())
+            {
+                x -= b.Width;
+                b.Location = new Point(x, (Height - b.Height) / 2);
+                x -= 8;
+            }
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            base.OnPaint(e);
+            using var pen = new Pen(Theme.Current.Border);
+            e.Graphics.DrawLine(pen, 0, 0, Width, 0);
+        }
     }
 
     /// <summary>Controllername übersetzen; „Controller“ bleibt (die Tabelle übersetzt es als Mehrzahl).</summary>
@@ -382,29 +483,64 @@ internal static class PasswordDialog
     public static string? Ask(IWin32Window owner, bool confirm, bool keysOffered, out bool includeKeys)
     {
         includeKeys = false;
+        const int left = 24, width = 452;
         using var form = new Form
         {
             Text = confirm ? "Kopplungsdaten exportieren" : "Passwort eingeben", StartPosition = FormStartPosition.CenterParent,
             FormBorderStyle = FormBorderStyle.FixedDialog, MinimizeBox = false, MaximizeBox = false, ShowInTaskbar = false,
-            ClientSize = new Size(460, confirm ? 250 : 130), Font = new Font("Segoe UI", 9.5f),
+            ClientSize = new Size(left * 2 + width, confirm ? 336 : 210), Font = UiFonts.Body, KeyPreview = true,
+        };
+        var title = new Label
+        {
+            AutoSize = true, Location = new Point(left, 18), Font = UiFonts.Subtitle,
+            Text = confirm ? "Kopplungsdaten exportieren" : "Passwort eingeben",
         };
         var info = new Label
         {
-            AutoSize = true, MaximumSize = new Size(436, 0), Location = new Point(12, 12),
+            AutoSize = true, MaximumSize = new Size(width, 0), Location = new Point(left, 52),
             Text = confirm
                 ? "Passwort (optional). Ohne Passwort steht der Inhalt lesbar in der Datei. Mit Kopplungsschlüsseln ist ein Passwort Pflicht."
                 : "Die Datei ist mit einem Passwort geschützt.",
         };
-        var first = new TextBox { UseSystemPasswordChar = true, Location = new Point(12, confirm ? 60 : 44), Width = 436, PlaceholderText = "Passwort" };
-        var second = new TextBox { UseSystemPasswordChar = true, Location = new Point(12, 94), Width = 436, PlaceholderText = "Passwort wiederholen", Visible = confirm };
-        var keys = new CheckBox
+        var first = new TextBox { UseSystemPasswordChar = true, Location = new Point(left, confirm ? 100 : 82), Width = width, PlaceholderText = "Passwort" };
+        var second = new TextBox { UseSystemPasswordChar = true, Location = new Point(left, 136), Width = width, PlaceholderText = "Passwort wiederholen", Visible = confirm };
+        var keysLabel = new Label
         {
-            AutoSize = true, Location = new Point(12, 130), Visible = confirm, Enabled = keysOffered,
+            AutoSize = true, MaximumSize = new Size(width - 110, 0), Location = new Point(left, 180), Visible = confirm,
             Text = keysOffered ? "Kopplungsschlüssel der Switch-Controller mitnehmen" : "Kopplungsschlüssel mitnehmen (erst Switch-SD-Karte einlesen)",
+            ForeColor = keysOffered ? SystemColors.ControlText : SystemColors.GrayText,
         };
-        var status = new Label { AutoSize = true, Location = new Point(12, 162), Visible = confirm };
-        var ok = new Button { Text = "OK", DialogResult = DialogResult.OK, AutoSize = true, Location = new Point(286, confirm ? 205 : 84) };
-        var cancel = new Button { Text = "Abbrechen", DialogResult = DialogResult.Cancel, AutoSize = true, Location = new Point(372, confirm ? 205 : 84) };
+        var keys = new ToggleSwitch { Location = new Point(left + width - 96, 176), Visible = confirm, Enabled = keysOffered };
+        var status = new Label { AutoSize = true, Location = new Point(left, 214), Visible = confirm, Font = UiFonts.Small, ForeColor = SystemColors.GrayText };
+        var ok = new GlyphButton("OK", accent: true) { Width = 110 };
+        var cancel = new GlyphButton("Abbrechen") { Width = 110 };
+        var footer = new Panel { Dock = DockStyle.Bottom, Height = 64, BackColor = Theme.Current.Surface };
+        footer.Paint += (_, e) =>
+        {
+            using var pen = new Pen(Theme.Current.Border);
+            e.Graphics.DrawLine(pen, 0, 0, footer.Width, 0);
+        };
+        cancel.Location = new Point(left + width - cancel.Width, 16);
+        ok.Location = new Point(cancel.Left - 8 - ok.Width, 16);
+        ok.BackColor = cancel.BackColor = footer.BackColor;
+        footer.Controls.AddRange([ok, cancel]);
+        ok.Click += (_, _) =>
+        {
+            if (ok.Enabled)
+                form.DialogResult = DialogResult.OK;
+        };
+        cancel.Click += (_, _) => form.DialogResult = DialogResult.Cancel;
+        form.KeyDown += (_, e) =>
+        {
+            if (e.KeyCode == Keys.Enter && ok.Enabled)
+                form.DialogResult = DialogResult.OK;
+            else if (e.KeyCode == Keys.Escape)
+                form.DialogResult = DialogResult.Cancel;
+            else
+                return;
+            e.SuppressKeyPress = true;
+        };
+        ok.EnabledChanged += (_, _) => ok.Accent = ok.Enabled;
         void Check()
         {
             string? problem = !confirm ? (first.Text.Length == 0 ? "" : null)
@@ -418,10 +554,9 @@ internal static class PasswordDialog
         first.TextChanged += (_, _) => Check();
         second.TextChanged += (_, _) => Check();
         keys.CheckedChanged += (_, _) => Check();
-        form.Controls.AddRange([info, first, second, keys, status, ok, cancel]);
-        form.AcceptButton = ok;
-        form.CancelButton = cancel;
+        form.Controls.AddRange([title, info, new TextField(first), new TextField(second), keysLabel, keys, status, footer]);
         Theme.Apply(form);
+        keys.BackColor = form.BackColor;
         Tr.Apply(form);
         first.PlaceholderText = Tr.T(first.PlaceholderText);
         second.PlaceholderText = Tr.T(second.PlaceholderText);

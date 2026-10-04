@@ -591,14 +591,24 @@ internal static partial class Tr
         ["Klicken, um Kopplungsdaten der Controller zu übernehmen."] = "Click to take over controller pairing data.",
         ["Controller-Kopplungen von der Switch-SD-Karte oder von einem anderen PC übernehmen – oder für einen anderen PC exportieren. Es werden nur Einstellungen von N-Connect geändert; Windows und der Bluetooth-Adapter bleiben unverändert."] =
             "Take over controller pairings from the Switch SD card or from another PC – or export them for another PC. Only N-Connect settings are changed; Windows and the Bluetooth adapter stay untouched.",
-        ["Von der Switch-SD-Karte …"] = "From the Switch SD card …",
-        ["Von einem anderen PC …"] = "From another PC …",
-        ["Für einen anderen PC exportieren …"] = "Export for another PC …",
-        ["Sicherung wiederherstellen …"] = "Restore backup …",
+        ["Von der Switch-SD-Karte"] = "From the Switch SD card",
+        ["Mit Bluepick_RCM oder hekate erstellte Kopplungsdaten (switchroot/joycon_mac.ini)"] =
+            "Pairing data created with Bluepick_RCM or hekate (switchroot/joycon_mac.ini)",
+        ["Einlesen …"] = "Read …",
+        ["Von einem anderen PC"] = "From another PC",
+        ["Mit N-Connect exportierte Datei (*.ncpair)"] = "File exported by N-Connect (*.ncpair)",
+        ["Datei öffnen …"] = "Open file …",
+        ["Inhalt"] = "Contents",
+        ["Weitergeben und sichern"] = "Share and back up",
+        ["Für einen anderen PC exportieren"] = "Export for another PC",
+        ["Bekannte Controller und Einstellungen je Controller, optional mit Passwort"] =
+            "Known controllers and per-controller settings, optionally password-protected",
         ["Sicherung wiederherstellen"] = "Restore backup",
-        ["Bluetooth-Adapter dieses PCs: wird ermittelt …"] = "Bluetooth adapter of this PC: detecting …",
-        ["Bluetooth-Adapter dieses PCs: nicht gefunden"] = "Bluetooth adapter of this PC: not found",
-        ["Bluetooth-Adapter dieses PCs:"] = "Bluetooth adapter of this PC:",
+        ["Vor jedem „Übernehmen“ wird automatisch eine Sicherung angelegt"] = "A backup is created automatically before every “Apply”",
+        ["Wiederherstellen …"] = "Restore …",
+        ["Bluetooth-Adapter dieses PCs"] = "Bluetooth adapter of this PC",
+        ["wird ermittelt …"] = "detecting …",
+        ["nicht gefunden"] = "not found",
         ["Quelle wählen: Switch-SD-Karte (mit Bluepick_RCM oder hekate erstellte Kopplungsdaten) oder eine Datei von einem anderen PC."] =
             "Choose a source: Switch SD card (pairing data created with Bluepick_RCM or hekate) or a file from another PC.",
         ["Keine Switch-SD-Karte gefunden. SD-Karte in den Kartenleser stecken oder die Switch per hekate („USB Tools“ → „SD Card“) als Laufwerk verbinden.\n\nOrdner selbst auswählen?"] =

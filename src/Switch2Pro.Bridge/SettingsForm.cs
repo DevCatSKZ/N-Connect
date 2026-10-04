@@ -145,7 +145,7 @@ internal sealed class SettingsForm : Form
     {
         var rail = new Panel { Dock = DockStyle.Left, Width = 250, BackColor = Theme.Backdrop };
         var header = new Panel { Dock = DockStyle.Top, Height = 72, BackColor = Theme.Backdrop };
-        var logo = new PictureBox { Image = Branding.Render(64), SizeMode = PictureBoxSizeMode.Zoom, Bounds = new Rectangle(20, 20, 32, 32) };
+        var logo = new LogoView { Bounds = new Rectangle(20, 20, 32, 32) };
         var name = new Label { Text = "N-Connect", Font = UiFonts.Subtitle, AutoSize = true, Location = new Point(62, 24), Tag = Tr.UserData };
         header.Controls.AddRange([logo, name]);
         var version = new Label
@@ -216,7 +216,7 @@ internal sealed class SettingsForm : Form
             Row("Profil", "Ein eigenes Profil gilt automatisch, solange eines seiner Programme im Vordergrund ist – sonst „Standard“.",
                 profileBox, Glyph.Layers),
             Row("Aktiv bei Programm", "Programmdateien, bei denen dieses Profil gilt (mit Komma trennen).",
-                Inline(_programs, _programAdd), Glyph.Folder));
+                Inline(new TextField(_programs), _programAdd), Glyph.Folder));
         page.AddGroup("Bearbeiten",
             Row("Controller", "Jeder Controller hat seine eigene Belegung.", _mapKind, Glyph.Gamepad),
             Row("Ebene", "Die Shift-Ebene gilt, solange eine Taste mit „Shift-Ebene“ gehalten wird.", _layer, Glyph.Layers));

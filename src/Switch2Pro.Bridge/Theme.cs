@@ -168,6 +168,10 @@ internal static class Theme
                 b.FlatAppearance.MouseOverBackColor = Blend(p.SurfaceHover, p.Text, 0.08f);
                 b.FlatAppearance.MouseDownBackColor = Blend(p.SurfaceHover, p.Text, 0.14f);
                 break;
+            case TextBox t when t.Parent is TextField:
+                t.BackColor = t.Enabled ? p.SurfaceHover : p.Surface;
+                t.ForeColor = p.Text;
+                break;
             case TextBox t:
                 t.BackColor = p.SurfaceHover;
                 t.ForeColor = p.Text;

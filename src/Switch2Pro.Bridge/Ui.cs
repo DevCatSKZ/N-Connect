@@ -936,6 +936,61 @@ internal sealed class NavItem : Control, ISelfTranslating
     }
 }
 
+/// <summary>
+/// Eingabefeld im Windows-11-Stil: abgerundeter Rahmen, Text senkrecht mittig mit Innenabstand, Akzentlinie unten bei
+/// Fokus. Umhüllt ein randloses <see cref="TextBox"/> (Text, Platzhalter, Ereignisse bleiben dort).
+/// </summary>
+internal sealed class TextField : Panel
+{
+    public TextBox Box { get; }
+
+    public TextField(TextBox box, int? width = null)
+    {
+        Box = box;
+        SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint
+                 | ControlStyles.ResizeRedraw, true);
+        Size = new Size(width ?? box.Width, 32);
+        Location = box.Location;
+        box.BorderStyle = BorderStyle.None;
+        box.Font = UiFonts.Body;
+        Controls.Add(box);
+        box.GotFocus += (_, _) => Invalidate();
+        box.LostFocus += (_, _) => Invalidate();
+        box.EnabledChanged += (_, _) => { Enabled = box.Enabled; Invalidate(); };
+        Visible = box.Visible; // danach das Feld ein-/ausblenden, nicht das TextBox
+        box.Visible = true;
+        Cursor = Cursors.IBeam;
+        Click += (_, _) => box.Focus();
+    }
+
+    protected override void OnLayout(LayoutEventArgs levent)
+    {
+        base.OnLayout(levent);
+        Box.SetBounds(10, (Height - Box.PreferredHeight) / 2 + 1, Math.Max(10, Width - 20), Box.PreferredHeight);
+    }
+
+    protected override void OnPaint(PaintEventArgs e)
+    {
+        var g = e.Graphics;
+        var p = Theme.Current;
+        g.Clear(Parent?.BackColor ?? Theme.Backdrop);
+        g.SmoothingMode = SmoothingMode.AntiAlias;
+        Box.BackColor = Enabled ? p.SurfaceHover : p.Surface;
+        using (var path = Theme.RoundedRect(new RectangleF(0.5f, 0.5f, Width - 1.5f, Height - 1.5f), 5))
+        {
+            using var fill = new SolidBrush(Box.BackColor);
+            g.FillPath(fill, path);
+            using var pen = new Pen(p.Border);
+            g.DrawPath(pen, path);
+        }
+        if (Box.Focused)
+        {
+            using var accent = new Pen(Theme.Accent, 2f);
+            g.DrawLine(accent, 4, Height - 1.5f, Width - 5, Height - 1.5f);
+        }
+    }
+}
+
 /// <summary>Seite mit senkrechtem Bildlauf; Inhalt (StackPanel) in voller Breite bis zu einer Höchstbreite.</summary>
 internal sealed class ScrollPage : Panel
 {
