@@ -249,6 +249,13 @@ internal sealed partial class InputView
     {
         using var path = Rounded(r, 5);
         Fill(g, path, on, Mix(_body, Color.Black, 0.2f));
+        if (_captionRotation != 0)
+        {
+            // Quer gehalten liegt die Schiene waagerecht: Beschriftung waagerecht (Caption dreht zurück, Maße getauscht).
+            float cx = r.X + r.Width / 2, cy = r.Y + r.Height / 2;
+            Caption(g, new RectangleF(cx - r.Height / 2, cy - r.Width / 2, r.Height, r.Width), text, 6.5f, on ? Color.White : FaceText);
+            return;
+        }
         var state = g.Save();
         g.TranslateTransform(r.X + r.Width / 2, r.Y + r.Height / 2);
         g.RotateTransform(-90);
