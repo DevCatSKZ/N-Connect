@@ -35,8 +35,15 @@ internal static class Theme
     public static Palette Current { get; private set; } = DarkPalette;
     public static bool Dark => Current.Dark;
     public static Color Accent { get; private set; } = Color.FromArgb(0, 120, 212);
-    /// <summary>Text auf Akzentflächen (dunkler Modus: helle Akzentfarbe, daher schwarz – wie in Windows 11).</summary>
-    public static Color OnAccent => Dark ? Color.Black : Color.White;
+    /// <summary>Text auf Akzentflächen: schwarz oder weiß, je nachdem was auf der Akzentfarbe besser lesbar ist.</summary>
+    public static Color OnAccent => Luminance(Accent) > 0.36f ? Color.Black : Color.White;
+
+    /// <summary>Relative Helligkeit (WCAG) einer Farbe, 0 = schwarz, 1 = weiß.</summary>
+    public static float Luminance(Color c)
+    {
+        static float L(int v) { float s = v / 255f; return s <= 0.03928f ? s / 12.92f : MathF.Pow((s + 0.055f) / 1.055f, 2.4f); }
+        return 0.2126f * L(c.R) + 0.7152f * L(c.G) + 0.0722f * L(c.B);
+    }
     /// <summary>Mica-Titelleiste aktiv (Einstellung an und Windows 11).</summary>
     public static bool Mica { get; private set; }
 
@@ -67,16 +74,28 @@ internal static class Theme
         }
     }
 
-    /// <summary>Akzentfarbe von Windows (DWM, ABGR); im dunklen Modus etwas aufgehellt wie in Windows.</summary>
+    /// <summary>
+    /// Akzentfarbe wie Windows 11 sie für Schaltflächen nimmt: aus der Akzentpalette im dunklen Modus die helle
+    /// Stufe „Light 2“, im hellen Modus die dunkle Stufe „Dark 1“ – so bleibt Text darauf immer gut lesbar.
+    /// Ohne Palette die DWM-Akzentfarbe, im dunklen Modus deutlich aufgehellt.
+    /// </summary>
     private static Color? WindowsAccent()
     {
         try
         {
+            using (var accent = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\Accent"))
+            {
+                if (accent?.GetValue("AccentPalette") is byte[] { Length: >= 28 } palette)
+                {
+                    int i = Current.Dark ? 1 : 4; // Light 2 bzw. Dark 1
+                    return Color.FromArgb(palette[i * 4], palette[i * 4 + 1], palette[i * 4 + 2]);
+                }
+            }
             using var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\DWM");
             if (key?.GetValue("AccentColor") is not int abgr)
                 return null;
             var c = Color.FromArgb(abgr & 0xFF, (abgr >> 8) & 0xFF, (abgr >> 16) & 0xFF);
-            return Current.Dark ? Blend(c, Color.White, 0.25f) : c;
+            return Current.Dark ? Blend(c, Color.White, 0.55f) : c;
         }
         catch (Exception e) when (e is System.Security.SecurityException or UnauthorizedAccessException or IOException)
         {
@@ -201,7 +220,7 @@ internal static class Theme
         bool editField = (e.State & DrawItemState.ComboBoxEdit) != 0;
         bool selected = !editField && (e.State & DrawItemState.Selected) != 0;
         var back = selected ? Accent : combo.Enabled ? Current.SurfaceHover : Current.Surface;
-        var fore = selected ? Color.White : combo.Enabled ? Current.Text : Current.TextMuted;
+        var fore = selected ? OnAccent : combo.Enabled ? Current.Text : Current.TextMuted;
         using (var brush = new SolidBrush(back))
             e.Graphics.FillRectangle(brush, e.Bounds);
         if (e.Index >= 0)

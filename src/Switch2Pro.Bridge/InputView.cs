@@ -88,14 +88,16 @@ internal sealed partial class InputView : Control
 
         // Umriss und alle Tastenpositionen 1:1 vom offiziellen Produktfoto (Frontansicht), wie bei den anderen Controllern.
         var f = Frame(307, 1600, 92, 1012);
-        var darkShoulder = Mix(_body, Color.White, 0.08f);
+        // Schultertasten aus der Gehäusefarbe abgeleitet: Trigger ZL/ZR dezent, Schultertasten L/R als hellere Taste.
+        var triggerColor = Mix(_body, Color.White, 0.13f);
+        var bumperColor = Mix(_body, Color.White, 0.30f);
 
-        // Hinten die Trigger ZL/ZR, dann das Gehäuse, dann die hellen Schultertasten L/R an den oberen Ecken.
-        Shoulder(g, f.R(452, 56, 240, 44), On(ProButtons.ZL), "ZL", darkShoulder, _gamepad.LeftTrigger / 255f);
-        Shoulder(g, f.R(1215, 56, 240, 44), On(ProButtons.ZR), "ZR", darkShoulder, _gamepad.RightTrigger / 255f);
+        // Hinten die Trigger ZL/ZR (unterer Rand vom Gehäuse verdeckt), dann das Gehäuse, dann die Schultertasten L/R.
+        Shoulder(g, f.R(448, 44, 246, 70), On(ProButtons.ZL), "ZL", triggerColor, _gamepad.LeftTrigger / 255f, tucked: true);
+        Shoulder(g, f.R(1213, 44, 246, 70), On(ProButtons.ZR), "ZR", triggerColor, _gamepad.RightTrigger / 255f, tucked: true);
         DrawPro2Body(g, f);
-        Shoulder(g, f.R(432, 96, 266, 56), On(ProButtons.L), "L", _grip);
-        Shoulder(g, f.R(1202, 96, 266, 56), On(ProButtons.R), "R", _grip);
+        Shoulder(g, f.R(430, 102, 268, 52), On(ProButtons.L), "L", bumperColor);
+        Shoulder(g, f.R(1202, 102, 268, 52), On(ProButtons.R), "R", bumperColor);
 
         // Links: Stick oben außen, Steuerkreuz darunter weiter innen
         Stick(g, f.P(575, 372), _gamepad.LeftX, _gamepad.LeftY, On(ProButtons.LeftStick), f.S(92), f.S(62));
@@ -121,12 +123,28 @@ internal sealed partial class InputView : Control
 
         Gyro(g, p?.Motion);
 
+        // Rücktasten GL/GR (auf der Rückseite der Griffe) – als Tasten auf den Griffen angedeutet, nicht lose daneben.
         if (switch2)
         {
-            bool gl = On(ProButtons.GL), gr = On(ProButtons.GR);
-            BackButton(g, new RectangleF(f.P(307, 560).X - 8, f.P(0, 560).Y, 40, 26), gl, "GL");
-            BackButton(g, new RectangleF(f.P(1600, 560).X - 32, f.P(0, 560).Y, 40, 26), gr, "GR");
+            GripButton(g, f.R(340, 646, 124, 54), On(ProButtons.GL), "GL");
+            GripButton(g, f.R(1443, 646, 124, 54), On(ProButtons.GR), "GR");
         }
+    }
+
+    /// <summary>Rücktaste GL/GR als flache Taste auf dem Griff (leuchtet beim Drücken).</summary>
+    private void GripButton(Graphics g, RectangleF r, bool on, string text)
+    {
+        using var path = Rounded(r, r.Height / 2);
+        if (on)
+        {
+            using var glow = new Pen(AccentGlow, 6f);
+            g.DrawPath(glow, path);
+        }
+        using (var fill = new SolidBrush(on ? Accent : Mix(_body, Color.Black, 0.28f)))
+            g.FillPath(fill, path);
+        using (var edge = new Pen(on ? Color.FromArgb(160, 235, 255) : Mix(_body, Color.White, 0.18f), 1.2f))
+            g.DrawPath(edge, path);
+        Caption(g, r, text, Math.Clamp(r.Height * 0.42f, 7f, 9f), on ? Color.White : Mix(_body, Color.White, 0.7f));
     }
 
     /// <summary>Gehäuse des Pro Controller 2: Umriss vom Foto, matte Fläche mit leichtem Verlauf und feiner Glanzkante.</summary>
@@ -175,14 +193,6 @@ internal sealed partial class InputView : Control
             using var led = new SolidBrush(on ? Color.FromArgb(140, 255, 140) : Mix(_body, Color.Black, 0.4f));
             g.FillEllipse(led, x - 2, c.Y - 2, 4, 4);
         }
-    }
-
-    /// <summary>Rücktaste (GL/GR) bzw. SL/SR, seitlich neben dem Griff dargestellt.</summary>
-    private void BackButton(Graphics g, RectangleF r, bool on, string text)
-    {
-        using var path = Rounded(r, 9);
-        Fill(g, path, on, Mix(_body, Color.Black, 0.15f));
-        Caption(g, r, text, 8.5f, on ? Color.White : FaceText);
     }
 
     // ---------- Bedienelemente ----------

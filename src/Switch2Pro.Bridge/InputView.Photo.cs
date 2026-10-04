@@ -142,8 +142,11 @@ internal sealed partial class InputView
         g.Restore(state);
     }
 
-    /// <summary>Schultertaste als abgerundete Fläche an ihrer Foto-Position (über dem Gehäuse, leuchtet beim Drücken).</summary>
-    private void Shoulder(Graphics g, RectangleF r, bool on, string text, Color color, float value = 0)
+    /// <summary>
+    /// Schultertaste als abgerundete Fläche an ihrer Foto-Position (leuchtet beim Drücken). <paramref name="tucked"/>:
+    /// liegt hinter der Gehäuse-Oberkante (vor dem Gehäuse gezeichnet) – die Beschriftung sitzt dann im sichtbaren oberen Teil.
+    /// </summary>
+    private void Shoulder(Graphics g, RectangleF r, bool on, string text, Color color, float value = 0, bool tucked = false)
     {
         using var path = Rounded(r, Math.Min(r.Height / 2, 10));
         if (on)
@@ -166,7 +169,8 @@ internal sealed partial class InputView
         using (var edge = new Pen(on ? Color.FromArgb(160, 235, 255) : Mix(color, Color.Black, 0.35f), 1.2f))
             g.DrawPath(edge, path);
         var label = on || value > 0.5f ? Color.White : color.GetBrightness() > 0.55f ? Mix(color, Color.Black, 0.6f) : Mix(color, Color.White, 0.7f);
-        Caption(g, r, text, Math.Clamp(r.Height * 0.42f, 7f, 10f), label);
+        var captionRect = tucked ? new RectangleF(r.X, r.Y, r.Width, r.Height * 0.5f) : r;
+        Caption(g, captionRect, text, Math.Clamp(captionRect.Height * (tucked ? 0.62f : 0.42f), 6.5f, 10f), label);
     }
 
     /// <summary>Beschriftung unter einer Taste (z. B. SELECT, START) in Foto-Position.</summary>
@@ -185,13 +189,13 @@ internal sealed partial class InputView
         var f = Frame(108, 1184, 92, 914);
         var body = Color.FromArgb(0x4B, 0x4E, 0xA6);
         var grey = Color.FromArgb(0xD4, 0xD4, 0xDC);
+        // Schultern hinter der Oberkante: Z (blau, rechts) bzw. ZL (links, Switch-2-Version) ganz hinten, davor L/R (grau, analog)
+        Shoulder(g, f.R(950, 62, 120, 44), on(ProButtons.ZR), "Z", Color.FromArgb(0x5A, 0x5C, 0xD8), tucked: true);
+        Shoulder(g, f.R(210, 62, 120, 44), on(ProButtons.ZL), "ZL", Color.FromArgb(0x5A, 0x5C, 0xD8), tucked: true);
+        Shoulder(g, f.R(215, 96, 160, 60), on(ProButtons.L), "L", grey, _input?.LeftTrigger ?? 0, tucked: true);
+        Shoulder(g, f.R(905, 96, 160, 60), on(ProButtons.R), "R", grey, _input?.RightTrigger ?? 0, tucked: true);
         using (var path = f.Outline(PhotoOutlines.GameCube))
             BodyShape(g, path, body);
-        // Schultern: L/R grau (analog), Z blau rechts, ZL links (Switch-2-Version)
-        Shoulder(g, f.R(225, 140, 140, 46), on(ProButtons.L), "L", grey, _input?.LeftTrigger ?? 0);
-        Shoulder(g, f.R(915, 140, 140, 46), on(ProButtons.R), "R", grey, _input?.RightTrigger ?? 0);
-        Shoulder(g, f.R(960, 110, 110, 34), on(ProButtons.ZR), "Z", Color.FromArgb(0x5A, 0x5C, 0xD8));
-        Shoulder(g, f.R(210, 110, 110, 34), on(ProButtons.ZL), "ZL", Color.FromArgb(0x5A, 0x5C, 0xD8));
 
         Stick(g, f.P(318, 348), _gamepad.LeftX, _gamepad.LeftY, on(ProButtons.LeftStick), f.S(98), f.S(68),
             capColor: grey, wellColor: Mix(body, Color.Black, 0.3f), octagon: true);
@@ -223,12 +227,12 @@ internal sealed partial class InputView
         var key = Color.FromArgb(0x30, 0x30, 0x35);
         var text = Color.FromArgb(0xE0, 0xE0, 0xE6);
         // Schultern hinter der Oberkante: ZL/ZR außen, L/R davor
-        Shoulder(g, f.R(240, 96, 170, 40), on(ProButtons.ZL), "ZL", Color.FromArgb(0x48, 0x48, 0x4E));
-        Shoulder(g, f.R(870, 96, 170, 40), on(ProButtons.ZR), "ZR", Color.FromArgb(0x48, 0x48, 0x4E));
+        Shoulder(g, f.R(240, 66, 180, 56), on(ProButtons.ZL), "ZL", Color.FromArgb(0x48, 0x48, 0x4E), tucked: true);
+        Shoulder(g, f.R(860, 66, 180, 56), on(ProButtons.ZR), "ZR", Color.FromArgb(0x48, 0x48, 0x4E), tucked: true);
         using (var path = f.Outline(PhotoOutlines.WiiUPro, symmetric: true))
             BodyShape(g, path, body);
-        Shoulder(g, f.R(250, 128, 160, 30), on(ProButtons.L), "L", Color.FromArgb(0x58, 0x58, 0x5E));
-        Shoulder(g, f.R(870, 128, 160, 30), on(ProButtons.R), "R", Color.FromArgb(0x58, 0x58, 0x5E));
+        Shoulder(g, f.R(250, 112, 170, 40), on(ProButtons.L), "L", Color.FromArgb(0x5E, 0x5E, 0x66));
+        Shoulder(g, f.R(860, 112, 170, 40), on(ProButtons.R), "R", Color.FromArgb(0x5E, 0x5E, 0x66));
 
         Stick(g, f.P(335, 215), _gamepad.LeftX, _gamepad.LeftY, on(ProButtons.LeftStick), f.S(92), f.S(60), key, Color.FromArgb(0x1A, 0x1A, 0x1E));
         Stick(g, f.P(945, 215), _gamepad.RightX, _gamepad.RightY, on(ProButtons.RightStick), f.S(92), f.S(60), key, Color.FromArgb(0x1A, 0x1A, 0x1E));
@@ -270,11 +274,12 @@ internal sealed partial class InputView
         var f = Frame(28, 1252, 53, 1235);
         var body = Color.FromArgb(0xB4, 0xB4, 0xB8);
         var dark = Color.FromArgb(0x4E, 0x4E, 0x54);
+        // Schultern hinter der Oberkante (ZR der Switch-Online-Version sitzt hinten rechts)
+        Shoulder(g, f.R(790, 46, 130, 60), on(ProButtons.ZR), "ZR", Color.FromArgb(0x6A, 0x6A, 0x70), tucked: true);
+        Shoulder(g, f.R(150, 92, 200, 76), on(ProButtons.L), "L", Color.FromArgb(0x6A, 0x6A, 0x70), tucked: true);
+        Shoulder(g, f.R(930, 92, 200, 76), on(ProButtons.R), "R", Color.FromArgb(0x6A, 0x6A, 0x70), tucked: true);
         using (var path = f.Outline(PhotoOutlines.N64, symmetric: true))
             BodyShape(g, path, body);
-        Shoulder(g, f.R(150, 152, 190, 52), on(ProButtons.L), "L", Color.FromArgb(0x6A, 0x6A, 0x70));
-        Shoulder(g, f.R(940, 152, 190, 52), on(ProButtons.R), "R", Color.FromArgb(0x6A, 0x6A, 0x70));
-        Shoulder(g, f.R(800, 100, 110, 36), on(ProButtons.ZR), "ZR", Color.FromArgb(0x6A, 0x6A, 0x70));
 
         using (var dish = new SolidBrush(Mix(body, Color.White, 0.2f)))
         {
@@ -317,12 +322,13 @@ internal sealed partial class InputView
         var f = Frame(31, 1238, 70, 596);
         var body = Color.FromArgb(0xCD, 0xCD, 0xD2);
         var shoulder = Color.FromArgb(0xB0, 0xB0, 0xB6);
-        Shoulder(g, f.R(450, 68, 95, 30), on(ProButtons.ZL), "ZL", shoulder);
-        Shoulder(g, f.R(725, 68, 95, 30), on(ProButtons.ZR), "ZR", shoulder);
+        // Schultern hinter der Oberkante: ZL/ZR innen, L/R über den Ecken
+        Shoulder(g, f.R(440, 36, 115, 56), on(ProButtons.ZL), "ZL", shoulder, tucked: true);
+        Shoulder(g, f.R(715, 36, 115, 56), on(ProButtons.ZR), "ZR", shoulder, tucked: true);
+        Shoulder(g, f.R(165, 40, 260, 64), on(ProButtons.L), "L", shoulder, tucked: true);
+        Shoulder(g, f.R(845, 40, 260, 64), on(ProButtons.R), "R", shoulder, tucked: true);
         using (var path = f.Outline(PhotoOutlines.Snes, symmetric: true))
             BodyShape(g, path, body);
-        Shoulder(g, f.R(170, 72, 248, 32), on(ProButtons.L), "L", shoulder);
-        Shoulder(g, f.R(848, 72, 252, 32), on(ProButtons.R), "R", shoulder);
 
         using (var dish = new SolidBrush(Mix(body, Color.White, 0.25f)))
             g.FillEllipse(dish, f.R(140, 196, 290, 290));
@@ -352,8 +358,8 @@ internal sealed partial class InputView
         var face = Color.FromArgb(0x26, 0x26, 0x28);
         var stripe = Color.FromArgb(0xB4, 0xB2, 0xAE);
         var red = Color.FromArgb(0xC8, 0x22, 0x28);
-        Shoulder(g, f.R(70, 66, 250, 28), on(ProButtons.L), "L", Color.FromArgb(0xA8, 0xA6, 0xA2));
-        Shoulder(g, f.R(958, 66, 250, 28), on(ProButtons.R), "R", Color.FromArgb(0xA8, 0xA6, 0xA2));
+        Shoulder(g, f.R(70, 48, 250, 60), on(ProButtons.L), "L", Color.FromArgb(0xA8, 0xA6, 0xA2), tucked: true);
+        Shoulder(g, f.R(958, 48, 250, 60), on(ProButtons.R), "R", Color.FromArgb(0xA8, 0xA6, 0xA2), tucked: true);
         using (var path = Rounded(f.R(35, 83, 1208, 522), f.S(22)))
             BodyShape(g, path, body);
         using (var plate = Rounded(f.R(70, 168, 1138, 400), f.S(8)))
@@ -406,7 +412,7 @@ internal sealed partial class InputView
     {
         var f = Frame(465, 1200, 387, 739);
         var body = Color.FromArgb(0x2C, 0x2C, 0x30);
-        Shoulder(g, f.R(700, 372, 90, 30), on(ProButtons.Minus), "MODE", Color.FromArgb(0x50, 0x50, 0x56));
+        Shoulder(g, f.R(1030, 384, 110, 50), on(ProButtons.Minus), "MODE", Color.FromArgb(0x50, 0x50, 0x56), tucked: true);
         using (var path = f.Outline(PhotoOutlines.MegaDrive, symmetric: true, mirrorRight: true))
             BodyShape(g, path, body);
         var dish = Mix(body, Color.Black, 0.25f);
@@ -439,10 +445,10 @@ internal sealed partial class InputView
     {
         var f = Frame(58, 1217, 61, 610);
         var shoulder = Color.FromArgb(0xDA, 0xDA, 0xE0);
-        Shoulder(g, f.R(250, 46, 210, 40), on(ProButtons.L) || (_input?.LeftTrigger ?? 0) > 0.1f, "L", shoulder, _input?.LeftTrigger ?? 0);
-        Shoulder(g, f.R(820, 46, 210, 40), on(ProButtons.R) || (_input?.RightTrigger ?? 0) > 0.1f, "R", shoulder, _input?.RightTrigger ?? 0);
-        Shoulder(g, f.R(468, 50, 96, 34), on(ProButtons.ZL), "ZL", shoulder);
-        Shoulder(g, f.R(716, 50, 96, 34), on(ProButtons.ZR), "ZR", shoulder);
+        Shoulder(g, f.R(250, 26, 210, 64), on(ProButtons.L) || (_input?.LeftTrigger ?? 0) > 0.1f, "L", shoulder, _input?.LeftTrigger ?? 0, tucked: true);
+        Shoulder(g, f.R(820, 26, 210, 64), on(ProButtons.R) || (_input?.RightTrigger ?? 0) > 0.1f, "R", shoulder, _input?.RightTrigger ?? 0, tucked: true);
+        Shoulder(g, f.R(468, 32, 96, 56), on(ProButtons.ZL), "ZL", shoulder, tucked: true);
+        Shoulder(g, f.R(716, 32, 96, 56), on(ProButtons.ZR), "ZR", shoulder, tucked: true);
         // Unterer Fotorand liegt im Schatten: oberes linkes Viertel in beide Richtungen gespiegelt.
         using (var path = new GraphicsPath())
         {

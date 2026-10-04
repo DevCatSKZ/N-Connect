@@ -394,7 +394,7 @@ internal sealed class ToggleSwitch : Control, ISelfTranslating
             g.DrawPath(pen, path);
         }
         float d = 12, x = _checked ? track.Right - d - 4 : track.X + 4;
-        using (var knob = new SolidBrush(_checked ? (Theme.Dark ? Color.Black : Color.White) : Enabled ? p.TextMuted : p.Border))
+        using (var knob = new SolidBrush(_checked ? Theme.OnAccent : Enabled ? p.TextMuted : p.Border))
             g.FillEllipse(knob, x, track.Y + (track.Height - d) / 2, d, d);
         if (Focused && ShowFocusCues)
         {

@@ -97,9 +97,9 @@ internal sealed partial class InputView
         float top = f.P(0, 104).Y;
         DrawJoyConIn(g, left, new RectangleF(f.P(198, 0).X, top, w, h));
         DrawJoyConIn(g, right, new RectangleF(f.P(1082, 0).X - w, top, w, h));
-        bool gl = _input?.Has(ProButtons.GL) == true, gr = _input?.Has(ProButtons.GR) == true;
-        BackButton(g, new RectangleF(f.P(120, 0).X - 20, f.P(0, 860).Y, 40, 26), gl, "GL");
-        BackButton(g, new RectangleF(f.P(1160, 0).X - 20, f.P(0, 860).Y, 40, 26), gr, "GR");
+        // Rücktasten GL/GR (hinten an den Griffen) als Tasten auf den Griffen, wie beim Pro Controller 2
+        GripButton(g, f.R(96, 846, 130, 58), _input?.Has(ProButtons.GL) == true, "GL");
+        GripButton(g, f.R(1054, 846, 130, 58), _input?.Has(ProButtons.GR) == true, "GR");
     }
 
     /// <summary>Joy-Con in ein Zielrechteck (Gehäuse ohne Schultertasten) zeichnen.</summary>
@@ -152,8 +152,12 @@ internal sealed partial class InputView
             var bumper = new RectangleF(left ? 2 : LW - 90, -lh * 0.035f, 88, 30);
             using (var bPath = Rounded(bumper, 14))
                 Fill(g, bPath, On(left ? ProButtons.L : ProButtons.R), Mix(_body, Color.White, 0.15f));
-            Caption(g, new RectangleF(trigger.X, trigger.Y + 1, trigger.Width, 14), left ? "ZL" : "ZR", 7.5f, FaceText);
-            Caption(g, new RectangleF(bumper.X, bumper.Y + 3, bumper.Width, 14), left ? "L" : "R", 7.5f, Mix(_body, Color.White, 0.8f));
+            // Beschriftung jeweils im sichtbaren Streifen (der Rest liegt hinter der Taste davor bzw. dem Gehäuse)
+            Caption(g, new RectangleF(trigger.X, trigger.Y, trigger.Width, bumper.Y - trigger.Y), left ? "ZL" : "ZR", 7f,
+                On(left ? ProButtons.ZL : ProButtons.ZR) ? Color.White : FaceText);
+            var bumperText = Theme.Luminance(Mix(_body, Color.White, 0.15f)) > 0.4f ? Color.FromArgb(0x20, 0x20, 0x24) : Color.White;
+            Caption(g, new RectangleF(bumper.X, bumper.Y, bumper.Width, -bumper.Y), left ? "L" : "R", 7f,
+                On(left ? ProButtons.L : ProButtons.R) ? Color.White : bumperText);
 
             // Gehäuse: Umriss vom Foto
             using var shell = new GraphicsPath();
