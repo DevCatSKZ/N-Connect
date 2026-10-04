@@ -14,6 +14,8 @@ internal sealed class SettingsForm : Form
     private readonly Action<bool> _changed; // true = Ausgabeart geändert
     private readonly ControllerManager? _manager;
     private readonly Action? _wiiPairing;
+    /// <summary>Öffnet das Fenster „Kopplungsdaten“ (Switch-SD-Karte, anderer PC).</summary>
+    private readonly Action? _pairingData;
     private readonly MappingContext _mapping;
     private readonly ControllerOverview _overview;
     private readonly System.Windows.Forms.Timer _liveTimer = new() { Interval = 16 }; // ~60 Bilder/s: Anzeige ohne spürbare Verzögerung
@@ -67,6 +69,7 @@ internal sealed class SettingsForm : Form
     private readonly ToggleSwitch _mouse = new();
     private readonly Slider _mouseSpeed = Bar(1, 50, v => $"{v / 10f:0.0}×");
     private readonly ToggleSwitch _wiiPointer = new();
+    private readonly ToggleSwitch _switchCardHint = new();
 
     // ---------- Tastenbelegung ----------
     private readonly ComboBox _profileSelect = Combo(240);
@@ -80,12 +83,13 @@ internal sealed class SettingsForm : Form
     private readonly MappingEditor _mapEditor;
     private readonly List<ControllerKind> _mapKinds = [], _tuneKinds = [];
 
-    public SettingsForm(Settings settings, Action<bool> changed, ControllerManager? manager, Action? wiiPairing = null)
+    public SettingsForm(Settings settings, Action<bool> changed, ControllerManager? manager, Action? wiiPairing = null, Action? pairingData = null)
     {
         _settings = settings;
         _changed = changed;
         _manager = manager;
         _wiiPairing = wiiPairing;
+        _pairingData = pairingData;
         _mapping = new MappingContext(() => _settings, () => _changed(false), () => this);
         _overview = new ControllerOverview(manager, () => _settings, _mapping, () => _changed(false), ShowPage);
         _mapEditor = new MappingEditor(_mapping, ControllerKind.Pro2);
@@ -296,6 +300,13 @@ internal sealed class SettingsForm : Form
         page.AddGroup("Wii",
             Row("Wii-Controller koppeln", "Wii-Fernbedienung und Wii U Pro Controller einmalig mit dem PC koppeln.", pair, Glyph.Bluetooth),
             Row("Zeiger steuert die Maus", "Wii-Fernbedienung auf die Sensorleiste richten, um den Mauszeiger zu bewegen.", _wiiPointer, Glyph.Pointer));
+        var pairing = new GlyphButton("Kopplungsdaten von der Switch übernehmen", Glyph.Import) { Enabled = _pairingData is not null };
+        pairing.Click += (_, _) => _pairingData?.Invoke();
+        page.AddGroup("Kopplungsdaten",
+            Row("Kopplungen übernehmen oder weitergeben", "Von der Switch-SD-Karte (Bluepick_RCM/hekate) oder von einem anderen PC übernehmen, " +
+                "oder für einen anderen PC exportieren.", pairing, Glyph.Sync),
+            Row("Bei Switch-SD-Karte nachfragen", "Steckt eine SD-Karte der Switch im PC (Kartenleser oder hekate „USB Tools“), " +
+                "bietet N-Connect die Übernahme an. Die Karte wird nur gelesen.", _switchCardHint, Glyph.Folder));
         return page;
     }
 
@@ -417,6 +428,7 @@ internal sealed class SettingsForm : Form
         _invertX.CheckedChanged += (_, _) => Apply(() => _settings.MouseInvertX = _invertX.Checked);
         _invertY.CheckedChanged += (_, _) => Apply(() => _settings.MouseInvertY = _invertY.Checked);
         _wiiPointer.CheckedChanged += (_, _) => Apply(() => _settings.WiiPointerMouse = _wiiPointer.Checked);
+        _switchCardHint.CheckedChanged += (_, _) => Apply(() => _settings.SwitchCardHint = _switchCardHint.Checked);
         _inactivity.SelectedIndexChanged += (_, _) =>
             Apply(() => _settings.InactivityMinutes = _inactivityValues[Math.Max(0, _inactivity.SelectedIndex)]);
         _gyroSource.SelectedIndexChanged += (_, _) =>
@@ -499,6 +511,7 @@ internal sealed class SettingsForm : Form
         _invertX.Checked = _settings.MouseInvertX;
         _invertY.Checked = _settings.MouseInvertY;
         _wiiPointer.Checked = _settings.WiiPointerMouse;
+        _switchCardHint.Checked = _settings.SwitchCardHint;
         // Auswahl jedes Mal neu aufbauen; ein von Hand eingetragener Wert (z. B. 20) erscheint als eigener Eintrag.
         _inactivityValues.Clear();
         _inactivityValues.AddRange(InactivityChoices);

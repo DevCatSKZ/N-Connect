@@ -248,6 +248,15 @@ public sealed class Settings
     /// <summary>Einzelne Joy-Con, die hochkant statt quer gehalten werden (Bluetooth-Adressen).</summary>
     public List<string> UprightJoyCons { get; set; } = [];
 
+    /// <summary>
+    /// Übernommene Kopplungsdaten (von der Switch-SD-Karte oder einem anderen PC): welcher Controller an welchen
+    /// Host gebunden ist. Nur zur Anzeige und für den Export – Schlüssel werden hier nie gespeichert.
+    /// </summary>
+    public List<PairingNote> ImportedPairings { get; set; } = [];
+
+    /// <summary>Beim Einstecken einer Switch-SD-Karte anbieten, die Kopplungsdaten zu übernehmen.</summary>
+    public bool SwitchCardHint { get; set; } = true;
+
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         WriteIndented = true,
@@ -333,6 +342,8 @@ public sealed class Settings
         KnownControllers = [.. other.KnownControllers];
         AllowedControllers = [.. other.AllowedControllers];
         SingleJoyCons = [.. other.SingleJoyCons];
+        ImportedPairings = [.. other.ImportedPairings];
+        SwitchCardHint = other.SwitchCardHint;
     }
 
     [JsonIgnore]
@@ -420,6 +431,7 @@ public sealed class Settings
         SingleJoyCons ??= [];
         UprightJoyCons ??= [];
         HiddenDevices ??= [];
+        ImportedPairings = ImportedPairings?.Where(p => p?.Address is not null).ToList() ?? [];
         Remap ??= [];
         Profiles ??= [];
         ShiftProfiles ??= [];
@@ -463,3 +475,6 @@ public sealed class Settings
         return this;
     }
 }
+
+/// <summary>Ein übernommener Kopplungseintrag: Controller-Adresse, Name, Host-Adresse, Herkunft ("Switch"/"N-Connect").</summary>
+public sealed record PairingNote(string Address, string? Name, string? HostAddress, string? Source);
