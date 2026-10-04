@@ -69,8 +69,13 @@ Bis zu **8 Spieler** gleichzeitig (`ControllerManager.MaxPlayers`). Der 9. Contr
 - Nach einem **Fehlschlag** lässt die Hintergrundsuche den Controller **90 s** in Ruhe (sonst wäre er bei jedem
   Versuch belegt und tauchte auch in „Gerät hinzufügen“ von Windows nicht auf). Das Fenster „Controller koppeln“
   versucht es trotzdem.
-- Achtung: Vor dem Neukoppeln wird die alte Windows-Kopplung entfernt (sonst verweigert Windows die neue). Scheitert
-  die neue Kopplung (z. B. Wii, Fehler 259), muss der Controller erneut per SYNC gekoppelt werden.
+- **Neukoppeln abgesichert** (`ScanOnce`, `FindAnswering`):
+  1. Ein bekannter Controller wird nur angefasst, wenn er in einer **zweiten Suche erneut antwortet** (strikt neueres
+     `stLastSeen`) – sonst bleibt seine Kopplung unverändert (Protokoll: „antwortet nicht erneut“).
+  2. Alte Kopplung entfernen (sonst verweigert Windows die neue), dann das Gerät **neu suchen** und mit den frischen
+     Gerätedaten koppeln – mit den alten Daten schlug die Kopplung fehl (Wii: Fehler 259 = keine Einträge).
+  3. Scheitert die Kopplung und antwortet der Controller noch, **zweiter Versuch** mit frisch gesuchten Daten.
+  Erst danach gilt sie als fehlgeschlagen (90 s Pause im Hintergrund). Jede Suche dauert ~1,3 s.
 - **„Controller koppeln …“** (Fenster): sucht 60 s lang, 1 s Pause zwischen den Läufen, koppelt auch bekannte
   Controller neu, die gerade sichtbar sind.
 - Erkannte Namen: „Joy-Con (L/R)“, „Pro Controller“, „Lic Pro Controller“, „NES/HVC/SNES/N64 Controller“,
