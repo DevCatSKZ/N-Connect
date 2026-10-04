@@ -859,6 +859,7 @@ internal sealed class SettingsForm : Form
         }
         NoWheel(_grid);
         Tr.Apply(_grid);
+        Theme.ApplyControls(_grid); // neu erzeugte Listen ebenfalls im gewählten Design
         _grid.ResumeLayout();
     }
 
