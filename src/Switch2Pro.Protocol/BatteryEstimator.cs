@@ -12,6 +12,9 @@ public sealed class BatteryEstimator
     /// <summary>Zeitkonstante der Glättung (Millisekunden).</summary>
     private const double SmoothingMs = 4000;
 
+    /// <summary>Spielraum an Prozentgrenzen (Millivolt), gegen Flackern zwischen zwei Werten.</summary>
+    private const int ToleranceMillivolts = 3;
+
     private double _millivolts;
     private long _lastTicks;
     private bool _charging;
@@ -70,17 +73,29 @@ public sealed class BatteryEstimator
         }
 
         int offsetNow = charging ? ChargeOffset ?? DefaultChargeOffsetMillivolts(kind) : 0;
-        int estimate = InputReports.BatteryPercentFromMillivolts((int)Math.Round(_millivolts) - offsetNow, kind);
-        if (_shown < 0 || unplugged)
-            _shown = estimate; // Laden beendet: Ruhespannung zeigt den echten Stand
+        int mv = (int)Math.Round(_millivolts) - offsetNow;
+        int estimate = InputReports.BatteryPercentFromMillivolts(mv, kind);
+        // Toleranz: liegt die Spannung genau an einer Prozentgrenze, soll die Anzeige nicht hin- und herspringen.
+        int low = InputReports.BatteryPercentFromMillivolts(mv - ToleranceMillivolts, kind);
+        int high = InputReports.BatteryPercentFromMillivolts(mv + ToleranceMillivolts, kind);
+        if (_shown < 0)
+            _shown = estimate;
+        else if (unplugged)
+        {
+            // Laden beendet bzw. Ladepause: die Ruhespannung zeigt den echten Stand
+            if (high < _shown || low > _shown)
+                _shown = estimate;
+        }
         else if (charging && _plugTicks >= 0)
         {
             // gerade angesteckt: Stand von vorher halten, bis der Spannungssprung gemessen ist
         }
         else if (charging)
-            _shown = Math.Max(_shown, estimate); // lädt: nur steigen (beim Anstecken vom Stand davor aus)
-        else if (estimate < _shown || estimate > _shown + 5)
-            _shown = estimate; // entlädt: nur sinken; deutlich höher nur nach dem Laden bzw. Akkuwechsel
+            _shown = Math.Max(_shown, low); // lädt: nur steigen (beim Anstecken vom Stand davor aus)
+        else if (high < _shown)
+            _shown = high; // entlädt: nur sinken
+        else if (low > _shown + 5)
+            _shown = low; // deutlich höher nur nach dem Laden bzw. Akkuwechsel
         return _shown;
     }
 }

@@ -113,6 +113,20 @@ public class BatteryEstimatorTests
     }
 
     [Fact]
+    public void Prozentgrenze_KeinFlackern()
+    {
+        // Gemessen: Ladepausen mit 3705 mV (26 %) und 3704 mV (25 %) im Wechsel mit Laden bei 3724 mV.
+        var e = new BatteryEstimator(chargeOffsetMillivolts: 20);
+        long t = 1000;
+        int first = e.Update(3705, false, Pro, t);
+        foreach (var (mv, charging) in new[] { (3724, true), (3704, false), (3712, true), (3705, false), (3704, false), (3724, true) })
+        {
+            t += 30_000;
+            Assert.Equal(first, e.Update(mv, charging, Pro, t));
+        }
+    }
+
+    [Fact]
     public void Abstecken_ZeigtEchtenStand()
     {
         var e = new BatteryEstimator();
