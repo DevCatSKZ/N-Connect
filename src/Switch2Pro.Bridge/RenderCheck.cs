@@ -219,6 +219,35 @@ internal static class RenderCheck
             }
             Directory.Delete(sd, recursive: true);
 
+            // Weitere Fenster mit dem ersten simulierten Controller (Stick-Kalibrierung, Gyro-Assistent).
+            void Snap(Form dialog, string name)
+            {
+                dialog.StartPosition = FormStartPosition.Manual;
+                dialog.Location = new Point(-6000, -6000);
+                dialog.ShowInTaskbar = false;
+                dialog.Show();
+                for (int i = 0; i < 40; i++)
+                {
+                    Application.DoEvents();
+                    Thread.Sleep(20);
+                }
+                using var bmp = new Bitmap(dialog.Width, dialog.Height);
+                using (var g = Graphics.FromImage(bmp))
+                {
+                    var hdc = g.GetHdc();
+                    PrintWindow(dialog.Handle, hdc, 2);
+                    g.ReleaseHdc(hdc);
+                }
+                bmp.Save(Path.Combine(folder, $"ui_{name}{variant}_{lang}.png"), ImageFormat.Png);
+                dialog.Close();
+            }
+            if (manager?.Players.FirstOrDefault(StickCalibrationForm.CanCalibrate) is { } calibratable)
+                using (var sticks = new StickCalibrationForm(calibratable, () => new Settings(), () => { }))
+                    Snap(sticks, "sticks");
+            if (manager?.Players.FirstOrDefault() is { } anyPlayer)
+                using (var gyro = new GyroSetupForm(anyPlayer, () => new Settings(), () => { }))
+                    Snap(gyro, "gyro");
+
             // Meldungsfenster im Design: kurz anzeigen, abfotografieren, schließen.
             var shot = new System.Windows.Forms.Timer { Interval = 400 };
             shot.Tick += (_, _) =>

@@ -189,9 +189,21 @@ internal sealed class Player : IDisposable
     private bool _lastCharging;
 
     /// <summary>Kalibrierung eines Controllers mit dem vom Benutzer gemessenen Gyro-Nullpunkt (falls vorhanden).</summary>
-    public static DeviceCalibration CalibrationFor(IControllerLink link, Settings settings) =>
-        settings.GyroCalibration.Count == 0 ? link.Calibration
-            : link.Calibration with { Gyro = settings.GyroBiasFor(link.Address, link.Calibration.Gyro) };
+    public static DeviceCalibration CalibrationFor(IControllerLink link, Settings settings)
+    {
+        var cal = link.Calibration;
+        if (settings.GyroCalibration.Count > 0)
+            cal = cal with { Gyro = settings.GyroBiasFor(link.Address, cal.Gyro) };
+        // Eigene Stick-Kalibrierung (geführt gemessen) statt der Werkswerte.
+        if (settings.StickCalibrations.Count > 0)
+        {
+            if (settings.StickCalibrationFor(link.Address, left: true) is { } l)
+                cal = cal with { Left = l };
+            if (settings.StickCalibrationFor(link.Address, left: false) is { } r)
+                cal = cal with { Right = r };
+        }
+        return cal;
+    }
 
     /// <summary>
     /// Einheitliche Eingabe aus den letzten Zuständen (auch für die Anzeige): Paar zusammengefügt,
