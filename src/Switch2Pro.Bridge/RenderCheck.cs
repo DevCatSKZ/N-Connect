@@ -106,7 +106,8 @@ internal static class RenderCheck
     {
         Directory.CreateDirectory(folder);
         string lang = Tr.English ? "en" : "de";
-        string variant = Environment.GetCommandLineArgs().Contains("--demo-all") ? "_alle" : Environment.GetCommandLineArgs().Contains("--demo-retro") ? "_retro" : "";
+        string variant = (Environment.GetCommandLineArgs().Contains("--demo-all") ? "_alle" : Environment.GetCommandLineArgs().Contains("--demo-retro") ? "_retro" : "")
+                         + (Environment.GetCommandLineArgs().Contains("--wide") ? "_breit" : "");
         var log = new List<string>();
         using var factory = PadFactory.TryCreate();
         ControllerManager? manager = factory is null ? null : new ControllerManager(() => new Settings(), factory);
@@ -118,7 +119,7 @@ internal static class RenderCheck
             using var form = new SettingsForm(new Settings(), _ => { }, manager)
             {
                 StartPosition = FormStartPosition.Manual, Location = new Point(-6000, -6000), ShowInTaskbar = false,
-                Size = new Size(1220, 900),
+                Size = Environment.GetCommandLineArgs().Contains("--wide") ? new Size(1900, 1040) : new Size(1220, 900),
             };
             form.Show();
             log.Add($"Fenster erzeugt und gezeigt: {sw.ElapsedMilliseconds} ms");
@@ -156,7 +157,7 @@ internal static class RenderCheck
             var cards = form.Overview.Cards;
             for (int c = 0; c < cards.Count; c++)
             {
-                for (int tab = 0; tab < 5; tab++)
+                for (int tab = 0; tab < 6; tab++)
                 {
                     sw.Restart();
                     bool shown = ControllerOverview.ExpandCard(cards[c], tab);

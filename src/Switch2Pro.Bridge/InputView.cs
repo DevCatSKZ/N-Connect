@@ -9,11 +9,11 @@ namespace Switch2Pro.Bridge;
 /// Gezeichneter Controller im Stil des Pro Controller 2 zum Prüfen der Eingaben: gedrückte Tasten leuchten
 /// auf, Sticks bewegen ihre Kappe, Trigger füllen sich, der Bewegungssensor erscheint als Balken.
 /// Farben kommen vom Controller selbst (Gehäuse, Tasten, Griffe), sonst die des Pro Controller 2.
-/// Zeichnet in einem festen Raster (580 × 410) und skaliert auf die Größe des Steuerelements.
+/// Zeichnet in einem festen Raster (580 × 430) und skaliert auf die Größe des Steuerelements.
 /// </summary>
 internal sealed partial class InputView : Control
 {
-    private const float W = 580, H = 410;
+    private const float W = 580, H = 430;
 
     /// <summary>Breite der Controller-Zeichnung; sie steht um <see cref="X0"/> eingerückt, daneben GL/GR.</summary>
     private const float CW = 520, X0 = 30;
@@ -96,45 +96,42 @@ internal sealed partial class InputView : Control
         bool On(ProButtons b) => p is not null && p.Has(b);
         bool joyCon = p?.Kind.IsJoyCon() == true;
 
-        // Positionen maßstabsgetreu nach einem Produktfoto des Pro Controller 2 (Frontansicht).
-        // Hinten: Trigger ZL/ZR, davor die hell abgesetzten Schultertasten L/R
-        CornerTrigger(g, left: true, _gamepad.LeftTrigger / 255f);
-        CornerTrigger(g, left: false, _gamepad.RightTrigger / 255f);
-        CornerBumper(g, left: true, On(ProButtons.L));
-        CornerBumper(g, left: false, On(ProButtons.R));
+        // Alle Positionen vom offiziellen Produktfoto (Frontansicht) übertragen: 1 Foto-Pixel = 0,397 Einheiten,
+        // Gesamtmaß 148 × 105 mm. Hinten die Trigger ZL/ZR, davor die hellen Schultertasten L/R an den Ecken.
+        Pro2Trigger(g, left: true, _gamepad.LeftTrigger / 255f);
+        Pro2Trigger(g, left: false, _gamepad.RightTrigger / 255f);
+        Pro2Bumper(g, left: true, On(ProButtons.L));
+        Pro2Bumper(g, left: false, On(ProButtons.R));
 
         DrawBody(g);
-        ShoulderLabels(g, _gamepad.LeftTrigger / 255f, _gamepad.RightTrigger / 255f, On(ProButtons.L), On(ProButtons.R));
 
-        // Rücktasten (Pro Controller 2: GL/GR, einzelner Joy-Con: SL/SR) – unter den Griffen angedeutet
-
-        // Links: Stick oben außen, großes Steuerkreuz darunter weiter innen
-        Stick(g, P(119, 153), _gamepad.LeftX, _gamepad.LeftY, On(ProButtons.LeftStick));
-        DPad(g, P(192, 233), On(ProButtons.Up), On(ProButtons.Down), On(ProButtons.Left), On(ProButtons.Right));
+        // Links: Stick oben außen, Steuerkreuz darunter weiter innen
+        Stick(g, new PointF(117, 143), _gamepad.LeftX, _gamepad.LeftY, On(ProButtons.LeftStick));
+        DPad(g, new PointF(183, 217), On(ProButtons.Up), On(ProButtons.Down), On(ProButtons.Left), On(ProButtons.Right));
 
         // Rechts: Tasten oben außen (X oben, A rechts, B unten, Y links), Stick darunter weiter innen
-        Face(g, P(412, 116), On(ProButtons.X), "X");
-        Face(g, P(456, 153), On(ProButtons.A), "A");
-        Face(g, P(412, 190), On(ProButtons.B), "B");
-        Face(g, P(368, 154), On(ProButtons.Y), "Y");
-        Stick(g, P(339, 231), _gamepad.RightX, _gamepad.RightY, On(ProButtons.RightStick));
+        Face(g, new PointF(390, 107), On(ProButtons.X), "X");
+        Face(g, new PointF(432, 143), On(ProButtons.A), "A");
+        Face(g, new PointF(390, 179), On(ProButtons.B), "B");
+        Face(g, new PointF(348, 143), On(ProButtons.Y), "Y");
+        Stick(g, new PointF(320, 217), _gamepad.RightX, _gamepad.RightY, On(ProButtons.RightStick));
 
         // Mitte: − / + oben, Aufnahme (eckig) / HOME (rund) darunter, C unten mittig
-        Small(g, P(205, 112), On(ProButtons.Minus), "−");
-        Small(g, P(336, 112), On(ProButtons.Plus), "+");
-        CaptureKey(g, P(238, 155), On(ProButtons.Capture));
-        Home(g, P(304, 154), On(ProButtons.Home));
-        SquareKey(g, P(272, 273), On(ProButtons.C), "C");
-        PlayerLeds(g, new PointF(CW / 2, 47));
+        Small(g, new PointF(195, 104), On(ProButtons.Minus), "−");
+        Small(g, new PointF(319, 104), On(ProButtons.Plus), "+");
+        CaptureKey(g, new PointF(226, 144), On(ProButtons.Capture));
+        Home(g, new PointF(289, 144), On(ProButtons.Home));
+        SquareKey(g, new PointF(257, 256), On(ProButtons.C), "C");
+        PlayerLeds(g, new PointF(CW / 2, 50));
 
         Gyro(g, p?.Motion);
 
-        // Rücktasten GL/GR (bzw. SL/SR beim einzelnen Joy-Con) seitlich neben den Griffen, symmetrisch
+        // Rücktasten GL/GR (bzw. SL/SR beim einzelnen Joy-Con) seitlich neben dem schmalen Oberteil, symmetrisch
         g.Restore(controller);
         bool gl = On(ProButtons.GL) || On(ProButtons.SLLeft) || On(ProButtons.SLRight);
         bool gr = On(ProButtons.GR) || On(ProButtons.SRLeft) || On(ProButtons.SRRight);
-        BackButton(g, new RectangleF(2, 318, 40, 26), gl, joyCon ? "SL" : "GL");
-        BackButton(g, new RectangleF(W - 42, 318, 40, 26), gr, joyCon ? "SR" : "GR");
+        BackButton(g, new RectangleF(10, 196, 40, 26), gl, joyCon ? "SL" : "GL");
+        BackButton(g, new RectangleF(W - 50, 196, 40, 26), gr, joyCon ? "SR" : "GR");
     }
 
     /// <summary>Spielernummer für die LED-Anzeige (0–7), −1 = aus.</summary>
@@ -160,36 +157,34 @@ internal sealed partial class InputView : Control
 
     // ---------- Gehäuse ----------
 
+    /// <summary>
+    /// Linke Hälfte des Umrisses, vom offiziellen Frontfoto übertragen (oben Mitte → über den linken Griff → Bogen
+    /// unten Mitte). Typisch für das Original: Oberteil schmaler als die Griffe, die Griffe laufen nach unten schräg
+    /// nach außen, dazwischen ein breiter, flacher Bogen. Die rechte Hälfte ist gespiegelt.
+    /// </summary>
+    private static readonly PointF[] BodyLeft =
+    [
+        new(CW / 2, 40.7f),                                                       // oben Mitte
+        new(230, 40.7f), new(200, 40.8f), new(181, 40.9f),                        // Oberkante (gerade)
+        new(120, 41.5f), new(68, 50), new(57.6f, 75.7f),                          // obere Ecke (unter der Schultertaste)
+        new(50, 95), new(48.5f, 150), new(49, 194.8f),                            // schmales Oberteil, fast senkrecht
+        new(49, 225), new(32, 262), new(21.8f, 294),                              // Übergang in den Griff, nach außen
+        new(10, 325), new(1, 350), new(0, 373.4f),                                // Griff außen
+        new(-1, 392), new(15, 398), new(29.8f, 397.3f),                           // rundes Griffende
+        new(48, 397), new(62, 393), new(69.5f, 385),
+        new(78, 365), new(90, 340), new(105.2f, 320),                             // Griff innen, schräg nach oben
+        new(118, 303), new(132, 296), new(148.9f, 294),
+        new(180, 293), new(230, 293.3f), new(CW / 2, 293.3f),                     // breiter, flacher Bogen
+    ];
+
     private static GraphicsPath BodyPath()
     {
-        var path = new GraphicsPath { FillMode = FillMode.Winding };
-        // Umriss des Pro Controller 2, vermessen nach dem Produktfoto (Frontansicht, Maßstab ≈ 0,49):
-        // Oberkante fast gerade mit großen runden Ecken, senkrechte Seiten, darunter breite, runde Griffe,
-        // die nach unten leicht nach innen laufen; zwischen den Griffen ein flacher Bogen.
-        // Linke Hälfte als Punktliste, die rechte entsteht durch Spiegeln an der Mittelachse – exakt symmetrisch.
-        PointF[] left =
-        [
-            new(CW / 2, 42),                                                   // Mitte oben
-            new(170, 42), new(80, 43), new(46, 46),                            // Oberkante
-            new(16, 50), new(4, 80), new(4, 118),                              // Ecke oben links
-            new(4, 160), new(5, 200), new(7, 228),                             // Seite
-            new(10, 290), new(36, 372), new(76, 392),                          // Griff außen, nach innen laufend
-            new(104, 405), new(134, 398), new(140, 372),                       // rundes Griffende
-            new(146, 344), new(146, 318), new(158, 302),                       // Griff innen
-            new(200, 290), new(240, 288), new(CW / 2, 288),                    // Bogen unten bis zur Mitte
-        ];
+        // Linke Hälfte rückwärts (unten Mitte → über den linken Griff → oben Mitte), dann rechte Hälfte gespiegelt.
+        var path = new GraphicsPath();
         path.StartFigure();
-        // Linke Hälfte rückwärts (von unten Mitte über den linken Griff nach oben Mitte) …
-        var leftReversed = left.Reverse().ToArray();
-        // … dann rechte Hälfte gespiegelt (von oben Mitte über den rechten Griff nach unten Mitte).
-        var right = left.Select(p => new PointF(CW - p.X, p.Y)).ToArray();
-        path.AddBeziers(leftReversed);
-        path.AddBeziers(right);
+        path.AddBeziers(BodyLeft.Reverse().ToArray());
+        path.AddBeziers(BodyLeft.Select(p => new PointF(CW - p.X, p.Y)).ToArray());
         path.CloseFigure();
-        using var squash = new Matrix();
-        squash.Translate(0, 44 * (1 - Vs));
-        squash.Scale(1, Vs);
-        path.Transform(squash);
         return path;
     }
 
@@ -205,51 +200,80 @@ internal sealed partial class InputView : Control
             g.Restore(state);
         }
 
-        // Gehäuse, matt mit leichtem Verlauf
-        using (var fill = new LinearGradientBrush(new RectangleF(0, 40, CW, 340),
+        // Gehäuse, matt mit leichtem Verlauf über die ganze Höhe
+        using (var fill = new LinearGradientBrush(new RectangleF(0, 36, CW, 370),
                    Mix(_body, Color.White, 0.12f), Mix(_body, Color.Black, 0.2f), LinearGradientMode.Vertical))
             g.FillPath(fill, path);
 
         var clip = g.Save();
         g.SetClip(path);
-        // Griffe: zum Ende hin etwas dunkler (gerundete Form, wie auf dem Foto)
-        using (var shade = new LinearGradientBrush(new RectangleF(0, 240, CW, 170),
-                   Color.FromArgb(0, 0, 0, 0), Color.FromArgb(75, 0, 0, 0), LinearGradientMode.Vertical) { WrapMode = WrapMode.TileFlipXY })
-            g.FillRectangle(shade, 0, 241, CW, 169);
+        // Griffe zum Ende hin etwas dunkler (gerundete Form)
+        using (var shade = new LinearGradientBrush(new RectangleF(0, 290, CW, 116),
+                   Color.FromArgb(0, 0, 0, 0), Color.FromArgb(70, 0, 0, 0), LinearGradientMode.Vertical))
+            g.FillRectangle(shade, 0, 291, CW, 115);
+        // Abgesetzte Frontplatte (beim Original als feine Kante sichtbar)
+        using (var plate = Rounded(new RectangleF(53, 8, CW - 106, 268), 44)) // obere Ecken liegen außerhalb (abgeschnitten)
+        using (var line = new Pen(Color.FromArgb(40, 255, 255, 255), 1.2f))
+            g.DrawPath(line, plate);
         // Glanzkante oben
         using (var shine = new Pen(Color.FromArgb(45, 255, 255, 255), 2f))
-            g.DrawBezier(shine, 120, 50, 200, 46, 320, 46, 400, 50);
+            g.DrawBezier(shine, 120, 46, 200, 43, 320, 43, 400, 46);
         g.Restore(clip);
 
         using (var pen = new Pen(Mix(_body, Color.White, 0.3f), 1.5f))
             g.DrawPath(pen, path);
     }
 
-    // ---------- Schulter- und Triggertasten (Blick von vorn: L/R auf den oberen Ecken, ZL/ZR dahinter) ----------
+    // ---------- Schulter- und Triggertasten (Blick von vorn) ----------
 
-    /// <summary>Linke Seite zeichnen; rechts wird an der Mittelachse gespiegelt.</summary>
+    /// <summary>Spiegelt einen Punkt der linken Seite für die rechte.</summary>
     private static PointF M(bool left, float x, float y) => new(left ? x : CW - x, y);
 
-    /// <summary>Form einer Schultertaste: oben gerade, innen klein abgerundet, außen der Gehäuseecke folgend.</summary>
-    private static GraphicsPath ShoulderPath(bool left, float top, float inner, float outerX, float outerY, float bottom)
+    /// <summary>
+    /// Schultertaste L/R: helle Sichel, die die obere Gehäuseecke umfasst (innen = Gehäusekante, außen etwas größer).
+    /// </summary>
+    private static GraphicsPath BumperPath(bool left)
     {
         var path = new GraphicsPath();
-        path.StartFigure();
-        path.AddLine(M(left, outerX + 34, top), M(left, inner - 10, top));
-        path.AddBezier(M(left, inner - 10, top), M(left, inner - 3, top), M(left, inner, top + 3), M(left, inner, top + 10));
-        path.AddLine(M(left, inner, top + 10), M(left, inner, bottom));
-        path.AddLine(M(left, inner, bottom), M(left, outerX + 10, bottom + 30));
-        path.AddLine(M(left, outerX + 10, bottom + 30), M(left, outerX, outerY));
-        path.AddBezier(M(left, outerX, outerY), M(left, outerX, top + 22), M(left, outerX + 12, top), M(left, outerX + 34, top));
+        path.AddBeziers(
+        [
+            M(left, 184, 41),
+            M(left, 172, 32), M(left, 130, 29), M(left, 105, 30),                      // Oberkante der Sichel
+            M(left, 78, 31), M(left, 56, 40), M(left, 48, 58),                         // um die Ecke
+            M(left, 44, 68), M(left, 46, 78), M(left, 50, 86),                         // ausläufig zur Seite
+            // zurück entlang der Gehäusekante (wird vom Gehäuse verdeckt)
+            M(left, 51, 80), M(left, 53, 78), M(left, 57.6f, 75.7f),
+            M(left, 68, 50), M(left, 120, 41.5f), M(left, 181, 40.9f),
+            M(left, 182, 41), M(left, 183, 41), M(left, 184, 41),
+        ]);
         path.CloseFigure();
         return path;
     }
 
-    private void CornerTrigger(Graphics g, bool left, float value)
+    private void Pro2Bumper(Graphics g, bool left, bool on)
     {
-        using var path = ShoulderPath(left, top: 4, inner: 172, outerX: 34, outerY: 70, bottom: 44);
+        using var path = BumperPath(left);
+        if (on)
+        {
+            using var glow = new Pen(AccentGlow, 7f);
+            g.DrawPath(glow, path);
+        }
         var bounds = path.GetBounds();
-        using (var back = new LinearGradientBrush(bounds, Mix(_body, Color.White, 0.12f), Mix(_body, Color.Black, 0.25f), LinearGradientMode.Vertical))
+        using (var fill = new LinearGradientBrush(bounds, on ? Accent : Mix(_grip, Color.White, 0.3f),
+                   on ? Mix(Accent, Color.Black, 0.2f) : Mix(_grip, Color.Black, 0.15f), LinearGradientMode.Vertical))
+            g.FillPath(fill, path);
+        using (var edge = new Pen(on ? Color.FromArgb(160, 235, 255) : Mix(_grip, Color.Black, 0.3f), 1.2f))
+            g.DrawPath(edge, path);
+        Caption(g, new RectangleF(left ? 92 : CW - 132, 30, 40, 12), left ? "L" : "R", 8.5f,
+            on ? Color.White : Mix(_grip, Color.Black, 0.65f));
+    }
+
+    /// <summary>Trigger ZL/ZR: hinter der Schultertaste, nur der obere Rand ist von vorn sichtbar.</summary>
+    private void Pro2Trigger(Graphics g, bool left, float value)
+    {
+        var r = new RectangleF(left ? 62 : CW - 176, 8, 114, 40);
+        using var path = Rounded(r, 12);
+        using (var back = new LinearGradientBrush(r, Mix(_body, Color.White, 0.14f), Mix(_body, Color.Black, 0.25f), LinearGradientMode.Vertical))
             g.FillPath(back, path);
         value = Math.Clamp(value, 0f, 1f);
         if (value > 0.02f)
@@ -257,44 +281,14 @@ internal sealed partial class InputView : Control
             // Analog: füllt sich von außen nach innen, je weiter der Trigger gedrückt ist.
             var state = g.Save();
             g.SetClip(path);
-            float w = bounds.Width * value;
+            float w = r.Width * value;
             using var fill = new SolidBrush(Accent);
-            g.FillRectangle(fill, left ? bounds.X : bounds.Right - w, bounds.Y, w, bounds.Height);
+            g.FillRectangle(fill, left ? r.X : r.Right - w, r.Y, w, r.Height);
             g.Restore(state);
         }
-        using var edge = new Pen(value > 0.02f ? Accent : KeyEdge, 1.3f);
-        g.DrawPath(edge, path);
-    }
-
-    private void CornerBumper(Graphics g, bool left, bool on)
-    {
-        using var path = ShoulderPath(left, top: 24, inner: 178, outerX: 24, outerY: 92, bottom: 60);
-        if (on)
-        {
-            using var glow = new Pen(AccentGlow, 7f);
-            g.DrawPath(glow, path);
-        }
-        var bounds = path.GetBounds();
-        using (var fill = new LinearGradientBrush(bounds, on ? Accent : Mix(_grip, Color.White, 0.25f),
-                   on ? Mix(Accent, Color.Black, 0.2f) : Mix(_grip, Color.Black, 0.2f), LinearGradientMode.Vertical))
-            g.FillPath(fill, path);
-        using var edge = new Pen(on ? Color.FromArgb(160, 235, 255) : Mix(_grip, Color.Black, 0.3f), 1.2f);
-        g.DrawPath(edge, path);
-    }
-
-    /// <summary>Beschriftungen nach dem Gehäuse, damit sie im sichtbaren Teil der Tasten stehen.</summary>
-    private void ShoulderLabels(Graphics g, float zl, float zr, bool l, bool r)
-    {
-        var onBumper = Mix(_grip, Color.Black, 0.65f);
-        foreach (bool left in new[] { true, false })
-        {
-            var trigger = new RectangleF(left ? 90 : CW - 160, 5, 70, 18);
-            var bumper = new RectangleF(left ? 90 : CW - 160, 25, 70, 18);
-            float value = left ? zl : zr;
-            bool pressed = left ? l : r;
-            Caption(g, trigger, left ? "ZL" : "ZR", 9f, value > 0.5f ? Color.White : FaceText);
-            Caption(g, bumper, left ? "L" : "R", 9.5f, pressed ? Color.White : onBumper);
-        }
+        using (var edge = new Pen(value > 0.02f ? Accent : KeyEdge, 1.3f))
+            g.DrawPath(edge, path);
+        Caption(g, new RectangleF(r.X + 30, 10, 54, 16), left ? "ZL" : "ZR", 8.5f, value > 0.5f ? Color.White : FaceText);
     }
 
     /// <summary>Rücktaste (GL/GR) bzw. SL/SR, seitlich neben dem Griff dargestellt.</summary>
@@ -396,7 +390,8 @@ internal sealed partial class InputView : Control
         g.FillPath(brush, house);
     }
 
-    private void DPad(Graphics g, PointF c, bool up, bool down, bool left, bool right)
+    /// <summary>Steuerkreuz; Farben wahlweise eigene (z. B. weiß bei der Wii-Fernbedienung), sonst nach dem Gehäuse.</summary>
+    private void DPad(Graphics g, PointF c, bool up, bool down, bool left, bool right, Color? fill = null, Color? border = null, Color? glyphs = null)
     {
         const float arm = 28, len = 43;
         using (var cross = new GraphicsPath { FillMode = FillMode.Winding })
@@ -405,9 +400,24 @@ internal sealed partial class InputView : Control
                 cross.AddPath(vertical, false);
             using (var horizontal = Rounded(new RectangleF(c.X - len, c.Y - arm / 2, len * 2, arm), 6))
                 cross.AddPath(horizontal, false);
-            using var well = new SolidBrush(KeyFill);
-            g.FillPath(well, cross);
-            using var edge = new Pen(KeyEdge, 1.2f);
+            if (fill is { } light)
+            {
+                // Helles Kreuz (Wii): leichter Schatten darunter, Fläche mit sanftem Verlauf.
+                var shadowState = g.Save();
+                g.TranslateTransform(0, 2.5f);
+                using (var shadow = new SolidBrush(Color.FromArgb(55, 0, 0, 0)))
+                    g.FillPath(shadow, cross);
+                g.Restore(shadowState);
+                using var gradient = new LinearGradientBrush(new RectangleF(c.X - len, c.Y - len, len * 2, len * 2),
+                    Mix(light, Color.White, 0.6f), Mix(light, Color.Black, 0.08f), LinearGradientMode.ForwardDiagonal);
+                g.FillPath(gradient, cross);
+            }
+            else
+            {
+                using var well = new SolidBrush(KeyFill);
+                g.FillPath(well, cross);
+            }
+            using var edge = new Pen(border ?? KeyEdge, 1.2f);
             g.DrawPath(edge, cross);
         }
         void Arm(bool on, RectangleF r, string glyph)
@@ -417,7 +427,7 @@ internal sealed partial class InputView : Control
                 using var lit = new SolidBrush(Accent);
                 g.FillRectangle(lit, r);
             }
-            Caption(g, r, glyph, 8f, on ? Color.White : FaceText);
+            Caption(g, r, glyph, 8f, on ? Color.White : glyphs ?? FaceText);
         }
         Arm(up, new RectangleF(c.X - arm / 2, c.Y - len, arm, len - arm / 2), "▲");
         Arm(down, new RectangleF(c.X - arm / 2, c.Y + arm / 2, arm, len - arm / 2), "▼");
@@ -455,7 +465,7 @@ internal sealed partial class InputView : Control
 
     private void Gyro(Graphics g, Motion? motion)
     {
-        var area = new RectangleF(160, 394, 200, 14);
+        var area = new RectangleF(160, 412, 200, 14);
         using var font = new Font("Segoe UI", 7.5f, FontStyle.Bold);
         using var label = new SolidBrush(Color.FromArgb(170, 175, 185));
         if (motion is not { } m)

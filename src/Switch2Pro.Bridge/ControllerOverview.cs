@@ -24,7 +24,7 @@ internal sealed class ControllerOverview : Panel
     private readonly Action<int> _showPage;
     private readonly FlowLayoutPanel _cards = new()
     {
-        Dock = DockStyle.Fill, FlowDirection = FlowDirection.TopDown, WrapContents = false, AutoScroll = true,
+        Dock = DockStyle.Fill, FlowDirection = FlowDirection.LeftToRight, WrapContents = true, AutoScroll = true,
         BackColor = Background, Padding = new Padding(12, 4, 12, 12),
     };
     private readonly Label _empty = new()
@@ -111,9 +111,10 @@ internal sealed class ControllerOverview : Panel
         {
             if (!_byPlayer.TryGetValue(p, out var card))
             {
-                card = new Card(this) { Width = CardWidth };
+                card = new Card(this);
                 _byPlayer[p] = card;
                 _cards.Controls.Add(card);
+                card.Width = CardWidth(card);
             }
             card.Show(p, _settings());
         }
@@ -133,13 +134,34 @@ internal sealed class ControllerOverview : Panel
             card.Expand(tab);
     }
 
-    private int CardWidth => Math.Max(760, _cards.ClientSize.Width - 30);
+    // ---------- Anordnung: zusammengeklappte Karten nebeneinander, wenn Platz ist ----------
+    private const int Gap = 12, MinCardWidth = 640;
+
+    private int Available => Math.Max(MinCardWidth, _cards.ClientSize.Width - _cards.Padding.Horizontal - SystemInformation.VerticalScrollBarWidth);
+
+    private int CardWidth(Card card)
+    {
+        int full = Available - Gap;
+        bool twoColumns = Available >= 2 * MinCardWidth + 2 * Gap;
+        return card.IsExpanded || !twoColumns ? full : (Available - 2 * Gap) / 2;
+    }
+
+    private void LayoutCards()
+    {
+        _cards.SuspendLayout();
+        foreach (var card in _byPlayer.Values)
+        {
+            int width = CardWidth(card);
+            if (card.Width != width)
+                card.Width = width;
+        }
+        _cards.ResumeLayout();
+    }
 
     protected override void OnResize(EventArgs eventargs)
     {
         base.OnResize(eventargs);
-        foreach (var card in _byPlayer.Values)
-            card.Width = CardWidth;
+        LayoutCards();
     }
 
     /// <summary>Live-Eingaben eines Spielers (für Anzeige und Hervorhebung in der Tastenbelegung).</summary>
@@ -158,9 +180,9 @@ internal sealed class ControllerOverview : Panel
     /// </summary>
     private sealed class Card : Panel
     {
-        private const int TabMapping = 0, TabTuning = 1, TabGyro = 2, TabJoyCon = 3, TabExtras = 4;
+        private const int TabMapping = 0, TabTuning = 1, TabGyro = 2, TabJoyCon = 3, TabExtras = 4, TabDetails = 5;
         private readonly ControllerOverview _owner;
-        private readonly InputView _view = new() { Size = new Size(522, 369) };
+        private readonly InputView _view = new() { Size = new Size(400, 297) };
         private readonly InfoPanel _info = new();
         private readonly GlyphButton _identify = new("Vibrieren", Glyph.Vibrate);
         private readonly GlyphButton _disconnect = new("Trennen", Glyph.Power);
@@ -168,10 +190,12 @@ internal sealed class ControllerOverview : Panel
         private readonly ToolTip _tips = Theme.CreateToolTip();
         private readonly PivotTabs _tabs = new();
         private readonly StackPanel _panel = new() { Spacing = 0 };
-        private readonly Control?[] _tabPages = new Control?[5];
+        private readonly Control?[] _tabPages = new Control?[6];
         private Player? _player;
         private ControllerKind _builtFor = ControllerKind.Unknown;
         private bool _expanded;
+        public bool IsExpanded => _expanded;
+        private InfoPanel? _details;
         private string? _title;
         private string? _rawTitle;
 
@@ -184,7 +208,7 @@ internal sealed class ControllerOverview : Panel
             DoubleBuffered = true;
             ResizeRedraw = true;
             BackColor = Background;
-            Margin = new Padding(0, 0, 0, 12);
+            Margin = new Padding(0, 0, Gap, Gap);
             Height = 460;
             foreach (var b in new[] { _identify, _disconnect, _settingsButton })
                 b.BackColor = CardColor;
@@ -195,6 +219,7 @@ internal sealed class ControllerOverview : Panel
             _tabs.Add("Gyro");
             _tabs.Add("Joy-Con");
             _tabs.Add("Extras");
+            _tabs.Add("Details");
             _tabs.Visible = _panel.Visible = false;
             _tabs.SelectedIndexChanged += (_, _) => ShowTab();
 
@@ -226,6 +251,7 @@ internal sealed class ControllerOverview : Panel
             if (tab != _tabs.SelectedIndex)
                 _tabs.SelectedIndex = tab;
             _tabs.Visible = _panel.Visible = true;
+            _owner.LayoutCards(); // aufgeklappt über die ganze Breite
             ShowTab();
             return shown;
         }
@@ -238,6 +264,7 @@ internal sealed class ControllerOverview : Panel
             _settingsButton.Invalidate();
             _tabs.Visible = _panel.Visible = false;
             PerformLayout();
+            _owner.LayoutCards();
         }
 
         /// <summary>Kind, dessen Belegung gilt: hochkant gehaltene einzelne Joy-Con nutzen die des Joy-Con-Paars.</summary>
@@ -277,6 +304,7 @@ internal sealed class ControllerOverview : Panel
             _tabs.SetShown(TabGyro, KindInfo.HasMotion(kind));
             _tabs.SetShown(TabJoyCon, links.Count > 0 && links.All(l => l.Kind.IsJoyCon()));
             _tabs.SetShown(TabExtras, ExtrasAvailable(CurrentSettings));
+            _details = null;
         }
 
         private Control? BuildTab(int tab, ControllerKind kind) => tab switch
@@ -288,6 +316,7 @@ internal sealed class ControllerOverview : Panel
             TabGyro => GyroPage(kind),
             TabJoyCon => JoyConPage(),
             TabExtras => ExtrasPage(),
+            TabDetails => DetailsPage(),
             _ => null,
         };
 
@@ -538,11 +567,24 @@ internal sealed class ControllerOverview : Panel
                 c.Text = text;
         }
 
+        /// <summary>Alle Eigenschaften (Adresse, Seriennummer, Firmware …) – in der Karte stehen nur die wichtigsten.</summary>
+        private Control DetailsPage()
+        {
+            _details = new InfoPanel { Compact = false, Margin = new Padding(16, 12, 16, 12) };
+            var group = new SettingsGroup();
+            group.Controls.Add(_details);
+            return Column(group);
+        }
+
         // ---------- Anordnung ----------
 
         protected override void OnLayout(LayoutEventArgs levent)
         {
-            const int pad = 20, top = 64;
+            const int pad = 20, top = 62;
+            // Schmale Karte: Vibrieren/Trennen nur als Symbol (mit Tooltip), damit der Titel Platz hat.
+            bool narrow = Width < 820;
+            SetText(_identify, narrow ? "" : "Vibrieren");
+            SetText(_disconnect, narrow ? "" : "Trennen");
             int x = Width - pad;
             foreach (var b in new[] { _settingsButton, _disconnect, _identify })
             {
@@ -550,8 +592,10 @@ internal sealed class ControllerOverview : Panel
                 b.Location = new Point(x, 16);
                 x -= 8;
             }
-            _view.Location = new Point(pad - 4, top);
-            _info.Location = new Point(_view.Right + 24, top + 6);
+            // Grafik wächst mit der Karte (Seitenverhältnis der Zeichnung 580 × 430).
+            int viewWidth = Math.Clamp((Width - 2 * pad) * 46 / 100, 280, 380);
+            _view.Bounds = new Rectangle(pad - 4, top, viewWidth, viewWidth * 430 / 580);
+            _info.Location = new Point(_view.Right + 20, top + 8);
             _info.Width = Math.Max(240, Width - _info.Left - pad);
             int bodyBottom = Math.Max(_view.Bottom, _info.Bottom) + 12;
             int height = bodyBottom;
@@ -628,7 +672,10 @@ internal sealed class ControllerOverview : Panel
                 _view.Show(input, gamepad);
             }
             _view.PlayerIndex = player.Index;
-            _info.Show(links, input, links.Where(player.MouseActive).ToList());
+            var mouse = links.Where(player.MouseActive).ToList();
+            _info.Show(links, input, mouse);
+            if (_expanded && _details is { Visible: true } details)
+                details.Show(links, input, mouse);
 
             if (_expanded)
             {
@@ -823,6 +870,9 @@ internal sealed class ControllerOverview : Panel
         private PadInput? _input;
         private const int LabelWidth = 120, RowHeight = 24;
 
+        /// <summary>Kompakt (Karte): nur Akku, Verbindung, Griff/Maus und gedrückte Tasten; sonst alle Eigenschaften.</summary>
+        public bool Compact { get; init; } = true;
+
         public InfoPanel()
         {
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint, true);
@@ -842,8 +892,7 @@ internal sealed class ControllerOverview : Panel
             _links = links;
             _mouse = mouse;
             _input = input;
-            int rows = links.Count * 8 + 2; // je Controller bis zu 8 Zeilen (Überschrift, Akku … Griff, Maus) + „Gedrückt“
-            int height = Math.Max(260, rows * RowHeight + 10);
+            int height = Walk(null) + 4; // gleiche Zeilen wie beim Zeichnen, nur gezählt
             if (Height != height)
                 Height = height;
             if (changed)
@@ -857,45 +906,57 @@ internal sealed class ControllerOverview : Panel
 
         protected override void OnPaint(PaintEventArgs e)
         {
-            var g = e.Graphics;
-            g.Clear(BackColor);
-            g.SmoothingMode = SmoothingMode.AntiAlias;
+            e.Graphics.Clear(BackColor);
+            e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+            Walk(e.Graphics);
+        }
+
+        /// <summary>Alle Zeilen zeichnen (g = null: nur die Höhe ermitteln).</summary>
+        private int Walk(Graphics? g)
+        {
             int y = 0;
             foreach (var link in _links)
             {
                 if (_links.Count > 1)
                 {
-                    TextRenderer.DrawText(g, Tr.T(link.Kind.DisplayName()), UiFonts.Strong, new Point(0, y), Accent, TextFormatFlags.NoPrefix);
+                    if (g is not null)
+                        TextRenderer.DrawText(g, Tr.T(link.Kind.DisplayName()), UiFonts.Strong, new Point(0, y), Accent, TextFormatFlags.NoPrefix);
                     y += RowHeight + 2;
                 }
-                var st = link.LastState;
                 Row(g, ref y, "Akku", null);
-                DrawBattery(g, LabelWidth, y - RowHeight, st);
+                if (g is not null)
+                    DrawBattery(g, LabelWidth, y - RowHeight, link.LastState);
                 Row(g, ref y, "Verbindung", $"{Transport(link.Transport)} · {link.ReportRate:F0} Berichte/s");
-                if (link.Address is { } address)
-                    Row(g, ref y, "Adresse", address);
-                if (link.Info.SerialNumber is { } serial)
-                    Row(g, ref y, "Seriennummer", serial);
-                if (link.Info.Firmware is { } firmware)
-                    Row(g, ref y, "Firmware", firmware);
+                if (!Compact)
+                {
+                    if (link.Address is { } address)
+                        Row(g, ref y, "Adresse", address);
+                    if (link.Info.SerialNumber is { } serial)
+                        Row(g, ref y, "Seriennummer", serial);
+                    if (link.Info.Firmware is { } firmware)
+                        Row(g, ref y, "Firmware", firmware);
+                }
                 if (link.InGrip)
                     Row(g, ref y, "Griff", "Charging Grip – GL/GR aktiv");
                 if (link.Kind is ControllerKind.JoyCon2Left or ControllerKind.JoyCon2Right)
                     Row(g, ref y, "Maus", _mouse.Contains(link) ? "aktiv (liegt auf dem Tisch)" : "bereit (auf den Tisch legen)");
                 y += 8;
             }
-
             var pressed = _input is null ? [] : Enum.GetValues<ProButtons>()
                 .Where(b => b != ProButtons.None && _input.Has(b)).Select(ButtonName).ToList();
             Row(g, ref y, "Gedrückt", pressed.Count == 0 ? "–" : string.Join("  ", pressed));
+            return y;
         }
 
-        private void Row(Graphics g, ref int y, string label, string? value)
+        private void Row(Graphics? g, ref int y, string label, string? value)
         {
-            TextRenderer.DrawText(g, Tr.T(label), UiFonts.Body, new Point(0, y), MutedColor, TextFormatFlags.NoPrefix);
-            if (value is not null)
-                TextRenderer.DrawText(g, Tr.T(value), UiFonts.Body, new Rectangle(LabelWidth, y, Width - LabelWidth, RowHeight),
-                    TextColor, TextFormatFlags.NoPrefix | TextFormatFlags.EndEllipsis);
+            if (g is not null)
+            {
+                TextRenderer.DrawText(g, Tr.T(label), UiFonts.Body, new Point(0, y), MutedColor, TextFormatFlags.NoPrefix);
+                if (value is not null)
+                    TextRenderer.DrawText(g, Tr.T(value), UiFonts.Body, new Rectangle(LabelWidth, y, Width - LabelWidth, RowHeight),
+                        TextColor, TextFormatFlags.NoPrefix | TextFormatFlags.EndEllipsis);
+            }
             y += RowHeight;
         }
 

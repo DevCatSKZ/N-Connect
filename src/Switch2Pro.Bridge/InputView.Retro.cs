@@ -329,7 +329,8 @@ internal sealed partial class InputView
         var state = g.Save();
         g.TranslateTransform(cx, 92);
         g.ScaleTransform(0.56f, 0.56f);
-        DPad(g, new PointF(0, 0), up, down, left, right);
+        DPad(g, new PointF(0, 0), up, down, left, right,
+            fill: Color.FromArgb(0xEE, 0xEE, 0xF1), border: Color.FromArgb(0xB0, 0xB0, 0xBA), glyphs: Color.FromArgb(0x90, 0x90, 0x9A));
         g.Restore(state);
 
         // A: groß, leicht vertieft mit Ring
@@ -351,8 +352,11 @@ internal sealed partial class InputView
                     g.FillEllipse(holes, cx - 15 + col * 6, 240 + row * 6, 2.6f, 2.6f);
 
         // 1 und 2
-        ColorKey(g, new PointF(cx, 282), on(ProButtons.Y), "1", key, 13, dark);
-        ColorKey(g, new PointF(cx, 318), on(ProButtons.B), "2", key, 13, dark);
+        ColorKey(g, new PointF(cx, 274), on(ProButtons.Y), "1", key, 13, dark);
+        ColorKey(g, new PointF(cx, 306), on(ProButtons.B), "2", key, 13, dark);
+
+        // „Wii“-Schriftzug zwischen 2 und den LEDs
+        Caption(g, new RectangleF(edge, bottom - 48, RemoteW, 18), "Wii", 10f, Color.FromArgb(0xA8, 0xA8, 0xB2));
 
         // Vier Spieler-LEDs unten (blau, wie das Original)
         byte mask = PlayerIndex >= 0 ? Commands.PlayerLedMask(PlayerIndex) : (byte)0;
