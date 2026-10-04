@@ -2,14 +2,15 @@
 
 Stand: 04.10.2026. Entwickelt im Repo `sfm` (Branch `ccr-ad005d0f-jon8df`, Ordner `switch2-pro-windows/`);
 veröffentlicht als eigenes Repo **DevCatSKZ/N-Connect** (öffentlich) per `git subtree split`.
-Was das Programm kann und wie man es baut: siehe [README.md](README.md).
+Was das Programm kann und wie man es baut: siehe [README.md](README.md). Vollständige Entwicklerdokumentation
+(Funktionen und Verhalten, Architektur, Protokolle, Portierung): [docs/](docs/README.md).
 
 ## Arbeitsablauf nach jeder Änderung
 
 ```powershell
 cd switch2-pro-windows
 dotnet build -c Release                      # Warnungen gelten als Fehler
-dotnet test -c Release --no-build            # aktuell 140 Tests, alle grün
+dotnet test -c Release --no-build            # aktuell 166 Tests, alle grün
 N-Connect.exe --render <Ordner>              # alle Controller-Grafiken prüfen
 N-Connect.exe --render-ui <Ordner> --demo-all --wide   # alle Seiten/Karten prüfen (auch --demo, --demo-retro)
 dotnet publish src\Switch2Pro.Bridge -c Release -r win-x64 --self-contained -p:PublishSingleFile=true `
@@ -32,17 +33,26 @@ Commits als **devcatskz** (devcatskz@gmail.com), ohne „Co-Authored-By“-Zeile
   0x1C–0x2F mit („Akku …“), gemessene Ladeanstiege landen in `battery.json`. Über einen kompletten Ladevorgang
   ist die Anzeige noch nicht beobachtet.
 - **Selbst koppeln (Switch 1, NSO, Wii)** ist gebaut (`ControllerPairing`, Hintergrundsuche in `TrayApp.AutoPairLoopAsync`,
-  Einstellung `AutoPair`), aber **noch nicht mit echter Hardware getestet**. Switch 1/NSO: Kopplung ohne PIN, Rückfrage
-  per `BluetoothRegisterForAuthenticationEx` selbst bestätigt; schlägt das fehl, steht der Fehlercode im Protokoll
-  („Kopplung …: Authentifizierung → Fehler …“). Wii: Adress-PIN wie bisher.
+  Einstellung `AutoPair`). Wii mit echter Hardware bestätigt (auch automatisch im Hintergrund). **Joy-Con 1 per SYNC noch
+  nicht bestätigt** – seit 04.10. 11:37 werden auch bereits bekannte Controller neu gekoppelt, wenn sie während des
+  Suchlaufs antworten (Vergleich `stLastSeen` vorher/nachher). Switch 1/NSO: Kopplung ohne PIN, Rückfrage per
+  `BluetoothRegisterForAuthenticationEx` selbst bestätigt; schlägt das fehl, steht der Fehlercode im Protokoll
+  („Kopplung …: Authentifizierung → Fehler …“).
+- **Am 04.10.2026 gebaut, mit echter Hardware noch nicht (vollständig) geprüft:** Spielerplatz/Namen (Kartentitel),
+  Stick-Kalibrierung (`StickCalibrationForm`, nur mit simulierten Controllern gesehen), Gyro-Assistent
+  (`GyroSetupForm`), Untermenüs im Infobereich, Ein-Klick-Update (`UpdateCheck.DownloadAsync` – braucht ein erstes
+  GitHub-Release), Kabel-Pads HORI/PowerA/PDP (`WiredPadLink`, Kennungen aus öffentlichen Listen), Nachbauten
+  (Speicher nicht lesbar, leere Adresse), Joy-Con automatisch trennen (quer + SL/SR), Wii „nur bei Änderung senden“
+  mit Statusabfrage als Lebenszeichen, robustere Wii-Erweiterungserkennung.
+- **Passive BLE-Suche** geprüft (Werkzeug im Scratchpad, N-Connect beendet): in 90 s keine Nintendo-Werbung empfangen,
+  243 andere – nicht eindeutig (evtl. keine Taste gedrückt), daher **nicht** übernommen; die Suche bleibt aktiv.
 - **Viele Controller auf einem Bluetooth-Stick** (gemessen 04.10.2026, Barrot BT 5.4, USB 33FA:0010): Ab drei bis vier
   Controllern (z. B. Wii-Fernbedienung + Joy-Con-2-Paar + Pro Controller 2) bekommt jeder nur ~10–11 Berichte/s,
   die Wii reagiert spürbar verzögert, ein weiterer Controller braucht ~9 s zum Verbinden. Vom Nutzer vorerst so gelassen.
   **Nicht wiederholen:** Ab drei Bluetooth-Controllern die Switch-2-Controller auf „ausgeglichen“ umzuschalten
   (Commit 24c4938, zurückgenommen) brachte keine höhere Rate, und weil schon ein Verbindungsversuch mitzählte,
-  verhandelten bei jedem Versuch alle Verbindungen neu – der neue Controller scheiterte dann mit „Unreachable“. Mögliche nächste Schritte: Wii ab drei Controllern ohne Dauersenden (`Wii.SetMode`
-  setzt 0x04 „continuous“; vorher prüfen, dass der Watchdog dann nicht fälschlich trennt), Controller-Suche bei vielen
-  Controllern passiv statt aktiv (`ControllerManager._watcher`) – jeweils vorher/nachher messen. Verlässlichste Lösung:
+  verhandelten bei jedem Versuch alle Verbindungen neu – der neue Controller scheiterte dann mit „Unreachable“.
+  Umgesetzt: Wii sendet nur bei Änderung (Lebenszeichen per Statusabfrage). Verlässlichste Lösung:
   stärkerer Adapter (Intel AX200/AX210, Realtek RTL8761B). **Bestätigt:** Mit einem Realtek-Bluetooth-5.3-Stick
   (USB 0BDA:A725) sind die Probleme beim Nutzer weg.
   Achtung: Nach Herstellerbefehlen an den Stick (fremdes Werkzeug `tools/Switch2Pro.BtIdentityProbe`, nicht Teil von
@@ -77,6 +87,9 @@ src/Switch2Pro.Bridge     Windows-App (.NET 8 WinForms)
                           zum Erzeugen lag im Scratchpad: Konturverfolgung + Douglas-Peucker)
   SwitchCardWatcher, PairingDataForm   SD-Karte, Kopplungsdaten
   ControllerPairing, PairForm          selbst koppeln (Switch 1, NSO, Wii), Fenster „Controller koppeln“
+  StickCalibrationForm, GyroSetupForm  Stick-Kalibrierung, Gyro-Assistent
+  Links/WiredPadLink                   Kabel-Pads HORI/PowerA/PDP (Protokoll: WiredSwitchPad)
+  UpdateCheck                          Update-Prüfung und Ein-Klick-Update
 installer/N-Connect.iss   Inno Setup 6 (ViGEmBus, optional HidHide); den Autostart richtet die App selbst ein
                           (standardmäßig an, Einstellung „Mit Windows starten“)
 ```

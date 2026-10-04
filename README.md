@@ -20,8 +20,11 @@ Einmal installieren, Controller verbinden, spielen. Die Oberfläche gibt es auf 
 | **NES, SNES, N64, SEGA Mega Drive** (Nintendo Switch Online) | Bluetooth (SYNC, N-Connect koppelt selbst) | eigene Anordnung, N64-C-Tasten = rechter Stick |
 | **Wii-Fernbedienung** (auch Plus) | Bluetooth (SYNC, N-Connect koppelt selbst) | mit **Nunchuk** oder **Classic Controller** |
 | **Wii U Pro Controller** | Bluetooth (SYNC, N-Connect koppelt selbst) | beide Sticks, Akkuanzeige |
+| **Kabel-Pads von HORI, PowerA, PDP** (für Switch) | USB-Kabel | wie Pro Controller, ohne Gyro/Vibration (noch nicht mit echter Hardware geprüft) |
+| **Nachbauten im Switch-Modus** (z. B. 8BitDo, „Lic Pro Controller“) | wie Switch Pro Controller | soweit der Nachbau das Protokoll beherrscht |
 
-Bis zu 8 Controller gleichzeitig (Spieler 1–8).
+Bis zu 8 Controller gleichzeitig (Spieler 1–8). Tipp für viele Controller: ein leistungsfähiger Bluetooth-Adapter
+(z. B. Intel AX200/AX210 oder Realtek-Bluetooth-5.3-Stick) – einfache Sticks reichen oft nur für 2–3 Controller.
 
 ## Installation
 
@@ -62,8 +65,14 @@ Die Suche im Hintergrund läuft nur, solange gerade niemand spielt; gezielt such
 - Knöpfe je Controller: **Trennen**, **Vibrieren** (welcher ist welcher Spieler?), **Gyro kalibrieren**,
   Joy-Con **trennen/zusammenfügen**, **hochkant/quer**, **amiibo lesen**, **Ring-Con**, **IR-Kamera**,
   **„Doppelt angezeigt? Verstecken“** (HidHide, bei USB).
-- **Joy-Con wie an der Switch:** zwei Joy-Con werden automatisch ein Controller; SL + SR eine Sekunde halten trennt,
-  L + R gleichzeitig verbindet wieder. Die Wahl wird je Joy-Con gemerkt.
+- **Spielerplatz und Name:** Klick auf den Kartentitel → Platz 1–8 wählen (belegt = tauschen; Lichter und die
+  Reihenfolge im Spiel ziehen mit, wird je Controller gemerkt) oder Controller umbenennen („Lenas Joy-Con“).
+- **Sticks kalibrieren** (gegen Drift): geführt Mitte und Rand messen, mit Rundheitsanzeige – nur in N-Connect
+  gespeichert, der Controller bleibt unverändert.
+- **Gyro-Assistent:** Zielen per Bewegung in drei Schritten einrichten, mit Live-Vorschau.
+- **Joy-Con wie an der Switch:** zwei Joy-Con werden automatisch ein Controller; einen Joy-Con quer halten und SL
+  oder SR drücken (oder SL + SR eine Sekunde halten) macht ihn zum eigenen Spieler, L + R gleichzeitig verbindet
+  wieder. Die Wahl wird je Joy-Con gemerkt.
 - **Joy-Con-2-Mausmodus:** Joy-Con auf die Schienenkante stellen → Maus (R/L = Linksklick, ZR/ZL = Rechtsklick,
   Stick = Scrollen).
 - **Tastenbelegung je Controller-Typ:** jede Taste auf Gamepad-Tasten, **Tastatur-Hotkeys**, **Maustasten**,
@@ -83,7 +92,9 @@ Die Suche im Hintergrund läuft nur, solange gerade niemand spielt; gezielt such
 - **Kopplungsdaten auf einen anderen PC übertragen:** als `.ncpair`-Datei exportieren (optional mit Passwort,
   Schlüssel nur auf ausdrücklichen Wunsch) und auf dem zweiten PC öffnen. Bluetooth-Adapter und Windows-Kopplungen
   werden dabei nicht verändert.
-- **Update-Hinweis**, wenn auf GitHub eine neue Version erscheint.
+- **Infobereich-Menü:** je Spieler Vibrieren, Spielerplatz, Trennen; alle Controller trennen; Ausgabeart, Profil u. a.
+- **Ein-Klick-Update:** Erscheint auf GitHub eine neue Version, lädt N-Connect den Installer auf Klick herunter
+  (geprüft), installiert ihn und startet neu.
 
 Alle Einstellungen sind optional und gelten sofort (Klick auf das Symbol im Infobereich; links die Bereiche
 *Controller, Tastenbelegung, Sticks & Vibration, Gyro & Maus, Joy-Con & Wii, Allgemein*).
@@ -103,6 +114,9 @@ Protokoll: `%LOCALAPPDATA%\N-Connect\bridge.log` · Einstellungen: `%APPDATA%\N-
 Akku-Messwerte: `%LOCALAPPDATA%\N-Connect\battery.json` (Ordner der Vorversion `Switch2ProBridge` werden einmalig übernommen)
 
 ## Wie es funktioniert (technisch)
+
+Ausführliche Entwicklerdokumentation (alle Funktionen und ihr Verhalten, Architektur, Controller-Protokolle,
+Portierung auf andere Plattformen): **[docs/](docs/README.md)**.
 
 Das Programm spricht die Controller im **Benutzermodus** direkt an (Bluetooth LE über WinRT, HID, WinUSB) und gibt
 die Eingaben an **ViGEmBus** weiter, einen signierten Kernel-Treiber, der einen virtuellen Xbox-360- bzw.
