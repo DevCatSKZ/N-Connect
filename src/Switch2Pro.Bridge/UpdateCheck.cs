@@ -58,7 +58,7 @@ internal static class UpdateCheck
         catch (Exception e) when (e is HttpRequestException or TaskCanceledException or JsonException or InvalidOperationException
                                       or KeyNotFoundException)
         {
-            Log.Info($"Update-Prüfung nicht möglich: {e.Message}");
+            Log.Info($"Update-Prüfung nicht möglich: {Log.Reason(e)}");
             return null;
         }
     }

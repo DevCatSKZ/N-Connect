@@ -66,7 +66,7 @@ internal static class HidHide
         catch (Exception e) when (e is System.ComponentModel.Win32Exception or TimeoutException or InvalidOperationException)
         {
             // Abbruch der UAC-Abfrage: Win32Exception 1223.
-            Log.Warn($"HidHide: nicht eingerichtet ({e.Message})");
+            Log.Warn($"HidHide: nicht eingerichtet ({Log.Reason(e)})");
             return false;
         }
     }

@@ -166,7 +166,7 @@ internal sealed class Switch2UsbLink : IControllerLink
         }
         catch (IOException e)
         {
-            Log.Info($"{Id}: USB getrennt ({e.Message})");
+            Log.Info($"{Id}: USB getrennt ({Log.Reason(e)})");
             RaiseLost();
         }
     }
@@ -249,7 +249,7 @@ internal sealed class Switch2UsbLink : IControllerLink
         }
         catch (Exception e)
         {
-            Log.Warn($"{Id}: Vibration abgeschaltet: {e.Message}");
+            Log.Warn($"{Id}: Vibration abgeschaltet: {Log.Reason(e)}");
         }
     }
 

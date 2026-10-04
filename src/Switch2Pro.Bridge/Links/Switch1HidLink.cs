@@ -421,7 +421,7 @@ internal sealed class Switch1HidLink : IControllerLink
         }
         catch (IOException e)
         {
-            Log.Warn($"{Id}: IR-Kamera: {e.Message}");
+            Log.Warn($"{Id}: IR-Kamera: {Log.Reason(e)}");
             await StopIrCoreAsync();
             return false;
         }
@@ -506,7 +506,7 @@ internal sealed class Switch1HidLink : IControllerLink
         catch (Exception e)
         {
             if (Volatile.Read(ref _closed) == 0)
-                Log.Warn($"{Id}: Lesen beendet: {e.Message}");
+                Log.Warn($"{Id}: Lesen beendet: {Log.Reason(e)}");
             RaiseLost();
         }
     }
@@ -606,7 +606,7 @@ internal sealed class Switch1HidLink : IControllerLink
         }
         catch (Exception e)
         {
-            Log.Warn($"{Id}: Vibration abgeschaltet: {e.Message}");
+            Log.Warn($"{Id}: Vibration abgeschaltet: {Log.Reason(e)}");
         }
     }
 
