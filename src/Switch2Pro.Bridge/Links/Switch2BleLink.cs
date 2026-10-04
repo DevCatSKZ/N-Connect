@@ -22,8 +22,7 @@ internal sealed class Switch2BleLink : IControllerLink
 
     private readonly BluetoothLEDevice _device;
     private readonly GattSession _session;
-    private IDisposable? _connectionParameters; // aktuelle Vorgabe (schnell bzw. ausgeglichen, siehe BleAirtime)
-    private readonly object _parametersLock = new();
+    private readonly IDisposable? _connectionParameters;
     private readonly SemaphoreSlim _commandLock = new(1, 1);
     private readonly CancellationTokenSource _cts = new();
     private readonly RateMeter _rate = new();
@@ -82,7 +81,6 @@ internal sealed class Switch2BleLink : IControllerLink
         _device = device;
         _session = session;
         _connectionParameters = parameters;
-        BleAirtime.Changed += OnAirtimeChanged;
     }
 
     public static async Task<Switch2BleLink> ConnectAsync(ulong address, BluetoothAddressType addressType, ControllerKind kind,
@@ -98,7 +96,7 @@ internal sealed class Switch2BleLink : IControllerLink
         {
             session = await GattSession.FromDeviceIdAsync(device.BluetoothDeviceId);
             session.MaintainConnection = true;
-            parameters = RequestParameters(device, id, BleAirtime.Crowded);
+            parameters = RequestLowLatency(device, id);
         }
         catch
         {
@@ -121,48 +119,21 @@ internal sealed class Switch2BleLink : IControllerLink
         }
     }
 
-    /// <summary>
-    /// Kürzeres Verbindungsintervall (Windows 11 22H2+) = mehr Berichte pro Sekunde, weniger Verzögerung.
-    /// Bei vielen Bluetooth-Controllern (<paramref name="crowded"/>) das ausgeglichene, damit alle genug Funkzeit bekommen.
-    /// </summary>
-    private static IDisposable? RequestParameters(BluetoothLEDevice device, string id, bool crowded)
+    /// <summary>Kürzeres Verbindungsintervall (Windows 11 22H2+) = mehr Berichte pro Sekunde, weniger Verzögerung.</summary>
+    private static IDisposable? RequestLowLatency(BluetoothLEDevice device, string id)
     {
         if (!OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22621))
             return null;
         try
         {
-            var request = device.RequestPreferredConnectionParameters(crowded
-                ? BluetoothLEPreferredConnectionParameters.Balanced
-                : BluetoothLEPreferredConnectionParameters.ThroughputOptimized);
-            Log.Info($"{id}: {(crowded ? "ausgeglichene" : "schnelle")} Verbindung angefragt: {request.Status}");
+            var request = device.RequestPreferredConnectionParameters(BluetoothLEPreferredConnectionParameters.ThroughputOptimized);
+            Log.Info($"{id}: schnelle Verbindung angefragt: {request.Status}");
             return request;
         }
         catch (Exception e)
         {
             Log.Warn($"{id}: Verbindungsparameter nicht gesetzt: {e.Message}");
             return null;
-        }
-    }
-
-    /// <summary>Vorgabe geändert (mehr/weniger Bluetooth-Controller): Intervall neu anfordern.</summary>
-    private void OnAirtimeChanged()
-    {
-        if (!OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22621))
-            return;
-        lock (_parametersLock)
-        {
-            if (Volatile.Read(ref _closed) != 0)
-                return;
-            bool crowded = BleAirtime.Crowded;
-            _lateParameters?.Dispose();
-            _lateParameters = null;
-            _connectionParameters?.Dispose();
-            // Windows verhandelt nur neu, wenn sich die Vorgabe ändert: beim Wechsel auf „schnell“ erst kurz „ausgeglichen“.
-            if (!crowded)
-                using (RequestParameters(_device, Id, crowded: true)) { }
-            _connectionParameters = RequestParameters(_device, Id, crowded);
-            _lateRequests = 0;
-            _wasFast = false;
         }
     }
 
@@ -184,10 +155,8 @@ internal sealed class Switch2BleLink : IControllerLink
         // selbst auf 30 ms zurück) – höchstens dreimal, damit kein Hin und Her entsteht.
         if (p.ConnectionInterval * 1.25 < 10)
             _wasFast = true;
-        if (p.ConnectionInterval * 1.25 > 15 && _wasFast && _lateRequests < 3 && Volatile.Read(ref _closed) == 0
-            && !BleAirtime.Crowded) // bei vielen Controllern ist „ausgeglichen“ gewollt
+        if (p.ConnectionInterval * 1.25 > 15 && _wasFast && _lateRequests < 3 && Volatile.Read(ref _closed) == 0)
         {
-            lock (_parametersLock)
             try
             {
                 _lateRequests++;
@@ -553,12 +522,8 @@ internal sealed class Switch2BleLink : IControllerLink
         if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22621))
             _device.ConnectionParametersChanged -= OnConnectionParametersChanged;
         _service?.Dispose();
-        BleAirtime.Changed -= OnAirtimeChanged;
-        lock (_parametersLock)
-        {
-            _lateParameters?.Dispose();
-            _connectionParameters?.Dispose();
-        }
+        _lateParameters?.Dispose();
+        _connectionParameters?.Dispose();
         _session.MaintainConnection = false;
         _session.Dispose();
         _device.Dispose();

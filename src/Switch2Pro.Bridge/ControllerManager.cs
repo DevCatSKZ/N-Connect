@@ -141,19 +141,6 @@ internal sealed class ControllerManager : IAsyncDisposable
 
     public bool IsConnecting => !_connecting.IsEmpty;
 
-    /// <summary>
-    /// Verbindungen geändert: Funkzeit anpassen (viele Bluetooth-Controller → Switch-2-Controller „ausgeglichen“,
-    /// siehe <see cref="BleAirtime"/>) und die Oberfläche benachrichtigen. Gezählt werden bestehende und gerade
-    /// entstehende Bluetooth-Verbindungen (USB nicht).
-    /// </summary>
-    private void OnChanged()
-    {
-        int bluetooth = _links.Values.Count(l => l.Transport != Transport.Usb && l is not DemoLink)
-                        + _connecting.Keys.Count(k => !k.StartsWith(@"USB\", StringComparison.OrdinalIgnoreCase));
-        BleAirtime.Update(bluetooth);
-        Changed?.Invoke();
-    }
-
     public async Task StartAsync()
     {
         await StartBluetoothAsync();
@@ -193,7 +180,7 @@ internal sealed class ControllerManager : IAsyncDisposable
             }
         }
         AdapterProblem = problem;
-        OnChanged();
+        Changed?.Invoke();
         if (AdapterProblem is not null)
         {
             _restartTimer.Change(5000, Timeout.Infinite);
@@ -211,7 +198,7 @@ internal sealed class ControllerManager : IAsyncDisposable
         {
             Log.Error("Bluetooth-Suche konnte nicht starten", e);
             AdapterProblem = "Bluetooth-Suche konnte nicht starten.";
-            OnChanged();
+            Changed?.Invoke();
             _restartTimer.Change(5000, Timeout.Infinite);
         }
     }
@@ -310,7 +297,7 @@ internal sealed class ControllerManager : IAsyncDisposable
 
     private async Task ConnectBleAsync(ulong address, BluetoothAddressType type, ControllerKind kind, string id, bool sync)
     {
-        OnChanged();
+        Changed?.Invoke();
         Log.Info($"{id}: {kind.DisplayName()} gefunden, verbinde …");
         try
         {
@@ -359,7 +346,7 @@ internal sealed class ControllerManager : IAsyncDisposable
         finally
         {
             _connecting.TryRemove(id, out _);
-            OnChanged();
+            Changed?.Invoke();
         }
     }
 
@@ -438,7 +425,7 @@ internal sealed class ControllerManager : IAsyncDisposable
 
     private async Task ConnectHidAsync(string path, ControllerKind kind)
     {
-        OnChanged();
+        Changed?.Invoke();
         Log.Info($"{kind.DisplayName()} gefunden ({path})");
         try
         {
@@ -464,7 +451,7 @@ internal sealed class ControllerManager : IAsyncDisposable
         finally
         {
             _connecting.TryRemove(path, out _);
-            OnChanged();
+            Changed?.Invoke();
         }
     }
 
@@ -492,7 +479,7 @@ internal sealed class ControllerManager : IAsyncDisposable
 
     private async Task ConnectUsbAsync(UsbControllerInfo device)
     {
-        OnChanged();
+        Changed?.Invoke();
         Log.Info($"{device.Kind.DisplayName()} per USB gefunden ({device.DeviceId})");
         try
         {
@@ -539,7 +526,7 @@ internal sealed class ControllerManager : IAsyncDisposable
         finally
         {
             _connecting.TryRemove(device.DeviceId, out _);
-            OnChanged();
+            Changed?.Invoke();
         }
     }
 
@@ -609,7 +596,7 @@ internal sealed class ControllerManager : IAsyncDisposable
             OnLinkLost(link);
         Log.Info(message);
         Notify?.Invoke(message);
-        OnChanged();
+        Changed?.Invoke();
         return true;
     }
 
@@ -640,14 +627,14 @@ internal sealed class ControllerManager : IAsyncDisposable
             Log.Info($"{link.Kind.DisplayName()} getrennt");
             if (!_disposed)
                 Notify?.Invoke($"{link.Kind.DisplayName()} getrennt");
-            OnChanged();
+            Changed?.Invoke();
         }));
     }
 
     private Player NewPlayer(int index, IControllerLink link)
     {
         var player = new Player(index, link, _settings, _factory);
-        player.Changed += () => OnChanged();
+        player.Changed += () => Changed?.Invoke();
         player.SplitRequested += (p, l) => Split(p, l);
         player.PairRequested += OnPairRequested;
         player.Warning += message => Notify?.Invoke(message);
@@ -690,7 +677,7 @@ internal sealed class ControllerManager : IAsyncDisposable
                 JoyConModeChanged?.Invoke(address, true);
         Log.Info(message);
         Notify?.Invoke(message);
-        OnChanged();
+        Changed?.Invoke();
     }
 
     /// <summary>Ein Paar in zwei einzelne Joy-Con trennen (Knopf im Fenster).</summary>
@@ -748,7 +735,7 @@ internal sealed class ControllerManager : IAsyncDisposable
         emptied?.Dispose();
         Log.Info(message);
         Notify?.Invoke(message);
-        OnChanged();
+        Changed?.Invoke();
     }
 
     /// <summary>Geste wie an der Switch: L am linken und R am rechten Joy-Con innerhalb einer Sekunde.</summary>
