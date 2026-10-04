@@ -53,10 +53,13 @@ internal sealed partial class InputView : Control
     }
 
     // Abgeleitete Farben: Tasten auf dem Gehäuse etwas dunkler, Beschriftung je nach Helligkeit.
-    private Color KeyFill => Mix(_body, Color.Black, 0.35f);
-    private Color KeyEdge => Mix(_body, Color.White, 0.25f);
-    private Color FaceFill => Mix(_body, Color.Black, 0.25f);
-    private Color FaceText => _buttons;
+    /// <summary>Tasten dunkel mit hellen Beschriftungen zeichnen (Joy-Con: schwarze Tasten auf neonfarbenem Gehäuse).</summary>
+    private bool _darkButtons;
+
+    private Color KeyFill => _darkButtons ? Color.FromArgb(0x20, 0x20, 0x24) : Mix(_body, Color.Black, 0.35f);
+    private Color KeyEdge => _darkButtons ? Color.FromArgb(0x3A, 0x3A, 0x40) : Mix(_body, Color.White, 0.25f);
+    private Color FaceFill => _darkButtons ? Color.FromArgb(0x24, 0x24, 0x28) : Mix(_body, Color.Black, 0.25f);
+    private Color FaceText => _darkButtons ? Color.FromArgb(0xDE, 0xDE, 0xE4) : _buttons;
 
     private static Color Mix(Color a, Color b, float t) => Color.FromArgb(
         (int)(a.R + (b.R - a.R) * t), (int)(a.G + (b.G - a.G) * t), (int)(a.B + (b.B - a.B) * t));
@@ -82,7 +85,6 @@ internal sealed partial class InputView : Control
         }
         var p = _input;
         bool On(ProButtons b) => p is not null && p.Has(b);
-        bool joyCon = p?.Kind.IsJoyCon() == true;
 
         // Umriss und alle Tastenpositionen 1:1 vom offiziellen Produktfoto (Frontansicht), wie bei den anderen Controllern.
         var f = Frame(307, 1600, 92, 1012);
@@ -106,21 +108,25 @@ internal sealed partial class InputView : Control
         Face(g, f.P(1190, 372), On(ProButtons.Y), "Y", f.S(50));
         Stick(g, f.P(1095, 558), _gamepad.RightX, _gamepad.RightY, On(ProButtons.RightStick), f.S(92), f.S(62));
 
-        // Mitte: − / + oben, Aufnahme (eckig) / HOME (rund) darunter, C unten mittig
+        // Mitte: − / + oben, Aufnahme (eckig) / HOME (rund) darunter; C nur beim Switch-2-Pro
         Face(g, f.P(795, 272), On(ProButtons.Minus), "−", f.S(28));
         Face(g, f.P(1110, 272), On(ProButtons.Plus), "+", f.S(28));
         CaptureKey(g, f.P(873, 372), On(ProButtons.Capture));
         Home(g, f.P(1035, 372), On(ProButtons.Home));
-        SquareKey(g, f.P(955, 650), On(ProButtons.C), "C");
+        // C-Taste und GL/GR gibt es nur am Switch-2-Pro-Controller, nicht am Switch-1-Pro.
+        bool switch2 = p?.Kind == ControllerKind.Pro2;
+        if (switch2)
+            SquareKey(g, f.P(955, 650), On(ProButtons.C), "C");
         PlayerLeds(g, f.P(830, 120));
 
         Gyro(g, p?.Motion);
 
-        // Rücktasten GL/GR (bzw. SL/SR beim einzelnen Joy-Con) seitlich außen an den Griffen
-        bool gl = On(ProButtons.GL) || On(ProButtons.SLLeft) || On(ProButtons.SLRight);
-        bool gr = On(ProButtons.GR) || On(ProButtons.SRLeft) || On(ProButtons.SRRight);
-        BackButton(g, new RectangleF(f.P(307, 560).X - 8, f.P(0, 560).Y, 40, 26), gl, joyCon ? "SL" : "GL");
-        BackButton(g, new RectangleF(f.P(1600, 560).X - 32, f.P(0, 560).Y, 40, 26), gr, joyCon ? "SR" : "GR");
+        if (switch2)
+        {
+            bool gl = On(ProButtons.GL), gr = On(ProButtons.GR);
+            BackButton(g, new RectangleF(f.P(307, 560).X - 8, f.P(0, 560).Y, 40, 26), gl, "GL");
+            BackButton(g, new RectangleF(f.P(1600, 560).X - 32, f.P(0, 560).Y, 40, 26), gr, "GR");
+        }
     }
 
     /// <summary>Gehäuse des Pro Controller 2: Umriss vom Foto, matte Fläche mit leichtem Verlauf und feiner Glanzkante.</summary>

@@ -126,6 +126,8 @@ internal sealed partial class InputView
         var savedButtons = _buttons;
         if (part.Info.BodyColor is { } body) _body = Rgb(body);
         if (part.Info.ButtonColor is { } btn) _buttons = Rgb(btn);
+        // Joy-Con: schwarze Tasten mit hellen Beschriftungen, unabhängig von der Gehäusefarbe (wie das Original).
+        _darkButtons = true;
         try
         {
             bool left = part.Kind.IsLeftJoyCon();
@@ -192,7 +194,8 @@ internal sealed partial class InputView
                 var ls = P(282, 333);
                 AccentRing(g, ls, S(96), accent);
                 Stick(g, ls, StickValue(s.LeftX, part.Calibration.Left.X),
-                    StickValue(s.LeftY, part.Calibration.Left.Y), On(ProButtons.LeftStick), S(85), S(58));
+                    StickValue(s.LeftY, part.Calibration.Left.Y), On(ProButtons.LeftStick), S(85), S(58),
+                    capColor: Color.FromArgb(0x2A, 0x2A, 0x2E), wellColor: Color.FromArgb(0x16, 0x16, 0x1A));
                 float r = S(40);
                 Face(g, P(282, 560), On(ProButtons.Up), "▲", r);
                 Face(g, P(280, 723), On(ProButtons.Down), "▼", r);
@@ -211,7 +214,8 @@ internal sealed partial class InputView
                 var rs = P(1003, 640);
                 AccentRing(g, rs, S(96), accent);
                 Stick(g, rs, StickValue(s.RightX, part.Calibration.Right.X),
-                    StickValue(s.RightY, part.Calibration.Right.Y), On(ProButtons.RightStick), S(85), S(58));
+                    StickValue(s.RightY, part.Calibration.Right.Y), On(ProButtons.RightStick), S(85), S(58),
+                    capColor: Color.FromArgb(0x2A, 0x2A, 0x2E), wellColor: Color.FromArgb(0x16, 0x16, 0x1A));
                 Home(g, P(941, 855), On(ProButtons.Home));
                 if (switch2)
                     SquareKey(g, P(941, 960), On(ProButtons.C), "C");
@@ -221,6 +225,7 @@ internal sealed partial class InputView
         {
             _body = savedBody;
             _buttons = savedButtons;
+            _darkButtons = false;
         }
     }
 

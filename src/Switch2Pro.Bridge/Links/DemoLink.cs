@@ -39,6 +39,11 @@ internal sealed class DemoLink : IControllerLink
             ControllerKind.Pro2 => new ControllerInfo { SerialNumber = "DEMO", Firmware = "0.0.0", BodyColor = 0x232323, ButtonColor = 0xA0A0A0, GripColor = 0xE6E6E6 },
             ControllerKind.JoyCon2Left => new ControllerInfo { SerialNumber = "DEMO", Firmware = "0.0.0", BodyColor = 0x2D2E33, ButtonColor = 0xC8C8C8, GripColor = 0x1CB4DC },
             ControllerKind.JoyCon2Right => new ControllerInfo { SerialNumber = "DEMO", Firmware = "0.0.0", BodyColor = 0x2D2E33, ButtonColor = 0xC8C8C8, GripColor = 0xF2593C },
+            // Switch-1-Joy-Con in Neonblau/Neonrot, Tasten dunkel (wie das Original).
+            ControllerKind.JoyCon1Left => new ControllerInfo { SerialNumber = "DEMO", Firmware = "0.0.0", BodyColor = 0x4AC7EC, ButtonColor = 0x0F1419 },
+            ControllerKind.JoyCon1Right => new ControllerInfo { SerialNumber = "DEMO", Firmware = "0.0.0", BodyColor = 0xFF3C28, ButtonColor = 0x0F1419 },
+            // Switch-1-Pro-Controller schwarz mit dunkelgrauen Griffen.
+            ControllerKind.Pro1 => new ControllerInfo { SerialNumber = "DEMO", Firmware = "0.0.0", BodyColor = 0x313131, ButtonColor = 0xB4B4B4, GripColor = 0x313131 },
             _ => new ControllerInfo { SerialNumber = "DEMO", Firmware = "0.0.0", BodyColor = 0xE33B3B, ButtonColor = 0x1A1A1A, GripColor = 0xE33B3B },
         };
         _ = Task.Run(() => RunAsync(number, _cts.Token));
