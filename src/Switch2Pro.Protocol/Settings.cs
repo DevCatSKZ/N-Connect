@@ -262,6 +262,35 @@ public sealed class Settings
     /// <summary>Beim Einstecken einer Switch-SD-Karte anbieten, die Kopplungsdaten zu übernehmen.</summary>
     public bool SwitchCardHint { get; set; } = true;
 
+    /// <summary>Eigene Namen je Controller (Adresse → Name), z. B. „Lenas Joy-Con“.</summary>
+    public Dictionary<string, string> ControllerNames { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>Gewünschter Spielerplatz je Controller (Adresse → 0–7); wird beim Verbinden bevorzugt.</summary>
+    public Dictionary<string, int> PlayerSlots { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>Eigener Name eines Controllers (null = keiner).</summary>
+    public string? NameFor(string? address) =>
+        address is not null && ControllerNames.TryGetValue(address, out var name) && !string.IsNullOrWhiteSpace(name) ? name : null;
+
+    /// <summary>Namen setzen; leer = entfernen. Neue Kopie, weil andere Threads gleichzeitig lesen.</summary>
+    public void SetName(string address, string? name)
+    {
+        var copy = new Dictionary<string, string>(ControllerNames, StringComparer.OrdinalIgnoreCase);
+        if (string.IsNullOrWhiteSpace(name))
+            copy.Remove(address);
+        else
+            copy[address] = name.Trim().Length > 40 ? name.Trim()[..40] : name.Trim();
+        ControllerNames = copy;
+    }
+
+    /// <summary>Gewünschter Spielerplatz eines Controllers (null = keiner).</summary>
+    public int? SlotFor(string? address) =>
+        address is not null && PlayerSlots.TryGetValue(address, out int slot) && slot is >= 0 and < 8 ? slot : null;
+
+    /// <summary>Spielerplatz merken. Neue Kopie, weil andere Threads gleichzeitig lesen.</summary>
+    public void SetSlot(string address, int slot) =>
+        PlayerSlots = new Dictionary<string, int>(PlayerSlots, StringComparer.OrdinalIgnoreCase) { [address] = Math.Clamp(slot, 0, 7) };
+
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         WriteIndented = true,
@@ -350,6 +379,8 @@ public sealed class Settings
         SingleJoyCons = [.. other.SingleJoyCons];
         ImportedPairings = [.. other.ImportedPairings];
         SwitchCardHint = other.SwitchCardHint;
+        ControllerNames = new Dictionary<string, string>(other.ControllerNames, StringComparer.OrdinalIgnoreCase);
+        PlayerSlots = new Dictionary<string, int>(other.PlayerSlots, StringComparer.OrdinalIgnoreCase);
     }
 
     [JsonIgnore]
@@ -478,6 +509,10 @@ public sealed class Settings
         KnownControllers.RemoveAll(a => a is null);
         SingleJoyCons.RemoveAll(a => a is null);
         Profiles = Clean(Profiles);
+        ControllerNames = ControllerNames?.Where(n => n.Key is not null && !string.IsNullOrWhiteSpace(n.Value))
+            .ToDictionary(n => n.Key, n => n.Value.Trim(), StringComparer.OrdinalIgnoreCase) ?? new(StringComparer.OrdinalIgnoreCase);
+        PlayerSlots = PlayerSlots?.Where(s => s.Key is not null && s.Value is >= 0 and < 8)
+            .ToDictionary(s => s.Key, s => s.Value, StringComparer.OrdinalIgnoreCase) ?? new(StringComparer.OrdinalIgnoreCase);
         return this;
     }
 }

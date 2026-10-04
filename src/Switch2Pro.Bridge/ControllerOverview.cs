@@ -118,6 +118,10 @@ internal sealed class ControllerOverview : Panel
             }
             card.Show(p, _settings());
         }
+        // Karten in Spielerreihenfolge (auch nach dem Umsortieren).
+        for (int i = 0; i < players.Count; i++)
+            if (_byPlayer.TryGetValue(players[i], out var ordered) && _cards.Controls.GetChildIndex(ordered) != i)
+                _cards.Controls.SetChildIndex(ordered, i);
         // Zusammengeklappte Karten gleich hoch – nebeneinander wirkt die Übersicht so ruhig und symmetrisch.
         int body = _byPlayer.Values.Where(c => !c.IsExpanded).Select(c => c.NaturalBodyHeight).DefaultIfEmpty(0).Max();
         foreach (var card in _byPlayer.Values)
@@ -653,8 +657,97 @@ internal sealed class ControllerOverview : Panel
             }
             using var pen = new Pen(Theme.Current.Border, 1f);
             g.DrawPath(pen, path);
-            TextRenderer.DrawText(g, _title ?? "", UiFonts.Subtitle, new Rectangle(20, 14, Math.Max(100, _identify.Left - 30), 36),
-                TextColor, TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis | TextFormatFlags.NoPrefix);
+            // Titel mit kleinem Pfeil: Klick öffnet Spielerplatz und Umbenennen.
+            const TextFormatFlags flags = TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis | TextFormatFlags.NoPrefix;
+            int maxWidth = Math.Max(100, _identify.Left - 50);
+            int width = Math.Min(maxWidth, TextRenderer.MeasureText(g, _title ?? "", UiFonts.Subtitle, new Size(maxWidth, 36), flags).Width);
+            var titleBox = new Rectangle(20, 14, width, 36);
+            if (_titleHover)
+                using (var hover = new SolidBrush(Theme.Current.SurfaceHover))
+                using (var round = Theme.RoundedRect(new RectangleF(titleBox.X - 8, titleBox.Y + 2, titleBox.Width + 34, titleBox.Height - 4), 6))
+                    g.FillPath(hover, round);
+            TextRenderer.DrawText(g, _title ?? "", UiFonts.Subtitle, titleBox, TextColor, flags);
+            TextRenderer.DrawText(g, "▾", UiFonts.Body, new Rectangle(titleBox.Right + 4, 14, 18, 36), MutedColor, TextFormatFlags.VerticalCenter);
+            _titleRect = new Rectangle(titleBox.X - 8, titleBox.Y, titleBox.Width + 34, titleBox.Height);
+        }
+
+        private Rectangle _titleRect;
+        private bool _titleHover;
+
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            base.OnMouseMove(e);
+            bool hover = _titleRect.Contains(e.Location);
+            if (hover == _titleHover)
+                return;
+            _titleHover = hover;
+            Cursor = hover ? Cursors.Hand : Cursors.Default;
+            Invalidate(new Rectangle(0, 0, Width, 60));
+        }
+
+        protected override void OnMouseLeave(EventArgs e)
+        {
+            base.OnMouseLeave(e);
+            if (!_titleHover)
+                return;
+            _titleHover = false;
+            Cursor = Cursors.Default;
+            Invalidate(new Rectangle(0, 0, Width, 60));
+        }
+
+        protected override void OnMouseClick(MouseEventArgs e)
+        {
+            base.OnMouseClick(e);
+            if (_titleRect.Contains(e.Location) && _player is not null)
+                ShowPlayerMenu(new Point(_titleRect.Left, _titleRect.Bottom));
+        }
+
+        /// <summary>Menü am Titel: Spielerplatz wählen (belegter Platz = tauschen) und Controller umbenennen.</summary>
+        private void ShowPlayerMenu(Point at)
+        {
+            var player = _player!;
+            var settings = CurrentSettings;
+            var others = Manager.Players.ToDictionary(p => p.Index);
+            var menu = new ContextMenuStrip { Renderer = Theme.MenuRenderer(), ForeColor = Theme.Current.Text, ShowCheckMargin = true };
+            for (int i = 0; i < 8; i++)
+            {
+                int slot = i;
+                string text = others.TryGetValue(i, out var occupant) && occupant != player
+                    ? $"Spieler {i + 1} – tauschen mit {occupant.DisplayName(settings)}"
+                    : i == player.Index ? $"Spieler {i + 1}" : $"Spieler {i + 1} – frei";
+                var item = new ToolStripMenuItem(Tr.T(text)) { Checked = i == player.Index };
+                item.Click += (_, _) => Manager.MovePlayer(player, slot);
+                menu.Items.Add(item);
+            }
+            menu.Items.Add(new ToolStripSeparator());
+            var links = player.Links;
+            foreach (var link in links)
+            {
+                if (link.Address is not { } address)
+                    continue;
+                string label = links.Count == 2
+                    ? link.Kind.IsLeftJoyCon() ? "Linken Joy-Con umbenennen …" : "Rechten Joy-Con umbenennen …"
+                    : "Umbenennen …";
+                var rename = new ToolStripMenuItem(Tr.T(label));
+                rename.Click += (_, _) => Rename(address, link.Kind);
+                menu.Items.Add(rename);
+            }
+            menu.Closed += (_, _) => BeginInvoke(menu.Dispose);
+            menu.Show(this, at);
+        }
+
+        private void Rename(string address, ControllerKind kind)
+        {
+            var settings = CurrentSettings;
+            string? name = Prompt.Ask(FindForm()!, Tr.T("Controller umbenennen"),
+                Tr.T($"Name für {kind.DisplayName()} (leer = Standardname):"), settings.NameFor(address) ?? "", allowEmpty: true);
+            if (name is null)
+                return;
+            settings.SetName(address, name);
+            _owner._save();
+            _rawTitle = null; // Titel neu aufbauen
+            if (_player is { } p)
+                Show(p, settings);
         }
 
         // ---------- Live (~60-mal pro Sekunde) ----------
@@ -663,7 +756,7 @@ internal sealed class ControllerOverview : Panel
         {
             _player = player;
             var links = player.Links;
-            string title = $"Spieler {player.Index + 1}  ·  {player.Kind.DisplayName()}" + (player.GyroMouseActive ? "  ·  Gyro-Maus" : "") + (player.GyroStickActive ? "  ·  Gyro-Stick" : "");
+            string title = $"Spieler {player.Index + 1}  ·  {player.DisplayName(settings)}" + (player.GyroMouseActive ? "  ·  Gyro-Maus" : "") + (player.GyroStickActive ? "  ·  Gyro-Stick" : "");
             if (title != _rawTitle)
             {
                 _rawTitle = title;

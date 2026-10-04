@@ -33,8 +33,58 @@ internal sealed class Player : IDisposable
     private long _updates;
     private ulong? _mac;
 
-    /// <summary>Spielernummer (0–7): bestimmt LEDs und DSU-Slot. Wird nur vom Manager vergeben.</summary>
-    public int Index { get; }
+    /// <summary>Spielernummer (0–7): bestimmt LEDs und DSU-Slot. Wird nur vom Manager vergeben (auch umgestellt).</summary>
+    public int Index { get; private set; }
+
+    /// <summary>Anzeigename: eigene Namen der Controller, sonst die Controller-Art (Paar: beide Namen, falls vergeben).</summary>
+    public string DisplayName(Settings settings)
+    {
+        var links = Links;
+        var names = links.Select(l => settings.NameFor(l.Address)).Where(n => n is not null).ToList();
+        if (names.Count == 0)
+            return Kind.DisplayName();
+        return links.Count == 2 && names.Count == 1 ? $"{names[0]} (Joy-Con-Paar)" : string.Join(" + ", names);
+    }
+
+    /// <summary>Spielernummer ändern (Manager): LEDs der Controller und DSU-Slot folgen.</summary>
+    internal void MoveTo(int index)
+    {
+        if (index == Index)
+            return;
+        lock (_output)
+            DsuServer.Instance?.Clear(Index);
+        Index = index;
+        foreach (var link in Links)
+            link.SetPlayerAsync(index).Forget($"{link.Id}: Spieler-LED");
+        Changed?.Invoke();
+    }
+
+    /// <summary>
+    /// Virtuellen Controller abbauen (Manager, beim Umsortieren): Windows vergibt die Xbox-Plätze in der Reihenfolge,
+    /// in der die virtuellen Controller entstehen – zum Umsortieren erst alle abbauen, dann der Reihe nach neu anlegen.
+    /// </summary>
+    internal void ReleasePad()
+    {
+        IVirtualPad? pad;
+        lock (_output)
+        {
+            StopRumble();
+            pad = _pad;
+            _pad = null;
+        }
+        if (pad is not null)
+            DisposePad(pad);
+    }
+
+    /// <summary>Virtuellen Controller wieder anlegen (nach <see cref="ReleasePad"/>).</summary>
+    internal void RestorePad()
+    {
+        bool missing;
+        lock (_output)
+            missing = _pad is null && !_disposed;
+        if (missing)
+            CreatePad(_settings().OutputMode);
+    }
 
     /// <summary>Wird ausgelöst, wenn sich Akku, Ladezustand o. Ä. sichtbar ändert.</summary>
     public event Action? Changed;

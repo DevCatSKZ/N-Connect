@@ -227,10 +227,11 @@ internal static class MacroDialog
     }
 }
 
-/// <summary>Einfache Texteingabe (Profilname).</summary>
+/// <summary>Einfache Texteingabe (Profilname, Controller-Name).</summary>
 internal static class Prompt
 {
-    public static string? Ask(IWin32Window owner, string title, string question, string initial)
+    /// <param name="allowEmpty">Leere Eingabe ist erlaubt und liefert "" (z. B. Namen entfernen); null heißt dann nur „abgebrochen“.</param>
+    public static string? Ask(IWin32Window owner, string title, string question, string initial, bool allowEmpty = false)
     {
         using var form = new Form
         {
@@ -250,7 +251,7 @@ internal static class Prompt
         if (form.ShowDialog(owner) != DialogResult.OK)
             return null;
         var text = box.Text.Trim();
-        return text.Length == 0 ? null : text;
+        return text.Length == 0 && !allowEmpty ? null : text;
     }
 }
 
