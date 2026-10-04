@@ -451,11 +451,9 @@ internal static partial class Tr
             "To search on purpose: page “General” → “Pair controller …”.",
         ["Neue Controller automatisch koppeln"] = "Pair new controllers automatically",
         ["Joy-Con, Pro Controller, NES/SNES/N64/Mega Drive und Wii: einfach SYNC drücken – " +
-         "kein Umweg über die Windows-Bluetooth-Einstellungen. Gesucht wird nur, solange niemand spielt und kein " +
-         "Switch-2-Controller verbunden ist – sonst „Gezielt suchen“."] =
+         "kein Umweg über die Windows-Bluetooth-Einstellungen. Gesucht wird nur, solange niemand spielt."] =
             "Joy-Con, Pro Controller, NES/SNES/N64/Mega Drive and Wii: just press SYNC – no detour via the Windows " +
-            "Bluetooth settings. Searches only while nobody is playing and no Switch 2 controller is connected – " +
-            "otherwise “Search on purpose”.",
+            "Bluetooth settings. Searches only while nobody is playing.",
         ["Gezielt suchen"] = "Search on purpose",
         ["Sucht eine Minute lang nach Controllern im Kopplungsmodus."] = "Searches for controllers in pairing mode for one minute.",
         ["Controller koppeln …"] = "Pair controller …",
