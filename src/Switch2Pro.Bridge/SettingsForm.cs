@@ -102,6 +102,7 @@ internal sealed class SettingsForm : Form
     private readonly TrackBar _mouseSpeed = new() { Minimum = 1, Maximum = 50, TickFrequency = 5, Width = 200 };
     private readonly CheckBox _invertX = new() { Text = "Maus: links/rechts umkehren", AutoSize = true };
     private readonly CheckBox _invertY = new() { Text = "Maus: hoch/runter umkehren", AutoSize = true };
+    private readonly CheckBox _wiiPointer = new() { Text = "Wii-Fernbedienung: Zeiger (Sensorleiste) steuert die Maus", AutoSize = true };
 
     private readonly ComboBox _inactivity = new() { DropDownStyle = ComboBoxStyle.DropDownList, Width = 130 };
     private static readonly int[] InactivityChoices = [0, 5, 10, 15, 30, 60];
@@ -204,6 +205,7 @@ internal sealed class SettingsForm : Form
         joyCon.Controls.Add(_mouseSpeed);
         joyCon.Controls.Add(_invertX);
         joyCon.Controls.Add(_invertY);
+        joyCon.Controls.Add(_wiiPointer);
         joyCon.SetFlowBreak(_gyroSource, true);
         joyCon.SetFlowBreak(_mouseSpeed, true);
         joyCon.Controls.Add(new Label
@@ -214,7 +216,7 @@ internal sealed class SettingsForm : Form
                    "(auch nach dem nächsten Verbinden). Im Mausmodus: R/L = Linksklick, " +
                    "ZR/ZL = Rechtsklick, Stick drücken = Mittelklick, Stick hoch/runter = Scrollen.",
         });
-        root.Controls.Add(WrapGroup("4. Joy-Con", joyCon));
+        root.Controls.Add(WrapGroup("4. Joy-Con und Wii", joyCon));
 
         var aim = Flow();
         _gyroStickMode.Items.AddRange(["aus (nur per Taste „Gyro-Stick“)", "immer", "beim Zielen (solange ZL / linker Trigger gedrückt)"]);
@@ -355,6 +357,7 @@ internal sealed class SettingsForm : Form
         _mouseSpeed.ValueChanged += (_, _) => Apply(() => _settings.MouseSpeed = _mouseSpeed.Value / 10f);
         _invertX.CheckedChanged += (_, _) => Apply(() => _settings.MouseInvertX = _invertX.Checked);
         _invertY.CheckedChanged += (_, _) => Apply(() => _settings.MouseInvertY = _invertY.Checked);
+        _wiiPointer.CheckedChanged += (_, _) => Apply(() => _settings.WiiPointerMouse = _wiiPointer.Checked);
         _profileKind.SelectedIndexChanged += (_, _) => { if (!_loading) { LoadKindDeadzone(); BuildProfileGrid(); } };
         _inactivity.SelectedIndexChanged += (_, _) =>
             Apply(() => _settings.InactivityMinutes = _inactivityValues[Math.Max(0, _inactivity.SelectedIndex)]);
@@ -406,6 +409,7 @@ internal sealed class SettingsForm : Form
         _mouseSpeed.Value = Math.Clamp((int)MathF.Round(_settings.MouseSpeed * 10), 1, 50);
         _invertX.Checked = _settings.MouseInvertX;
         _invertY.Checked = _settings.MouseInvertY;
+        _wiiPointer.Checked = _settings.WiiPointerMouse;
         // Auswahl jedes Mal neu aufbauen; ein von Hand eingetragener Wert (z. B. 20) erscheint als eigener Eintrag.
         _inactivityValues.Clear();
         _inactivityValues.AddRange(InactivityChoices);

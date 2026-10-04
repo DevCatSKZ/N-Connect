@@ -17,6 +17,14 @@ internal static class Program
             RenderCheck.Run(args[render + 1]);
             return;
         }
+        int renderUi = Array.IndexOf(args, "--render-ui");
+        if (renderUi >= 0 && renderUi + 1 < args.Length)
+        {
+            ApplicationConfiguration.Initialize();
+            Tr.Init(args.Contains("--en") ? "en" : "de");
+            RenderCheck.RenderUi(args[renderUi + 1]);
+            return;
+        }
         // Prüfhilfe für die Übersetzung: alle Texte der Fenster ausgeben (und welche noch nicht übersetzt sind).
         int dump = Array.IndexOf(args, "--dump-ui");
         if (dump >= 0 && dump + 1 < args.Length)

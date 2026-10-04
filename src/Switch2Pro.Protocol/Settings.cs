@@ -170,6 +170,8 @@ public sealed class Settings
 
     /// <summary>Beim Start auf GitHub nach einer neuen Version suchen.</summary>
     public bool CheckForUpdates { get; set; } = true;
+    /// <summary>Wii-Fernbedienung: Zeiger über die Sensorleiste (IR-Kamera) steuert den Mauszeiger.</summary>
+    public bool WiiPointerMouse { get; set; }
     /// <summary>Sprache der Oberfläche: null = wie Windows, sonst "de" oder "en".</summary>
     public string? Language { get; set; }
 
@@ -274,6 +276,7 @@ public sealed class Settings
         TriggerFullAt = other.TriggerFullAt;
         TurboRate = other.TurboRate;
         CheckForUpdates = other.CheckForUpdates;
+        WiiPointerMouse = other.WiiPointerMouse;
         Language = other.Language;
         UprightJoyCons = [.. other.UprightJoyCons];
         HiddenDevices = [.. other.HiddenDevices];

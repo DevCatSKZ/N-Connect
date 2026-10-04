@@ -264,53 +264,163 @@ internal sealed partial class InputView
         var white = Color.FromArgb(0xF0, 0xF0, 0xF2);
         var key = Color.FromArgb(0xE2, 0xE2, 0xE6);
         var dark = Color.FromArgb(0x50, 0x50, 0x58);
-        if (WiiExtension == WiiExtension.Classic)
+        if (WiiExtension.HasClassic())
         {
             PaintWiiClassic(g, on, white, key, dark);
             return;
         }
-        bool nunchuk = WiiExtension == WiiExtension.Nunchuk;
-        // Fernbedienung senkrecht; ohne Nunchuk wird sie quer gehalten (Steuerkreuz links) – Hinweis darunter.
-        float cx = nunchuk ? W / 2 + 90 : W / 2;
-        using (var path = Rounded(new RectangleF(cx - 42, 30, 84, 350), 30))
-            BodyShape(g, path, white);
+        WiiOverlay(g); // Zeiger-Anzeige (nur bei der Fernbedienung selbst)
+        bool nunchuk = WiiExtension.HasNunchuk();
+        bool motionPlus = WiiExtension.HasMotionPlus();
+        float cx = nunchuk ? W / 2 + 80 : W / 2;
+        // Maße wie das Original (14,8 × 3,6 cm): schlank, oben und unten stark gerundet.
+        const float RemoteW = 76, Top = 22;
+        float bottom = motionPlus ? 352 : 378;
+        float edge = cx - RemoteW / 2;
+        if (nunchuk)
+            PaintNunchuk(g, on, cx, motionPlus ? 392 : bottom, white, key, dark);
+
+        // B-Abzug auf der Rückseite: als seitlich vorstehender Abzug angedeutet (hinter dem Gehäuse).
+        using (var trigger = new GraphicsPath())
+        {
+            trigger.AddBeziers(
+            [
+                new PointF(cx + 20, 112), new PointF(cx + 56, 116), new PointF(cx + 62, 150), new PointF(cx + 52, 182),
+                new PointF(cx + 46, 198), new PointF(cx + 30, 200), new PointF(cx + 20, 196),
+            ]);
+            trigger.CloseFigure();
+            bool b = on(ProButtons.ZR);
+            if (b)
+            {
+                using var glow = new Pen(AccentGlow, 7f);
+                g.DrawPath(glow, trigger);
+            }
+            using (var fill = new SolidBrush(b ? Accent : Color.FromArgb(0xC8, 0xC8, 0xCE)))
+                g.FillPath(fill, trigger);
+            Caption(g, new RectangleF(cx + 38, 142, 20, 18), "B", 9f, b ? Color.White : dark);
+        }
+
+        using (var body = Rounded(new RectangleF(edge, Top, RemoteW, bottom - Top), 30))
+            BodyShape(g, body, white);
+        // IR-Fenster an der Spitze (dunkel, durchscheinend)
+        using (var ir = new GraphicsPath())
+        {
+            ir.AddArc(edge, Top, RemoteW, 60, 180, 180);
+            ir.AddLine(edge + RemoteW, Top + 30, edge + RemoteW, Top + 16);
+            ir.AddLine(edge, Top + 16, edge, Top + 30);
+            ir.CloseFigure();
+            var clip = g.Save();
+            using (var bodyClip = Rounded(new RectangleF(edge, Top, RemoteW, bottom - Top), 30))
+                g.SetClip(bodyClip);
+            using (var dark1 = new LinearGradientBrush(new RectangleF(edge, Top, RemoteW, 20), Color.FromArgb(70, 72, 82), Color.FromArgb(30, 32, 38), LinearGradientMode.Vertical))
+                g.FillRectangle(dark1, edge, Top, RemoteW, 18);
+            g.Restore(clip);
+        }
+        // Ein/Aus-Taste (klein, oben links)
+        using (var power = new SolidBrush(Color.FromArgb(0xD6, 0xD6, 0xDC)))
+            g.FillEllipse(power, edge + 12, Top + 26, 14, 14);
+        using (var red = new Pen(Color.FromArgb(200, 70, 70), 1.6f))
+            g.DrawArc(red, edge + 15.5f, Top + 29.5f, 7, 7, -60, 300);
+
         // Steuerkreuz: Eingaben sind beim Querhalten schon gedreht – für die Anzeige zurückdrehen.
         bool up = on(ProButtons.Up), down = on(ProButtons.Down), left = on(ProButtons.Left), right = on(ProButtons.Right);
         if (!nunchuk)
             (up, down, left, right) = (on(ProButtons.Left), on(ProButtons.Right), on(ProButtons.Down), on(ProButtons.Up));
         var state = g.Save();
         g.TranslateTransform(cx, 92);
-        g.ScaleTransform(0.62f, 0.62f);
+        g.ScaleTransform(0.56f, 0.56f);
         DPad(g, new PointF(0, 0), up, down, left, right);
         g.Restore(state);
-        ColorKey(g, new PointF(cx, 160), on(ProButtons.A), "A", key, 20, dark);
-        ColorKey(g, new PointF(cx - 28, 212), on(ProButtons.Minus), "−", key, 10, dark);
-        ColorKey(g, new PointF(cx, 212), on(ProButtons.Home), "⌂", key, 10, Color.FromArgb(40, 120, 220));
-        ColorKey(g, new PointF(cx + 28, 212), on(ProButtons.Plus), "+", key, 10, dark);
-        ColorKey(g, new PointF(cx, 288), on(ProButtons.Y), "1", key, 15, dark);
-        ColorKey(g, new PointF(cx, 330), on(ProButtons.B), "2", key, 15, dark);
-        // B-Abzug auf der Rückseite: seitlich angedeutet
-        Tab(g, new RectangleF(cx + 48, 140, 46, 40), on(ProButtons.ZR), "B", key);
-        if (nunchuk)
+
+        // A: groß, leicht vertieft mit Ring
+        using (var ring = new Pen(Color.FromArgb(0xC6, 0xC6, 0xCC), 2f))
+            g.DrawEllipse(ring, cx - 25, 132, 50, 50);
+        ColorKey(g, new PointF(cx, 157), on(ProButtons.A), "A", key, 20, dark);
+
+        // − HOME + (HOME mit blauem Ring)
+        ColorKey(g, new PointF(cx - 24, 214), on(ProButtons.Minus), "−", key, 9, dark);
+        ColorKey(g, new PointF(cx + 24, 214), on(ProButtons.Plus), "+", key, 9, dark);
+        using (var blue = new Pen(Color.FromArgb(70, 140, 230), 1.6f))
+            g.DrawEllipse(blue, cx - 11, 203, 22, 22);
+        ColorKey(g, new PointF(cx, 214), on(ProButtons.Home), "⌂", key, 9, Color.FromArgb(40, 120, 220));
+
+        // Lautsprecher (Lochraster)
+        using (var holes = new SolidBrush(Color.FromArgb(0xB8, 0xB8, 0xC0)))
+            for (int row = 0; row < 3; row++)
+                for (int col = 0; col < 6; col++)
+                    g.FillEllipse(holes, cx - 15 + col * 6, 240 + row * 6, 2.6f, 2.6f);
+
+        // 1 und 2
+        ColorKey(g, new PointF(cx, 282), on(ProButtons.Y), "1", key, 13, dark);
+        ColorKey(g, new PointF(cx, 318), on(ProButtons.B), "2", key, 13, dark);
+
+        // Vier Spieler-LEDs unten (blau, wie das Original)
+        byte mask = PlayerIndex >= 0 ? Commands.PlayerLedMask(PlayerIndex) : (byte)0;
+        for (int i = 0; i < 4; i++)
         {
-            using (var path = new GraphicsPath { FillMode = FillMode.Winding })
-            {
-                path.AddEllipse(60, 70, 150, 130);
-                path.AddEllipse(95, 160, 80, 210);
-                BodyShape(g, path, white);
-            }
-            Stick(g, new PointF(135, 130), _gamepad.LeftX, _gamepad.LeftY, false, 34, 20);
-            Tab(g, new RectangleF(196, 92, 44, 28), on(ProButtons.L), "C", key);
-            Tab(g, new RectangleF(196, 126, 44, 40), on(ProButtons.ZL), "Z", key);
-            using var cable = new Pen(Color.FromArgb(200, 200, 205), 3f);
-            g.DrawBezier(cable, 135, 370, 160, 400, cx - 40, 400, cx, 380);
+            bool lit = (mask & (1 << i)) != 0;
+            using var led = new SolidBrush(lit ? Color.FromArgb(70, 160, 255) : Color.FromArgb(0xC0, 0xC0, 0xC8));
+            g.FillRectangle(led, cx - 17 + i * 10, bottom - 22, 5, 3);
         }
-        else
+
+        // MotionPlus-Aufsatz unten
+        if (motionPlus)
+        {
+            using (var mp = Rounded(new RectangleF(edge + 2, bottom - 4, RemoteW - 4, 40), 10))
+                BodyShape(g, mp, Color.FromArgb(0xEC, 0xEC, 0xF0));
+            Caption(g, new RectangleF(edge, bottom + 6, RemoteW, 16), "MotionPlus", 7f, Color.FromArgb(90, 120, 200));
+        }
+        if (!nunchuk)
         {
             using var font = new Font("Segoe UI", 8f);
             using var label = new SolidBrush(Color.FromArgb(150, 155, 166));
-            g.DrawString(Tr.T("quer halten: Steuerkreuz links,\n1 und 2 rechts"), font, label, cx + 60, 270);
+            g.DrawString(Tr.T("quer halten: Steuerkreuz links,\n1 und 2 rechts"), font, label, cx + 64, 270);
         }
+    }
+
+    /// <summary>
+    /// Nunchuk von oben: runder Kopf mit Stick, nach unten schmaler Griff; vorn C (klein, rund) und Z (breit);
+    /// Kabel zur Unterseite der Fernbedienung.
+    /// </summary>
+    private void PaintNunchuk(Graphics g, Func<ProButtons, bool> on, float remoteX, float remoteBottom, Color white, Color key, Color dark)
+    {
+        const float nx = 150;
+        // Kabel zuerst (liegt hinter beiden Geräten)
+        using (var cable = new Pen(Color.FromArgb(190, 190, 198), 3.2f))
+            g.DrawBezier(cable, nx, 366, nx, 404, remoteX - 10, 404, remoteX, remoteBottom);
+        // Z (breit) und C (klein) an der Vorderkante, teilweise hinter dem Kopf
+        bool z = on(ProButtons.ZL), c = on(ProButtons.L);
+        using (var zPath = Rounded(new RectangleF(nx - 38, 40, 76, 30), 12))
+        {
+            if (z)
+            {
+                using var glow = new Pen(AccentGlow, 6f);
+                g.DrawPath(glow, zPath);
+            }
+            using var fill = new SolidBrush(z ? Accent : key);
+            g.FillPath(fill, zPath);
+            using var edgePen = new Pen(Color.FromArgb(0xA8, 0xA8, 0xB0), 1.2f);
+            g.DrawPath(edgePen, zPath);
+        }
+        Caption(g, new RectangleF(nx + 14, 44, 22, 16), "Z", 8.5f, z ? Color.White : dark);
+        // Körper: ein Umriss – breiter, runder Kopf, schmaler werdender Griff
+        using (var body = new GraphicsPath())
+        {
+            body.AddBeziers(
+            [
+                new PointF(nx, 54),
+                new PointF(nx + 58, 54), new PointF(nx + 74, 98), new PointF(nx + 66, 140),   // Kopf rechts
+                new PointF(nx + 60, 172), new PointF(nx + 38, 190), new PointF(nx + 36, 232), // Übergang
+                new PointF(nx + 34, 290), new PointF(nx + 34, 350), new PointF(nx, 368),      // Griff rechts
+                new PointF(nx - 34, 350), new PointF(nx - 34, 290), new PointF(nx - 36, 232), // Griff links
+                new PointF(nx - 38, 190), new PointF(nx - 60, 172), new PointF(nx - 66, 140), // Übergang
+                new PointF(nx - 74, 98), new PointF(nx - 58, 54), new PointF(nx, 54),         // Kopf links
+            ]);
+            body.CloseFigure();
+            BodyShape(g, body, white);
+        }
+        ColorKey(g, new PointF(nx - 30, 50), c, "C", key, 10, dark);
+        Stick(g, new PointF(nx, 112), _gamepad.LeftX, _gamepad.LeftY, false, 34, 21);
     }
 
     private void PaintWiiClassic(Graphics g, Func<ProButtons, bool> on, Color white, Color key, Color dark)
@@ -334,6 +444,26 @@ internal sealed partial class InputView
         Stick(g, new PointF(W / 2 + 64, 252), _gamepad.RightX, _gamepad.RightY, false, 28, 17);
         Batt(g);
     }
+
+    /// <summary>
+    /// Wii-Zusätze oben rechts: „MotionPlus“-Abzeichen und – wenn die Sensorleiste im Blick ist – ein kleiner
+    /// Bildschirm mit dem Zeigerpunkt.
+    /// </summary>
+    private void WiiOverlay(Graphics g)
+    {
+        if (_input?.Pointer is not { } p)
+            return;
+        var screen = new RectangleF(W - 128, 36, 116, 70);
+        using (var back = new SolidBrush(Color.FromArgb(40, 42, 50)))
+            g.FillRectangle(back, screen);
+        using (var edge = new Pen(Color.FromArgb(120, 125, 140), 1.2f))
+            g.DrawRectangle(edge, screen.X, screen.Y, screen.Width, screen.Height);
+        using (var dot = new SolidBrush(Accent))
+            g.FillEllipse(dot, screen.X + p.X * screen.Width - 4, screen.Y + p.Y * screen.Height - 4, 8, 8);
+        Caption(g, new RectangleF(screen.X, screen.Bottom + 2, screen.Width, 14), Tr.T("Zeiger"), 7.5f, MutedText);
+    }
+
+    private static readonly Color MutedText = Color.FromArgb(150, 155, 166);
 
     // ---------- GameCube-Controller (Switch 2) ----------
 

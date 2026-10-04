@@ -235,6 +235,8 @@ internal sealed class Player : IDisposable
             var keys = output.Keys;
             gamepad = ApplyMacros(gamepad, output.Macros, keys);
             UpdateSpecials(output.Specials, motionFresh ? input.Motion : null, settings);
+            if (settings.WiiPointerMouse && state.Pointer is { } pointer)
+                MovePointer(pointer);
             // Gyro als rechter Stick: immer, beim Zielen (linker Trigger) oder per Taste (halten/ein-aus).
             bool gyroStick = settings.GyroStick == GyroStickMode.Always
                              || settings.GyroStick == GyroStickMode.WhileAiming && gamepad.LeftTrigger > 40
@@ -461,6 +463,21 @@ internal sealed class Player : IDisposable
             _gyroMouse.Add(settings.MouseInvertX ? -dx : dx, settings.MouseInvertY ? -dy : dy);
         }
         _lastGyroTicks = now;
+    }
+
+    private (float X, float Y)? _pointer;
+
+    /// <summary>
+    /// Wii-Zeiger → Mauszeiger (absolut auf dem Hauptbildschirm). Geglättet gegen das Zittern der IR-Punkte; der
+    /// mittlere Bereich des Kamerabilds wird auf den ganzen Bildschirm gestreckt, damit man nicht weit zielen muss.
+    /// Aufruf unter <see cref="_output"/>.
+    /// </summary>
+    private void MovePointer((float X, float Y) target)
+    {
+        const float Smoothing = 0.35f, Stretch = 1.5f;
+        var (x, y) = _pointer is { } p ? (p.X + (target.X - p.X) * Smoothing, p.Y + (target.Y - p.Y) * Smoothing) : target;
+        _pointer = (x, y);
+        WindowsInput.MoveMouseAbsolute(0.5f + (x - 0.5f) * Stretch, 0.5f + (y - 0.5f) * Stretch);
     }
 
     /// <summary>Gehaltene Maustasten lösen (beim Freigeben). Aufruf unter <see cref="_output"/>.</summary>

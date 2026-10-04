@@ -363,7 +363,7 @@ internal sealed class ControllerManager : IAsyncDisposable
             using var timeout = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token);
             timeout.CancelAfter(TimeSpan.FromSeconds(15));
             IControllerLink link = kind == ControllerKind.WiiRemote
-                ? await WiimoteHidLink.ConnectAsync(path, timeout.Token)
+                ? await WiimoteHidLink.ConnectAsync(path, _settings, timeout.Token)
                 : await Switch1HidLink.ConnectAsync(path, kind, timeout.Token);
             Attach(link);
         }

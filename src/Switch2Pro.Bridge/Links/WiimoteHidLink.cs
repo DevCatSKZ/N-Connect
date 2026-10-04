@@ -44,11 +44,15 @@ internal sealed class WiimoteHidLink : IControllerLink
     public event Action<IControllerLink, ControllerState>? StateReceived;
     public event Action<IControllerLink>? Lost;
 
-    private WiimoteHidLink(string path, HidChannel hid, ControllerKind kind)
+    private readonly Func<Settings> _settings;
+    private readonly WiiParser _parser = new();
+
+    private WiimoteHidLink(string path, HidChannel hid, ControllerKind kind, Func<Settings> settings)
     {
         Id = path;
         _hid = hid;
         Kind = kind;
+        _settings = settings;
         Address = AddressFromPath(path);
     }
 
@@ -62,10 +66,10 @@ internal sealed class WiimoteHidLink : IControllerLink
         return string.Join(':', Enumerable.Range(0, 6).Select(i => hex.Substring(i * 2, 2)));
     }
 
-    public static async Task<WiimoteHidLink> ConnectAsync(string path, CancellationToken ct)
+    public static async Task<WiimoteHidLink> ConnectAsync(string path, Func<Settings> settings, CancellationToken ct)
     {
         var hid = new HidChannel(path);
-        var link = new WiimoteHidLink(path, hid, ControllerKind.WiiRemote);
+        var link = new WiimoteHidLink(path, hid, ControllerKind.WiiRemote, settings);
         try
         {
             await link.StartAsync(ct);
@@ -94,28 +98,73 @@ internal sealed class WiimoteHidLink : IControllerLink
         Log.Info($"{Id}: {Kind.DisplayName()} bereit (Erweiterung: {_extension}, Akku {_battery} %)");
     }
 
-    /// <summary>Erweiterung initialisieren und erkennen, dann das passende Datenformat einstellen.</summary>
+    /// <summary>MotionPlus: null = noch nicht geprüft, sonst vorhanden ja/nein (wird nur einmal gesucht).</summary>
+    private bool? _motionPlus;
+    private bool _irOn;
+    private bool _pointerWanted;
+
+    /// <summary>
+    /// Erweiterung initialisieren und erkennen (auch MotionPlus, ggf. mit Nunchuk/Classic dahinter), IR-Kamera für den
+    /// Zeiger ein-/ausschalten und das passende Datenformat einstellen.
+    /// </summary>
     private async Task SetupExtensionAsync(CancellationToken ct)
     {
         await _setupLock.WaitAsync(ct);
         try
         {
             var ext = WiiExtension.None;
-            if (_extensionPlugged)
+            // 1) Ist schon ein MotionPlus aktiv? Dann steht seine Kennung im Erweiterungsregister – nichts neu einschalten.
+            var current = _extensionPlugged ? await ReadAsync(Wii.RegExtensionId, 6, ct) : null;
+            if (current is { Length: >= 6 } && Wii.ExtensionFromId(current).HasMotionPlus())
             {
-                await SendAsync(Wii.WriteRegister(Wii.RegExtensionInit1, [0x55], _rumble), ct);
-                await Task.Delay(30, ct);
-                await SendAsync(Wii.WriteRegister(Wii.RegExtensionInit2, [0x00], _rumble), ct);
-                await Task.Delay(30, ct);
-                if (await ReadAsync(Wii.RegExtensionId, 6, ct) is { Length: >= 6 } id)
-                    ext = Wii.ExtensionFromId(id);
+                ext = Wii.ExtensionFromId(current);
+            }
+            else
+            {
+                // 2) Gewöhnliche Erweiterung: unverschlüsselt initialisieren (0x55 → F0, 0x00 → FB) und erkennen.
+                if (_extensionPlugged)
+                {
+                    await SendAsync(Wii.WriteRegister(Wii.RegExtensionInit1, [0x55], _rumble), ct);
+                    await Task.Delay(30, ct);
+                    await SendAsync(Wii.WriteRegister(Wii.RegExtensionInit2, [0x00], _rumble), ct);
+                    await Task.Delay(30, ct);
+                    if (await ReadAsync(Wii.RegExtensionId, 6, ct) is { Length: >= 6 } id)
+                        ext = Wii.ExtensionFromId(id);
+                }
+                // 3) MotionPlus (Aufsatz oder „MotionPlus Inside“) suchen und einschalten – Nunchuk/Classic wird durchgereicht.
+                if (_motionPlus != false && ext is WiiExtension.None or WiiExtension.Nunchuk or WiiExtension.Classic)
+                    ext = await TryActivateMotionPlusAsync(ext, ct);
             }
             if (ext != _extension)
                 Log.Info($"{Id}: Erweiterung {_extension} → {ext}");
             _extension = ext;
             Kind = ext == WiiExtension.WiiUPro ? ControllerKind.WiiUPro : ControllerKind.WiiRemote;
             Calibration = Wii.DefaultCalibration(ext);
-            byte mode = ext == WiiExtension.WiiUPro ? Wii.ModeButtonsExt19 : Wii.ModeButtonsAccelExt;
+
+            // IR-Kamera nur für den Zeiger (kostet Akku); der Wii U Pro hat keine.
+            _pointerWanted = _settings().WiiPointerMouse && ext != WiiExtension.WiiUPro;
+            if (_pointerWanted && !_irOn)
+            {
+                await SendAsync(Wii.IrPixelClock(_rumble), ct);
+                await Task.Delay(50, ct);
+                await SendAsync(Wii.IrLogic(_rumble), ct);
+                await Task.Delay(50, ct);
+                foreach (var step in Wii.IrSetup(_rumble))
+                {
+                    await SendAsync(step, ct);
+                    await Task.Delay(50, ct);
+                }
+                _irOn = true;
+                Log.Info($"{Id}: IR-Kamera für den Zeiger eingeschaltet");
+            }
+            else if (!_pointerWanted && _irOn)
+            {
+                await SendAsync([Wii.ReportIrPixelClock, (byte)(_rumble ? 1 : 0)], ct);
+                await SendAsync([Wii.ReportIrLogic, (byte)(_rumble ? 1 : 0)], ct);
+                _irOn = false;
+            }
+
+            byte mode = ext == WiiExtension.WiiUPro ? Wii.ModeButtonsExt19 : _irOn ? Wii.ModeButtonsAccelIrExt : Wii.ModeButtonsAccelExt;
             await SendAsync(Wii.SetMode(mode, _rumble), ct);
             await SendAsync(Wii.Leds(_player, _rumble), ct);
         }
@@ -123,6 +172,31 @@ internal sealed class WiimoteHidLink : IControllerLink
         {
             _setupLock.Release();
         }
+    }
+
+    /// <summary>
+    /// MotionPlus suchen (0x55 → 0xA600F0, Kennung bei 0xA600FA) und im passenden Modus einschalten (0xA600FE).
+    /// Liefert die neue Erweiterungsart (MotionPlus…) oder unverändert <paramref name="behind"/>.
+    /// </summary>
+    private async Task<WiiExtension> TryActivateMotionPlusAsync(WiiExtension behind, CancellationToken ct)
+    {
+        await SendAsync(Wii.WriteRegister(Wii.RegMotionPlusInit, [0x55], _rumble), ct);
+        await Task.Delay(30, ct);
+        if (await ReadAsync(Wii.RegMotionPlusId, 6, ct) is not { Length: >= 6 } id || !Wii.IsInactiveMotionPlus(id))
+        {
+            _motionPlus = false;
+            return behind;
+        }
+        _motionPlus = true;
+        await SendAsync(Wii.WriteRegister(Wii.RegMotionPlusActivate, [Wii.MotionPlusMode(behind)], _rumble), ct);
+        await Task.Delay(150, ct);
+        if (await ReadAsync(Wii.RegExtensionId, 6, ct) is { Length: >= 6 } active && Wii.ExtensionFromId(active).HasMotionPlus())
+        {
+            _extensionPlugged = true;
+            return Wii.ExtensionFromId(active);
+        }
+        Log.Info($"{Id}: MotionPlus gefunden, ließ sich aber nicht einschalten");
+        return behind;
     }
 
     private async Task<byte[]?> ReadAsync(uint address, ushort size, CancellationToken ct)
@@ -208,7 +282,7 @@ internal sealed class WiimoteHidLink : IControllerLink
                     if (changed)
                         SetupExtensionAsync(_cts.Token).Forget($"{Id}: Erweiterung erkennen");
                     else
-                        SendAsync(Wii.SetMode(_extension == WiiExtension.WiiUPro ? Wii.ModeButtonsExt19 : Wii.ModeButtonsAccelExt, _rumble), _cts.Token)
+                        SendAsync(Wii.SetMode(_extension == WiiExtension.WiiUPro ? Wii.ModeButtonsExt19 : _irOn ? Wii.ModeButtonsAccelIrExt : Wii.ModeButtonsAccelExt, _rumble), _cts.Token)
                             .Forget($"{Id}: Datenformat setzen");
                 }
                 return;
@@ -219,7 +293,7 @@ internal sealed class WiimoteHidLink : IControllerLink
             case Wii.InputAck:
                 return;
         }
-        if (!Wii.TryParseData(r, _extension, _battery, out var state))
+        if (!_parser.TryParse(r, _extension, _battery, out var state))
             return;
         _rate.Tick();
         LastState = state;
@@ -247,6 +321,9 @@ internal sealed class WiimoteHidLink : IControllerLink
                     RaiseLost();
                     return;
                 }
+                // Zeiger in den Einstellungen ein-/ausgeschaltet: IR-Kamera und Datenformat anpassen.
+                if (_extension != WiiExtension.WiiUPro && _settings().WiiPointerMouse != _pointerWanted)
+                    await SetupExtensionAsync(ct);
                 if (Environment.TickCount64 - lastStatus > StatusIntervalMs)
                 {
                     lastStatus = Environment.TickCount64;

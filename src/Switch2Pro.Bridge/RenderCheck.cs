@@ -52,6 +52,64 @@ internal static class RenderCheck
         || new[] { " und ", " der ", " die ", " das ", "Taste", "Spieler", " mit ", " nach ", "Belegung", "Einstellung" }
             .Any(w => t.Contains(w, StringComparison.Ordinal));
 
+    /// <summary>
+    /// Prüfhilfe (<c>--render-ui &lt;Ordner&gt; [--en]</c>): Einstellungsfenster in voller Höhe und die Übersicht mit
+    /// simulierten Controllern als PNG – zum Prüfen von Übersetzung und abgeschnittenen Beschriftungen.
+    /// </summary>
+    public static void RenderUi(string folder)
+    {
+        Directory.CreateDirectory(folder);
+        string lang = Tr.English ? "en" : "de";
+        using var factory = PadFactory.TryCreate();
+        ControllerManager? manager = factory is null ? null : new ControllerManager(() => new Settings(), factory);
+        try
+        {
+            manager?.StartDemo();
+            // Als echtes Fenster außerhalb des sichtbaren Bereichs anzeigen, damit alle Steuerelemente entstehen.
+            using var form = new SettingsForm(new Settings(), _ => { }, manager)
+            {
+                StartPosition = FormStartPosition.Manual, Location = new Point(-6000, -6000), ShowInTaskbar = false,
+                Size = new Size(1000, 1100),
+            };
+            form.Show();
+            void Pump()
+            {
+                for (int i = 0; i < 20; i++)
+                {
+                    Application.DoEvents();
+                    Thread.Sleep(20);
+                }
+            }
+            Pump();
+            var tabs = form.Controls.OfType<TabControl>().First();
+
+            // Übersicht: so wie sie im Fenster erscheint.
+            tabs.SelectedIndex = 0;
+            Pump();
+            using (var bmp = new Bitmap(form.Width, form.Height))
+            {
+                form.DrawToBitmap(bmp, new Rectangle(0, 0, form.Width, form.Height));
+                bmp.Save(Path.Combine(folder, $"ui_overview_{lang}.png"), ImageFormat.Png);
+            }
+
+            // Einstellungen: den ganzen Inhalt der Seite (länger als das Fenster).
+            tabs.SelectedIndex = 1;
+            Pump();
+            var content = tabs.TabPages[1].Controls[0];
+            using (var bmp = new Bitmap(Math.Max(1, content.Width), Math.Max(1, content.Height)))
+            {
+                content.DrawToBitmap(bmp, new Rectangle(0, 0, content.Width, content.Height));
+                bmp.Save(Path.Combine(folder, $"ui_settings_{lang}.png"), ImageFormat.Png);
+            }
+            form.Close();
+        }
+        finally
+        {
+            if (manager is not null)
+                Task.Run(async () => await manager.DisposeAsync()).Wait(TimeSpan.FromSeconds(5));
+        }
+    }
+
     public static void Run(string folder)
     {
         Directory.CreateDirectory(folder);
@@ -66,6 +124,7 @@ internal static class RenderCheck
             (ControllerKind.WiiRemote, WiiExtension.None, "wii"),
             (ControllerKind.WiiRemote, WiiExtension.Nunchuk, "wii_nunchuk"),
             (ControllerKind.WiiRemote, WiiExtension.Classic, "wii_classic"),
+            (ControllerKind.WiiRemote, WiiExtension.MotionPlusNunchuk, "wii_motionplus_nunchuk"),
             (ControllerKind.WiiUPro, WiiExtension.None, "wiiupro"),
         };
         foreach (var (kind, ext, name) in kinds)
@@ -79,6 +138,7 @@ internal static class RenderCheck
                     Buttons = pressed ? ProButtons.A | ProButtons.Up | ProButtons.L | ProButtons.Plus | ProButtons.ZL : ProButtons.None,
                     LeftX = pressed ? 0.8f : 0, LeftY = pressed ? 0.5f : 0, RightX = pressed ? 1 : 0, RightY = 0,
                     LeftTrigger = pressed ? 0.6f : 0, RightTrigger = 0,
+                    Pointer = pressed && kind == ControllerKind.WiiRemote ? (0.3f, 0.6f) : null,
                 };
                 var gamepad = Mapping.ToGamepad(input, new Settings());
                 view.Show(input, gamepad);

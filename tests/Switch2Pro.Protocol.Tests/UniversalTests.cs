@@ -713,7 +713,7 @@ public class DsuTests
         Assert.Equal(WiiExtension.Nunchuk, Wii.ExtensionFromId([0, 0, 0xA4, 0x20, 0, 0]));
         Assert.Equal(WiiExtension.Classic, Wii.ExtensionFromId([1, 0, 0xA4, 0x20, 1, 1]));
         Assert.Equal(WiiExtension.WiiUPro, Wii.ExtensionFromId([0, 0, 0xA4, 0x20, 1, 0x20]));
-        Assert.Equal(WiiExtension.Other, Wii.ExtensionFromId([0, 0, 0xA4, 0x20, 4, 5]));
+        Assert.Equal(WiiExtension.Other, Wii.ExtensionFromId([0, 0, 0xA4, 0x20, 4, 2])); // Balance Board
         Assert.Equal([0x11, 0x21], Wii.Leds(1, true));                 // Spieler 2, Vibration an
         Assert.Equal([0x12, 0x04, 0x35], Wii.SetMode(0x35, false));
         var w = Wii.WriteRegister(0xA400F0, [0x55], false);
@@ -818,6 +818,75 @@ public class DsuTests
         var p = Mapping.Normalize(new ControllerState { Kind = ControllerKind.JoyCon1Right, RingFlex = 0.75f }, new DeviceCalibration());
         Assert.Equal(0.75f, p.RightTrigger);
         Assert.Equal(0f, p.LeftTrigger);
+    }
+
+    [Fact]
+    public void MotionPlusIdsAndModes()
+    {
+        Assert.Equal(WiiExtension.MotionPlus, Wii.ExtensionFromId([0, 0, 0xA4, 0x20, 0x04, 0x05]));
+        Assert.Equal(WiiExtension.MotionPlusNunchuk, Wii.ExtensionFromId([0, 0, 0xA4, 0x20, 0x05, 0x05]));
+        Assert.Equal(WiiExtension.MotionPlusClassic, Wii.ExtensionFromId([0, 0, 0xA4, 0x20, 0x07, 0x05]));
+        Assert.True(Wii.IsInactiveMotionPlus([0, 0, 0xA6, 0x20, 0x00, 0x05]));
+        Assert.False(Wii.IsInactiveMotionPlus([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]));
+        Assert.Equal(0x05, Wii.MotionPlusMode(WiiExtension.Nunchuk));
+        Assert.Equal(0x07, Wii.MotionPlusMode(WiiExtension.Classic));
+        Assert.Equal(0x04, Wii.MotionPlusMode(WiiExtension.None));
+    }
+
+    /// <summary>MotionPlus-Erweiterungsbytes für Gieren/Rollen/Nicken (14 Bit, „langsam“ gesetzt).</summary>
+    private static byte[] MotionPlusBytes(int yaw, int roll, int pitch) =>
+    [
+        (byte)yaw, (byte)roll, (byte)pitch,
+        (byte)((yaw >> 6 & 0xFC) | 0x02 | 0x01),  // langsam: Gieren, Nicken
+        (byte)((roll >> 6 & 0xFC) | 0x02),         // langsam: Rollen
+        (byte)((pitch >> 6 & 0xFC) | 0x02),        // Kennung MotionPlus-Daten
+    ];
+
+    [Fact]
+    public void MotionPlusGyroWithAutoZeroAndNunchukPassThrough()
+    {
+        var parser = new WiiParser();
+        byte[] Report(byte[] ext)
+        {
+            var r = new byte[22];
+            r[0] = 0x35; r[3] = r[4] = r[5] = 0x80;
+            ext.CopyTo(r, 6);
+            return r;
+        }
+        // Ruhe mit kleinem Nullpunktfehler (8200 statt 8192) → nach 50 Proben auf 0 nachgeführt.
+        ControllerState s = new();
+        for (int i = 0; i < 60; i++)
+            parser.TryParse(Report(MotionPlusBytes(8200, 8192, 8192)), WiiExtension.MotionPlusNunchuk, 80, out s);
+        Assert.Equal(0, s.Motion!.Value.GyroZ);
+        // Drehen: Gieren +100 °/s (langsam: 8192 Schritte ≙ 440 °/s) → Rohwert ≈ 100/2000 × 32767
+        int yaw = 8200 + (int)(100f / 440f * 8192f);
+        parser.TryParse(Report(MotionPlusBytes(yaw, 8192, 8192)), WiiExtension.MotionPlusNunchuk, 80, out s);
+        Assert.InRange(s.Motion!.Value.GyroZ, 1580, 1700);
+        // Durchgereichter Nunchuk (Byte 5 Bit 1 = 0): Stick, Z gedrückt (Bit 2 = 0), C nicht (Bit 3 = 1).
+        parser.TryParse(Report([0xF0, 0x80, 0x80, 0x80, 0x80, 0x08]), WiiExtension.MotionPlusNunchuk, 80, out s);
+        Assert.Equal(0xF0 << 4, s.LeftX);
+        Assert.True(s.Has(ProButtons.ZL));
+        Assert.False(s.Has(ProButtons.L));
+        Assert.InRange(s.Motion!.Value.GyroZ, 1580, 1700); // Gyro bleibt vom letzten MotionPlus-Bericht
+    }
+
+    [Fact]
+    public void WiiIrPointsAndPointer()
+    {
+        // Punkt 1: (200, 300), Punkt 2: (600, 340); zweites Paar leer (0x3FF).
+        byte[] ir = [200 & 0xFF, 300 & 0xFF, (byte)((300 >> 8) << 6 | (200 >> 8) << 4 | (340 >> 8) << 2 | (600 >> 8)), 600 & 0xFF, 340 & 0xFF,
+                     0xFF, 0xFF, 0xFF, 0xFF, 0xFF];
+        var points = Wii.ParseIrBasic(ir);
+        Assert.Equal([(200, 300), (600, 340)], points);
+        var p = Wii.Pointer(points)!.Value;
+        Assert.InRange(p.X, 0.60f, 0.61f);   // gespiegelt: 1 − 400/1023
+        Assert.InRange(p.Y, 0.41f, 0.43f);   // 320/767
+        Assert.Null(Wii.Pointer([]));
+        var r = new byte[22];
+        r[0] = 0x37; r[3] = r[4] = r[5] = 0x80;
+        ir.CopyTo(r, 6);
+        Assert.True(Wii.TryParseData(r, WiiExtension.None, 50, out var s));
+        Assert.NotNull(s.Pointer);
     }
 
     [Fact]

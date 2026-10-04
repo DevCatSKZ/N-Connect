@@ -13,6 +13,11 @@ internal static partial class Tr
         ["2. Tasten A/B/X/Y"] = "2. A/B/X/Y buttons",
         ["3. Vibration, Sticks, Verbinden, Gyro-Maus"] = "3. Vibration, sticks, connecting, gyro mouse",
         ["4. Joy-Con"] = "4. Joy-Con",
+        ["4. Joy-Con und Wii"] = "4. Joy-Con and Wii",
+        ["Wii-Fernbedienung: Zeiger (Sensorleiste) steuert die Maus"] = "Wii Remote: pointer (sensor bar) moves the mouse",
+        ["Zeiger"] = "Pointer",
+        ["kein Zeiger – Sensorleiste nicht im Blick"] = "no pointer – sensor bar not in view",
+        ["MotionPlus"] = "MotionPlus",
         ["5. Zielen, Sticks, Trigger, Turbo"] = "5. Aiming, sticks, triggers, turbo",
         ["6. Tastenbelegung und Profile  (Taste → Gamepad, Tastatur, Maus, Gyro-Maus, Shift-Ebene)"] =
             "6. Button mapping and profiles  (button → gamepad, keyboard, mouse, gyro mouse, shift layer)",

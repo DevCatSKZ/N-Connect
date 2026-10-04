@@ -45,6 +45,15 @@ internal static class WindowsInput
             Send(Mouse(MOUSEEVENTF_MOVE, dx, dy));
     }
 
+    private const uint MOUSEEVENTF_ABSOLUTE = 0x8000;
+
+    /// <summary>Mauszeiger auf eine Stelle des Hauptbildschirms setzen: x/y 0…1 (links oben = 0,0).</summary>
+    public static void MoveMouseAbsolute(float x, float y)
+    {
+        int ax = (int)MathF.Round(Math.Clamp(x, 0f, 1f) * 65535f), ay = (int)MathF.Round(Math.Clamp(y, 0f, 1f) * 65535f);
+        Send(Mouse(MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE, ax, ay));
+    }
+
     public enum MouseButton { Left, Right, Middle }
 
     public static void MouseButtonState(MouseButton button, bool down)

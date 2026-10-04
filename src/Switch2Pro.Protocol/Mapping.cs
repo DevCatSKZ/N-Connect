@@ -34,6 +34,8 @@ public sealed record PadInput
     public Motion? Motion { get; init; }
     public int BatteryPercent { get; init; } = -1;
     public bool Charging { get; init; }
+    /// <summary>Wii-Zeiger (siehe ControllerState.Pointer).</summary>
+    public (float X, float Y)? Pointer { get; init; }
 
     public bool Has(ProButtons b) => (Buttons & b) != 0;
 }
@@ -59,6 +61,7 @@ public static class Mapping
             Motion = motion,
             BatteryPercent = s.BatteryPercent,
             Charging = s.Charging,
+            Pointer = s.Pointer,
         };
 
         if (s.Kind == ControllerKind.GameCube2 && s.LeftTrigger >= 0 && s.RightTrigger >= 0)

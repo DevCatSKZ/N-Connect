@@ -433,7 +433,7 @@ internal sealed class ControllerOverview : Panel
             _links = links;
             _mouse = mouse;
             _input = input;
-            int rows = links.Count * 7 + 3;
+            int rows = links.Count * 9 + 3; // je Controller bis zu 8 Zeilen (Überschrift, Akku … Griff, Maus) + Abstand
             Height = Math.Max(270, rows * 22 + 10);
             Invalidate();
         }
