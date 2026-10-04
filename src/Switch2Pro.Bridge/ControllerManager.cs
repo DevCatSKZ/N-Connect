@@ -567,8 +567,7 @@ internal sealed class ControllerManager : IAsyncDisposable
             }
             else
             {
-                var used = _players.Select(p => p.Index).ToHashSet();
-                int index = Enumerable.Range(0, MaxPlayers).FirstOrDefault(i => !used.Contains(i), -1);
+                int index = FreeIndex(link.Address);
                 if (index < 0)
                 {
                     Log.Warn($"{link.Id}: schon {MaxPlayers} Spieler – Controller wird nicht verwendet");
@@ -642,10 +641,63 @@ internal sealed class ControllerManager : IAsyncDisposable
         return player;
     }
 
-    private int FreeIndex()
+    private int FreeIndex(string? address = null)
     {
         var used = _players.Select(p => p.Index).ToHashSet();
+        // Gemerkter Platz des Controllers, wenn frei – so landet er nach dem Verbinden wieder dort.
+        if (_settings().SlotFor(address) is { } slot && !used.Contains(slot))
+            return slot;
         return Enumerable.Range(0, MaxPlayers).FirstOrDefault(i => !used.Contains(i), -1);
+    }
+
+    /// <summary>
+    /// Spieler auf einen anderen Platz setzen; ein dort sitzender Spieler tauscht. LEDs folgen, die virtuellen
+    /// Controller werden in der neuen Reihenfolge neu angelegt (damit auch Spiele sie in dieser Reihenfolge sehen),
+    /// und der Platz wird je Controller gemerkt.
+    /// </summary>
+    public void MovePlayer(Player player, int target)
+    {
+        if (target is < 0 or >= MaxPlayers)
+            return;
+        List<Player> ordered;
+        Player? other;
+        lock (_playerGate)
+        {
+            if (!_players.Contains(player) || player.Index == target)
+                return;
+            other = _players.FirstOrDefault(p => p.Index == target);
+            int from = player.Index;
+            other?.MoveTo(from);
+            player.MoveTo(target);
+            ordered = [.. _players.OrderBy(p => p.Index)];
+        }
+        // Erst alle virtuellen Controller abbauen, dann der Reihe nach anlegen: Windows vergibt die Xbox-Plätze
+        // in Anlegereihenfolge.
+        foreach (var p in ordered)
+            p.ReleasePad();
+        foreach (var p in ordered)
+        {
+            try
+            {
+                p.RestorePad();
+            }
+            catch (Exception e)
+            {
+                Log.Error($"Spieler {p.Index + 1}: virtuellen Controller neu anlegen", e);
+            }
+        }
+        var settings = _settings();
+        foreach (var p in other is null ? [player] : new[] { player, other })
+            foreach (var link in p.Links)
+                if (link.Address is { } address)
+                    settings.SetSlot(address, p.Index);
+        RequestSave();
+        string message = other is null
+            ? $"{player.Kind.DisplayName()} ist jetzt Spieler {target + 1}"
+            : $"Spieler {player.Index + 1} und {other.Index + 1} getauscht";
+        Log.Info(message);
+        Notify?.Invoke(message);
+        Changed?.Invoke();
     }
 
     /// <summary>Einen Joy-Con aus seinem Paar lösen: er wird ein eigener Spieler (quer gehalten).</summary>
@@ -656,7 +708,7 @@ internal sealed class ControllerManager : IAsyncDisposable
         {
             if (!_players.Contains(player) || !player.IsPair || !player.Links.Contains(link))
                 return;
-            int index = FreeIndex();
+            int index = FreeIndex(link.Address);
             if (index < 0)
                 return;
             player.Remove(link);

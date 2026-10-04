@@ -458,6 +458,10 @@ internal static partial class Tr
         ["Sucht eine Minute lang nach Controllern im Kopplungsmodus."] = "Searches for controllers in pairing mode for one minute.",
         ["Controller koppeln …"] = "Pair controller …",
         ["Controller koppeln"] = "Pair controller",
+        ["Umbenennen …"] = "Rename …",
+        ["Linken Joy-Con umbenennen …"] = "Rename left Joy-Con …",
+        ["Rechten Joy-Con umbenennen …"] = "Rename right Joy-Con …",
+        ["Controller umbenennen"] = "Rename controller",
         ["Controller gekoppelt"] = "Controller paired",
         ["Joy-Con, Pro Controller, NES/SNES/N64/Mega Drive: SYNC-Taste drücken, bis die Lichter laufen.\n" +
          "Wii-Fernbedienung: Batteriefach öffnen und die rote SYNC-Taste drücken.\n" +
