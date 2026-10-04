@@ -144,10 +144,14 @@ internal sealed class TrayApp : ApplicationContext
         try
         {
             await Task.Delay(5000, ct);
+            long lastScan = 0;
             while (!ct.IsCancellationRequested)
             {
-                if (_settings.AutoPair && CanScanInBackground())
+                // Mit verbundenen Switch-2-Controllern (Bluetooth LE) seltener suchen: jede Suche nimmt ihnen kurz Funkzeit.
+                int interval = SwitchTwoConnected() ? 15_000 : 6_000;
+                if (_settings.AutoPair && Environment.TickCount64 - lastScan >= interval && CanScanInBackground())
                 {
+                    lastScan = Environment.TickCount64;
                     var paired = ControllerPairing.BackgroundScan();
                     if (paired.Count > 0)
                     {
@@ -159,7 +163,7 @@ internal sealed class TrayApp : ApplicationContext
                         }, null);
                     }
                 }
-                await Task.Delay(6000, ct);
+                await Task.Delay(2000, ct);
             }
         }
         catch (OperationCanceledException)
@@ -172,19 +176,20 @@ internal sealed class TrayApp : ApplicationContext
     }
 
     /// <summary>
-    /// Darf jetzt im Hintergrund gesucht werden? Eine Suche belegt den Bluetooth-Funk – Switch-2-Controller
-    /// (Bluetooth LE) verbinden sich dabei nicht („Unreachable“) oder brechen ab. Deshalb nur, wenn keiner per
-    /// Bluetooth LE verbunden ist, gerade keiner verbunden wird und seit 20 Sekunden niemand spielt.
+    /// Darf jetzt im Hintergrund gesucht werden? Eine Suche belegt den Bluetooth-Funk – ein Switch-2-Controller, der
+    /// sich gerade verbindet, scheitert dabei („Unreachable“), und wer spielt, merkt Aussetzer. Deshalb nur, wenn
+    /// gerade keiner verbunden wird und seit 20 Sekunden niemand spielt (Suchlauf nur 1,3 s, siehe ControllerPairing).
     /// </summary>
     private bool CanScanInBackground()
     {
         if (_manager is null || _manager.IsConnecting)
             return false;
         long now = Environment.TickCount64;
-        var players = _manager.Players;
-        return !players.Any(p => p.Links.Any(l => l.Transport == Links.Transport.BluetoothLE))
-               && !players.Any(p => now - p.LastActivity < 20_000);
+        return !_manager.Players.Any(p => now - p.LastActivity < 20_000);
     }
+
+    private bool SwitchTwoConnected() =>
+        _manager?.Players.Any(p => p.Links.Any(l => l.Transport == Links.Transport.BluetoothLE)) == true;
 
     private PairForm? _wiiPairing;
 
