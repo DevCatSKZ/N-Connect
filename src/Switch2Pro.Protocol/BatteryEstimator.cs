@@ -15,6 +15,9 @@ public sealed class BatteryEstimator
     /// <summary>Spielraum an Prozentgrenzen (Millivolt), gegen Flackern zwischen zwei Werten.</summary>
     private const int ToleranceMillivolts = 3;
 
+    /// <summary>So lange nach dem Anstecken wird gemessen, bevor der Spannungssprung übernommen wird (Millisekunden).</summary>
+    private const int MeasureMs = 10_000;
+
     private double _millivolts;
     private long _lastTicks;
     private bool _charging;
@@ -63,16 +66,22 @@ public sealed class BatteryEstimator
         _charging = charging;
         if (!charging)
             _resting = _millivolts;
-        else if (_plugTicks >= 0 && nowMs - _plugTicks >= 3000)
+        else if (_plugTicks >= 0 && nowMs - _plugTicks >= MeasureMs)
         {
-            // Ein paar Sekunden nach dem Anstecken hat sich die Ladespannung eingestellt: Sprung übernehmen.
-            int offset = Math.Clamp((int)Math.Round(_millivolts - _resting), 0, 250);
+            // Einige Sekunden nach dem Anstecken (Ladespannung geglättet) den Sprung übernehmen. Vorsichtig: immer den
+            // größten gemessenen Wert – ein zu großer schätzt beim Laden etwas zu niedrig (die nächste Ladepause
+            // korrigiert nach oben), ein zu kleiner ließe die Anzeige erst hoch- und dann wieder herunterspringen.
+            int measured = Math.Clamp((int)Math.Round(_millivolts - _resting), 0, 250);
+            int offset = Math.Max(Math.Max(ChargeOffset ?? 0, DefaultChargeOffsetMillivolts(kind)), measured);
             _plugTicks = -1;
-            ChargeOffset = offset;
-            ChargeOffsetMeasured?.Invoke(offset);
+            if (offset != ChargeOffset)
+            {
+                ChargeOffset = offset;
+                ChargeOffsetMeasured?.Invoke(offset);
+            }
         }
 
-        int offsetNow = charging ? ChargeOffset ?? DefaultChargeOffsetMillivolts(kind) : 0;
+        int offsetNow = charging ? Math.Max(ChargeOffset ?? 0, DefaultChargeOffsetMillivolts(kind)) : 0;
         int mv = (int)Math.Round(_millivolts) - offsetNow;
         int estimate = InputReports.BatteryPercentFromMillivolts(mv, kind);
         // Toleranz: liegt die Spannung genau an einer Prozentgrenze, soll die Anzeige nicht hin- und herspringen.

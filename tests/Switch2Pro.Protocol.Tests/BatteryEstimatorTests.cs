@@ -89,9 +89,24 @@ public class BatteryEstimatorTests
         e.ChargeOffsetMeasured += o => measured = o;
         int before = e.Update(3704, false, Pro, 1000);
         e.Update(3724, true, Pro, 2000);
-        int after = e.Update(3724, true, Pro, 6000);
+        int after = e.Update(3724, true, Pro, 13_000);
         Assert.Equal(20, measured);
         Assert.Equal(before, after);
+    }
+
+    [Fact]
+    public void KleinererMesswert_SenktSprungNicht_KeinSprungAuf27()
+    {
+        // Gemessen: zweites Anstecken ergab nur 10 mV (Ladespannung schwankt 3710–3724 mV); Anzeige sprang auf 27 %.
+        var e = new BatteryEstimator(chargeOffsetMillivolts: 10); // so bereits gespeichert
+        int? measured = null;
+        e.ChargeOffsetMeasured += o => measured = o;
+        int before = e.Update(3704, false, Pro, 1000);
+        e.Update(3714, true, Pro, 2000);
+        int charging = e.Update(3724, true, Pro, 13_000);
+        Assert.True(charging <= InputReports.BatteryPercentFromMillivolts(3705, Pro));
+        Assert.True(measured is null or >= 20);
+        Assert.True(charging >= before);
     }
 
     [Fact]
