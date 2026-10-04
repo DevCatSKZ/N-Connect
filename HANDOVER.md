@@ -43,7 +43,8 @@ Commits als **devcatskz** (devcatskz@gmail.com), ohne „Co-Authored-By“-Zeile
   verhandelten bei jedem Versuch alle Verbindungen neu – der neue Controller scheiterte dann mit „Unreachable“. Mögliche nächste Schritte: Wii ab drei Controllern ohne Dauersenden (`Wii.SetMode`
   setzt 0x04 „continuous“; vorher prüfen, dass der Watchdog dann nicht fälschlich trennt), Controller-Suche bei vielen
   Controllern passiv statt aktiv (`ControllerManager._watcher`) – jeweils vorher/nachher messen. Verlässlichste Lösung:
-  stärkerer Adapter (Intel AX200/AX210, Realtek RTL8761B).
+  stärkerer Adapter (Intel AX200/AX210, Realtek RTL8761B). **Bestätigt:** Mit einem Realtek-Bluetooth-5.3-Stick
+  (USB 0BDA:A725) sind die Probleme beim Nutzer weg.
   Achtung: Nach Herstellerbefehlen an den Stick (fremdes Werkzeug `tools/Switch2Pro.BtIdentityProbe`, nicht Teil von
   N-Connect) verband sich kein dritter Switch-2-Controller mehr – Ab- und Anstecken des Sticks hat das behoben.
 - Angeboten, noch nicht entschieden: Kopplungsdaten-Fenster (`PairingDataForm`) im Windows-11-Stil;
