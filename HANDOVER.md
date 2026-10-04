@@ -37,9 +37,10 @@ Commits als **devcatskz** (devcatskz@gmail.com), ohne „Co-Authored-By“-Zeile
   („Kopplung …: Authentifizierung → Fehler …“). Wii: Adress-PIN wie bisher.
 - **Viele Controller auf einem Bluetooth-Stick** (gemessen 04.10.2026, Barrot BT 5.4, USB 33FA:0010): Ab drei bis vier
   Controllern (z. B. Wii-Fernbedienung + Joy-Con-2-Paar + Pro Controller 2) bekommt jeder nur ~10–11 Berichte/s,
-  die Wii reagiert spürbar verzögert, ein weiterer Controller braucht ~9 s zum Verbinden. N-Connect schaltet ab drei
-  Bluetooth-Controllern die Switch-2-Controller auf das ausgeglichene Intervall (`BleAirtime`), das reicht nicht ganz.
-  Vom Nutzer vorerst so gelassen. Mögliche nächste Schritte: Wii ab drei Controllern ohne Dauersenden (`Wii.SetMode`
+  die Wii reagiert spürbar verzögert, ein weiterer Controller braucht ~9 s zum Verbinden. Vom Nutzer vorerst so gelassen.
+  **Nicht wiederholen:** Ab drei Bluetooth-Controllern die Switch-2-Controller auf „ausgeglichen“ umzuschalten
+  (Commit 24c4938, zurückgenommen) brachte keine höhere Rate, und weil schon ein Verbindungsversuch mitzählte,
+  verhandelten bei jedem Versuch alle Verbindungen neu – der neue Controller scheiterte dann mit „Unreachable“. Mögliche nächste Schritte: Wii ab drei Controllern ohne Dauersenden (`Wii.SetMode`
   setzt 0x04 „continuous“; vorher prüfen, dass der Watchdog dann nicht fälschlich trennt), Controller-Suche bei vielen
   Controllern passiv statt aktiv (`ControllerManager._watcher`) – jeweils vorher/nachher messen. Verlässlichste Lösung:
   stärkerer Adapter (Intel AX200/AX210, Realtek RTL8761B).
