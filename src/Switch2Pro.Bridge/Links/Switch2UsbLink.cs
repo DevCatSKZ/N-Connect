@@ -11,7 +11,8 @@ namespace Switch2Pro.Bridge.Links;
 /// </summary>
 internal sealed class Switch2UsbLink : IControllerLink
 {
-    private const int InputTimeoutMs = 1500;
+    /// <summary>Beim Anstecken (Wechsel von Bluetooth auf USB) pausiert der Controller kurz – erst danach als getrennt werten.</summary>
+    private const int InputTimeoutMs = 3000;
     private const int RumbleIntervalMs = 12;
 
     private readonly UsbControllerInfo _device;
@@ -145,8 +146,8 @@ internal sealed class Switch2UsbLink : IControllerLink
                 // Byte 0 = Report-ID, danach wie der Bluetooth-Bericht 0x05.
                 if (n < 2 || !InputReports.TryParseReport05(buffer.AsSpan(1, n - 1), out var state, Kind))
                     continue;
-                // Am Kabel lädt der Controller immer; die Spannung im Bericht ist dann wenig aussagekräftig.
-                state = state with { Charging = true };
+                // Am Kabel lädt der Controller immer; die Ladespannung rechnet die Akkuschätzung heraus.
+                state = BatteryTracker.Apply(Info.SerialNumber ?? Id, state with { Charging = true });
                 _lastInputTicks = Environment.TickCount64;
                 _rate.Tick();
                 LastState = state;

@@ -396,6 +396,7 @@ internal sealed class Switch2BleLink : IControllerLink
         CryptographicBuffer.CopyToByteArray(args.CharacteristicValue, out byte[] data);
         if (data is null || !InputReports.TryParseReport05(data, out var state, Kind))
             return;
+        state = BatteryTracker.Apply(Info.SerialNumber ?? Id, state);
         _lastInputTicks = Environment.TickCount64;
         _rate.Tick();
         LastState = state;
