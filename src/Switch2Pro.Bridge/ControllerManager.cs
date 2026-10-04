@@ -649,6 +649,7 @@ internal sealed class ControllerManager : IAsyncDisposable
             emptied?.Dispose();
             await link.DisposeAsync();
             _retryAfter[link.Id] = Environment.TickCount64 + 1500;
+            ControllerPairing.NoteDisconnected(link.Address); // eben getrennt ≠ Kopplungsmodus
             Log.Info($"{link.Kind.DisplayName()} getrennt");
             if (!_disposed)
                 Notify?.Invoke($"{link.Kind.DisplayName()} getrennt");

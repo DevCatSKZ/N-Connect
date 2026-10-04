@@ -239,7 +239,12 @@ internal static class ControllerPairing
         var paired = new List<string>();
         // „Zuletzt gesehen“ der bekannten Geräte vor der Suche: Windows erneuert den Wert nur, wenn ein Gerät auf die
         // Suche antwortet (= sichtbar, also im Kopplungsmodus).
-        var before = Remembered(radio).ToDictionary(d => d.Address, d => Stamp(d.stLastSeen));
+        var known = Remembered(radio);
+        var before = known.ToDictionary(d => d.Address, d => Stamp(d.stLastSeen));
+        long now = Environment.TickCount64;
+        lock (LastConnected)
+            foreach (var d in known.Where(d => d.fConnected != 0))
+                LastConnected[d.Address] = now;
         foreach (var device in Inquiry(radio))
         {
             bool wii = IsWiiName(device.szName), switch1 = IsSwitch1Name(device.szName);
@@ -255,8 +260,18 @@ internal static class ControllerPairing
             if (info.fRemembered != 0)
             {
                 bool answeredNow = before.TryGetValue(info.Address, out long earlier) && Stamp(info.stLastSeen) > earlier;
-                if (!answeredNow && !(repairRemembered && SeenRecently(info.stLastSeen)))
+                // „Gerade eben gesehen“ zählt auch: sucht Windows selbst (z. B. offene Bluetooth-Einstellungen), ist der
+                // Zeitstempel schon vor unserem Suchlauf neu. Ein ausgeschalteter oder mit der Switch verbundener
+                // Controller antwortet nicht – den sieht Windows nicht.
+                // Ein eben noch verbundener Controller (ausgeschaltet, Funk abgerissen) ist ebenfalls „gerade gesehen“ –
+                // der ist nicht im Kopplungsmodus und behält seine Kopplung.
+                if (!repairRemembered && ConnectedRecently(info.Address))
+                    continue;
+                if (!answeredNow && !SeenRecently(info.stLastSeen, repairRemembered ? 20 : 8))
+                {
+                    LogSkipped(info);
                     continue; // nicht im Kopplungsmodus – Kopplung unangetastet lassen
+                }
                 Log.Info($"Kopplung: {info.szName} ({info.Address:X12}) ist bekannt, aber im Kopplungsmodus – neu koppeln");
             }
             // Alte, nicht verbundene Kopplung entfernen (sonst verweigert Windows die neue).
@@ -295,8 +310,44 @@ internal static class ControllerPairing
             return Failures.TryGetValue(address, out long at) && Environment.TickCount64 - at < FailurePause.TotalMilliseconds;
     }
 
-    /// <summary>Zuletzt gesehen (UTC) innerhalb der letzten 20 Sekunden?</summary>
-    private static bool SeenRecently(SYSTEMTIME t)
+    private static readonly Dictionary<ulong, long> SkipLogged = [];
+
+    /// <summary>Wann ein bekannter Controller zuletzt verbunden war (bei jedem Suchlauf aktualisiert).</summary>
+    private static readonly Dictionary<ulong, long> LastConnected = [];
+
+    /// <summary>Ein Controller wurde getrennt (Adresse „AA:BB:…“; andere Formen wie „USB:…“ werden ignoriert).</summary>
+    public static void NoteDisconnected(string? address)
+    {
+        if (address is null || address.Length != 17
+            || !ulong.TryParse(address.Replace(":", ""), System.Globalization.NumberStyles.HexNumber, null, out ulong value))
+            return;
+        lock (LastConnected)
+            LastConnected[value] = Environment.TickCount64;
+    }
+
+    private static bool ConnectedRecently(ulong address)
+    {
+        lock (LastConnected)
+            return LastConnected.TryGetValue(address, out long at) && Environment.TickCount64 - at < 30_000;
+    }
+
+    /// <summary>Übersprungenen bekannten Controller protokollieren (je Gerät höchstens einmal pro Minute).</summary>
+    private static void LogSkipped(BLUETOOTH_DEVICE_INFO info)
+    {
+        long now = Environment.TickCount64;
+        lock (SkipLogged)
+        {
+            if (SkipLogged.TryGetValue(info.Address, out long at) && now - at < 60_000)
+                return;
+            SkipLogged[info.Address] = now;
+        }
+        var t = info.stLastSeen;
+        Log.Info($"Kopplung: {info.szName} ({info.Address:X12}) bekannt, nicht verbunden, zuletzt gesehen " +
+                 $"{t.Year:D4}-{t.Month:D2}-{t.Day:D2} {t.Hour:D2}:{t.Minute:D2}:{t.Second:D2} – nicht im Kopplungsmodus erkannt");
+    }
+
+    /// <summary>Zuletzt gesehen (UTC) innerhalb der letzten <paramref name="seconds"/> Sekunden?</summary>
+    private static bool SeenRecently(SYSTEMTIME t, int seconds = 20)
     {
         if (t.Year < 2000)
             return false;
@@ -304,7 +355,7 @@ internal static class ControllerPairing
         {
             // Windows liefert UTC; zur Sicherheit auch Ortszeit zulassen.
             var seen = new DateTime(t.Year, t.Month, t.Day, t.Hour, t.Minute, t.Second);
-            var window = TimeSpan.FromSeconds(20);
+            var window = TimeSpan.FromSeconds(seconds);
             return (DateTime.UtcNow - seen).Duration() < window || (DateTime.Now - seen).Duration() < window;
         }
         catch (ArgumentOutOfRangeException)

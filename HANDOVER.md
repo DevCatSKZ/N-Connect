@@ -33,11 +33,13 @@ Commits als **devcatskz** (devcatskz@gmail.com), ohne „Co-Authored-By“-Zeile
   0x1C–0x2F mit („Akku …“), gemessene Ladeanstiege landen in `battery.json`. Über einen kompletten Ladevorgang
   ist die Anzeige noch nicht beobachtet.
 - **Selbst koppeln (Switch 1, NSO, Wii)** ist gebaut (`ControllerPairing`, Hintergrundsuche in `TrayApp.AutoPairLoopAsync`,
-  Einstellung `AutoPair`). Wii mit echter Hardware bestätigt (auch automatisch im Hintergrund). **Joy-Con 1 per SYNC noch
-  nicht bestätigt** – seit 04.10. 11:37 werden auch bereits bekannte Controller neu gekoppelt, wenn sie während des
-  Suchlaufs antworten (Vergleich `stLastSeen` vorher/nachher). Switch 1/NSO: Kopplung ohne PIN, Rückfrage per
-  `BluetoothRegisterForAuthenticationEx` selbst bestätigt; schlägt das fehl, steht der Fehlercode im Protokoll
-  („Kopplung …: Authentifizierung → Fehler …“).
+  Einstellung `AutoPair`). Wii mit echter Hardware bestätigt (auch automatisch im Hintergrund). **Joy-Con 1 per SYNC
+  bestätigt (04.10.2026, auch nach Zwischenstopp an der Switch)**: Switch 1/NSO werden über WinRT
+  (`DeviceInformationCustomPairing`, Anfrage sofort bestätigt) gekoppelt – die Win32-Rückfrage kam bei Joy-Con zu
+  spät (Fehler 1244/258). Bekannte Controller gelten als „im Kopplungsmodus“, wenn Windows sie während des Suchlaufs
+  oder in den letzten 8 s gesehen hat – außer sie waren in den letzten 30 s verbunden (`NoteDisconnected`), sonst
+  würde ein eben ausgeschalteter Controller neu gekoppelt. Nach Fehlschlag 90 s Pause im Hintergrund. Übersprungene
+  bekannte Controller stehen im Protokoll („… nicht im Kopplungsmodus erkannt“).
 - **Am 04.10.2026 gebaut, mit echter Hardware noch nicht (vollständig) geprüft:** Spielerplatz/Namen (Kartentitel),
   Stick-Kalibrierung (`StickCalibrationForm`, nur mit simulierten Controllern gesehen), Gyro-Assistent
   (`GyroSetupForm`), Untermenüs im Infobereich, Ein-Klick-Update (`UpdateCheck.DownloadAsync` – braucht ein erstes
