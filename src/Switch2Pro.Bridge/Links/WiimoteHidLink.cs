@@ -13,6 +13,8 @@ internal sealed class WiimoteHidLink : IControllerLink
 {
     private const int InputTimeoutMs = 3000;
     private const int StatusIntervalMs = 30_000;
+    /// <summary>So lange auf die Antwort auf eine Statusabfrage warten, bevor die Verbindung als verloren gilt.</summary>
+    private const int ProbeTimeoutMs = 2500;
 
     private readonly HidChannel _hid;
     private readonly CancellationTokenSource _cts = new();
@@ -195,7 +197,7 @@ internal sealed class WiimoteHidLink : IControllerLink
             }
 
             byte mode = ext == WiiExtension.WiiUPro ? Wii.ModeButtonsExt19 : _irOn ? Wii.ModeButtonsAccelIrExt : Wii.ModeButtonsAccelExt;
-            await SendAsync(Wii.SetMode(mode, _rumble), ct);
+            await SendAsync(Wii.SetMode(mode, _rumble, continuous: false), ct);
             await SendAsync(Wii.Leds(_player, _rumble), ct);
         }
         finally
@@ -326,7 +328,7 @@ internal sealed class WiimoteHidLink : IControllerLink
                     if (changed)
                         SetupExtensionAsync(_cts.Token).Forget($"{Id}: Erweiterung erkennen");
                     else
-                        SendAsync(Wii.SetMode(_extension == WiiExtension.WiiUPro ? Wii.ModeButtonsExt19 : _irOn ? Wii.ModeButtonsAccelIrExt : Wii.ModeButtonsAccelExt, _rumble), _cts.Token)
+                        SendAsync(Wii.SetMode(_extension == WiiExtension.WiiUPro ? Wii.ModeButtonsExt19 : _irOn ? Wii.ModeButtonsAccelIrExt : Wii.ModeButtonsAccelExt, _rumble, continuous: false), _cts.Token)
                             .Forget($"{Id}: Datenformat setzen");
                 }
                 return;
@@ -357,12 +359,26 @@ internal sealed class WiimoteHidLink : IControllerLink
         try
         {
             long lastStatus = Environment.TickCount64;
+            long probeSince = 0;
             while (!ct.IsCancellationRequested)
             {
                 await Task.Delay(500, ct);
-                if (Environment.TickCount64 - _lastInputTicks > InputTimeoutMs)
+                // Die Fernbedienung sendet nur bei Änderung: Bleibt es still, erst nachfragen (Statusbericht kommt immer)
+                // und nur ohne Antwort als getrennt werten.
+                long idle = Environment.TickCount64 - _lastInputTicks;
+                if (idle <= InputTimeoutMs)
                 {
-                    Log.Warn($"{Id}: seit {InputTimeoutMs} ms keine Wii-Eingaben – Verbindung verloren");
+                    probeSince = 0;
+                }
+                else if (probeSince == 0)
+                {
+                    probeSince = Environment.TickCount64;
+                    lastStatus = probeSince;
+                    await SendAsync(Wii.StatusRequest(_rumble), ct);
+                }
+                else if (Environment.TickCount64 - probeSince > ProbeTimeoutMs)
+                {
+                    Log.Warn($"{Id}: keine Antwort der Wii-Fernbedienung – Verbindung verloren");
                     RaiseLost();
                     return;
                 }

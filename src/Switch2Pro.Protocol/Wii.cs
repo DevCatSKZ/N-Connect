@@ -53,7 +53,12 @@ public static class Wii
     }
 
     /// <summary>Daten dauernd senden (Bit 2), im gewünschten Format.</summary>
-    public static byte[] SetMode(byte mode, bool rumble) => [ReportMode, (byte)(0x04 | (rumble ? 1 : 0)), mode];
+    /// <summary>
+    /// Datenformat einstellen. <paramref name="continuous"/>: 100 Berichte/s auch ohne Änderung (Bit 0x04); sonst nur
+    /// bei Änderung – spart Funkzeit für andere Controller, ohne Verzögerung (Änderungen werden sofort gesendet).
+    /// </summary>
+    public static byte[] SetMode(byte mode, bool rumble, bool continuous = true) =>
+        [ReportMode, (byte)((continuous ? 0x04 : 0) | (rumble ? 1 : 0)), mode];
 
     public static byte[] StatusRequest(bool rumble) => [ReportStatusRequest, (byte)(rumble ? 1 : 0)];
 

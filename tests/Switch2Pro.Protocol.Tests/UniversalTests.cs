@@ -716,6 +716,8 @@ public class DsuTests
         Assert.Equal(WiiExtension.Other, Wii.ExtensionFromId([0, 0, 0xA4, 0x20, 4, 2])); // Balance Board
         Assert.Equal([0x11, 0x21], Wii.Leds(1, true));                 // Spieler 2, Vibration an
         Assert.Equal([0x12, 0x04, 0x35], Wii.SetMode(0x35, false));
+        Assert.Equal([0x12, 0x00, 0x35], Wii.SetMode(0x35, false, continuous: false)); // nur bei Änderung
+        Assert.Equal([0x12, 0x01, 0x37], Wii.SetMode(0x37, true, continuous: false));  // mit Vibration
         var w = Wii.WriteRegister(0xA400F0, [0x55], false);
         Assert.Equal([0x16, 0x04, 0xA4, 0x00, 0xF0, 0x01, 0x55], w[..7]);
         Assert.True(Wii.TryParseStatus([0x20, 0, 0, 0x02, 0, 0, 200], out bool ext, out int bat));
