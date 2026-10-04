@@ -89,8 +89,9 @@ Hinweise zur Umgebung:
   würde ein eben ausgeschalteter Controller neu gekoppelt. Nach Fehlschlag 90 s Pause im Hintergrund. Übersprungene
   bekannte Controller stehen im Protokoll („… nicht im Kopplungsmodus erkannt“). Koppeln dauert ~20 s; der erste
   HID-Öffnungsversuch danach scheitert manchmal („keine Antwort auf Unterbefehl 02“), der nächste nach ~6 s klappt.
-  Bekanntes Risiko: Vor dem Neukoppeln wird die alte Windows-Kopplung entfernt – scheitert die neue (gesehen bei der
-  Wii, Fehler 259), muss der Nutzer erneut SYNC drücken.
+  Neukoppeln abgesichert (FUNKTIONEN 2.3): erst bestätigen (zweite Suche), nach dem Entfernen neu suchen und mit
+  frischen Gerätedaten koppeln (Ursache des Wii-Fehlers 259), bei Fehlschlag zweiter Versuch – mit Hardware noch
+  **nicht** geprüft.
 - **Am 04.10.2026 gebaut, mit echter Hardware noch nicht (vollständig) geprüft:** Spielerplatz/Namen (Kartentitel),
   Stick-Kalibrierung (`StickCalibrationForm`, nur mit simulierten Controllern gesehen), Gyro-Assistent
   (`GyroSetupForm`), Untermenüs im Infobereich, Ein-Klick-Update (`UpdateCheck.DownloadAsync` – braucht ein erstes
