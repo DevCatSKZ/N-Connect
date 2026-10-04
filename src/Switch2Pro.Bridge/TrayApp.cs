@@ -201,7 +201,7 @@ internal sealed class TrayApp : ApplicationContext
             _wiiPairing.Activate();
             return;
         }
-        _wiiPairing = new PairForm();
+        _wiiPairing = new PairForm(_manager);
         _wiiPairing.Show();
     }
 

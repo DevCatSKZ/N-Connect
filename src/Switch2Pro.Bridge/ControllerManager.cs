@@ -43,6 +43,9 @@ internal sealed class ControllerManager : IAsyncDisposable
     private volatile bool _disposed;
 
     public event Action? Changed;
+
+    /// <summary>Aktuelle Einstellungen (Namen, Plätze …) – nur lesen.</summary>
+    public Settings Settings => _settings();
     public event Action<string>? Notify;
     /// <summary>Ein Joy-Con wurde getrennt (true) bzw. wieder zum Paar gefügt (false) – Adresse zum Merken.</summary>
     public event Action<string, bool>? JoyConModeChanged;

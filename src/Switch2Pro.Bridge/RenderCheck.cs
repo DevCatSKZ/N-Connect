@@ -48,7 +48,7 @@ internal static class RenderCheck
             Walk(welcome);
         using (var capture = new KeyCaptureDialog("X"))
             Walk(capture);
-        using (var wii = new PairForm())
+        using (var wii = new PairForm(null))
             Walk(wii);
         using (var pairing = new PairingDataForm(settings, () => { }))
             Walk(pairing);
@@ -247,6 +247,8 @@ internal static class RenderCheck
             if (manager?.Players.FirstOrDefault() is { } anyPlayer)
                 using (var gyro = new GyroSetupForm(anyPlayer, () => new Settings(), () => { }))
                     Snap(gyro, "gyro");
+            using (var pairing = new PairForm(null) { Preview = Tr.T(ControllerKind.JoyCon1Left.DisplayName()) })
+                Snap(pairing, "koppeln");
 
             // Meldungsfenster im Design: kurz anzeigen, abfotografieren, schließen.
             var shot = new System.Windows.Forms.Timer { Interval = 400 };

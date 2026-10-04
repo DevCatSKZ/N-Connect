@@ -76,8 +76,12 @@ Bis zu **8 Spieler** gleichzeitig (`ControllerManager.MaxPlayers`). Der 9. Contr
      Gerätedaten koppeln – mit den alten Daten schlug die Kopplung fehl (Wii: Fehler 259 = keine Einträge).
   3. Scheitert die Kopplung und antwortet der Controller noch, **zweiter Versuch** mit frisch gesuchten Daten.
   Erst danach gilt sie als fehlgeschlagen (90 s Pause im Hintergrund). Jede Suche dauert ~1,3 s.
-- **„Controller koppeln …“** (Fenster): sucht 60 s lang, 1 s Pause zwischen den Läufen, koppelt auch bekannte
-  Controller neu, die gerade sichtbar sind.
+- **„Controller koppeln …“** (Fenster `PairForm`, Windows-11-Stil): sucht 60 s lang, 1 s Pause zwischen den Läufen,
+  koppelt auch bekannte Controller neu, die gerade sichtbar sind. Oben **Status** (aktueller Schritt, Restzeit) und
+  **Verbunden**: jeder Controller, der sich verbindet, solange das Fenster offen ist (auch Switch 2 per SYNC oder per
+  Hintergrund), erscheint sofort mit ✓, Name, Spieler und Verbindungsart (über `ControllerManager.Changed`; schon
+  vorher verbundene zählen nicht). Danach „Fertig“ (Akzent, sobald etwas verbunden ist) oder „Erneut suchen“.
+  Darunter die Anleitung je Controller-Art. Prüfhilfe: `PairForm.Preview` (ohne Bluetooth), Bild `ui_koppeln_*.png`.
 - Erkannte Namen: „Joy-Con (L/R)“, „Pro Controller“, „Lic Pro Controller“, „NES/HVC/SNES/N64 Controller“,
   „MD/Gen Control Pad“, „Nintendo RVL-CNT-01…“ (Wii), „Nintendo RVL-WBC-01…“.
 - Gekoppelte Classic-Controller werden alle 2 s über die HID-Geräteliste gesucht und verbunden (Switch 1/NSO:
