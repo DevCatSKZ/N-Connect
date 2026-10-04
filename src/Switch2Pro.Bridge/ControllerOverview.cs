@@ -328,15 +328,37 @@ internal sealed class ControllerOverview : Panel
         private Control? BuildTab(int tab, ControllerKind kind) => tab switch
         {
             TabMapping => MappingPage(kind),
-            TabTuning => Column(
-                new TuningEditor(_owner._settings, _owner._save, kind, TuningParts.Sticks | TuningParts.Triggers | TuningParts.Rumble),
-                Hint("Ohne eigenen Wert gilt der allgemeine Wert der Seite „Sticks & Vibration“.")),
+            TabTuning => TuningPage(kind),
             TabGyro => GyroPage(kind),
             TabJoyCon => JoyConPage(),
             TabExtras => ExtrasPage(),
             TabDetails => DetailsPage(),
             _ => null,
         };
+
+        /// <summary>Feineinstellung: Stick-Kalibrierung (falls möglich), dann Totzone, Kennlinie, Trigger, Vibration.</summary>
+        private Control TuningPage(ControllerKind kind)
+        {
+            var column = Column(
+                new TuningEditor(_owner._settings, _owner._save, kind, TuningParts.Sticks | TuningParts.Triggers | TuningParts.Rumble),
+                Hint("Ohne eigenen Wert gilt der allgemeine Wert der Seite „Sticks & Vibration“."));
+            if (_player is { } player && StickCalibrationForm.CanCalibrate(player))
+            {
+                var calibrate = new GlyphButton("Kalibrieren …", Glyph.Stick);
+                calibrate.Click += (_, _) =>
+                {
+                    if (_player is null)
+                        return;
+                    using var form = new StickCalibrationForm(_player, _owner._settings, _owner._save);
+                    form.ShowDialog(FindForm());
+                };
+                var group = Group(Row("Sticks kalibrieren", "Gegen Drift oder zu kleinen Ausschlag: Mitte und Rand neu messen. " +
+                    "Wird nur in N-Connect gespeichert, der Controller bleibt unverändert.", calibrate, Glyph.Stick));
+                column.Controls.Add(group);
+                column.Controls.SetChildIndex(group, 0);
+            }
+            return column;
+        }
 
         private void ShowTab()
         {
@@ -450,9 +472,19 @@ internal sealed class ControllerOverview : Panel
                 return null;
             _calibrate = new GlyphButton("Kalibrieren", Glyph.Gauge);
             _calibrate.Click += async (_, _) => await CalibrateAsync();
+            var setup = new GlyphButton("Einrichten …", Glyph.Rotate, accent: true);
+            setup.Click += (_, _) =>
+            {
+                if (_player is null)
+                    return;
+                using var form = new GyroSetupForm(_player, _owner._settings, _owner._save);
+                form.ShowDialog(FindForm());
+            };
             return Column(
-                Group(Row("Gyro kalibrieren", "Controller ruhig auf den Tisch legen und klicken: misst den Nullpunkt neu (gegen Abdriften).",
-                    _calibrate, Glyph.Rotate)),
+                Group(Row("Zielen per Bewegung einrichten", "Schritt für Schritt: Nullpunkt, wann der Gyro zielt, Empfindlichkeit – mit Vorschau.",
+                    setup, Glyph.Rotate),
+                    Row("Gyro kalibrieren", "Controller ruhig auf den Tisch legen und klicken: misst den Nullpunkt neu (gegen Abdriften).",
+                    _calibrate, Glyph.Gauge)),
                 new TuningEditor(_owner._settings, _owner._save, kind, TuningParts.GyroMouse),
                 Group(Link("Gyro als rechter Stick und Mausrichtung", "Gilt für alle Controller", SettingsForm.PageGyro)));
         }
@@ -769,7 +801,7 @@ internal sealed class ControllerOverview : Panel
             bool upright = links.Count == 1 && joyCon && settings.IsUprightJoyCon(links[0].Address);
             if (joyCon && links.All(l => l.LastState is not null))
             {
-                var parts = links.Select(l => new InputView.JoyConPart(l.Kind, l.LastState!, l.Calibration, l.Info,
+                var parts = links.Select(l => new InputView.JoyConPart(l.Kind, l.LastState!, Player.CalibrationFor(l, settings), l.Info,
                     player.MouseActive(l), l.InGrip, upright)).ToList();
                 _view.ShowJoyCons(parts, input);
             }

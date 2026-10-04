@@ -265,6 +265,29 @@ public sealed class Settings
     /// <summary>Eigene Namen je Controller (Adresse → Name), z. B. „Lenas Joy-Con“.</summary>
     public Dictionary<string, string> ControllerNames { get; set; } = new(StringComparer.OrdinalIgnoreCase);
 
+    /// <summary>
+    /// Eigene Stick-Kalibrierung (geführt gemessen) je Controller und Stick – Schlüssel „Adresse|L“ bzw. „Adresse|R“.
+    /// Ersetzt die Werkswerte des Controllers; in den Controller selbst wird nichts geschrieben.
+    /// </summary>
+    public Dictionary<string, StickCalibration> StickCalibrations { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+
+    public static string StickKey(string address, bool left) => $"{address}|{(left ? "L" : "R")}";
+
+    /// <summary>Eigene Kalibrierung eines Sticks (null = Werkswerte).</summary>
+    public StickCalibration? StickCalibrationFor(string? address, bool left) =>
+        address is not null && StickCalibrations.TryGetValue(StickKey(address, left), out var c) ? c : null;
+
+    /// <summary>Eigene Kalibrierung setzen bzw. mit null entfernen. Neue Kopie, weil andere Threads gleichzeitig lesen.</summary>
+    public void SetStickCalibration(string address, bool left, StickCalibration? calibration)
+    {
+        var copy = new Dictionary<string, StickCalibration>(StickCalibrations, StringComparer.OrdinalIgnoreCase);
+        if (calibration is { } c)
+            copy[StickKey(address, left)] = c;
+        else
+            copy.Remove(StickKey(address, left));
+        StickCalibrations = copy;
+    }
+
     /// <summary>Gewünschter Spielerplatz je Controller (Adresse → 0–7); wird beim Verbinden bevorzugt.</summary>
     public Dictionary<string, int> PlayerSlots { get; set; } = new(StringComparer.OrdinalIgnoreCase);
 
@@ -381,6 +404,7 @@ public sealed class Settings
         SwitchCardHint = other.SwitchCardHint;
         ControllerNames = new Dictionary<string, string>(other.ControllerNames, StringComparer.OrdinalIgnoreCase);
         PlayerSlots = new Dictionary<string, int>(other.PlayerSlots, StringComparer.OrdinalIgnoreCase);
+        StickCalibrations = new Dictionary<string, StickCalibration>(other.StickCalibrations, StringComparer.OrdinalIgnoreCase);
     }
 
     [JsonIgnore]
@@ -513,6 +537,10 @@ public sealed class Settings
             .ToDictionary(n => n.Key, n => n.Value.Trim(), StringComparer.OrdinalIgnoreCase) ?? new(StringComparer.OrdinalIgnoreCase);
         PlayerSlots = PlayerSlots?.Where(s => s.Key is not null && s.Value is >= 0 and < 8)
             .ToDictionary(s => s.Key, s => s.Value, StringComparer.OrdinalIgnoreCase) ?? new(StringComparer.OrdinalIgnoreCase);
+        // Nur plausible Kalibrierungen (Mitte im 12-Bit-Bereich, Ausschlag 200–2047) – sonst lieber die Werkswerte.
+        static bool Plausible(AxisCalibration a) => a.Neutral is > 0 and < 4095 && a.Max is >= 200 and <= 2047 && a.Min is >= 200 and <= 2047;
+        StickCalibrations = StickCalibrations?.Where(c => c.Key is not null && Plausible(c.Value.X) && Plausible(c.Value.Y))
+            .ToDictionary(c => c.Key, c => c.Value, StringComparer.OrdinalIgnoreCase) ?? new(StringComparer.OrdinalIgnoreCase);
         return this;
     }
 }

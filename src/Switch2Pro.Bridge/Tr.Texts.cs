@@ -462,6 +462,59 @@ internal static partial class Tr
         ["Linken Joy-Con umbenennen …"] = "Rename left Joy-Con …",
         ["Rechten Joy-Con umbenennen …"] = "Rename right Joy-Con …",
         ["Controller umbenennen"] = "Rename controller",
+        // Stick-Kalibrierung
+        ["Sticks kalibrieren"] = "Calibrate sticks",
+        ["Kalibrieren …"] = "Calibrate …",
+        ["Gegen Drift oder zu kleinen Ausschlag: Mitte und Rand neu messen. Wird nur in N-Connect gespeichert, der Controller bleibt unverändert."] =
+            "Against drift or too little range: measure centre and edge again. Stored only in N-Connect, the controller stays unchanged.",
+        ["Linker Stick"] = "Left stick",
+        ["Rechter Stick"] = "Right stick",
+        ["Stick"] = "Stick",
+        ["Stick (linker Joy-Con)"] = "Stick (left Joy-Con)",
+        ["Stick (rechter Joy-Con)"] = "Stick (right Joy-Con)",
+        ["Neu messen"] = "Measure again",
+        ["Übernehmen"] = "Apply",
+        ["Werkswerte"] = "Factory values",
+        ["Der Punkt zeigt, wo der Stick gerade steht. Steht er losgelassen nicht in der Mitte oder erreicht er den Kreis nicht, auf „Neu messen“ klicken."] =
+            "The dot shows where the stick is. If it is not centred when released or does not reach the circle, click “Measure again”.",
+        ["Gilt gerade: eigene Kalibrierung."] = "Currently used: own calibration.",
+        ["Gilt gerade: Werkswerte des Controllers."] = "Currently used: the controller's factory values.",
+        ["1/2 – Stick loslassen und den Controller ruhig halten …"] = "1/2 – Release the stick and hold the controller still …",
+        ["2/2 – Stick bis zum Anschlag drücken und langsam ein- bis zweimal im Kreis drehen."] =
+            "2/2 – Push the stick all the way and slowly rotate it once or twice.",
+        ["Fertig. „Übernehmen“ speichert die neue Kalibrierung für diesen Controller."] = "Done. “Apply” saves the new calibration for this controller.",
+        ["Der Stick hat den Rand nicht erreicht. Bitte bis zum Anschlag drücken und erneut messen."] =
+            "The stick did not reach the edge. Please push it all the way and measure again.",
+        ["Übernommen ✓ – gilt ab sofort."] = "Applied ✓ – in effect now.",
+        ["Werkswerte des Controllers gelten wieder."] = "The controller's factory values apply again.",
+        // Gyro-Assistent
+        ["Gyro einrichten"] = "Set up gyro",
+        ["Einrichten …"] = "Set up …",
+        ["Zielen per Bewegung einrichten"] = "Set up motion aiming",
+        ["Schritt für Schritt: Nullpunkt, wann der Gyro zielt, Empfindlichkeit – mit Vorschau."] =
+            "Step by step: zero point, when the gyro aims, sensitivity – with preview.",
+        ["1  Nullpunkt"] = "1  Zero point",
+        ["Controller flach auf den Tisch legen, nicht berühren – verhindert, dass das Ziel von selbst wandert."] =
+            "Lay the controller flat on the table, do not touch it – keeps the aim from drifting by itself.",
+        ["Nullpunkt messen"] = "Measure zero point",
+        ["Ruhig liegen lassen …"] = "Keep it still …",
+        ["Der Controller hat sich bewegt – bitte flach hinlegen und erneut versuchen."] = "The controller moved – please lay it flat and try again.",
+        ["Nullpunkt gemessen ✓"] = "Zero point measured ✓",
+        ["2  Wann zielt der Gyro?"] = "2  When does the gyro aim?",
+        ["Nur per Taste"] = "Button only",
+        ["Immer"] = "Always",
+        ["Beim Zielen (ZL/LT)"] = "While aiming (ZL/LT)",
+        ["„Beim Zielen“: nur solange ZL (linker Trigger) gehalten wird – wie in vielen Shootern."] =
+            "“While aiming”: only while ZL (left trigger) is held – as in many shooters.",
+        ["3  Empfindlichkeit"] = "3  Sensitivity",
+        ["Voller Ausschlag ab"] = "Full deflection from",
+        ["Mindestausschlag"] = "Minimum deflection",
+        ["Hoch/runter umkehren"] = "Invert up/down",
+        ["Kleinerer Wert bei „Voller Ausschlag ab“ = empfindlicher. „Mindestausschlag“ überwindet die Totzone des Spiels."] =
+            "Smaller “Full deflection from” = more sensitive. “Minimum deflection” overcomes the game's dead zone.",
+        ["Mitte"] = "Centre",
+        ["Vorschau: Fadenkreuz folgt dem Controller (unabhängig von Schritt 2)."] = "Preview: the crosshair follows the controller (regardless of step 2).",
+        ["Keine Bewegungsdaten"] = "No motion data",
         ["Controller gekoppelt"] = "Controller paired",
         ["Joy-Con, Pro Controller, NES/SNES/N64/Mega Drive: SYNC-Taste drücken, bis die Lichter laufen.\n" +
          "Wii-Fernbedienung: Batteriefach öffnen und die rote SYNC-Taste drücken.\n" +

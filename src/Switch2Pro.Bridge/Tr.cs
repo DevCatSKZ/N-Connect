@@ -115,6 +115,8 @@ internal static partial class Tr
         (Re(@"^Spieler (?<a>\d+) und (?<b>\d+) getauscht$"), m => $"Players {m.Groups["a"]} and {m.Groups["b"]} swapped"),
         (Re(@"^Name für (?<k>.+) \(leer = Standardname\):$"), m => $"Name for {N(m, "k")} (empty = default name):"),
         (Re(@"^(?<k>.+) \(Joy-Con-Paar\)$"), m => $"{m.Groups["k"]} (Joy-Con pair)"),
+        (Re(@"^Mitte (?<x>\d+) / (?<y>\d+) · Abweichung vom Kreis: vorher (?<a>\d+) %, neu (?<b>\d+) %$"),
+            m => $"Centre {m.Groups["x"]} / {m.Groups["y"]} · deviation from circle: before {m.Groups["a"]} %, new {m.Groups["b"]} %"),
         (Re(@"^Joy-Con zusammengefasst \(Spieler (?<n>\d+)\)$"), m => $"Joy-Cons combined (player {m.Groups["n"]})"),
         (Re(@"^Joy-Con getrennt – (?<k>.+) ist jetzt Spieler (?<n>\d+)$"), m => $"Joy-Con split – {N(m, "k")} is now player {m.Groups["n"]}"),
         (Re(@"^Spieler (?<n>\d+): Akku (?<k>.+) fast leer \((?<p>\d+) %\) – bitte aufladen$"),
