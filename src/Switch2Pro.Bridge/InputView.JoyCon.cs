@@ -1,11 +1,15 @@
-﻿using System.Drawing;
+using System.Drawing;
 using System.Drawing.Drawing2D;
 using Switch2Pro.Protocol;
 using Switch2Pro.Bridge.Links;
 
 namespace Switch2Pro.Bridge;
 
-/// <summary>Joy-Con-Darstellung: als Paar aufrecht nebeneinander, einzeln quer gehalten.</summary>
+/// <summary>
+/// Joy-Con nach Produktfotos: Umriss und Tastenlage 1:1 vom Foto (Joy-Con 1), Joy-Con 2 auf sein schlankeres
+/// Seitenverhältnis gestreckt. Als Paar nebeneinander, im Charging Grip (Umriss des Griffs vom Foto, Joy-Con links
+/// und rechts vom Mittelstück), einzeln hochkant oder quer.
+/// </summary>
 internal sealed partial class InputView
 {
     /// <summary>Ein Joy-Con für die Anzeige: roher Zustand (Tasten an ihrer echten Position), Farben, Mausmodus.</summary>
@@ -21,89 +25,102 @@ internal sealed partial class InputView
         Invalidate();
     }
 
-    private const float JW = 120, JH = 330;
+    /// <summary>Lokales Raster eines Joy-Con: 120 Einheiten breit, Höhe nach Seitenverhältnis (Schultertasten darüber).</summary>
+    private const float LW = 120;
+
+    /// <summary>Breite : Höhe – Joy-Con 1 vom Foto (392 × 1094 px), Joy-Con 2 schlanker und länger.</summary>
+    private static float Aspect(ControllerKind kind) =>
+        kind is ControllerKind.JoyCon2Left or ControllerKind.JoyCon2Right ? 0.30f : 392f / 1094f;
+
+    private static float LocalHeight(ControllerKind kind) => LW / Aspect(kind);
 
     private void PaintJoyCons(Graphics g, IReadOnlyList<JoyConPart> parts)
     {
+        const float shoulder = 0.09f; // Anteil der Höhe für die Schultertasten über dem Gehäuse
         if (parts.Count == 2)
         {
-            // Paar: links und rechts aufrecht, wie im Halter
             var left = parts.First(p => p.Kind.IsLeftJoyCon());
             var right = parts.First(p => !p.Kind.IsLeftJoyCon());
-            float gap = 16, x = (W - 2 * JW - gap) / 2, y = 30;
             if (left.InGrip && right.InGrip)
-                DrawGrip(g, x, y, gap);
-            DrawJoyConAt(g, left, x, y);
-            DrawJoyConAt(g, right, x + JW + gap, y);
+            {
+                PaintGrip(g, left, right);
+            }
+            else
+            {
+                // Paar ohne Griff: aufrecht nebeneinander, schmale Fuge
+                float h = Stage.Height / (1 + shoulder), w = h * Aspect(left.Kind), gap = 10;
+                float x = Stage.X + (Stage.Width - 2 * w - gap) / 2, y = Stage.Y + h * shoulder;
+                DrawJoyConIn(g, left, new RectangleF(x, y, w, h));
+                DrawJoyConIn(g, right, new RectangleF(x + w + gap, y, w, h));
+            }
         }
         else if (parts[0].Upright)
         {
-            // Einzeln hochkant gehalten: aufrecht in der Mitte
-            DrawJoyConAt(g, parts[0], (W - JW) / 2, 30);
-            if (parts[0].MouseActive)
-                MouseBadge(g, new PointF(W / 2, 300));
+            float h = Stage.Height / (1 + shoulder), w = h * Aspect(parts[0].Kind);
+            DrawJoyConIn(g, parts[0], new RectangleF(Stage.X + (Stage.Width - w) / 2, Stage.Y + h * shoulder, w, h));
         }
         else
         {
-            // Einzeln: quer gehalten, Schiene (SL/SR) oben – links gegen den Uhrzeigersinn gedreht, rechts mit
+            // Einzeln quer gehalten: Schiene (SL/SR) oben – links gegen den Uhrzeigersinn gedreht, rechts mit
             var part = parts[0];
+            float length = Math.Min(Stage.Width * 0.82f, 440), w = length * Aspect(part.Kind);
             var state = g.Save();
-            g.TranslateTransform(W / 2, 190);
+            g.TranslateTransform(Stage.X + Stage.Width / 2, Stage.Y + Stage.Height / 2);
             float angle = part.Kind.IsLeftJoyCon() ? -90 : 90;
             g.RotateTransform(angle);
-            g.TranslateTransform(-JW / 2, -JH / 2);
             _captionRotation = angle;
-            try { DrawJoyCon(g, part); } finally { _captionRotation = 0; }
+            try { DrawJoyConIn(g, part, new RectangleF(-w / 2, -length / 2, w, length), badge: false); }
+            finally { _captionRotation = 0; }
             g.Restore(state);
             if (part.MouseActive)
-                MouseBadge(g, new PointF(W / 2, 300));
+                MouseBadge(g, new PointF(W / 2, Stage.Bottom - 6));
         }
         Gyro(g, _input?.Motion);
     }
 
-    /// <summary>Charging Grip hinter einem Joy-Con-Paar: Gehäuse mit Handgriffen, GL/GR seitlich.</summary>
-    private void DrawGrip(Graphics g, float x, float y, float gap)
+    /// <summary>
+    /// Joy-Con-Paar im Charging Grip: Umriss des Griffs vom Foto (Joy-Con 2 Grip), darauf die Joy-Con an ihrer
+    /// Foto-Position links und rechts vom Mittelstück. GL/GR sitzen hinten an den Griffen.
+    /// </summary>
+    private void PaintGrip(Graphics g, JoyConPart left, JoyConPart right)
     {
-        float left = x - 26, right = x + 2 * JW + gap + 26, top = y + 40, bottom = y + JH - 20;
-        using var grip = new GraphicsPath { FillMode = FillMode.Winding };
-        using (var outline = Rounded(new RectangleF(left, top, right - left, bottom - top), 44))
-            grip.AddPath(outline, false);
-        grip.AddEllipse(left - 18, bottom - 110, 96, 170);
-        grip.AddEllipse(right - 78, bottom - 110, 96, 170);
-        var color = Color.FromArgb(40, 41, 46);
-        using (var shadow = new SolidBrush(Color.FromArgb(90, 0, 0, 0)))
-        {
-            var st = g.Save();
-            g.TranslateTransform(0, 6);
-            g.FillPath(shadow, grip);
-            g.Restore(st);
-        }
-        using (var fill = new LinearGradientBrush(new RectangleF(left - 20, top, right - left + 40, bottom - top + 70),
-                   Mix(color, Color.White, 0.1f), Mix(color, Color.Black, 0.2f), LinearGradientMode.Vertical))
-            g.FillPath(fill, grip);
-        using (var pen = new Pen(Mix(color, Color.White, 0.25f), 1.4f))
-            g.DrawPath(pen, grip);
+        var f = Frame(83, 1197, 92, 990);
+        var color = Color.FromArgb(0x34, 0x35, 0x3A);
+        using (var path = f.Outline(PhotoOutlines.JoyConGrip, symmetric: true))
+            BodyShape(g, path, color);
+        // Mittelstück zwischen den Joy-Con (leicht abgesetzt)
+        using (var middle = Rounded(f.R(470, 100, 340, 870), f.S(26)))
+        using (var brush = new LinearGradientBrush(f.R(470, 100, 340, 870), Mix(color, Color.White, 0.08f), Mix(color, Color.Black, 0.12f), LinearGradientMode.Vertical))
+            g.FillPath(brush, middle);
+        // Joy-Con: oben bündig mit dem Griff, Breite wie auf dem Foto
+        float w = f.S(270), h = w / Aspect(left.Kind);
+        float top = f.P(0, 104).Y;
+        DrawJoyConIn(g, left, new RectangleF(f.P(198, 0).X, top, w, h));
+        DrawJoyConIn(g, right, new RectangleF(f.P(1082, 0).X - w, top, w, h));
         bool gl = _input?.Has(ProButtons.GL) == true, gr = _input?.Has(ProButtons.GR) == true;
-        BackButton(g, new RectangleF(left - 66, bottom - 10, 40, 26), gl, "GL");
-        BackButton(g, new RectangleF(right + 26, bottom - 10, 40, 26), gr, "GR");
+        BackButton(g, new RectangleF(f.P(120, 0).X - 20, f.P(0, 860).Y, 40, 26), gl, "GL");
+        BackButton(g, new RectangleF(f.P(1160, 0).X - 20, f.P(0, 860).Y, 40, 26), gr, "GR");
     }
 
-    private void DrawJoyConAt(Graphics g, JoyConPart part, float x, float y)
+    /// <summary>Joy-Con in ein Zielrechteck (Gehäuse ohne Schultertasten) zeichnen.</summary>
+    private void DrawJoyConIn(Graphics g, JoyConPart part, RectangleF body, bool badge = true)
     {
+        float lh = LocalHeight(part.Kind);
         var state = g.Save();
-        g.TranslateTransform(x, y);
-        DrawJoyCon(g, part);
+        g.TranslateTransform(body.X, body.Y);
+        g.ScaleTransform(body.Width / LW, body.Height / lh);
+        DrawJoyCon(g, part, lh);
         g.Restore(state);
-        if (part.MouseActive)
-            MouseBadge(g, new PointF(x + JW / 2, y + JH + 14));
+        if (badge && part.MouseActive)
+            MouseBadge(g, new PointF(body.X + body.Width / 2, Math.Min(body.Bottom + 14, H - 30)));
     }
 
     /// <summary>
-    /// Einen Joy-Con aufrecht zeichnen (lokal 120 × 330). Linker Joy-Con: Schiene rechts, Stick oben,
-    /// Richtungstasten darunter, „−“ oben innen, Aufnahme unten innen. Rechter Joy-Con gespiegelt mit
-    /// A/B/X/Y oben, Stick darunter, „+“, HOME und (Joy-Con 2) C.
+    /// Einen Joy-Con im lokalen Raster zeichnen (Breite 120, Höhe <paramref name="lh"/>; Schultertasten bei y &lt; 0).
+    /// Umriss und Tastenpositionen kommen vom Foto: links Stick oben, Richtungstasten, „−“, Aufnahme; rechts A/B/X/Y,
+    /// Stick, „+“, HOME und beim Joy-Con 2 die C-Taste.
     /// </summary>
-    private void DrawJoyCon(Graphics g, JoyConPart part)
+    private void DrawJoyCon(Graphics g, JoyConPart part, float lh)
     {
         var savedBody = _body;
         var savedButtons = _buttons;
@@ -120,35 +137,26 @@ internal sealed partial class InputView
                 accent = Mix(_body, Color.Black, 0.45f);
             var s = part.State;
             bool On(ProButtons b) => s.Has(b);
-            float X(float x) => left ? x : JW - x; // rechter Joy-Con gespiegelt
+            // Foto-Pixel → lokales Raster (Joy-Con 2: gleiche Anordnung, auf seine Länge gestreckt)
+            var photo = left ? new RectangleF(89, 66, 392, 1094) : new RectangleF(803, 71, 390, 1092);
+            float sx = LW / photo.Width, sy = lh / photo.Height;
+            PointF P(float x, float y) => new((x - photo.X) * sx, (y - photo.Y) * sy);
+            float S(float v) => v * sx;
 
-            // Trigger- und Schultertaste oben außen
-            var trigger = new RectangleF(left ? 14 : JW - 86, -4, 72, 30);
+            // Trigger und Schultertaste oben außen (über dem Gehäuse)
+            var trigger = new RectangleF(left ? 10 : LW - 82, -lh * 0.075f, 72, 30);
             using (var tPath = Rounded(trigger, 12))
                 Fill(g, tPath, On(left ? ProButtons.ZL : ProButtons.ZR), Mix(_body, Color.Black, 0.25f));
-            var bumper = new RectangleF(left ? 4 : JW - 92, 10, 88, 30);
+            var bumper = new RectangleF(left ? 2 : LW - 90, -lh * 0.035f, 88, 30);
             using (var bPath = Rounded(bumper, 14))
                 Fill(g, bPath, On(left ? ProButtons.L : ProButtons.R), Mix(_body, Color.White, 0.15f));
+            Caption(g, new RectangleF(trigger.X, trigger.Y + 1, trigger.Width, 14), left ? "ZL" : "ZR", 7.5f, FaceText);
+            Caption(g, new RectangleF(bumper.X, bumper.Y + 3, bumper.Width, 14), left ? "L" : "R", 7.5f, Mix(_body, Color.White, 0.8f));
 
-            // Gehäuse: außen stark gerundet, an der Schiene (innen) gerade
+            // Gehäuse: Umriss vom Foto
             using var shell = new GraphicsPath();
-            const float r = 52, ri = 8;
-            var rect = new RectangleF(0, 24, JW, JH - 24);
-            if (left)
-            {
-                shell.AddArc(rect.X, rect.Y, r * 2, r * 2, 180, 90);
-                shell.AddArc(rect.Right - ri * 2, rect.Y, ri * 2, ri * 2, 270, 90);
-                shell.AddArc(rect.Right - ri * 2, rect.Bottom - ri * 2, ri * 2, ri * 2, 0, 90);
-                shell.AddArc(rect.X, rect.Bottom - r * 2, r * 2, r * 2, 90, 90);
-            }
-            else
-            {
-                shell.AddArc(rect.X, rect.Y, ri * 2, ri * 2, 180, 90);
-                shell.AddArc(rect.Right - r * 2, rect.Y, r * 2, r * 2, 270, 90);
-                shell.AddArc(rect.Right - r * 2, rect.Bottom - r * 2, r * 2, r * 2, 0, 90);
-                shell.AddArc(rect.X, rect.Bottom - ri * 2, ri * 2, ri * 2, 90, 90);
-            }
-            shell.CloseFigure();
+            shell.AddClosedCurve(ParsePoints(left ? PhotoOutlines.JoyCon1Left : PhotoOutlines.JoyCon1Right)
+                .Select(q => P(q.X, q.Y)).ToArray(), 0.3f);
             using (var shadow = new SolidBrush(Color.FromArgb(90, 0, 0, 0)))
             {
                 var st = g.Save();
@@ -156,14 +164,17 @@ internal sealed partial class InputView
                 g.FillPath(shadow, shell);
                 g.Restore(st);
             }
-            using (var fill = new LinearGradientBrush(rect, Mix(_body, Color.White, 0.14f), Mix(_body, Color.Black, 0.18f),
-                       left ? LinearGradientMode.Horizontal : LinearGradientMode.Horizontal))
+            var bounds = shell.GetBounds();
+            using (var fill = new LinearGradientBrush(bounds, Mix(_body, Color.White, 0.14f), Mix(_body, Color.Black, 0.18f), LinearGradientMode.Horizontal))
                 g.FillPath(fill, shell);
             using (var pen = new Pen(Mix(_body, Color.White, 0.3f), 1.4f))
                 g.DrawPath(pen, shell);
 
-            // Schiene mit SL/SR (innen)
-            var rail = new RectangleF(left ? JW - 12 : 0, 40, 12, JH - 70);
+            // Schiene mit SL/SR (innen, Foto: linker Joy-Con x 445–481, rechter x 803–835)
+            var railTop = P(0, 130).Y;
+            var railBottom = P(0, 1050).Y;
+            float railX = left ? P(447, 0).X : P(805, 0).X, railW = S(32);
+            var rail = new RectangleF(railX, railTop, railW, railBottom - railTop);
             using (var railBrush = new SolidBrush(Mix(_body, Color.Black, 0.45f)))
                 g.FillRectangle(railBrush, rail);
             using (var edgeBrush = new SolidBrush(accent))
@@ -171,41 +182,40 @@ internal sealed partial class InputView
             var sl = left ? ProButtons.SLLeft : ProButtons.SLRight;
             var sr = left ? ProButtons.SRLeft : ProButtons.SRRight;
             // Quer gehalten liegt SL jeweils links: beim linken Joy-Con oben, beim rechten unten.
-            RailButton(g, new RectangleF(rail.X, left ? 70 : JH - 120, 12, 50), On(sl), "SL");
-            RailButton(g, new RectangleF(rail.X, left ? JH - 120 : 70, 12, 50), On(sr), "SR");
+            float slotH = lh * 0.16f;
+            RailButton(g, new RectangleF(rail.X, left ? lh * 0.24f : lh * 0.62f, rail.Width, slotH), On(sl), "SL");
+            RailButton(g, new RectangleF(rail.X, left ? lh * 0.62f : lh * 0.24f, rail.Width, slotH), On(sr), "SR");
 
             if (left)
             {
-                Small(g, new PointF(X(92), 50), On(ProButtons.Minus), "−");
-                var ls = new PointF(X(56), 104);
-                AccentRing(g, ls, 34, accent);
+                Small(g, P(393, 173), On(ProButtons.Minus), "−");
+                var ls = P(282, 333);
+                AccentRing(g, ls, S(96), accent);
                 Stick(g, ls, StickValue(s.LeftX, part.Calibration.Left.X),
-                    StickValue(s.LeftY, part.Calibration.Left.Y), On(ProButtons.LeftStick), 28, 19);
-                var d = new PointF(X(56), 196);
-                Face(g, new PointF(d.X, d.Y - 25), On(ProButtons.Up), "▲", 12);
-                Face(g, new PointF(d.X, d.Y + 25), On(ProButtons.Down), "▼", 12);
-                Face(g, new PointF(d.X - 25, d.Y), On(ProButtons.Left), "◀", 12);
-                Face(g, new PointF(d.X + 25, d.Y), On(ProButtons.Right), "▶", 12);
-                CaptureKey(g, new PointF(X(76), 268), On(ProButtons.Capture));
+                    StickValue(s.LeftY, part.Calibration.Left.Y), On(ProButtons.LeftStick), S(85), S(58));
+                float r = S(40);
+                Face(g, P(282, 560), On(ProButtons.Up), "▲", r);
+                Face(g, P(280, 723), On(ProButtons.Down), "▼", r);
+                Face(g, P(195, 642), On(ProButtons.Left), "◀", r);
+                Face(g, P(368, 642), On(ProButtons.Right), "▶", r);
+                CaptureKey(g, P(340, 848), On(ProButtons.Capture));
             }
             else
             {
-                Small(g, new PointF(X(92), 50), On(ProButtons.Plus), "+");
-                var f = new PointF(X(60), 104);
-                Face(g, new PointF(f.X, f.Y - 25), On(ProButtons.X), "X", 12);
-                Face(g, new PointF(f.X + 25, f.Y), On(ProButtons.A), "A", 12);
-                Face(g, new PointF(f.X, f.Y + 25), On(ProButtons.B), "B", 12);
-                Face(g, new PointF(f.X - 25, f.Y), On(ProButtons.Y), "Y", 12);
-                var rs = new PointF(X(56), 196);
-                AccentRing(g, rs, 34, accent);
+                Small(g, P(891, 175), On(ProButtons.Plus), "+");
+                float r = S(40);
+                Face(g, P(1000, 258), On(ProButtons.X), "X", r);
+                Face(g, P(1087, 340), On(ProButtons.A), "A", r);
+                Face(g, P(1000, 422), On(ProButtons.B), "B", r);
+                Face(g, P(915, 340), On(ProButtons.Y), "Y", r);
+                var rs = P(1003, 640);
+                AccentRing(g, rs, S(96), accent);
                 Stick(g, rs, StickValue(s.RightX, part.Calibration.Right.X),
-                    StickValue(s.RightY, part.Calibration.Right.Y), On(ProButtons.RightStick), 28, 19);
-                Home(g, new PointF(X(78), 262), On(ProButtons.Home));
+                    StickValue(s.RightY, part.Calibration.Right.Y), On(ProButtons.RightStick), S(85), S(58));
+                Home(g, P(941, 855), On(ProButtons.Home));
                 if (switch2)
-                    SquareKey(g, new PointF(X(78), 292), On(ProButtons.C), "C");
+                    SquareKey(g, P(941, 960), On(ProButtons.C), "C");
             }
-            Caption(g, new RectangleF(left ? 16 : JW - 84, -3, 68, 14), left ? "ZL" : "ZR", 7.5f, FaceText);
-            Caption(g, new RectangleF(left ? 10 : JW - 86, 12, 76, 14), left ? "L" : "R", 7.5f, Mix(_body, Color.White, 0.8f));
         }
         finally
         {

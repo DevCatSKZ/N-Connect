@@ -118,7 +118,7 @@ internal static class RenderCheck
             var sw = System.Diagnostics.Stopwatch.StartNew();
             using var form = new SettingsForm(new Settings(), _ => { }, manager)
             {
-                StartPosition = FormStartPosition.Manual, Location = new Point(-6000, -6000), ShowInTaskbar = false,
+                StartPosition = FormStartPosition.Manual, Location = new Point(-6000, -6000), ShowInTaskbar = false, ShowInactive = true,
                 Size = Environment.GetCommandLineArgs().Contains("--wide") ? new Size(1900, 1040) : new Size(1220, 900),
             };
             form.Show();

@@ -409,7 +409,7 @@ internal sealed partial class InputView : Control
                     g.FillPath(shadow, cross);
                 g.Restore(shadowState);
                 using var gradient = new LinearGradientBrush(new RectangleF(c.X - len, c.Y - len, len * 2, len * 2),
-                    Mix(light, Color.White, 0.6f), Mix(light, Color.Black, 0.08f), LinearGradientMode.ForwardDiagonal);
+                    Mix(light, Color.White, light.GetBrightness() > 0.5f ? 0.6f : 0.12f), Mix(light, Color.Black, 0.08f), LinearGradientMode.ForwardDiagonal);
                 g.FillPath(gradient, cross);
             }
             else
@@ -435,16 +435,30 @@ internal sealed partial class InputView : Control
         Arm(right, new RectangleF(c.X + arm / 2, c.Y - arm / 2, len - arm / 2, arm), "▶");
     }
 
-    private void Stick(Graphics g, PointF c, short x, short y, bool pressed, float well = 41, float cap = 27)
+    /// <summary>
+    /// Stick mit Mulde und Kappe. Farben wahlweise eigene (z. B. graue Kappe beim GameCube), sonst nach dem Gehäuse;
+    /// <paramref name="octagon"/>: achteckige Führung wie bei GameCube, N64 und Classic Controller.
+    /// </summary>
+    private void Stick(Graphics g, PointF c, short x, short y, bool pressed, float well = 41, float cap = 27,
+        Color? capColor = null, Color? wellColor = null, bool octagon = false)
     {
         (x, y) = Smooth(c, x, y);
-        // Erhabener Ring um die Stick-Mulde (wie beim Original)
-        using (var outer = new Pen(Mix(_body, Color.White, 0.1f), 3f))
-            g.DrawEllipse(outer, c.X - well - 3, c.Y - well - 3, (well + 3) * 2, (well + 3) * 2);
-        using (var wellBrush = new SolidBrush(Mix(_body, Color.Black, 0.55f)))
-            g.FillEllipse(wellBrush, c.X - well, c.Y - well, well * 2, well * 2);
-        using (var ring = new Pen(KeyEdge, 1.2f))
-            g.DrawEllipse(ring, c.X - well, c.Y - well, well * 2, well * 2);
+        var wellFill = wellColor ?? Mix(_body, Color.Black, 0.55f);
+        using (var wellPath = new GraphicsPath())
+        {
+            if (octagon)
+                wellPath.AddPolygon(Enumerable.Range(0, 8).Select(i =>
+                    new PointF(c.X + well * MathF.Cos((i * 45 + 22.5f) * MathF.PI / 180), c.Y + well * MathF.Sin((i * 45 + 22.5f) * MathF.PI / 180))).ToArray());
+            else
+                wellPath.AddEllipse(c.X - well, c.Y - well, well * 2, well * 2);
+            // Erhabener Rand um die Mulde (wie beim Original)
+            using (var outer = new Pen(Mix(wellFill, Color.White, 0.18f), 3f))
+                g.DrawPath(outer, wellPath);
+            using (var wellBrush = new SolidBrush(wellFill))
+                g.FillPath(wellBrush, wellPath);
+            using var ring = new Pen(Mix(wellFill, Color.Black, 0.3f), 1.2f);
+            g.DrawPath(ring, wellPath);
+        }
 
         float travel = well - cap + 2;
         float px = c.X + x / 32767f * travel, py = c.Y - y / 32767f * travel;
@@ -454,13 +468,16 @@ internal sealed partial class InputView : Control
             using var glow = new SolidBrush(AccentGlow);
             g.FillEllipse(glow, px - cap - 5, py - cap - 5, (cap + 5) * 2, (cap + 5) * 2);
         }
+        var capBase = capColor ?? _body;
         using (var capBrush = new LinearGradientBrush(new RectangleF(px - cap, py - cap, cap * 2, cap * 2),
-                   Mix(_body, Color.White, 0.25f), Mix(_body, Color.Black, 0.2f), LinearGradientMode.ForwardDiagonal))
+                   Mix(capBase, Color.White, 0.25f), Mix(capBase, Color.Black, 0.2f), LinearGradientMode.ForwardDiagonal))
             g.FillEllipse(capBrush, px - cap, py - cap, cap * 2, cap * 2);
-        using (var capEdge = new Pen(pressed || moved ? Accent : KeyEdge, pressed ? 2.5f : 1.5f))
+        var edgeColor = capColor is { } cc ? Mix(cc, Color.Black, 0.3f) : KeyEdge;
+        using (var capEdge = new Pen(pressed || moved ? Accent : edgeColor, pressed ? 2.5f : 1.5f))
             g.DrawEllipse(capEdge, px - cap, py - cap, cap * 2, cap * 2);
-        using var dot = new SolidBrush(moved || pressed ? Accent : KeyEdge);
-        g.FillEllipse(dot, px - 5, py - 5, 10, 10);
+        float dotR = Math.Max(3f, cap * 0.18f);
+        using var dot = new SolidBrush(moved || pressed ? Accent : edgeColor);
+        g.FillEllipse(dot, px - dotR, py - dotR, dotR * 2, dotR * 2);
     }
 
     private void Gyro(Graphics g, Motion? motion)

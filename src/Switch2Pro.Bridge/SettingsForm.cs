@@ -829,6 +829,11 @@ internal sealed class SettingsForm : Form
             Program.ShowSignal?.Set();
         });
 
+    /// <summary>Prüfhilfe: Fenster zeigen, ohne den Fokus zu übernehmen (Tastatureingaben bleiben beim Benutzer).</summary>
+    internal bool ShowInactive { get; init; }
+
+    protected override bool ShowWithoutActivation => ShowInactive;
+
     /// <summary>Seite, auf der ein neu geöffnetes Fenster starten soll (nach Sprach-/Darstellungswechsel).</summary>
     public static int? ReopenPage { get; set; }
 
