@@ -5,14 +5,14 @@ using System.Text.Json;
 namespace Switch2Pro.Bridge;
 
 /// <summary>
-/// Sucht auf GitHub nach einer neueren Version (Releases mit Tag „s2p-v1.2.3“, wie sie der Build-Workflow anlegt).
+/// Sucht auf GitHub nach einer neueren Version (Releases mit Tag „v1.2.3“, wie sie der Build-Workflow anlegt).
 /// Lädt nichts herunter – meldet nur, damit der Benutzer selbst entscheidet. Fehler (offline, privates Repo) werden
 /// still ignoriert.
 /// </summary>
 internal static class UpdateCheck
 {
-    private const string Releases = "https://api.github.com/repos/DevCatSKZ-0815/sfm/releases?per_page=30";
-    private const string TagPrefix = "s2p-v";
+    private const string Releases = "https://api.github.com/repos/DevCatSKZ/N-Connect/releases?per_page=30";
+    private const string TagPrefix = "v";
 
     public sealed record Update(Version Version, string Url);
 
@@ -34,7 +34,7 @@ internal static class UpdateCheck
         try
         {
             using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(15) };
-            http.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("NintendoControllerForWindows", Current.ToString()));
+            http.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("N-Connect", Current.ToString()));
             http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
             using var response = await http.GetAsync(Releases, ct);
             if (!response.IsSuccessStatusCode)

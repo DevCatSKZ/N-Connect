@@ -1,4 +1,6 @@
-# Nintendo Controller für Windows
+<img src="installer/art/N-Connect.png" width="96" align="right" alt="">
+
+# N-Connect
 
 Nintendo-Controller am PC nutzen – in **Windows, Steam, Xbox-/Game-Pass-Spielen, Epic, Emulatoren** und allen
 anderen Programmen, die Controller unterstützen. Jeder Controller erscheint als **Xbox-360-Controller**
@@ -23,7 +25,7 @@ Bis zu 8 Controller gleichzeitig (Spieler 1–8).
 
 ## Installation
 
-1. **`NintendoController-Setup-….exe`** herunterladen (GitHub → *Releases* bzw. *Actions* → letzter Lauf → *Artifacts*).
+1. **`N-Connect-Setup-….exe`** herunterladen (GitHub → *Releases* bzw. *Actions* → letzter Lauf → *Artifacts*).
 2. Setup starten. Es installiert automatisch:
    - das Programm (läuft unauffällig unten rechts im Infobereich),
    - den signierten Treiber **ViGEmBus** für den virtuellen Controller (falls noch nicht vorhanden),
@@ -102,7 +104,7 @@ installer/                Inno-Setup-Skript (Setup.exe mit ViGEmBus und optional
 Selbst bauen: .NET 8 SDK, dann `dotnet test tests/Switch2Pro.Protocol.Tests` und
 `dotnet publish src/Switch2Pro.Bridge -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o out/publish/win-x64`.
 Den Installer baut der Workflow `.github/workflows/switch2-pro-windows.yml`.
-Prüfhilfen: `Switch2ProBridge.exe --render <Ordner>` (alle Grafiken als PNG), `--demo` / `--demo-retro` (simulierte Controller).
+Prüfhilfen: `N-Connect.exe --render <Ordner>` (alle Grafiken als PNG), `--render-brand <Ordner>` (Logo, Icon, Installer-Bilder), `--demo` / `--demo-retro` (simulierte Controller).
 
 ### Quellen und Dank
 

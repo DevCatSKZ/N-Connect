@@ -6,7 +6,6 @@ internal static partial class Tr
     private static readonly Dictionary<string, string> Texts = new(StringComparer.Ordinal)
     {
         // ---------- Fenster, Reiter, Abschnitte ----------
-        ["Nintendo Controller für Windows"] = "Nintendo Controller for Windows",
         ["Controller"] = "Controllers",
         ["Einstellungen (optional)"] = "Settings (optional)",
         ["1. Windows und Spiele sehen den Controller als …"] = "1. Windows and games see the controller as …",
@@ -220,8 +219,8 @@ internal static partial class Tr
         ["Kurzanleitung"] = "Quick guide",
         ["Protokoll öffnen"] = "Open log",
         ["Beenden"] = "Exit",
-        ["Nintendo Controller: warte auf Controller (SYNC drücken)"] = "Nintendo Controller: waiting for a controller (press SYNC)",
-        ["Nintendo Controller: ViGEmBus fehlt"] = "Nintendo Controller: ViGEmBus missing",
+        ["N-Connect: warte auf Controller (SYNC drücken)"] = "N-Connect: waiting for a controller (press SYNC)",
+        ["N-Connect: ViGEmBus fehlt"] = "N-Connect: ViGEmBus missing",
         ["Neue Version verfügbar"] = "New version available",
         ["Einstellungen fehlerhaft"] = "Settings damaged",
         ["settings.json konnte nicht gelesen werden – es gelten die Standardwerte."] = "settings.json could not be read – defaults apply.",

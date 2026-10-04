@@ -35,7 +35,7 @@ internal sealed class WelcomeForm : Form
 
     public WelcomeForm()
     {
-        Text = Tr.English ? "Nintendo Controller for Windows – Welcome" : "Nintendo Controller für Windows – Willkommen";
+        Text = Tr.English ? "N-Connect – Welcome" : "N-Connect – Willkommen";
         StartPosition = FormStartPosition.CenterScreen;
         FormBorderStyle = FormBorderStyle.FixedDialog;
         MaximizeBox = MinimizeBox = false;

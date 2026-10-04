@@ -2,11 +2,27 @@ namespace Switch2Pro.Bridge;
 
 internal static class Paths
 {
-    public static string SettingsDir { get; } =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Switch2ProBridge");
+    public static string SettingsDir { get; } = Folder(Environment.SpecialFolder.ApplicationData);
     public static string SettingsFile { get; } = Path.Combine(SettingsDir, "settings.json");
-    public static string LogDir { get; } =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Switch2ProBridge");
+    public static string LogDir { get; } = Folder(Environment.SpecialFolder.LocalApplicationData);
+
+    /// <summary>Ordner „N-Connect“; der Ordner der Vorversion („Switch2ProBridge“) wird einmalig übernommen.</summary>
+    private static string Folder(Environment.SpecialFolder root)
+    {
+        string baseDir = Environment.GetFolderPath(root);
+        string dir = Path.Combine(baseDir, "N-Connect");
+        string legacy = Path.Combine(baseDir, "Switch2ProBridge");
+        try
+        {
+            if (!Directory.Exists(dir) && Directory.Exists(legacy))
+                Directory.Move(legacy, dir);
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            // Alter Ordner gesperrt: dann eben mit Standardwerten im neuen Ordner beginnen.
+        }
+        return dir;
+    }
     public static string LogFile { get; } = Path.Combine(LogDir, "bridge.log");
 }
 

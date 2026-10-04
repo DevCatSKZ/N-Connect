@@ -8,8 +8,15 @@ internal static class Program
     [STAThread]
     private static void Main()
     {
-        // Prüfhilfe: alle Controller-Grafiken als PNG speichern (ohne Controller, ohne Fenster).
+        // Logo, Programm-Icon und Installer-Grafiken erzeugen.
         var args = Environment.GetCommandLineArgs();
+        int brand = Array.IndexOf(args, "--render-brand");
+        if (brand >= 0 && brand + 1 < args.Length)
+        {
+            Branding.RenderAll(args[brand + 1]);
+            return;
+        }
+        // Prüfhilfe: alle Controller-Grafiken als PNG speichern (ohne Controller, ohne Fenster).
         int render = Array.IndexOf(args, "--render");
         if (render >= 0 && render + 1 < args.Length)
         {
@@ -39,8 +46,8 @@ internal static class Program
         }
 
         // Nur eine Instanz pro Benutzer: zwei Programme würden um denselben Controller streiten.
-        using var mutex = new Mutex(true, @"Local\Switch2ProBridge", out bool first);
-        using var showSignal = new EventWaitHandle(false, EventResetMode.AutoReset, @"Local\Switch2ProBridge.Show");
+        using var mutex = new Mutex(true, @"Local\N-Connect", out bool first);
+        using var showSignal = new EventWaitHandle(false, EventResetMode.AutoReset, @"Local\N-Connect.Show");
         if (!first)
         {
             // Läuft schon: dort das Fenster öffnen, statt still zu beenden.
@@ -48,6 +55,7 @@ internal static class Program
             return;
         }
         ShowSignal = showSignal;
+        Autostart.MigrateLegacy();
 
         Log.Info($"Start, Version {typeof(Program).Assembly.GetName().Version}, Windows {Environment.OSVersion.Version}");
         Application.ThreadException += (_, e) => Log.Error("Unbehandelter Fehler (UI)", e.Exception);

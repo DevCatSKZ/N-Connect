@@ -112,6 +112,7 @@ internal static class Theme
     /// </summary>
     public static void Apply(Form form)
     {
+        form.Icon = Branding.AppIcon;
         form.BackColor = Backdrop;
         if (Mica)
             form.TransparencyKey = MicaKey;

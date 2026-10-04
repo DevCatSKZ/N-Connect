@@ -1,13 +1,13 @@
-; Installer „Nintendo Controller für Windows“ (Switch-1- und Switch-2-Controller per Bluetooth).
-; Bauen: siehe .github/workflows/switch2-pro-windows.yml (Inno Setup 6).
-; Erwartet:  ..\out\publish\win-x64\Switch2ProBridge.exe  (dotnet publish, self-contained)
+; Installer „N-Connect“ – Nintendo-Controller unter Windows (Switch 1/2, NSO, Wii, Wii U).
+; Bauen: siehe .github/workflows/build.yml (Inno Setup 6).
+; Erwartet:  ..\out\publish\win-x64\N-Connect.exe  (dotnet publish, self-contained)
 ;            redist\ViGEmBus_Setup.msi  ODER  redist\ViGEmBus_Setup.exe  (offizieller ViGEmBus-Installer)
 
-#define AppName "Nintendo Controller für Windows"
+#define AppName "N-Connect"
 #ifndef AppVersion
   #define AppVersion "1.0.0"
 #endif
-#define AppExe "Switch2ProBridge.exe"
+#define AppExe "N-Connect.exe"
 #if FileExists(AddBackslash(SourcePath) + "redist\ViGEmBus_Setup.msi")
   #define ViGEmFile "ViGEmBus_Setup.msi"
 #elif FileExists(AddBackslash(SourcePath) + "redist\ViGEmBus_Setup.exe")
@@ -25,15 +25,21 @@ AppId={{6F3C2B9E-52A1-4C8B-9E44-2D5F1B7A9C31}
 AppName={#AppName}
 AppVersion={#AppVersion}
 AppPublisher=devcatskz
-DefaultDirName={autopf}\Switch2ProBridge
+DefaultDirName={autopf}\N-Connect
 DefaultGroupName={#AppName}
 DisableProgramGroupPage=yes
 DisableDirPage=auto
 OutputDir=..\out
-OutputBaseFilename=NintendoController-Setup-{#AppVersion}
+OutputBaseFilename=N-Connect-Setup-{#AppVersion}
 Compression=lzma2/max
 SolidCompression=yes
 WizardStyle=modern
+; Logo und Banner (erzeugt mit „N-Connect.exe --render-brand installer\art“).
+SetupIconFile=art\N-Connect.ico
+WizardImageFile=art\wizard-100.bmp,art\wizard-150.bmp,art\wizard-200.bmp
+WizardSmallImageFile=art\wizard-small-100.bmp,art\wizard-small-150.bmp,art\wizard-small-200.bmp
+WizardImageStretch=no
+WizardImageBackColor=$120D0C
 ; Adminrechte für ViGEmBus (Kernel-Treiber), Programme-Ordner und Autostart für alle Benutzer.
 PrivilegesRequired=admin
 ArchitecturesAllowed=x64compatible
@@ -77,10 +83,16 @@ Source: "redist\{#ViGEmFile}"; DestDir: "{tmp}"; Flags: deleteafterinstall; Chec
 Source: "redist\HidHide_Setup.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall; Tasks: hidhide
 #endif
 
+[InstallDelete]
+; Reste der Vorversion („Nintendo Controller für Windows“, Switch2ProBridge.exe) beim Update entfernen.
+Type: files; Name: "{app}\Switch2ProBridge.exe"
+Type: files; Name: "{autoprograms}\Nintendo Controller für Windows.lnk"
+
 [Registry]
+Root: HKLM; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: none; ValueName: "Switch2ProBridge"; Flags: deletevalue
 ; Autostart für alle Benutzer – unabhängig davon, ob „Jetzt starten“ angehakt bleibt.
 ; Wird beim Deinstallieren entfernt.
-Root: HKLM; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "Switch2ProBridge"; ValueData: """{app}\{#AppExe}"" --autostart"; Flags: uninsdeletevalue; Tasks: autostart
+Root: HKLM; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "N-Connect"; ValueData: """{app}\{#AppExe}"" --autostart"; Flags: uninsdeletevalue; Tasks: autostart
 
 [Icons]
 Name: "{autoprograms}\{#AppName}"; Filename: "{app}\{#AppExe}"
@@ -103,7 +115,7 @@ Filename: "{app}\{#AppExe}"; Description: "{cm:LaunchNow}"; Flags: nowait postin
 [UninstallRun]
 Filename: "{cmd}"; Parameters: "/C taskkill /IM {#AppExe} /F"; Flags: runhidden; RunOnceId: "KillBridge"
 ; Autostart, den die App selbst für den angemeldeten Benutzer gesetzt hat (Einstellungsfenster).
-Filename: "{cmd}"; Parameters: "/C reg delete HKCU\Software\Microsoft\Windows\CurrentVersion\Run /v Switch2ProBridge /f"; Flags: runhidden; RunOnceId: "RemoveAutostart"
+Filename: "{cmd}"; Parameters: "/C reg delete HKCU\Software\Microsoft\Windows\CurrentVersion\Run /v N-Connect /f"; Flags: runhidden; RunOnceId: "RemoveAutostart"
 
 [Code]
 // Vergleicht zwei Versionsangaben „a.b.c.d“ (−1, 0, 1).
@@ -162,5 +174,6 @@ var
   Code: Integer;
 begin
   Exec(ExpandConstant('{cmd}'), '/C taskkill /IM {#AppExe} /F', '', SW_HIDE, ewWaitUntilTerminated, Code);
+  Exec(ExpandConstant('{cmd}'), '/C taskkill /IM Switch2ProBridge.exe /F', '', SW_HIDE, ewWaitUntilTerminated, Code);
   Result := '';
 end;

@@ -33,7 +33,7 @@ internal sealed class TrayApp : ApplicationContext
         if (_settings.LoadError is { } err)
             Log.Warn($"settings.json fehlerhaft, nutze Standardwerte: {err}");
 
-        _icon = new NotifyIcon { Icon = CreateIcon(), Visible = true, Text = "Nintendo Controller" };
+        _icon = new NotifyIcon { Icon = CreateIcon(), Visible = true, Text = "N-Connect" };
         _icon.ContextMenuStrip = new ContextMenuStrip { Renderer = Theme.MenuRenderer(), ForeColor = Theme.Current.Text };
         _icon.ContextMenuStrip.Opening += (_, _) => BuildMenu();
         // Linksklick = Einstellungen, Rechtsklick = Menü.
@@ -46,7 +46,7 @@ internal sealed class TrayApp : ApplicationContext
         _factory = PadFactory.TryCreate();
         if (_factory is null)
         {
-            _icon.Text = "Switch 2 Pro: ViGEmBus fehlt";
+            _icon.Text = "N-Connect: ViGEmBus fehlt";
             Balloon(10000, "ViGEmBus-Treiber fehlt",
                 "Ohne ViGEmBus kann kein virtueller Controller erzeugt werden. Bitte das Setup erneut ausführen " +
                 "oder ViGEmBus installieren (Rechtsklick auf das Symbol → ViGEmBus herunterladen).", ToolTipIcon.Error);
@@ -59,7 +59,7 @@ internal sealed class TrayApp : ApplicationContext
         _manager.Notify += message => _ui.Post(_ =>
         {
             _balloonUrl = null;
-            Balloon(2500, "Nintendo Controller", message, ToolTipIcon.Info);
+            Balloon(2500, "N-Connect", message, ToolTipIcon.Info);
         }, null);
         _manager.ControllerConnected += (address, _) => _ui.Post(_ => RememberController(address), null);
         _manager.JoyConModeChanged += (address, single) => _ui.Post(_ =>
@@ -201,14 +201,14 @@ internal sealed class TrayApp : ApplicationContext
     {
         string text;
         if (_manager is null)
-            text = "Nintendo Controller: ViGEmBus fehlt";
+            text = "N-Connect: ViGEmBus fehlt";
         else if (_manager.AdapterProblem is { } problem)
-            text = $"Nintendo Controller: {problem}";
+            text = $"N-Connect: {problem}";
         else
         {
             var players = _manager.Players;
             text = players.Count == 0
-                ? "Nintendo Controller: warte auf Controller (SYNC drücken)"
+                ? "N-Connect: warte auf Controller (SYNC drücken)"
                 : string.Join("\n", players.Select(p => $"P{p.Index + 1} {ShortName(p.Kind)} {Battery(p)}"));
         }
         // NotifyIcon.Text ist auf 127 Zeichen begrenzt.
@@ -273,7 +273,7 @@ internal sealed class TrayApp : ApplicationContext
         var menu = _icon.ContextMenuStrip!;
         foreach (var item in menu.Items.Cast<ToolStripItem>().ToList())
             item.Dispose(); // entfernt das Element zugleich aus dem Menü
-        menu.Items.Add(new ToolStripMenuItem("Nintendo Controller für Windows") { Enabled = false, Font = _boldFont ??= new Font(menu.Font, FontStyle.Bold) });
+        menu.Items.Add(new ToolStripMenuItem("N-Connect") { Enabled = false, Font = _boldFont ??= new Font(menu.Font, FontStyle.Bold) });
 
         if (_manager is null)
         {
@@ -373,7 +373,7 @@ internal sealed class TrayApp : ApplicationContext
         if (_settings.ForcedProfile is null)
         {
             _balloonUrl = null;
-            Balloon(1500, "Nintendo Controller", $"Profil „{detected ?? "Standard"}“ aktiv", ToolTipIcon.None);
+            Balloon(1500, "N-Connect", $"Profil „{detected ?? "Standard"}“ aktiv", ToolTipIcon.None);
         }
     }
 
@@ -442,17 +442,8 @@ internal sealed class TrayApp : ApplicationContext
         {
             g.SmoothingMode = SmoothingMode.AntiAlias;
             g.Clear(Color.Transparent);
-            float top = battery is null ? 8 : 2; // mit Akkuanzeige rückt der Controller nach oben
-            using var body = new SolidBrush(Color.FromArgb(45, 45, 50));
-            using var path = new GraphicsPath();
-            path.FillMode = FillMode.Winding;
-            path.AddEllipse(1, top, 14, 20);
-            path.AddEllipse(17, top, 14, 20);
-            path.AddRectangle(new RectangleF(8, top, 16, 13));
-            g.FillPath(body, path);
-            using var red = new SolidBrush(Color.FromArgb(230, 0, 18));
-            g.FillEllipse(red, 5, top + 3, 6, 6);
-            g.FillEllipse(red, 20, top + 7, 6, 6);
+            // Logo; mit Akkuanzeige etwas kleiner und nach oben gerückt.
+            Branding.DrawLogo(g, battery is null ? new RectangleF(0, 0, 32, 32) : new RectangleF(5, 0, 22, 22));
             if (battery is { } percent)
             {
                 var frame = new RectangleF(1, 23, 27, 8);

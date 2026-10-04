@@ -1,0 +1,91 @@
+# Baut den Windows-Installer von N-Connect.
+# Download: GitHub → Actions → „N-Connect – Windows-Installer“ → letzter Lauf → Artifacts.
+# Ein Tag „v1.2.3“ erzeugt zusätzlich ein GitHub-Release mit der Setup.exe.
+name: N-Connect – Windows-Installer
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+permissions:
+  contents: write
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  installer:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Version bestimmen
+        id: version
+        run: |
+          $v = "1.0.${{ github.run_number }}"
+          if ("${{ github.ref }}" -like "refs/tags/v*") { $v = "${{ github.ref_name }}".Substring(1) }
+          "version=$v" >> $env:GITHUB_OUTPUT
+
+      - name: Tests
+        run: dotnet test tests/Switch2Pro.Protocol.Tests -c Release
+
+      - name: App veröffentlichen (eine EXE, ohne .NET-Installation lauffähig)
+        run: >
+          dotnet publish src/Switch2Pro.Bridge -c Release -r win-x64 --self-contained
+          -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
+          -p:EnableCompressionInSingleFile=true -p:DebugType=none
+          -p:Version=${{ steps.version.outputs.version }}
+          -o out/publish/win-x64
+
+      - name: ViGEmBus-Installer holen (offizielles Release v1.22.0)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          New-Item -ItemType Directory -Force installer/redist | Out-Null
+          gh release download v1.22.0 -R nefarius/ViGEmBus -D installer/redist-dl -p "*.msi" -p "*.exe"
+          $file = Get-ChildItem installer/redist-dl | Sort-Object { $_.Extension -ne ".msi" } | Select-Object -First 1
+          if (-not $file) { throw "Kein ViGEmBus-Installer im Release gefunden" }
+          Write-Host "ViGEmBus: $($file.Name)"
+          $sig = Get-AuthenticodeSignature $file.FullName
+          Write-Host "Signatur: $($sig.Status) – $($sig.SignerCertificate.Subject)"
+          if ($sig.Status -ne "Valid") { throw "ViGEmBus-Installer ist nicht gültig signiert" }
+          Copy-Item $file.FullName ("installer/redist/ViGEmBus_Setup" + $file.Extension)
+
+      - name: HidHide-Installer holen (offizielles Release v1.5.230.0)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download v1.5.230.0 -R nefarius/HidHide -D installer/hidhide-dl -p "*_x64.exe"
+          $file = Get-ChildItem installer/hidhide-dl -Filter *.exe | Select-Object -First 1
+          if (-not $file) { throw "Kein HidHide-Installer im Release gefunden" }
+          $sig = Get-AuthenticodeSignature $file.FullName
+          Write-Host "HidHide: $($file.Name) – Signatur: $($sig.Status) – $($sig.SignerCertificate.Subject)"
+          if ($sig.Status -ne "Valid") { throw "HidHide-Installer ist nicht gültig signiert" }
+          Copy-Item $file.FullName installer/redist/HidHide_Setup.exe
+
+      - name: Inno Setup installieren
+        run: choco install innosetup --version 6.4.3 -y --no-progress
+
+      - name: Installer bauen
+        run: |
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DAppVersion=${{ steps.version.outputs.version }}" installer/N-Connect.iss
+          Get-ChildItem out/*.exe
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: N-Connect-Setup
+          path: out/N-Connect-Setup-*.exe
+          if-no-files-found: error
+
+      - name: Release anlegen (nur bei Tag v*)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: out/N-Connect-Setup-*.exe

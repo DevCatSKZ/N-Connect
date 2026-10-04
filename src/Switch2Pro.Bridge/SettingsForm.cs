@@ -147,7 +147,7 @@ internal sealed class SettingsForm : Form
         _manager = manager;
         _overview = new ControllerOverview(manager, () => _settings);
 
-        Text = "Nintendo Controller für Windows";
+        Text = "N-Connect";
         StartPosition = FormStartPosition.CenterScreen;
         Size = new Size(1040, 800);
         MinimumSize = new Size(720, 560);
@@ -1222,7 +1222,9 @@ internal static class Prompt
 internal static class Autostart
 {
     private const string RunKey = @"Software\Microsoft\Windows\CurrentVersion\Run";
-    private const string RunValue = "Switch2ProBridge";
+    private const string RunValue = "N-Connect";
+    /// <summary>Eintrag der Vorversion (vor der Umbenennung in N-Connect).</summary>
+    private const string LegacyRunValue = "Switch2ProBridge";
 
     /// <summary>Autostart für den angemeldeten Benutzer (von der App gesetzt).</summary>
     public static bool IsEnabled
@@ -1251,5 +1253,22 @@ internal static class Autostart
             key.SetValue(RunValue, $"\"{Environment.ProcessPath}\" --autostart"); // im Infobereich, ohne Fenster
         else
             key.DeleteValue(RunValue, throwOnMissingValue: false);
+    }
+
+    /// <summary>Autostart der Vorversion auf den neuen Namen und die neue EXE umstellen.</summary>
+    public static void MigrateLegacy()
+    {
+        try
+        {
+            using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(RunKey, writable: true);
+            if (key?.GetValue(LegacyRunValue) is not string)
+                return;
+            key.DeleteValue(LegacyRunValue, throwOnMissingValue: false);
+            Set(true);
+        }
+        catch (Exception e) when (e is UnauthorizedAccessException or System.Security.SecurityException or IOException)
+        {
+            Log.Warn($"Alter Autostart-Eintrag nicht umgestellt: {e.Message}");
+        }
     }
 }

@@ -1,8 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Company>devcatskz</Company>
     <Authors>devcatskz</Authors>
-    <Product>Nintendo Controller für Windows</Product>
+    <Product>N-Connect</Product>
     <Copyright>© devcatskz</Copyright>
     <OutputType>WinExe</OutputType>
     <!-- 22621 = Windows 11 22H2 SDK (für schnellere BLE-Verbindungsparameter); läuft ab Windows 10 2004. -->
@@ -10,9 +10,10 @@
     <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
     <UseWindowsForms>true</UseWindowsForms>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
-    <AssemblyName>Switch2ProBridge</AssemblyName>
+    <AssemblyName>N-Connect</AssemblyName>
     <RootNamespace>Switch2Pro.Bridge</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>N-Connect.ico</ApplicationIcon>
     <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
     <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
   </PropertyGroup>
