@@ -19,7 +19,9 @@ internal sealed class WiimoteHidLink : IControllerLink
     private readonly RateMeter _rate = new();
     private readonly SemaphoreSlim _writeLock = new(1, 1);
     private readonly SemaphoreSlim _setupLock = new(1, 1);
-    private TaskCompletionSource<byte[]>? _pendingRead;
+    /// <summary>Laufende Leseanfrage: untere 16 Bit der Adresse (so meldet die Antwort sie) und Ergebnis.</summary>
+    private sealed record PendingRead(ushort AddressLow, TaskCompletionSource<byte[]> Reply);
+    private volatile PendingRead? _pendingRead;
     private bool _useSetOutputReport;
     private volatile bool _rumble;
     private int _player = -1;
@@ -98,6 +100,17 @@ internal sealed class WiimoteHidLink : IControllerLink
         Log.Info($"{Id}: {Kind.DisplayName()} bereit (Erweiterung: {_extension}, Akku {_battery} %)");
     }
 
+    private int _setupRetries;
+
+    /// <summary>Erkennung in 2 s noch einmal (die Fernbedienung hat nicht geantwortet).</summary>
+    private void RetrySetupLater() =>
+        Task.Run(async () =>
+        {
+            await Task.Delay(2000, _cts.Token);
+            if (Volatile.Read(ref _closed) == 0 && _extensionPlugged)
+                await SetupExtensionAsync(_cts.Token);
+        }).Forget($"{Id}: Erweiterung erneut erkennen");
+
     /// <summary>MotionPlus: null = noch nicht geprüft, sonst vorhanden ja/nein (wird nur einmal gesucht).</summary>
     private bool? _motionPlus;
     private bool _irOn;
@@ -113,6 +126,7 @@ internal sealed class WiimoteHidLink : IControllerLink
         try
         {
             var ext = WiiExtension.None;
+            bool unanswered = false; // steckt eine Erweiterung, aber die Kennung kam nicht an (Funk überlastet)
             // 1) Ist schon ein MotionPlus aktiv? Dann steht seine Kennung im Erweiterungsregister – nichts neu einschalten.
             var current = _extensionPlugged ? await ReadAsync(Wii.RegExtensionId, 6, ct) : null;
             if (current is { Length: >= 6 } && Wii.ExtensionFromId(current).HasMotionPlus())
@@ -130,9 +144,25 @@ internal sealed class WiimoteHidLink : IControllerLink
                     await Task.Delay(30, ct);
                     if (await ReadAsync(Wii.RegExtensionId, 6, ct) is { Length: >= 6 } id)
                         ext = Wii.ExtensionFromId(id);
+                    else
+                        unanswered = true;
+                }
+                if (unanswered)
+                {
+                    // Keine Antwort heißt nicht „keine Erweiterung“: bisherige behalten und gleich noch einmal versuchen.
+                    if (Interlocked.Increment(ref _setupRetries) <= 5)
+                    {
+                        Log.Info($"{Id}: Erweiterung antwortet nicht – neuer Versuch");
+                        RetrySetupLater();
+                    }
+                    ext = _extension;
+                }
+                else
+                {
+                    Interlocked.Exchange(ref _setupRetries, 0);
                 }
                 // 3) MotionPlus (Aufsatz oder „MotionPlus Inside“) suchen und einschalten – Nunchuk/Classic wird durchgereicht.
-                if (_motionPlus != false && ext is WiiExtension.None or WiiExtension.Nunchuk or WiiExtension.Classic)
+                if (!unanswered && _motionPlus != false && ext is WiiExtension.None or WiiExtension.Nunchuk or WiiExtension.Classic)
                     ext = await TryActivateMotionPlusAsync(ext, ct);
             }
             if (ext != _extension)
@@ -182,7 +212,10 @@ internal sealed class WiimoteHidLink : IControllerLink
     {
         await SendAsync(Wii.WriteRegister(Wii.RegMotionPlusInit, [0x55], _rumble), ct);
         await Task.Delay(30, ct);
-        if (await ReadAsync(Wii.RegMotionPlusId, 6, ct) is not { Length: >= 6 } id || !Wii.IsInactiveMotionPlus(id))
+        var id = await ReadAsync(Wii.RegMotionPlusId, 6, ct);
+        if (id is null)
+            return behind; // keine Antwort (Funk überlastet): beim nächsten Mal wieder suchen
+        if (id.Length < 6 || !Wii.IsInactiveMotionPlus(id))
         {
             _motionPlus = false;
             return behind;
@@ -199,14 +232,25 @@ internal sealed class WiimoteHidLink : IControllerLink
         return behind;
     }
 
+    /// <summary>
+    /// Speicher der Fernbedienung lesen; null, wenn keine Antwort kam. Bei vielen Bluetooth-Controllern kommen Antworten
+    /// deutlich später (gemessen: ~11 statt 100 Berichte/s) – daher großzügig warten, mehrfach fragen und Antworten
+    /// über die Adresse zuordnen (eine verspätete Antwort darf nicht als Antwort auf die nächste Anfrage gelten).
+    /// </summary>
     private async Task<byte[]?> ReadAsync(uint address, ushort size, CancellationToken ct)
     {
-        var tcs = new TaskCompletionSource<byte[]>(TaskCreationOptions.RunContinuationsAsynchronously);
-        _pendingRead = tcs;
-        await SendAsync(Wii.ReadRegister(address, size, _rumble), ct);
-        var done = await Task.WhenAny(tcs.Task, Task.Delay(500, ct));
-        _pendingRead = null;
-        return done == tcs.Task ? await tcs.Task : null;
+        for (int attempt = 0; attempt < 3; attempt++)
+        {
+            var pending = new PendingRead((ushort)address, new TaskCompletionSource<byte[]>(TaskCreationOptions.RunContinuationsAsynchronously));
+            _pendingRead = pending;
+            await SendAsync(Wii.ReadRegister(address, size, _rumble), ct);
+            var done = await Task.WhenAny(pending.Reply.Task, Task.Delay(1500, ct));
+            _pendingRead = null;
+            if (done == pending.Reply.Task)
+                return await pending.Reply.Task;
+        }
+        Log.Info($"{Id}: keine Antwort beim Lesen von 0x{address:X6}");
+        return null;
     }
 
     /// <summary>Senden per WriteFile; lehnt der Treiber ab, ab dann über HidD_SetOutputReport.</summary>
@@ -287,8 +331,9 @@ internal sealed class WiimoteHidLink : IControllerLink
                 }
                 return;
             }
-            case Wii.InputRead when Wii.TryParseRead(r, out int error, out _, out var data):
-                _pendingRead?.TrySetResult(error == 0 ? data : []);
+            case Wii.InputRead when Wii.TryParseRead(r, out int error, out ushort addressLow, out var data):
+                if (_pendingRead is { } pending && pending.AddressLow == addressLow)
+                    pending.Reply.TrySetResult(error == 0 ? data : []);
                 return;
             case Wii.InputAck:
                 return;
