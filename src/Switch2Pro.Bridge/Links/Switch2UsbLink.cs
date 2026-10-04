@@ -147,7 +147,7 @@ internal sealed class Switch2UsbLink : IControllerLink
                 if (n < 2 || !InputReports.TryParseReport05(buffer.AsSpan(1, n - 1), out var state, Kind))
                     continue;
                 // Am Kabel lädt der Controller immer; die Ladespannung rechnet die Akkuschätzung heraus.
-                state = BatteryTracker.Apply(Info.SerialNumber ?? Id, state with { Charging = true });
+                state = BatteryTracker.Apply(Info.SerialNumber ?? Id, state with { Charging = true }, buffer.AsSpan(1, n - 1));
                 _lastInputTicks = Environment.TickCount64;
                 _rate.Tick();
                 LastState = state;
