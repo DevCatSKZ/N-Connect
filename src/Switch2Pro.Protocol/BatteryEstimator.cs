@@ -18,12 +18,16 @@ public sealed class BatteryEstimator
     /// <summary>So lange nach dem Anstecken wird gemessen, bevor der Spannungssprung übernommen wird (Millisekunden).</summary>
     private const int MeasureMs = 10_000;
 
+    /// <summary>So lange nach dem Abziehen bzw. Ende des Ladens abwarten, bis die Spannung abgeklungen ist (Millisekunden).</summary>
+    private const int SettleMs = 10_000;
+
     private double _millivolts;
     private long _lastTicks;
     private bool _charging;
     private int _shown = -1;
     private double _resting; // geglättete Spannung ohne Kabel (für die Messung beim Anstecken)
     private long _plugTicks = -1; // Zeitpunkt des Ansteckens, solange der Spannungssprung noch gemessen wird
+    private long _settleTicks = -1; // Zeitpunkt des Abziehens, solange die Spannung noch abklingt
 
     public BatteryEstimator(int? chargeOffsetMillivolts = null) => ChargeOffset = chargeOffsetMillivolts;
 
@@ -87,13 +91,22 @@ public sealed class BatteryEstimator
         // Toleranz: liegt die Spannung genau an einer Prozentgrenze, soll die Anzeige nicht hin- und herspringen.
         int low = InputReports.BatteryPercentFromMillivolts(mv - ToleranceMillivolts, kind);
         int high = InputReports.BatteryPercentFromMillivolts(mv + ToleranceMillivolts, kind);
+        if (unplugged)
+            _settleTicks = nowMs;
+        else if (charging)
+            _settleTicks = -1;
         if (_shown < 0)
             _shown = estimate;
-        else if (unplugged)
+        else if (_settleTicks >= 0)
         {
-            // Laden beendet bzw. Ladepause: die Ruhespannung zeigt den echten Stand
-            if (high < _shown || low > _shown)
-                _shown = estimate;
+            // Laden beendet bzw. Ladepause: kurz nach dem Abziehen liegt die Spannung noch etwas höher. Erst nach dem
+            // Abklingen zeigt die Ruhespannung den echten Stand – bis dahin den bisherigen Wert halten.
+            if (nowMs - _settleTicks >= SettleMs)
+            {
+                _settleTicks = -1;
+                if (high < _shown || low > _shown)
+                    _shown = estimate;
+            }
         }
         else if (charging && _plugTicks >= 0)
         {

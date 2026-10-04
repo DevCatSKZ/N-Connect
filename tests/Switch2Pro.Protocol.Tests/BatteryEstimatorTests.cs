@@ -122,7 +122,8 @@ public class BatteryEstimatorTests
         // Gemessen: mit Kabel 3724 mV (Anzeige 24 % bei zu großem Abzug), danach ohne Laden 3705 mV ≈ 26 %.
         var e = new BatteryEstimator(chargeOffsetMillivolts: 30);
         int charging = e.Update(3724, true, Pro, 1000);
-        int after = e.Update(3705, false, Pro, 31_000);
+        e.Update(3705, false, Pro, 31_000);
+        int after = e.Update(3705, false, Pro, 42_000); // nach dem Abklingen
         Assert.True(after > charging);
         Assert.Equal(InputReports.BatteryPercentFromMillivolts(3705, Pro), after);
     }
@@ -139,6 +140,26 @@ public class BatteryEstimatorTests
             t += 30_000;
             Assert.Equal(first, e.Update(mv, charging, Pro, t));
         }
+    }
+
+    [Fact]
+    public void LadenUndAbziehen_ZeigenDenselbenStand_GemessenAmProController()
+    {
+        // Gemessen: mit Kabel 3724 mV, Ruhespannung 3704–3707 mV, direkt nach dem Abziehen kurz höher (Anzeige 27 %).
+        var e = new BatteryEstimator(chargeOffsetMillivolts: 20);
+        int charging = e.Update(3724, true, Pro, 1000);
+        int spike = e.Update(3716, false, Pro, 31_000);   // direkt nach dem Abziehen
+        int settled = e.Update(3707, false, Pro, 61_000); // abgeklungen
+        Assert.Equal(26, charging);
+        Assert.Equal(26, spike);
+        Assert.Equal(26, settled);
+    }
+
+    [Fact]
+    public void Umrechnung_Rundet()
+    {
+        Assert.Equal(26, InputReports.BatteryPercentFromMillivolts(3704, Pro)); // 25,8 %
+        Assert.Equal(26, InputReports.BatteryPercentFromMillivolts(3707, Pro)); // 26,4 %
     }
 
     [Fact]

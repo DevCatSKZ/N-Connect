@@ -106,7 +106,11 @@ public static class InputReports
         for (int i = 1; i < volts.Length; i++)
         {
             if (mv <= volts[i])
-                return pct[i - 1] + (mv - volts[i - 1]) * (pct[i] - pct[i - 1]) / (volts[i] - volts[i - 1]);
+            {
+                // Kaufmännisch gerundet (3707 mV ≈ 26,4 % → 26, 3704 mV ≈ 25,8 % → 26 statt abgeschnitten 25)
+                int num = (mv - volts[i - 1]) * (pct[i] - pct[i - 1]), den = volts[i] - volts[i - 1];
+                return pct[i - 1] + (2 * num + den) / (2 * den);
+            }
         }
         return 100;
     }
