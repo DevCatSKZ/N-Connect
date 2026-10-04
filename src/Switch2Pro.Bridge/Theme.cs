@@ -75,9 +75,9 @@ internal static class Theme
     }
 
     /// <summary>
-    /// Akzentfarbe wie Windows 11 sie für Schaltflächen nimmt: aus der Akzentpalette im dunklen Modus die helle
-    /// Stufe „Light 2“, im hellen Modus die dunkle Stufe „Dark 1“ – so bleibt Text darauf immer gut lesbar.
-    /// Ohne Palette die DWM-Akzentfarbe, im dunklen Modus deutlich aufgehellt.
+    /// Akzentfarbe aus der Windows-Akzentpalette: im dunklen Modus die Stufe „Light 1“ (kräftig; „Light 2“, die
+    /// Windows 11 nimmt, wirkt bei vielen Farben blass-pastell), im hellen Modus „Dark 1“. Die Schrift darauf wählt
+    /// <see cref="OnAccent"/> nach Helligkeit. Ohne Palette die DWM-Akzentfarbe, im dunklen Modus etwas aufgehellt.
     /// </summary>
     private static Color? WindowsAccent()
     {
@@ -87,7 +87,7 @@ internal static class Theme
             {
                 if (accent?.GetValue("AccentPalette") is byte[] { Length: >= 28 } palette)
                 {
-                    int i = Current.Dark ? 1 : 4; // Light 2 bzw. Dark 1
+                    int i = Current.Dark ? 2 : 4; // Light 1 bzw. Dark 1
                     return Color.FromArgb(palette[i * 4], palette[i * 4 + 1], palette[i * 4 + 2]);
                 }
             }
@@ -95,7 +95,7 @@ internal static class Theme
             if (key?.GetValue("AccentColor") is not int abgr)
                 return null;
             var c = Color.FromArgb(abgr & 0xFF, (abgr >> 8) & 0xFF, (abgr >> 16) & 0xFF);
-            return Current.Dark ? Blend(c, Color.White, 0.55f) : c;
+            return Current.Dark ? Blend(c, Color.White, 0.3f) : c;
         }
         catch (Exception e) when (e is System.Security.SecurityException or UnauthorizedAccessException or IOException)
         {
