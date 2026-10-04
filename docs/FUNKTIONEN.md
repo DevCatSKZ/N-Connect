@@ -50,15 +50,27 @@ Bis zu **8 Spieler** gleichzeitig (`ControllerManager.MaxPlayers`). Der 9. Contr
 
 ### 2.3 Switch 1, NSO, Wii – selbst koppeln
 - Diese Controller nutzen Bluetooth Classic. N-Connect koppelt sie **selbst** mit Windows (`ControllerPairing`):
-  - Switch 1/NSO: Kopplung ohne PIN („Just Works“); die Rückfrage von Windows beantwortet N-Connect selbst.
+  - Switch 1/NSO: Kopplung ohne PIN („Just Works“) über WinRT (`DeviceInformationCustomPairing.PairAsync`,
+    `ConfirmOnly | ConfirmPinMatch`, Anfrage wird sofort bestätigt, höchstens 20 s). Nur wenn WinRT das Gerät gar
+    nicht öffnen kann: Win32 (`BluetoothAuthenticateDeviceEx` + `BluetoothRegisterForAuthenticationEx`) – dort kam
+    die Rückfrage bei Joy-Con oft erst nach dem Abbruch an (Fehler 1244/258, Antwort danach 1167).
   - Wii: binäre PIN = Adresse des PC-Adapters (dreimal versucht – nur so verbindet sich die Fernbedienung später
     per Tastendruck), sonst eigene Adresse (Kopplung „1+2“, ohne Wiederverbinden; Hinweis im Protokoll).
   - Danach HID-Dienst einschalten; der Controller wird beim nächsten HID-Suchlauf gefunden.
 - **Hintergrundsuche** („Neue Controller automatisch koppeln“, Standard an): Suchläufe von 1,3 s – alle 6 s, bzw.
   alle 15 s, wenn ein Switch-2-Controller verbunden ist; **nie**, während jemand spielt (Eingabe in den letzten 20 s)
-  oder gerade ein Controller verbunden wird. Bereits gekoppelte Controller werden im Hintergrund nur dann neu
-  gekoppelt, wenn sie **während dieses Suchlaufs** antworten (= im SYNC-Modus); nur ausgeschaltete oder verbundene
-  Controller bleiben unberührt.
+  oder gerade ein Controller verbunden wird. Bereits gekoppelte Controller (z. B. Joy-Con, die zwischendurch an der
+  Switch hingen) werden neu gekoppelt, wenn sie im SYNC-Modus sind. Erkannt wird das daran, dass Windows sie
+  **während dieses Suchlaufs** (`stLastSeen` vorher/nachher) oder **in den letzten 8 s** gesehen hat – **außer**
+  sie waren in den letzten 30 s verbunden (`ControllerPairing.NoteDisconnected`, aufgerufen beim Trennen; sonst
+  würde ein eben ausgeschalteter Controller „gesehen“ und seine Kopplung gelöscht). Ausgeschaltete oder mit der
+  Switch verbundene Controller antworten nicht und bleiben unberührt. Übersprungene bekannte Controller stehen
+  einmal pro Minute im Protokoll („… nicht im Kopplungsmodus erkannt“).
+- Nach einem **Fehlschlag** lässt die Hintergrundsuche den Controller **90 s** in Ruhe (sonst wäre er bei jedem
+  Versuch belegt und tauchte auch in „Gerät hinzufügen“ von Windows nicht auf). Das Fenster „Controller koppeln“
+  versucht es trotzdem.
+- Achtung: Vor dem Neukoppeln wird die alte Windows-Kopplung entfernt (sonst verweigert Windows die neue). Scheitert
+  die neue Kopplung (z. B. Wii, Fehler 259), muss der Controller erneut per SYNC gekoppelt werden.
 - **„Controller koppeln …“** (Fenster): sucht 60 s lang, 1 s Pause zwischen den Läufen, koppelt auch bekannte
   Controller neu, die gerade sichtbar sind.
 - Erkannte Namen: „Joy-Con (L/R)“, „Pro Controller“, „Lic Pro Controller“, „NES/HVC/SNES/N64 Controller“,
@@ -88,7 +100,10 @@ Bis zu **8 Spieler** gleichzeitig (`ControllerManager.MaxPlayers`). Der 9. Contr
   gedrückte Tasten leuchten, Sticks bewegen sich, analoge Trigger füllen sich), Akku, Verbindung (Art +
   Berichte/s), Griff/Maus (Joy-Con 2), gedrückte Tasten. Zwei Spalten bei breitem Fenster, zugeklappte Karten
   gleich hoch.
-- **Titel anklicken** → Menü: Spielerplatz 1–8 wählen (belegt = tauschen) und Controller umbenennen
+- **Spieler-Reihenfolge** (`PlayerOrderBar`, ab zwei Spielern über den Karten): je Spieler ein Chip (Nummer, Name,
+  ‹ ›). Spieler 1 ist hervorgehoben – das ist für Windows, Steam und Spiele der erste Controller. ‹ › tauscht mit
+  dem Nachbarn (`ControllerManager.MovePlayer`).
+- **Titel anklicken** → Menü: einen belegten Spielerplatz wählen (= tauschen) und Controller umbenennen
   (bei einem Paar je Joy-Con).
 - Knöpfe: **Vibrieren** (welcher ist welcher?), **Trennen**, **Einstellungen** (klappt Reiter für genau diesen
   Controller auf): Tasten, Feineinstellung, Gyro, Joy-Con, Extras, Details.
@@ -96,9 +111,14 @@ Bis zu **8 Spieler** gleichzeitig (`ControllerManager.MaxPlayers`). Der 9. Contr
   absichtlich nur bei Änderung sendet).
 
 ## 4. Spielerplätze und Namen
-- **Platz**: Klick auf den Kartentitel oder Infobereich → Spieler → Spielerplatz. Ein belegter Platz wird getauscht.
-  LEDs und DSU-Slot folgen; die virtuellen Controller werden in der neuen Reihenfolge **neu angelegt** (Windows
-  vergibt Xbox-Plätze nach Anlegereihenfolge). Der Platz wird je Controller gemerkt und beim Verbinden bevorzugt.
+- **Platz**: Leiste „Spieler-Reihenfolge“, Klick auf den Kartentitel oder Infobereich → Spieler → Spielerplatz.
+  Angeboten werden nur belegte Plätze (= tauschen). LEDs und DSU-Slot folgen; die virtuellen Controller werden in der
+  neuen Reihenfolge **neu angelegt** (Windows vergibt Xbox-Plätze nach Anlegereihenfolge; Spiele sehen kurz ein
+  Trennen/Verbinden). Der Platz wird je Controller gemerkt (`Settings.PlayerSlots`).
+- **Immer lückenlos** (`ControllerManager.CompactPlayers`): Fällt ein Spieler weg (getrennt, Joy-Con zum Paar
+  zusammengefasst), rücken die übrigen auf – Spieler 2 wird Spieler 1 usw. (Meldung „… ist jetzt Spieler 1“). Die
+  gemerkten Plätze bleiben dabei unverändert. Beim Verbinden bekommt ein Controller seinen gemerkten Platz nur, wenn
+  er frei ist **und** keine Lücke entsteht (`FreeIndex`: Platz ≤ Anzahl Spieler), sonst den ersten freien.
 - **Name** (max. 40 Zeichen, leer = Standardname): erscheint in Karte, Infobereich-Menü und Tooltip. Paar: Namen
   beider Joy-Con, bei nur einem Namen „Name (Joy-Con-Paar)“.
 
@@ -245,18 +265,28 @@ Bis zu **8 Spieler** gleichzeitig (`ControllerManager.MaxPlayers`). Der 9. Contr
 - **PC → PC**: Datei `*.ncpair` (JSON; optional mit Passwort: AES-256-GCM, Schlüssel per PBKDF2-SHA256). Schlüssel
   nur auf ausdrücklichen Wunsch. Übernahme ergänzt, löscht nichts.
 - N-Connect ändert dabei **weder** die Bluetooth-Adresse des Adapters **noch** Windows-Kopplungen.
+- Fenster `PairingDataForm` im Windows-11-Stil (Gruppen „Übernehmen“, „Inhalt“, „Weitergeben und sichern“, Fußleiste
+  mit Akzent-Knopf „Übernehmen“); Inhalt wird selbst gezeichnet (`Report`: Zeilen mit „:“ am Ende = Zwischenüberschrift,
+  „  •  “ = Aufzählung). Passwort-Dialog (`PasswordDialog`) ebenso, Eingabefelder als `TextField`.
 
 ## 14. Programm
 
 - **Autostart** (Standard an beim ersten Start, danach Nutzerentscheidung): HKCU\…\Run mit `--autostart`
   (unsichtbar starten). Zweiter Start zeigt das Fenster der laufenden Instanz.
 - **Darstellung**: Dunkel (Standard), Hell, Wie Windows; Akzentfarbe aus der Windows-11-Akzentpalette (dunkel:
-  „Light 2“, hell: „Dark 1“), Schrift darauf nach Kontrast; Mica-Titelleiste ab Windows 11.
+  „Light 1“ – „Light 2“ wie in Windows 11 wirkte beim Nutzer blass-pastell; hell: „Dark 1“), Schrift darauf nach
+  Kontrast (`Theme.OnAccent`); Mica-Titelleiste ab Windows 11.
+- **Logo/Icon**: In der Oberfläche direkt in Zielgröße gezeichnet (`LogoView`), Fenstersymbol aus der eingebetteten
+  ICO-Datei mit allen Größen (nicht `ExtractAssociatedIcon` – nur 32 px, verkleinert pixelig). Die ICO-Datei
+  (`--render-brand`) enthält kleine Größen als 32-Bit-Bitmap, 256 px als PNG; heller Kachelrand erst ab 48 px.
+- **Grafiken**: Pfeile (▲▼◀▶) zeichnet `InputView.Caption` als gleich große Dreiecke, die bei gedrehtem Controller
+  (quer gehaltener Joy-Con) mitdrehen; alle anderen Beschriftungen bleiben waagerecht lesbar.
 - **Sprache**: Deutsch/Englisch, Standard wie Windows (Übersetzungstabelle + Muster für Texte mit Platzhaltern).
 - **Update**: Prüft beim Start (nach 10 s) GitHub-Releases (`v1.2.3`). Mit Installer im Release: Ein-Klick-Update –
   Nachfrage, Download nur von GitHub, Größe und SHA-256 (falls angegeben) geprüft, stiller Installer, Neustart.
 - **Protokoll**: `%LOCALAPPDATA%\N-Connect\bridge.log` (ab 1 MB einmal rotiert). Einstellungen:
   `%APPDATA%\N-Connect\settings.json` (bei Änderung von außen neu geladen, 300 ms entprellt).
 - **Prüfhilfen**: `--demo`, `--demo-all`, `--demo-retro` (simulierte Controller), `--render <Ordner>`
-  (Controller-Grafiken), `--render-ui <Ordner> [--wide] [--en] [--light]` (alle Seiten/Karten/Dialoge),
+  (Controller-Grafiken, auch Joy-Con 1/2 quer, hochkant, Paar, Grip: `jc1_links_quer.png` …),
+  `--render-ui <Ordner> [--wide] [--en] [--light]` (alle Seiten/Karten/Dialoge, auch `ui_kopplungsdaten_*.png`),
   `--render-brand`, `--dump-ui <Datei> --en` (Texte ohne Übersetzung).
