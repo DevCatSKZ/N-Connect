@@ -325,10 +325,24 @@ internal sealed class Player : IDisposable
         return text is { Length: 12 } && ulong.TryParse(text, System.Globalization.NumberStyles.HexNumber, null, out ulong mac) ? mac : 0;
     }
 
-    /// <summary>Wie an der Switch: SL + SR an einem Joy-Con halten löst ihn aus dem Paar (Zeit je Joy-Con).</summary>
+    /// <summary>
+    /// Joy-Con aus dem Paar lösen: automatisch, wenn er quer gehalten wird und SL oder SR gedrückt wird (so hält man
+    /// einen einzelnen Joy-Con – im Paar zeigt die Schiene zur Seite, ein versehentlicher Druck trennt dann nichts);
+    /// oder wie an der Switch: SL + SR eine Sekunde halten.
+    /// </summary>
     private void CheckSplitGesture(IControllerLink source, ControllerState state)
     {
         var rail = source.Kind.IsLeftJoyCon() ? ProButtons.SLLeft | ProButtons.SRLeft : ProButtons.SLRight | ProButtons.SRRight;
+        if ((state.Buttons & rail) != 0 && state.Motion is { } a && IsHeldSideways(a))
+        {
+            if (!_splitSince.ContainsKey(source))
+            {
+                _splitSince[source] = long.MinValue; // nur einmal auslösen, bis die Taste losgelassen wird
+                Log.Info($"{source.Id}: quer gehalten und SL/SR gedrückt – als einzelner Joy-Con");
+                ThreadPool.QueueUserWorkItem(_ => SplitRequested?.Invoke(this, source));
+            }
+            return;
+        }
         if ((state.Buttons & rail) != rail)
         {
             _splitSince.Remove(source);
@@ -344,6 +358,16 @@ internal sealed class Player : IDisposable
             _splitSince.Remove(source);
             ThreadPool.QueueUserWorkItem(_ => SplitRequested?.Invoke(this, source));
         }
+    }
+
+    /// <summary>
+    /// Quer gehalten: Die Schwerkraft wirkt überwiegend entlang der Geräteachse X (quer zur Schiene, 4096 ≙ 1 g) –
+    /// wie beim Stehen auf der Schiene (Mausmodus), nur in der Hand etwas gekippt, daher großzügiger.
+    /// </summary>
+    private static bool IsHeldSideways(Motion a)
+    {
+        int x = Math.Abs((int)a.AccelX), y = Math.Abs((int)a.AccelY), z = Math.Abs((int)a.AccelZ);
+        return x > 2500 && x > y + y / 2 && x > z + z / 2;
     }
 
     /// <summary>Wie an der Switch: L am linken und R am rechten einzelnen Joy-Con gleichzeitig = Paar.</summary>

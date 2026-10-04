@@ -254,9 +254,7 @@ internal static class ControllerPairing
                 BluetoothRemoveDevice(ref address);
             }
             progress($"Gefunden: {info.szName} – kopple …");
-            bool ok = wii
-                ? PairWithPin(radio, ref info, radioAddress) || PairWithPin(radio, ref info, info.Address)
-                : PairJustWorks(radio, ref info);
+            bool ok = wii ? PairWii(radio, ref info, radioAddress) : PairJustWorks(radio, ref info);
             if (ok && EnableHid(radio, ref info))
             {
                 paired.Add(info.szName);
@@ -313,6 +311,26 @@ internal static class ControllerPairing
             BluetoothFindDeviceClose(find);
         }
         return result;
+    }
+
+    /// <summary>
+    /// Wii: bevorzugt mit der Adresse des PCs als PIN koppeln (rote SYNC-Taste) – nur dann verbindet sich die
+    /// Fernbedienung später per Tastendruck von selbst. Bei vollem Funk scheitert der erste Versuch gelegentlich
+    /// (Fehler 31), deshalb mehrmals; erst danach die eigene Adresse (Kopplung über 1+2, ohne Wiederverbinden).
+    /// </summary>
+    private static bool PairWii(IntPtr radio, ref BLUETOOTH_DEVICE_INFO info, ulong radioAddress)
+    {
+        for (int attempt = 0; attempt < 3; attempt++)
+        {
+            if (PairWithPin(radio, ref info, radioAddress))
+                return true;
+            Thread.Sleep(300);
+        }
+        if (!PairWithPin(radio, ref info, info.Address))
+            return false;
+        Log.Warn($"Kopplung {info.szName}: nur über 1+2 gekoppelt – verbindet sich nicht per Tastendruck. " +
+                 "Für das automatische Verbinden einmal mit der roten SYNC-Taste koppeln.");
+        return true;
     }
 
     /// <summary>Wii: mit binärer PIN (6 Byte Adresse, niedrigstes Byte zuerst) authentifizieren.</summary>
