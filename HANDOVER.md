@@ -31,7 +31,10 @@ Commits als **devcatskz** (devcatskz@gmail.com), ohne „Co-Authored-By“-Zeile
   GameCube-Controller sind die Werte noch geschätzt; das Protokoll schreibt alle 30 s Spannung und Rohbytes
   0x1C–0x2F mit („Akku …“), gemessene Ladeanstiege landen in `battery.json`. Über einen kompletten Ladevorgang
   ist die Anzeige noch nicht beobachtet.
-- **Switch-1-Controller mit einem SYNC-Druck koppeln** (ähnlich `WiiPairing.ScanAndPair`): angefangen, nicht gebaut.
+- **Selbst koppeln (Switch 1, NSO, Wii)** ist gebaut (`ControllerPairing`, Hintergrundsuche in `TrayApp.AutoPairLoopAsync`,
+  Einstellung `AutoPair`), aber **noch nicht mit echter Hardware getestet**. Switch 1/NSO: Kopplung ohne PIN, Rückfrage
+  per `BluetoothRegisterForAuthenticationEx` selbst bestätigt; schlägt das fehl, steht der Fehlercode im Protokoll
+  („Kopplung …: Authentifizierung → Fehler …“). Wii: Adress-PIN wie bisher.
 - Angeboten, noch nicht entschieden: Kopplungsdaten-Fenster (`PairingDataForm`) im Windows-11-Stil;
   Switch-1-Pro-Controller aus dem verschlüsselten Spielstand `8000000000000050.bin` lesen; eigene Controller-Bilder
   (Nano-Banana-Prompts wurden geliefert) statt der gezeichneten Grafiken.

@@ -15,11 +15,11 @@ Einmal installieren, Controller verbinden, spielen. Die Oberfläche gibt es auf 
 | **Switch 2 Pro Controller** | Bluetooth (SYNC) oder **USB-Kabel** (bis ~500 Hz) | GL/GR, C-Taste, Gyro, HD-Vibration |
 | **Joy-Con 2 (L/R)** | Bluetooth (SYNC) | als Paar oder einzeln, **Mausmodus** (auf den Tisch stellen), Charging Grip mit GL/GR |
 | **GameCube-Controller (Switch 2)** | Bluetooth (SYNC) oder USB-Kabel | analoge Trigger |
-| **Switch Pro Controller** (Switch 1) | Windows-Bluetooth-Kopplung oder USB | Gyro, Vibration, **amiibo lesen** |
-| **Joy-Con (L/R)** (Switch 1) | Windows-Bluetooth-Kopplung | Paar oder einzeln, **amiibo**, **Ring-Con**, **IR-Kamera** (rechter Joy-Con) |
-| **NES, SNES, N64, SEGA Mega Drive** (Nintendo Switch Online) | Windows-Bluetooth-Kopplung | eigene Anordnung, N64-C-Tasten = rechter Stick |
-| **Wii-Fernbedienung** (auch Plus) | „Wii-Controller koppeln …“ im Programm | mit **Nunchuk** oder **Classic Controller** |
-| **Wii U Pro Controller** | „Wii-Controller koppeln …“ im Programm | beide Sticks, Akkuanzeige |
+| **Switch Pro Controller** (Switch 1) | Bluetooth (SYNC, N-Connect koppelt selbst) oder USB | Gyro, Vibration, **amiibo lesen** |
+| **Joy-Con (L/R)** (Switch 1) | Bluetooth (SYNC, N-Connect koppelt selbst) | Paar oder einzeln, **amiibo**, **Ring-Con**, **IR-Kamera** (rechter Joy-Con) |
+| **NES, SNES, N64, SEGA Mega Drive** (Nintendo Switch Online) | Bluetooth (SYNC, N-Connect koppelt selbst) | eigene Anordnung, N64-C-Tasten = rechter Stick |
+| **Wii-Fernbedienung** (auch Plus) | Bluetooth (SYNC, N-Connect koppelt selbst) | mit **Nunchuk** oder **Classic Controller** |
+| **Wii U Pro Controller** | Bluetooth (SYNC, N-Connect koppelt selbst) | beide Sticks, Akkuanzeige |
 
 Bis zu 8 Controller gleichzeitig (Spieler 1–8).
 
@@ -93,8 +93,7 @@ Alle Einstellungen sind optional und gelten sofort (Klick auf das Symbol im Info
 | Problem | Lösung |
 |---|---|
 | Switch-2-Controller verbindet sich nicht | SYNC kurz drücken (nicht halten). Ist er in den Windows-Bluetooth-Einstellungen eingetragen → dort **entfernen**. Switch 2 in der Nähe in den Ruhemodus versetzen. |
-| Switch-1-/NSO-Controller wird nicht erkannt | In Windows unter Bluetooth koppeln; nach dem Koppeln einmal eine Taste drücken. |
-| Wii-Fernbedienung koppelt nicht | Im Programm „Wii-Controller koppeln …“ verwenden (nicht das Windows-Fenster); rote SYNC-Taste drücken, solange gesucht wird. |
+| Switch-1-/NSO-/Wii-Controller wird nicht gekoppelt | *Allgemein → Controller koppeln …* öffnen und SYNC drücken, solange gesucht wird (die Hintergrundsuche pausiert, während jemand spielt). Fehlercodes stehen im Protokoll („Kopplung …“). |
 | Spiel sieht einen USB-Controller doppelt | Auf der Karte „Doppelt angezeigt? Verstecken“ klicken (HidHide). |
 | Akkuanzeige weicht beim Laden ab | Einmal Kabel abziehen und wieder anstecken – N-Connect misst den Spannungsanstieg dann neu. Werte stehen alle 30 s im Protokoll („Akku …“). |
 | „ViGEmBus-Treiber fehlt“ | Setup erneut ausführen oder ViGEmBus installieren: <https://github.com/nefarius/ViGEmBus/releases> |
