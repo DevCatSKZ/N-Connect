@@ -1,4 +1,4 @@
-using System.Drawing;
+﻿using System.Drawing;
 using System.Drawing.Imaging;
 using Switch2Pro.Protocol;
 
@@ -48,7 +48,7 @@ internal static class RenderCheck
             Walk(welcome);
         using (var capture = new KeyCaptureDialog("X"))
             Walk(capture);
-        using (var wii = new WiiPairForm())
+        using (var wii = new PairForm())
             Walk(wii);
         using (var pairing = new PairingDataForm(settings, () => { }))
             Walk(pairing);

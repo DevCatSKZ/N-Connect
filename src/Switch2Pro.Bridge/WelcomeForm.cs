@@ -13,10 +13,9 @@ internal sealed class WelcomeForm : Form
         "   Kurz die kleine SYNC-Taste drücken – nach ein paar Sekunden vibriert der Controller.\n" +
         "   Danach reicht ein Tastendruck zum Verbinden. Pro Controller und GameCube gehen auch per USB-Kabel.\n" +
         "   Wichtig: NICHT über „Bluetooth → Gerät hinzufügen“ koppeln – das stört die Verbindung.\n\n" +
-        "Switch 1 (Pro Controller, Joy-Con, NES/SNES/N64/Mega Drive):\n" +
-        "   Einmal in Windows unter „Bluetooth → Gerät hinzufügen“ koppeln (SYNC-Taste halten).\n\n" +
-        "Wii-Fernbedienung und Wii U Pro Controller:\n" +
-        "   Rechtsklick auf das Symbol im Infobereich → „Wii-Controller koppeln …“.\n\n" +
+        "Switch 1 (Pro Controller, Joy-Con, NES/SNES/N64/Mega Drive), Wii-Fernbedienung, Wii U Pro Controller:\n" +
+        "   SYNC-Taste drücken – N-Connect koppelt den Controller selbst (kein Umweg über die Windows-Einstellungen).\n" +
+        "   Danach verbindet er sich per Tastendruck. Gezielt suchen: Rechtsklick auf das Symbol → „Controller koppeln …“.\n\n" +
         "Windows, Steam und Spiele sehen jeden Controller als Xbox-Controller.\n" +
         "Das Programm läuft unten rechts im Infobereich – ein Klick öffnet die Übersicht.";
 
@@ -26,10 +25,9 @@ internal sealed class WelcomeForm : Form
         "   Briefly press the small SYNC button – after a few seconds the controller vibrates.\n" +
         "   Afterwards a button press is enough to connect. Pro Controller and GameCube also work via USB cable.\n" +
         "   Important: do NOT pair via “Bluetooth → Add device” – that disturbs the connection.\n\n" +
-        "Switch 1 (Pro Controller, Joy-Con, NES/SNES/N64/Mega Drive):\n" +
-        "   Pair once in Windows under “Bluetooth → Add device” (hold the SYNC button).\n\n" +
-        "Wii Remote and Wii U Pro Controller:\n" +
-        "   Right-click the tray icon → “Pair Wii controller …”.\n\n" +
+        "Switch 1 (Pro Controller, Joy-Con, NES/SNES/N64/Mega Drive), Wii Remote, Wii U Pro Controller:\n" +
+        "   Press the SYNC button – N-Connect pairs the controller itself (no detour via the Windows settings).\n" +
+        "   Afterwards it connects with a button press. To search on purpose: right-click the icon → “Pair controller …”.\n\n" +
         "Windows, Steam and games see every controller as an Xbox controller.\n" +
         "The program runs in the tray at the bottom right – a click opens the overview.";
 

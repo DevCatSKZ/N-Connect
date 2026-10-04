@@ -82,8 +82,11 @@ internal sealed class TrayApp : ApplicationContext
         if (_settings.DsuServer)
             _dsu = DsuServer.Start();
         _manager.StartAsync().Forget("Controller-Suche starten");
-        if (Environment.GetCommandLineArgs().Any(a => a.StartsWith("--demo", StringComparison.Ordinal)))
+        bool demo = Environment.GetCommandLineArgs().Any(a => a.StartsWith("--demo", StringComparison.Ordinal));
+        if (demo)
             _manager.StartDemo();
+        else
+            Task.Run(() => AutoPairLoopAsync(_autoPairCts.Token)).Forget("Controller automatisch koppeln");
 
         _settingsWatcher = new FileSystemWatcher(Paths.SettingsDir, Path.GetFileName(Paths.SettingsFile))
         {
@@ -130,9 +133,54 @@ internal sealed class TrayApp : ApplicationContext
         SaveSettings();
     }
 
-    private WiiPairForm? _wiiPairing;
+    private readonly CancellationTokenSource _autoPairCts = new();
 
-    /// <summary>Wii-Fernbedienung / Wii U Pro Controller mit Windows koppeln (einmalig).</summary>
+    /// <summary>
+    /// Switch-1-, NSO- und Wii-Controller im Kopplungsmodus im Hintergrund selbst koppeln (Einstellung „Neue Controller
+    /// automatisch koppeln“). Jede Suche belegt den Bluetooth-Adapter ~2,5 s – deshalb nur, solange niemand spielt.
+    /// </summary>
+    private async Task AutoPairLoopAsync(CancellationToken ct)
+    {
+        try
+        {
+            await Task.Delay(5000, ct);
+            while (!ct.IsCancellationRequested)
+            {
+                if (_settings.AutoPair && !SomeonePlaying())
+                {
+                    var paired = ControllerPairing.BackgroundScan();
+                    if (paired.Count > 0)
+                    {
+                        _ui.Post(_ =>
+                        {
+                            _balloonUrl = null;
+                            Balloon(4000, "Controller gekoppelt",
+                                $"Gekoppelt: {string.Join(", ", paired)}\nDer Controller erscheint gleich in der Übersicht.", ToolTipIcon.Info);
+                        }, null);
+                    }
+                }
+                await Task.Delay(6000, ct);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception e) when (e is DllNotFoundException or EntryPointNotFoundException or System.ComponentModel.Win32Exception)
+        {
+            Log.Warn($"Automatisches Koppeln nicht verfügbar: {e.Message}");
+        }
+    }
+
+    /// <summary>Hat in den letzten 20 Sekunden jemand einen Controller benutzt?</summary>
+    private bool SomeonePlaying()
+    {
+        long now = Environment.TickCount64;
+        return _manager?.Players.Any(p => now - p.LastActivity < 20_000) == true;
+    }
+
+    private PairForm? _wiiPairing;
+
+    /// <summary>Fenster „Controller koppeln“ (Switch 1, Nintendo Switch Online, Wii) – gezielt suchen.</summary>
     internal void ShowWiiPairing()
     {
         if (_wiiPairing is { IsDisposed: false })
@@ -140,7 +188,7 @@ internal sealed class TrayApp : ApplicationContext
             _wiiPairing.Activate();
             return;
         }
-        _wiiPairing = new WiiPairForm();
+        _wiiPairing = new PairForm();
         _wiiPairing.Show();
     }
 
@@ -414,7 +462,7 @@ internal sealed class TrayApp : ApplicationContext
 
         menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add(new ToolStripMenuItem("Einstellungen …", null, (_, _) => ShowSettings()) { Font = _boldFont ??= new Font(menu.Font, FontStyle.Bold) });
-        menu.Items.Add("Wii-Controller koppeln …", null, (_, _) => ShowWiiPairing());
+        menu.Items.Add("Controller koppeln …", null, (_, _) => ShowWiiPairing());
         menu.Items.Add("Kurzanleitung", null, (_, _) => ShowWelcome());
         menu.Items.Add("Protokoll öffnen", null, (_, _) => Open(Paths.LogFile));
         if (_update is { } update)
@@ -572,6 +620,7 @@ internal sealed class TrayApp : ApplicationContext
 
     protected override void ExitThreadCore()
     {
+        _autoPairCts.Cancel();
         _icon.Visible = false;
         _settingsForm?.Close();
         _settingsWatcher?.Dispose();
