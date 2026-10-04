@@ -65,8 +65,10 @@ Die Suche im Hintergrund läuft nur, solange gerade niemand spielt; gezielt such
 - Knöpfe je Controller: **Trennen**, **Vibrieren** (welcher ist welcher Spieler?), **Gyro kalibrieren**,
   Joy-Con **trennen/zusammenfügen**, **hochkant/quer**, **amiibo lesen**, **Ring-Con**, **IR-Kamera**,
   **„Doppelt angezeigt? Verstecken“** (HidHide, bei USB).
-- **Spielerplatz und Name:** Klick auf den Kartentitel → Platz 1–8 wählen (belegt = tauschen; Lichter und die
-  Reihenfolge im Spiel ziehen mit, wird je Controller gemerkt) oder Controller umbenennen („Lenas Joy-Con“).
+- **Spieler-Reihenfolge:** Leiste über den Karten – mit ‹ › festlegen, welcher Controller Spieler 1, 2 … ist
+  (Spieler 1 = erster Controller für Windows, Steam und Spiele; Lichter ziehen mit, wird je Controller gemerkt).
+  Wird ein Controller getrennt, rücken die anderen automatisch auf. Auch über den Kartentitel (dort auch
+  umbenennen, z. B. „Lenas Joy-Con“).
 - **Sticks kalibrieren** (gegen Drift): geführt Mitte und Rand messen, mit Rundheitsanzeige – nur in N-Connect
   gespeichert, der Controller bleibt unverändert.
 - **Gyro-Assistent:** Zielen per Bewegung in drei Schritten einrichten, mit Live-Vorschau.
@@ -104,7 +106,8 @@ Alle Einstellungen sind optional und gelten sofort (Klick auf das Symbol im Info
 | Problem | Lösung |
 |---|---|
 | Switch-2-Controller verbindet sich nicht | SYNC kurz drücken (nicht halten). Ist er in den Windows-Bluetooth-Einstellungen eingetragen → dort **entfernen**. Switch 2 in der Nähe in den Ruhemodus versetzen. |
-| Switch-1-/NSO-/Wii-Controller wird nicht gekoppelt | *Allgemein → Controller koppeln …* öffnen und SYNC drücken, solange gesucht wird (die Hintergrundsuche pausiert, während jemand spielt). Fehlercodes stehen im Protokoll („Kopplung …“). |
+| Switch-1-/NSO-/Wii-Controller wird nicht gekoppelt | *Allgemein → Controller koppeln …* öffnen und SYNC drücken, solange gesucht wird (die Hintergrundsuche pausiert, während jemand spielt). Fehlercodes stehen im Protokoll („Kopplung …“). Nach einem Fehlschlag wartet die Hintergrundsuche 90 s, bevor sie es erneut versucht. |
+| Joy-Con ist plötzlich ein eigener Spieler (Tasten/Stick gedreht) | Er wurde vom Paar gelöst (quer halten + SL/SR). L am linken und R am rechten Joy-Con gleichzeitig drücken fügt sie wieder zusammen. |
 | Spiel sieht einen USB-Controller doppelt | Auf der Karte „Doppelt angezeigt? Verstecken“ klicken (HidHide). |
 | Akkuanzeige weicht beim Laden ab | Einmal Kabel abziehen und wieder anstecken – N-Connect misst den Spannungsanstieg dann neu. Werte stehen alle 30 s im Protokoll („Akku …“). |
 | „ViGEmBus-Treiber fehlt“ | Setup erneut ausführen oder ViGEmBus installieren: <https://github.com/nefarius/ViGEmBus/releases> |

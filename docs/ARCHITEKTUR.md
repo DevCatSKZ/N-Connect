@@ -38,7 +38,7 @@ Protokoll-Projekt (plattformunabhängig, getestet). Die Bridge enthält nur Betr
 | Steuerung | `ControllerManager` (Suche, Verbinden, Spieler), `Player` (ein virtueller Controller), `ControllerPairing` (Classic-Kopplung) |
 | Ausgabe | `VirtualPads` (ViGEm Xbox 360 / DS4), `WindowsInput` (Tastatur/Maus per SendInput), `SmoothMouse`, `JoyConMouse`, `DsuServer`, `HidHide` |
 | Zusatz | `BatteryTracker`, `UpdateCheck`, `SwitchCardWatcher`, `Log`, `Autostart` (in `Dialogs.cs`) |
-| Oberfläche | `TrayApp` (Infobereich, Lebenszyklus), `SettingsForm`, `ControllerOverview` (Karten), `InputView*` (Grafiken), `MappingEditor`, `TuningEditor`, Dialoge, `Theme`, `Ui`, `Tr` (Übersetzung) |
+| Oberfläche | `TrayApp` (Infobereich, Lebenszyklus), `SettingsForm`, `ControllerOverview` (Karten), `PlayerOrderBar` (Spieler-Reihenfolge), `InputView*` (Grafiken), `MappingEditor`, `TuningEditor`, `PairingDataForm`, `PairForm`, `StickCalibrationForm`, `GyroSetupForm`, Dialoge, `Theme`, `Ui`, `Branding` (Logo, `LogoView`), `Tr` (Übersetzung) |
 
 ---
 
@@ -102,13 +102,20 @@ Die Oberfläche liest den Zustand selbst (60-mal pro Sekunde, `SettingsForm._liv
 
 ### 3.3 Spielerverwaltung
 - `Player` besitzt den virtuellen Controller; `Index` 0–7 bestimmt LEDs und DSU-Slot.
-- Umsortieren (`MovePlayer`): Indizes tauschen → alle virtuellen Controller abbauen → in neuer Reihenfolge anlegen
-  (Windows vergibt XInput-Plätze nach Anlegereihenfolge) → Plätze je Controller speichern.
+- Umsortieren (`MovePlayer`, Ziel höchstens letzter belegter Platz): Indizes tauschen → alle virtuellen Controller
+  abbauen → in neuer Reihenfolge anlegen (Windows vergibt XInput-Plätze nach Anlegereihenfolge) → Plätze je
+  Controller speichern.
+- Lückenlos (`CompactPlayers`, nach Wegfall eines Spielers in `OnLinkLost` und `Merge`): Indizes 0…n−1 neu
+  vergeben, virtuelle Controller wie oben neu anlegen, gemerkte Plätze **nicht** überschreiben. `FreeIndex` nimmt
+  den gemerkten Platz nur ohne Lücke.
 - Paar trennen/zusammenfügen: `Split`/`Merge` verschieben Links zwischen Spielern; der kleinere Index bleibt.
 
 ### 3.4 Kopplung Classic (`ControllerPairing`)
 Siehe FUNKTIONEN 2.3 und PROTOKOLLE 6. Läuft nie parallel (Semaphore) und im Hintergrund nur unter den
-dort genannten Bedingungen (`TrayApp.CanScanInBackground`).
+dort genannten Bedingungen (`TrayApp.CanScanInBackground`). Ablauf je Suchlauf (`ScanOnce`): bekannte Geräte
+merken (`stLastSeen`, verbundene → `LastConnected`) → kurze Suche → je Nintendo-Gerät: verbunden/kürzlich verbunden/
+nach Fehlschlag in Pause → überspringen; bekannt und nicht im SYNC-Modus → überspringen (protokolliert); sonst alte
+Kopplung entfernen → Wii: `PairWii` (binäre PIN), sonst `PairJustWorks` (WinRT, Win32 als Ersatz) → HID-Dienst an.
 
 ---
 
@@ -139,7 +146,7 @@ Spielerplätze, Stick- und Gyro-Kalibrierung, Einzel-/Hochkant-Joy-Con.
 
 WinForms mit eigenen, selbst gezeichneten Steuerelementen im Windows-11-Stil (`Ui.cs`: `StackPanel`,
 `SettingsGroup`, `SettingRow`, `ToggleSwitch`, `Slider`, `Segmented`, `GlyphButton`, `PivotTabs`, `NavItem`,
-`ScrollPage`; Symbole aus „Segoe MDL2 Assets“). Farben zentral in `Theme` (Paletten dunkel/hell, Akzentfarbe aus
+`ScrollPage`, `TextField` (umhüllt ein randloses `TextBox`: Rahmen, Text mittig, Akzentlinie bei Fokus); Symbole aus „Segoe MDL2 Assets“). Farben zentral in `Theme` (Paletten dunkel/hell, Akzentfarbe aus
 der Windows-Akzentpalette). Controller-Grafiken (`InputView*`) sind gezeichnet: Umrisse aus Produktfotos
 extrahiert (`InputView.Outlines.cs`, Punktlisten in Foto-Pixeln, `PhotoFrame` rechnet auf die Bühne um).
 Übersetzung: `Tr.T(deutscher Text)` mit Tabelle (`Tr.Texts.cs`) und Mustern für Texte mit Platzhaltern (`Tr.cs`).
