@@ -10,6 +10,9 @@ namespace Switch2Pro.Bridge;
 /// </summary>
 internal static class RenderCheck
 {
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern bool PrintWindow(IntPtr hwnd, IntPtr hdc, uint flags);
+
     /// <summary>Alle sichtbaren Texte der Fenster (Steuerelemente, Listen) in eine Datei schreiben – je Zeile ein Text.</summary>
     public static void DumpTexts(string file)
     {
@@ -102,10 +105,9 @@ internal static class RenderCheck
                 }
             }
             Pump();
-            var tabs = form.Controls.OfType<TabControl>().First();
 
             // Übersicht: so wie sie im Fenster erscheint.
-            tabs.SelectedIndex = 0;
+            form.ShowPage(0);
             Pump();
             using (var bmp = new Bitmap(form.Width, form.Height))
             {
@@ -114,9 +116,20 @@ internal static class RenderCheck
             }
 
             // Einstellungen: den ganzen Inhalt der Seite (länger als das Fenster).
-            tabs.SelectedIndex = 1;
+            form.ShowPage(1);
             Pump();
-            var content = tabs.TabPages[1].Controls[0];
+            // Zusätzlich so, wie Windows das Fenster wirklich zeichnet (DrawToBitmap zeigt manche Steuerelemente nur im Grundzustand).
+            using (var bmp = new Bitmap(form.Width, form.Height))
+            {
+                using (var g = Graphics.FromImage(bmp))
+                {
+                    var hdc = g.GetHdc();
+                    PrintWindow(form.Handle, hdc, 2); // PW_RENDERFULLCONTENT
+                    g.ReleaseHdc(hdc);
+                }
+                bmp.Save(Path.Combine(folder, $"ui_settings_window_{lang}.png"), ImageFormat.Png);
+            }
+            var content = form.SettingsContent;
             using (var bmp = new Bitmap(Math.Max(1, content.Width), Math.Max(1, content.Height)))
             {
                 content.DrawToBitmap(bmp, new Rectangle(0, 0, content.Width, content.Height));

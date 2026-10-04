@@ -14,6 +14,7 @@ internal static class Program
         if (render >= 0 && render + 1 < args.Length)
         {
             ApplicationConfiguration.Initialize();
+            Theme.Init(args.Contains("--light") ? "light" : "dark", transparency: false);
             RenderCheck.Run(args[render + 1]);
             return;
         }
@@ -22,6 +23,7 @@ internal static class Program
         {
             ApplicationConfiguration.Initialize();
             Tr.Init(args.Contains("--en") ? "en" : "de");
+            Theme.Init(args.Contains("--light") ? "light" : "dark", transparency: false);
             RenderCheck.RenderUi(args[renderUi + 1]);
             return;
         }
@@ -31,6 +33,7 @@ internal static class Program
         {
             ApplicationConfiguration.Initialize();
             Tr.Init(args.Contains("--en") ? "en" : "de");
+            Theme.Init(args.Contains("--light") ? "light" : "dark", transparency: false);
             RenderCheck.DumpTexts(args[dump + 1]);
             return;
         }

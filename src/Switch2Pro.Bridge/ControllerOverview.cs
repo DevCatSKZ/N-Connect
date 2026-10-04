@@ -11,15 +11,16 @@ namespace Switch2Pro.Bridge;
 /// </summary>
 internal sealed class ControllerOverview : Panel
 {
-    internal static readonly Color Background = Color.FromArgb(22, 23, 27);
-    internal static readonly Color CardColor = Color.FromArgb(30, 31, 36);
-    internal static readonly Color TextColor = Color.FromArgb(236, 237, 241);
-    internal static readonly Color MutedColor = Color.FromArgb(150, 155, 166);
+    // Farben aus der Darstellung (dunkel/hell, Mica): Hintergrund durchscheinend, Karten wie Windows-11-Kacheln.
+    internal static Color Background => Theme.Backdrop;
+    internal static Color CardColor => Theme.Current.Surface;
+    internal static Color TextColor => Theme.Current.Text;
+    internal static Color MutedColor => Theme.Current.TextMuted;
     // Schriften einmal für alle Karten (Karten kommen und gehen mit den Controllern).
     private static readonly Font TitleFont = new("Segoe UI Semibold", 13f);
     private static readonly Font ButtonFont = new("Segoe UI", 9.5f);
     private static readonly Font EmptyFont = new("Segoe UI", 11f);
-    internal static readonly Color Accent = Color.FromArgb(0, 190, 255);
+    internal static Color Accent => Theme.Accent;
 
     private readonly Func<IReadOnlyList<Player>> _players;
     private readonly ControllerManager? _manager;
@@ -160,10 +161,11 @@ internal sealed class ControllerOverview : Panel
         {
             var b = new Button
             {
-                Text = Tr.T(text), AutoSize = true, FlatStyle = FlatStyle.Flat, ForeColor = TextColor, BackColor = Color.FromArgb(45, 47, 54),
+                Text = Tr.T(text), AutoSize = true, FlatStyle = FlatStyle.Flat, ForeColor = TextColor, BackColor = Theme.Current.SurfaceHover,
                 Font = ButtonFont, Padding = new Padding(6, 1, 6, 1), Margin = new Padding(6, 0, 0, 0),
             };
-            b.FlatAppearance.BorderColor = MutedColor;
+            b.FlatAppearance.BorderColor = Theme.Current.Border;
+            b.FlatAppearance.MouseOverBackColor = Theme.Blend(Theme.Current.SurfaceHover, Theme.Current.Text, 0.08f);
             return b;
         }
 
@@ -172,7 +174,8 @@ internal sealed class ControllerOverview : Panel
             _manager = manager;
             _settings = settings;
             DoubleBuffered = true;
-            BackColor = CardColor;
+            ResizeRedraw = true;
+            BackColor = Background; // Ecken außerhalb der abgerundeten Karte: Fensterhintergrund (Mica)
             Height = 430;
             Margin = new Padding(0, 0, 0, 12);
 
@@ -373,6 +376,18 @@ internal sealed class ControllerOverview : Panel
                     _calibrate.Text = Tr.T("Gyro kalibrieren");
                 }
             }
+        }
+
+        /// <summary>Karte wie eine Windows-11-Kachel: abgerundet, dünner Rand.</summary>
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            var g = e.Graphics;
+            g.SmoothingMode = Theme.EdgeSmoothing;
+            using var path = Theme.RoundedRect(new RectangleF(0.5f, 0.5f, Width - 1.5f, Height - 1.5f), 10);
+            using (var fill = new SolidBrush(CardColor))
+                g.FillPath(fill, path);
+            using var pen = new Pen(Theme.Current.Border, 1f);
+            g.DrawPath(pen, path);
         }
 
         protected override void OnResize(EventArgs eventargs)

@@ -96,6 +96,8 @@ internal sealed class SettingsForm : Form
     private readonly CheckBox _dsu = new() { Text = "Gyro für Emulatoren bereitstellen (Cemuhook/DSU, Port 26760 – wirkt nach Neustart)", AutoSize = true };
     private readonly CheckBox _updates = new() { Text = "Beim Start nach neuer Version suchen (GitHub)", AutoSize = true };
     private readonly ComboBox _language = new() { DropDownStyle = ComboBoxStyle.DropDownList, Width = 190 };
+    private readonly ComboBox _themeMode = new() { DropDownStyle = ComboBoxStyle.DropDownList, Width = 170 };
+    private readonly CheckBox _transparency = new() { Text = "Durchscheinender Hintergrund (Mica, ab Windows 11)", AutoSize = true };
 
     private readonly CheckBox _combine = new() { Text = "Zwei Joy-Con automatisch zu einem Controller zusammenfassen", AutoSize = true };
     private readonly CheckBox _mouse = new() { Text = "Joy-Con 2 als Maus, wenn er auf dem Tisch liegt", AutoSize = true };
@@ -147,27 +149,32 @@ internal sealed class SettingsForm : Form
 
         Text = "Nintendo Controller für Windows";
         StartPosition = FormStartPosition.CenterScreen;
-        Size = new Size(1000, 780);
-        MinimumSize = new Size(700, 560);
+        Size = new Size(1040, 800);
+        MinimumSize = new Size(720, 560);
         Font = new Font("Segoe UI", 9.5f);
         AutoScaleMode = AutoScaleMode.Dpi;
 
-        var tabs = new TabControl { Dock = DockStyle.Fill };
-        var overviewPage = new TabPage("Controller") { Padding = new Padding(8) };
-        overviewPage.Controls.Add(_overview);
-        var settingsPage = new TabPage("Einstellungen (optional)") { AutoScroll = true };
-        tabs.TabPages.Add(overviewPage);
-        tabs.TabPages.Add(settingsPage);
-        Controls.Add(tabs);
-        if (Environment.GetCommandLineArgs().Contains("--settings"))
-            tabs.SelectedTab = settingsPage;
+        // Navigation wie in Windows 11 (statt Registerkarten): zwei Seiten, die aktive mit Akzent-Unterstrich.
+        _overviewPage = new Panel { Dock = DockStyle.Fill, Padding = new Padding(12, 4, 12, 12), BackColor = Theme.Backdrop };
+        _overviewPage.Controls.Add(_overview);
+        _settingsPage = new Panel { Dock = DockStyle.Fill, AutoScroll = true, BackColor = Theme.Backdrop, Visible = false };
+        Controls.Add(_overviewPage);
+        Controls.Add(_settingsPage);
+        var nav = new FlowLayoutPanel { Dock = DockStyle.Top, Height = 52, Padding = new Padding(14, 10, 0, 0), BackColor = Theme.Backdrop };
+        _navOverview = new NavButton("Controller", () => ShowPage(0));
+        _navSettings = new NavButton("Einstellungen", () => ShowPage(1));
+        nav.Controls.Add(_navOverview);
+        nav.Controls.Add(_navSettings);
+        Controls.Add(nav);
+        ShowPage(Environment.GetCommandLineArgs().Contains("--settings") ? 1 : 0);
 
         var root = new FlowLayoutPanel
         {
             Dock = DockStyle.Top, AutoSize = true, FlowDirection = FlowDirection.TopDown, WrapContents = false,
-            Padding = new Padding(12),
+            Padding = new Padding(16, 4, 16, 16), BackColor = Theme.Backdrop,
         };
-        settingsPage.Controls.Add(root);
+        _settingsContent = root;
+        _settingsPage.Controls.Add(root);
 
         root.Controls.Add(Group("1. Windows und Spiele sehen den Controller als …", _xbox360, _ds4));
         root.Controls.Add(Group("2. Tasten A/B/X/Y", _layoutXbox, _layoutSwitch));
@@ -185,12 +192,16 @@ internal sealed class SettingsForm : Form
         misc.Controls.Add(_updates);
         misc.Controls.Add(new Label { Text = "Sprache / Language:", AutoSize = true, Padding = new Padding(12, 6, 0, 0) });
         misc.Controls.Add(_language);
+        misc.Controls.Add(new Label { Text = "Darstellung:", AutoSize = true, Padding = new Padding(12, 6, 0, 0) });
+        misc.Controls.Add(_themeMode);
+        misc.Controls.Add(_transparency);
         misc.Controls.Add(new Label { Text = "Ohne Eingabe automatisch trennen nach:", AutoSize = true, Padding = new Padding(0, 6, 0, 0) });
         misc.Controls.Add(_inactivity);
         misc.Controls.Add(new Label { Text = "Gyro-Maus-Geschwindigkeit:", AutoSize = true, Padding = new Padding(12, 6, 0, 0) });
         misc.Controls.Add(_gyroMouseSpeed);
         misc.SetFlowBreak(_deadzone, true);
-        misc.SetFlowBreak(_language, true);
+        misc.SetFlowBreak(_transparency, true);
+        _themeMode.Items.AddRange(["Dunkel", "Hell", "Wie Windows"]);
         _language.Items.AddRange(["Automatisch (wie Windows)", "Deutsch", "English"]);
         root.Controls.Add(WrapGroup("3. Vibration, Sticks, Verbinden, Gyro-Maus", misc));
 
@@ -293,6 +304,7 @@ internal sealed class SettingsForm : Form
         WireEvents();
         NoWheel(root);
         LoadValues();
+        Theme.Apply(this);
         Tr.Apply(this);
         _liveTimer.Tick += (_, _) => _overview.UpdateView();
         _liveTimer.Start();
@@ -319,23 +331,39 @@ internal sealed class SettingsForm : Form
         }
     }
 
-    private static FlowLayoutPanel Flow() =>
-        new() { AutoSize = true, Dock = DockStyle.Top, FlowDirection = FlowDirection.LeftToRight, WrapContents = true, MaximumSize = new Size(900, 0) };
+    private readonly Panel _overviewPage, _settingsPage;
+    private readonly NavButton _navOverview, _navSettings;
+    private readonly Control _settingsContent;
 
-    private static GroupBox Group(string title, params Control[] controls)
+    /// <summary>Inhalt der Einstellungsseite (für die Prüfhilfe --render-ui).</summary>
+    internal Control SettingsContent => _settingsContent;
+
+    /// <summary>Seite zeigen: 0 = Controller-Übersicht, 1 = Einstellungen.</summary>
+    internal void ShowPage(int page)
     {
-        var flow = new FlowLayoutPanel { AutoSize = true, Dock = DockStyle.Top, FlowDirection = FlowDirection.TopDown, WrapContents = false };
+        _overviewPage.Visible = page == 0;
+        _settingsPage.Visible = page == 1;
+        _navOverview.Selected = page == 0;
+        _navSettings.Selected = page == 1;
+    }
+
+    private static FlowLayoutPanel Flow() =>
+        new()
+        {
+            AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, FlowDirection = FlowDirection.LeftToRight, WrapContents = true, MaximumSize = new Size(900, 0),
+            BackColor = Color.Transparent,
+        };
+
+    private static Section Group(string title, params Control[] controls)
+    {
+        var flow = new FlowLayoutPanel { AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, FlowDirection = FlowDirection.TopDown, WrapContents = false, BackColor = Color.Transparent };
         flow.Controls.AddRange(controls);
         return WrapGroup(title, flow);
     }
 
-    private static GroupBox WrapGroup(string title, Control content)
-    {
-        var group = new GroupBox { Text = title, AutoSize = true, Padding = new Padding(8), MinimumSize = new Size(920, 0) };
-        group.Controls.Add(content);
-        content.Dock = DockStyle.Fill;
-        return group;
-    }
+    /// <summary>Abschnitt im Stil von Windows 11 (abgerundete Kachel mit Überschrift).</summary>
+    private static Section WrapGroup(string title, Control content) =>
+        new(title, content) { MinimumSize = new Size(940, 0) };
 
     private void WireEvents()
     {
@@ -352,6 +380,8 @@ internal sealed class SettingsForm : Form
         _dsu.CheckedChanged += (_, _) => Apply(() => _settings.DsuServer = _dsu.Checked);
         _updates.CheckedChanged += (_, _) => Apply(() => _settings.CheckForUpdates = _updates.Checked);
         _language.SelectedIndexChanged += (_, _) => ChangeLanguage();
+        _themeMode.SelectedIndexChanged += (_, _) => ChangeTheme();
+        _transparency.CheckedChanged += (_, _) => ChangeTheme();
         _combine.CheckedChanged += (_, _) => Apply(() => _settings.CombineJoyCons = _combine.Checked);
         _mouse.CheckedChanged += (_, _) => Apply(() => _settings.JoyConMouse = _mouse.Checked);
         _mouseSpeed.ValueChanged += (_, _) => Apply(() => _settings.MouseSpeed = _mouseSpeed.Value / 10f);
@@ -404,6 +434,8 @@ internal sealed class SettingsForm : Form
         _dsu.Checked = _settings.DsuServer;
         _updates.Checked = _settings.CheckForUpdates;
         _language.SelectedIndex = _settings.Language switch { "de" => 1, "en" => 2, _ => 0 };
+        _themeMode.SelectedIndex = _settings.Theme switch { "light" => 1, "system" => 2, _ => 0 };
+        _transparency.Checked = _settings.Transparency;
         _combine.Checked = _settings.CombineJoyCons;
         _mouse.Checked = _settings.JoyConMouse;
         _mouseSpeed.Value = Math.Clamp((int)MathF.Round(_settings.MouseSpeed * 10), 1, 50);
@@ -439,6 +471,25 @@ internal sealed class SettingsForm : Form
     }
 
     /// <summary>Sprache wechseln: speichern und das Fenster in der neuen Sprache neu öffnen.</summary>
+    /// <summary>Darstellung wechseln: speichern und das Fenster in der neuen Darstellung neu öffnen.</summary>
+    private void ChangeTheme()
+    {
+        if (_loading)
+            return;
+        string? mode = _themeMode.SelectedIndex switch { 1 => "light", 2 => "system", _ => null };
+        if (mode == _settings.Theme && _transparency.Checked == _settings.Transparency)
+            return;
+        _settings.Theme = mode;
+        _settings.Transparency = _transparency.Checked;
+        _changed(false);
+        Theme.Init(mode, _transparency.Checked);
+        BeginInvoke(() =>
+        {
+            Close();
+            Program.ShowSignal?.Set();
+        });
+    }
+
     private void ChangeLanguage()
     {
         if (_loading)
@@ -953,6 +1004,7 @@ internal sealed class KeyCaptureDialog : Form
         Controls.Add(hint);
         Controls.Add(bar);
         CancelButton = cancel;
+        Theme.Apply(this);
         Tr.Apply(this);
 
         KeyDown += (_, e) =>
@@ -1079,6 +1131,7 @@ internal static class TurboDialog
         form.Controls.AddRange([info, target, ok, cancel]);
         form.AcceptButton = ok;
         form.CancelButton = cancel;
+        Theme.Apply(form);
         Tr.Apply(form);
         if (form.ShowDialog(owner) != DialogResult.OK)
             return null;
@@ -1130,6 +1183,7 @@ internal static class MacroDialog
         Check();
         form.Controls.AddRange([info, box, status, ok, cancel]);
         form.CancelButton = cancel;
+        Theme.Apply(form);
         Tr.Apply(form);
         if (form.ShowDialog(owner) != DialogResult.OK)
             return null;
@@ -1155,6 +1209,7 @@ internal static class Prompt
         form.Controls.AddRange([label, box, ok, cancel]);
         form.AcceptButton = ok;
         form.CancelButton = cancel;
+        Theme.Apply(form);
         Tr.Apply(form);
         if (form.ShowDialog(owner) != DialogResult.OK)
             return null;

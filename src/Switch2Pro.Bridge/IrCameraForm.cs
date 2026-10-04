@@ -51,6 +51,7 @@ internal sealed class IrCameraForm : Form
         Controls.Add(bar);
         _resolution.SelectedIndexChanged += async (_, _) => await RestartAsync();
         Shown += async (_, _) => await RestartAsync();
+        Theme.Apply(this);
         Tr.Apply(this);
     }
 

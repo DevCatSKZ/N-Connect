@@ -174,6 +174,10 @@ public sealed class Settings
     public bool WiiPointerMouse { get; set; }
     /// <summary>Hinweis „an der Switch 2 neu koppeln“ wurde schon einmal gezeigt.</summary>
     public bool ConsoleHintShown { get; set; }
+    /// <summary>Darstellung: "dark" (Standard), "light" oder "system" (wie Windows).</summary>
+    public string? Theme { get; set; }
+    /// <summary>Durchscheinender Fensterhintergrund (Mica, ab Windows 11).</summary>
+    public bool Transparency { get; set; } = true;
     /// <summary>Sprache der Oberfläche: null = wie Windows, sonst "de" oder "en".</summary>
     public string? Language { get; set; }
 
@@ -280,6 +284,8 @@ public sealed class Settings
         CheckForUpdates = other.CheckForUpdates;
         WiiPointerMouse = other.WiiPointerMouse;
         ConsoleHintShown = other.ConsoleHintShown;
+        Theme = other.Theme;
+        Transparency = other.Transparency;
         Language = other.Language;
         UprightJoyCons = [.. other.UprightJoyCons];
         HiddenDevices = [.. other.HiddenDevices];
@@ -377,6 +383,8 @@ public sealed class Settings
         TriggerDeadzone = Fin(TriggerDeadzone, 0f, 0.5f, 0.05f);
         TriggerFullAt = Fin(TriggerFullAt, 0.5f, 1f, 1f);
         TurboRate = Fin(TurboRate, 2f, 30f, 12f);
+        if (Theme is not (null or "dark" or "light" or "system"))
+            Theme = null;
         if (Language is not (null or "de" or "en"))
             Language = null;
         if (!Enum.IsDefined(GyroStick))

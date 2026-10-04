@@ -55,5 +55,6 @@ internal sealed class WelcomeForm : Form
 
         Controls.Add(text);
         Controls.Add(buttons);
+        Theme.Apply(this);
     }
 }

@@ -32,6 +32,7 @@ internal sealed class WiiPairForm : Form
         Controls.Add(hint);
         Controls.Add(close);
         Shown += async (_, _) => await RunAsync();
+        Theme.Apply(this);
         Tr.Apply(this);
     }
 

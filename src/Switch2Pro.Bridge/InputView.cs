@@ -32,7 +32,8 @@ internal sealed partial class InputView : Control
     private Color _buttons = Color.FromArgb(0xA0, 0xA0, 0xA0);
     private Color _grip = Color.FromArgb(0xE6, 0xE6, 0xE6);
 
-    private static readonly Color Back = Color.FromArgb(30, 31, 36);
+    /// <summary>Hintergrund der Grafik = Kartenfarbe der Darstellung (dunkel/hell).</summary>
+    private static Color Back => Theme.Current.Surface;
     private static readonly Color Accent = Color.FromArgb(0, 190, 255);
     private static readonly Color AccentGlow = Color.FromArgb(110, 0, 190, 255);
 
@@ -468,7 +469,7 @@ internal sealed partial class InputView : Control
         for (int i = 0; i < 3; i++)
         {
             var r = new RectangleF(area.X + i * (w + 10), area.Y + 8, w, 8);
-            using (var back = new SolidBrush(Color.FromArgb(55, 57, 64)))
+            using (var back = new SolidBrush(Theme.Current.Border))
                 g.FillRectangle(back, r);
             float v = Math.Clamp(axes[i].Value / 6000f, -1f, 1f) * r.Width / 2;
             using (var fill = new SolidBrush(Accent))

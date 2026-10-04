@@ -29,11 +29,12 @@ internal sealed class TrayApp : ApplicationContext
         bool firstRun = !File.Exists(Paths.SettingsFile);
         _settings = Settings.Load(Paths.SettingsFile);
         Tr.Init(_settings.Language);
+        Theme.Init(_settings.Theme, _settings.Transparency);
         if (_settings.LoadError is { } err)
             Log.Warn($"settings.json fehlerhaft, nutze Standardwerte: {err}");
 
         _icon = new NotifyIcon { Icon = CreateIcon(), Visible = true, Text = "Nintendo Controller" };
-        _icon.ContextMenuStrip = new ContextMenuStrip();
+        _icon.ContextMenuStrip = new ContextMenuStrip { Renderer = Theme.MenuRenderer(), ForeColor = Theme.Current.Text };
         _icon.ContextMenuStrip.Opening += (_, _) => BuildMenu();
         // Linksklick = Einstellungen, Rechtsklick = Menü.
         _icon.MouseClick += (_, e) =>
@@ -167,6 +168,9 @@ internal sealed class TrayApp : ApplicationContext
         var oldMode = _settings.OutputMode;
         // Werte übernehmen statt das Objekt zu ersetzen – das offene Einstellungsfenster arbeitet darauf.
         _settings.CopyFrom(fresh);
+        Theme.Init(_settings.Theme, _settings.Transparency);
+        _icon.ContextMenuStrip!.Renderer = Theme.MenuRenderer();
+        _icon.ContextMenuStrip.ForeColor = Theme.Current.Text;
         if (fresh.OutputMode != oldMode)
             _manager?.ApplyOutputMode(fresh.OutputMode);
         if (_settingsForm is { IsDisposed: false } form)

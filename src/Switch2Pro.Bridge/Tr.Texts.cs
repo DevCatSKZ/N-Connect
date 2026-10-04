@@ -280,6 +280,12 @@ internal static partial class Tr
         ["Verstanden"] = "Got it",
         ["Einstellungen öffnen"] = "Open settings",
         ["Willkommen"] = "Welcome",
+        ["Einstellungen"] = "Settings",
+        ["Darstellung:"] = "Appearance:",
+        ["Dunkel"] = "Dark",
+        ["Hell"] = "Light",
+        ["Wie Windows"] = "Like Windows",
+        ["Durchscheinender Hintergrund (Mica, ab Windows 11)"] = "Translucent background (Mica, Windows 11 and later)",
 
         // ---------- Fehlerfälle und Hinweise ----------
         ["Kein Bluetooth-Adapter gefunden."] = "No Bluetooth adapter found.",
