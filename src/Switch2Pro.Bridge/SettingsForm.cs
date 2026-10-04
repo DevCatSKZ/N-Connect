@@ -97,7 +97,7 @@ internal sealed class SettingsForm : Form
     private readonly CheckBox _updates = new() { Text = "Beim Start nach neuer Version suchen (GitHub)", AutoSize = true };
     private readonly ComboBox _language = new() { DropDownStyle = ComboBoxStyle.DropDownList, Width = 190 };
     private readonly ComboBox _themeMode = new() { DropDownStyle = ComboBoxStyle.DropDownList, Width = 170 };
-    private readonly CheckBox _transparency = new() { Text = "Durchscheinender Hintergrund (Mica, ab Windows 11)", AutoSize = true };
+    private readonly CheckBox _transparency = new() { Text = "Mica-Effekt in der Titelleiste (ab Windows 11)", AutoSize = true };
 
     private readonly CheckBox _combine = new() { Text = "Zwei Joy-Con automatisch zu einem Controller zusammenfassen", AutoSize = true };
     private readonly CheckBox _mouse = new() { Text = "Joy-Con 2 als Maus, wenn er auf dem Tisch liegt", AutoSize = true };
@@ -306,7 +306,12 @@ internal sealed class SettingsForm : Form
         LoadValues();
         Theme.Apply(this);
         Tr.Apply(this);
-        _liveTimer.Tick += (_, _) => _overview.UpdateView();
+        _liveTimer.Tick += (_, _) =>
+        {
+            // Nur zeichnen, wenn die Übersicht wirklich zu sehen ist.
+            if (_overviewPage.Visible && WindowState != FormWindowState.Minimized)
+                _overview.UpdateView();
+        };
         _liveTimer.Start();
         _overview.UpdateView();
     }
@@ -345,18 +350,20 @@ internal sealed class SettingsForm : Form
         _settingsPage.Visible = page == 1;
         _navOverview.Selected = page == 0;
         _navSettings.Selected = page == 1;
+        if (page == 0)
+            _overview.UpdateView();
     }
 
     private static FlowLayoutPanel Flow() =>
         new()
         {
             AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, FlowDirection = FlowDirection.LeftToRight, WrapContents = true, MaximumSize = new Size(900, 0),
-            BackColor = Color.Transparent,
+            BackColor = Theme.Current.Surface,
         };
 
     private static Section Group(string title, params Control[] controls)
     {
-        var flow = new FlowLayoutPanel { AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, FlowDirection = FlowDirection.TopDown, WrapContents = false, BackColor = Color.Transparent };
+        var flow = new FlowLayoutPanel { AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, FlowDirection = FlowDirection.TopDown, WrapContents = false, BackColor = Theme.Current.Surface };
         flow.Controls.AddRange(controls);
         return WrapGroup(title, flow);
     }

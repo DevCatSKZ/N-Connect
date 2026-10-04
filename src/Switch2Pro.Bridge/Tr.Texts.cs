@@ -284,7 +284,7 @@ internal static partial class Tr
         ["Dunkel"] = "Dark",
         ["Hell"] = "Light",
         ["Wie Windows"] = "Like Windows",
-        ["Durchscheinender Hintergrund (Mica, ab Windows 11)"] = "Translucent background (Mica, Windows 11 and later)",
+        ["Mica-Effekt in der Titelleiste (ab Windows 11)"] = "Mica effect in the title bar (Windows 11 and later)",
 
         // ---------- Fehlerfälle und Hinweise ----------
         ["Kein Bluetooth-Adapter gefunden."] = "No Bluetooth adapter found.",

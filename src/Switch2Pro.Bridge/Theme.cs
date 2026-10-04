@@ -7,7 +7,7 @@ namespace Switch2Pro.Bridge;
 
 /// <summary>
 /// Darstellung im Stil von Windows 11: dunkel (Standard), hell oder wie Windows; Akzentfarbe von Windows;
-/// Mica-Hintergrund (durchscheinend) ab Windows 11. Farben aller Fenster, Karten und Grafiken kommen von hier.
+/// Mica in der Titelleiste ab Windows 11. Farben aller Fenster, Karten und Grafiken kommen von hier.
 /// </summary>
 internal static class Theme
 {
@@ -31,13 +31,11 @@ internal static class Theme
         Color.FromArgb(0xE0, 0xE0, 0xE0), Color.FromArgb(0x1B, 0x1B, 0x1B), Color.FromArgb(0x60, 0x60, 0x66),
         Color.FromArgb(0xEC, 0xEC, 0xF0));
 
-    /// <summary>Farbe, die durch Mica ersetzt wird (Farbschlüssel) – kommt sonst nirgends vor.</summary>
-    public static readonly Color MicaKey = Color.FromArgb(1, 2, 3);
 
     public static Palette Current { get; private set; } = DarkPalette;
     public static bool Dark => Current.Dark;
     public static Color Accent { get; private set; } = Color.FromArgb(0, 120, 212);
-    /// <summary>Mica aktiv (Einstellung an und Windows 11).</summary>
+    /// <summary>Mica-Titelleiste aktiv (Einstellung an und Windows 11).</summary>
     public static bool Mica { get; private set; }
 
     /// <summary>Darstellung festlegen: "dark" (Standard), "light" oder "system"; Mica nur ab Windows 11.</summary>
@@ -87,14 +85,8 @@ internal static class Theme
     public static Color Blend(Color a, Color b, float t) => Color.FromArgb(
         (int)(a.R + (b.R - a.R) * t), (int)(a.G + (b.G - a.G) * t), (int)(a.B + (b.B - a.B) * t));
 
-    /// <summary>
-    /// Kantenglättung für Formen am Mica-Hintergrund: Mit Farbschlüssel entstünden sonst dunkle Säume an den Rändern
-    /// (Mischfarben aus Fläche und Schlüsselfarbe).
-    /// </summary>
-    public static SmoothingMode EdgeSmoothing => Mica ? SmoothingMode.None : SmoothingMode.AntiAlias;
-
-    /// <summary>Hintergrund von Flächen, durch die Mica scheinen soll (sonst die normale Fensterfarbe).</summary>
-    public static Color Backdrop => Mica ? MicaKey : Current.Window;
+    /// <summary>Fensterhintergrund (hinter Karten und Abschnitten).</summary>
+    public static Color Backdrop => Current.Window;
 
     // ---------- Fensterrahmen ----------
 
@@ -108,14 +100,13 @@ internal static class Theme
 
     /// <summary>
     /// Fenster in die Windows-Darstellung einbinden: Titelleiste hell/dunkel, abgerundete Ecken, Mica-Hintergrund,
-    /// Farben aller Steuerelemente. Mica scheint durch Flächen in <see cref="MicaKey"/> (Farbschlüssel).
+    /// Farben aller Steuerelemente. Der Inhalt bleibt deckend: ein durchsichtiger Fensterinhalt (Farbschlüssel/Layered
+    /// Window) zwingt Windows zum Neuzeichnen per CPU und macht die Live-Anzeige sehr langsam.
     /// </summary>
     public static void Apply(Form form)
     {
         form.Icon = Branding.AppIcon;
         form.BackColor = Backdrop;
-        if (Mica)
-            form.TransparencyKey = MicaKey;
         form.ForeColor = Current.Text;
         void Frame()
         {
@@ -184,7 +175,7 @@ internal static class Theme
                 break;
             case CheckBox or RadioButton:
                 c.ForeColor = p.Text;
-                c.BackColor = Color.Transparent;
+                c.BackColor = Parent(c); // deckend: durchsichtige Steuerelemente zeichnen bei jeder Änderung ihr Elternelement mit
                 break;
             case Label label when label.ForeColor == SystemColors.GrayText || Equals(label.Tag, MutedTag):
                 label.ForeColor = p.TextMuted;
@@ -222,7 +213,7 @@ internal static class Theme
     private static Color Parent(Control c)
     {
         for (var p = c.Parent; p is not null; p = p.Parent)
-            if (p.BackColor != Color.Transparent && p.BackColor != MicaKey)
+            if (p.BackColor != Color.Transparent)
                 return p.BackColor;
         return Current.Window;
     }
@@ -301,7 +292,7 @@ internal sealed class NavButton : Control
     protected override void OnPaint(PaintEventArgs e)
     {
         var g = e.Graphics;
-        g.SmoothingMode = Theme.EdgeSmoothing;
+        g.SmoothingMode = SmoothingMode.AntiAlias;
         var p = Theme.Current;
         if (_selected || _hover)
         {
@@ -350,7 +341,7 @@ internal sealed class Section : Panel
     protected override void OnPaint(PaintEventArgs e)
     {
         var g = e.Graphics;
-        g.SmoothingMode = Theme.EdgeSmoothing;
+        g.SmoothingMode = SmoothingMode.AntiAlias;
         var r = new RectangleF(0.5f, 0.5f, Width - 1.5f, Height - 1.5f);
         using var path = Theme.RoundedRect(r, 8);
         using (var fill = new SolidBrush(Theme.Current.Surface))

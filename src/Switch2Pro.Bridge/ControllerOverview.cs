@@ -134,13 +134,13 @@ internal sealed class ControllerOverview : Panel
         private readonly InputView _view = new() { Location = new Point(16, 52), Size = new Size(522, 369) };
         private readonly Label _title = new()
         {
-            AutoSize = true, Location = new Point(16, 14), ForeColor = TextColor, BackColor = Color.Transparent,
+            AutoSize = true, Location = new Point(16, 14), ForeColor = TextColor, BackColor = CardColor,
             Font = TitleFont,
         };
         private readonly InfoPanel _info = new() { Location = new Point(556, 52) };
         private readonly FlowLayoutPanel _actions = new()
         {
-            AutoSize = true, FlowDirection = FlowDirection.RightToLeft, WrapContents = true, BackColor = Color.Transparent,
+            AutoSize = true, FlowDirection = FlowDirection.RightToLeft, WrapContents = true, BackColor = CardColor,
         };
         private readonly ToolTip _tips = new();
         private readonly Button _disconnect = ActionButton("Trennen");
@@ -382,7 +382,7 @@ internal sealed class ControllerOverview : Panel
         protected override void OnPaint(PaintEventArgs e)
         {
             var g = e.Graphics;
-            g.SmoothingMode = Theme.EdgeSmoothing;
+            g.SmoothingMode = SmoothingMode.AntiAlias;
             using var path = Theme.RoundedRect(new RectangleF(0.5f, 0.5f, Width - 1.5f, Height - 1.5f), 10);
             using (var fill = new SolidBrush(CardColor))
                 g.FillPath(fill, path);
@@ -409,7 +409,13 @@ internal sealed class ControllerOverview : Panel
         {
             _player = player;
             var links = player.Links;
-            _title.Text = Tr.T($"Spieler {player.Index + 1}  ·  {player.Kind.DisplayName()}" + (player.GyroMouseActive ? "  ·  Gyro-Maus" : "") + (player.GyroStickActive ? "  ·  Gyro-Stick" : ""));
+            // Läuft ~60-mal pro Sekunde: nur bei Änderungen übersetzen und neu anordnen.
+            string title = $"Spieler {player.Index + 1}  ·  {player.Kind.DisplayName()}" + (player.GyroMouseActive ? "  ·  Gyro-Maus" : "") + (player.GyroStickActive ? "  ·  Gyro-Stick" : "");
+            if (title != _rawTitle)
+            {
+                _rawTitle = title;
+                _title.Text = Tr.T(title);
+            }
 
             var (input, gamepad) = Live(player, settings);
             bool joyCon = links.Count > 0 && links.All(l => l.Kind.IsJoyCon());
@@ -439,11 +445,21 @@ internal sealed class ControllerOverview : Panel
             SetButton(_ringCon, ringLink is null ? null : ringLink.RingConActive ? "Ring-Con aus" : "Ring-Con ein");
             _irCamera.Visible = ringLink is { HasIrCamera: true };
             _calibrate.Visible = links.Any(l => l.LastState?.Motion is not null) && links.All(l => l.Address is not null);
-            PlaceActions();
+            var actions = string.Join("|", _actions.Controls.Cast<Control>().Select(c => c.Visible ? c.Text : ""));
+            if (actions != _shownActions)
+            {
+                _shownActions = actions;
+                PlaceActions();
+            }
 
             _info.Show(links, input, links.Where(player.MouseActive).ToList());
-            Height = Math.Max(430, _info.Bottom + 16);
+            int height = Math.Max(430, _info.Bottom + 16);
+            if (Height != height)
+                Height = height;
         }
+
+        private string? _rawTitle;
+        private string? _shownActions;
 
         private static void SetButton(Button button, string? text)
         {
@@ -488,13 +504,26 @@ internal sealed class ControllerOverview : Panel
 
         public void Show(IReadOnlyList<IControllerLink> links, PadInput? input, IReadOnlyList<IControllerLink> mouse)
         {
+            // Gedrückte Tasten sofort zeigen, Akku/Berichte/s reichen 4-mal pro Sekunde (Text zeichnen ist teuer).
+            var pressed = input?.Buttons;
+            long now = Environment.TickCount64;
+            bool changed = !links.SequenceEqual(_links) || !mouse.SequenceEqual(_mouse) || !Equals(pressed, _input?.Buttons)
+                           || now - _lastPaint >= 250;
             _links = links;
             _mouse = mouse;
             _input = input;
             int rows = links.Count * 9 + 3; // je Controller bis zu 8 Zeilen (Überschrift, Akku … Griff, Maus) + Abstand
-            Height = Math.Max(270, rows * 22 + 10);
-            Invalidate();
+            int height = Math.Max(270, rows * 22 + 10);
+            if (Height != height)
+                Height = height;
+            if (changed)
+            {
+                _lastPaint = now;
+                Invalidate();
+            }
         }
+
+        private long _lastPaint;
 
         protected override void OnPaint(PaintEventArgs e)
         {
