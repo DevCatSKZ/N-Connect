@@ -1,5 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <Company>devcatskz</Company>
+    <Authors>devcatskz</Authors>
+    <Product>Nintendo Controller für Windows</Product>
+    <Copyright>© devcatskz</Copyright>
     <OutputType>WinExe</OutputType>
     <!-- 22621 = Windows 11 22H2 SDK (für schnellere BLE-Verbindungsparameter); läuft ab Windows 10 2004. -->
     <TargetFramework>net8.0-windows10.0.22621.0</TargetFramework>

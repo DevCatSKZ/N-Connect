@@ -113,5 +113,5 @@ Linux `hid-nintendo` und `hid-wiimote`, WiiBrew, die Emulatoren yuzu/Citron (NFC
 (Wii-Kopplung), Switch2Connect. Start-Sequenz und Vibrationsformat über Bluetooth: NS2Pro-Bridge-Windows (MIT).
 Virtueller Controller: [ViGEmBus](https://github.com/nefarius/ViGEmBus), [HidHide](https://github.com/nefarius/HidHide) von Nefarius.
 
-Inoffizielles Projekt, nicht mit Nintendo verbunden. „Nintendo“, „Switch“, „Wii“, „amiibo“ sind Marken von Nintendo;
+Entwickelt von **devcatskz**. Inoffizielles Projekt, nicht mit Nintendo verbunden. „Nintendo“, „Switch“, „Wii“, „amiibo“ sind Marken von Nintendo;
 „SEGA“ und „Mega Drive“ sind Marken von SEGA.

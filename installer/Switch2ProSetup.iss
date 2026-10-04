@@ -24,7 +24,7 @@
 AppId={{6F3C2B9E-52A1-4C8B-9E44-2D5F1B7A9C31}
 AppName={#AppName}
 AppVersion={#AppVersion}
-AppPublisher=Switch2 Pro Bridge
+AppPublisher=devcatskz
 DefaultDirName={autopf}\Switch2ProBridge
 DefaultGroupName={#AppName}
 DisableProgramGroupPage=yes
