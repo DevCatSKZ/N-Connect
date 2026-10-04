@@ -111,6 +111,8 @@ internal static partial class Tr
         (Re(@"^Spieler (?<n>\d+) – tauschen mit (?<k>.+)$"), m => $"Player {m.Groups["n"]} – swap with {N(m, "k")}"),
         (Re(@"^Spieler (?<n>\d+) – frei$"), m => $"Player {m.Groups["n"]} – free"),
         (Re(@"^Spieler (?<n>\d+)$"), m => $"Player {m.Groups["n"]}"),
+        (Re(@"^Xbox 360 · Platz (?<n>\d+)$"), m => $"Xbox 360 · slot {m.Groups["n"]}"),
+        (Re(@"^Ins Spiel wechseln … (?<n>\d+)$"), m => $"Switch to the game … {m.Groups["n"]}"),
         (Re(@"^(?<k>.+) ist jetzt Spieler (?<n>\d+)$"), m => $"{N(m, "k")} is now player {m.Groups["n"]}"),
         (Re(@"^Spieler (?<a>\d+) und (?<b>\d+) getauscht$"), m => $"Players {m.Groups["a"]} and {m.Groups["b"]} swapped"),
         (Re(@"^Name für (?<k>.+) \(leer = Standardname\):$"), m => $"Name for {N(m, "k")} (empty = default name):"),

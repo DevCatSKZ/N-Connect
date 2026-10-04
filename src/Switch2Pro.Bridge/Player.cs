@@ -172,7 +172,7 @@ internal sealed class Player : IDisposable
             _mac = null; // DSU-Adresse neu bestimmen
         }
         link.StateReceived += OnState;
-        link.SetPlayerAsync(Index).Forget($"{link.Id}: Spieler-LED");
+        link.SetPlayerAsync(LedIndex).Forget($"{link.Id}: Spieler-LED");
         Changed?.Invoke();
     }
 
@@ -317,7 +317,19 @@ internal sealed class Player : IDisposable
                 GyroStickActive = gyroStick;
                 ThreadPool.QueueUserWorkItem(_ => Changed?.Invoke());
             }
-            if (gyroStick && input.Motion is { } motion)
+            // Flick-Stick: der rechte Stick dreht per Maus; ans Spiel geht dann nur noch der Gyro-Anteil.
+            if (settings.FlickStick)
+            {
+                Flick(input.RightX, input.RightY, settings);
+                gamepad = gamepad with { RightX = 0, RightY = 0 };
+            }
+            else if (_lastFlickTicks != 0)
+            {
+                _flick.Reset();
+                _lastFlickTicks = 0;
+            }
+            bool gyroPaused = output.Specials.HasFlag(SpecialAction.GyroPause); // „Ratchet“: Gyro aus, solange gehalten
+            if (gyroStick && !gyroPaused && input.Motion is { } motion)
             {
                 var (gx, gy) = Mapping.GyroToStick(motion, settings, gamepad.RightX, gamepad.RightY);
                 gamepad = gamepad with { RightX = gx, RightY = gy };
@@ -529,6 +541,11 @@ internal sealed class Player : IDisposable
         }
         if (!active || motion is not { } m)
             return;
+        if (wanted.HasFlag(SpecialAction.GyroPause))
+        {
+            _lastGyroTicks = 0; // „Ratchet“: angehalten – beim Loslassen ohne Sprung weiter
+            return;
+        }
 
         long now = System.Diagnostics.Stopwatch.GetTimestamp();
         if (_lastGyroTicks != 0)
@@ -539,13 +556,82 @@ internal sealed class Player : IDisposable
             float yaw = m.GyroZ * DegPerRaw, pitch = m.GyroX * DegPerRaw;
             // Kleines Rauschen unterdrücken (weicher Übergang statt harter Schwelle).
             static float Soft(float v) => MathF.Abs(v) < 1.5f ? v * MathF.Abs(v) / 1.5f : v;
-            float speed = settings.GyroMouseSpeedFor(Kind);
+            float speed = settings.GyroMouseSpeedFor(Kind) * Mapping.GyroAccelFactor(MathF.Sqrt(yaw * yaw + pitch * pitch), settings);
             float dx = -Soft(yaw) * (float)dt * speed;
             float dy = -Soft(pitch) * (float)dt * speed;
             _gyroMouse.Add(settings.MouseInvertX ? -dx : dx, settings.MouseInvertY ? -dy : dy);
         }
         _lastGyroTicks = now;
     }
+
+    // ---------- Flick-Stick ----------
+
+    private readonly FlickStick _flick = new();
+    private long _lastFlickTicks;
+    private float _flickRest;
+
+    /// <summary>
+    /// Flick-Stick rechnen und als waagerechte Mausbewegung ausgeben (Drehwinkel × Counts je 360°). Direkt statt über
+    /// <see cref="SmoothMouse"/>: der Flick ist schon über <see cref="Settings.FlickTime"/> verteilt, jede weitere
+    /// Glättung wäre Verzögerung. Aufruf unter <see cref="_output"/>.
+    /// </summary>
+    private void Flick(float x, float y, Settings settings)
+    {
+        long now = System.Diagnostics.Stopwatch.GetTimestamp();
+        float dt = _lastFlickTicks == 0 ? 0f : (float)Math.Min(0.1, System.Diagnostics.Stopwatch.GetElapsedTime(_lastFlickTicks, now).TotalSeconds);
+        _lastFlickTicks = now;
+        float degrees = _flick.Update(x, y, dt, settings.FlickTime);
+        if (degrees == 0f)
+            return;
+        float counts = degrees * settings.FlickCountsPer360 / 360f + _flickRest;
+        int move = (int)counts;
+        _flickRest = counts - move;
+        if (move != 0)
+            WindowsInput.MoveMouse(move, 0);
+    }
+
+    // ---------- Rückkanal vom Spiel: Spieler-LED, Lichtleiste ----------
+
+    /// <summary>Xbox-Platz (0–3), den Windows dem virtuellen Controller gegeben hat; null = unbekannt bzw. DualShock 4.</summary>
+    public int? GameSlot { get; private set; }
+
+    /// <summary>Lichtleistenfarbe, die ein Spiel dem virtuellen DualShock 4 gesetzt hat; null = keine.</summary>
+    public (byte R, byte G, byte B)? Lightbar { get; private set; }
+
+    /// <summary>Spieler-LED: mit „Spieler-LED vom Spiel“ der Xbox-Platz von Windows, sonst die eigene Spielernummer.</summary>
+    private int LedIndex => _settings().GameLeds && GameSlot is { } slot ? slot : Index;
+
+    private void OnGameSlot(int slot)
+    {
+        if (slot is < 0 or > 3 || slot == GameSlot)
+            return;
+        GameSlot = slot;
+        if (_settings().GameLeds)
+            foreach (var link in Links)
+                link.SetPlayerAsync(slot).Forget($"{link.Id}: Spieler-LED vom Spiel");
+        ThreadPool.QueueUserWorkItem(_ => Changed?.Invoke());
+    }
+
+    private void OnLightbar(byte r, byte g, byte b)
+    {
+        if (Lightbar == (r, g, b))
+            return;
+        Lightbar = (r, g, b);
+        if (_settings().GameLeds)
+        {
+            // HOME-LED (Switch 1 Pro, Joy-Con R) mit der Helligkeit der Lichtleiste – nur bei geänderter Stufe senden.
+            byte level = (byte)(Math.Max(r, Math.Max(g, b)) / 17);
+            if (level != _homeLevel)
+            {
+                _homeLevel = level;
+                foreach (var link in Links)
+                    link.SetHomeLightAsync(level).Forget($"{link.Id}: HOME-LED");
+            }
+        }
+        ThreadPool.QueueUserWorkItem(_ => Changed?.Invoke());
+    }
+
+    private int _homeLevel = -1;
 
     private (float X, float Y)? _pointer;
 
@@ -657,6 +743,10 @@ internal sealed class Player : IDisposable
     {
         var pad = _factory.Create(mode);
         pad.Rumble += OnGameRumble;
+        pad.PlayerIndexAssigned += OnGameSlot;
+        pad.Lightbar += OnLightbar;
+        GameSlot = null; // neuer virtueller Controller: Windows meldet den Platz neu
+        Lightbar = null;
         IVirtualPad? old;
         lock (_output)
         {
@@ -680,6 +770,8 @@ internal sealed class Player : IDisposable
     private void DisposePad(IVirtualPad pad)
     {
         pad.Rumble -= OnGameRumble;
+        pad.PlayerIndexAssigned -= OnGameSlot;
+        pad.Lightbar -= OnLightbar;
         pad.Dispose();
     }
 

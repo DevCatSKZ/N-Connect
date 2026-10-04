@@ -5,7 +5,7 @@
 **`Switch2Pro.Protocol` ist plattformunabhängig** (reines .NET 8, keine Windows-Aufrufe) und läuft unverändert
 unter Linux, macOS und Android (.NET MAUI/Android). Es enthält das gesamte Controller-Wissen: Berichte zerlegen,
 Befehle bauen, Kalibrierung, Kopplungsverfahren der Switch 2, Belegung, Makros, Gyro→Stick, Akkuschätzung,
-DS4-/DSU-Format, Einstellungen (JSON). Die 169 Tests laufen auf jeder Plattform (`dotnet test`).
+DS4-/DSU-Format, Einstellungen (JSON). Die 177 Tests laufen auf jeder Plattform (`dotnet test`).
 
 Wer in einer anderen Sprache portiert, nutzt [PROTOKOLLE.md](PROTOKOLLE.md) und die Tests als Spezifikation
 (Testfälle enthalten echte gemessene Werte).

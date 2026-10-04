@@ -160,6 +160,7 @@ internal static class MappingChoices
             yield return new Choice("⇧  Shift-Ebene (solange gehalten)", nameof(SpecialAction.Shift));
         yield return new Choice("🎯  Gyro als rechter Stick (solange gehalten)", nameof(SpecialAction.GyroStick));
         yield return new Choice("🎯  Gyro als rechter Stick ein/aus", nameof(SpecialAction.GyroStickToggle));
+        yield return new Choice("✋  Gyro anhalten (solange gehalten, „Ratchet“)", nameof(SpecialAction.GyroPause));
         yield return new Choice("🔁  Turbo / Dauerfeuer …", ChooseTurbo);
         yield return new Choice("⏯  Makro (Tastenfolge) …", ChooseMacro);
         yield return new Choice("📷  Bildschirmfoto speichern (Win+Druck)", "Key:Win+Print");

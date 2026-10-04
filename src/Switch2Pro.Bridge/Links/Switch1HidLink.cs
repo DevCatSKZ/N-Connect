@@ -202,6 +202,19 @@ internal sealed class Switch1HidLink : IControllerLink
             ? Task.CompletedTask
             : SubcommandAsync(Switch1.SubPlayerLights, [Commands.PlayerLedMask(playerIndex)], _cts.Token);
 
+    /// <summary>
+    /// HOME-LED (Unterbefehl 0x38, wie SDL): gleichbleibende Helligkeit 0–15; nur Pro Controller und rechter Joy-Con
+    /// haben eine. Muster: 1 Basiszyklus, Starthelligkeit = Helligkeit, danach so bleiben.
+    /// </summary>
+    public Task SetHomeLightAsync(byte intensity)
+    {
+        if (Volatile.Read(ref _closed) == 1 || Kind is not (ControllerKind.Pro1 or ControllerKind.JoyCon1Right))
+            return Task.CompletedTask;
+        byte level = (byte)Math.Min((int)intensity, 15);
+        byte[] pattern = level == 0 ? [0, 0, 0, 0] : [0x01, (byte)(level << 4), (byte)(level << 4), 0x00];
+        return SubcommandAsync(Switch1.SubHomeLight, pattern, _cts.Token);
+    }
+
     /// <summary>Unterbefehl 0x06 (HCI-Zustand) mit 0x00: Controller trennt die Verbindung und schläft.</summary>
     public Task SleepAsync() =>
         Volatile.Read(ref _closed) == 1 ? Task.CompletedTask : SubcommandAsync(Switch1.SubSetHciState, [0x00], _cts.Token);

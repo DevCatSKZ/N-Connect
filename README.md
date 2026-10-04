@@ -69,6 +69,10 @@ Die Suche im Hintergrund läuft nur, solange gerade niemand spielt; gezielt such
   bestätigen) – Steam sieht nur den virtuellen Xbox-Controller. **Erscheint als** je Controller wählbar (Xbox 360 oder
   DualShock 4 mit Gyro), Standard Xbox 360.
 - **Joy-Con im Ladegriff per USB** (Switch 1) werden erkannt.
+- **Gyro-Extras wie in JoyShockMapper:** Flick-Stick (rechter Stick dreht die Kamera sofort in seine Richtung, je Spiel
+  per „Testdrehung“ einstellbar), Gyro-Beschleunigung, Taste „Gyro anhalten“ (Ratchet).
+- **Rückmeldung vom Spiel:** Spieler-LEDs zeigen den Xbox-Platz von Windows; bei DualShock 4 steuert die Lichtleiste
+  des Spiels die HOME-LED (Switch 1 Pro, Joy-Con R) und wird in der Karte angezeigt.
 - **Spieler-Reihenfolge:** Leiste über den Karten – mit ‹ › festlegen, welcher Controller Spieler 1, 2 … ist
   (Spieler 1 = erster Controller für Windows, Steam und Spiele; Lichter ziehen mit, wird je Controller gemerkt).
   Wird ein Controller getrennt, rücken die anderen automatisch auf. Auch über den Kartentitel (dort auch

@@ -64,6 +64,12 @@ internal sealed class SettingsForm : Form
     private readonly Slider _gyroMouseSpeed = Bar(2, 80, v => $"{v}");
     private readonly ToggleSwitch _invertX = new();
     private readonly ToggleSwitch _invertY = new();
+    private readonly Slider _gyroAccel = Bar(100, 400, v => v <= 100 ? "aus" : $"{v / 100f:0.0#}×", step: 10);
+    private readonly ToggleSwitch _flick = new();
+    private readonly Slider _flickCounts = Bar(500, 20000, v => $"{v}", step: 100);
+    private readonly Slider _flickTime = Bar(0, 300, v => $"{v} ms", step: 10);
+    private readonly GlyphButton _flickTest = new("Testdrehung (360°)", Glyph.Rotate);
+    private readonly ToggleSwitch _gameLeds = new();
 
     // ---------- Joy-Con & Wii ----------
     private readonly ToggleSwitch _combine = new();
@@ -276,7 +282,18 @@ internal sealed class SettingsForm : Form
         page.AddGroup("Mausrichtung (Gyro-Maus und Joy-Con-Maus)",
             Row("Links/rechts umkehren", null, _invertX, Glyph.Swap),
             Row("Hoch/runter umkehren", null, _invertY, Glyph.Swap));
-        var toMapping = new SettingRow("Gyro-Funktionen einer Taste zuweisen", "Gyro-Maus oder Gyro-Stick ein/aus bzw. solange gehalten",
+        page.AddGroup("Gyro-Beschleunigung",
+            Row("Bei schneller Drehung", "Langsame Bewegungen bleiben fein, schnelle drehen weiter (wie JoyShockMapper). " +
+                "Voll ab 120 °/s, unter 20 °/s normal. Gilt für Gyro-Stick und Gyro-Maus.", _gyroAccel, Glyph.Gauge));
+        page.AddGroup("Flick-Stick (Spiele mit Maussteuerung)",
+            Row("Flick-Stick", "Rechten Stick in eine Richtung schieben = Kamera dreht sofort dorthin; am Rand drehen = Kamera dreht mit. " +
+                "Zielen dann per Gyro. Der rechte Stick geht nicht mehr ans Spiel.", _flick, Glyph.Stick),
+            Row("Mausbewegung je Umdrehung", "Je Spiel einmal einstellen: „Testdrehung“ klicken, ins Spiel wechseln – nach 3 s dreht " +
+                "die Kamera einmal. Genau eine volle Drehung = richtig.", _flickCounts, Glyph.Mouse),
+            Row("Testdrehung", null, _flickTest, Glyph.Rotate),
+            Row("Flick-Dauer", "So lange dauert die Drehung beim Flick (0 = sofort).", _flickTime, Glyph.Timer));
+        var toMapping = new SettingRow("Gyro-Funktionen einer Taste zuweisen",
+            "Gyro-Maus oder Gyro-Stick ein/aus bzw. solange gehalten, „Gyro anhalten“ (Ratchet: Controller zurückführen, ohne dass sich das Ziel bewegt)",
             null, Glyph.Keyboard) { Navigates = true };
         toMapping.Click += (_, _) => ShowPage(PageMapping);
         page.AddGroup(null, toMapping);
@@ -331,7 +348,9 @@ internal sealed class SettingsForm : Form
                 ? "Empfohlen: Steam und viele Spiele kennen Switch-1-, NSO- und USB-Controller selbst und sähen sie sonst doppelt. " +
                   "Beim ersten Verbinden fragt Windows einmal nach Adminrechten."
                 : "Steam und viele Spiele sehen Switch-1-, NSO- und USB-Controller sonst doppelt. Dafür wird das kostenlose " +
-                  "HidHide gebraucht (bei der N-Connect-Installation dabei, hier nachträglich).", hideContent, Glyph.Eye));
+                  "HidHide gebraucht (bei der N-Connect-Installation dabei, hier nachträglich).", hideContent, Glyph.Eye),
+            Row("Spieler-LED und Lichtleiste vom Spiel", "Die Spieler-LEDs zeigen den Xbox-Platz, den Windows vergibt. Bei DualShock 4 " +
+                "steuert die Lichtleiste des Spiels die HOME-LED (Switch 1 Pro Controller, rechter Joy-Con).", _gameLeds, Glyph.Flash));
         var pair = new GlyphButton("Controller koppeln …", Glyph.Bluetooth) { Enabled = _wiiPairing is not null };
         pair.Click += (_, _) => _wiiPairing?.Invoke();
         page.AddGroup("Verbinden",
@@ -466,6 +485,12 @@ internal sealed class SettingsForm : Form
         _gyroStickSpeed.ValueChanged += (_, _) => Apply(() => _settings.GyroStickFullSpeed = _gyroStickSpeed.Value);
         _gyroStickMin.ValueChanged += (_, _) => Apply(() => _settings.GyroStickAntiDeadzone = _gyroStickMin.Value / 100f);
         _gyroStickInvert.CheckedChanged += (_, _) => Apply(() => _settings.GyroStickInvertY = _gyroStickInvert.Checked);
+        _gyroAccel.ValueChanged += (_, _) => Apply(() => _settings.GyroAcceleration = _gyroAccel.Value / 100f);
+        _flick.CheckedChanged += (_, _) => Apply(() => _settings.FlickStick = _flick.Checked);
+        _flickCounts.ValueChanged += (_, _) => Apply(() => _settings.FlickCountsPer360 = _flickCounts.Value);
+        _flickTime.ValueChanged += (_, _) => Apply(() => _settings.FlickTime = _flickTime.Value / 1000f);
+        _flickTest.Click += async (_, _) => await FlickTestAsync();
+        _gameLeds.CheckedChanged += (_, _) => Apply(() => _settings.GameLeds = _gameLeds.Checked);
         _stickCurve.ValueChanged += (_, _) => { Apply(() => _settings.StickCurve = _stickCurve.Value / 100f); RefreshTuning(); };
         _triggerDeadzone.ValueChanged += (_, _) => { Apply(() => _settings.TriggerDeadzone = _triggerDeadzone.Value / 100f); RefreshTuning(); };
         _triggerFull.ValueChanged += (_, _) => { Apply(() => _settings.TriggerFullAt = _triggerFull.Value / 100f); RefreshTuning(); };
@@ -557,6 +582,11 @@ internal sealed class SettingsForm : Form
         _gyroStickSpeed.Value = Clamp(_gyroStickSpeed, _settings.GyroStickFullSpeed);
         _gyroStickMin.Value = Clamp(_gyroStickMin, _settings.GyroStickAntiDeadzone * 100);
         _gyroStickInvert.Checked = _settings.GyroStickInvertY;
+        _gyroAccel.Value = Clamp(_gyroAccel, _settings.GyroAcceleration * 100);
+        _flick.Checked = _settings.FlickStick;
+        _flickCounts.Value = Clamp(_flickCounts, _settings.FlickCountsPer360);
+        _flickTime.Value = Clamp(_flickTime, _settings.FlickTime * 1000);
+        _gameLeds.Checked = _settings.GameLeds;
         _stickCurve.Value = Clamp(_stickCurve, _settings.StickCurve * 100);
         _triggerDeadzone.Value = Clamp(_triggerDeadzone, _settings.TriggerDeadzone * 100);
         _triggerFull.Value = Clamp(_triggerFull, _settings.TriggerFullAt * 100);
@@ -808,6 +838,40 @@ internal sealed class SettingsForm : Form
     }
 
     // ---------- Übernehmen ----------
+
+    /// <summary>
+    /// Flick-Stick einstellen (wie JoyShockMapper): 3 s Zeit, ins Spiel zu wechseln, dann eine volle Drehung
+    /// (eingestellte Counts) über 0,5 s als Mausbewegung. Dreht die Kamera genau einmal, stimmt der Wert.
+    /// </summary>
+    private async Task FlickTestAsync()
+    {
+        _flickTest.Enabled = false;
+        try
+        {
+            for (int s = 3; s > 0; s--)
+            {
+                _flickTest.Text = Tr.T($"Ins Spiel wechseln … {s}");
+                await Task.Delay(1000);
+            }
+            _flickTest.Text = Tr.T("Dreht …");
+            int total = _settings.FlickCountsPer360, steps = 50, sent = 0;
+            for (int i = 1; i <= steps; i++)
+            {
+                int target = total * i / steps;
+                WindowsInput.MoveMouse(target - sent, 0);
+                sent = target;
+                await Task.Delay(10);
+            }
+        }
+        finally
+        {
+            if (!IsDisposed)
+            {
+                _flickTest.Text = Tr.T("Testdrehung (360°)");
+                _flickTest.Enabled = true;
+            }
+        }
+    }
 
     private void SetOutput(OutputMode mode)
     {

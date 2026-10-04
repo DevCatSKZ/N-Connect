@@ -830,8 +830,12 @@ internal sealed class ControllerOverview : Panel
                 _view.WiiExtension = first is WiimoteHidLink wii ? wii.Extension : WiiExtension.None;
                 _view.Show(input, gamepad);
             }
-            _view.PlayerIndex = player.Index;
+            // LEDs in der Grafik wie am Controller: mit „Spieler-LED vom Spiel“ der Xbox-Platz von Windows.
+            _view.PlayerIndex = settings.GameLeds && player.GameSlot is { } slot ? slot : player.Index;
             var mouse = links.Where(player.MouseActive).ToList();
+            _info.Game = player.Output == OutputMode.DualShock4
+                ? ("DualShock 4", player.Lightbar is { } bar ? Color.FromArgb(bar.R, bar.G, bar.B) : null)
+                : (player.GameSlot is { } s ? $"Xbox 360 · Platz {s + 1}" : "Xbox 360", null);
             _info.Show(links, input, mouse);
             if (_expanded && _details is { Visible: true } details)
                 details.Show(links, input, mouse);
@@ -1032,6 +1036,21 @@ internal sealed class ControllerOverview : Panel
         /// <summary>Kompakt (Karte): nur Akku, Verbindung, Griff/Maus und gedrückte Tasten; sonst alle Eigenschaften.</summary>
         public bool Compact { get; init; } = true;
 
+        /// <summary>Wie Spiele den Controller sehen (Art, Xbox-Platz) und ggf. die vom Spiel gesetzte Lichtleiste.</summary>
+        public (string Text, Color? Lightbar)? Game
+        {
+            get => _game;
+            set
+            {
+                if (_game == value)
+                    return;
+                _game = value;
+                Invalidate();
+            }
+        }
+
+        private (string Text, Color? Lightbar)? _game;
+
         public InfoPanel()
         {
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint, true);
@@ -1100,6 +1119,20 @@ internal sealed class ControllerOverview : Panel
                 if (link.Kind is ControllerKind.JoyCon2Left or ControllerKind.JoyCon2Right)
                     Row(g, ref y, "Maus", _mouse.Contains(link) ? "aktiv (liegt auf dem Tisch)" : "bereit (auf den Tisch legen)");
                 y += 8;
+            }
+            if (_game is { } game)
+            {
+                Row(g, ref y, "Im Spiel", game.Text);
+                if (g is not null && game.Lightbar is { } color)
+                {
+                    // Lichtleiste, die das Spiel gesetzt hat, als kleiner Balken hinter dem Text.
+                    int x = LabelWidth + TextRenderer.MeasureText(Tr.T(game.Text), UiFonts.Body).Width + 8;
+                    using var path = Theme.RoundedRect(new RectangleF(x, y - RowHeight + 5, 28, 12), 4);
+                    using var fill = new SolidBrush(color);
+                    g.FillPath(fill, path);
+                    using var pen = new Pen(Theme.Current.Border);
+                    g.DrawPath(pen, path);
+                }
             }
             var pressed = _input is null ? [] : Enum.GetValues<ProButtons>()
                 .Where(b => b != ProButtons.None && _input.Has(b)).Select(ButtonName).ToList();

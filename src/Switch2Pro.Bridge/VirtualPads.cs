@@ -14,6 +14,8 @@ internal interface IVirtualPad : IDisposable
     event Action<byte, byte>? Rumble;
     /// <summary>Spielernummer, die Windows dem virtuellen Xbox-Controller zuteilt (0–3).</summary>
     event Action<int>? PlayerIndexAssigned;
+    /// <summary>Lichtleistenfarbe, die ein Spiel dem virtuellen DualShock 4 setzt (R, G, B).</summary>
+    event Action<byte, byte, byte>? Lightbar;
 }
 
 /// <summary>Verwaltet die Verbindung zum ViGEmBus-Treiber.</summary>
@@ -56,7 +58,22 @@ internal sealed class Xbox360Pad : IVirtualPad
     private bool _disposed;
 
     public event Action<byte, byte>? Rumble;
-    public event Action<int>? PlayerIndexAssigned;
+    public event Action<byte, byte, byte>? Lightbar { add { } remove { } }
+
+    private Action<int>? _playerIndexAssigned;
+    private volatile int _slot = -1;
+
+    /// <summary>Windows meldet den Platz schon beim Verbinden – wer sich danach anmeldet, bekommt ihn nachgeliefert.</summary>
+    public event Action<int>? PlayerIndexAssigned
+    {
+        add
+        {
+            _playerIndexAssigned += value;
+            if (_slot >= 0)
+                value?.Invoke(_slot);
+        }
+        remove => _playerIndexAssigned -= value;
+    }
 
     public Xbox360Pad(IXbox360Controller pad)
     {
@@ -69,7 +86,8 @@ internal sealed class Xbox360Pad : IVirtualPad
     private void OnFeedback(object? sender, Xbox360FeedbackReceivedEventArgs e)
     {
         Rumble?.Invoke(e.LargeMotor, e.SmallMotor);
-        PlayerIndexAssigned?.Invoke(e.LedNumber);
+        _slot = e.LedNumber;
+        _playerIndexAssigned?.Invoke(e.LedNumber);
     }
 
     private static readonly (XButtons Flag, Xbox360Button Button)[] ButtonMap =
@@ -127,6 +145,7 @@ internal sealed class Ds4Pad : IVirtualPad
 
     public event Action<byte, byte>? Rumble;
     public event Action<int>? PlayerIndexAssigned { add { } remove { } }
+    public event Action<byte, byte, byte>? Lightbar;
 
     public Ds4Pad(IDualShock4Controller pad)
     {
@@ -141,7 +160,8 @@ internal sealed class Ds4Pad : IVirtualPad
 
     /// <summary>
     /// Liest die Ausgabeberichte, die Spiele an den virtuellen DS4 schicken (USB-Bericht 0x05:
-    /// Byte 1 Bit 0 = Vibration gültig, Byte 4 = kleiner Motor, Byte 5 = großer Motor).
+    /// Byte 1 Bit 0 = Vibration gültig, Bit 1 = Lichtleiste gültig, Byte 4 = kleiner Motor, Byte 5 = großer Motor,
+    /// Byte 6–8 = Lichtleiste R, G, B – wie DS4Windows).
     /// </summary>
     private void ReadOutputReports()
     {
@@ -154,6 +174,8 @@ internal sealed class Ds4Pad : IVirtualPad
                     continue;
                 if (report[0] == 0x05 && (report[1] & 0x01) != 0)
                     Rumble?.Invoke(report[5], report[4]);
+                if (report[0] == 0x05 && (report[1] & 0x02) != 0 && report.Length >= 9)
+                    Lightbar?.Invoke(report[6], report[7], report[8]);
             }
             catch (Exception e)
             {
