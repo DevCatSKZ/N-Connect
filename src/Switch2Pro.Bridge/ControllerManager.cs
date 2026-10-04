@@ -652,9 +652,58 @@ internal sealed class ControllerManager : IAsyncDisposable
             ControllerPairing.NoteDisconnected(link.Address); // eben getrennt ≠ Kopplungsmodus
             Log.Info($"{link.Kind.DisplayName()} getrennt");
             if (!_disposed)
+            {
                 Notify?.Invoke($"{link.Kind.DisplayName()} getrennt");
+                if (emptied is not null)
+                    CompactPlayers();
+            }
             Changed?.Invoke();
         }));
+    }
+
+    /// <summary>
+    /// Lücken schließen: Fällt ein Spieler weg (getrennt, Joy-Con zum Paar zusammengefasst), rücken die übrigen auf –
+    /// wer Spieler 2 war, wird Spieler 1 usw. Die virtuellen Controller werden in der neuen Reihenfolge angelegt, damit
+    /// Windows, Steam und Spiele dieselbe Reihenfolge sehen. Gemerkte Plätze bleiben unverändert; ein zurückkehrender
+    /// Controller bekommt seinen Platz nur, wenn er frei ist, sonst reiht er sich hinten ein.
+    /// </summary>
+    private void CompactPlayers()
+    {
+        List<Player> ordered;
+        var moved = new List<string>();
+        lock (_playerGate)
+        {
+            ordered = [.. _players.OrderBy(p => p.Index)];
+            if (ordered.Select((p, i) => p.Index == i).All(same => same))
+                return;
+            var settings = _settings();
+            for (int i = 0; i < ordered.Count; i++)
+            {
+                if (ordered[i].Index == i)
+                    continue;
+                ordered[i].MoveTo(i);
+                moved.Add($"{ordered[i].DisplayName(settings)} ist jetzt Spieler {i + 1}");
+            }
+        }
+        foreach (var p in ordered)
+            p.ReleasePad();
+        foreach (var p in ordered)
+        {
+            try
+            {
+                p.RestorePad();
+            }
+            catch (Exception e)
+            {
+                Log.Error($"Spieler {p.Index + 1}: virtuellen Controller neu anlegen", e);
+            }
+        }
+        foreach (var message in moved)
+        {
+            Log.Info(message);
+            Notify?.Invoke(message);
+        }
+        Changed?.Invoke();
     }
 
     private Player NewPlayer(int index, IControllerLink link)
@@ -670,8 +719,9 @@ internal sealed class ControllerManager : IAsyncDisposable
     private int FreeIndex(string? address = null)
     {
         var used = _players.Select(p => p.Index).ToHashSet();
-        // Gemerkter Platz des Controllers, wenn frei – so landet er nach dem Verbinden wieder dort.
-        if (_settings().SlotFor(address) is { } slot && !used.Contains(slot))
+        // Gemerkter Platz des Controllers, wenn frei und ohne Lücke davor – so landet er nach dem Verbinden wieder
+        // dort, aber es entsteht kein „Spieler 3“ ohne Spieler 1 und 2.
+        if (_settings().SlotFor(address) is { } slot && !used.Contains(slot) && slot <= _players.Count)
             return slot;
         return Enumerable.Range(0, MaxPlayers).FirstOrDefault(i => !used.Contains(i), -1);
     }
@@ -689,6 +739,7 @@ internal sealed class ControllerManager : IAsyncDisposable
         Player? other;
         lock (_playerGate)
         {
+            target = Math.Min(target, _players.Count - 1); // keine Lücken: höchstens der letzte belegte Platz
             if (!_players.Contains(player) || player.Index == target)
                 return;
             other = _players.FirstOrDefault(p => p.Index == target);
@@ -814,6 +865,8 @@ internal sealed class ControllerManager : IAsyncDisposable
         emptied?.Dispose();
         Log.Info(message);
         Notify?.Invoke(message);
+        if (emptied is not null)
+            CompactPlayers();
         Changed?.Invoke();
     }
 

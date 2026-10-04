@@ -591,6 +591,8 @@ internal static partial class Tr
         ["Klicken, um Kopplungsdaten der Controller zu übernehmen."] = "Click to take over controller pairing data.",
         ["Controller-Kopplungen von der Switch-SD-Karte oder von einem anderen PC übernehmen – oder für einen anderen PC exportieren. Es werden nur Einstellungen von N-Connect geändert; Windows und der Bluetooth-Adapter bleiben unverändert."] =
             "Take over controller pairings from the Switch SD card or from another PC – or export them for another PC. Only N-Connect settings are changed; Windows and the Bluetooth adapter stay untouched.",
+        ["Spieler-Reihenfolge – Spieler 1 ist für Windows, Steam und Spiele der erste Controller. Mit ‹ › umsortieren."] =
+            "Player order – player 1 is the first controller for Windows, Steam and games. Use ‹ › to reorder.",
         ["Von der Switch-SD-Karte"] = "From the Switch SD card",
         ["Mit Bluepick_RCM oder hekate erstellte Kopplungsdaten (switchroot/joycon_mac.ini)"] =
             "Pairing data created with Bluepick_RCM or hekate (switchroot/joycon_mac.ini)",
