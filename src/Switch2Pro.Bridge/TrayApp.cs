@@ -146,7 +146,7 @@ internal sealed class TrayApp : ApplicationContext
             await Task.Delay(5000, ct);
             while (!ct.IsCancellationRequested)
             {
-                if (_settings.AutoPair && !SomeonePlaying())
+                if (_settings.AutoPair && CanScanInBackground())
                 {
                     var paired = ControllerPairing.BackgroundScan();
                     if (paired.Count > 0)
@@ -171,11 +171,19 @@ internal sealed class TrayApp : ApplicationContext
         }
     }
 
-    /// <summary>Hat in den letzten 20 Sekunden jemand einen Controller benutzt?</summary>
-    private bool SomeonePlaying()
+    /// <summary>
+    /// Darf jetzt im Hintergrund gesucht werden? Eine Suche belegt den Bluetooth-Funk – Switch-2-Controller
+    /// (Bluetooth LE) verbinden sich dabei nicht („Unreachable“) oder brechen ab. Deshalb nur, wenn keiner per
+    /// Bluetooth LE verbunden ist, gerade keiner verbunden wird und seit 20 Sekunden niemand spielt.
+    /// </summary>
+    private bool CanScanInBackground()
     {
+        if (_manager is null || _manager.IsConnecting)
+            return false;
         long now = Environment.TickCount64;
-        return _manager?.Players.Any(p => now - p.LastActivity < 20_000) == true;
+        var players = _manager.Players;
+        return !players.Any(p => p.Links.Any(l => l.Transport == Links.Transport.BluetoothLE))
+               && !players.Any(p => now - p.LastActivity < 20_000);
     }
 
     private PairForm? _wiiPairing;

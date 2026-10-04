@@ -165,9 +165,11 @@ internal static class ControllerPairing
                 while (DateTime.UtcNow < until && !ct.IsCancellationRequested)
                 {
                     progress("Suche … SYNC-Taste am Controller drücken (Joy-Con: an der Schiene, Wii-Fernbedienung: im Batteriefach).");
-                    paired.AddRange(ScanOnce(radio, radioAddress, progress));
+                    paired.AddRange(ScanOnce(radio, radioAddress, progress, repairRemembered: true));
                     if (paired.Count > 0)
                         break;
+                    // Kurze Pause zwischen den Suchläufen: verbundene Controller bekommen wieder Funkzeit.
+                    ct.WaitHandle.WaitOne(1000);
                 }
             }
             finally
@@ -196,7 +198,7 @@ internal static class ControllerPairing
                 return [];
             try
             {
-                return ScanOnce(radio, radioAddress, _ => { });
+                return ScanOnce(radio, radioAddress, _ => { }, repairRemembered: false);
             }
             finally
             {
@@ -223,7 +225,12 @@ internal static class ControllerPairing
         return true;
     }
 
-    private static List<string> ScanOnce(IntPtr radio, ulong radioAddress, Action<string> progress)
+    /// <param name="repairRemembered">
+    /// Auch Controller neu koppeln, die Windows schon kennt (alte Kopplung wird entfernt). Nur im Fenster „Controller
+    /// koppeln“, wenn der Nutzer gerade SYNC drückt – im Hintergrund nie: dort lässt sich ein gekoppelter, nur kurz
+    /// sichtbarer Controller nicht sicher von einem im Kopplungsmodus unterscheiden (so ging eine Wii-Kopplung verloren).
+    /// </param>
+    private static List<string> ScanOnce(IntPtr radio, ulong radioAddress, Action<string> progress, bool repairRemembered)
     {
         var paired = new List<string>();
         foreach (var device in Inquiry(radio))
@@ -233,6 +240,8 @@ internal static class ControllerPairing
                 continue;
             var info = device;
             if (info.fConnected != 0 && info.fAuthenticated != 0)
+                continue;
+            if (info.fRemembered != 0 && !repairRemembered)
                 continue;
             // Gemerkte Controller nur anfassen, wenn sie gerade in Reichweite sichtbar sind (SYNC gedrückt);
             // sonst ginge die Kopplung eines anderen, nur ausgeschalteten Controllers verloren.
@@ -276,7 +285,7 @@ internal static class ControllerPairing
         }
     }
 
-    /// <summary>Eine Suche (≈ 2,5 s) nach Geräten in Reichweite.</summary>
+    /// <summary>Eine kurze Suche (≈ 1,3 s) nach Geräten in Reichweite – kurz, damit verbundene Controller nicht abreißen.</summary>
     private static List<BLUETOOTH_DEVICE_INFO> Inquiry(IntPtr radio)
     {
         var result = new List<BLUETOOTH_DEVICE_INFO>();
@@ -284,7 +293,7 @@ internal static class ControllerPairing
         {
             dwSize = Marshal.SizeOf<BLUETOOTH_DEVICE_SEARCH_PARAMS>(),
             fReturnAuthenticated = 1, fReturnRemembered = 1, fReturnUnknown = 1, fReturnConnected = 1, fIssueInquiry = 1,
-            cTimeoutMultiplier = 2, hRadio = radio,
+            cTimeoutMultiplier = 1, hRadio = radio,
         };
         var info = new BLUETOOTH_DEVICE_INFO { dwSize = Marshal.SizeOf<BLUETOOTH_DEVICE_INFO>(), szName = "" };
         var find = BluetoothFindFirstDevice(ref search, ref info);
