@@ -43,6 +43,10 @@ internal interface IControllerLink : IAsyncDisposable
     bool IsLost { get; }
     /// <summary>Joy-Con 2 steckt im Charging Grip (dessen GL/GR-Tasten sind dann eingeschaltet).</summary>
     bool InGrip => false;
+    /// <summary>Eigener Gerätename (z. B. Kabel-Gamepads von HORI/PowerA), sonst null = Name der Controller-Art.</summary>
+    string? ProductName => null;
+    /// <summary>HID-Instanz eines USB-Geräts, das Spiele zusätzlich direkt sehen (zum Verstecken per HidHide), sonst null.</summary>
+    string? HidInstanceId => null;
 
     event Action<IControllerLink, ControllerState>? StateReceived;
     /// <summary>Wird genau einmal ausgelöst, wenn die Verbindung abbricht.</summary>

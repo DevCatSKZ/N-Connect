@@ -36,7 +36,7 @@ internal sealed class StickCalibrationForm : Form
         foreach (var link in player.Links)
         {
             // DemoLink: simulierte Controller der Prüfhilfe (--demo, --render-ui).
-            if (link is not (Switch2BleLink or Switch2UsbLink or Switch1HidLink or DemoLink) || link.Address is null)
+            if (link is not (Switch2BleLink or Switch2UsbLink or Switch1HidLink or WiredPadLink or DemoLink) || link.Address is null)
                 continue;
             var k = link.Kind;
             bool both = k is ControllerKind.Pro2 or ControllerKind.Pro1 or ControllerKind.GameCube2;

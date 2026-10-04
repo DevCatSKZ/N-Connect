@@ -82,8 +82,12 @@ internal sealed class Switch1HidLink : IControllerLink
 
         if (await SubcommandAsync(Switch1.SubDeviceInfo, [], ct) is { Length: >= 10 } info)
         {
-            // Byte 4–9: MAC (big-endian).
-            Address = string.Join(':', info.Skip(4).Take(6).Select(b => b.ToString("X2")));
+            // Byte 4–9: MAC (big-endian). Nachbauten melden teils 00:00:… bzw. FF:FF:… – dann die eindeutige
+            // Gerätekennung nehmen, sonst teilten sich mehrere solche Controller Namen, Platz und Kalibrierung.
+            var mac = info.Skip(4).Take(6).ToArray();
+            Address = mac.All(b => b == 0) || mac.All(b => b == 0xFF)
+                ? $"HID:{UsbNative.GetInstanceId(Id) ?? Id}"
+                : string.Join(':', mac.Select(b => b.ToString("X2")));
             Info = Info with { Firmware = $"{info[0]}.{info[1]:D2}" };
             // Byte 2: Gerätetyp – NES-Controller geben sich per Produkt-ID als Joy-Con aus.
             var detected = ControllerKinds.FromSwitch1DeviceType(info[2], Kind);
@@ -140,8 +144,25 @@ internal sealed class Switch1HidLink : IControllerLink
         Log.Info($"{Id}: Kalibrierung L={cal.Left} R={cal.Right} IMU={_imu}");
     }
 
-    private Task<byte[]?> SpiReadAsync(uint address, byte length, CancellationToken ct) =>
-        SubcommandAsync(Switch1.SubSpiRead, Switch1.SpiReadArgs(address, length), ct, address);
+    /// <summary>
+    /// Speicher lesen. Manche Nachbauten (Lizenz-Controller, ältere 8BitDo-Firmware) beantworten das gar nicht – dann
+    /// nicht jede weitere Leseanfrage einzeln ins Leere laufen lassen (~1 s je Anfrage), sondern Standardwerte nutzen.
+    /// </summary>
+    private async Task<byte[]?> SpiReadAsync(uint address, byte length, CancellationToken ct)
+    {
+        if (_spiUnsupported)
+            return null;
+        var reply = await SubcommandAsync(Switch1.SubSpiRead, Switch1.SpiReadArgs(address, length), ct, address);
+        if (reply is null && !_spiAnswered)
+        {
+            _spiUnsupported = true;
+            Log.Info($"{Id}: Speicher nicht lesbar (Nachbau?) – Standard-Kalibrierung, keine Farben");
+        }
+        _spiAnswered |= reply is not null;
+        return reply;
+    }
+
+    private bool _spiUnsupported, _spiAnswered;
 
     /// <summary>Unterbefehl senden (bis zu 3 Versuche) und Antwort 0x21 abwarten.</summary>
     private async Task<byte[]?> SubcommandAsync(byte subcommand, byte[] data, CancellationToken ct, uint spiAddress = 0)
