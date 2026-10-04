@@ -187,6 +187,31 @@ public sealed class Settings
     public float GyroStickAntiDeadzone { get; set; } = 0.12f;
     public bool GyroStickInvertY { get; set; }
 
+    /// <summary>
+    /// Gyro-Beschleunigung (wie JoyShockMapper MIN/MAX_GYRO_SENS): bei langsamer Drehung (≤ <see cref="GyroAccelSlow"/>
+    /// °/s) normale Empfindlichkeit, bei schneller (≥ <see cref="GyroAccelFast"/> °/s) das <see cref="GyroAcceleration"/>-
+    /// fache, dazwischen linear. 1 = aus. Gilt für Gyro-Stick und Gyro-Maus.
+    /// </summary>
+    public float GyroAcceleration { get; set; } = 1f;
+    public float GyroAccelSlow { get; set; } = 20f;
+    public float GyroAccelFast { get; set; } = 120f;
+
+    /// <summary>
+    /// Flick-Stick (wie JoyShockMapper FLICK_STICK): Der rechte Stick dreht die Kamera per Maus sofort in die Richtung,
+    /// in die er zeigt; am Rand gedreht dreht sie mit. Für Spiele mit Maussteuerung (Zielen per Gyro, Drehen per Stick).
+    /// </summary>
+    public bool FlickStick { get; set; }
+    /// <summary>Mausbewegung (Bildpunkte/Counts) für eine volle Drehung im Spiel – je Spiel einmal einstellen.</summary>
+    public int FlickCountsPer360 { get; set; } = 3600;
+    /// <summary>Dauer eines Flicks in Sekunden (JoyShockMapper FLICK_TIME).</summary>
+    public float FlickTime { get; set; } = 0.1f;
+
+    /// <summary>
+    /// Spieler-LED und Lichtleiste aus dem Spiel übernehmen: Xbox-Platz, den Windows vergibt, als Spieler-LED;
+    /// DualShock-4-Lichtleiste als HOME-LED (Switch 1 Pro, Joy-Con R) und in der Übersicht.
+    /// </summary>
+    public bool GameLeds { get; set; } = true;
+
     /// <summary>Stick-Kennlinie: 1 = linear, &gt; 1 = feiner in der Mitte, &lt; 1 = schneller.</summary>
     public float StickCurve { get; set; } = 1f;
     /// <summary>Analoge Trigger (GameCube): Totzone am Anfang, 0–0,5.</summary>
@@ -399,6 +424,13 @@ public sealed class Settings
         GyroStickFullSpeed = other.GyroStickFullSpeed;
         GyroStickAntiDeadzone = other.GyroStickAntiDeadzone;
         GyroStickInvertY = other.GyroStickInvertY;
+        GyroAcceleration = other.GyroAcceleration;
+        GyroAccelSlow = other.GyroAccelSlow;
+        GyroAccelFast = other.GyroAccelFast;
+        FlickStick = other.FlickStick;
+        FlickCountsPer360 = other.FlickCountsPer360;
+        FlickTime = other.FlickTime;
+        GameLeds = other.GameLeds;
         StickCurve = other.StickCurve;
         TriggerDeadzone = other.TriggerDeadzone;
         TriggerFullAt = other.TriggerFullAt;
@@ -531,6 +563,11 @@ public sealed class Settings
         static float Fin(float v, float min, float max, float fallback) => float.IsFinite(v) ? Math.Clamp(v, min, max) : fallback;
         GyroStickFullSpeed = Fin(GyroStickFullSpeed, 20f, 1000f, 150f);
         GyroStickAntiDeadzone = Fin(GyroStickAntiDeadzone, 0f, 0.4f, 0.12f);
+        GyroAcceleration = Fin(GyroAcceleration, 1f, 4f, 1f);
+        GyroAccelSlow = Fin(GyroAccelSlow, 0f, 500f, 20f);
+        GyroAccelFast = Fin(GyroAccelFast, GyroAccelSlow + 1f, 1000f, Math.Max(GyroAccelSlow + 1f, 120f));
+        FlickCountsPer360 = Math.Clamp(FlickCountsPer360, 100, 100_000);
+        FlickTime = Fin(FlickTime, 0f, 0.5f, 0.1f);
         StickCurve = Fin(StickCurve, 0.3f, 3f, 1f);
         TriggerDeadzone = Fin(TriggerDeadzone, 0f, 0.5f, 0.05f);
         TriggerFullAt = Fin(TriggerFullAt, 0.5f, 1f, 1f);

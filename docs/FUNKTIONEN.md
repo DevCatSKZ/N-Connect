@@ -211,6 +211,26 @@ Bis zu **8 Spieler** gleichzeitig (`ControllerManager.MaxPlayers`). Der 9. Contr
 - **DualShock 4**: Bewegungsdaten gehen an Spiele/Steam.
 - **Cemuhook/DSU** (Standard an): UDP 127.0.0.1:26760 für Emulatoren (Cemu, Dolphin, Yuzu-Nachfolger …).
 
+### 7.1 Extras nach JoyShockMapper (Referenz: JSM-Dokumentation, gleiche Begriffe)
+- **Gyro-Beschleunigung** (`GyroAcceleration` 1–4, 1 = aus; `GyroAccelSlow` 20 °/s, `GyroAccelFast` 120 °/s – wie
+  MIN/MAX_GYRO_SENS mit MIN/MAX_GYRO_THRESHOLD): Faktor 1 bis zur langsamen Schwelle, voll ab der schnellen,
+  dazwischen linear (`Mapping.GyroAccelFactor`). Gilt für Gyro-Stick und Gyro-Maus.
+- **Gyro anhalten / „Ratchet“** (`SpecialAction.GyroPause`, wie GYRO_OFF): einer Taste zuweisbar; solange gehalten
+  bewegt der Gyro weder Stick noch Maus (Gyro-Maus setzt ohne Sprung fort).
+- **Flick-Stick** (`FlickStick`, Klasse `FlickStick` im Protokoll, wie FLICK_STICK): rechter Stick ≥ 90 % →
+  Kamera dreht um den Stick-Winkel (oben 0°, rechts +90°) über `FlickTime` (Standard 0,1 s, linear); am Rand
+  gedreht → dreht um die Winkeländerung mit (über die Rückseite ohne Sprung); unter 75 % = losgelassen. Ausgabe als
+  waagerechte **Mausbewegung** (`FlickCountsPer360`, Standard 3600, je Spiel per „Testdrehung“ einstellen: nach 3 s
+  eine volle Drehung in 0,5 s). Der rechte Stick geht dann nicht ans Spiel; ein Gyro-Stick-Anteil bleibt.
+
+### 7.2 Rückkanal vom Spiel (`GameLeds`, Standard an)
+- **Xbox 360**: Den Platz (0–3), den Windows dem virtuellen Controller gibt (ViGEm `LedNumber`), zeigen die
+  Spieler-LEDs des Controllers und die Grafik; die Karte zeigt „Im Spiel: Xbox 360 · Platz n“. Der virtuelle
+  Controller merkt sich den gemeldeten Platz und liefert ihn bei späterer Anmeldung nach (kommt beim Verbinden).
+- **DualShock 4**: Lichtleiste aus dem Ausgabebericht 0x05 (Byte 1 Bit 1, Byte 6–8 RGB, wie DS4Windows) → Farbe in
+  der Karte; Helligkeit (max(R,G,B)/17, 0–15) als HOME-LED (Unterbefehl 0x38 wie SDL; nur Switch 1 Pro und
+  Joy-Con R), nur bei geänderter Stufe gesendet.
+
 ## 8. Joy-Con-Besonderheiten
 
 - **Paar automatisch**: Linker + rechter Joy-Con werden ein Spieler (abschaltbar), außer einer wurde zuletzt einzeln

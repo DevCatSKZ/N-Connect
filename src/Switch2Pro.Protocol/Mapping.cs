@@ -364,6 +364,9 @@ public static class Mapping
         const float DegPerRaw = 2000f / 32767f;
         const float RestDegPerSec = 1.5f; // darunter: Sensorrauschen, keine Bewegung
         float yaw = -m.GyroZ * DegPerRaw, pitch = m.GyroX * DegPerRaw;
+        float accel = GyroAccelFactor(MathF.Sqrt(yaw * yaw + pitch * pitch), s);
+        yaw *= accel;
+        pitch *= accel;
         if (s.GyroStickInvertY)
             pitch = -pitch;
         float Axis(float rate)
@@ -376,6 +379,18 @@ public static class Mapping
         }
         float x = stickX / 32767f + Axis(yaw), y = stickY / 32767f + Axis(pitch);
         return (ToShort(Math.Clamp(x, -1f, 1f)), ToShort(Math.Clamp(y, -1f, 1f)));
+    }
+
+    /// <summary>
+    /// Gyro-Beschleunigung wie JoyShockMapper: Faktor 1 bis zur langsamen Schwelle, <see cref="Settings.GyroAcceleration"/>
+    /// ab der schnellen, dazwischen linear. <paramref name="degPerSec"/> = Betrag der Drehgeschwindigkeit.
+    /// </summary>
+    public static float GyroAccelFactor(float degPerSec, Settings s)
+    {
+        if (s.GyroAcceleration <= 1f)
+            return 1f;
+        float t = Math.Clamp((degPerSec - s.GyroAccelSlow) / Math.Max(1f, s.GyroAccelFast - s.GyroAccelSlow), 0f, 1f);
+        return 1f + (s.GyroAcceleration - 1f) * t;
     }
 
     /// <summary>Einheitliche Eingabe → Xbox-Schema (gilt auch als Grundlage für DualShock 4).</summary>

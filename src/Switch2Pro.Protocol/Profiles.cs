@@ -16,6 +16,11 @@ public enum SpecialAction
     GyroStick = 64,
     /// <summary>Gyro-Stick ein/aus (bei jedem Drücken).</summary>
     GyroStickToggle = 128,
+    /// <summary>
+    /// „Ratchet“ (JoyShockMapper GYRO_OFF): Gyro aus, solange gehalten – Controller zurückführen, ohne dass sich das
+    /// Ziel bewegt (wie die Maus anheben). Gilt für Gyro-Stick und Gyro-Maus.
+    /// </summary>
+    GyroPause = 256,
 }
 
 /// <summary>

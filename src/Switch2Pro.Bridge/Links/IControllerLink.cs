@@ -55,6 +55,8 @@ internal interface IControllerLink : IAsyncDisposable
     /// <summary>Vibration setzen (großer/kleiner Motor 0–255, Stärke 0–1). Die Verbindung wiederholt sie selbst.</summary>
     void SetRumble(byte large, byte small, float strength);
     Task SetPlayerAsync(int playerIndex);
+    /// <summary>HOME-LED-Helligkeit 0–15 (0 = aus), falls der Controller eine hat (Switch 1 Pro, Joy-Con R).</summary>
+    Task SetHomeLightAsync(byte intensity) => Task.CompletedTask;
     /// <summary>Controller schlafen legen, bevor die Verbindung getrennt wird (falls das Protokoll es kann).</summary>
     Task SleepAsync() => Task.CompletedTask;
 }

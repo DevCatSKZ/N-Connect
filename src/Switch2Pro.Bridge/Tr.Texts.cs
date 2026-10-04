@@ -366,6 +366,30 @@ internal static partial class Tr
         ["Xbox 360 läuft mit fast allen Spielen und Steam. DualShock 4 bietet zusätzlich Bewegungssteuerung (Steam, Emulatoren). Gilt für alle Controller ohne eigene Einstellung (Karte → Einstellungen → Tasten)."] =
             "Xbox 360 works with almost all games and Steam. DualShock 4 adds motion controls (Steam, emulators). Applies to all controllers without their own setting (card → Settings → Buttons).",
         ["Original-Controller verstecken"] = "Hide original controllers",
+        ["Im Spiel"] = "In game",
+        ["Dreht …"] = "Turning …",
+        ["Testdrehung (360°)"] = "Test turn (360°)",
+        ["Testdrehung"] = "Test turn",
+        ["aus"] = "off",
+        ["Gyro-Beschleunigung"] = "Gyro acceleration",
+        ["Bei schneller Drehung"] = "On fast turns",
+        ["Langsame Bewegungen bleiben fein, schnelle drehen weiter (wie JoyShockMapper). Voll ab 120 °/s, unter 20 °/s normal. Gilt für Gyro-Stick und Gyro-Maus."] =
+            "Slow movements stay precise, fast ones turn further (like JoyShockMapper). Full at 120 °/s, normal below 20 °/s. Applies to gyro stick and gyro mouse.",
+        ["Flick-Stick (Spiele mit Maussteuerung)"] = "Flick stick (games with mouse control)",
+        ["Flick-Stick"] = "Flick stick",
+        ["Rechten Stick in eine Richtung schieben = Kamera dreht sofort dorthin; am Rand drehen = Kamera dreht mit. Zielen dann per Gyro. Der rechte Stick geht nicht mehr ans Spiel."] =
+            "Push the right stick in a direction = the camera turns there immediately; rotate it along the edge = the camera follows. Aim with the gyro. The right stick is no longer sent to the game.",
+        ["Mausbewegung je Umdrehung"] = "Mouse movement per turn",
+        ["Je Spiel einmal einstellen: „Testdrehung“ klicken, ins Spiel wechseln – nach 3 s dreht die Kamera einmal. Genau eine volle Drehung = richtig."] =
+            "Set once per game: click “Test turn”, switch to the game – after 3 s the camera turns once. Exactly one full turn = correct.",
+        ["Flick-Dauer"] = "Flick duration",
+        ["So lange dauert die Drehung beim Flick (0 = sofort)."] = "How long the turn of a flick takes (0 = instant).",
+        ["Gyro-Maus oder Gyro-Stick ein/aus bzw. solange gehalten, „Gyro anhalten“ (Ratchet: Controller zurückführen, ohne dass sich das Ziel bewegt)"] =
+            "Gyro mouse or gyro stick on/off or while held, “Pause gyro” (ratchet: bring the controller back without moving the aim)",
+        ["✋  Gyro anhalten (solange gehalten, „Ratchet“)"] = "✋  Pause gyro (while held, “ratchet”)",
+        ["Spieler-LED und Lichtleiste vom Spiel"] = "Player LED and light bar from the game",
+        ["Die Spieler-LEDs zeigen den Xbox-Platz, den Windows vergibt. Bei DualShock 4 steuert die Lichtleiste des Spiels die HOME-LED (Switch 1 Pro Controller, rechter Joy-Con)."] =
+            "The player LEDs show the Xbox slot assigned by Windows. With DualShock 4, the game's light bar drives the HOME LED (Switch 1 Pro Controller, right Joy-Con).",
         ["HidHide installieren …"] = "Install HidHide …",
         ["Empfohlen: Steam und viele Spiele kennen Switch-1-, NSO- und USB-Controller selbst und sähen sie sonst doppelt. Beim ersten Verbinden fragt Windows einmal nach Adminrechten."] =
             "Recommended: Steam and many games support Switch 1, NSO and USB controllers themselves and would otherwise see them twice. On first connection Windows asks once for administrator rights.",
