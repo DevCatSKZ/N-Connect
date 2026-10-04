@@ -29,9 +29,9 @@ Bis zu 8 Controller gleichzeitig (Spieler 1–8).
 2. Setup starten. Es installiert automatisch:
    - das Programm (läuft unauffällig unten rechts im Infobereich),
    - den signierten Treiber **ViGEmBus** für den virtuellen Controller (falls noch nicht vorhanden),
-   - auf Wunsch **HidHide** (verhindert, dass Spiele einen per USB angeschlossenen Controller doppelt sehen),
-   - auf Wunsch den Autostart mit Windows.
-3. Beim ersten Start erscheint eine Kurzanleitung.
+   - auf Wunsch **HidHide** (verhindert, dass Spiele einen per USB angeschlossenen Controller doppelt sehen).
+3. N-Connect startet danach **automatisch mit Windows** im Hintergrund (abschaltbar unter *Allgemein → Mit Windows starten*).
+4. Beim ersten Start erscheint eine Kurzanleitung.
 
 Voraussetzungen: Windows 10 (2004) oder Windows 11, 64 Bit, Bluetooth 4.0+ (für Switch-2-Controller Bluetooth LE).
 
@@ -53,7 +53,12 @@ dann die rote SYNC-Taste (im Batteriefach bzw. auf der Unterseite) drücken.
 
 ## Was das Programm kann
 
-- **Übersicht** mit Live-Grafik jedes Controllers (gedrückte Tasten leuchten), Akku, Verbindung, Seriennummer, Firmware.
+- **Übersicht** mit Live-Grafik jedes Controllers (Form und Tastenlage nach Produktfotos, Originalfarben, gedrückte
+  Tasten leuchten), Akku, Verbindung, Seriennummer, Firmware. Bei breitem Fenster zwei Spalten, alle Karten gleich hoch.
+- **Einstellungen direkt an der Controller-Karte** („Einstellungen“ aufklappen): Tasten, Feineinstellung, Gyro,
+  Joy-Con, Extras, Details – jeweils nur für diesen Controller.
+- **Taste per Tastendruck belegen:** hinter jeder Taste das Tastatur-Symbol klicken und die gewünschte Taste drücken.
+- **Oberfläche im Windows-11-Stil:** dunkel (Standard), hell oder wie Windows; Akzentfarbe aus Windows, Mica-Titelleiste.
 - Knöpfe je Controller: **Trennen**, **Vibrieren** (welcher ist welcher Spieler?), **Gyro kalibrieren**,
   Joy-Con **trennen/zusammenfügen**, **hochkant/quer**, **amiibo lesen**, **Ring-Con**, **IR-Kamera**,
   **„Doppelt angezeigt? Verstecken“** (HidHide, bei USB).
@@ -70,9 +75,18 @@ dann die rote SYNC-Taste (im Batteriefach bzw. auf der Unterseite) drücken.
 - **Feinabstimmung:** Stick-Totzone (auch je Controller-Typ), Stick-Kennlinie, Trigger-Schwelle, Turbo-Geschwindigkeit.
 - **Emulatoren:** Bewegungsdaten per **Cemuhook/DSU** (Port 26760), z. B. für Cemu, Yuzu-Nachfolger, Dolphin.
 - **Akku-Symbol** im Infobereich, **Warnung** bei niedrigem Akku, **automatisches Trennen** bei Inaktivität (einstellbar).
+  Switch-2-Controller melden nur die Spannung; N-Connect rechnet sie geglättet in Prozent um – auch beim Laden am
+  Kabel (der Spannungsanstieg beim Laden wird je Controller gemessen und herausgerechnet).
+- **Kopplungsdaten von der Switch (Switch 1):** Mit dem Payload *Bluepick RCM* auf die SD-Karte gesicherte
+  Kopplungsdaten (`switchroot/joycon_mac.ini`) liest N-Connect ein – die SD-Karte im Kartenleser bzw. die
+  angeschlossene Switch wird automatisch erkannt (*Allgemein → Kopplungsdaten von der Switch übernehmen*).
+- **Kopplungsdaten auf einen anderen PC übertragen:** als `.ncpair`-Datei exportieren (optional mit Passwort,
+  Schlüssel nur auf ausdrücklichen Wunsch) und auf dem zweiten PC öffnen. Bluetooth-Adapter und Windows-Kopplungen
+  werden dabei nicht verändert.
 - **Update-Hinweis**, wenn auf GitHub eine neue Version erscheint.
 
-Alle Einstellungen sind optional und gelten sofort (Klick auf das Symbol im Infobereich → Reiter *Einstellungen*).
+Alle Einstellungen sind optional und gelten sofort (Klick auf das Symbol im Infobereich; links die Bereiche
+*Controller, Tastenbelegung, Sticks & Vibration, Gyro & Maus, Joy-Con & Wii, Allgemein*).
 
 ## Fehlerbehebung
 
@@ -82,10 +96,12 @@ Alle Einstellungen sind optional und gelten sofort (Klick auf das Symbol im Info
 | Switch-1-/NSO-Controller wird nicht erkannt | In Windows unter Bluetooth koppeln; nach dem Koppeln einmal eine Taste drücken. |
 | Wii-Fernbedienung koppelt nicht | Im Programm „Wii-Controller koppeln …“ verwenden (nicht das Windows-Fenster); rote SYNC-Taste drücken, solange gesucht wird. |
 | Spiel sieht einen USB-Controller doppelt | Auf der Karte „Doppelt angezeigt? Verstecken“ klicken (HidHide). |
+| Akkuanzeige weicht beim Laden ab | Einmal Kabel abziehen und wieder anstecken – N-Connect misst den Spannungsanstieg dann neu. Werte stehen alle 30 s im Protokoll („Akku …“). |
 | „ViGEmBus-Treiber fehlt“ | Setup erneut ausführen oder ViGEmBus installieren: <https://github.com/nefarius/ViGEmBus/releases> |
 | Etwas anderes | Rechtsklick auf das Symbol → **Protokoll öffnen** und den Inhalt bei einer Fehlermeldung beilegen. |
 
-Protokoll: `%LOCALAPPDATA%\Switch2ProBridge\bridge.log` · Einstellungen: `%APPDATA%\Switch2ProBridge\settings.json`
+Protokoll: `%LOCALAPPDATA%\N-Connect\bridge.log` · Einstellungen: `%APPDATA%\N-Connect\settings.json` ·
+Akku-Messwerte: `%LOCALAPPDATA%\N-Connect\battery.json` (Ordner der Vorversion `Switch2ProBridge` werden einmalig übernommen)
 
 ## Wie es funktioniert (technisch)
 
@@ -104,7 +120,10 @@ installer/                Inno-Setup-Skript (Setup.exe mit ViGEmBus und optional
 Selbst bauen: .NET 8 SDK, dann `dotnet test tests/Switch2Pro.Protocol.Tests` und
 `dotnet publish src/Switch2Pro.Bridge -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o out/publish/win-x64`.
 Den Installer baut der Workflow `.github/workflows/switch2-pro-windows.yml`.
-Prüfhilfen: `N-Connect.exe --render <Ordner>` (alle Grafiken als PNG), `--render-brand <Ordner>` (Logo, Icon, Installer-Bilder), `--demo` / `--demo-retro` (simulierte Controller).
+Den Installer lokal bauen: Inno Setup 6, dann `ISCC.exe installer\N-Connect.iss` (Ergebnis in `out\`).
+Prüfhilfen: `N-Connect.exe --render <Ordner>` (alle Controller-Grafiken als PNG), `--render-ui <Ordner>` (alle Seiten
+und Karten, hell/dunkel, Deutsch/Englisch; mit `--wide` für breite Fenster), `--render-brand <Ordner>` (Logo, Icon,
+Installer-Bilder), `--demo` / `--demo-all` / `--demo-retro` (simulierte Controller).
 
 ### Quellen und Dank
 
