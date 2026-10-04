@@ -138,6 +138,20 @@ internal static class RenderCheck
                 content.DrawToBitmap(bmp, new Rectangle(0, 0, content.Width, content.Height));
                 bmp.Save(Path.Combine(folder, $"ui_settings_{lang}.png"), ImageFormat.Png);
             }
+            // Meldungsfenster im Design: kurz anzeigen, abfotografieren, schließen.
+            var shot = new System.Windows.Forms.Timer { Interval = 400 };
+            shot.Tick += (_, _) =>
+            {
+                shot.Stop();
+                var message = Application.OpenForms.Cast<Form>().Last();
+                using var bmp = new Bitmap(message.Width, message.Height);
+                message.DrawToBitmap(bmp, new Rectangle(0, 0, message.Width, message.Height));
+                bmp.Save(Path.Combine(folder, $"ui_message_{lang}.png"), ImageFormat.Png);
+                message.Close();
+            };
+            shot.Start();
+            Tr.Show(form, "Alle Einstellungen und Tastenbelegungen auf Standard zurücksetzen?", "N-Connect", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            shot.Dispose();
             form.Close();
         }
         finally

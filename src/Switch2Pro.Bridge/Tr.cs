@@ -91,7 +91,7 @@ internal static partial class Tr
 
     public static DialogResult Show(IWin32Window? owner, string text, string caption = "",
         MessageBoxButtons buttons = MessageBoxButtons.OK, MessageBoxIcon icon = MessageBoxIcon.None) =>
-        MessageBox.Show(owner, T(text), T(caption), buttons, icon);
+        Theme.Message(owner, T(text), T(caption), buttons, icon);
 
     private static string N(Match m, string group) => T(m.Groups[group].Value);
 

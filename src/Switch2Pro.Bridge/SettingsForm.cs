@@ -120,7 +120,7 @@ internal sealed class SettingsForm : Form
     private readonly TrackBar _triggerDeadzone = new() { Minimum = 0, Maximum = 50, TickFrequency = 5, Width = 160 };
     private readonly TrackBar _triggerFull = new() { Minimum = 50, Maximum = 100, TickFrequency = 5, Width = 160 };
     private readonly TrackBar _turboRate = new() { Minimum = 2, Maximum = 30, TickFrequency = 2, Width = 160 };
-    private readonly ToolTip _tips = new();
+    private readonly ToolTip _tips = Theme.CreateToolTip();
     private readonly Label _aimInfo = new() { AutoSize = true, ForeColor = SystemColors.GrayText, Padding = new Padding(0, 6, 0, 0) };
 
     private readonly ComboBox _profileSelect = new() { DropDownStyle = ComboBoxStyle.DropDownList, Width = 300, Tag = Tr.UserData };
@@ -1249,7 +1249,7 @@ internal static class MacroDialog
         {
             bool valid = MacroScript.TryParse((box.Text ?? "").Replace("\r", "").Replace('\n', ','), out var script);
             ok.Enabled = valid;
-            status.ForeColor = valid ? SystemColors.ControlText : Color.Firebrick;
+            status.ForeColor = valid ? Theme.Current.Text : Theme.Dark ? Color.FromArgb(255, 120, 110) : Color.Firebrick;
             status.Text = Tr.T(valid ? $"✓ {script.Steps.Count} Schritte, Dauer {script.TotalMs} ms" : "Ungültig – bitte Schreibweise prüfen (siehe oben).");
         }
         box.TextChanged += (_, _) => Check();

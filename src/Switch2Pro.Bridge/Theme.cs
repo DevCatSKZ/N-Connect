@@ -240,6 +240,78 @@ internal static class Theme
     }
 
     /// <summary>Menü im Infobereich in den Farben der Darstellung.</summary>
+    /// <summary>Tooltip in den Farben der Darstellung (der Windows-Standard ist immer hell).</summary>
+    public static ToolTip CreateToolTip()
+    {
+        var tip = new ToolTip { OwnerDraw = true };
+        tip.Draw += (_, e) =>
+        {
+            var p = Current;
+            using (var back = new SolidBrush(p.SurfaceHover))
+                e.Graphics.FillRectangle(back, e.Bounds);
+            using (var border = new Pen(p.Border))
+                e.Graphics.DrawRectangle(border, e.Bounds.X, e.Bounds.Y, e.Bounds.Width - 1, e.Bounds.Height - 1);
+            TextRenderer.DrawText(e.Graphics, e.ToolTipText, e.Font, e.Bounds, p.Text,
+                TextFormatFlags.VerticalCenter | TextFormatFlags.HorizontalCenter | TextFormatFlags.WordBreak);
+        };
+        return tip;
+    }
+
+    /// <summary>Meldung im Stil der Darstellung (statt der immer hellen MessageBox von Windows).</summary>
+    public static DialogResult Message(IWin32Window? owner, string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon)
+    {
+        using var form = new Form
+        {
+            Text = caption, FormBorderStyle = FormBorderStyle.FixedDialog, MinimizeBox = false, MaximizeBox = false,
+            ShowInTaskbar = owner is null, StartPosition = owner is null ? FormStartPosition.CenterScreen : FormStartPosition.CenterParent,
+            Font = new Font("Segoe UI", 9.5f), AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink,
+            Padding = new Padding(0),
+        };
+        var layout = new TableLayoutPanel { AutoSize = true, ColumnCount = 2, RowCount = 2, Padding = new Padding(20, 20, 20, 12) };
+        Icon? symbol = icon switch
+        {
+            MessageBoxIcon.Error => SystemIcons.Error,
+            MessageBoxIcon.Warning => SystemIcons.Warning,
+            MessageBoxIcon.Question => SystemIcons.Question,
+            MessageBoxIcon.Information => SystemIcons.Information,
+            _ => null,
+        };
+        if (symbol is not null)
+            layout.Controls.Add(new PictureBox { Image = symbol.ToBitmap(), Size = new Size(32, 32), Margin = new Padding(0, 0, 14, 0) }, 0, 0);
+        layout.Controls.Add(new Label { Text = text, AutoSize = true, MaximumSize = new Size(460, 0), Margin = new Padding(0, 6, 0, 16) }, 1, 0);
+
+        var bar = new FlowLayoutPanel { AutoSize = true, FlowDirection = FlowDirection.RightToLeft, Anchor = AnchorStyles.Right, Margin = new Padding(0) };
+        (string Text, DialogResult Result)[] choices = buttons switch
+        {
+            MessageBoxButtons.YesNo => [("Nein", DialogResult.No), ("Ja", DialogResult.Yes)],
+            MessageBoxButtons.YesNoCancel => [("Abbrechen", DialogResult.Cancel), ("Nein", DialogResult.No), ("Ja", DialogResult.Yes)],
+            MessageBoxButtons.OKCancel => [("Abbrechen", DialogResult.Cancel), ("OK", DialogResult.OK)],
+            _ => [("OK", DialogResult.OK)],
+        };
+        foreach (var (label, result) in choices)
+        {
+            var button = new Button { Text = Tr.T(label), DialogResult = result, MinimumSize = new Size(88, 30), AutoSize = true };
+            bar.Controls.Add(button);
+            if (result is DialogResult.Yes or DialogResult.OK)
+                form.AcceptButton = button;
+            if (result is DialogResult.Cancel or DialogResult.No)
+                form.CancelButton = button;
+        }
+        form.CancelButton ??= (IButtonControl)bar.Controls[0];
+        layout.Controls.Add(bar, 0, 1);
+        layout.SetColumnSpan(bar, 2);
+        form.Controls.Add(layout);
+        Apply(form);
+        switch (icon)
+        {
+            case MessageBoxIcon.Error: System.Media.SystemSounds.Hand.Play(); break;
+            case MessageBoxIcon.Warning: System.Media.SystemSounds.Exclamation.Play(); break;
+            case MessageBoxIcon.Question: System.Media.SystemSounds.Question.Play(); break;
+            case MessageBoxIcon.Information: System.Media.SystemSounds.Asterisk.Play(); break;
+        }
+        return form.ShowDialog(owner);
+    }
+
     public static ToolStripRenderer MenuRenderer() => new ToolStripProfessionalRenderer(new MenuColors()) { RoundedEdges = true };
 
     private sealed class MenuColors : ProfessionalColorTable

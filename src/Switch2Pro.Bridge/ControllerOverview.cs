@@ -142,7 +142,7 @@ internal sealed class ControllerOverview : Panel
         {
             AutoSize = true, FlowDirection = FlowDirection.RightToLeft, WrapContents = true, BackColor = CardColor,
         };
-        private readonly ToolTip _tips = new();
+        private readonly ToolTip _tips = Theme.CreateToolTip();
         private readonly Button _disconnect = ActionButton("Trennen");
         private readonly Button _identify = ActionButton("Vibrieren");
         private readonly Button _calibrate = ActionButton("Gyro kalibrieren");

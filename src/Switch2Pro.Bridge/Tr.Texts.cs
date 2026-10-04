@@ -231,6 +231,8 @@ internal static partial class Tr
         ["Tastatur-Taste festlegen"] = "Set keyboard key",
         ["Übernehmen"] = "Apply",
         ["Abbrechen"] = "Cancel",
+        ["Ja"] = "Yes",
+        ["Nein"] = "No",
         ["Turbo / Dauerfeuer"] = "Turbo / rapid fire",
         ["Tastatur-Taste aufnehmen …"] = "Record keyboard key …",
         ["Makro (Tastenfolge)"] = "Macro (button sequence)",
