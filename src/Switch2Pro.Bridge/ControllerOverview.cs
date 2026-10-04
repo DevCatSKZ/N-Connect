@@ -118,6 +118,14 @@ internal sealed class ControllerOverview : Panel
             }
             card.Show(p, _settings());
         }
+        // Zusammengeklappte Karten gleich hoch – nebeneinander wirkt die Übersicht so ruhig und symmetrisch.
+        int body = _byPlayer.Values.Where(c => !c.IsExpanded).Select(c => c.NaturalBodyHeight).DefaultIfEmpty(0).Max();
+        foreach (var card in _byPlayer.Values)
+            if (card.BodyHeight != body)
+            {
+                card.BodyHeight = body;
+                card.PerformLayout();
+            }
     }
 
     internal Control? FirstCard => _byPlayer.Values.FirstOrDefault();
@@ -195,6 +203,12 @@ internal sealed class ControllerOverview : Panel
         private ControllerKind _builtFor = ControllerKind.Unknown;
         private bool _expanded;
         public bool IsExpanded => _expanded;
+
+        /// <summary>Höhe, die die Karte zusammengeklappt selbst braucht.</summary>
+        public int NaturalBodyHeight { get; private set; }
+
+        /// <summary>Vorgabe der Übersicht: alle zusammengeklappten Karten gleich hoch.</summary>
+        public int BodyHeight { get; set; }
         private InfoPanel? _details;
         private string? _title;
         private string? _rawTitle;
@@ -595,9 +609,12 @@ internal sealed class ControllerOverview : Panel
             // Grafik wächst mit der Karte (Seitenverhältnis der Zeichnung 580 × 430).
             int viewWidth = Math.Clamp((Width - 2 * pad) * 46 / 100, 280, 380);
             _view.Bounds = new Rectangle(pad - 4, top, viewWidth, viewWidth * 430 / 580);
-            _info.Location = new Point(_view.Right + 20, top + 8);
+            _info.Location = new Point(_view.Right + 20, top + 8); // Infospalte immer oben bündig
             _info.Width = Math.Max(240, Width - _info.Left - pad);
-            int bodyBottom = Math.Max(_view.Bottom, _info.Bottom) + 12;
+            NaturalBodyHeight = Math.Max(_view.Bottom, _info.Bottom) + 12;
+            // Gleich hohe Karten nebeneinander: Grafik im (ggf. höheren) Feld senkrecht mittig.
+            int bodyBottom = Math.Max(NaturalBodyHeight, _expanded ? 0 : BodyHeight);
+            _view.Top = top + (bodyBottom - 12 - top - _view.Height) / 2;
             int height = bodyBottom;
             if (_expanded)
             {
@@ -691,7 +708,7 @@ internal sealed class ControllerOverview : Panel
                 if (_calibrate is not null && !_calibrating)
                     _calibrate.Enabled = links.Any(l => l.LastState?.Motion is not null) && links.All(l => l.Address is not null);
             }
-            if (Height != Math.Max(_view.Bottom, _info.Bottom) + 12 && !_expanded)
+            if (!_expanded && Height != Math.Max(NaturalBodyHeight, BodyHeight))
                 PerformLayout();
         }
 

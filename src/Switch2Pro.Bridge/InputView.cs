@@ -170,10 +170,10 @@ internal sealed partial class InputView : Control
         new(50, 95), new(48.5f, 150), new(49, 194.8f),                            // schmales Oberteil, fast senkrecht
         new(49, 225), new(32, 262), new(21.8f, 294),                              // Übergang in den Griff, nach außen
         new(10, 325), new(1, 350), new(0, 373.4f),                                // Griff außen
-        new(-1, 392), new(15, 398), new(29.8f, 397.3f),                           // rundes Griffende
-        new(48, 397), new(62, 393), new(69.5f, 385),
-        new(78, 365), new(90, 340), new(105.2f, 320),                             // Griff innen, schräg nach oben
-        new(118, 303), new(132, 296), new(148.9f, 294),
+        new(-1, 394), new(12, 400), new(30, 399.5f),                              // rundes, breites Griffende
+        new(50, 399), new(66, 395), new(73, 383),
+        new(77, 362), new(79, 336), new(98, 318),                                 // Griff innen: erst fast senkrecht,
+        new(112, 302), new(130, 295.5f), new(148.9f, 294),                        // dann großer Bogen zur Mitte
         new(180, 293), new(230, 293.3f), new(CW / 2, 293.3f),                     // breiter, flacher Bogen
     ];
 
