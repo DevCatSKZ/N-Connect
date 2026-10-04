@@ -342,7 +342,7 @@ internal sealed class TrayApp : ApplicationContext
             var players = _manager.Players;
             text = players.Count == 0
                 ? "N-Connect: warte auf Controller (SYNC drücken)"
-                : string.Join("\n", players.Select(p => $"P{p.Index + 1} {ShortName(p.Kind)} {Battery(p)}"));
+                : string.Join("\n", players.Select(p => $"P{p.Index + 1} {ShortLabel(p)} {Battery(p)}"));
         }
         // NotifyIcon.Text ist auf 127 Zeichen begrenzt.
         text = Tr.T(text);
@@ -407,6 +407,14 @@ internal sealed class TrayApp : ApplicationContext
         _ => "Controller",
     };
 
+    /// <summary>Kurzer Name für den Tooltip (max. 127 Zeichen insgesamt): eigener Name, sonst die Kurzform der Art.</summary>
+    private string ShortLabel(Player p)
+    {
+        var names = p.Links.Select(l => _settings.NameFor(l.Address)).Where(n => n is not null).ToList();
+        string label = names.Count > 0 ? string.Join("+", names) : ShortName(p.Kind);
+        return label.Length > 18 ? label[..17] + "…" : label;
+    }
+
     private void BuildMenu()
     {
         var menu = _icon.ContextMenuStrip!;
@@ -430,8 +438,28 @@ internal sealed class TrayApp : ApplicationContext
                 menu.Items.Add(new ToolStripMenuItem(_manager.IsConnecting
                     ? "Verbinde …"
                     : "Kein Controller – SYNC-Taste am Controller kurz drücken") { Enabled = false });
+            // Je Spieler ein Untermenü: wer ist das (vibrieren), Platz wechseln, trennen.
             foreach (var p in players)
-                menu.Items.Add(new ToolStripMenuItem($"Spieler {p.Index + 1} · {p.Kind.DisplayName()} {Battery(p)}") { Enabled = false });
+            {
+                var player = p;
+                var item = new ToolStripMenuItem($"Spieler {p.Index + 1} · {p.DisplayName(_settings)} {Battery(p)}");
+                item.DropDownItems.Add("Vibrieren", null, (_, _) => player.IdentifyAsync().Forget("Vibrieren"));
+                var slots = new ToolStripMenuItem("Spielerplatz");
+                for (int i = 0; i < 8; i++)
+                {
+                    int slot = i;
+                    slots.DropDownItems.Add(Radio($"Spieler {i + 1}", player.Index == i, () => _manager.MovePlayer(player, slot)));
+                }
+                item.DropDownItems.Add(slots);
+                item.DropDownItems.Add("Trennen", null, (_, _) => _manager.Disconnect(player));
+                menu.Items.Add(item);
+            }
+            if (players.Count > 1)
+                menu.Items.Add("Alle Controller trennen", null, (_, _) =>
+                {
+                    foreach (var p in _manager.Players)
+                        _manager.Disconnect(p);
+                });
         }
 
         menu.Items.Add(new ToolStripSeparator());
