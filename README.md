@@ -45,11 +45,11 @@ Pro Controller und GameCube-Controller funktionieren auch einfach per **USB-Kabe
 > eigenes Nintendo-Verfahren; die Windows-Kopplung stört die Verbindung.
 > Hinweis: Nach dem Verbinden mit dem PC muss der Controller an der Switch 2 einmal neu gekoppelt werden (SYNC an der Konsole).
 
-**Switch 1 und Nintendo-Switch-Online-Controller:** einmalig in Windows unter *Bluetooth → Gerät hinzufügen* koppeln
-(SYNC-Taste am Controller halten). Das Programm erkennt sie dann automatisch.
-
-**Wii-Fernbedienung / Wii U Pro Controller:** Rechtsklick auf das Symbol im Infobereich → **„Wii-Controller koppeln …“**,
-dann die rote SYNC-Taste (im Batteriefach bzw. auf der Unterseite) drücken.
+**Switch 1, Nintendo-Switch-Online- und Wii-Controller:** einfach die **SYNC-Taste** drücken (Joy-Con: an der
+Schiene, Wii-Fernbedienung: rote Taste im Batteriefach, Wii U Pro: Unterseite). N-Connect koppelt den Controller
+**selbst** mit Windows – kein Umweg über die Windows-Bluetooth-Einstellungen. Danach reicht ein Tastendruck.
+Die Suche im Hintergrund läuft nur, solange gerade niemand spielt; gezielt suchen: *Allgemein → Controller koppeln …*
+(abschaltbar: *Neue Controller automatisch koppeln*).
 
 ## Was das Programm kann
 

@@ -63,7 +63,8 @@ src/Switch2Pro.Bridge     Windows-App (.NET 8 WinForms)
   SettingsForm, ControllerOverview, MappingEditor, TuningEditor   Fenster, Karten, Einstellungen je Controller
   InputView*.cs           Controller-Grafiken; Umrisse aus Produktfotos (InputView.Outlines.cs, Werkzeug
                           zum Erzeugen lag im Scratchpad: Konturverfolgung + Douglas-Peucker)
-  SwitchCardWatcher, PairingDataForm, WiiPairing                  SD-Karte, Kopplungsdaten, Wii-Kopplung
+  SwitchCardWatcher, PairingDataForm   SD-Karte, Kopplungsdaten
+  ControllerPairing, PairForm          selbst koppeln (Switch 1, NSO, Wii), Fenster „Controller koppeln“
 installer/N-Connect.iss   Inno Setup 6 (ViGEmBus, optional HidHide); den Autostart richtet die App selbst ein
                           (standardmäßig an, Einstellung „Mit Windows starten“)
 ```
