@@ -559,7 +559,7 @@ internal sealed partial class InputView
             LightbarEdge(g, f.P(813, 106), f.P(799, 290), lightbar);
             LightbarEdge(g, f.P(488, 292), f.P(792, 292), lightbar);
             // Mute-Taste (Mikro) unter der PS-Taste.
-            using (var mute = Rounded(f.R(615, 508, 50, 20), 10))
+            using (var mute = Rounded(f.R(615, 458, 50, 20), 10))
             {
                 if (on(ProButtons.Headset))
                 {
@@ -570,7 +570,7 @@ internal sealed partial class InputView
                 g.FillPath(fill, mute);
             }
             // Kleines Mikro-Piktogramm in der Taste.
-            var mc = f.P(640, 518);
+            var mc = f.P(640, 468);
             var mic = on(ProButtons.Headset) ? Color.White : text;
             using (var p1 = new Pen(mic, 1.6f))
             {
@@ -587,7 +587,7 @@ internal sealed partial class InputView
         Label(g, f, 885, 174, "OPTIONS", muted, 5.5f);
 
         // PS-Taste mittig unter dem Touchpad (Kreis mit „PS“).
-        var pc = f.P(640, 452);
+        var pc = f.P(640, 415);
         float pr = f.S(24);
         using (var path = new GraphicsPath())
         {
@@ -601,7 +601,7 @@ internal sealed partial class InputView
         if (!ds5)
         {
             // Lautsprecher-Lochreihe unter dem Touchpad.
-            var dots = f.P(640, 352);
+            var dots = f.P(640, 340);
             using var holes = new SolidBrush(Mix(body, Color.White, 0.25f));
             for (int i = -2; i <= 2; i++)
                 g.FillEllipse(holes, dots.X + i * f.S(16) - 2, dots.Y - 2, 4, 4);
@@ -609,7 +609,7 @@ internal sealed partial class InputView
         else
         {
             // DualSense: fünf kleine Spieler-LEDs unter dem Touchpad (mittig gefüllt nach Platz).
-            var ly = f.P(640, 392);
+            var ly = f.P(640, 335);
             int n = PlayerIndex >= 0 ? Math.Min(5, PlayerIndex + 1) : 0;
             int start = (5 - n) / 2;
             for (int i = 0; i < 5; i++)
