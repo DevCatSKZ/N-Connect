@@ -529,7 +529,7 @@ internal sealed partial class InputView
         EdgeShoulder(g, f, 208, 359, 80, 36, 154, 110, on(ProButtons.L), "L1", bumper, labelDy: 34);
         EdgeShoulder(g, f, 371, 505, 36, 28, 110, 98, on(ProButtons.ZL), "L2", trigger, _input?.LeftTrigger ?? 0, 32);
         EdgeShoulder(g, f, 775, 909, 28, 36, 98, 110, on(ProButtons.ZR), "R2", trigger, _input?.RightTrigger ?? 0, 32);
-        EdgeShoulder(g, f, 921, 1072, 36, 80, 110, 154, on(ProButtons.R), "R1", bumper, labelDy: 34);
+        EdgeShoulder(g, f, 921, 1072, 36, 80, 100, 130, on(ProButtons.R), "R1", bumper, labelDy: 34);
 
         // Steuerkreuz oben links, Symboltasten oben rechts (DS5: graue Symbole, DS4: Originalfarben).
         PhotoDPad(g, f, 322, 255, 96, on, fill: key, border: Mix(key, ds5 ? Color.Black : Color.White, 0.18f), glyphs: text);
@@ -537,10 +537,10 @@ internal sealed partial class InputView
         var symA = ds5 ? text : Color.FromArgb(0xE0, 0x4B, 0x5A);
         var symB = ds5 ? text : Color.FromArgb(0x4C, 0x7F, 0xD9);
         var symY = ds5 ? text : Color.FromArgb(0xD9, 0x7F, 0xB4);
-        Face(g, f.P(960, 175), on(ProButtons.X), "△", f.S(40), symX);
-        Face(g, f.P(1035, 250), on(ProButtons.A), "○", f.S(40), symA);
-        Face(g, f.P(960, 325), on(ProButtons.B), "✕", f.S(40), symB);
-        Face(g, f.P(885, 250), on(ProButtons.Y), "□", f.S(40), symY);
+        Face(g, f.P(958, 192), on(ProButtons.X), "△", f.S(40), symX);
+        Face(g, f.P(1033, 267), on(ProButtons.A), "○", f.S(40), symA);
+        Face(g, f.P(958, 342), on(ProButtons.B), "✕", f.S(40), symB);
+        Face(g, f.P(883, 267), on(ProButtons.Y), "□", f.S(40), symY);
 
         // Beide Sticks symmetrisch unten (Kappe und Mulde schwarz, auch beim weißen DualSense).
         var cap = Color.FromArgb(0x24, 0x24, 0x28);
