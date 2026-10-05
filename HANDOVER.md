@@ -110,8 +110,12 @@ kleben; ggf. Aufschrift weglassen statt verschieben.
   GameCube-Controller sind die Werte noch geschätzt; das Protokoll schreibt alle 30 s Spannung und Rohbytes
   0x1C–0x2F mit („Akku …“), gemessene Ladeanstiege landen in `battery.json`. Über einen kompletten Ladevorgang
   ist die Anzeige noch nicht beobachtet.
-- **Selbst koppeln (Switch 1, NSO, Wii)** ist gebaut (`ControllerPairing`, Hintergrundsuche in `TrayApp.AutoPairLoopAsync`,
-  Einstellung `AutoPair`). Wii mit echter Hardware bestätigt (auch automatisch im Hintergrund). **Joy-Con 1 per SYNC
+- **Selbst koppeln (Switch 1, NSO, Wii, PlayStation; Xbox nur im Koppelfenster)** ist gebaut (`ControllerPairing`,
+  Hintergrundsuche in `TrayApp.AutoPairLoopAsync`, Einstellung `AutoPair`). Wii mit echter Hardware bestätigt (auch
+  automatisch im Hintergrund). **Neu (05.10.):** Sony-Pads werben im Kopplungsmodus als „Wireless Controller“ und
+  laufen über `PairJustWorks` (klassisch, auch im Hintergrund); Xbox-Controller werben per BLE („Xbox …“) und werden
+  nur im Fenster „Controller koppeln“ über einen LE-Watcher + WinRT-Kopplung gekoppelt (`WatchXbox`/`PairXbox` –
+  nur ungekoppelte, `IsPaired`-Test). Beide noch **nicht** mit Hardware geprüft. **Joy-Con 1 per SYNC
   bestätigt (04.10.2026, auch nach Zwischenstopp an der Switch)**: Switch 1/NSO werden über WinRT
   (`DeviceInformationCustomPairing`, Anfrage sofort bestätigt) gekoppelt – die Win32-Rückfrage kam bei Joy-Con zu
   spät (Fehler 1244/258). Bekannte Controller gelten als „im Kopplungsmodus“, wenn Windows sie während des Suchlaufs
