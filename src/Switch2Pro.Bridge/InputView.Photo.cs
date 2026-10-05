@@ -328,7 +328,7 @@ internal sealed partial class InputView
         using (var path = f.Outline(PhotoOutlines.N64, symmetric: true))
             BodyShape(g, path, body);
         EdgeShoulder(g, f, 152, 400, 160, 104, 232, 176, on(ProButtons.L), "L", Color.FromArgb(0x6A, 0x6A, 0x70), labelDy: 34);
-        EdgeShoulder(g, f, 750, 884, 28, 104, 96, 176, on(ProButtons.ZR), "ZR", Color.FromArgb(0x6A, 0x6A, 0x70), labelDy: 32);
+        EdgeShoulder(g, f, 768, 868, 52, 96, 108, 148, on(ProButtons.ZR), "ZR", Color.FromArgb(0x6A, 0x6A, 0x70), labelDy: 26);
         EdgeShoulder(g, f, 896, 1130, 104, 165, 180, 238, on(ProButtons.R), "R", Color.FromArgb(0x6A, 0x6A, 0x70), labelDy: 34);
 
         using (var dish = new SolidBrush(Mix(body, Color.White, 0.2f)))
