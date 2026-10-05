@@ -500,14 +500,24 @@ internal sealed partial class InputView
     private void PaintPlayStation(Graphics g, ControllerKind kind, Func<ProButtons, bool> on)
     {
         bool ds5 = kind == ControllerKind.DualSense;
-        var body = ds5 ? Color.FromArgb(0xEA, 0xEA, 0xEE) : Color.FromArgb(0x27, 0x27, 0x2C);
-        var key = ds5 ? Color.FromArgb(0x2C, 0x2C, 0x32) : Color.FromArgb(0x33, 0x33, 0x39);
-        var text = Color.FromArgb(0xD8, 0xD8, 0xDE);
+        var body = ds5 ? Color.FromArgb(0xF4, 0xF4, 0xF7) : Color.FromArgb(0x27, 0x27, 0x2C);
+        // DualSense: Tasten weiß mit grauen Symbolen; DualShock 4: dunkle Tasten mit Farbsymbolen.
+        var key = ds5 ? Color.FromArgb(0xEC, 0xEC, 0xF0) : Color.FromArgb(0x33, 0x33, 0x39);
+        var text = ds5 ? Color.FromArgb(0x8E, 0x8E, 0x98) : Color.FromArgb(0xD8, 0xD8, 0xDE);
         var trigger = ds5 ? Color.FromArgb(0xDC, 0xDC, 0xE2) : Color.FromArgb(0x3A, 0x3A, 0x40);
         var bumper = ds5 ? Color.FromArgb(0xF4, 0xF4, 0xF6) : Color.FromArgb(0x4A, 0x4A, 0x52);
         // Lichtleiste: vom Spiel gesetzte Farbe, sonst das übliche PlayStation-Blau.
         var lightbar = LightbarTint ?? Color.FromArgb(0x1E, 0x6F, 0xE0);
         var f = Frame(40, 1240, 40, 760);
+        // Tastenpalette auf das Original stellen: DualSense weiß, DualShock 4 dunkel.
+        var savedBody = _body;
+        var savedButtons = _buttons;
+        var savedDark = _darkButtons;
+        _body = body;
+        _buttons = key;
+        _darkButtons = !ds5;
+        try
+        {
 
         using (var path = f.Outline(ds5 ? PhotoOutlines.DualSense : PhotoOutlines.DualShock))
             BodyShape(g, path, body);
@@ -520,12 +530,16 @@ internal sealed partial class InputView
         EdgeShoulder(g, f, 775, 915, 28, 36, 98, 110, on(ProButtons.ZR), "R2", trigger, _input?.RightTrigger ?? 0, 32);
         EdgeShoulder(g, f, 915, 1072, 36, 80, 110, 154, on(ProButtons.R), "R1", bumper, labelDy: 34);
 
-        // Steuerkreuz oben links, Symboltasten oben rechts in den Originalfarben.
-        PhotoDPad(g, f, 322, 255, 96, on, fill: key, border: Mix(key, Color.White, 0.2f), glyphs: text);
-        Face(g, f.P(960, 175), on(ProButtons.X), "△", f.S(40), Color.FromArgb(0x2F, 0xB5, 0x8C));
-        Face(g, f.P(1035, 250), on(ProButtons.A), "○", f.S(40), Color.FromArgb(0xE0, 0x4B, 0x5A));
-        Face(g, f.P(960, 325), on(ProButtons.B), "✕", f.S(40), Color.FromArgb(0x4C, 0x7F, 0xD9));
-        Face(g, f.P(885, 250), on(ProButtons.Y), "□", f.S(40), Color.FromArgb(0xD9, 0x7F, 0xB4));
+        // Steuerkreuz oben links, Symboltasten oben rechts (DS5: graue Symbole, DS4: Originalfarben).
+        PhotoDPad(g, f, 322, 255, 96, on, fill: key, border: Mix(key, ds5 ? Color.Black : Color.White, 0.18f), glyphs: text);
+        var symX = ds5 ? text : Color.FromArgb(0x2F, 0xB5, 0x8C);
+        var symA = ds5 ? text : Color.FromArgb(0xE0, 0x4B, 0x5A);
+        var symB = ds5 ? text : Color.FromArgb(0x4C, 0x7F, 0xD9);
+        var symY = ds5 ? text : Color.FromArgb(0xD9, 0x7F, 0xB4);
+        Face(g, f.P(960, 175), on(ProButtons.X), "△", f.S(40), symX);
+        Face(g, f.P(1035, 250), on(ProButtons.A), "○", f.S(40), symA);
+        Face(g, f.P(960, 325), on(ProButtons.B), "✕", f.S(40), symB);
+        Face(g, f.P(885, 250), on(ProButtons.Y), "□", f.S(40), symY);
 
         // Beide Sticks symmetrisch unten (Kappe und Mulde schwarz, auch beim weißen DualSense).
         var cap = Color.FromArgb(0x24, 0x24, 0x28);
@@ -545,8 +559,8 @@ internal sealed partial class InputView
                 g.DrawPath(glow, pad);
             }
             var pb = pad.GetBounds();
-            var padTop = on(ProButtons.Capture) ? Accent : ds5 ? Color.FromArgb(0x24, 0x24, 0x28) : Color.FromArgb(0x34, 0x34, 0x3A);
-            var padBottom = on(ProButtons.Capture) ? Mix(Accent, Color.Black, 0.2f) : Color.FromArgb(0x12, 0x12, 0x16);
+            var padTop = on(ProButtons.Capture) ? Accent : ds5 ? Color.FromArgb(0xF0, 0xF0, 0xF3) : Color.FromArgb(0x34, 0x34, 0x3A);
+            var padBottom = on(ProButtons.Capture) ? Mix(Accent, Color.Black, 0.2f) : ds5 ? Color.FromArgb(0xD8, 0xD8, 0xDE) : Color.FromArgb(0x12, 0x12, 0x16);
             using (var fill = new LinearGradientBrush(pb, padTop, padBottom, LinearGradientMode.Vertical))
                 g.FillPath(fill, pad);
             using var edge = new Pen(ds5 ? Color.FromArgb(0xA8, 0xA8, 0xB2) : Color.FromArgb(0x4A, 0x4A, 0x52), 1.4f);
@@ -579,12 +593,13 @@ internal sealed partial class InputView
             }
         }
 
-        // SHARE/CREATE und OPTIONS: kleine Tasten links und rechts vom Touchpad.
-        PillKey(g, f.P(425, 148), on(ProButtons.Minus), "", key, 0, f.S(56), f.S(20));
-        PillKey(g, f.P(855, 148), on(ProButtons.Plus), "", key, 0, f.S(56), f.S(20));
+        // SHARE/CREATE und OPTIONS: kleine Tasten oberhalb der Touchpad-Ecken.
+        var menuKey = ds5 ? Color.FromArgb(0xDD, 0xDD, 0xE2) : key;
+        PillKey(g, f.P(415, 140), on(ProButtons.Minus), "", menuKey, 0, f.S(56), f.S(20));
+        PillKey(g, f.P(865, 140), on(ProButtons.Plus), "", menuKey, 0, f.S(56), f.S(20));
         var muted = Color.FromArgb(0x98, 0x98, 0xA2);
-        Label(g, f, 395, 174, ds5 ? "CREATE" : "SHARE", muted, 5.5f);
-        Label(g, f, 885, 174, "OPTIONS", muted, 5.5f);
+        Label(g, f, 392, 168, ds5 ? "CREATE" : "SHARE", muted, 5.5f);
+        Label(g, f, 888, 168, "OPTIONS", muted, 5.5f);
 
         // PS-Taste mittig unter dem Touchpad (Kreis mit „PS“).
         var pc = f.P(640, 415);
@@ -620,6 +635,13 @@ internal sealed partial class InputView
             }
         }
         Gyro(g, _input?.Motion);
+        }
+        finally
+        {
+            _body = savedBody;
+            _buttons = savedButtons;
+            _darkButtons = savedDark;
+        }
     }
 
     /// <summary>Leuchtstreifen der Lichtleiste in der vom Spiel gesetzten Farbe (mit Glühschein).</summary>
