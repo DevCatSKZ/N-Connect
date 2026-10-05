@@ -59,6 +59,10 @@ geprüft, 216/216 Tests grün):
   (Wii-Fernbedienung) entfernt; PS- und Xbox-Logo durch neutrales Haus-Symbol `⌂` ersetzt (`XboxHome`).
   Übrig bleiben nur Funktionsnamen: L/R, ZL/ZR, L1/L2/R1/R2, LB/LT/RB/RT, A/B/X/Y, SELECT/START/HOME, MODE.
 - **Wii Classic**: Sticks rund statt achteckig. **N64**: Z als Kapsel am Mittelgriff, ZR klein.
+- **Koppeln erweitert (`2ff4999`)**: Fenster „Controller koppeln“ und AutoPair decken jetzt auch
+  **PlayStation** (klassisch, Name „Wireless Controller“, `PairJustWorks` – auch im Hintergrund) und
+  **Xbox über Bluetooth** (BLE: `WatchXbox`/`PairXbox` im Fenster, WinRT-Kopplung, `IsPaired`-Test) ab.
+  Beide mit Hardware noch ungeprüft.
 
 Rendern/Prüfen wie immer: `N-Connect.exe --render <Ordner>`. Bei Überlappungs-Meldungen vom Nutzer:
 Textgrößen sind fest in pt, Positionen skalieren mit `PhotoFrame` – bei kleinen Karten kann Text an Kanten
