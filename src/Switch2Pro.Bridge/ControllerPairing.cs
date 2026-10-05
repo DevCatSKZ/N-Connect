@@ -1,5 +1,7 @@
+using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
 using Windows.Devices.Bluetooth;
+using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Devices.Enumeration;
 
 namespace Switch2Pro.Bridge;
@@ -11,8 +13,13 @@ namespace Switch2Pro.Bridge;
 /// einfache Kopplung ohne PIN („Just Works“); N-Connect bestätigt die Anfrage selbst.</item>
 /// <item>Wii-Fernbedienung und Wii U Pro Controller: binäre PIN = Bluetooth-Adresse des PCs (rote SYNC-Taste) bzw.
 /// die eigene (1+2), Byte für Byte – über „Gerät hinzufügen“ klappt das oft nicht (Vorgehen wie in Dolphin).</item>
+/// <item>PlayStation (DualShock 4, DualSense): klassisches Bluetooth, Name „Wireless Controller“, ohne PIN –
+/// wie Switch 1. Im Koppelfenster und im Hintergrund (die klassische Suche sieht nur Geräte im Kopplungsmodus).</item>
+/// <item>Xbox über Bluetooth (One S und neuer): Bluetooth LE – nicht in der klassischen Suche, darum ein eigener
+/// LE-Watcher während des Koppelfensters; Kopplung ohne PIN über WinRT. Nur im Fenster, nicht im Hintergrund.</item>
 /// </list>
-/// Danach den HID-Dienst einschalten; N-Connect findet den Controller dann wie jeden gekoppelten.
+/// Danach den HID-Dienst einschalten (klassisch); LE-Geräte richtet Windows selbst ein. N-Connect findet den
+/// Controller dann wie jeden gekoppelten.
 /// Windows-Bluetooth-API (BluetoothApis.dll / bthprops.cpl). Switch-2-Controller (Bluetooth LE) brauchen das nicht.
 /// </summary>
 internal static class ControllerPairing
@@ -146,6 +153,14 @@ internal static class ControllerPairing
     public static bool IsSwitch1Name(string? name) =>
         name is not null && Switch1Names.Any(n => name.StartsWith(n, StringComparison.OrdinalIgnoreCase));
 
+    /// <summary>DualShock 4 und DualSense werben im Kopplungsmodus (PS + Teilen/Create) als „Wireless Controller“.</summary>
+    public static bool IsSonyName(string? name) =>
+        name is not null && name.StartsWith("Wireless Controller", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>Xbox-Controller über Bluetooth-LE (One S und neuer; der Xbox 360 hat kein Bluetooth).</summary>
+    public static bool IsXboxName(string? name) =>
+        name is not null && name.StartsWith("Xbox", StringComparison.OrdinalIgnoreCase);
+
     /// <summary>
     /// Fenster „Controller koppeln“: sucht bis zu <paramref name="timeout"/> nach Controllern im Kopplungsmodus und
     /// koppelt sie. Liefert die Namen der neu gekoppelten Geräte. Läuft blockierend – auf einem Hintergrund-Thread aufrufen.
@@ -164,14 +179,25 @@ internal static class ControllerPairing
             try
             {
                 var until = DateTime.UtcNow + timeout;
-                while (DateTime.UtcNow < until && !ct.IsCancellationRequested)
+                // Xbox-Controller werben per Bluetooth LE – sie fehlen in der klassischen Suche, darum läuft
+                // während des Fensters zusätzlich ein LE-Watcher mit (Pairing-Modus = „Kopplungstaste halten“).
+                var xboxSeen = WatchXbox();
+                try
                 {
-                    progress("Suche … SYNC-Taste am Controller drücken (Joy-Con: an der Schiene, Wii-Fernbedienung: im Batteriefach).");
-                    paired.AddRange(ScanOnce(radio, radioAddress, progress, repairRemembered: true));
-                    if (paired.Count > 0)
-                        break;
-                    // Kurze Pause zwischen den Suchläufen: verbundene Controller bekommen wieder Funkzeit.
-                    ct.WaitHandle.WaitOne(1000);
+                    while (DateTime.UtcNow < until && !ct.IsCancellationRequested)
+                    {
+                        progress("Suche … SYNC-Taste drücken (Xbox: Kopplungstaste oben halten, PlayStation: PS + Teilen/Create halten).");
+                        paired.AddRange(ScanOnce(radio, radioAddress, progress, repairRemembered: true));
+                        paired.AddRange(PairXbox(xboxSeen, progress));
+                        if (paired.Count > 0)
+                            break;
+                        // Kurze Pause zwischen den Suchläufen: verbundene Controller bekommen wieder Funkzeit.
+                        ct.WaitHandle.WaitOne(1000);
+                    }
+                }
+                finally
+                {
+                    xboxSeen.Watcher.Stop();
                 }
             }
             finally
@@ -247,8 +273,8 @@ internal static class ControllerPairing
                 LastConnected[d.Address] = now;
         foreach (var device in Inquiry(radio))
         {
-            bool wii = IsWiiName(device.szName), switch1 = IsSwitch1Name(device.szName);
-            if (!wii && !switch1)
+            bool wii = IsWiiName(device.szName), switch1 = IsSwitch1Name(device.szName), sony = IsSonyName(device.szName);
+            if (!wii && !switch1 && !sony)
                 continue;
             var info = device;
             if (info.fConnected != 0)
@@ -301,6 +327,7 @@ internal static class ControllerPairing
                 }
             }
             progress($"Gefunden: {info.szName} – kopple …");
+            // Sony (wie Switch 1): Kopplung ohne PIN; nur die Wii braucht ihre eigene PIN-Behandlung.
             bool ok = wii ? PairWii(radio, ref info, radioAddress) : PairJustWorks(radio, ref info);
             if (!ok && FindAnswering(radio, info.Address, LastSeenNow(radio, info.Address)) is { } retry)
             {
@@ -326,6 +353,82 @@ internal static class ControllerPairing
             }
         }
         return paired;
+    }
+
+    // ---------- Xbox (Bluetooth LE – erscheint nicht in der klassischen Suche) ----------
+
+    /// <summary>Während des Koppelfensters laufender LE-Watcher, der werbende Xbox-Controller sammelt.</summary>
+    private sealed class XboxScan
+    {
+        public readonly BluetoothLEAdvertisementWatcher Watcher = new() { ScanningMode = BluetoothLEScanningMode.Active };
+        public readonly ConcurrentDictionary<ulong, byte> Seen = new();
+    }
+
+    private static XboxScan WatchXbox()
+    {
+        var scan = new XboxScan();
+        scan.Watcher.Received += (_, a) =>
+        {
+            if (IsXboxName(a.Advertisement.LocalName))
+                scan.Seen.TryAdd(a.BluetoothAddress, 0);
+        };
+        scan.Watcher.Start();
+        return scan;
+    }
+
+    /// <summary>Alle seit der letzten Suche gesehenen Xbox-Controller koppeln (nur ungekoppelte – eigene Werbung beim
+    /// Wiederverbinden ignoriert der <see cref="DeviceInformation.Pairing.IsPaired"/>-Test).</summary>
+    private static List<string> PairXbox(XboxScan scan, Action<string> progress)
+    {
+        var paired = new List<string>();
+        foreach (var address in scan.Seen.Keys)
+            if (scan.Seen.TryRemove(address, out _) && TryPairXbox(address, progress) is { } name)
+                paired.Add(name);
+        return paired;
+    }
+
+    /// <summary>Xbox-Controller über WinRT koppeln (Kopplung ohne PIN, Rückfrage wird sofort bestätigt).</summary>
+    private static string? TryPairXbox(ulong address, Action<string> progress)
+    {
+        try
+        {
+            using var device = BluetoothLEDevice.FromBluetoothAddressAsync(address).AsTask().GetAwaiter().GetResult();
+            if (device is null)
+                return null;
+            var info = device.DeviceInformation;
+            if (info.Pairing.IsPaired)
+                return null; // gehört schon diesem PC – verbindet sich von selbst
+            string name = string.IsNullOrEmpty(info.Name) ? "Xbox Wireless Controller" : info.Name;
+            progress($"Gefunden: {name} – kopple …");
+            var custom = info.Pairing.Custom;
+            void Accept(DeviceInformationCustomPairing s, DevicePairingRequestedEventArgs a) => a.Accept();
+            custom.PairingRequested += Accept;
+            try
+            {
+                var pairing = custom.PairAsync(DevicePairingKinds.ConfirmOnly | DevicePairingKinds.ConfirmPinMatch,
+                    DevicePairingProtectionLevel.None).AsTask();
+                if (!pairing.Wait(TimeSpan.FromSeconds(20)))
+                    return null;
+                var status = pairing.Result.Status;
+                if (status is not (DevicePairingResultStatus.Paired or DevicePairingResultStatus.AlreadyPaired))
+                {
+                    Log.Info($"Kopplung {name}: {status}");
+                    return null;
+                }
+                progress($"Gekoppelt: {name}");
+                Log.Info($"Kopplung: {name} (LE {address:X12}) gekoppelt");
+                return name;
+            }
+            finally
+            {
+                custom.PairingRequested -= Accept;
+            }
+        }
+        catch (Exception e)
+        {
+            Log.Info($"Kopplung Xbox ({address:X12}): {Log.Reason(e)}");
+            return null;
+        }
     }
 
     private static readonly TimeSpan FailurePause = TimeSpan.FromSeconds(90);

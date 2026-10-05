@@ -355,8 +355,8 @@ internal sealed class SettingsForm : Form
         var pair = new GlyphButton("Controller koppeln …", Glyph.Bluetooth) { Enabled = _wiiPairing is not null };
         pair.Click += (_, _) => _wiiPairing?.Invoke();
         page.AddGroup("Verbinden",
-            Row("Neue Controller automatisch koppeln", "Joy-Con, Pro Controller, NES/SNES/N64/Mega Drive und Wii: einfach SYNC drücken – " +
-                "kein Umweg über die Windows-Bluetooth-Einstellungen. Gesucht wird nur, solange niemand spielt.", _autoPair, Glyph.Bluetooth),
+            Row("Neue Controller automatisch koppeln", "Joy-Con, Pro Controller, NES/SNES/N64/Mega Drive, Wii und PlayStation: einfach SYNC " +
+                "drücken – kein Umweg über die Windows-Bluetooth-Einstellungen. Gesucht wird nur, solange niemand spielt.", _autoPair, Glyph.Bluetooth),
             Row("Gezielt suchen", "Sucht eine Minute lang nach Controllern im Kopplungsmodus.", pair, Glyph.Bluetooth),
             Row("Per Tastendruck verbinden", "Gekoppelte Controller verbinden sich ohne SYNC-Taste.", _autoReconnect, Glyph.Bluetooth),
             Row("Beim Verbinden kurz vibrieren", null, _connectFeedback, Glyph.Vibrate),
