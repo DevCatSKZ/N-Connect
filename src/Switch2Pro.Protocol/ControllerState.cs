@@ -59,6 +59,12 @@ public enum ControllerKind
     WiiRemote,
     /// <summary>Wii U Pro Controller.</summary>
     WiiUPro,
+    /// <summary>Sony DualShock 4 (USB oder Bluetooth).</summary>
+    DualShock4,
+    /// <summary>Sony DualSense (auch Edge), USB oder Bluetooth.</summary>
+    DualSense,
+    /// <summary>Xbox-Controller (360, One, Series, Elite …) über XInput – Bluetooth, USB oder Microsoft-Adapter.</summary>
+    XboxController,
 }
 
 public static class ControllerKinds
@@ -105,12 +111,23 @@ public static class ControllerKinds
         ControllerKind.MegaDrive => "SEGA Mega Drive Controller (Nintendo Switch Online)",
         ControllerKind.WiiRemote => "Wii-Fernbedienung",
         ControllerKind.WiiUPro => "Wii U Pro Controller",
+        ControllerKind.DualShock4 => "Sony DualShock 4",
+        ControllerKind.DualSense => "Sony DualSense",
+        ControllerKind.XboxController => "Xbox-Controller",
         _ => "Nintendo Controller",
     };
 
     /// <summary>Nintendo-Switch-Online-Controller (Switch-1-Protokoll, eigene Tastenanordnung).</summary>
     public static bool IsClassic(this ControllerKind k) =>
         k is ControllerKind.NesController or ControllerKind.SnesController or ControllerKind.N64Controller or ControllerKind.MegaDrive;
+
+    /// <summary>PlayStation-Controller (DualShock 4, DualSense) – eigene Tastensymbole, Gyro, analoge Trigger.</summary>
+    public static bool IsPlayStation(this ControllerKind k) =>
+        k is ControllerKind.DualShock4 or ControllerKind.DualSense;
+
+    /// <summary>Xbox-Controller über XInput (Bluetooth, USB oder Microsoft-Adapter). Wird von Windows schon
+    /// als Xbox-Controller geführt – N-Connect erzeugt keinen virtuellen Controller, um Doppeleingaben zu vermeiden.</summary>
+    public static bool IsXbox(this ControllerKind k) => k == ControllerKind.XboxController;
 
     /// <summary>
     /// Art aus dem Gerätetyp der Antwort auf „Geräteinfo“ (Switch-1-Protokoll, Byte 2): NES-Controller melden

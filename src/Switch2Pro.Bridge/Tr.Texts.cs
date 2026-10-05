@@ -139,9 +139,34 @@ internal static partial class Tr
         ["1 (quer) / Classic Y"] = "1 (sideways) / Classic Y",
         ["2 (quer) / Classic B"] = "2 (sideways) / Classic B",
         ["B (Abzug) / Classic ZR"] = "B (trigger) / Classic ZR",
+        // Sony: Tastensymbole nach Position.
+        ["Kreuz (unten)"] = "Cross (bottom)",
+        ["Kreis (rechts)"] = "Circle (right)",
+        ["Viereck (links)"] = "Square (left)",
+        ["Dreieck (oben)"] = "Triangle (top)",
+        ["Create"] = "Create",
+        ["Share"] = "Share",
+        ["Options"] = "Options",
+        ["PS-Taste"] = "PS button",
+        ["Touchpad-Klick"] = "Touchpad click",
+        ["Mikro stumm"] = "Mic mute",
+        ["Fn links (Edge)"] = "Fn left (Edge)",
+        ["Rücktaste links (Edge)"] = "Left back button (Edge)",
+        ["Rücktaste rechts (Edge)"] = "Right back button (Edge)",
+        ["L3 (Stick drücken)"] = "L3 (press stick)",
+        ["R3 (Stick drücken)"] = "R3 (press stick)",
+        // Xbox.
+        ["Ansicht/Zurück"] = "View/Back",
+        ["Menü/Start"] = "Menu/Start",
+        ["Xbox-Taste"] = "Xbox button",
 
         // ---------- Controller-Namen ----------
         ["Wii-Fernbedienung"] = "Wii Remote",
+        ["Sony DualShock 4"] = "Sony DualShock 4",
+        ["Sony DualSense"] = "Sony DualSense",
+        ["Xbox-Controller"] = "Xbox controller",
+        ["Xbox-Controller (Microsoft)"] = "Xbox controller (Microsoft)",
+        ["XInput (USB, Bluetooth oder Xbox-Adapter)"] = "XInput (USB, Bluetooth, or Xbox adapter)",
 
         // ---------- Übersicht / Karten ----------
         ["Trennen"] = "Disconnect",
@@ -414,14 +439,16 @@ internal static partial class Tr
         ["Die Spieler-LEDs zeigen den Xbox-Platz, den Windows vergibt. Bei DualShock 4 steuert die Lichtleiste des Spiels die HOME-LED (Switch 1 Pro Controller, rechter Joy-Con)."] =
             "The player LEDs show the Xbox slot assigned by Windows. With DualShock 4, the game's light bar drives the HOME LED (Switch 1 Pro Controller, right Joy-Con).",
         ["HidHide installieren …"] = "Install HidHide …",
-        ["Empfohlen: Steam und viele Spiele kennen Switch-1-, NSO- und USB-Controller selbst und sähen sie sonst doppelt. Beim ersten Verbinden fragt Windows einmal nach Adminrechten."] =
-            "Recommended: Steam and many games support Switch 1, NSO and USB controllers themselves and would otherwise see them twice. On first connection Windows asks once for administrator rights.",
+        ["Empfohlen: Steam und viele Spiele kennen Switch-1-, NSO- und USB-Controller selbst und sähen sie sonst doppelt. Läuft nach der Installation ohne Rückfrage (sonst fragt Windows nach Adminrechten)."] =
+            "Recommended: Steam and many games support Switch 1, NSO and USB controllers themselves and would otherwise see them twice. Works without prompts once installed (otherwise Windows asks for administrator rights).",
         ["Steam und viele Spiele sehen Switch-1-, NSO- und USB-Controller sonst doppelt. Dafür wird das kostenlose HidHide gebraucht (bei der N-Connect-Installation dabei, hier nachträglich)."] =
             "Otherwise Steam and many games see Switch 1, NSO and USB controllers twice. This needs the free HidHide (included in the N-Connect setup, install it here afterwards).",
         ["Erscheint als"] = "Appears as",
         ["Wie allgemein"] = "As in General",
         ["Nur für diesen Controller. Xbox 360 läuft überall; DualShock 4 bringt zusätzlich Gyro nach Steam und in Emulatoren. „Wie allgemein“ folgt der Seite „Allgemein“."] =
             "Only for this controller. Xbox 360 works everywhere; DualShock 4 adds gyro in Steam and emulators. “As in General” follows the “General” page.",
+        ["Der echte Xbox-Controller – Spiele sehen ihn von Windows aus direkt. Belegungen hier wirken auf Sonderaktionen (Tastatur, Makros, Gyro), nicht auf den Controller selbst."] =
+            "The real Xbox controller – Windows already shows it to games directly. Mappings here apply to special actions (keyboard, macros, gyro), not to the controller itself.",
         ["Steam und manche Spiele sehen diesen Controller sonst doppelt. Abhilfe: HidHide installieren (Seite „Allgemein“ → „Original-Controller verstecken“)."] =
             "Otherwise Steam and some games see this controller twice. Fix: install HidHide (“General” page → “Hide original controllers”).",
         ["Original-Controller vor Spielen versteckt. Steam bitte einmal neu starten – danach sieht es nur noch den virtuellen Controller."] =
@@ -511,11 +538,14 @@ internal static partial class Tr
         ["Kein Controller verbunden\n\n" +
          "Switch-2-Controller: kurz die SYNC-Taste drücken – danach reicht ein beliebiger Tastendruck.\n" +
          "Switch-1-, NSO- und Wii-Controller: SYNC-Taste drücken – N-Connect koppelt sie selbst.\n" +
-         "Gezielt suchen: Seite „Allgemein“ → „Controller koppeln …“."] =
+         "Oder hier gezielt suchen und koppeln:"] =
             "No controller connected\n\n" +
             "Switch 2 controllers: briefly press the SYNC button – afterwards any button press is enough.\n" +
             "Switch 1, NSO and Wii controllers: press the SYNC button – N-Connect pairs them itself.\n" +
-            "To search on purpose: page “General” → “Pair controller …”.",
+            "Or search and pair right here:",
+        ["Controller suchen …"] = "Search for controllers …",
+        ["Switch-1-, NSO- und Wii-Controller suchen und koppeln (SYNC-Taste drücken)."] =
+            "Search and pair Switch 1, NSO and Wii controllers (press the SYNC button).",
         ["Neue Controller automatisch koppeln"] = "Pair new controllers automatically",
         ["Joy-Con, Pro Controller, NES/SNES/N64/Mega Drive und Wii: einfach SYNC drücken – " +
          "kein Umweg über die Windows-Bluetooth-Einstellungen. Gesucht wird nur, solange niemand spielt."] =
@@ -531,6 +561,11 @@ internal static partial class Tr
         ["Controller umbenennen"] = "Rename controller",
         ["Spielerplatz"] = "Player slot",
         ["N-Connect aktualisieren"] = "Update N-Connect",
+        ["HidHide aktualisieren"] = "Update HidHide",
+        ["HidHide-Update verfügbar"] = "HidHide update available",
+        ["HidHide aktuell halten"] = "Keep HidHide up to date",
+        ["Beim Start nach einer neuen HidHide-Version suchen. Installiert wird nur nach Rückfrage (geprüfter Download vom Hersteller, Neustart nötig)."] =
+            "Check for a new HidHide version at startup. It is only installed after you confirm (verified download from the vendor, restart required).",
         ["Der Download hat nicht geklappt oder die Datei war fehlerhaft. Die Release-Seite im Browser öffnen?"] =
             "The download failed or the file was damaged. Open the release page in the browser?",
         ["Alle Controller trennen"] = "Disconnect all controllers",

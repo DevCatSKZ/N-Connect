@@ -57,7 +57,10 @@ internal static class Theme
             _ => true,
         };
         Current = dark ? DarkPalette : LightPalette;
-        Accent = WindowsAccent() ?? Color.FromArgb(0, 120, 212);
+        // Akzent = sattes Blau (weniger cyan als Branding.Blue – das wirkte zu türkis); im hellen Modus etwas
+        // tiefer für den Kontrast auf weißen Flächen. Nicht die Windows-Akzentfarbe – die sieht je nach
+        // Nutzerwahl beliebig aus (z. B. pink).
+        Accent = dark ? Color.FromArgb(0, 140, 220) : Color.FromArgb(0, 120, 212);
         Mica = transparency && OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22621);
     }
 
@@ -74,34 +77,8 @@ internal static class Theme
         }
     }
 
-    /// <summary>
-    /// Akzentfarbe aus der Windows-Akzentpalette: im dunklen Modus die Stufe „Light 1“ (kräftig; „Light 2“, die
-    /// Windows 11 nimmt, wirkt bei vielen Farben blass-pastell), im hellen Modus „Dark 1“. Die Schrift darauf wählt
-    /// <see cref="OnAccent"/> nach Helligkeit. Ohne Palette die DWM-Akzentfarbe, im dunklen Modus etwas aufgehellt.
-    /// </summary>
-    private static Color? WindowsAccent()
-    {
-        try
-        {
-            using (var accent = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\Accent"))
-            {
-                if (accent?.GetValue("AccentPalette") is byte[] { Length: >= 28 } palette)
-                {
-                    int i = Current.Dark ? 2 : 4; // Light 1 bzw. Dark 1
-                    return Color.FromArgb(palette[i * 4], palette[i * 4 + 1], palette[i * 4 + 2]);
-                }
-            }
-            using var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\DWM");
-            if (key?.GetValue("AccentColor") is not int abgr)
-                return null;
-            var c = Color.FromArgb(abgr & 0xFF, (abgr >> 8) & 0xFF, (abgr >> 16) & 0xFF);
-            return Current.Dark ? Blend(c, Color.White, 0.3f) : c;
-        }
-        catch (Exception e) when (e is System.Security.SecurityException or UnauthorizedAccessException or IOException)
-        {
-            return null;
-        }
-    }
+
+
 
     public static Color Blend(Color a, Color b, float t) => Color.FromArgb(
         (int)(a.R + (b.R - a.R) * t), (int)(a.G + (b.G - a.G) * t), (int)(a.B + (b.B - a.B) * t));

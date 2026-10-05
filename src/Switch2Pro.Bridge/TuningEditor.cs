@@ -9,14 +9,16 @@ internal static class KindInfo
     public static bool HasSticks(ControllerKind k) =>
         k is not (ControllerKind.NesController or ControllerKind.SnesController or ControllerKind.MegaDrive);
 
-    public static bool HasAnalogTriggers(ControllerKind k) => k is ControllerKind.GameCube2;
+    public static bool HasAnalogTriggers(ControllerKind k) =>
+        k is ControllerKind.GameCube2 or ControllerKind.DualShock4 or ControllerKind.DualSense or ControllerKind.XboxController;
 
     public static bool HasRumble(ControllerKind k) =>
         k is not (ControllerKind.NesController or ControllerKind.SnesController or ControllerKind.MegaDrive);
 
     public static bool HasMotion(ControllerKind k) =>
         k is ControllerKind.Pro2 or ControllerKind.JoyCon2Left or ControllerKind.JoyCon2Right or ControllerKind.JoyConPair
-            or ControllerKind.Pro1 or ControllerKind.JoyCon1Left or ControllerKind.JoyCon1Right or ControllerKind.WiiRemote;
+            or ControllerKind.Pro1 or ControllerKind.JoyCon1Left or ControllerKind.JoyCon1Right or ControllerKind.WiiRemote
+            or ControllerKind.DualShock4 or ControllerKind.DualSense;
 
     /// <summary>Alle Controller-Arten, für die sich eigene Belegungen und Werte festlegen lassen.</summary>
     public static readonly ControllerKind[] Configurable =
@@ -25,6 +27,7 @@ internal static class KindInfo
         ControllerKind.GameCube2, ControllerKind.Pro1, ControllerKind.JoyCon1Left, ControllerKind.JoyCon1Right,
         ControllerKind.NesController, ControllerKind.SnesController, ControllerKind.N64Controller, ControllerKind.MegaDrive,
         ControllerKind.WiiRemote, ControllerKind.WiiUPro,
+        ControllerKind.DualShock4, ControllerKind.DualSense, ControllerKind.XboxController,
     ];
 }
 

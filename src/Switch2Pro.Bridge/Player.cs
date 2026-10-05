@@ -73,10 +73,14 @@ internal sealed class Player : IDisposable
             DisposePad(pad);
     }
 
-    /// <summary>Virtuellen Controller wieder anlegen (nach <see cref="ReleasePad"/>).</summary>
+    /// <summary>Virtuellen Controller wieder anlegen (nach <see cref="ReleasePad"/>). Bei nativen
+    /// Controllern (Xbox über XInput) gibt es nichts anzulegen – Windows sieht sie schon selbst.</summary>
     internal void RestorePad()
     {
         bool missing;
+        lock (_gate)
+            if (_links.Count > 0 && _links.All(l => l.Native))
+                return;
         lock (_output)
             missing = _pad is null && !_disposed;
         if (missing)
@@ -88,9 +92,13 @@ internal sealed class Player : IDisposable
 
     /// <summary>
     /// Gewünschte Ausgabeart: eigene Einstellung eines seiner Controller (Paar: der erste mit eigener Einstellung),
-    /// sonst die allgemeine.
+    /// sonst die allgemeine. Native Controller (Xbox über XInput) haben keine virtuelle Ausgabe.
     /// </summary>
-    public OutputMode DesiredOutput(Settings settings) => DesiredOutput(settings, Links);
+    public OutputMode DesiredOutput(Settings settings)
+    {
+        var links = Links;
+        return links.Count > 0 && links.All(l => l.Native) ? Output : DesiredOutput(settings, links);
+    }
 
     private static OutputMode DesiredOutput(Settings settings, IEnumerable<IControllerLink> links) =>
         links.Select(l => settings.OutputFor(l.Address)).FirstOrDefault(m => m is not null) ?? settings.OutputMode;
@@ -107,7 +115,9 @@ internal sealed class Player : IDisposable
         Index = index;
         _settings = settings;
         _factory = factory;
-        CreatePad(DesiredOutput(settings(), [first])); // wirft bei ViGEm-Fehlern – der Manager fängt das ab
+        // Xbox über XInput ist in Spielen schon sichtbar – kein virtueller Controller, sonst doppelt.
+        if (!first.Native)
+            CreatePad(DesiredOutput(settings(), [first])); // wirft bei ViGEm-Fehlern – der Manager fängt das ab
         Add(first);
     }
 
@@ -172,6 +182,9 @@ internal sealed class Player : IDisposable
             _mac = null; // DSU-Adresse neu bestimmen
         }
         link.StateReceived += OnState;
+        // Nativer Xbox-Controller: der XInput-Platz steht fest, kein virtueller Controller meldet ihn.
+        if (link.NativeSlot is { } native)
+            GameSlot = native;
         link.SetPlayerAsync(LedIndex).Forget($"{link.Id}: Spieler-LED");
         Changed?.Invoke();
     }
@@ -627,6 +640,9 @@ internal sealed class Player : IDisposable
                 foreach (var link in Links)
                     link.SetHomeLightAsync(level).Forget($"{link.Id}: HOME-LED");
             }
+            // Sony-Controller: die Lichtleiste direkt übernehmen (DualShock 4, DualSense).
+            foreach (var link in Links.Where(l => l.Kind.IsPlayStation()))
+                link.SetLightbarAsync(r, g, b).Forget($"{link.Id}: Lichtleiste vom Spiel");
         }
         ThreadPool.QueueUserWorkItem(_ => Changed?.Invoke());
     }

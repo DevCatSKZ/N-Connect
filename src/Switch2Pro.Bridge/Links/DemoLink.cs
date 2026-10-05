@@ -13,7 +13,10 @@ internal sealed class DemoLink : IControllerLink
     private int _lost;
 
     public ControllerKind Kind { get; }
-    public Transport Transport => Transport.BluetoothLE;
+    public Transport Transport => Kind == ControllerKind.XboxController ? Transport.XInput : Transport.BluetoothLE;
+    /// <summary>Der Demo-Xbox-Controller verhält sich wie ein echter: nativ sichtbar, kein virtuelles Pad.</summary>
+    public bool Native => Kind == ControllerKind.XboxController;
+    public int? NativeSlot => Kind == ControllerKind.XboxController ? 1 : null;
     public string Id { get; }
     public string? Address { get; }
     public DeviceCalibration Calibration { get; } = DeviceCalibration.Default;
@@ -64,8 +67,8 @@ internal sealed class DemoLink : IControllerLink
                     Kind = Kind,
                     Buttons = buttons[(int)(t * 2) % buttons.Length],
                     LeftX = x, LeftY = y, RightX = 4096 - x, RightY = y,
-                    LeftTrigger = Kind == ControllerKind.GameCube2 ? (int)(127 + 100 * Math.Sin(t)) : -1,
-                    RightTrigger = Kind == ControllerKind.GameCube2 ? (int)(127 + 100 * Math.Cos(t)) : -1,
+                    LeftTrigger = Analog ? (int)(127 + 100 * Math.Sin(t)) : -1,
+                    RightTrigger = Analog ? (int)(127 + 100 * Math.Cos(t)) : -1,
                     Motion = new Motion(0, 0, 4096, (short)(3000 * Math.Sin(t)), 0, 0),
                     BatteryPercent = 20 + seed * 37 % 80,
                 };
@@ -79,6 +82,9 @@ internal sealed class DemoLink : IControllerLink
         {
         }
     }
+
+    /// <summary>Analoge Trigger zeigen (GameCube, DualShock 4, DualSense, Xbox).</summary>
+    private bool Analog => Kind is ControllerKind.GameCube2 or ControllerKind.DualShock4 or ControllerKind.DualSense or ControllerKind.XboxController;
 
     public void SetRumble(byte large, byte small, float strength) => Rumble = (large, small);
 

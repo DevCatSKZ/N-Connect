@@ -196,6 +196,28 @@ internal static class UsbNative
     [DllImport("hid.dll", SetLastError = true)]
     public static extern bool HidD_SetOutputReport(SafeFileHandle device, byte[] report, int length);
 
+    /// <summary>Feature-Bericht lesen (Byte 0 = Report-ID; Pufferlänge = FeatureReportByteLength).</summary>
+    [DllImport("hid.dll", SetLastError = true)]
+    public static extern bool HidD_GetFeature(SafeFileHandle device, byte[] report, int length);
+
+    /// <summary>Produktname aus dem HID-Deskriptor (z. B. „Wireless Controller“).</summary>
+    [DllImport("hid.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    private static extern bool HidD_GetProductString(SafeFileHandle device, byte[] buffer, int length);
+
+    /// <summary>Seriennummer aus dem HID-Deskriptor (bei Bluetooth oft die Geräteadresse).</summary>
+    [DllImport("hid.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    private static extern bool HidD_GetSerialNumberString(SafeFileHandle device, byte[] buffer, int length);
+
+    /// <summary>Eine HID-Zeichenkette (Produktname, Seriennummer) lesen; null, wenn nicht vorhanden.</summary>
+    public static string? GetHidString(SafeFileHandle device, bool serial)
+    {
+        var buffer = new byte[256];
+        return (serial ? HidD_GetSerialNumberString(device, buffer, buffer.Length)
+                : HidD_GetProductString(device, buffer, buffer.Length))
+            ? System.Text.Encoding.Unicode.GetString(buffer).TrimEnd('\0') is { Length: > 0 } s ? s : null
+            : null;
+    }
+
     public static HIDP_CAPS GetHidCaps(SafeFileHandle device)
     {
         if (!HidD_GetPreparsedData(device, out var preparsed))

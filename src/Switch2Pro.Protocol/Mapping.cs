@@ -64,12 +64,14 @@ public static class Mapping
             Pointer = s.Pointer,
         };
 
-        if (s.Kind == ControllerKind.GameCube2 && s.LeftTrigger >= 0 && s.RightTrigger >= 0)
+        if (s.LeftTrigger >= 0 && s.RightTrigger >= 0)
         {
+            // GameCube hat eine eigene Ruhepunkt-Kalibrierung; Sony/Xbox liefern saubere 0–255-Werte.
+            bool gameCube = s.Kind == ControllerKind.GameCube2;
             return input with
             {
-                LeftTrigger = Trigger(s.LeftTrigger, cal.TriggerZeroLeft),
-                RightTrigger = Trigger(s.RightTrigger, cal.TriggerZeroRight),
+                LeftTrigger = gameCube ? Trigger(s.LeftTrigger, cal.TriggerZeroLeft) : s.LeftTrigger / 255f,
+                RightTrigger = gameCube ? Trigger(s.RightTrigger, cal.TriggerZeroRight) : s.RightTrigger / 255f,
             };
         }
 
@@ -223,8 +225,9 @@ public static class Mapping
     {
         // GameCube: Tasten nach Position (die Beschriftung passt zu keinem Schema), Z = RB,
         // ZL = LB, die digitalen Trigger-Klicks sind durch die analogen Trigger abgedeckt.
-        // N64 und Mega Drive: Tasten sind schon nach Position angeordnet (siehe NormalizeClassic).
-        if (kind is ControllerKind.N64Controller or ControllerKind.MegaDrive)
+        // N64, Mega Drive, Xbox und PlayStation: Tasten sind schon nach Position angeordnet
+        // (siehe NormalizeClassic bzw. die positionsgetreue Zuordnung in XboxPad/PlayStationPad).
+        if (kind is ControllerKind.N64Controller or ControllerKind.MegaDrive || kind.IsXbox() || kind.IsPlayStation())
             layout = FaceButtonLayout.Xbox;
         if (kind == ControllerKind.GameCube2)
         {

@@ -78,13 +78,19 @@ internal sealed partial class InputView : Control
             PaintJoyCons(g, parts);
             return;
         }
+        var p = _input;
+        bool On(ProButtons b) => p is not null && p.Has(b);
         if (_input is { Kind: var kind } && IsRetro(kind))
         {
             PaintRetro(g, kind);
             return;
         }
-        var p = _input;
-        bool On(ProButtons b) => p is not null && p.Has(b);
+        // Sony-Pads haben ein eigenes Layout (Sticks symmetrisch unten, Touchpad mittig) – eigene Zeichnung.
+        if (p?.Kind is ControllerKind.DualShock4 or ControllerKind.DualSense)
+        {
+            PaintPlayStation(g, p.Kind, On);
+            return;
+        }
 
         // Umriss und alle Tastenpositionen 1:1 vom offiziellen Produktfoto (Frontansicht), wie bei den anderen Controllern.
         var f = Frame(307, 1600, 92, 1012);
@@ -93,28 +99,41 @@ internal sealed partial class InputView : Control
         var bumperColor = Mix(_body, Color.White, 0.30f);
 
         // Hinten die Trigger ZL/ZR (unterer Rand vom Gehäuse verdeckt), dann das Gehäuse, dann die Schultertasten L/R.
-        Shoulder(g, f.R(448, 44, 246, 70), On(ProButtons.ZL), "ZL", triggerColor, _gamepad.LeftTrigger / 255f, tucked: true);
-        Shoulder(g, f.R(1213, 44, 246, 70), On(ProButtons.ZR), "ZR", triggerColor, _gamepad.RightTrigger / 255f, tucked: true);
+        var (lt, rt, lb, rb) = p?.Kind switch
+        {
+            ControllerKind.XboxController => ("LT", "RT", "LB", "RB"),
+            ControllerKind.DualShock4 or ControllerKind.DualSense => ("L2", "R2", "L1", "R1"),
+            _ => ("ZL", "ZR", "L", "R"),
+        };
+        Shoulder(g, f.R(448, 44, 246, 70), On(ProButtons.ZL), lt, triggerColor, _gamepad.LeftTrigger / 255f, tucked: true);
+        Shoulder(g, f.R(1213, 44, 246, 70), On(ProButtons.ZR), rt, triggerColor, _gamepad.RightTrigger / 255f, tucked: true);
         DrawPro2Body(g, f);
-        Shoulder(g, f.R(430, 102, 268, 52), On(ProButtons.L), "L", bumperColor);
-        Shoulder(g, f.R(1202, 102, 268, 52), On(ProButtons.R), "R", bumperColor);
+        Shoulder(g, f.R(430, 102, 268, 52), On(ProButtons.L), lb, bumperColor);
+        Shoulder(g, f.R(1202, 102, 268, 52), On(ProButtons.R), rb, bumperColor);
 
         // Links: Stick oben außen, Steuerkreuz darunter weiter innen
         Stick(g, f.P(575, 372), _gamepad.LeftX, _gamepad.LeftY, On(ProButtons.LeftStick), f.S(92), f.S(62));
         PhotoDPad(g, f, 765, 558, 96, On);
 
-        // Rechts: Tasten oben außen (X oben, A rechts, B unten, Y links), Stick darunter weiter innen
-        Face(g, f.P(1292, 278), On(ProButtons.X), "X", f.S(50));
-        Face(g, f.P(1388, 372), On(ProButtons.A), "A", f.S(50));
-        Face(g, f.P(1290, 462), On(ProButtons.B), "B", f.S(50));
-        Face(g, f.P(1190, 372), On(ProButtons.Y), "Y", f.S(50));
+        // Rechts: Tasten oben außen (X oben, A rechts, B unten, Y links), Stick darunter weiter innen.
+        // Beschriftung je nach Controller-Art: Xbox = A/B/X/Y in den Originalfarben, Nintendo = A/B/X/Y.
+        bool xbox = p?.Kind == ControllerKind.XboxController;
+        var (top, right, bottom, left) = xbox ? ("Y", "B", "A", "X") : ("X", "A", "B", "Y");
+        Face(g, f.P(1292, 278), On(ProButtons.X), top, f.S(50), xbox ? XboxYellow : null);
+        Face(g, f.P(1388, 372), On(ProButtons.A), right, f.S(50), xbox ? XboxRed : null);
+        Face(g, f.P(1290, 462), On(ProButtons.B), bottom, f.S(50), xbox ? XboxGreen : null);
+        Face(g, f.P(1190, 372), On(ProButtons.Y), left, f.S(50), xbox ? XboxBlue : null);
         Stick(g, f.P(1095, 558), _gamepad.RightX, _gamepad.RightY, On(ProButtons.RightStick), f.S(92), f.S(62));
 
-        // Mitte: − / + oben, Aufnahme (eckig) / HOME (rund) darunter; C nur beim Switch-2-Pro
-        Face(g, f.P(795, 272), On(ProButtons.Minus), "−", f.S(28));
-        Face(g, f.P(1110, 272), On(ProButtons.Plus), "+", f.S(28));
+        // Mitte: − / + oben, Aufnahme (eckig) / HOME (rund) darunter; C nur beim Switch-2-Pro.
+        // Xbox: Ansicht/Menü und Xbox-Taste.
+        Face(g, f.P(795, 272), On(ProButtons.Minus), xbox ? "▤" : "−", f.S(28));
+        Face(g, f.P(1110, 272), On(ProButtons.Plus), xbox ? "☰" : "+", f.S(28));
         CaptureKey(g, f.P(873, 372), On(ProButtons.Capture));
-        Home(g, f.P(1035, 372), On(ProButtons.Home));
+        if (xbox)
+            XboxHome(g, f.P(1035, 372), On(ProButtons.Home));
+        else
+            Home(g, f.P(1035, 372), On(ProButtons.Home));
         // C-Taste und GL/GR gibt es nur am Switch-2-Pro-Controller, nicht am Switch-1-Pro.
         bool switch2 = p?.Kind == ControllerKind.Pro2;
         if (switch2)
@@ -177,6 +196,15 @@ internal sealed partial class InputView : Control
     /// <summary>Spielernummer für die LED-Anzeige (0–7), −1 = aus.</summary>
     public int PlayerIndex { get; set; } = -1;
 
+    /// <summary>Farbe der Lichtleiste, die das Spiel dem Controller gegeben hat (Sony-Pads), null = Standard.</summary>
+    public Color? LightbarTint { get; set; }
+
+    // Tastenfarben des Xbox-Controllers (Buchstaben auf schwarzen Tasten).
+    private static readonly Color XboxGreen = Color.FromArgb(0x44, 0xB2, 0x3F);
+    private static readonly Color XboxRed = Color.FromArgb(0xE0, 0x46, 0x3E);
+    private static readonly Color XboxBlue = Color.FromArgb(0x4E, 0x8F, 0xD8);
+    private static readonly Color XboxYellow = Color.FromArgb(0xF0, 0xB6, 0x10);
+
     /// <summary>Vier Spieler-LEDs oben an der Gehäusekante, Muster wie an der Konsole.</summary>
     private void PlayerLeds(Graphics g, PointF c)
     {
@@ -197,12 +225,12 @@ internal sealed partial class InputView : Control
 
     // ---------- Bedienelemente ----------
 
-    private void Face(Graphics g, PointF c, bool on, string text, float r = 20.5f)
+    private void Face(Graphics g, PointF c, bool on, string text, float r = 20.5f, Color? glyph = null)
     {
         using var path = new GraphicsPath();
         path.AddEllipse(c.X - r, c.Y - r, r * 2, r * 2);
         Fill(g, path, on, FaceFill);
-        Caption(g, new RectangleF(c.X - r, c.Y - r, r * 2, r * 2), text, r * 0.63f, on ? Color.White : FaceText);
+        Caption(g, new RectangleF(c.X - r, c.Y - r, r * 2, r * 2), text, r * 0.63f, on ? Color.White : glyph ?? FaceText);
     }
 
     private void Small(Graphics g, PointF c, bool on, string text)
@@ -251,6 +279,22 @@ internal sealed partial class InputView : Control
             new PointF(c.X + 3.5f, c.Y + 5), new PointF(c.X - 3.5f, c.Y + 5), new PointF(c.X - 3.5f, c.Y), new PointF(c.X - 5.5f, c.Y)]);
         using var brush = new SolidBrush(on ? Color.White : FaceText);
         g.FillPath(brush, house);
+    }
+
+    /// <summary>Xbox-Taste: runde Taste mit dem Xbox-X (Ring und Kreuz) statt des Hauses.</summary>
+    private void XboxHome(Graphics g, PointF c, bool on)
+    {
+        const float r = 13;
+        using var path = new GraphicsPath();
+        path.AddEllipse(c.X - r, c.Y - r, r * 2, r * 2);
+        Fill(g, path, on, KeyFill);
+        var col = on ? Color.White : FaceText;
+        using (var ring = new Pen(col, 1.4f))
+            g.DrawEllipse(ring, c.X - r + 3.5f, c.Y - r + 3.5f, (r - 3.5f) * 2, (r - 3.5f) * 2);
+        float d = r * 0.38f;
+        using var x = new Pen(col, 2.4f) { StartCap = LineCap.Round, EndCap = LineCap.Round };
+        g.DrawLine(x, c.X - d, c.Y - d, c.X + d, c.Y + d);
+        g.DrawLine(x, c.X - d, c.Y + d, c.X + d, c.Y - d);
     }
 
     /// <summary>Steuerkreuz; Farben wahlweise eigene (z. B. weiß bei der Wii-Fernbedienung), sonst nach dem Gehäuse.</summary>

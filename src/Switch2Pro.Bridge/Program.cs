@@ -8,8 +8,15 @@ internal static class Program
     [STAThread]
     private static void Main()
     {
-        // Logo, Programm-Icon und Installer-Grafiken erzeugen.
         var args = Environment.GetCommandLineArgs();
+        // Geplante Aufgabe des Installers (als SYSTEM): Controller per HidHide verstecken, sonst nichts. Muss als Erstes
+        // geprüft werden, damit weitere Argumente in diesem Aufruf nichts anderes auslösen.
+        if (args.Contains("--hidhide-helper", StringComparer.OrdinalIgnoreCase))
+        {
+            Environment.Exit(HidHide.RunHelper(args));
+            return;
+        }
+        // Logo, Programm-Icon und Installer-Grafiken erzeugen.
         int brand = Array.IndexOf(args, "--render-brand");
         if (brand >= 0 && brand + 1 < args.Length)
         {

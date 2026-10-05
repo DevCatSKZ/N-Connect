@@ -8,6 +8,8 @@
   #define AppVersion "1.0.0"
 #endif
 #define AppExe "N-Connect.exe"
+; Geplante Aufgabe, über die N-Connect Controller ohne UAC-Abfrage per HidHide versteckt (Name wie HidHide.TaskName).
+#define HidHideTask "N-Connect HidHide"
 #if FileExists(AddBackslash(SourcePath) + "redist\ViGEmBus_Setup.msi")
   #define ViGEmFile "ViGEmBus_Setup.msi"
 #elif FileExists(AddBackslash(SourcePath) + "redist\ViGEmBus_Setup.exe")
@@ -15,7 +17,8 @@
 #else
   #error "ViGEmBus-Installer fehlt: installer\redist\ViGEmBus_Setup.msi oder .exe ablegen"
 #endif
-; Optional: HidHide (versteckt per USB angeschlossene Controller vor Spielen, damit sie nicht doppelt erscheinen).
+; HidHide (versteckt Original-Controller vor Steam und Spielen, damit sie nicht doppelt erscheinen) – wird immer
+; mitinstalliert, wenn redist\HidHide_Setup.exe beim Bauen vorliegt.
 #if FileExists(AddBackslash(SourcePath) + "redist\HidHide_Setup.exe")
   #define WithHidHide
 #endif
@@ -61,15 +64,10 @@ english.LaunchNow=Launch now
 german.ViGEmFailed=ViGEmBus konnte nicht installiert werden. Ohne diesen Treiber kann kein virtueller Controller erzeugt werden. Sie können ViGEmBus später manuell installieren: https://github.com/nefarius/ViGEmBus/releases
 english.ViGEmFailed=ViGEmBus could not be installed. Without it no virtual controller can be created. You can install it manually later: https://github.com/nefarius/ViGEmBus/releases
 
-german.TaskHidHide=HidHide installieren – verhindert doppelte Controller bei USB-Kabel (Neustart nötig)
-english.TaskHidHide=Install HidHide – prevents duplicate controllers when using a USB cable (restart required)
-german.InstallingHidHide=Installiere HidHide …
-english.InstallingHidHide=Installing HidHide …
-
-[Tasks]
-#ifdef WithHidHide
-Name: "hidhide"; Description: "{cm:TaskHidHide}"; Check: not HidHideInstalled
-#endif
+german.InstallingHidHide=Installiere HidHide (verhindert doppelte Controller in Steam und Spielen) …
+english.InstallingHidHide=Installing HidHide (prevents duplicate controllers in Steam and games) …
+german.ConfiguringHidHide=Gebe N-Connect in HidHide frei …
+english.ConfiguringHidHide=Allowing N-Connect in HidHide …
 
 [Files]
 Source: "..\out\publish\win-x64\{#AppExe}"; DestDir: "{app}"; Flags: ignoreversion
@@ -77,7 +75,7 @@ Source: "..\README.md"; DestDir: "{app}"; DestName: "Anleitung.md"; Flags: ignor
 Source: "..\THIRD-PARTY-NOTICES.md"; DestDir: "{app}"; Flags: ignoreversion
 Source: "redist\{#ViGEmFile}"; DestDir: "{tmp}"; Flags: deleteafterinstall; Check: not ViGEmInstalled
 #ifdef WithHidHide
-Source: "redist\HidHide_Setup.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall; Tasks: hidhide
+Source: "redist\HidHide_Setup.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall; Check: HidHideMissing
 #endif
 
 [InstallDelete]
@@ -104,14 +102,20 @@ Filename: "msiexec.exe"; Parameters: "/i ""{tmp}\{#ViGEmFile}"" /qn /norestart";
 Filename: "{tmp}\{#ViGEmFile}"; Parameters: "/exenoui /qn /norestart"; StatusMsg: "{cm:InstallingViGEm}"; Flags: waituntilterminated; Check: not ViGEmInstalled; AfterInstall: CheckViGEmResult
 #endif
 #ifdef WithHidHide
-; HidHide still installieren (gleicher Installer-Typ wie ViGEmBus). Neustart verlangt Windows ggf. selbst.
-Filename: "{tmp}\HidHide_Setup.exe"; Parameters: "/exenoui /qn /norestart"; StatusMsg: "{cm:InstallingHidHide}"; Flags: waituntilterminated; Tasks: hidhide
+; HidHide immer still mitinstallieren, wenn es fehlt (gleicher Installer-Typ wie ViGEmBus). Neustart fragt das Setup am Ende.
+Filename: "{tmp}\HidHide_Setup.exe"; Parameters: "/exenoui /qn /norestart"; StatusMsg: "{cm:InstallingHidHide}"; Flags: waituntilterminated; Check: HidHideMissing
 #endif
+; N-Connect gleich als erlaubtes Programm eintragen und Verstecken einschalten (Fehlschlag, z. B. vor dem Neustart, ist
+; unkritisch – die App holt das beim ersten Verstecken nach).
+Filename: "{code:HidHideCli}"; Parameters: "--app-reg ""{app}\{#AppExe}"" --cloak-on"; StatusMsg: "{cm:ConfiguringHidHide}"; Flags: runhidden waituntilterminated skipifdoesntexist; Check: HidHideInstalled
 ; Programm im Kontext des angemeldeten Benutzers starten (zeigt beim ersten Start die Kurzanleitung).
 Filename: "{app}\{#AppExe}"; Description: "{cm:LaunchNow}"; Flags: nowait postinstall runasoriginaluser
 
 [UninstallRun]
 Filename: "{cmd}"; Parameters: "/C taskkill /IM {#AppExe} /F"; Flags: runhidden; RunOnceId: "KillBridge"
+Filename: "{sys}\schtasks.exe"; Parameters: "/Delete /TN ""{#HidHideTask}"" /F"; Flags: runhidden; RunOnceId: "HidHideTask"
+; Freigabe in HidHide wieder austragen (HidHide selbst bleibt, andere Programme nutzen es evtl. auch).
+Filename: "{code:HidHideCli}"; Parameters: "--app-unreg ""{app}\{#AppExe}"""; Flags: runhidden skipifdoesntexist; RunOnceId: "HidHideUnreg"
 ; Autostart, den die App selbst für den angemeldeten Benutzer gesetzt hat (Einstellungsfenster).
 Filename: "{cmd}"; Parameters: "/C reg delete HKCU\Software\Microsoft\Windows\CurrentVersion\Run /v N-Connect /f"; Flags: runhidden; RunOnceId: "RemoveAutostart"
 
@@ -154,10 +158,68 @@ begin
   Result := RegKeyExists(HKLM, 'SYSTEM\CurrentControlSet\Services\HidHide');
 end;
 
+var
+  HidHideWasMissing: Boolean;
+
+function InitializeSetup: Boolean;
+begin
+  HidHideWasMissing := not HidHideInstalled;
+  Result := True;
+end;
+
+function HidHideMissing: Boolean;
+begin
+  Result := not HidHideInstalled;
+end;
+
+// Pfad zu HidHideCLI.exe (Installationsordner aus der Registry, sonst Standardordner).
+function HidHideCli(Param: String): String;
+var
+  Dir: String;
+begin
+  if not RegQueryStringValue(HKLM64, 'SOFTWARE\Nefarius Software Solutions e.U.\HidHide', 'Path', Dir) then
+    Dir := ExpandConstant('{autopf}\Nefarius Software Solutions\HidHide');
+  Result := AddBackslash(Dir) + 'x64\HidHideCLI.exe';
+end;
+
 // Nach der HidHide-Installation ist ein Neustart nötig, damit der Filtertreiber aktiv wird.
 function NeedRestart: Boolean;
 begin
-  Result := WizardIsTaskSelected('hidhide') and HidHideInstalled;
+  Result := HidHideWasMissing and HidHideInstalled;
+end;
+
+// Aufgabe „N-Connect HidHide“: startet „N-Connect.exe --hidhide-helper "<IDs>"“ als SYSTEM. Angemeldete Benutzer
+// dürfen sie nur lesen und starten (GRGX), nicht ändern – so versteckt die App neue Controller ohne UAC-Abfrage.
+// Der Helfer versteckt nur angeschlossene Nintendo-Controller/Kabel-Pads und gibt nur sich selbst frei.
+procedure RegisterHidHideTask;
+var
+  Service, Folder: Variant;
+  Xml: String;
+begin
+  Xml :=
+    '<Task version="1.2" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">' +
+    '<RegistrationInfo><Author>N-Connect</Author><Description>N-Connect: Controller per HidHide vor Spielen verstecken (ohne Adminabfrage).</Description></RegistrationInfo>' +
+    '<Principals><Principal id="Author"><UserId>S-1-5-18</UserId><RunLevel>HighestAvailable</RunLevel></Principal></Principals>' +
+    '<Settings><MultipleInstancesPolicy>Queue</MultipleInstancesPolicy><DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>' +
+    '<StopIfGoingOnBatteries>false</StopIfGoingOnBatteries><AllowStartOnDemand>true</AllowStartOnDemand><Enabled>true</Enabled>' +
+    '<Hidden>true</Hidden><ExecutionTimeLimit>PT1M</ExecutionTimeLimit></Settings>' +
+    '<Actions Context="Author"><Exec><Command>' + ExpandConstant('{app}\{#AppExe}') + '</Command>' +
+    '<Arguments>--hidhide-helper "$(Arg0)"</Arguments></Exec></Actions></Task>';
+  try
+    Service := CreateOleObject('Schedule.Service');
+    Service.Connect;
+    Folder := Service.GetFolder('\');
+    // 6 = anlegen oder ersetzen, 5 = Dienstkonto (SYSTEM)
+    Folder.RegisterTask('{#HidHideTask}', Xml, 6, 'SYSTEM', Null, 5, 'D:(A;;FA;;;SY)(A;;FA;;;BA)(A;;GRGX;;;AU)');
+  except
+    Log('Aufgabe {#HidHideTask} nicht angelegt: ' + GetExceptionMessage);
+  end;
+end;
+
+procedure CurStepChanged(CurStep: TSetupStep);
+begin
+  if CurStep = ssPostInstall then
+    RegisterHidHideTask;
 end;
 
 procedure CheckViGEmResult;

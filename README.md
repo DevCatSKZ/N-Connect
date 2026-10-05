@@ -2,9 +2,10 @@
 
 # N-Connect
 
-Nintendo-Controller am PC nutzen – in **Windows, Steam, Xbox-/Game-Pass-Spielen, Epic, Emulatoren** und allen
-anderen Programmen, die Controller unterstützen. Jeder Controller erscheint als **Xbox-360-Controller**
-(oder auf Wunsch als **DualShock 4** mit Bewegungssteuerung).
+Nintendo-, **PlayStation- und Xbox-Controller** am PC nutzen und verwalten – in **Windows, Steam,
+Xbox-/Game-Pass-Spielen, Epic, Emulatoren** und allen anderen Programmen, die Controller unterstützen.
+Jeder Controller erscheint als **Xbox-360-Controller** (oder auf Wunsch als **DualShock 4** mit
+Bewegungssteuerung).
 
 Einmal installieren, Controller verbinden, spielen. Die Oberfläche gibt es auf Deutsch und Englisch.
 
@@ -22,6 +23,9 @@ Einmal installieren, Controller verbinden, spielen. Die Oberfläche gibt es auf 
 | **Wii U Pro Controller** | Bluetooth (SYNC, N-Connect koppelt selbst) | beide Sticks, Akkuanzeige |
 | **Kabel-Pads von HORI, PowerA, PDP** (für Switch) | USB-Kabel | wie Pro Controller, ohne Gyro/Vibration (noch nicht mit echter Hardware geprüft) |
 | **Nachbauten im Switch-Modus** (z. B. 8BitDo, „Lic Pro Controller“) | wie Switch Pro Controller | soweit der Nachbau das Protokoll beherrscht |
+| **Sony DualShock 4** | USB-Kabel oder Bluetooth (über Windows koppeln) | Touchpad-Klick, Gyro, Lichtleiste folgt dem Spiel |
+| **Sony DualSense / DualSense Edge** | USB-Kabel oder Bluetooth (über Windows koppeln) | Touchpad, Gyro, Spieler-LEDs, Mikro-Taste, Edge-Backtasten |
+| **Xbox-Controller** (360, One, Series, Elite u. a.) | USB, Bluetooth oder Xbox-Wireless-Adapter | wird **nativ** verwaltet – Akku, eigene Belegung für Sonderaktionen, kein Doppel-Controller |
 
 Bis zu 8 Controller gleichzeitig (Spieler 1–8). Tipp für viele Controller: ein leistungsfähiger Bluetooth-Adapter
 (z. B. Intel AX200/AX210 oder Realtek-Bluetooth-5.3-Stick) – einfache Sticks reichen oft nur für 2–3 Controller.
@@ -32,7 +36,8 @@ Bis zu 8 Controller gleichzeitig (Spieler 1–8). Tipp für viele Controller: ei
 2. Setup starten. Es installiert automatisch:
    - das Programm (läuft unauffällig unten rechts im Infobereich),
    - den signierten Treiber **ViGEmBus** für den virtuellen Controller (falls noch nicht vorhanden),
-   - **HidHide** (standardmäßig angehakt: verhindert, dass Steam und Spiele Switch-1-, NSO- und USB-Controller doppelt sehen).
+   - **HidHide** (falls noch nicht vorhanden; verhindert, dass Steam und Spiele Switch-1-, NSO- und USB-Controller doppelt sehen –
+     danach einmal neu starten).
 3. N-Connect startet danach **automatisch mit Windows** im Hintergrund (abschaltbar unter *Allgemein → Mit Windows starten*).
 4. Beim ersten Start erscheint eine Kurzanleitung.
 
@@ -52,7 +57,16 @@ Pro Controller und GameCube-Controller funktionieren auch einfach per **USB-Kabe
 Schiene, Wii-Fernbedienung: rote Taste im Batteriefach, Wii U Pro: Unterseite). N-Connect koppelt den Controller
 **selbst** mit Windows – kein Umweg über die Windows-Bluetooth-Einstellungen. Danach reicht ein Tastendruck.
 Die Suche im Hintergrund läuft nur, solange gerade niemand spielt; gezielt suchen: *Allgemein → Controller koppeln …*
+oder den Knopf **„Controller suchen …“** direkt auf der Controller-Seite
 (abschaltbar: *Neue Controller automatisch koppeln*).
+
+**DualShock 4 / DualSense:** einmal über die Windows-Bluetooth-Einstellungen koppeln (oder per USB-Kabel
+anschließen) – N-Connect erkennt sie von selbst, zeigt Akku und Gyro und versteckt sie vor Spielen, damit nur der
+virtuelle Controller zählt.
+
+**Xbox-Controller:** einfach anschließen (USB, Bluetooth oder Xbox-Wireless-Adapter). Er erscheint in der Übersicht
+mit Akku und XInput-Platz; Spiele nutzen ihn direkt – es wird bewusst **kein** zweiter (virtueller) Controller
+angelegt.
 
 ## Was das Programm kann
 
@@ -61,13 +75,19 @@ Die Suche im Hintergrund läuft nur, solange gerade niemand spielt; gezielt such
 - **Einstellungen direkt an der Controller-Karte** („Einstellungen“ aufklappen): Tasten, Feineinstellung, Gyro,
   Joy-Con, Extras, Details – jeweils nur für diesen Controller.
 - **Taste per Tastendruck belegen:** hinter jeder Taste das Tastatur-Symbol klicken und die gewünschte Taste drücken.
-- **Oberfläche im Windows-11-Stil:** dunkel (Standard), hell oder wie Windows; Akzentfarbe aus Windows, Mica-Titelleiste.
+- **Oberfläche im Windows-11-Stil:** dunkel (Standard), hell oder wie Windows; Akzentfarbe in Marken-Blau, Mica-Titelleiste.
 - Knöpfe je Controller: **Trennen**, **Vibrieren** (welcher ist welcher Spieler?), **Gyro kalibrieren**,
   Joy-Con **trennen/zusammenfügen**, **hochkant/quer**, **amiibo lesen**, **Ring-Con**, **IR-Kamera**,
   **„Doppelt angezeigt? Verstecken“** (HidHide).
-- **Für Steam vorbereitet:** Original-Controller werden automatisch vor Steam und Spielen versteckt (HidHide, einmal
-  bestätigen) – Steam sieht nur den virtuellen Xbox-Controller. **Erscheint als** je Controller wählbar (Xbox 360 oder
-  DualShock 4 mit Gyro), Standard Xbox 360.
+- **Für Steam vorbereitet:** Original-Controller (Nintendo **und Sony**) werden automatisch vor Steam und Spielen
+  versteckt (HidHide) – Steam sieht nur den virtuellen Xbox-Controller. **Erscheint als** je Controller wählbar
+  (Xbox 360 oder DualShock 4 mit Gyro), Standard Xbox 360.
+- **Xbox- und PlayStation-Controller werden mitverwaltet:** Xbox (360/One/Series/Elite, USB, Bluetooth oder
+  Microsoft-Adapter – über XInput) erscheint nativ in der Übersicht mit Akku, Platz und eigener Tastenbelegung für
+  Sonderaktionen, ohne doppelten virtuellen Controller. DualShock 4 und DualSense (auch Edge) werden wie Nintendo-
+  Controller verwaltet: eigene Grafik und Beschriftung (△ ○ ✕ □, L1–L3/R1–R3, Share/Options, PS-Taste, Touchpad),
+  analoge Trigger, Gyro, Vibration und Lichtleiste/Spieler-LEDs – wahlweise als virtueller Xbox-360- oder
+  DualShock-4-Controller für Spiele.
 - **Joy-Con im Ladegriff per USB** (Switch 1) werden erkannt.
 - **Gyro-Extras wie in JoyShockMapper:** Flick-Stick (rechter Stick dreht die Kamera sofort in seine Richtung, je Spiel
   per „Testdrehung“ einstellbar), Gyro-Beschleunigung, Taste „Gyro anhalten“ (Ratchet).
@@ -105,6 +125,9 @@ Die Suche im Hintergrund läuft nur, solange gerade niemand spielt; gezielt such
 - **Infobereich-Menü:** je Spieler Vibrieren, Spielerplatz, Trennen; alle Controller trennen; Ausgabeart, Profil u. a.
 - **Ein-Klick-Update:** Erscheint auf GitHub eine neue Version, lädt N-Connect den Installer auf Klick herunter
   (geprüft), installiert ihn und startet neu.
+- **HidHide aktuell halten:** Gibt es eine neue HidHide-Version, bietet N-Connect sie an – nach Bestätigung wird das
+  signierte Setup vom Hersteller geladen, geprüft und gestartet; danach versteckt N-Connect die Controller selbst neu
+  (abschaltbar unter *Allgemein → Erweitert*).
 
 Alle Einstellungen sind optional und gelten sofort (Klick auf das Symbol im Infobereich; links die Bereiche
 *Controller, Tastenbelegung, Sticks & Vibration, Gyro & Maus, Joy-Con & Wii, Allgemein*).
@@ -138,7 +161,7 @@ src/Switch2Pro.Protocol   Protokolle (plattformunabhängig, mit Tests): Switch 2
                           IR-Kamera, Ring-Con), Wii, Belegung, Makros, DSU, DS4-Bericht
 src/Switch2Pro.Bridge     Windows-App: Verbindungen, ViGEm-Ausgabe, Infobereich, Fenster, Übersetzung
 tests/                    xUnit-Tests
-installer/                Inno-Setup-Skript (Setup.exe mit ViGEmBus und optional HidHide)
+installer/                Inno-Setup-Skript (Setup.exe mit ViGEmBus und HidHide)
 ```
 
 Selbst bauen: .NET 8 SDK, dann `dotnet test tests/Switch2Pro.Protocol.Tests` und

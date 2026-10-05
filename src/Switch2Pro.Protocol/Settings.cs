@@ -224,6 +224,13 @@ public sealed class Settings
 
     /// <summary>Beim Start auf GitHub nach einer neuen Version suchen.</summary>
     public bool CheckForUpdates { get; set; } = true;
+    /// <summary>Beim Start auf GitHub nach einer neuen HidHide-Version suchen (Installation nur nach Rückfrage).</summary>
+    public bool CheckHidHideUpdates { get; set; } = true;
+    /// <summary>
+    /// Zuletzt gesehene HidHide-Version. Ändert sie sich (Update = Neuinstallation, dabei geht HidHides Geräteliste
+    /// verloren), werden die Controller neu versteckt.
+    /// </summary>
+    public string? HidHideVersion { get; set; }
     /// <summary>Wii-Fernbedienung: Zeiger über die Sensorleiste (IR-Kamera) steuert den Mauszeiger.</summary>
     public bool WiiPointerMouse { get; set; }
     /// <summary>Hinweis „an der Switch 2 neu koppeln“ wurde schon einmal gezeigt.</summary>
@@ -436,6 +443,8 @@ public sealed class Settings
         TriggerFullAt = other.TriggerFullAt;
         TurboRate = other.TurboRate;
         CheckForUpdates = other.CheckForUpdates;
+        CheckHidHideUpdates = other.CheckHidHideUpdates;
+        HidHideVersion = other.HidHideVersion;
         WiiPointerMouse = other.WiiPointerMouse;
         ConsoleHintShown = other.ConsoleHintShown;
         AutostartConfigured = other.AutostartConfigured;

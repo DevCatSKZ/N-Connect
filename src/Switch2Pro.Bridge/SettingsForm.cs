@@ -44,6 +44,7 @@ internal sealed class SettingsForm : Form
     private readonly ComboBox _language = Combo(220, "Automatisch (wie Windows)", "Deutsch", "English");
     private readonly ToggleSwitch _dsu = new();
     private readonly ToggleSwitch _updates = new();
+    private readonly ToggleSwitch _hidHideUpdates = new();
 
     // ---------- Sticks & Vibration ----------
     private readonly Slider _deadzone = Bar(0, 30, v => $"{v} %");
@@ -99,7 +100,7 @@ internal sealed class SettingsForm : Form
         _wiiPairing = wiiPairing;
         _pairingData = pairingData;
         _mapping = new MappingContext(() => _settings, () => _changed(false), () => this);
-        _overview = new ControllerOverview(manager, () => _settings, _mapping, () => _changed(false), ShowPage);
+        _overview = new ControllerOverview(manager, () => _settings, _mapping, () => _changed(false), ShowPage, wiiPairing);
         _mapEditor = new MappingEditor(_mapping, ControllerKind.Pro2);
         _tuning = new TuningEditor(() => _settings, () => _changed(false), ControllerKind.Pro2);
 
@@ -346,7 +347,7 @@ internal sealed class SettingsForm : Form
             Row("Tastenanordnung A/B/X/Y", "Xbox: nach Position (untere Taste = A). Nintendo: nach Beschriftung (A bleibt A).", _layout, Glyph.Swap),
             Row("Original-Controller verstecken", HidHide.IsInstalled
                 ? "Empfohlen: Steam und viele Spiele kennen Switch-1-, NSO- und USB-Controller selbst und sähen sie sonst doppelt. " +
-                  "Beim ersten Verbinden fragt Windows einmal nach Adminrechten."
+                  "Läuft nach der Installation ohne Rückfrage (sonst fragt Windows nach Adminrechten)."
                 : "Steam und viele Spiele sehen Switch-1-, NSO- und USB-Controller sonst doppelt. Dafür wird das kostenlose " +
                   "HidHide gebraucht (bei der N-Connect-Installation dabei, hier nachträglich).", hideContent, Glyph.Eye),
             Row("Spieler-LED und Lichtleiste vom Spiel", "Die Spieler-LEDs zeigen den Xbox-Platz, den Windows vergibt. Bei DualShock 4 " +
@@ -370,6 +371,8 @@ internal sealed class SettingsForm : Form
         page.AddGroup("Erweitert",
             Row("Gyro für Emulatoren (DSU)", "Cemuhook-Server auf Port 26760 – wirkt nach einem Neustart von N-Connect.", _dsu, Glyph.Rotate),
             Row("Nach Updates suchen", "Beim Start auf GitHub nach einer neuen Version suchen.", _updates, Glyph.Sync),
+            Row("HidHide aktuell halten", "Beim Start nach einer neuen HidHide-Version suchen. Installiert wird nur nach Rückfrage " +
+                "(geprüfter Download vom Hersteller, Neustart nötig).", _hidHideUpdates, Glyph.Sync),
             Row("Alles auf Standard", "Tastenbelegungen und Werte zurücksetzen. Gekoppelte Controller bleiben erhalten.", reset, Glyph.Refresh));
         return page;
     }
@@ -466,6 +469,7 @@ internal sealed class SettingsForm : Form
         _autostart.CheckedChanged += (_, _) => { if (!_loading) Autostart.Set(_autostart.Checked); };
         _dsu.CheckedChanged += (_, _) => Apply(() => _settings.DsuServer = _dsu.Checked);
         _updates.CheckedChanged += (_, _) => Apply(() => _settings.CheckForUpdates = _updates.Checked);
+        _hidHideUpdates.CheckedChanged += (_, _) => Apply(() => _settings.CheckHidHideUpdates = _hidHideUpdates.Checked);
         _language.SelectedIndexChanged += (_, _) => ChangeLanguage();
         _themeMode.SelectedIndexChanged += (_, _) => ChangeTheme();
         _transparency.CheckedChanged += (_, _) => ChangeTheme();
@@ -557,6 +561,7 @@ internal sealed class SettingsForm : Form
         _autostart.Enabled = !Autostart.IsEnabledForAllUsers; // alte Installation: für alle Benutzer eingetragen
         _dsu.Checked = _settings.DsuServer;
         _updates.Checked = _settings.CheckForUpdates;
+        _hidHideUpdates.Checked = _settings.CheckHidHideUpdates;
         _language.SelectedIndex = _settings.Language switch { "de" => 1, "en" => 2, _ => 0 };
         _themeMode.SelectedIndex = _settings.Theme switch { "light" => 1, "system" => 2, _ => 0 };
         _transparency.Checked = _settings.Transparency;

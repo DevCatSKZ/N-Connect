@@ -5,8 +5,9 @@
 ```
 src/Switch2Pro.Protocol     .NET-Bibliothek ohne Windows-Abhängigkeit – das Wissen über die Controller
 src/Switch2Pro.Bridge       Windows-App (WinForms, .NET 8, net8.0-windows10.0.22621): Verbindungen, Ausgabe, Oberfläche
-tests/Switch2Pro.Protocol.Tests   xUnit-Tests für das Protokoll-Projekt (177 Tests)
-installer/N-Connect.iss     Inno Setup 6 (installiert ViGEmBus, optional HidHide)
+tests/Switch2Pro.Protocol.Tests   xUnit-Tests für das Protokoll-Projekt (216 Tests)
+installer/N-Connect.iss     Inno Setup 6 (installiert ViGEmBus und HidHide, gibt N-Connect in HidHide frei,
+                            legt die Aufgabe „N-Connect HidHide“ an: Verstecken ohne UAC)
 .github/workflows/build.yml Build, Tests, Installer; Tag „v*“ → GitHub-Release mit N-Connect-Setup-*.exe
 ```
 
@@ -22,6 +23,8 @@ Protokoll-Projekt (plattformunabhängig, getestet). Die Bridge enthält nur Betr
 | `Switch1.cs`, `Nfc.cs`, `IrCamera.cs` | Switch 1 / NSO (HID-Berichte, Unterbefehle, IMU, Rumble, amiibo, Ring-Con, IR-Kamera) |
 | `Wii.cs` | Wii-Fernbedienung, Erweiterungen, MotionPlus, IR-Zeiger, Wii U Pro |
 | `WiredSwitchPad.cs` | Kabel-Pads HORI/PowerA/PDP |
+| `PlayStationPad.cs` | Sony DualShock 4 / DualSense (Edge): USB- und BT-Berichte, CRC32, Effekt-Berichte (Vibration, Lichtleiste, LEDs), Seriennummer/Firmware |
+| `XboxPad.cs` | XInput-Zustand → `ControllerState`, Akku, Modellname aus VID/PID |
 | `Mapping.cs` | Normalisieren, Paar zusammenführen, Belegung auswerten, Sticks/Trigger, Gyro→Stick, DS4-Bericht |
 | `Profiles.cs`, `Macro.cs` | Tastenaktionen, Tastenlisten/-namen je Controller, Makros |
 | `Settings.cs` | Alle Einstellungen (JSON), Aufräumen beim Laden |
@@ -33,8 +36,8 @@ Protokoll-Projekt (plattformunabhängig, getestet). Die Bridge enthält nur Betr
 
 | Bereich | Dateien |
 |---|---|
-| Verbindungen (`Links/`) | `IControllerLink`, `Switch2BleLink`, `Switch2UsbLink`, `Switch1HidLink`, `WiimoteHidLink`, `WiredPadLink`, `DemoLink` |
-| Geräte-Zugriff | `Usb/UsbNative` (SetupAPI), `Usb/UsbChannels` (`WinUsbChannel`, `HidChannel`), WinRT-Bluetooth |
+| Verbindungen (`Links/`) | `IControllerLink`, `Switch2BleLink`, `Switch2UsbLink`, `Switch1HidLink`, `WiimoteHidLink`, `WiredPadLink`, `PlayStationHidLink` (DS4/DS5 über USB/BT), `XInputLink` (nativer Xbox), `DemoLink` |
+| Geräte-Zugriff | `Usb/UsbNative` (SetupAPI), `Usb/UsbChannels` (`WinUsbChannel`, `HidChannel`), `XInput` (xinput1_4/9_1_0/1_3, dynamisch; Ordinale 100/108 für Guide/VID-PID, virtuelle Slot-Markierung), WinRT-Bluetooth |
 | Steuerung | `ControllerManager` (Suche, Verbinden, Spieler), `Player` (ein virtueller Controller), `ControllerPairing` (Classic-Kopplung) |
 | Ausgabe | `VirtualPads` (ViGEm Xbox 360 / DS4), `WindowsInput` (Tastatur/Maus per SendInput), `SmoothMouse`, `JoyConMouse`, `DsuServer`, `HidHide` |
 | Zusatz | `BatteryTracker`, `UpdateCheck`, `SwitchCardWatcher`, `Log`, `Autostart` (in `Dialogs.cs`) |
@@ -46,7 +49,8 @@ Protokoll-Projekt (plattformunabhängig, getestet). Die Bridge enthält nur Betr
 
 ```
 Funk/Kabel ──► Link (Thread des Links)
-                 │  Bericht zerlegen (Protocol: InputReports / Switch1 / WiiParser / WiredSwitchPad)
+                 │  Bericht zerlegen (Protocol: InputReports / Switch1 / WiiParser / WiredSwitchPad /
+                 │  PlayStationPad; XInputLink pollt den XInput-Zustand selbst)
                  │  Switch 2: Akku schätzen (BatteryTracker → BatteryEstimator)
                  ▼
             ControllerState (roh: Tasten, 12-Bit-Sticks, Motion in Switch-2-Achsen, Akku)
@@ -94,14 +98,19 @@ Die Oberfläche liest den Zustand selbst (60-mal pro Sekunde, `SettingsForm._liv
   Watchdog und Vibrations-Schleife starten, Kalibrierung/Gerätedaten lesen) → `Attach` → nach SYNC
   `PairWithHostAsync`.
 - **HID** (Classic/USB-HID): Gerätepfade aller HID-Schnittstellen → Art aus VID/PID (`Switch1Devices`,
-  `WiredSwitchPad`) → passender Link → `Attach`. Fehlschläge: still alle 5 s neu (gekoppelte, aber
-  ausgeschaltete Controller bleiben in Windows sichtbar).
+  `WiredSwitchPad`, `PlayStationPad` für Sony) → passender Link → `Attach`. Fehlschläge: still alle 5 s neu
+  (gekoppelte, aber ausgeschaltete Controller bleiben in Windows sichtbar). Der eigene virtuelle DS4 (ViGEm) wird
+  an der Gerätehierarchie erkannt und nicht angehängt.
+- **XInput**: alle vier Plätze im selben Suchlauf; `XInput.IsVirtual` überspringt selbst angelegte ViGEm-Slots;
+  verbunden → `XInputLink` (`Native = true`, `Player` legt kein virtuelles Pad an).
 - **USB (Switch 2)**: WinUSB-Schnittstelle (Interface 1) + HID (Interface 0) → `Switch2UsbLink.OpenAsync`.
 - **Attach**: Ist derselbe Controller schon per USB da → Bluetooth-Verbindung verwerfen. Sonst Joy-Con-Partner
   suchen (Paar) oder neuen Spieler auf dem gemerkten bzw. ersten freien Platz anlegen (virtueller Controller).
 
 ### 3.3 Spielerverwaltung
-- `Player` besitzt den virtuellen Controller; `Index` 0–7 bestimmt LEDs und DSU-Slot.
+- `Player` besitzt den virtuellen Controller; `Index` 0–7 bestimmt LEDs und DSU-Slot. Ausnahme native Links
+  (Xbox/XInput): kein virtuelles Pad, `GameSlot` = `NativeSlot`; Lichtleiste vom virtuellen DS4 läuft bei Sony
+  über `SetLightbarAsync` zurück an den physischen Controller.
 - Umsortieren (`MovePlayer`, Ziel höchstens letzter belegter Platz): Indizes tauschen → alle virtuellen Controller
   abbauen → in neuer Reihenfolge anlegen (Windows vergibt XInput-Plätze nach Anlegereihenfolge) → Plätze je
   Controller speichern.
@@ -146,7 +155,6 @@ Spielerplätze, Stick- und Gyro-Kalibrierung, Einzel-/Hochkant-Joy-Con.
 
 WinForms mit eigenen, selbst gezeichneten Steuerelementen im Windows-11-Stil (`Ui.cs`: `StackPanel`,
 `SettingsGroup`, `SettingRow`, `ToggleSwitch`, `Slider`, `Segmented`, `GlyphButton`, `PivotTabs`, `NavItem`,
-`ScrollPage`, `TextField` (umhüllt ein randloses `TextBox`: Rahmen, Text mittig, Akzentlinie bei Fokus); Symbole aus „Segoe MDL2 Assets“). Farben zentral in `Theme` (Paletten dunkel/hell, Akzentfarbe aus
-der Windows-Akzentpalette). Controller-Grafiken (`InputView*`) sind gezeichnet: Umrisse aus Produktfotos
+`ScrollPage`, `TextField` (umhüllt ein randloses `TextBox`: Rahmen, Text mittig, Akzentlinie bei Fokus); Symbole aus „Segoe MDL2 Assets“). Farben zentral in `Theme` (Paletten dunkel/hell, Akzentfarbe festes Marken-Blau aus dem Logo). Controller-Grafiken (`InputView*`) sind gezeichnet: Umrisse aus Produktfotos
 extrahiert (`InputView.Outlines.cs`, Punktlisten in Foto-Pixeln, `PhotoFrame` rechnet auf die Bühne um).
 Übersetzung: `Tr.T(deutscher Text)` mit Tabelle (`Tr.Texts.cs`) und Mustern für Texte mit Platzhaltern (`Tr.cs`).

@@ -10,7 +10,7 @@ Was das Programm kann und wie man es baut: siehe [README.md](README.md). Vollst�
 ```powershell
 cd switch2-pro-windows
 dotnet build -c Release                      # Warnungen gelten als Fehler
-dotnet test -c Release --no-build            # aktuell 177 Tests, alle grün
+dotnet test -c Release --no-build            # aktuell 216 Tests, alle grün
 N-Connect.exe --render <Ordner>              # alle Controller-Grafiken prüfen
 N-Connect.exe --render-ui <Ordner> --demo-all --wide   # alle Seiten/Karten prüfen (auch --demo, --demo-retro)
 dotnet publish src\Switch2Pro.Bridge -c Release -r win-x64 --self-contained -p:PublishSingleFile=true `
@@ -44,7 +44,8 @@ Hinweise zur Umgebung:
 - Grafiken: Pfeile als gleich große Dreiecke (drehen am quer gehaltenen Joy-Con mit), SL/SR quer waagerecht,
   Joy-Con-Ansichten in `--render`.
 - Eingabefelder `TextField` (Profil-Programme, Umbenennen, Passwort).
-- Akzentfarbe im dunklen Modus kräftiger (Palettenstufe „Light 1“).
+- Akzentfarbe festes sattes Blau (dunkel FF008CDC, hell FF0078D4) statt Windows-Akzentfarbe
+  (war beim Nutzer pink, nicht gewünscht; `Branding.Blue` FF00B4F0 wirkte zu cyan; `Theme.Init`).
 - Joy-Con-Paar trennt **nur noch** quer gehalten + SL/SR (Nutzer hatte per „SL + SR 1 s“ versehentlich getrennt; der
   Joy-Con lief dann einzeln mit gedrehter Belegung = „im Spiel falsch gemappt“).
 - Spieler-Reihenfolge: Leiste `PlayerOrderBar` über den Karten (‹ › tauschen); Spieler rücken nach Trennen/
@@ -89,9 +90,35 @@ Hinweise zur Umgebung:
   würde ein eben ausgeschalteter Controller neu gekoppelt. Nach Fehlschlag 90 s Pause im Hintergrund. Übersprungene
   bekannte Controller stehen im Protokoll („… nicht im Kopplungsmodus erkannt“). Koppeln dauert ~20 s; der erste
   HID-Öffnungsversuch danach scheitert manchmal („keine Antwort auf Unterbefehl 02“), der nächste nach ~6 s klappt.
-  Neukoppeln abgesichert (FUNKTIONEN 2.3): erst bestätigen (zweite Suche), nach dem Entfernen neu suchen und mit
-  frischen Gerätedaten koppeln (Ursache des Wii-Fehlers 259), bei Fehlschlag zweiter Versuch – mit Hardware noch
-  **nicht** geprüft.
+  Neukoppeln abgesichert (FUNKTIONEN 2.3): Bestätigung (zweite Suche) nur im Hintergrund – im Fenster wird sofort
+  entfernt und **bis zu ~8 s** neu gesucht, sonst zehrten die Suchläufe das kurze Wii-Kopplungsfenster (~20 s) vor dem
+  Entfernen auf (genau das zerstörte am 04.10. eine funktionierende Wii-Kopplung: entfernt, dann „nicht wiedergefunden“,
+  veralteter Versuch mit Fehler 259). Ohne Neufund wird nicht mehr mit veralteten Daten gekoppelt (war eh
+  aussichtslos); beim nächsten SYNC zählt der Controller als neu. Mit Hardware noch **nicht** geprüft – zu testen:
+  Wii einmal über die rote SYNC-Taste koppeln, dann aus/ein und nur eine normale Taste drücken (kein SYNC) – sie muss
+  sich von selbst verbinden. Tut sie das nicht, liegt es nicht an N-Connect (Kopplung ist dann permanent gespeichert),
+  sondern eher am Barrot-Stick oder an der Fernbedienung.
+- **„Controller suchen …“ auf der Controller-Seite** (04.10., Nutzerwunsch): Knopf `GlyphButton` im Leerzustand
+  (zentriert unter dem Hinweistext) und in einer Leiste am unteren Rand, sobald ≥ 1 Controller verbunden ist
+  (`ControllerOverview`, Aktion `pair` = `TrayApp.ShowWiiPairing`; in der Prüfhilfe `--render-ui` als No-Op übergeben).
+- **Xbox- und PlayStation-Controller mitverwalten** (04.10., Nutzerwunsch „perfekte Integration“, FUNKTIONEN 2.5):
+  - **Xbox nativ über XInput** (`XInputLink`, `XInput.cs` dynamisch aus xinput1_4/9_1_0/1_3, Ordinale 100/108,
+    ~125 Hz, 3 Fehlversuche bis „getrennt“): USB/Bluetooth/Adapter sind für XInput gleich – Karte zeigt „XInput“.
+    `Link.Native/NativeSlot`: **kein** ViGEm-Pad (sonst doppelt), „Erscheint als“ entfällt, „Im Spiel: Xbox · Platz n ·
+    nativ“. Eigene ViGEm-Slots werden per `XInput.SetVirtualSlot` markiert und nie als echt gemeldet.
+  - **Sony über HID** (`PlayStationHidLink`, Protokoll `PlayStationPad`): DS4 (05C4/09CC/0BA0) und DS5/Edge
+    (0CE6/0DF2), USB + Bluetooth, CRC32 (BT-Eingang + Ausgang mit Seed 0xA2), DS5-BT-Wechsel in den erweiterten
+    Modus durch ersten Effekt-Bericht, Vibration/Lichtleiste/Spieler-LEDs/Mikro-LED, Seriennummer/Firmware per
+    Feature-Bericht (DS4 0x12, DS5 0x09/0x20). Eigener virtueller DS4 wird an der Gerätehierarchie übersprungen.
+    Sony steht auf der HidHide-Whitelist (inkl. Aufgaben-Helfer) – native Xbox nie.
+  - `ControllerKind` neu: `DualShock4`, `DualSense`, `XboxController`; Standardbelegung positionsgetreu/Xbox
+    (`DefaultTarget`), analoge Trigger laufen bei allen Arten durch (`Mapping.Normalize`), Touchpad-Klick → Aufnahme.
+    Beschriftungen/Grafik in `InputView` + `Profiles.ControllerButtons`, Tuning (Sticks/Vibration/Gyro bei Sony),
+    Demo-Links und Render-/UI-Prüfungen um Xbox/DS4/DS5 erweitert. Tests: 177 → **216**.
+  - **Mit echter Hardware noch nicht geprüft** (wichtigste offene Prüfung!): DS4/DS5 über USB und Bluetooth
+    (CRC-Annahme, DS5-Erweiterungsmodus, Rumble/Lichtleiste), Xbox über Bluetooth und Wireless-Adapter
+    (XInput-Slot-Verhalten beim An-/Abstecken, Akkuarten), dass ViGEm-Slots nie als nativ auftauchen, Sony-Verstecken
+    in Steam, XInput-Platz nach Wechseln.
 - **Am 04.10.2026 gebaut, mit echter Hardware noch nicht (vollständig) geprüft:** Spielerplatz/Namen (Kartentitel),
   Stick-Kalibrierung (`StickCalibrationForm`, nur mit simulierten Controllern gesehen), Gyro-Assistent
   (`GyroSetupForm`), Untermenüs im Infobereich, Ein-Klick-Update (`UpdateCheck.DownloadAsync` – braucht ein erstes
@@ -129,14 +156,16 @@ Hinweise zur Umgebung:
 src/Switch2Pro.Protocol   plattformunabhängig, getestet
   InputReports, Commands, Calibration, Rumble   Switch 2 (BLE/USB)
   Switch1, Wii, Mapping, Dsu, Settings          Switch 1, Wii, Belegung, Cemuhook, Einstellungen
+  PlayStationPad, XboxPad                        DS4/DualSense (USB+BT, CRC, Effekte), XInput-Zustand
   BatteryEstimator                              Akku aus Spannung (Glättung, Ladekorrektur, keine Sprünge)
   SwitchPairingData, PairingTransfer            Bluepick-/hekate-Kopplungsdaten, .ncpair-Datei
 src/Switch2Pro.Bridge     Windows-App (.NET 8 WinForms)
-  Links/                  eine Verbindung je Controller (Switch2Ble/Usb, Switch1Hid, WiimoteHid, Demo)
+  Links/                  eine Verbindung je Controller (Switch2Ble/Usb, Switch1Hid, WiimoteHid, WiredPad,
+                          PlayStationHid, XInput nativ, Demo)
   ControllerManager, Player, VirtualPads        Suche, Spielerplätze (lückenlos), ViGEm-Ausgabe
   PlayerOrderBar          Leiste „Spieler-Reihenfolge“ über den Karten
   BatteryTracker          Akkuschätzung je Seriennummer (überlebt Wechsel Bluetooth ↔ USB)
-  Theme, Ui               Windows-11-Optik (Akzentpalette, Dunkel/Hell, eigene Steuerelemente inkl. TextField)
+  Theme, Ui               Windows-11-Optik (Dunkel/Hell, Marken-Blau als Akzent, eigene Steuerelemente inkl. TextField)
   Branding                Logo (gezeichnet), LogoView, Icon/Installer-Grafiken (--render-brand)
   SettingsForm, ControllerOverview, MappingEditor, TuningEditor   Fenster, Karten, Einstellungen je Controller
   InputView*.cs           Controller-Grafiken; Umrisse aus Produktfotos (InputView.Outlines.cs, Werkzeug
@@ -146,7 +175,7 @@ src/Switch2Pro.Bridge     Windows-App (.NET 8 WinForms)
   StickCalibrationForm, GyroSetupForm  Stick-Kalibrierung, Gyro-Assistent
   Links/WiredPadLink                   Kabel-Pads HORI/PowerA/PDP (Protokoll: WiredSwitchPad)
   UpdateCheck                          Update-Prüfung und Ein-Klick-Update
-installer/N-Connect.iss   Inno Setup 6 (ViGEmBus, optional HidHide); den Autostart richtet die App selbst ein
+installer/N-Connect.iss   Inno Setup 6 (ViGEmBus, HidHide immer mit, N-Connect dort freigegeben); den Autostart richtet die App selbst ein
                           (standardmäßig an, Einstellung „Mit Windows starten“)
 ```
 

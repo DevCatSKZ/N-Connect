@@ -274,22 +274,31 @@ internal static class ControllerPairing
                 }
                 // Vor dem Entfernen der alten Kopplung bestätigen: antwortet er in einer zweiten Suche erneut, ist er
                 // wirklich im SYNC-Modus. Sonst bleibt die Kopplung – lieber einmal zu wenig neu koppeln als eine
-                // funktionierende Kopplung zu verlieren.
-                if (FindAnswering(radio, info.Address, Stamp(info.stLastSeen)) is null)
+                // funktionierende Kopplung zu verlieren. Im Fenster „Controller koppeln“ wird die Bestätigung
+                // übersprungen: Der Nutzer drückt gerade SYNC, und die zwei Suchläufe würden das kurze Kopplungsfenster
+                // der Fernbedienung (ca. 20 s) aufzehren, bevor die Kopplung entfernt wird.
+                if (!repairRemembered && FindAnswering(radio, info.Address, Stamp(info.stLastSeen)) is null)
                 {
                     Log.Info($"Kopplung: {info.szName} ({info.Address:X12}) antwortet nicht erneut – Kopplung bleibt unverändert");
                     continue;
                 }
                 Log.Info($"Kopplung: {info.szName} ({info.Address:X12}) ist bekannt, aber im Kopplungsmodus – neu koppeln");
                 // Alte, nicht verbundene Kopplung entfernen (sonst verweigert Windows die neue). Danach kennt Windows das
-                // Gerät nicht mehr – mit den alten Gerätedaten schlug die Kopplung fehl (Wii: Fehler 259). Deshalb neu
-                // suchen und mit den frischen Daten koppeln.
+                // Gerät nicht mehr – mit den alten Gerätedaten schlägt die Kopplung fehl (Wii: Fehler 259). Deshalb
+                // mehrfach neu suchen und mit den frischen Daten koppeln; ohne Neufund bleibt das Gerät unbekannt und
+                // wird beim nächsten SYNC wie ein neues gekoppelt.
                 ulong address = info.Address;
                 BluetoothRemoveDevice(ref address);
-                if (FindAnswering(radio, info.Address, long.MaxValue) is { } fresh) // jetzt unbekannt: nur Antwortende
+                if (FindAnswering(radio, info.Address, long.MaxValue, attempts: 6) is { } fresh) // jetzt unbekannt: nur Antwortende
                     info = fresh;
                 else
-                    Log.Info($"Kopplung: {info.szName} nach dem Entfernen nicht wiedergefunden – Versuch mit den bisherigen Daten");
+                {
+                    Log.Info($"Kopplung: {info.szName} ({info.Address:X12}) nach dem Entfernen nicht wiedergefunden – " +
+                             "Kopplungsmodus vermutlich beendet; erneut SYNC drücken");
+                    lock (Failures)
+                        Failures[info.Address] = Environment.TickCount64;
+                    continue;
+                }
             }
             progress($"Gefunden: {info.szName} – kopple …");
             bool ok = wii ? PairWii(radio, ref info, radioAddress) : PairJustWorks(radio, ref info);
@@ -402,9 +411,9 @@ internal static class ControllerPairing
     /// einem strikt neueren „zuletzt gesehen“ als <paramref name="seenBefore"/> erkennbar (bekannte liefert Windows
     /// auch ohne Antwort), bei unbekannten (nach dem Entfernen) schon daran, dass die Suche es überhaupt liefert.
     /// </summary>
-    private static BLUETOOTH_DEVICE_INFO? FindAnswering(IntPtr radio, ulong address, long seenBefore)
+    private static BLUETOOTH_DEVICE_INFO? FindAnswering(IntPtr radio, ulong address, long seenBefore, int attempts = 2)
     {
-        for (int attempt = 0; attempt < 2; attempt++)
+        for (int attempt = 0; attempt < attempts; attempt++)
         {
             foreach (var d in Inquiry(radio))
             {

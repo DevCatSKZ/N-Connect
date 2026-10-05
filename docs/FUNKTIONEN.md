@@ -19,6 +19,9 @@ Fundstellen in Klammern (`Datei`/`Klasse`), damit sich Details schnell nachschla
 | Wii U Pro Controller | Bluetooth Classic HID (Wii-Protokoll) | Tasten, 2 Sticks, Akku | Vibration, LEDs |
 | Kabel-Pads HORI/PowerA/PDP | USB-HID (einfaches Format) | Tasten, Sticks, Steuerkreuz | – |
 | Nachbauten im Switch-Modus (8BitDo, „Lic Pro Controller“) | wie Switch Pro Controller | wie Pro Controller, soweit unterstützt | wie Pro Controller |
+| DualShock 4 (Sony) | USB und Bluetooth Classic HID (VID 054C, PID 05C4/09CC/0BA0) | Tasten, Touchpad-Klick, Sticks, analoge Trigger, Gyro/Beschl., Akku | Vibration, Lichtleiste |
+| DualSense / DualSense Edge (Sony) | USB und Bluetooth Classic HID (VID 054C, PID 0CE6/0DF2) | wie DualShock 4 + Mikro-Taste, Edge-Backtasten | Vibration, Lichtleiste, Spieler-LEDs, Mikro-LED |
+| Xbox-Controller (360, One, Series, Elite, XInput-kompatible) | beliebig (USB, Bluetooth, Xbox-Wireless-Adapter) – über **XInput** | Tasten, Sticks, analoge Trigger, Guide-Taste, Akku | Vibration direkt über XInput; **nativ**, kein virtueller Controller |
 
 Bis zu **8 Spieler** gleichzeitig (`ControllerManager.MaxPlayers`). Der 9. Controller wird abgewiesen (Einblendung).
 
@@ -70,13 +73,19 @@ Bis zu **8 Spieler** gleichzeitig (`ControllerManager.MaxPlayers`). Der 9. Contr
   Versuch belegt und tauchte auch in „Gerät hinzufügen“ von Windows nicht auf). Das Fenster „Controller koppeln“
   versucht es trotzdem.
 - **Neukoppeln abgesichert** (`ScanOnce`, `FindAnswering`):
-  1. Ein bekannter Controller wird nur angefasst, wenn er in einer **zweiten Suche erneut antwortet** (strikt neueres
-     `stLastSeen`) – sonst bleibt seine Kopplung unverändert (Protokoll: „antwortet nicht erneut“).
-  2. Alte Kopplung entfernen (sonst verweigert Windows die neue), dann das Gerät **neu suchen** und mit den frischen
-     Gerätedaten koppeln – mit den alten Daten schlug die Kopplung fehl (Wii: Fehler 259 = keine Einträge).
+  1. Ein bekannter Controller wird nur angefasst, wenn er im Kopplungsmodus ist; **im Hintergrund** muss er dafür in
+     einer zweiten Suche **erneut antworten** (strikt neueres `stLastSeen`) – sonst bleibt seine Kopplung unverändert
+     (Protokoll: „antwortet nicht erneut“). Im Fenster wird die Bestätigung übersprungen: Der Nutzer drückt gerade
+     SYNC, und die zwei Suchläufe würden das kurze Kopplungsfenster (~20 s) vor dem Entfernen aufzehren.
+  2. Alte Kopplung entfernen (sonst verweigert Windows die neue), dann das Gerät **bis zu ~8 s neu suchen** und mit
+     den frischen Gerätedaten koppeln – mit den alten Daten schlägt die Kopplung fehl (Wii: Fehler 259 = keine
+     Einträge). Wird es nicht wiedergefunden (Kopplungsmodus beendet), wird **nicht** mit veralteten Daten gekoppelt;
+     die alte Kopplung ist dann weg und beim nächsten SYNC wird es wie ein neues Gerät gekoppelt.
   3. Scheitert die Kopplung und antwortet der Controller noch, **zweiter Versuch** mit frisch gesuchten Daten.
   Erst danach gilt sie als fehlgeschlagen (90 s Pause im Hintergrund). Jede Suche dauert ~1,3 s.
-- **„Controller koppeln …“** (Fenster `PairForm`, Windows-11-Stil): sucht 60 s lang, 1 s Pause zwischen den Läufen,
+- **„Controller koppeln …“** (Fenster `PairForm`, Windows-11-Stil): erreichbar über das Infobereich-Menü, die Seite
+  „Allgemein“ und **direkt auf der Controller-Seite** – Knopf „Controller suchen …“ im Leerzustand bzw. in der
+  Leiste am unteren Rand (sichtbar, sobald ein Controller verbunden ist). Sucht 60 s lang, 1 s Pause zwischen den Läufen,
   koppelt auch bekannte Controller neu, die gerade sichtbar sind. Oben **Status** (aktueller Schritt, Restzeit) und
   **Verbunden**: jeder Controller, der sich verbindet, solange das Fenster offen ist (auch Switch 2 per SYNC oder per
   Hintergrund), erscheint sofort mit ✓, Name, Spieler und Verbindungsart (über `ControllerManager.Changed`; schon
@@ -97,12 +106,28 @@ Bis zu **8 Spieler** gleichzeitig (`ControllerManager.MaxPlayers`). Der 9. Contr
   Original außerdem eigene Startbefehle. Wii-Controller sind nicht betroffen.
 - Einstellung **„Original-Controller verstecken“** (`HideFromGames`, Standard an): Jeder solche Controller wird nach
   dem Verbinden automatisch per HidHide versteckt (`ControllerManager.QueueHide`): 3 s sammeln (Joy-Con-Paar), dann
-  **eine** UAC-Abfrage (`HidHideCLI --app-reg <N-Connect> --dev-hide … --cloak-on`). Erfolg → `HiddenDevices`, Meldung
+  `HidHideCLI --app-reg <N-Connect> --dev-hide … --cloak-on` – **ohne Rückfrage** über die geplante Aufgabe
+  „N-Connect HidHide“ (vom Installer angelegt, läuft als SYSTEM, Benutzer dürfen sie nur starten; `HidHide.HideViaTaskAsync`
+  startet sie mit den IDs als `$(Arg0)`, der Helfer `N-Connect.exe --hidhide-helper` versteckt nur gerade angeschlossene
+  Nintendo-Controller/Kabel-Pads und gibt nur sich selbst frei, schreibt keine Dateien). Fehlt die Aufgabe oder gehört
+  sie zu einer anderen EXE (Entwicklerversion): **eine** UAC-Abfrage wie bisher. Erfolg → `HiddenDevices`, Meldung
   (läuft Steam: „Steam einmal neu starten“ – Steam hält sein schon geöffnetes Handle). Abgebrochen → in dieser
   Sitzung nicht erneut fragen; Nachholen per Karte → Extras → „Doppelt angezeigt?“ oder Einstellung aus/ein.
-- Bluetooth-Instanz-IDs ändern sich nach jedem Neukoppeln → dann erneut eine Abfrage.
-- HidHide fehlt → einmalige Meldung, auf „Allgemein“ Knopf „HidHide installieren …“. Der Installer bringt HidHide
-  mit (Aufgabe standardmäßig angehakt; Neustart nötig).
+- Bluetooth-Instanz-IDs ändern sich nach jedem Neukoppeln → dann wird erneut versteckt (mit Aufgabe ohne Abfrage).
+- HidHide fehlt → einmalige Meldung, auf „Allgemein“ Knopf „HidHide installieren …“. Der Installer installiert
+  HidHide **immer** still mit, wenn es fehlt (keine Auswahl; danach fragt das Setup nach einem Neustart), trägt
+  N-Connect als erlaubtes Programm ein und schaltet das Verstecken ein (`--app-reg … --cloak-on`; schlägt das vor dem
+  Neustart fehl, holt die App es beim ersten Verstecken nach). Deinstallieren trägt die Freigabe wieder aus
+  (`--app-unreg`), HidHide selbst bleibt.
+- **HidHide-Update** (`HidHideUpdate`, Einstellung „HidHide aktuell halten“ = `CheckHidHideUpdates`, Standard an): beim
+  Start (nach der N-Connect-Prüfung, nur wenn es kein N-Connect-Update gibt) neueste Version von
+  `nefarius/HidHide/releases/latest` gegen die Dateiversion von `HidHideCLI.exe`. Neuer → Einblendung, Klick → Rückfrage →
+  Download nur von `github.com/nefarius/HidHide/` (Größe geprüft) → **Authenticode-Prüfung** (`WinVerifyTrust`,
+  Unterzeichner „Nefarius Software Solutions e.U.“) → offizielles Setup **mit Oberfläche** starten (es deinstalliert die
+  alte Version und verlangt Neustarts; daher bewusst nicht still). Nur x64.
+- **Nach jedem HidHide-Wechsel** (Version ≠ `Settings.HidHideVersion`, beim Start geprüft) wird `HiddenDevices`
+  geleert – die Neuinstallation verliert HidHides Geräteliste; die Controller werden beim Verbinden neu versteckt
+  (mit der Aufgabe ohne Abfrage).
 
 ### 2.4 Kabel-Pads und Nachbauten
 - HORI/PowerA/PDP-Kabel-Pads werden an Hersteller-/Produktkennung erkannt (`WiredSwitchPad.Known`) und laufen als
@@ -111,7 +136,40 @@ Bis zu **8 Spieler** gleichzeitig (`ControllerManager.MaxPlayers`). Der 9. Contr
   ausbleibenden Antwort Standardwerte (keine weiteren Wartezeiten). Melden sie keine Bluetooth-Adresse
   (00:… bzw. FF:…), dient die Geräte-Instanz als Kennung.
 
-### 2.5 Trennen und Schlafen
+### 2.5 Xbox- und PlayStation-Controller
+- **Xbox über XInput** (`XInputLink`, Protokoll `XboxPad`): alle vier XInput-Plätze werden alle 2 s geprüft.
+  Windows meldet einen Xbox-Controller über XInput unabhängig vom Transport (USB, Bluetooth, Xbox-Wireless-Adapter)
+  gleich – die Karte zeigt daher „XInput (USB, Bluetooth oder Xbox-Adapter)“ und nie eine falsche Art.
+  Abgedeckt: Xbox 360, Xbox One, Series, Elite und XInput-kompatible Drittanbieter. Modellname aus VID/PID
+  (Capabilities über Ordinal 108, wenn vorhanden). Akku über `XInputGetBatteryInformation`, Guide-Taste über
+  den erweiterten Zustand (Ordinal 100). Abfrage ~125 Hz; nach drei ausbleibenden Antworten gilt er als getrennt.
+- **Kein virtueller Controller:** Ein nativer Xbox-Controller ist für Spiele schon ein Controller – ein zusätzlicher
+  virtueller würde doppelt zählen. `Player` erzeugt für `Native`-Links kein ViGEm-Pad; die Karte zeigt
+  „Im Spiel: Xbox · Platz n · nativ“ und statt „Erscheint als“ einen Hinweis. Belegung wirkt nur auf
+  Sonderaktionen (Tastatur, Makros, Gyro), nicht auf den Controller selbst.
+- **Eigene virtuelle Pads nie als echt melden:** ViGEm-Xbox-360-Controller melden sich ebenfalls über XInput.
+  `XInput.SetVirtualSlot` markiert die von N-Connect angelegten Plätze (`Xbox360Pad` registriert seinen
+  `UserIndex`, `IsVirtual` filtert sie) – ein virtueller Controller wird nie als physischer Xbox-Controller
+  angezeigt.
+- **Sony über HID** (`PlayStationHidLink`, Protokoll `PlayStationPad`): Sony-HID-Pfade (054C:05C4/09CC/0BA0/0CE6/
+  0DF2) werden im selben 2-s-Suchlauf gefunden; USB- und Bluetooth-Pfade sind unterscheidbar (`vid_054c` vs.
+  `vid&0002054c`). Der eigene virtuelle DualShock 4 (ViGEm) wird an der Gerätehierarchie erkannt und übersprungen.
+- **Berichte:** DualShock 4 USB (0x01) und Bluetooth (0x11, CRC32), DualSense USB voll (0x01), einfach (0x01 BT)
+  und Bluetooth erweitert (0x31, CRC32) – jeweils Tasten, D-Pad, analoge Trigger, Sticks, Touchpad-Klick, PS-Taste,
+  DS5-Mikro und Edge-Tasten (Byte 10), Gyro/Beschl. (auf die internen Switch-2-Achsen gedreht), Akku.
+  Ungültige Bluetooth-CRCs werden verworfen.
+- **DualSense Bluetooth:** startet im einfachen Modus – N-Connect schickt einmalig einen Effekt-Bericht (0xA2 mit
+  CRC), womit der Controller in den erweiterten Modus wechselt (Gyro, Akku, Touchpad).
+- **Ausgaben an den Sony-Controller:** Vibration (DS4 0x05/0x11, DS5 0x02/0x31 inkl. Trigger-Effekte-Felder),
+  Lichtleiste (vom virtuellen DS4-Ausgang des Spiels durchgereicht, `IControllerLink.SetLightbarAsync`),
+  DS5-Spieler-LEDs und Mikro-LED; Bluetooth-Berichte mit Seed 0xA2 + CRC32.
+- **Metadaten:** Seriennummer/Adresse und Firmware über Feature-Berichte (DS4 0x12, DS5 0x09/0x20); die USB-Instanz-
+  ID wird **nicht** als Seriennummer ausgegeben. Adressschlüssel: Bluetooth = MAC, USB = `USB:<Instanz>`.
+- **Verstecken:** Sony-HID-Controller stehen wie Nintendo-Geräte auf der HidHide-Whitelist (`HidHide.IsKnownDevice`
+  und die Aufgaben-Helfer-Prüfung) und werden mit aktivem virtuellen Ausgang versteckt. **Native Xbox-Controller
+  werden nie versteckt** – das native Gerät ist dort der Spiele-Eingang.
+
+### 2.6 Trennen und Schlafen
 - **Trennen** (Karte, Infobereich, „Alle Controller trennen“): Switch 1 wird schlafen gelegt (HCI-Befehl, sonst hielte
   Windows die Verbindung; höchstens 1 s gewartet), die anderen werden getrennt. Bluetooth-Controller verbinden sich
   danach erst nach Pause und neuem Tastendruck (siehe 2.1), USB-Controller erst nach Ab- und Anstecken des Kabels.
@@ -143,6 +201,8 @@ Bis zu **8 Spieler** gleichzeitig (`ControllerManager.MaxPlayers`). Der 9. Contr
 - Paar: gilt die erste eigene Einstellung eines der beiden Joy-Con (`Player.DesiredOutput`).
 - Änderung → `ControllerManager.ApplyOutputMode`: passt ein virtueller Controller nicht mehr, werden **alle** in
   Spielerreihenfolge neu angelegt (Xbox-Plätze bleiben in Reihenfolge). Auch nach Verbinden/Zusammenfassen geprüft.
+- **Native Xbox-Controller** (`Link.Native`) bekommen keinen virtuellen Controller und keine Ausgabewahl – die Karte
+  zeigt statt „Erscheint als“ einen Hinweis (siehe 2.5). `DesiredOutput`/`ApplyOutputMode` überspringen sie.
 
 ## 4. Spielerplätze und Namen
 - **Platz**: Leiste „Spieler-Reihenfolge“, Klick auf den Kartentitel oder Infobereich → Spieler → Spielerplatz.
@@ -166,6 +226,10 @@ Bis zu **8 Spieler** gleichzeitig (`ControllerManager.MaxPlayers`). Der 9. Contr
   (nur DualShock 4), C/GL/GR/SL/SR/Headset → nichts.
 - GameCube: immer nach Position; Z (ZR) = RB, ZL = LB, L/R digital = nichts (analog über Trigger), C = Back.
 - N64/Mega Drive: Tasten sind schon nach Position angeordnet (siehe Protokolle).
+- **Xbox und PlayStation** (`XboxController`, `DualShock4`, `DualSense`): `DefaultTarget` zwingt die
+  **Xbox-Belegung nach Position** – die Tasten kommen schon positionsgleich an (unten→B, rechts→A, links→Y, oben→X;
+  Back/Share→−, Start/Options→+, Guide/PS→HOME, Touchpad-Klick→Aufnahme). Analoge Trigger werden bei allen Arten
+  übernommen (`Mapping.Normalize` schleift `LeftTrigger`/`RightTrigger` immer durch, nicht nur bei GameCube).
 
 ### 5.2 Aktionen je Taste (`ButtonAction`, als Text gespeichert)
 | Text | Wirkung |
@@ -327,9 +391,11 @@ Bis zu **8 Spieler** gleichzeitig (`ControllerManager.MaxPlayers`). Der 9. Contr
 
 - **Autostart** (Standard an beim ersten Start, danach Nutzerentscheidung): HKCU\…\Run mit `--autostart`
   (unsichtbar starten). Zweiter Start zeigt das Fenster der laufenden Instanz.
-- **Darstellung**: Dunkel (Standard), Hell, Wie Windows; Akzentfarbe aus der Windows-11-Akzentpalette (dunkel:
-  „Light 1“ – „Light 2“ wie in Windows 11 wirkte beim Nutzer blass-pastell; hell: „Dark 1“), Schrift darauf nach
-  Kontrast (`Theme.OnAccent`); Mica-Titelleiste ab Windows 11.
+- **Darstellung**: Dunkel (Standard), Hell, Wie Windows; Akzentfarbe festes sattes Blau (dunkel:
+  FF008CDC; hell: FF0078D4, etwas tiefer für den Kontrast auf weißen Flächen) – **nicht** `Branding.Blue` (zu cyan)
+  und **nicht** die Windows-Akzentfarbe, die sieht je nach Nutzerwahl beliebig aus (beim Nutzer pink, nicht
+  gewünscht). Schrift
+  darauf nach Kontrast (`Theme.OnAccent`); Mica-Titelleiste ab Windows 11.
 - **Logo/Icon**: In der Oberfläche direkt in Zielgröße gezeichnet (`LogoView`), Fenstersymbol aus der eingebetteten
   ICO-Datei mit allen Größen (nicht `ExtractAssociatedIcon` – nur 32 px, verkleinert pixelig). Die ICO-Datei
   (`--render-brand`) enthält kleine Größen als 32-Bit-Bitmap, 256 px als PNG; heller Kachelrand erst ab 48 px.

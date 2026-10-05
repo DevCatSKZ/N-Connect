@@ -78,8 +78,8 @@ internal sealed class ControllerManager : IAsyncDisposable
         foreach (var link in player.Links)
         {
             _suppressed[link.Id] = Environment.TickCount64;
-            if (link.Transport == Transport.Usb)
-                _usbSuppressed[link.Id] = 0; // am Kabel: erst nach Abziehen und Einstecken wieder verwenden
+            if (link.Transport is Transport.Usb or Transport.XInput)
+                _usbSuppressed[link.Id] = 0; // am Kabel/XInput: erst nach Abziehen bzw. Ausschalten wieder verwenden
             Log.Info($"{link.Id}: {reason}");
             Track(Task.Run(async () =>
             {
@@ -401,6 +401,14 @@ internal sealed class ControllerManager : IAsyncDisposable
                 {
                     Log.Warn($"USB-Suche: {Log.Reason(e)}");
                 }
+                try
+                {
+                    ScanXInput();
+                }
+                catch (Exception e)
+                {
+                    Log.Warn($"XInput-Suche: {Log.Reason(e)}");
+                }
                 await Task.Delay(2000, ct);
             }
         }
@@ -416,7 +424,11 @@ internal sealed class ControllerManager : IAsyncDisposable
             var kind = Switch1Devices.KindFromHidPath(path);
             // Lizenzierte Kabel-Gamepads (HORI, PowerA, PDP): eigenes, einfaches Format.
             string? wiredPad = kind == ControllerKind.Unknown ? WiredSwitchPad.NameFromHidPath(path) : null;
-            if (kind == ControllerKind.Unknown && wiredPad is null || _links.ContainsKey(path) || _connecting.ContainsKey(path))
+            // Sony DualShock 4 / DualSense (USB und Bluetooth-Classic-HID). Unser eigener virtueller
+            // DualShock 4 (ViGEm) sieht genauso aus – an der Gerätehierarchie erkennbar (kein USB-/BT-Stamm).
+            ControllerKind? sony = kind == ControllerKind.Unknown && wiredPad is null
+                && PlayStationPad.KindFromHidPath(path) is { } ps && IsPhysicalDevice(path) ? ps : null;
+            if (kind == ControllerKind.Unknown && wiredPad is null && sony is null || _links.ContainsKey(path) || _connecting.ContainsKey(path))
                 continue;
             if (_retryAfter.TryGetValue(path, out long until) && Environment.TickCount64 < until)
                 continue;
@@ -425,8 +437,27 @@ internal sealed class ControllerManager : IAsyncDisposable
                 continue;
             if (!_connecting.TryAdd(path, 0))
                 continue;
-            Track(wiredPad is not null ? ConnectWiredPadAsync(path, wiredPad) : ConnectHidAsync(path, kind));
+            Track(wiredPad is not null ? ConnectWiredPadAsync(path, wiredPad)
+                : sony is { } psKind ? ConnectPlayStationAsync(path, psKind)
+                : ConnectHidAsync(path, kind));
         }
+    }
+
+    /// <summary>
+    /// Echtes Gerät (hängt an USB oder Bluetooth) oder virtuelles? Virtuelle Ausgabe-Controller wie unser
+    /// ViGEm-DualShock 4 hängen an einem Software-Knoten (SWD\…/ROOT\…) und dürfen nicht als Eingabe dienen.
+    /// </summary>
+    private static bool IsPhysicalDevice(string hidPath)
+    {
+        var id = UsbNative.GetInstanceId(hidPath);
+        for (int depth = 0; id is not null && depth < 6; depth++)
+        {
+            if (id.StartsWith("USB\\", StringComparison.OrdinalIgnoreCase)
+                || id.StartsWith("BTH", StringComparison.OrdinalIgnoreCase))
+                return true;
+            id = UsbNative.GetParentInstanceId(id);
+        }
+        return false;
     }
 
     private async Task ConnectWiredPadAsync(string path, string name)
@@ -480,6 +511,94 @@ internal sealed class ControllerManager : IAsyncDisposable
         finally
         {
             _connecting.TryRemove(path, out _);
+            Changed?.Invoke();
+        }
+    }
+
+    private async Task ConnectPlayStationAsync(string path, ControllerKind kind)
+    {
+        Changed?.Invoke();
+        Log.Info($"{kind.DisplayName()} gefunden ({path})");
+        try
+        {
+            using var timeout = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token);
+            timeout.CancelAfter(TimeSpan.FromSeconds(10));
+            var link = await PlayStationHidLink.ConnectAsync(path, kind, timeout.Token);
+            _unreachable.TryRemove(path, out _);
+            // Derselbe Controller schon per Bluetooth verbunden? Dann übernimmt USB (schneller, lädt).
+            if (link.Transport == Transport.Usb && link.Info.SerialNumber is { } serial)
+            {
+                foreach (var bt in _links.Values.Where(l => l.Transport == Transport.Bluetooth && l.Info.SerialNumber == serial).ToList())
+                {
+                    _suppressed[bt.Id] = Environment.TickCount64;
+                    Log.Info($"{bt.Id}: per USB angeschlossen – Bluetooth-Verbindung wird beendet");
+                    OnLinkLost(bt);
+                }
+            }
+            if (!Attach(link))
+                _retryAfter[path] = Environment.TickCount64 + 10000;
+        }
+        catch (OperationCanceledException) when (_disposed)
+        {
+        }
+        catch (Exception e)
+        {
+            // Z. B. gekoppelt, aber ausgeschaltet oder von einem anderen Programm (Steam/DS4Windows) belegt:
+            // Windows zeigt das HID-Gerät trotzdem. Nur einmal melden, dann still weiter versuchen.
+            if (_unreachable.TryAdd(path, 0))
+                Log.Warn($"{kind.DisplayName()}: nicht erreichbar ({Log.Reason(e)}) – wird still weiter versucht");
+            _retryAfter[path] = Environment.TickCount64 + 5000;
+        }
+        finally
+        {
+            _connecting.TryRemove(path, out _);
+            Changed?.Invoke();
+        }
+    }
+
+    // ---------- Xbox (XInput: USB, Bluetooth, Xbox-Wireless-Adapter) ----------
+
+    private void ScanXInput()
+    {
+        // Von Hand getrennte Xbox-Controller erst wieder aufnehmen, wenn der Platz frei wurde (ausgeschaltet/abgezogen).
+        foreach (var id in _usbSuppressed.Keys.Where(k => k.StartsWith("XINPUT:", StringComparison.Ordinal)).ToList())
+        {
+            if (int.TryParse(id.AsSpan(7), out int slot) && !XInputLink.IsConnected(slot))
+                _usbSuppressed.TryRemove(id, out _);
+        }
+        for (int i = 0; i < XInput.MaxControllers; i++)
+        {
+            string id = $"XINPUT:{i}";
+            if (_links.ContainsKey(id) || _connecting.ContainsKey(id) || _usbSuppressed.ContainsKey(id))
+                continue;
+            if (_retryAfter.TryGetValue(id, out long until) && Environment.TickCount64 < until)
+                continue;
+            if (!XInputLink.IsConnected(i) || !_connecting.TryAdd(id, 0))
+                continue;
+            Track(ConnectXInputAsync(i, id));
+        }
+    }
+
+    private async Task ConnectXInputAsync(int slot, string id)
+    {
+        Changed?.Invoke();
+        Log.Info($"Xbox-Controller gefunden (XInput-Platz {slot + 1})");
+        try
+        {
+            var link = await Task.Run(() => XInputLink.Open(slot));
+            _unreachable.TryRemove(id, out _);
+            if (!Attach(link))
+                _retryAfter[id] = Environment.TickCount64 + 10000;
+        }
+        catch (Exception e)
+        {
+            if (_unreachable.TryAdd(id, 0))
+                Log.Warn($"Xbox-Controller (Platz {slot + 1}): nicht nutzbar ({Log.Reason(e)})");
+            _retryAfter[id] = Environment.TickCount64 + 5000;
+        }
+        finally
+        {
+            _connecting.TryRemove(id, out _);
             Changed?.Invoke();
         }
     }
@@ -561,8 +680,9 @@ internal sealed class ControllerManager : IAsyncDisposable
     /// <summary>Verbindung einem Spieler zuordnen. false, wenn die App gerade beendet wird.</summary>
     private bool Attach(IControllerLink link)
     {
-        // Steckt derselbe Controller schon am USB-Kabel, nicht zusätzlich per Bluetooth verwenden.
-        if (link.Transport == Transport.BluetoothLE && link.Info.SerialNumber is { } serial
+        // Steckt derselbe Controller schon am USB-Kabel, nicht zusätzlich per Bluetooth verwenden
+        // (Switch 2 meldet die Seriennummer in beiden Wegen, Sony-Controller die Bluetooth-Adresse).
+        if (link.Transport is Transport.BluetoothLE or Transport.Bluetooth && link.Info.SerialNumber is { } serial
             && _links.Values.Any(l => l.Transport == Transport.Usb && l.Info.SerialNumber == serial))
         {
             Log.Info($"{link.Id}: steckt am USB-Kabel – Bluetooth-Verbindung nicht verwendet");
@@ -1004,8 +1124,8 @@ internal sealed class ControllerManager : IAsyncDisposable
             int n = 20;
             foreach (var kind in new[]
                      {
-                         ControllerKind.GameCube2, ControllerKind.Pro1, ControllerKind.JoyCon1Left, ControllerKind.JoyCon1Right,
-                         ControllerKind.N64Controller, ControllerKind.WiiRemote, ControllerKind.WiiUPro, ControllerKind.MegaDrive,
+                         ControllerKind.GameCube2, ControllerKind.Pro1, ControllerKind.DualShock4, ControllerKind.DualSense,
+                         ControllerKind.XboxController, ControllerKind.WiiRemote, ControllerKind.WiiUPro, ControllerKind.MegaDrive,
                      })
                 Attach(new DemoLink(kind, n++));
             return;

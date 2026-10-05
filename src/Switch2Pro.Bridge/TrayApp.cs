@@ -65,6 +65,18 @@ internal sealed class TrayApp : ApplicationContext
             return;
         }
 
+        // HidHide aktualisiert (= neu installiert): seine Geräteliste ist dann leer – Controller beim Verbinden neu verstecken.
+        if (HidHideUpdate.Installed?.ToString() is { } hidHide && hidHide != _settings.HidHideVersion)
+        {
+            if (_settings.HidHideVersion is not null)
+            {
+                Log.Info($"HidHide {_settings.HidHideVersion} → {hidHide}: Controller werden neu versteckt");
+                _settings.HiddenDevices = [];
+            }
+            _settings.HidHideVersion = hidHide;
+            SaveSettings();
+        }
+
         _manager = new ControllerManager(() => _settings, _factory);
         _manager.Changed += () => _ui.Post(_ => UpdateTooltip(), null);
         _manager.Notify += message => _ui.Post(_ =>
@@ -365,11 +377,13 @@ internal sealed class TrayApp : ApplicationContext
     private async Task CheckForUpdateAsync()
     {
         await Task.Delay(TimeSpan.FromSeconds(10));
-        if (!_settings.CheckForUpdates)
-            return;
-        var update = await UpdateCheck.FindAsync(CancellationToken.None);
+        var update = _settings.CheckForUpdates ? await UpdateCheck.FindAsync(CancellationToken.None) : null;
         if (update is null)
+        {
+            // Erst N-Connect, dann HidHide – nie zwei Update-Meldungen auf einmal.
+            await CheckForHidHideUpdateAsync();
             return;
+        }
         _update = update;
         Log.Info($"Neue Version {update.Version} verfügbar (installiert: {UpdateCheck.Current})");
         if (update.Setup is null)
@@ -425,6 +439,68 @@ internal sealed class TrayApp : ApplicationContext
             }
             Log.Info($"Update auf {update.Version}: Installer gestartet, N-Connect wird beendet");
             ExitThread();
+        }
+        finally
+        {
+            _updating = false;
+        }
+    }
+
+    private async Task CheckForHidHideUpdateAsync()
+    {
+        if (!_settings.CheckHidHideUpdates || HidHideUpdate.Installed is not { } installed)
+            return;
+        var update = await HidHideUpdate.FindAsync(installed, CancellationToken.None);
+        if (update is null)
+            return;
+        Log.Info($"HidHide {update.Version} verfügbar (installiert: {installed})");
+        _balloonUrl = null;
+        Balloon(8000, "HidHide-Update verfügbar",
+            $"HidHide {update.Version} ist erschienen (installiert: {installed}). Klicken zum Installieren.", ToolTipIcon.Info,
+            () => InstallHidHideUpdateAsync(update).Forget("HidHide aktualisieren"));
+    }
+
+    /// <summary>
+    /// HidHide-Update: nachfragen, Installer von GitHub laden, Signatur von Nefarius prüfen und das offizielle Setup
+    /// (mit Oberfläche) starten. Es entfernt die alte Version und verlangt einen Neustart; danach versteckt N-Connect
+    /// die Controller neu (siehe <see cref="Settings.HidHideVersion"/>).
+    /// </summary>
+    private async Task InstallHidHideUpdateAsync(HidHideUpdate.Update update)
+    {
+        if (_updating)
+            return;
+        if (Tr.Show(null, $"HidHide {update.Version} herunterladen und installieren? Das HidHide-Setup entfernt zuerst die alte " +
+                          "Version und verlangt einen Neustart von Windows – bitte seinen Anweisungen folgen. Windows fragt dabei " +
+                          "nach Administratorrechten. Danach versteckt N-Connect die Controller automatisch neu.",
+                "HidHide aktualisieren", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+            return;
+        _updating = true;
+        try
+        {
+            _balloonUrl = null;
+            Balloon(3000, "HidHide aktualisieren", $"Lade HidHide {update.Version} herunter …", ToolTipIcon.Info);
+            string? path = await UpdateCheck.DownloadAsync(update.Setup, null, CancellationToken.None);
+            if (path is not null && !HidHideUpdate.IsSignedByNefarius(path))
+            {
+                try { File.Delete(path); } catch (Exception) { /* bleibt im Temp-Ordner */ }
+                path = null;
+            }
+            if (path is null)
+            {
+                if (Tr.Show(null, "Der Download hat nicht geklappt oder die Datei war fehlerhaft. Die Release-Seite im Browser öffnen?",
+                        "HidHide aktualisieren", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+                    Open(HidHideUpdate.ReleasesPage);
+                return;
+            }
+            try
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(path) { UseShellExecute = true });
+                Log.Info($"HidHide-Update auf {update.Version}: Setup gestartet");
+            }
+            catch (System.ComponentModel.Win32Exception e)
+            {
+                Log.Info($"HidHide-Update: Setup nicht gestartet: {Log.Reason(e)}");
+            }
         }
         finally
         {
