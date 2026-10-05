@@ -509,7 +509,7 @@ internal sealed partial class InputView
         var lightbar = LightbarTint ?? Color.FromArgb(0x1E, 0x6F, 0xE0);
         var f = Frame(40, 1240, 40, 760);
 
-        using (var path = f.Outline(PhotoOutlines.DualShock))
+        using (var path = f.Outline(ds5 ? PhotoOutlines.DualSense : PhotoOutlines.DualShock))
             BodyShape(g, path, body);
         // DS4: die Lichtleiste sitzt auf der Rückseite – von vorn als schmaler Leuchtstreifen an der Oberkante.
         if (!ds5)
@@ -533,24 +533,31 @@ internal sealed partial class InputView
         Stick(g, f.P(415, 455), _gamepad.LeftX, _gamepad.LeftY, on(ProButtons.LeftStick), f.S(88), f.S(58), cap, well);
         Stick(g, f.P(865, 455), _gamepad.RightX, _gamepad.RightY, on(ProButtons.RightStick), f.S(88), f.S(58), cap, well);
 
-        // Touchpad (leichtes Trapez, oben breiter), klickbar = Aufnahme-Taste. DualSense: Leuchtstreifen daneben.
+        // Touchpad (Trapez, oben breiter), klickbar = Aufnahme-Taste. DualSense: die Lichtleiste
+        // läuft als U entlang der Touchpad-Seiten, wie am Original.
+        PointF[] padPts = [f.P(465, 102), f.P(815, 102), f.P(800, 296), f.P(480, 296)];
         using (var pad = new GraphicsPath())
         {
-            pad.AddPolygon([f.P(468, 105), f.P(812, 105), f.P(795, 298), f.P(485, 298)]);
+            pad.AddPolygon(padPts);
             if (on(ProButtons.Capture))
             {
                 using var glow = new Pen(AccentGlow, 7f);
                 g.DrawPath(glow, pad);
             }
-            using (var fill = new SolidBrush(on(ProButtons.Capture) ? Accent : ds5 ? Color.FromArgb(0x1C, 0x1C, 0x20) : Color.FromArgb(0x30, 0x30, 0x36)))
+            var pb = pad.GetBounds();
+            var padTop = on(ProButtons.Capture) ? Accent : ds5 ? Color.FromArgb(0x24, 0x24, 0x28) : Color.FromArgb(0x34, 0x34, 0x3A);
+            var padBottom = on(ProButtons.Capture) ? Mix(Accent, Color.Black, 0.2f) : Color.FromArgb(0x12, 0x12, 0x16);
+            using (var fill = new LinearGradientBrush(pb, padTop, padBottom, LinearGradientMode.Vertical))
                 g.FillPath(fill, pad);
-            using var edge = new Pen(ds5 ? Color.FromArgb(0xB8, 0xB8, 0xC0) : Color.FromArgb(0x44, 0x44, 0x4C), 1.4f);
+            using var edge = new Pen(ds5 ? Color.FromArgb(0xA8, 0xA8, 0xB2) : Color.FromArgb(0x4A, 0x4A, 0x52), 1.4f);
             g.DrawPath(edge, pad);
         }
         if (ds5)
         {
-            LightbarStrip(g, f.R(445, 112, 14, 180), lightbar);
-            LightbarStrip(g, f.R(821, 112, 14, 180), lightbar);
+            // Leuchtstreifen säumen die Seiten und die Unterkante des Touchpads.
+            LightbarEdge(g, f.P(467, 106), f.P(481, 290), lightbar);
+            LightbarEdge(g, f.P(813, 106), f.P(799, 290), lightbar);
+            LightbarEdge(g, f.P(488, 292), f.P(792, 292), lightbar);
             // Mute-Taste (Mikro) unter der PS-Taste.
             using (var mute = Rounded(f.R(615, 508, 50, 20), 10))
             {
@@ -623,6 +630,15 @@ internal sealed partial class InputView
             g.DrawPath(glow, path);
         using var brush = new SolidBrush(c);
         g.FillPath(brush, path);
+    }
+
+    /// <summary>Leuchtstreifen entlang einer Linie (DualSense: rahmt das Touchpad), mit Glühschein.</summary>
+    private static void LightbarEdge(Graphics g, PointF p0, PointF p1, Color c)
+    {
+        using var glow = new Pen(Color.FromArgb(110, c), 9f) { StartCap = LineCap.Round, EndCap = LineCap.Round };
+        g.DrawLine(glow, p0, p1);
+        using var core = new Pen(c, 4.5f) { StartCap = LineCap.Round, EndCap = LineCap.Round };
+        g.DrawLine(core, p0, p1);
     }
 
     // ---------- Classic Controller (an der Wii-Fernbedienung) ----------
