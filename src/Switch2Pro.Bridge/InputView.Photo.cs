@@ -594,13 +594,13 @@ internal sealed partial class InputView
             }
         }
 
-        // SHARE/CREATE und OPTIONS: kleine Tasten oberhalb der Touchpad-Ecken.
+        // SHARE/CREATE und OPTIONS: kleine Tasten oberhalb der Touchpad-Ecken, Beschriftung mittig darunter.
         var menuKey = ds5 ? Color.FromArgb(0xDD, 0xDD, 0xE2) : key;
         PillKey(g, f.P(415, 140), on(ProButtons.Minus), "", menuKey, 0, f.S(56), f.S(20));
-        PillKey(g, f.P(865, 140), on(ProButtons.Plus), "", menuKey, 0, f.S(56), f.S(20));
+        PillKey(g, f.P(850, 140), on(ProButtons.Plus), "", menuKey, 0, f.S(56), f.S(20));
         var muted = Color.FromArgb(0x98, 0x98, 0xA2);
-        Label(g, f, 392, 168, ds5 ? "CREATE" : "SHARE", muted, 5.5f);
-        Label(g, f, 888, 168, "OPTIONS", muted, 5.5f);
+        Label(g, f, 415, 168, ds5 ? "CREATE" : "SHARE", muted, 5.5f);
+        Label(g, f, 850, 168, "OPTIONS", muted, 5.5f);
 
         // PS-Taste mittig unter dem Touchpad (Kreis mit „PS“).
         var pc = f.P(640, 415);
