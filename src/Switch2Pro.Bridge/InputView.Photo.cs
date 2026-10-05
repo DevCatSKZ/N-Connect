@@ -425,7 +425,6 @@ internal sealed partial class InputView
         }
         Label(g, f, 512, 347, "SELECT", red, 7f);
         Label(g, f, 685, 347, "START", red, 7f);
-        Caption(g, new RectangleF(f.P(840, 240).X, f.P(840, 240).Y, f.S(260), f.S(50)), "Nintendo", 11f, red);
         // Steuerkreuz auf hellem Rand
         using (var rim = Rounded(f.R(128, 272, 240, 240), f.S(14)))
         using (var rimBrush = new SolidBrush(Color.FromArgb(0xE6, 0xE4, 0xE0)))
@@ -477,7 +476,6 @@ internal sealed partial class InputView
             glyphs: Color.FromArgb(0x90, 0x90, 0x98));
         PillKey(g, f.P(827, 487), on(ProButtons.Plus), "", Color.FromArgb(0xD8, 0x2C, 0x2C), 0, f.S(58), f.S(24));
         Label(g, f, 827, 515, "START", Color.FromArgb(0xC8, 0xC8, 0xD0), 6.5f);
-        Caption(g, new RectangleF(f.P(824, 428).X - 40, f.P(824, 428).Y - 9, 80, 18), "SEGA", 9.5f, Color.FromArgb(0xC8, 0xC8, 0xD0));
         var grey = Color.FromArgb(0x7A, 0x7A, 0x82);
         var black = Color.FromArgb(0x1E, 0x1E, 0x22);
         var text = Color.FromArgb(0xB8, 0xB8, 0xC0);
@@ -612,7 +610,7 @@ internal sealed partial class InputView
         }
         using (var ring = new Pen(on(ProButtons.Home) ? Color.White : Mix(key, Color.White, 0.35f), 1.3f))
             g.DrawEllipse(ring, pc.X - pr + 3, pc.Y - pr + 3, (pr - 3) * 2, (pr - 3) * 2);
-        Caption(g, new RectangleF(pc.X - pr, pc.Y - pr, pr * 2, pr * 2), "PS", pr * 0.55f, on(ProButtons.Home) ? Color.White : text);
+        Caption(g, new RectangleF(pc.X - pr, pc.Y - pr, pr * 2, pr * 2), "⌂", pr * 0.55f, on(ProButtons.Home) ? Color.White : text);
 
         if (!ds5)
         {
