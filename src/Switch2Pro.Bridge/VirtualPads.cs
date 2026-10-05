@@ -81,6 +81,18 @@ internal sealed class Xbox360Pad : IVirtualPad
         _pad.AutoSubmitReport = false;
         _pad.FeedbackReceived += OnFeedback;
         _pad.Connect();
+        // Platz sofort merken: Feedback kommt erst beim ersten Rumble, der Slot ist aber ab Connect fest.
+        // Als „virtuell“ markiert, damit die XInput-Suche ihn nicht als echten Xbox-Controller ansieht.
+        try
+        {
+            _slot = (int)_pad.UserIndex;
+            if (_slot is >= 0 and <= 3)
+                XInput.SetVirtualSlot(_slot, true);
+        }
+        catch (Exception e)
+        {
+            Log.Warn($"Xbox-Pad: Platz nicht lesbar ({Log.Reason(e)})");
+        }
     }
 
     private void OnFeedback(object? sender, Xbox360FeedbackReceivedEventArgs e)
@@ -128,6 +140,8 @@ internal sealed class Xbox360Pad : IVirtualPad
                 return;
             _disposed = true;
             _pad.FeedbackReceived -= OnFeedback;
+            if (_slot is >= 0 and <= 3)
+                XInput.SetVirtualSlot(_slot, false);
             try { _pad.Disconnect(); } catch (Exception e) { Log.Warn($"Xbox-Pad trennen: {Log.Reason(e)}"); }
             // Ohne Dispose bliebe bei jedem Neuverbinden ein natives ViGEm-Ziel übrig.
             try { ((IDisposable)_pad).Dispose(); } catch (Exception e) { Log.Warn($"Xbox-Pad freigeben: {Log.Reason(e)}"); }

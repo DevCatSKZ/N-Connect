@@ -161,6 +161,7 @@ internal sealed class HidChannel : IDisposable
 
     public int InputLength { get; }
     public int OutputLength { get; }
+    public int FeatureLength { get; }
 
     public HidChannel(string path)
     {
@@ -170,12 +171,36 @@ internal sealed class HidChannel : IDisposable
             var caps = GetHidCaps(_file);
             InputLength = caps.InputReportByteLength;
             OutputLength = caps.OutputReportByteLength;
+            FeatureLength = caps.FeatureReportByteLength;
             _stream = new FileStream(_file, FileAccess.ReadWrite, 0, isAsync: true);
         }
         catch
         {
             _file.Dispose();
             throw;
+        }
+    }
+
+    /// <summary>Produktname bzw. Seriennummer aus dem HID-Deskriptor; null, wenn nicht vorhanden.</summary>
+    public string? GetString(bool serial) => UsbNative.GetHidString(_file, serial);
+
+    /// <summary>
+    /// Feature-Bericht lesen (synchron über den Steuerkanal). <paramref name="reportId"/> geht in Byte 0,
+    /// der Rest ist die Antwort. null bei Fehler bzw. wenn das Gerät keine Feature-Berichte kennt.
+    /// </summary>
+    public byte[]? GetFeatureReport(byte reportId)
+    {
+        if (FeatureLength <= 0)
+            return null;
+        try
+        {
+            var buffer = new byte[FeatureLength];
+            buffer[0] = reportId;
+            return HidD_GetFeature(_file, buffer, buffer.Length) ? buffer : null;
+        }
+        catch (ObjectDisposedException)
+        {
+            return null;
         }
     }
 

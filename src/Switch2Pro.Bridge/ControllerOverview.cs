@@ -27,35 +27,91 @@ internal sealed class ControllerOverview : Panel
         Dock = DockStyle.Fill, FlowDirection = FlowDirection.LeftToRight, WrapContents = true, AutoScroll = true,
         BackColor = Background, Padding = new Padding(12, 4, 12, 12),
     };
-    private readonly Label _empty = new()
+    private readonly Panel _empty = new() { Dock = DockStyle.Fill, BackColor = Background, Visible = false };
+    private readonly Label _emptyText = new()
     {
         AutoSize = false, Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleCenter,
         ForeColor = MutedColor, BackColor = Background, Font = UiFonts.Body,
         Text = "Kein Controller verbunden\n\n" +
                "Switch-2-Controller: kurz die SYNC-Taste drücken – danach reicht ein beliebiger Tastendruck.\n" +
                "Switch-1-, NSO- und Wii-Controller: SYNC-Taste drücken – N-Connect koppelt sie selbst.\n" +
-               "Gezielt suchen: Seite „Allgemein“ → „Controller koppeln …“.",
+               "Oder hier gezielt suchen und koppeln:",
     };
+    /// <summary>Suche/Kopplung (Fenster „Controller koppeln“) – Knopf in der Übersicht und Leiste unten.</summary>
+    private readonly Action? _pair;
+    private readonly GlyphButton? _pairButton;
+    private readonly Panel _pairBar = new() { Dock = DockStyle.Bottom, Height = 52, BackColor = Background, Visible = false };
     private readonly Dictionary<Player, Card> _byPlayer = [];
     /// <summary>Spieler-Reihenfolge (ab zwei Spielern sichtbar).</summary>
     private readonly PlayerOrderBar _order;
 
-    public ControllerOverview(ControllerManager? manager, Func<Settings> settings, MappingContext mapping, Action save, Action<int> showPage)
+    public ControllerOverview(ControllerManager? manager, Func<Settings> settings, MappingContext mapping, Action save, Action<int> showPage, Action? pair = null)
     {
         _manager = manager;
         _settings = settings;
         _mapping = mapping;
         _save = save;
         _showPage = showPage;
+        _pair = pair;
         Dock = DockStyle.Fill;
         BackColor = Background;
+        if (pair is not null)
+        {
+            _pairButton = new GlyphButton("Controller suchen …", Glyph.Bluetooth, accent: true);
+            _pairButton.Click += (_, _) => pair();
+        }
+        InitEmpty();
+        InitPairBar();
         Controls.Add(_cards);
         Controls.Add(_empty);
         _order = new PlayerOrderBar((player, target) => _manager?.MovePlayer(player, target)) { Visible = false };
         Controls.Add(_order);
         Theme.DarkScroll(_cards);
         Tr.Apply(_empty);
+        Tr.Apply(_pairBar);
         InitBanner(); // zuletzt hinzugefügt = zuerst angedockt (oben)
+    }
+
+    /// <summary>Leerzustand: Hinweistext mittig, darunter der Knopf „Controller suchen …“.</summary>
+    private void InitEmpty()
+    {
+        var layout = new TableLayoutPanel { Dock = DockStyle.Fill, BackColor = Background, ColumnCount = 1 };
+        layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+        layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        var cell = new Panel { Dock = DockStyle.Fill, BackColor = Background };
+        if (_pairButton is not null)
+        {
+            var button = new GlyphButton("Controller suchen …", Glyph.Bluetooth, accent: true);
+            button.Click += (_, _) => _pair!();
+            cell.Controls.Add(button);
+            cell.Height = 44;
+            // Mittig unter dem Text.
+            cell.Resize += (_, _) => button.Location = new Point(
+                Math.Max(0, (cell.Width - button.Width) / 2), (cell.Height - button.Height) / 2);
+        }
+        layout.Controls.Add(_emptyText, 0, 0);
+        layout.Controls.Add(cell, 0, 1);
+        _empty.Controls.Add(layout);
+    }
+
+    /// <summary>Leiste am unteren Rand: „Controller suchen …“, sichtbar sobald mind. ein Controller verbunden ist.</summary>
+    private void InitPairBar()
+    {
+        if (_pairButton is null)
+            return;
+        var hint = new Label
+        {
+            AutoSize = false, Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleLeft,
+            ForeColor = MutedColor, BackColor = Background, Font = UiFonts.Small,
+            Text = "Switch-1-, NSO- und Wii-Controller suchen und koppeln (SYNC-Taste drücken).",
+            Padding = new Padding(8, 0, 0, 0),
+        };
+        var box = new Panel { Dock = DockStyle.Left, Width = _pairButton.Width + 18, BackColor = Background };
+        _pairButton.Location = new Point(14, (_pairBar.Height - _pairButton.Height) / 2);
+        box.Controls.Add(_pairButton);
+        _pairBar.Controls.Add(hint);
+        _pairBar.Controls.Add(box);
+        Controls.Add(_pairBar);
     }
 
     /// <summary>Hinweisleiste oben bei Problemen (kein Bluetooth, ViGEmBus fehlt) mit passender Aktion.</summary>
@@ -105,6 +161,7 @@ internal sealed class ControllerOverview : Panel
         var players = _manager?.Players ?? [];
         _empty.Visible = players.Count == 0;
         _cards.Visible = players.Count > 0;
+        _pairBar.Visible = players.Count > 0 && _pair is not null;
         _order.SetPlayers(players, _settings());
         foreach (var gone in _byPlayer.Keys.Except(players).ToList())
         {
@@ -435,22 +492,38 @@ internal sealed class ControllerOverview : Panel
             _layer.SelectedIndexChanged += (_, _) => { if (!_syncing) _owner._mapping.SetShift(_layer.SelectedIndex == 1); };
             _owner._mapping.Changed += SyncProfile;
             _editor = new MappingEditor(_owner._mapping, kind);
-            // Ausgabeart nur für diesen Controller (z. B. Pro Controller als DualShock 4 mit Gyro in Steam).
-            var output = new Segmented("Wie allgemein", "Xbox 360", "DualShock 4");
-            var own = _player?.Links.Select(l => CurrentSettings.OutputFor(l.Address)).FirstOrDefault(m => m is not null);
-            output.SelectedIndex = own switch { OutputMode.Xbox360 => 1, OutputMode.DualShock4 => 2, _ => 0 };
-            output.SelectedIndexChanged += (_, _) =>
-            {
-                if (_player is { } p)
-                    Manager.SetPlayerOutput(p, output.SelectedIndex switch { 1 => OutputMode.Xbox360, 2 => OutputMode.DualShock4, _ => null });
-            };
-            return Column(
-                Group(Row("Erscheint als", "Nur für diesen Controller. Xbox 360 läuft überall; DualShock 4 bringt zusätzlich Gyro " +
-                          "nach Steam und in Emulatoren. „Wie allgemein“ folgt der Seite „Allgemein“.", output, Glyph.Gamepad)),
+            bool native = _player?.Links is { } links && links.Count > 0 && links.All(l => l.Native);
+            var column = Column(
                 Group(Row("Profil", "Belegung für alle Spiele (Standard) oder ein eigenes Profil.", profileBox, Glyph.Layers),
                       Row("Ebene", "Die Shift-Ebene gilt, solange eine Taste mit „Shift-Ebene“ gehalten wird.", _layer, Glyph.Layers)),
                 Hint("Drück eine Taste am Controller – ihre Zeile leuchtet auf. ⌨ weist eine Tastaturtaste zu, ↺ setzt zurück."),
                 _editor);
+            Control outputRow;
+            if (native)
+            {
+                // Xbox über XInput ist in Spielen schon der Controller selbst – nichts umzuleiten.
+                outputRow = new SettingRow("Erscheint als", "Der echte Xbox-Controller – Spiele sehen ihn von Windows aus direkt. " +
+                    "Belegungen hier wirken auf Sonderaktionen (Tastatur, Makros, Gyro), nicht auf den Controller selbst.",
+                    null, Glyph.Gamepad);
+            }
+            else
+            {
+                // Ausgabeart nur für diesen Controller (z. B. Pro Controller als DualShock 4 mit Gyro in Steam).
+                var output = new Segmented("Wie allgemein", "Xbox 360", "DualShock 4");
+                var own = _player?.Links.Select(l => CurrentSettings.OutputFor(l.Address)).FirstOrDefault(m => m is not null);
+                output.SelectedIndex = own switch { OutputMode.Xbox360 => 1, OutputMode.DualShock4 => 2, _ => 0 };
+                output.SelectedIndexChanged += (_, _) =>
+                {
+                    if (_player is { } p)
+                        Manager.SetPlayerOutput(p, output.SelectedIndex switch { 1 => OutputMode.Xbox360, 2 => OutputMode.DualShock4, _ => null });
+                };
+                outputRow = Row("Erscheint als", "Nur für diesen Controller. Xbox 360 läuft überall; DualShock 4 bringt zusätzlich Gyro " +
+                          "nach Steam und in Emulatoren. „Wie allgemein“ folgt der Seite „Allgemein“.", output, Glyph.Gamepad);
+            }
+            var outputGroup = Group(outputRow);
+            column.Controls.Add(outputGroup);
+            column.Controls.SetChildIndex(outputGroup, 0);
+            return column;
         }
 
         private bool _syncing;
@@ -832,10 +905,15 @@ internal sealed class ControllerOverview : Panel
             }
             // LEDs in der Grafik wie am Controller: mit „Spieler-LED vom Spiel“ der Xbox-Platz von Windows.
             _view.PlayerIndex = settings.GameLeds && player.GameSlot is { } slot ? slot : player.Index;
+            // Bei Sony-Pads: Lichtleiste in der Grafik in der Farbe, die das Spiel gesetzt hat.
+            _view.LightbarTint = player.Lightbar is { } lb ? Color.FromArgb(lb.R, lb.G, lb.B) : null;
             var mouse = links.Where(player.MouseActive).ToList();
-            _info.Game = player.Output == OutputMode.DualShock4
-                ? ("DualShock 4", player.Lightbar is { } bar ? Color.FromArgb(bar.R, bar.G, bar.B) : null)
-                : (player.GameSlot is { } s ? $"Xbox 360 · Platz {s + 1}" : "Xbox 360", null);
+            _info.Game = links.Any(l => l.Native)
+                // Xbox über XInput: Spiele sehen den echten Controller selbst – kein virtueller nötig.
+                ? (player.GameSlot is { } ns ? $"Xbox · Platz {ns + 1} · nativ" : "Xbox · nativ", null)
+                : player.Output == OutputMode.DualShock4
+                    ? ("DualShock 4", player.Lightbar is { } bar ? Color.FromArgb(bar.R, bar.G, bar.B) : null)
+                    : (player.GameSlot is { } s ? $"Xbox 360 · Platz {s + 1}" : "Xbox 360", null);
             _info.Show(links, input, mouse);
             if (_expanded && _details is { Visible: true } details)
                 details.Show(links, input, mouse);
@@ -1177,6 +1255,7 @@ internal sealed class ControllerOverview : Panel
         {
             Links.Transport.BluetoothLE => "Bluetooth LE",
             Links.Transport.Bluetooth => "Bluetooth",
+            Links.Transport.XInput => "XInput (USB, Bluetooth oder Xbox-Adapter)",
             _ => "USB",
         };
 

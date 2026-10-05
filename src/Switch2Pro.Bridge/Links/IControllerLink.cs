@@ -10,6 +10,8 @@ internal enum Transport
     /// <summary>Bluetooth Classic HID (Switch-1-Controller, in Windows gekoppelt).</summary>
     Bluetooth,
     Usb,
+    /// <summary>Über XInput (Xbox-Controller – Windows verrät nicht, ob USB, Bluetooth oder Adapter).</summary>
+    XInput,
 }
 
 /// <summary>Was die App über einen Controller weiß (für die Anzeige).</summary>
@@ -47,6 +49,13 @@ internal interface IControllerLink : IAsyncDisposable
     string? ProductName => null;
     /// <summary>HID-Instanz eines USB-Geräts, das Spiele zusätzlich direkt sehen (zum Verstecken per HidHide), sonst null.</summary>
     string? HidInstanceId => null;
+    /// <summary>
+    /// Controller ist für Spiele schon nativ sichtbar (Xbox über XInput): kein virtueller Controller,
+    /// damit nichts doppelt ankommt. Einstellungen wie Tastatur-Belegungen greifen trotzdem.
+    /// </summary>
+    bool Native => false;
+    /// <summary>Bei nativen XInput-Controllern der Platz (0–3), den Windows vergibt; sonst null.</summary>
+    int? NativeSlot => null;
 
     event Action<IControllerLink, ControllerState>? StateReceived;
     /// <summary>Wird genau einmal ausgelöst, wenn die Verbindung abbricht.</summary>
@@ -57,6 +66,8 @@ internal interface IControllerLink : IAsyncDisposable
     Task SetPlayerAsync(int playerIndex);
     /// <summary>HOME-LED-Helligkeit 0–15 (0 = aus), falls der Controller eine hat (Switch 1 Pro, Joy-Con R).</summary>
     Task SetHomeLightAsync(byte intensity) => Task.CompletedTask;
+    /// <summary>Lichtleistenfarbe (DualShock 4, DualSense), die ein Spiel dem virtuellen Controller gesetzt hat.</summary>
+    Task SetLightbarAsync(byte r, byte g, byte b) => Task.CompletedTask;
     /// <summary>Controller schlafen legen, bevor die Verbindung getrennt wird (falls das Protokoll es kann).</summary>
     Task SleepAsync() => Task.CompletedTask;
 }

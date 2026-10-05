@@ -160,6 +160,22 @@ public static class ControllerButtons
             .. Face, ProButtons.L, ProButtons.R, ProButtons.ZL, ProButtons.ZR, ProButtons.Minus, ProButtons.Plus,
             ProButtons.LeftStick, ProButtons.RightStick, ProButtons.Home, .. Dpad,
         ],
+        ControllerKind.DualShock4 =>
+        [
+            .. Face, ProButtons.L, ProButtons.R, ProButtons.ZL, ProButtons.ZR, ProButtons.Minus, ProButtons.Plus,
+            ProButtons.LeftStick, ProButtons.RightStick, ProButtons.Home, ProButtons.Capture, .. Dpad,
+        ],
+        ControllerKind.DualSense =>
+        [
+            .. Face, ProButtons.L, ProButtons.R, ProButtons.ZL, ProButtons.ZR, ProButtons.Minus, ProButtons.Plus,
+            ProButtons.LeftStick, ProButtons.RightStick, ProButtons.Home, ProButtons.Capture, ProButtons.Headset,
+            ProButtons.C, ProButtons.GL, ProButtons.GR, .. Dpad,
+        ],
+        ControllerKind.XboxController =>
+        [
+            .. Face, ProButtons.L, ProButtons.R, ProButtons.Minus, ProButtons.Plus,
+            ProButtons.LeftStick, ProButtons.RightStick, ProButtons.Home, .. Dpad,
+        ],
         _ => Enum.GetValues<ProButtons>().Where(b => b != ProButtons.None).ToArray(),
     };
 
@@ -206,6 +222,50 @@ public static class ControllerButtons
             case (ControllerKind.WiiRemote, ProButtons.L): return "Nunchuk C / Classic L";
             case (ControllerKind.WiiRemote, ProButtons.R): return "Classic R";
             case (ControllerKind.WiiRemote, ProButtons.X): return "Classic X";
+        }
+        if (kind.IsPlayStation())
+        {
+            bool ds5 = kind == ControllerKind.DualSense;
+            switch (button)
+            {
+                case ProButtons.B: return "Kreuz (unten)";
+                case ProButtons.A: return "Kreis (rechts)";
+                case ProButtons.Y: return "Viereck (links)";
+                case ProButtons.X: return "Dreieck (oben)";
+                case ProButtons.L: return "L1";
+                case ProButtons.R: return "R1";
+                case ProButtons.ZL: return "L2";
+                case ProButtons.ZR: return "R2";
+                case ProButtons.Minus: return ds5 ? "Create" : "Share";
+                case ProButtons.Plus: return "Options";
+                case ProButtons.LeftStick: return "L3 (Stick drücken)";
+                case ProButtons.RightStick: return "R3 (Stick drücken)";
+                case ProButtons.Home: return "PS-Taste";
+                case ProButtons.Capture: return "Touchpad-Klick";
+                case ProButtons.Headset: return "Mikro stumm";
+                case ProButtons.C: return "Fn links (Edge)";
+                case ProButtons.GL: return "Rücktaste links (Edge)";
+                case ProButtons.GR: return "Rücktaste rechts (Edge)";
+            }
+        }
+        if (kind.IsXbox())
+        {
+            switch (button)
+            {
+                case ProButtons.B: return "A";
+                case ProButtons.A: return "B";
+                case ProButtons.Y: return "X";
+                case ProButtons.X: return "Y";
+                case ProButtons.L: return "LB";
+                case ProButtons.R: return "RB";
+                case ProButtons.ZL: return "LT";
+                case ProButtons.ZR: return "RT";
+                case ProButtons.Minus: return "Ansicht/Zurück";
+                case ProButtons.Plus: return "Menü/Start";
+                case ProButtons.LeftStick: return "Linker Stick drücken";
+                case ProButtons.RightStick: return "Rechter Stick drücken";
+                case ProButtons.Home: return "Xbox-Taste";
+            }
         }
         if (kind.IsJoyCon() && kind != ControllerKind.JoyConPair)
         {

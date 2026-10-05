@@ -119,7 +119,7 @@ internal static class RenderCheck
             manager?.StartDemo();
             // Als echtes Fenster außerhalb des sichtbaren Bereichs anzeigen, damit alle Steuerelemente entstehen.
             var sw = System.Diagnostics.Stopwatch.StartNew();
-            using var form = new SettingsForm(new Settings(), _ => { }, manager)
+            using var form = new SettingsForm(new Settings(), _ => { }, manager, wiiPairing: () => { })
             {
                 StartPosition = FormStartPosition.Manual, Location = new Point(-6000, -6000), ShowInTaskbar = false, ShowInactive = true,
                 Size = Environment.GetCommandLineArgs().Contains("--wide") ? new Size(1900, 1040) : new Size(1220, 900),
@@ -292,12 +292,18 @@ internal static class RenderCheck
             (ControllerKind.WiiRemote, WiiExtension.Classic, "wii_classic"),
             (ControllerKind.WiiRemote, WiiExtension.MotionPlusNunchuk, "wii_motionplus_nunchuk"),
             (ControllerKind.WiiUPro, WiiExtension.None, "wiiupro"),
+            (ControllerKind.DualShock4, WiiExtension.None, "dualshock4"),
+            (ControllerKind.DualSense, WiiExtension.None, "dualsense"),
+            (ControllerKind.XboxController, WiiExtension.None, "xbox"),
         };
         foreach (var (kind, ext, name) in kinds)
         {
             foreach (bool pressed in new[] { false, true })
             {
                 using var view = new InputView { Size = new Size(580, 410), WiiExtension = ext };
+                // Bei Sony-Pads im Pressed-Bild die Lichtleiste einfärben (wie ein Spiel sie setzt).
+                if (pressed && kind is ControllerKind.DualShock4 or ControllerKind.DualSense)
+                    view.LightbarTint = Color.FromArgb(0x3C, 0xE0, 0x78);
                 var input = new PadInput
                 {
                     Kind = kind,

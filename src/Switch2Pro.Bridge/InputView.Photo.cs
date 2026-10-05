@@ -308,8 +308,8 @@ internal sealed partial class InputView
             g.FillEllipse(socket, f.R(520, 565, 260, 260));
         Stick(g, f.P(650, 695), _gamepad.LeftX, _gamepad.LeftY, false, f.S(82), f.S(56),
             capColor: Color.FromArgb(0xE2, 0xE2, 0xE6), wellColor: Color.FromArgb(0x38, 0x38, 0x3E), octagon: true);
-        // Z sitzt hinten am Mittelgriff
-        Shoulder(g, f.R(605, 935, 90, 44), on(ProButtons.ZL), "Z", Color.FromArgb(0x6A, 0x6A, 0x70));
+        // Z sitzt auf der Rückseite des Mittelgriffs unter dem Stick – als Kapsel auf dem Griff angedeutet.
+        GripButton(g, f.R(612, 875, 76, 150), on(ProButtons.ZL), "Z");
     }
 
     private float p_RightX() => _input?.RightX ?? 0;
@@ -439,6 +439,142 @@ internal sealed partial class InputView
         ColorKey(g, f.P(1094, 518), on(ProButtons.A), "C", black, f.S(31), text);
     }
 
+    // ---------- PlayStation (DualShock 4 / DualSense) ----------
+
+    /// <summary>
+    /// DualShock 4 und DualSense im Sony-Layout: Steuerkreuz und Symboltasten oben, beide Sticks symmetrisch
+    /// unten, Touchpad in der Mitte (klickbar = Aufnahme), SHARE/OPTIONS daneben, PS-Taste darunter.
+    /// DualSense: weiß, Leuchtstreifen neben dem Touchpad, Mute-Taste. DualShock 4: schwarz, die Lichtleiste
+    /// auf der Rückseite ist von vorn nur als schmaler Streifen an der Oberkante sichtbar.
+    /// </summary>
+    private void PaintPlayStation(Graphics g, ControllerKind kind, Func<ProButtons, bool> on)
+    {
+        bool ds5 = kind == ControllerKind.DualSense;
+        var body = ds5 ? Color.FromArgb(0xEA, 0xEA, 0xEE) : Color.FromArgb(0x27, 0x27, 0x2C);
+        var key = ds5 ? Color.FromArgb(0x2C, 0x2C, 0x32) : Color.FromArgb(0x33, 0x33, 0x39);
+        var text = Color.FromArgb(0xD8, 0xD8, 0xDE);
+        var trigger = ds5 ? Color.FromArgb(0xDC, 0xDC, 0xE2) : Color.FromArgb(0x3A, 0x3A, 0x40);
+        var bumper = ds5 ? Color.FromArgb(0xF4, 0xF4, 0xF6) : Color.FromArgb(0x4A, 0x4A, 0x52);
+        // Lichtleiste: vom Spiel gesetzte Farbe, sonst das übliche PlayStation-Blau.
+        var lightbar = LightbarTint ?? Color.FromArgb(0x1E, 0x6F, 0xE0);
+        var f = Frame(40, 1240, 40, 760);
+
+        // Trigger L2/R2 hinter der Oberkante (analog, füllen sich), Schultertasten L1/R1 davor.
+        Shoulder(g, f.R(200, 40, 220, 64), on(ProButtons.ZL), "L2", trigger, _input?.LeftTrigger ?? 0, tucked: true);
+        Shoulder(g, f.R(860, 40, 220, 64), on(ProButtons.ZR), "R2", trigger, _input?.RightTrigger ?? 0, tucked: true);
+        using (var path = f.Outline(PhotoOutlines.DualShock))
+            BodyShape(g, path, body);
+        // DS4: die Lichtleiste sitzt auf der Rückseite – von vorn als schmaler Leuchtstreifen an der Oberkante.
+        if (!ds5)
+            LightbarStrip(g, f.R(545, 92, 190, 20), lightbar);
+        Shoulder(g, f.R(215, 96, 185, 40), on(ProButtons.L), "L1", bumper);
+        Shoulder(g, f.R(880, 96, 185, 40), on(ProButtons.R), "R1", bumper);
+
+        // Steuerkreuz oben links, Symboltasten oben rechts in den Originalfarben.
+        PhotoDPad(g, f, 322, 255, 96, on, fill: key, border: Mix(key, Color.White, 0.2f), glyphs: text);
+        Face(g, f.P(960, 175), on(ProButtons.X), "△", f.S(40), Color.FromArgb(0x2F, 0xB5, 0x8C));
+        Face(g, f.P(1035, 250), on(ProButtons.A), "○", f.S(40), Color.FromArgb(0xE0, 0x4B, 0x5A));
+        Face(g, f.P(960, 325), on(ProButtons.B), "✕", f.S(40), Color.FromArgb(0x4C, 0x7F, 0xD9));
+        Face(g, f.P(885, 250), on(ProButtons.Y), "□", f.S(40), Color.FromArgb(0xD9, 0x7F, 0xB4));
+
+        // Beide Sticks symmetrisch unten (Kappe und Mulde schwarz, auch beim weißen DualSense).
+        var cap = Color.FromArgb(0x24, 0x24, 0x28);
+        var well = Color.FromArgb(0x18, 0x18, 0x1C);
+        Stick(g, f.P(415, 455), _gamepad.LeftX, _gamepad.LeftY, on(ProButtons.LeftStick), f.S(88), f.S(58), cap, well);
+        Stick(g, f.P(865, 455), _gamepad.RightX, _gamepad.RightY, on(ProButtons.RightStick), f.S(88), f.S(58), cap, well);
+
+        // Touchpad (leichtes Trapez, oben breiter), klickbar = Aufnahme-Taste. DualSense: Leuchtstreifen daneben.
+        using (var pad = new GraphicsPath())
+        {
+            pad.AddPolygon([f.P(468, 105), f.P(812, 105), f.P(795, 298), f.P(485, 298)]);
+            if (on(ProButtons.Capture))
+            {
+                using var glow = new Pen(AccentGlow, 7f);
+                g.DrawPath(glow, pad);
+            }
+            using (var fill = new SolidBrush(on(ProButtons.Capture) ? Accent : ds5 ? Color.FromArgb(0x1C, 0x1C, 0x20) : Color.FromArgb(0x30, 0x30, 0x36)))
+                g.FillPath(fill, pad);
+            using var edge = new Pen(ds5 ? Color.FromArgb(0xB8, 0xB8, 0xC0) : Color.FromArgb(0x44, 0x44, 0x4C), 1.4f);
+            g.DrawPath(edge, pad);
+        }
+        if (ds5)
+        {
+            LightbarStrip(g, f.R(445, 112, 14, 180), lightbar);
+            LightbarStrip(g, f.R(821, 112, 14, 180), lightbar);
+            // Mute-Taste (Mikro) unter der PS-Taste.
+            using (var mute = Rounded(f.R(615, 508, 50, 20), 10))
+            {
+                if (on(ProButtons.Headset))
+                {
+                    using var glow = new Pen(AccentGlow, 5f);
+                    g.DrawPath(glow, mute);
+                }
+                using var fill = new SolidBrush(on(ProButtons.Headset) ? Accent : key);
+                g.FillPath(fill, mute);
+            }
+            // Kleines Mikro-Piktogramm in der Taste.
+            var mc = f.P(640, 518);
+            var mic = on(ProButtons.Headset) ? Color.White : text;
+            using (var p1 = new Pen(mic, 1.6f))
+            {
+                g.DrawLine(p1, mc.X, mc.Y - 5, mc.X, mc.Y + 2);
+                g.DrawArc(p1, mc.X - 4, mc.Y - 2, 8, 6, 0, 180);
+            }
+        }
+
+        // SHARE/CREATE und OPTIONS: kleine Tasten links und rechts vom Touchpad.
+        PillKey(g, f.P(425, 148), on(ProButtons.Minus), "", key, 0, f.S(56), f.S(20));
+        PillKey(g, f.P(855, 148), on(ProButtons.Plus), "", key, 0, f.S(56), f.S(20));
+        var muted = Color.FromArgb(0x98, 0x98, 0xA2);
+        Label(g, f, 395, 174, ds5 ? "CREATE" : "SHARE", muted, 5.5f);
+        Label(g, f, 885, 174, "OPTIONS", muted, 5.5f);
+
+        // PS-Taste mittig unter dem Touchpad (Kreis mit „PS“).
+        var pc = f.P(640, 452);
+        float pr = f.S(24);
+        using (var path = new GraphicsPath())
+        {
+            path.AddEllipse(pc.X - pr, pc.Y - pr, pr * 2, pr * 2);
+            Fill(g, path, on(ProButtons.Home), key);
+        }
+        using (var ring = new Pen(on(ProButtons.Home) ? Color.White : Mix(key, Color.White, 0.35f), 1.3f))
+            g.DrawEllipse(ring, pc.X - pr + 3, pc.Y - pr + 3, (pr - 3) * 2, (pr - 3) * 2);
+        Caption(g, new RectangleF(pc.X - pr, pc.Y - pr, pr * 2, pr * 2), "PS", pr * 0.55f, on(ProButtons.Home) ? Color.White : text);
+
+        if (!ds5)
+        {
+            // Lautsprecher-Lochreihe unter dem Touchpad.
+            var dots = f.P(640, 352);
+            using var holes = new SolidBrush(Mix(body, Color.White, 0.25f));
+            for (int i = -2; i <= 2; i++)
+                g.FillEllipse(holes, dots.X + i * f.S(16) - 2, dots.Y - 2, 4, 4);
+        }
+        else
+        {
+            // DualSense: fünf kleine Spieler-LEDs unter dem Touchpad (mittig gefüllt nach Platz).
+            var ly = f.P(640, 392);
+            int n = PlayerIndex >= 0 ? Math.Min(5, PlayerIndex + 1) : 0;
+            int start = (5 - n) / 2;
+            for (int i = 0; i < 5; i++)
+            {
+                bool lit = i >= start && i < start + n;
+                using var led = new SolidBrush(lit ? lightbar : Mix(body, Color.Black, 0.2f));
+                g.FillRectangle(led, ly.X - f.S(50) + i * f.S(22), ly.Y, f.S(14), f.S(5));
+            }
+        }
+        Gyro(g, _input?.Motion);
+    }
+
+    /// <summary>Leuchtstreifen der Lichtleiste in der vom Spiel gesetzten Farbe (mit Glühschein).</summary>
+    private static void LightbarStrip(Graphics g, RectangleF r, Color c)
+    {
+        using var path = Rounded(r, r.Height / 2);
+        using (var glow = new Pen(Color.FromArgb(110, c), 6f))
+            g.DrawPath(glow, path);
+        using var brush = new SolidBrush(c);
+        g.FillPath(brush, path);
+    }
+
     // ---------- Classic Controller (an der Wii-Fernbedienung) ----------
 
     private void PaintWiiClassic(Graphics g, Func<ProButtons, bool> on, Color white, Color key, Color dark)
@@ -469,7 +605,7 @@ internal sealed partial class InputView
         ColorKey(g, f.P(990, 357), on(ProButtons.B), "b", key, f.S(43), dark);
         ColorKey(g, f.P(878, 270), on(ProButtons.Y), "y", key, f.S(43), dark);
         var gate = Color.FromArgb(0xD8, 0xD8, 0xDE);
-        Stick(g, f.P(482, 452), _gamepad.LeftX, _gamepad.LeftY, false, f.S(92), f.S(56), white, gate, octagon: true);
-        Stick(g, f.P(797, 452), _gamepad.RightX, _gamepad.RightY, false, f.S(92), f.S(56), white, gate, octagon: true);
+        Stick(g, f.P(482, 452), _gamepad.LeftX, _gamepad.LeftY, false, f.S(92), f.S(56), white, gate);
+        Stick(g, f.P(797, 452), _gamepad.RightX, _gamepad.RightY, false, f.S(92), f.S(56), white, gate);
     }
 }
