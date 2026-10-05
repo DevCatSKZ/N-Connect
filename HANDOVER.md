@@ -1,6 +1,6 @@
 # Übergabe: N-Connect
 
-Stand: 04.10.2026. Entwickelt im Repo `sfm` (Branch `ccr-ad005d0f-jon8df`, Ordner `switch2-pro-windows/`);
+Stand: 05.10.2026. Entwickelt im Repo `sfm` (Branch `ccr-ad005d0f-jon8df`, Ordner `switch2-pro-windows/`);
 veröffentlicht als eigenes Repo **DevCatSKZ/N-Connect** (öffentlich) per `git subtree split`.
 Was das Programm kann und wie man es baut: siehe [README.md](README.md). Vollständige Entwicklerdokumentation
 (Funktionen und Verhalten, Architektur, Protokolle, Portierung): [docs/](docs/README.md).
@@ -34,6 +34,35 @@ Hinweise zur Umgebung:
   git stash pop` (vom Nutzer so freigegeben).
 - Das Protokoll `%LOCALAPPDATA%\N-Connect\bridge.log` ist die wichtigste Quelle bei Hardwareproblemen. Die
   Prüfhilfen (`--render-ui --demo-all`) schreiben in dasselbe Protokoll („Demo-Modus …“) – nicht verwechseln.
+
+## Zuletzt erledigt (05.10.2026): Controller-Grafiken überarbeitet
+
+Komplette Grafik-Überarbeitung in `InputView.cs`, `InputView.Photo.cs`, `InputView.Outlines.cs`,
+`InputView.Retro.cs`, `InputView.JoyCon.cs` (Commits `ffaa98b` … `ef22786`, alle mit `--render` visuell
+geprüft, 216/216 Tests grün):
+
+- **Schultertasten neu** (`EdgeShoulder`/`Shoulder`): gewölbte Keil-Segmente, die sich der Gehäusekante
+  anschmiegen und **nebeneinander mit sichtbarem Spalt** liegen – nichts überlappt mehr. Reihenfolge wie am
+  Original: GC `ZL|L` bzw. `R|Z`, Sony `L1|L2` / `R2|R1`, Xbox `LB|LT` / `RT|RB`, N64 schmales `ZR` innen.
+  Trigger-Kappen höher und hinter den Bumper-Kappen; analoge Füllung bleibt.
+- **DualShock 4 / DualSense komplett neu** (`PaintPlayStation`): echte Sony-Anatomie – Kreuz links oben,
+  Symboltasten rechts oben, beide Sticks symmetrisch unten, Touchpad-Trapez mit Verlauf mittig (klickbar =
+  Aufnahme). Eigene Umrisse `PhotoOutlines.DualShock`/`DualSense`: schlanke angewinkelte Griffe mit
+  Einschnürung, tiefe V-Kerbe in der Mitte. SHARE/CREATE und OPTIONS als schmale Pills an den
+  Touchpad-Ecken **ohne Aufschrift** (Wort-Labels klebten je nach Fenstergröße an der Lichtleiste).
+- **Lichtleiste zeigt die Farbe vom Spiel** (`InputView.LightbarTint` ← `Player.Lightbar`): DualSense als
+  U-förmige Leuchtstreifen um das Touchpad (`LightbarEdge`), DS4 als Streifen in der Oberkanten-Mulde
+  (frei vom Touchpad).
+- **Paletten originalgetreu**: DualSense weiß (weißes Gehäuse/Touchpad/Tasten, graue Symbole, schwarze
+  Sticks), DS4 schwarz mit Farbsymbolen (△○✕□), Xbox farbige Buchstaben (A grün, B rot, X blau, Y gelb).
+- **Neutral ohne Markenzeichen** (Nutzerwunsch): „Nintendo“ (NES), „SEGA“ (Mega Drive), „Wii“/„MotionPlus“
+  (Wii-Fernbedienung) entfernt; PS- und Xbox-Logo durch neutrales Haus-Symbol `⌂` ersetzt (`XboxHome`).
+  Übrig bleiben nur Funktionsnamen: L/R, ZL/ZR, L1/L2/R1/R2, LB/LT/RB/RT, A/B/X/Y, SELECT/START/HOME, MODE.
+- **Wii Classic**: Sticks rund statt achteckig. **N64**: Z als Kapsel am Mittelgriff, ZR klein.
+
+Rendern/Prüfen wie immer: `N-Connect.exe --render <Ordner>`. Bei Überlappungs-Meldungen vom Nutzer:
+Textgrößen sind fest in pt, Positionen skalieren mit `PhotoFrame` – bei kleinen Karten kann Text an Kanten
+kleben; ggf. Aufschrift weglassen statt verschieben.
 
 ## Zuletzt erledigt (04.10.2026, Nachmittag)
 
@@ -180,10 +209,14 @@ installer/N-Connect.iss   Inno Setup 6 (ViGEmBus, HidHide immer mit, N-Connect d
 ```
 
 Wichtige Gestaltungsregeln der Grafiken: Alle Controller nutzen dieselbe Bühne (`PhotoFrame`), Schultertasten
-liegen hinter der Gehäuse-Oberkante (`Shoulder(..., tucked: true)`), GL/GR sitzen auf den Griffen (`GripButton`),
-Joy-Con haben schwarze Tasten unabhängig von der Gehäusefarbe (`_darkButtons`). Der Switch-1-Pro-Controller nutzt
-die Pro-2-Form, aber ohne C-Taste und GL/GR. Beschriftungen laufen über `InputView.Caption` (dreht bei gedrehtem
-Controller zurück, Pfeile ausgenommen). Jede Grafikänderung mit `--render` (Sammelbild aller Controller) prüfen.
+sind gewölbte Segmente **auf** der Gehäuse-Oberkante (`EdgeShoulder`, nebeneinander mit Spalt, kein Überlappen),
+GL/GR sitzen auf den Griffen (`GripButton`), Joy-Con haben schwarze Tasten unabhängig von der Gehäusefarbe
+(`_darkButtons`). Der Switch-1-Pro-Controller nutzt die Pro-2-Form, aber ohne C-Taste und GL/GR. Grafiken bleiben
+**neutral**: keine Hersteller-/Plattformnamen oder -logos (kein Nintendo/SEGA/Wii/PS/Xbox-Schriftzug), Home-Tasten
+tragen `⌂`; nur Funktionsnamen (L/R, ZL/ZR, A/B/X/Y, SELECT/START …) sind erlaubt. Beschriftungen laufen über
+`InputView.Caption` (dreht bei gedrehtem Controller zurück, Pfeile ausgenommen) – Textgrößen sind fest in pt,
+Positionen skalieren mit `PhotoFrame`, daher knappe Text-Abstände bei kleiner Kartenansicht vermeiden. Jede
+Grafikänderung mit `--render` (Sammelbild aller Controller) prüfen.
 
 Gestaltungsregeln der Oberfläche: nur Bausteine aus `Ui.cs` (keine Standard-`Button`/`TextBox` mit Rahmen; Textfelder
 in `TextField` hüllen), Farben nur aus `Theme`, jeder sichtbare Text auf Deutsch im Code und mit englischem Eintrag in
