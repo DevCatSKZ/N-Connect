@@ -6,7 +6,8 @@ namespace Switch2Pro.Bridge;
 
 /// <summary>
 /// Fenster „Controller koppeln“: zeigt je Controller-Art, wie man ihn in den Kopplungsmodus bringt, sucht 60 s nach
-/// Switch-1-, NSO- und Wii-Controllern (Switch 2 verbindet sich per SYNC ohnehin selbst) und zeigt live, was passiert:
+/// Switch-1-, NSO-, Wii-, PlayStation- und Xbox-Controllern (Switch 2 verbindet sich per SYNC ohnehin selbst) und
+/// zeigt live, was passiert:
 /// Restzeit, aktueller Schritt und jeder Controller, der sich während des offenen Fensters verbindet – mit Name,
 /// Spielernummer und Verbindungsart. Danach „Fertig“ oder „Erneut suchen“.
 /// </summary>
@@ -54,7 +55,9 @@ internal sealed class PairForm : Form
             new SettingRow("Switch 2: Pro Controller, Joy-Con 2, GameCube", "Kurz die kleine SYNC-Taste drücken.", null, Glyph.Gamepad),
             new SettingRow("Switch 1: Joy-Con, Pro Controller, NES/SNES/N64/Mega Drive", "SYNC-Taste drücken, bis die Lichter laufen.", null, Glyph.Gamepad),
             new SettingRow("Wii-Fernbedienung", "Batteriefach öffnen und die rote SYNC-Taste drücken.", null, Glyph.Pointer),
-            new SettingRow("Wii U Pro Controller", "Die SYNC-Taste auf der Unterseite drücken.", null, Glyph.Gamepad));
+            new SettingRow("Wii U Pro Controller", "Die SYNC-Taste auf der Unterseite drücken.", null, Glyph.Gamepad),
+            new SettingRow("PlayStation: DualShock 4, DualSense", "PS + Teilen bzw. Create halten, bis die Lichtleiste schnell blinkt.", null, Glyph.Gamepad),
+            new SettingRow("Xbox über Bluetooth: One S, Series X|S, Elite", "Kopplungstaste oben halten, bis die Xbox-Taste blinkt.", null, Glyph.Gamepad));
 
         var footer = new Panel { Dock = DockStyle.Bottom, Height = 64, BackColor = Theme.Current.Surface };
         footer.Paint += (_, e) =>

@@ -401,6 +401,11 @@ internal static partial class Tr
         ["SYNC-Taste drücken, bis die Lichter laufen."] = "Press the SYNC button until the lights run.",
         ["Batteriefach öffnen und die rote SYNC-Taste drücken."] = "Open the battery compartment and press the red SYNC button.",
         ["Die SYNC-Taste auf der Unterseite drücken."] = "Press the SYNC button on the bottom.",
+        ["PlayStation: DualShock 4, DualSense"] = "PlayStation: DualShock 4, DualSense",
+        ["PS + Teilen bzw. Create halten, bis die Lichtleiste schnell blinkt."] =
+            "Hold PS + Share/Create until the light bar blinks quickly.",
+        ["Xbox über Bluetooth: One S, Series X|S, Elite"] = "Xbox via Bluetooth: One S, Series X|S, Elite",
+        ["Kopplungstaste oben halten, bis die Xbox-Taste blinkt."] = "Hold the pairing button on top until the Xbox button blinks.",
         ["Status"] = "Status",
         ["Suche läuft …"] = "Searching …",
         ["Suche läuft – jetzt SYNC drücken …"] = "Searching – press SYNC now …",
@@ -547,10 +552,10 @@ internal static partial class Tr
         ["Switch-1-, NSO- und Wii-Controller suchen und koppeln (SYNC-Taste drücken)."] =
             "Search and pair Switch 1, NSO and Wii controllers (press the SYNC button).",
         ["Neue Controller automatisch koppeln"] = "Pair new controllers automatically",
-        ["Joy-Con, Pro Controller, NES/SNES/N64/Mega Drive und Wii: einfach SYNC drücken – " +
-         "kein Umweg über die Windows-Bluetooth-Einstellungen. Gesucht wird nur, solange niemand spielt."] =
-            "Joy-Con, Pro Controller, NES/SNES/N64/Mega Drive and Wii: just press SYNC – no detour via the Windows " +
-            "Bluetooth settings. Searches only while nobody is playing.",
+        ["Joy-Con, Pro Controller, NES/SNES/N64/Mega Drive, Wii und PlayStation: einfach SYNC " +
+         "drücken – kein Umweg über die Windows-Bluetooth-Einstellungen. Gesucht wird nur, solange niemand spielt."] =
+            "Joy-Con, Pro Controller, NES/SNES/N64/Mega Drive, Wii and PlayStation: just press SYNC – no detour via the " +
+            "Windows Bluetooth settings. Searches only while nobody is playing.",
         ["Gezielt suchen"] = "Search on purpose",
         ["Sucht eine Minute lang nach Controllern im Kopplungsmodus."] = "Searches for controllers in pairing mode for one minute.",
         ["Controller koppeln …"] = "Pair controller …",
@@ -631,8 +636,8 @@ internal static partial class Tr
             "Wii Remote: open the battery compartment and press the red SYNC button.\n" +
             "Wii U Pro Controller: press the SYNC button on the bottom.\n" +
             "Afterwards the controller connects with a button press.",
-        ["Suche … SYNC-Taste am Controller drücken (Joy-Con: an der Schiene, Wii-Fernbedienung: im Batteriefach)."] =
-            "Searching … press the SYNC button on the controller (Joy-Con: on the rail, Wii Remote: in the battery compartment).",
+        ["Suche … SYNC-Taste drücken (Xbox: Kopplungstaste oben halten, PlayStation: PS + Teilen/Create halten)."] =
+            "Searching … press the SYNC button (Xbox: hold the pairing button on top, PlayStation: hold PS + Share/Create).",
         ["Kein Controller im Kopplungsmodus gefunden. SYNC-Taste drücken und erneut versuchen."] =
             "No controller in pairing mode found. Press SYNC and try again.",
         ["Einstellungen"] = "Settings",
