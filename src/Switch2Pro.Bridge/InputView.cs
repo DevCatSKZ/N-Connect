@@ -98,18 +98,18 @@ internal sealed partial class InputView : Control
         var triggerColor = Mix(_body, Color.White, 0.13f);
         var bumperColor = Mix(_body, Color.White, 0.30f);
 
-        // Hinten die Trigger ZL/ZR (unterer Rand vom Gehäuse verdeckt), dann das Gehäuse, dann die Schultertasten L/R.
+        // Schultertasten als Kappen auf der Gehäusekante: erst die Trigger ZL/ZR (höher, dahinter),
+        // dann die Schultertasten L/R davor.
         var (lt, rt, lb, rb) = p?.Kind switch
         {
             ControllerKind.XboxController => ("LT", "RT", "LB", "RB"),
-            ControllerKind.DualShock4 or ControllerKind.DualSense => ("L2", "R2", "L1", "R1"),
             _ => ("ZL", "ZR", "L", "R"),
         };
-        Shoulder(g, f.R(448, 44, 246, 70), On(ProButtons.ZL), lt, triggerColor, _gamepad.LeftTrigger / 255f, tucked: true);
-        Shoulder(g, f.R(1213, 44, 246, 70), On(ProButtons.ZR), rt, triggerColor, _gamepad.RightTrigger / 255f, tucked: true);
         DrawPro2Body(g, f);
-        Shoulder(g, f.R(430, 102, 268, 52), On(ProButtons.L), lb, bumperColor);
-        Shoulder(g, f.R(1202, 102, 268, 52), On(ProButtons.R), rb, bumperColor);
+        EdgeShoulder(g, f, 460, 700, 138, 52, 192, 98, On(ProButtons.ZL), lt, triggerColor, _gamepad.LeftTrigger / 255f, 26);
+        EdgeShoulder(g, f, 1207, 1447, 52, 138, 98, 192, On(ProButtons.ZR), rt, triggerColor, _gamepad.RightTrigger / 255f, 26);
+        EdgeShoulder(g, f, 468, 700, 180, 115, 228, 155, On(ProButtons.L), lb, bumperColor, labelDy: 26);
+        EdgeShoulder(g, f, 1207, 1439, 115, 180, 155, 228, On(ProButtons.R), rb, bumperColor, labelDy: 26);
 
         // Links: Stick oben außen, Steuerkreuz darunter weiter innen
         Stick(g, f.P(575, 372), _gamepad.LeftX, _gamepad.LeftY, On(ProButtons.LeftStick), f.S(92), f.S(62));
