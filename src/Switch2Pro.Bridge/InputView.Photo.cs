@@ -592,14 +592,11 @@ internal sealed partial class InputView
             }
         }
 
-        // SHARE/CREATE und OPTIONS: kleine Tasten oberhalb der Touchpad-Ecken, Beschriftung mittig darunter.
-        // Weit genug außen, damit der Text nicht an der Touchpad-Lichtleiste klebt.
+        // SHARE/CREATE und OPTIONS: kleine Tasten oberhalb der Touchpad-Ecken, ohne Aufschrift
+        // (wie am Original nur schmale Pills) – so kann kein Text an der Lichtleiste kleben.
         var menuKey = ds5 ? Color.FromArgb(0xDD, 0xDD, 0xE2) : key;
-        PillKey(g, f.P(388, 136), on(ProButtons.Minus), "", menuKey, 0, f.S(56), f.S(20));
-        PillKey(g, f.P(877, 136), on(ProButtons.Plus), "", menuKey, 0, f.S(56), f.S(20));
-        var muted = Color.FromArgb(0x98, 0x98, 0xA2);
-        Label(g, f, 388, 163, ds5 ? "CREATE" : "SHARE", muted, 5f);
-        Label(g, f, 877, 163, "OPTIONS", muted, 5f);
+        PillKey(g, f.P(400, 140), on(ProButtons.Minus), "", menuKey, 0, f.S(52), f.S(18));
+        PillKey(g, f.P(865, 140), on(ProButtons.Plus), "", menuKey, 0, f.S(52), f.S(18));
 
         // PS-Taste mittig unter dem Touchpad (Kreis mit „PS“).
         var pc = f.P(640, 415);
