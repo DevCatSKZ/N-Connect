@@ -242,10 +242,10 @@ internal sealed partial class InputView
         var zcol = Color.FromArgb(0x6B, 0x6E, 0xC8);
         using (var path = f.Outline(PhotoOutlines.GameCube))
             BodyShape(g, path, body);
-        EdgeShoulder(g, f, 228, 330, 150, 102, 225, 178, on(ProButtons.ZL), "ZL", zcol, labelDy: 30);
-        EdgeShoulder(g, f, 330, 560, 102, 58, 178, 132, on(ProButtons.L), "L", grey, _input?.LeftTrigger ?? 0, 36);
-        EdgeShoulder(g, f, 720, 960, 58, 98, 132, 168, on(ProButtons.R), "R", grey, _input?.RightTrigger ?? 0, 36);
-        EdgeShoulder(g, f, 960, 1082, 98, 150, 168, 222, on(ProButtons.ZR), "Z", zcol, labelDy: 30);
+        EdgeShoulder(g, f, 228, 324, 150, 102, 225, 178, on(ProButtons.ZL), "ZL", zcol, labelDy: 30);
+        EdgeShoulder(g, f, 336, 560, 100, 58, 176, 132, on(ProButtons.L), "L", grey, _input?.LeftTrigger ?? 0, 36);
+        EdgeShoulder(g, f, 720, 954, 58, 98, 132, 166, on(ProButtons.R), "R", grey, _input?.RightTrigger ?? 0, 36);
+        EdgeShoulder(g, f, 966, 1082, 100, 150, 172, 222, on(ProButtons.ZR), "Z", zcol, labelDy: 30);
 
         Stick(g, f.P(318, 348), _gamepad.LeftX, _gamepad.LeftY, on(ProButtons.LeftStick), f.S(98), f.S(68),
             capColor: grey, wellColor: Mix(body, Color.Black, 0.3f), octagon: true);
@@ -279,10 +279,10 @@ internal sealed partial class InputView
         // Schultern an der Oberkante: ZL/ZR als höhere Kappen, L/R davor auf der Kante.
         using (var path = f.Outline(PhotoOutlines.WiiUPro, symmetric: true))
             BodyShape(g, path, body);
-        EdgeShoulder(g, f, 255, 430, 82, 66, 155, 138, on(ProButtons.L), "L", Color.FromArgb(0x5E, 0x5E, 0x66), labelDy: 32);
-        EdgeShoulder(g, f, 430, 565, 66, 100, 138, 173, on(ProButtons.ZL), "ZL", Color.FromArgb(0x48, 0x48, 0x4E), labelDy: 32);
-        EdgeShoulder(g, f, 715, 850, 100, 66, 173, 138, on(ProButtons.ZR), "ZR", Color.FromArgb(0x48, 0x48, 0x4E), labelDy: 32);
-        EdgeShoulder(g, f, 850, 1025, 66, 92, 138, 165, on(ProButtons.R), "R", Color.FromArgb(0x5E, 0x5E, 0x66), labelDy: 32);
+        EdgeShoulder(g, f, 255, 424, 82, 66, 155, 138, on(ProButtons.L), "L", Color.FromArgb(0x5E, 0x5E, 0x66), labelDy: 32);
+        EdgeShoulder(g, f, 436, 565, 66, 100, 138, 173, on(ProButtons.ZL), "ZL", Color.FromArgb(0x48, 0x48, 0x4E), labelDy: 32);
+        EdgeShoulder(g, f, 715, 844, 100, 66, 173, 138, on(ProButtons.ZR), "ZR", Color.FromArgb(0x48, 0x48, 0x4E), labelDy: 32);
+        EdgeShoulder(g, f, 856, 1025, 66, 92, 138, 165, on(ProButtons.R), "R", Color.FromArgb(0x5E, 0x5E, 0x66), labelDy: 32);
 
         Stick(g, f.P(335, 215), _gamepad.LeftX, _gamepad.LeftY, on(ProButtons.LeftStick), f.S(92), f.S(60), key, Color.FromArgb(0x1A, 0x1A, 0x1E));
         Stick(g, f.P(945, 215), _gamepad.RightX, _gamepad.RightY, on(ProButtons.RightStick), f.S(92), f.S(60), key, Color.FromArgb(0x1A, 0x1A, 0x1E));
@@ -328,8 +328,8 @@ internal sealed partial class InputView
         using (var path = f.Outline(PhotoOutlines.N64, symmetric: true))
             BodyShape(g, path, body);
         EdgeShoulder(g, f, 152, 400, 160, 104, 232, 176, on(ProButtons.L), "L", Color.FromArgb(0x6A, 0x6A, 0x70), labelDy: 34);
-        EdgeShoulder(g, f, 750, 890, 28, 104, 96, 178, on(ProButtons.ZR), "ZR", Color.FromArgb(0x6A, 0x6A, 0x70), labelDy: 32);
-        EdgeShoulder(g, f, 890, 1130, 104, 165, 178, 238, on(ProButtons.R), "R", Color.FromArgb(0x6A, 0x6A, 0x70), labelDy: 34);
+        EdgeShoulder(g, f, 750, 884, 28, 104, 96, 176, on(ProButtons.ZR), "ZR", Color.FromArgb(0x6A, 0x6A, 0x70), labelDy: 32);
+        EdgeShoulder(g, f, 896, 1130, 104, 165, 180, 238, on(ProButtons.R), "R", Color.FromArgb(0x6A, 0x6A, 0x70), labelDy: 34);
 
         using (var dish = new SolidBrush(Mix(body, Color.White, 0.2f)))
         {
@@ -375,10 +375,10 @@ internal sealed partial class InputView
         // Schultern: ZL/ZR (Switch-Online-Zusatztasten) als schmale Kappen in der Mulde, L/R über den Ecken.
         using (var path = f.Outline(PhotoOutlines.Snes, symmetric: true))
             BodyShape(g, path, body);
-        EdgeShoulder(g, f, 195, 430, 38, 45, 110, 118, on(ProButtons.L), "L", shoulder, labelDy: 34);
-        EdgeShoulder(g, f, 430, 575, 45, 45, 118, 118, on(ProButtons.ZL), "ZL", shoulder, labelDy: 34);
-        EdgeShoulder(g, f, 705, 855, 44, 38, 117, 110, on(ProButtons.ZR), "ZR", shoulder, labelDy: 34);
-        EdgeShoulder(g, f, 855, 1005, 38, 44, 110, 116, on(ProButtons.R), "R", shoulder, labelDy: 34);
+        EdgeShoulder(g, f, 195, 424, 38, 45, 110, 118, on(ProButtons.L), "L", shoulder, labelDy: 34);
+        EdgeShoulder(g, f, 436, 575, 45, 45, 118, 118, on(ProButtons.ZL), "ZL", shoulder, labelDy: 34);
+        EdgeShoulder(g, f, 705, 849, 44, 38, 117, 110, on(ProButtons.ZR), "ZR", shoulder, labelDy: 34);
+        EdgeShoulder(g, f, 861, 1005, 38, 44, 110, 116, on(ProButtons.R), "R", shoulder, labelDy: 34);
 
         using (var dish = new SolidBrush(Mix(body, Color.White, 0.25f)))
             g.FillEllipse(dish, f.R(140, 196, 290, 290));
@@ -521,14 +521,15 @@ internal sealed partial class InputView
 
         using (var path = f.Outline(ds5 ? PhotoOutlines.DualSense : PhotoOutlines.DualShock))
             BodyShape(g, path, body);
-        // DS4: die Lichtleiste sitzt auf der Rückseite – von vorn als schmaler Leuchtstreifen an der Oberkante.
+        // DS4: die Lichtleiste sitzt auf der Rückseite – von vorn als schmaler Leuchtstreifen in der Mulde
+        // der Oberkante (über dem Touchpad, ohne es zu berühren).
         if (!ds5)
-            LightbarStrip(g, f.R(545, 92, 190, 20), lightbar);
+            LightbarStrip(g, f.R(552, 82, 176, 14), lightbar);
         // Schulterkante in Segmente ohne Überlappung: L1 außen breit, L2 innen auf dem Höcker – rechts gespiegelt.
-        EdgeShoulder(g, f, 208, 365, 80, 36, 154, 110, on(ProButtons.L), "L1", bumper, labelDy: 34);
-        EdgeShoulder(g, f, 365, 505, 36, 28, 110, 98, on(ProButtons.ZL), "L2", trigger, _input?.LeftTrigger ?? 0, 32);
-        EdgeShoulder(g, f, 775, 915, 28, 36, 98, 110, on(ProButtons.ZR), "R2", trigger, _input?.RightTrigger ?? 0, 32);
-        EdgeShoulder(g, f, 915, 1072, 36, 80, 110, 154, on(ProButtons.R), "R1", bumper, labelDy: 34);
+        EdgeShoulder(g, f, 208, 359, 80, 36, 154, 110, on(ProButtons.L), "L1", bumper, labelDy: 34);
+        EdgeShoulder(g, f, 371, 505, 36, 28, 110, 98, on(ProButtons.ZL), "L2", trigger, _input?.LeftTrigger ?? 0, 32);
+        EdgeShoulder(g, f, 775, 909, 28, 36, 98, 110, on(ProButtons.ZR), "R2", trigger, _input?.RightTrigger ?? 0, 32);
+        EdgeShoulder(g, f, 921, 1072, 36, 80, 110, 154, on(ProButtons.R), "R1", bumper, labelDy: 34);
 
         // Steuerkreuz oben links, Symboltasten oben rechts (DS5: graue Symbole, DS4: Originalfarben).
         PhotoDPad(g, f, 322, 255, 96, on, fill: key, border: Mix(key, ds5 ? Color.Black : Color.White, 0.18f), glyphs: text);
@@ -676,10 +677,10 @@ internal sealed partial class InputView
             BodyShape(g, path, white);
         }
         // Schulterkante in Segmente ohne Überlappung: L breit außen, ZL innen (analoge Trigger), rechts gespiegelt.
-        EdgeShoulder(g, f, 190, 480, 68, 32, 140, 102, on(ProButtons.L) || (_input?.LeftTrigger ?? 0) > 0.1f, "L", shoulder, _input?.LeftTrigger ?? 0, 32);
-        EdgeShoulder(g, f, 480, 575, 32, 40, 102, 110, on(ProButtons.ZL), "ZL", shoulder, labelDy: 32);
-        EdgeShoulder(g, f, 705, 800, 38, 32, 108, 102, on(ProButtons.ZR), "ZR", shoulder, labelDy: 32);
-        EdgeShoulder(g, f, 800, 1090, 32, 68, 102, 140, on(ProButtons.R) || (_input?.RightTrigger ?? 0) > 0.1f, "R", shoulder, _input?.RightTrigger ?? 0, 32);
+        EdgeShoulder(g, f, 190, 474, 68, 32, 140, 102, on(ProButtons.L) || (_input?.LeftTrigger ?? 0) > 0.1f, "L", shoulder, _input?.LeftTrigger ?? 0, 32);
+        EdgeShoulder(g, f, 486, 575, 32, 40, 102, 110, on(ProButtons.ZL), "ZL", shoulder, labelDy: 32);
+        EdgeShoulder(g, f, 705, 794, 38, 32, 108, 102, on(ProButtons.ZR), "ZR", shoulder, labelDy: 32);
+        EdgeShoulder(g, f, 806, 1090, 32, 68, 102, 140, on(ProButtons.R) || (_input?.RightTrigger ?? 0) > 0.1f, "R", shoulder, _input?.RightTrigger ?? 0, 32);
         PhotoDPad(g, f, 285, 270, 102, on, fill: Color.FromArgb(0xEE, 0xEE, 0xF1), border: Color.FromArgb(0xB0, 0xB0, 0xBA),
             glyphs: Color.FromArgb(0x90, 0x90, 0x9A));
         var labels = Color.FromArgb(0x9A, 0x9A, 0xA4);

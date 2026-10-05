@@ -107,10 +107,10 @@ internal sealed partial class InputView : Control
         };
         DrawPro2Body(g, f);
         // Schulterkante in Segmente ohne Überlappung: L außen, ZL innen – rechts gespiegelt.
-        EdgeShoulder(g, f, 445, 700, 160, 55, 235, 128, On(ProButtons.L), lb, bumperColor, labelDy: 36);
-        EdgeShoulder(g, f, 700, 905, 55, 72, 128, 140, On(ProButtons.ZL), lt, triggerColor, _gamepad.LeftTrigger / 255f, 34);
-        EdgeShoulder(g, f, 1000, 1207, 72, 55, 140, 128, On(ProButtons.ZR), rt, triggerColor, _gamepad.RightTrigger / 255f, 34);
-        EdgeShoulder(g, f, 1207, 1462, 55, 160, 128, 235, On(ProButtons.R), rb, bumperColor, labelDy: 36);
+        EdgeShoulder(g, f, 445, 694, 160, 55, 235, 128, On(ProButtons.L), lb, bumperColor, labelDy: 36);
+        EdgeShoulder(g, f, 706, 905, 55, 72, 128, 140, On(ProButtons.ZL), lt, triggerColor, _gamepad.LeftTrigger / 255f, 34);
+        EdgeShoulder(g, f, 1000, 1199, 72, 55, 140, 128, On(ProButtons.ZR), rt, triggerColor, _gamepad.RightTrigger / 255f, 34);
+        EdgeShoulder(g, f, 1211, 1462, 55, 160, 128, 235, On(ProButtons.R), rb, bumperColor, labelDy: 36);
 
         // Links: Stick oben außen, Steuerkreuz darunter weiter innen
         Stick(g, f.P(575, 372), _gamepad.LeftX, _gamepad.LeftY, On(ProButtons.LeftStick), f.S(92), f.S(62));
