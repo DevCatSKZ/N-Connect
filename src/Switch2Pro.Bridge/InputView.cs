@@ -282,20 +282,14 @@ internal sealed partial class InputView : Control
         g.FillPath(brush, house);
     }
 
-    /// <summary>Xbox-Taste: runde Taste mit dem Xbox-X (Ring und Kreuz) statt des Hauses.</summary>
+    /// <summary>Neutrale Home-Taste des Xbox-Pads: runde Taste mit Haus-Symbol (kein Markenzeichen).</summary>
     private void XboxHome(Graphics g, PointF c, bool on)
     {
         const float r = 13;
         using var path = new GraphicsPath();
         path.AddEllipse(c.X - r, c.Y - r, r * 2, r * 2);
         Fill(g, path, on, KeyFill);
-        var col = on ? Color.White : FaceText;
-        using (var ring = new Pen(col, 1.4f))
-            g.DrawEllipse(ring, c.X - r + 3.5f, c.Y - r + 3.5f, (r - 3.5f) * 2, (r - 3.5f) * 2);
-        float d = r * 0.38f;
-        using var x = new Pen(col, 2.4f) { StartCap = LineCap.Round, EndCap = LineCap.Round };
-        g.DrawLine(x, c.X - d, c.Y - d, c.X + d, c.Y + d);
-        g.DrawLine(x, c.X - d, c.Y + d, c.X + d, c.Y - d);
+        Caption(g, new RectangleF(c.X - r, c.Y - r - 1, r * 2, r * 2), "⌂", 12f, on ? Color.White : FaceText);
     }
 
     /// <summary>Steuerkreuz; Farben wahlweise eigene (z. B. weiß bei der Wii-Fernbedienung), sonst nach dem Gehäuse.</summary>

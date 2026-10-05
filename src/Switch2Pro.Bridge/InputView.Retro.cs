@@ -194,7 +194,7 @@ internal sealed partial class InputView
         ColorKey(g, new PointF(cx, Y(0.65f)), on(ProButtons.Y), "1", key, oneR, dark);
         ColorKey(g, new PointF(cx, Y(0.73f)), on(ProButtons.B), "2", key, oneR, dark);
 
-        // Vier Spieler-LEDs (blau, wie das Original), darunter der „Wii“-Schriftzug
+        // Vier Spieler-LEDs (blau, wie das Original)
         byte mask = PlayerIndex >= 0 ? Commands.PlayerLedMask(PlayerIndex) : (byte)0;
         float ledY = Y(0.80f);
         for (int i = 0; i < 4; i++)
@@ -203,14 +203,12 @@ internal sealed partial class InputView
             using var led = new SolidBrush(lit ? Color.FromArgb(70, 160, 255) : Color.FromArgb(0xC0, 0xC0, 0xC8));
             g.FillRectangle(led, cx - 20 + i * 12, ledY - 1.5f, 6, 3);
         }
-        Caption(g, new RectangleF(edge, Y(0.865f) - 9, remoteW, 18), "Wii", 10f, Color.FromArgb(0xA8, 0xA8, 0xB2));
 
         // MotionPlus-Aufsatz unten
         if (motionPlus)
         {
             using (var mp = Rounded(new RectangleF(edge + 2, bottom - 4, remoteW - 4, 40), 10))
                 BodyShape(g, mp, Color.FromArgb(0xEC, 0xEC, 0xF0));
-            Caption(g, new RectangleF(edge, bottom + 6, remoteW, 16), "MotionPlus", 7f, Color.FromArgb(90, 120, 200));
         }
         if (!nunchuk)
         {
