@@ -39,6 +39,8 @@ internal sealed class PairForm : Form
         MinimizeBox = MaximizeBox = false;
         ClientSize = new Size(640, 720);
         Font = UiFonts.Body;
+        AutoScaleDimensions = new SizeF(96F, 96F);
+        AutoScaleMode = AutoScaleMode.Dpi;
         KeyPreview = true;
 
         var content = _page.Content;

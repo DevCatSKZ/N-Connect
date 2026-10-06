@@ -25,6 +25,8 @@ internal sealed class KeyCaptureDialog : Form
         KeyPreview = true;
         ClientSize = new Size(440, 170);
         Font = new Font("Segoe UI", 9.5f);
+        AutoScaleDimensions = new SizeF(96F, 96F);
+        AutoScaleMode = AutoScaleMode.Dpi;
 
         var hint = new Label
         {
@@ -121,6 +123,7 @@ internal static class TurboDialog
             Text = "Turbo / Dauerfeuer", StartPosition = FormStartPosition.CenterParent, FormBorderStyle = FormBorderStyle.FixedDialog,
             MinimizeBox = false, MaximizeBox = false, ShowInTaskbar = false, ClientSize = new Size(440, 170),
             Font = new Font("Segoe UI", 9.5f),
+            AutoScaleDimensions = new SizeF(96F, 96F), AutoScaleMode = AutoScaleMode.Dpi,
         };
         var info = new Label
         {
@@ -190,6 +193,7 @@ internal static class MacroDialog
             Text = "Makro (Tastenfolge)", StartPosition = FormStartPosition.CenterParent, FormBorderStyle = FormBorderStyle.FixedDialog,
             MinimizeBox = false, MaximizeBox = false, ShowInTaskbar = false, ClientSize = new Size(560, 300),
             Font = new Font("Segoe UI", 9.5f),
+            AutoScaleDimensions = new SizeF(96F, 96F), AutoScaleMode = AutoScaleMode.Dpi,
         };
         var info = new Label
         {
@@ -238,6 +242,7 @@ internal static class Prompt
             Text = title, StartPosition = FormStartPosition.CenterParent, FormBorderStyle = FormBorderStyle.FixedDialog,
             MinimizeBox = false, MaximizeBox = false, ShowInTaskbar = false, ClientSize = new Size(420, 130),
             Font = new Font("Segoe UI", 9.5f),
+            AutoScaleDimensions = new SizeF(96F, 96F), AutoScaleMode = AutoScaleMode.Dpi,
         };
         var label = new Label { Text = question, AutoSize = true, Location = new Point(12, 14) };
         var box = new TextBox { Text = initial, Location = new Point(12, 40), Width = 396 };

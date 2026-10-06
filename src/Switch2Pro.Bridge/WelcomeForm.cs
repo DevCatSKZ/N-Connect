@@ -38,6 +38,7 @@ internal sealed class WelcomeForm : Form
         FormBorderStyle = FormBorderStyle.FixedDialog;
         MaximizeBox = MinimizeBox = false;
         Font = new Font("Segoe UI", 10f);
+        AutoScaleDimensions = new SizeF(96F, 96F);
         AutoScaleMode = AutoScaleMode.Dpi;
         ClientSize = new Size(700, 440);
 
