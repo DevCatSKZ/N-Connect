@@ -71,7 +71,10 @@ jobs:
           Copy-Item $file.FullName installer/redist/HidHide_Setup.exe
 
       - name: Inno Setup installieren
-        run: choco install innosetup --version 6.4.3 -y --no-progress
+        run: |
+          if (-not (Test-Path "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe")) {
+            choco install innosetup -y --no-progress
+          }
 
       - name: Installer bauen
         run: |
