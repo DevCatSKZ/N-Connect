@@ -4,7 +4,7 @@ using Switch2Pro.Protocol;
 namespace Switch2Pro.Bridge;
 
 /// <summary>Nimmt eine Taste oder Tastenkombination auf (z. B. Strg+Umschalt+S, F5, Alt+Tab).</summary>
-internal sealed class KeyCaptureDialog : Form
+internal sealed class KeyCaptureDialog : UiForm
 {
     private readonly Label _shown = new()
     {
@@ -118,7 +118,7 @@ internal static class TurboDialog
     /// <summary>Ergebnis als Aktionstext („Turbo:A“, „Turbo:Key:Space“) oder null bei Abbruch.</summary>
     public static string? Ask(IWin32Window owner, string button, string? current)
     {
-        using var form = new Form
+        using var form = new UiForm
         {
             Text = "Turbo / Dauerfeuer", StartPosition = FormStartPosition.CenterParent, FormBorderStyle = FormBorderStyle.FixedDialog,
             MinimizeBox = false, MaximizeBox = false, ShowInTaskbar = false, ClientSize = new Size(440, 170),
@@ -188,7 +188,7 @@ internal static class MacroDialog
 {
     public static string? Ask(IWin32Window owner, string button, string? current)
     {
-        using var form = new Form
+        using var form = new UiForm
         {
             Text = "Makro (Tastenfolge)", StartPosition = FormStartPosition.CenterParent, FormBorderStyle = FormBorderStyle.FixedDialog,
             MinimizeBox = false, MaximizeBox = false, ShowInTaskbar = false, ClientSize = new Size(560, 300),
@@ -237,7 +237,7 @@ internal static class Prompt
     /// <param name="allowEmpty">Leere Eingabe ist erlaubt und liefert "" (z. B. Namen entfernen); null heißt dann nur „abgebrochen“.</param>
     public static string? Ask(IWin32Window owner, string title, string question, string initial, bool allowEmpty = false)
     {
-        using var form = new Form
+        using var form = new UiForm
         {
             Text = title, StartPosition = FormStartPosition.CenterParent, FormBorderStyle = FormBorderStyle.FixedDialog,
             MinimizeBox = false, MaximizeBox = false, ShowInTaskbar = false, ClientSize = new Size(420, 130),

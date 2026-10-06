@@ -11,7 +11,7 @@ namespace Switch2Pro.Bridge;
 /// Restzeit, aktueller Schritt und jeder Controller, der sich während des offenen Fensters verbindet – mit Name,
 /// Spielernummer und Verbindungsart. Danach „Fertig“ oder „Erneut suchen“.
 /// </summary>
-internal sealed class PairForm : Form
+internal sealed class PairForm : UiForm
 {
     private const int SearchSeconds = 60;
 

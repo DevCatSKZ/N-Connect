@@ -62,6 +62,40 @@ internal interface IExtraTexts
     IEnumerable<string> ExtraTexts { get; }
 }
 
+/// <summary>
+/// WinRT-/COM-Aufrufe (Bluetooth, Gerätesuche) können auf dem UI-Thread einen DPI-unaware-Kontext
+/// hinterlassen. Ein Fenster, das dann entsteht, meldet 96 DPI: das Layout bleibt unskaliert, Windows
+/// skaliert aber die GDI-Schrift auf die Monitor-DPI – Texte werden überall abgeschnitten. Darum
+/// erzeugt jedes Fenster sein Handle bewusst im PerMonitorV2-Kontext des Prozesses.
+/// </summary>
+internal static class Dpi
+{
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern IntPtr SetThreadDpiAwarenessContext(IntPtr context);
+
+    // DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2
+    private static readonly IntPtr PerMonitorV2 = new(-4);
+
+    public static IntPtr BeginPerMonitorV2() => OperatingSystem.IsWindows() ? SetThreadDpiAwarenessContext(PerMonitorV2) : IntPtr.Zero;
+
+    public static void End(IntPtr previous)
+    {
+        if (OperatingSystem.IsWindows() && previous != IntPtr.Zero)
+            SetThreadDpiAwarenessContext(previous);
+    }
+}
+
+/// <summary>Basis aller Fenster: erzeugt das Handle im PerMonitorV2-Kontext (siehe <see cref="Dpi"/>).</summary>
+internal class UiForm : Form
+{
+    protected override void CreateHandle()
+    {
+        var previous = Dpi.BeginPerMonitorV2();
+        try { base.CreateHandle(); }
+        finally { Dpi.End(previous); }
+    }
+}
+
 /// <summary>Ordnet Kinder untereinander in voller Breite an und passt die eigene Höhe an (schnell, ohne AutoSize-Ketten).</summary>
 internal class StackPanel : Panel, IHeightForWidth
 {

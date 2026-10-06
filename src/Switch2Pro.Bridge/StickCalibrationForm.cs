@@ -10,7 +10,7 @@ namespace Switch2Pro.Bridge;
 /// Mitte und Rand (<see cref="StickCalibrator"/>), Übernehmen oder zurück zu den Werkswerten. Gespeichert wird nur in
 /// N-Connect (Einstellungen), nicht im Controller.
 /// </summary>
-internal sealed class StickCalibrationForm : Form
+internal sealed class StickCalibrationForm : UiForm
 {
     private sealed record StickRef(IControllerLink Link, bool Left, string Title);
 

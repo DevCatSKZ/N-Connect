@@ -8,7 +8,7 @@ namespace Switch2Pro.Bridge;
 /// Seite „Controller“ zeigt die verbundenen Controller (mit eigenen Einstellungen je Controller), die übrigen Seiten
 /// die allgemeinen Werte. Alle Änderungen gelten sofort.
 /// </summary>
-internal sealed class SettingsForm : Form
+internal sealed class SettingsForm : UiForm
 {
     private readonly Settings _settings;
     private readonly Action<bool> _changed; // true = Ausgabeart geändert

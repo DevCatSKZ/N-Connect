@@ -131,6 +131,9 @@ internal sealed class TrayApp : ApplicationContext
         {
             ThreadPool.RegisterWaitForSingleObject(signal, (_, _) => _ui.Post(_ => ShowSettings(), null), null, -1, executeOnlyOnce: false);
         }
+        // Bluetooth-/WinRT-Initialisierung kann auf diesem Thread einen DPI-unaware-Kontext hinterlassen
+        // (Fenster skalieren dann falsch); den UI-Thread zurück auf PerMonitorV2 setzen.
+        Dpi.BeginPerMonitorV2();
         if (firstRun)
             _ui.Post(_ => ShowWelcome(), null);
         else if (!Environment.GetCommandLineArgs().Contains("--autostart"))

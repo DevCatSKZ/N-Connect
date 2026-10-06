@@ -262,7 +262,7 @@ internal static class Theme
     /// <summary>Meldung im Stil der Darstellung (statt der immer hellen MessageBox von Windows).</summary>
     public static DialogResult Message(IWin32Window? owner, string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon)
     {
-        using var form = new Form
+        using var form = new UiForm
         {
             Text = caption, FormBorderStyle = FormBorderStyle.FixedDialog, MinimizeBox = false, MaximizeBox = false,
             ShowInTaskbar = owner is null, StartPosition = owner is null ? FormStartPosition.CenterScreen : FormStartPosition.CenterParent,
