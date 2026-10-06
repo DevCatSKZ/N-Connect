@@ -11,7 +11,7 @@ namespace Switch2Pro.Bridge;
 /// von N-Connect – vorher wird eine Sicherung angelegt, die sich hier wiederherstellen lässt. Windows-Registrierung
 /// und Bluetooth-Adapter bleiben unverändert, deshalb ist kein Adminrecht (UAC) nötig.
 /// </summary>
-internal sealed class PairingDataForm : Form
+internal sealed class PairingDataForm : UiForm
 {
     private readonly Settings _settings;
     private readonly Action _saved;
@@ -486,7 +486,7 @@ internal static class PasswordDialog
     {
         includeKeys = false;
         const int left = 24, width = 452;
-        using var form = new Form
+        using var form = new UiForm
         {
             Text = confirm ? "Kopplungsdaten exportieren" : "Passwort eingeben", StartPosition = FormStartPosition.CenterParent,
             FormBorderStyle = FormBorderStyle.FixedDialog, MinimizeBox = false, MaximizeBox = false, ShowInTaskbar = false,

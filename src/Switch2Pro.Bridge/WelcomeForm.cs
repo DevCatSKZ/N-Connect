@@ -3,7 +3,7 @@ using System.Drawing;
 namespace Switch2Pro.Bridge;
 
 /// <summary>Kurzanleitung beim ersten Start (und im Menü): wie welche Controller verbunden werden.</summary>
-internal sealed class WelcomeForm : Form
+internal sealed class WelcomeForm : UiForm
 {
     public bool OpenSettings { get; private set; }
 

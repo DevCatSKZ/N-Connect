@@ -8,7 +8,7 @@ using Switch2Pro.Protocol;
 namespace Switch2Pro.Bridge;
 
 /// <summary>Live-Bild der IR-Kamera im rechten Joy-Con (Switch 1) – Graustufen, vergrößert, mit Auflösungswahl.</summary>
-internal sealed class IrCameraForm : Form
+internal sealed class IrCameraForm : UiForm
 {
     private readonly Switch1HidLink _link;
     private readonly ComboBox _resolution = new() { DropDownStyle = ComboBoxStyle.DropDownList, Width = 160 };

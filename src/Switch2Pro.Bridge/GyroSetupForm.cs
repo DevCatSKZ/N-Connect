@@ -9,7 +9,7 @@ namespace Switch2Pro.Bridge;
 /// 3. Empfindlichkeit – mit Live-Vorschau (Fadenkreuz folgt dem Controller wie im Spiel). Ändert dieselben
 /// Einstellungen wie die Seite „Gyro &amp; Maus“, sofort wirksam.
 /// </summary>
-internal sealed class GyroSetupForm : Form
+internal sealed class GyroSetupForm : UiForm
 {
     private readonly Player _player;
     private readonly Func<Settings> _settings;
