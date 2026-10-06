@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Diagnose-Werkzeug „Switch-Identität“: prüft, ob der Bluetooth-Adapter die Adresse der Switch annehmen kann. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RootNamespace>Switch2Pro.BtIdentityProbe</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Switch2Pro.Protocol\Switch2Pro.Protocol.csproj" />
+  </ItemGroup>
+</Project>
