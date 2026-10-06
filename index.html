@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>N-Connect – Nintendo-Controller unter Windows</title>
+<meta name="description" content="N-Connect bringt Nintendo-, PlayStation- und Xbox-Controller zuverlässig in Windows-Spiele – mit virtuellen Controllern, Gyro, Rumble und Profilen.">
+<style>
+  :root {
+    --bg: #0b0f14; --panel: #131a22; --panel2: #182230; --line: #263142;
+    --text: #e8edf3; --muted: #9aa8b8; --accent: #3b82f6; --accent2: #22d3ee;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", system-ui, sans-serif;
+    background: radial-gradient(1200px 600px at 70% -10%, #16233a 0%, var(--bg) 55%);
+    color: var(--text); line-height: 1.6; min-height: 100vh;
+  }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 48px 24px 64px; }
+  header { text-align: center; padding: 32px 0 40px; }
+  .logo { font-size: 52px; font-weight: 700; letter-spacing: -1px; }
+  .logo span { color: var(--accent2); }
+  .tagline { color: var(--muted); font-size: 19px; margin-top: 10px; }
+  .cta { display: flex; gap: 14px; justify-content: center; margin-top: 32px; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px; padding: 14px 28px;
+    border-radius: 10px; font-size: 16px; font-weight: 600; text-decoration: none;
+    border: 1px solid var(--line); transition: transform .12s ease, box-shadow .12s ease;
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn-primary { background: linear-gradient(135deg, var(--accent), #2563eb); color: #fff; box-shadow: 0 8px 24px rgba(59,130,246,.35); }
+  .btn-ghost { background: var(--panel); color: var(--text); }
+  .ver { display: block; text-align: center; margin-top: 12px; color: var(--muted); font-size: 13px; min-height: 18px; }
+  h2 { font-size: 26px; margin: 56px 0 20px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 22px; }
+  .card h3 { font-size: 16px; margin-bottom: 8px; color: var(--accent2); }
+  .card p { color: var(--muted); font-size: 14.5px; }
+  .pads { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 8px; }
+  .pad { background: var(--panel2); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; font-size: 13.5px; color: var(--text); }
+  ol.steps { margin-left: 22px; color: var(--muted); }
+  ol.steps li { margin: 10px 0; }
+  ol.steps b { color: var(--text); }
+  footer { margin-top: 64px; text-align: center; color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); padding-top: 24px; }
+  a { color: var(--accent2); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">N-<span>Connect</span></div>
+    <p class="tagline">Nintendo-, PlayStation- und Xbox-Controller zuverlässig in Windows-Spielen.<br>Einmal anstecken – überall spielen.</p>
+    <div class="cta">
+      <a id="dl" class="btn btn-primary" href="https://github.com/DevCatSKZ/N-Connect/releases/latest">⬇ N-Connect herunterladen</a>
+      <a class="btn btn-ghost" href="https://github.com/DevCatSKZ/N-Connect">Quellcode auf GitHub</a>
+    </div>
+    <span class="ver" id="ver"></span>
+  </header>
+
+  <h2>Unterstützte Controller</h2>
+  <div class="pads">
+    <span class="pad">Switch 2 Pro Controller</span><span class="pad">Switch Pro Controller</span>
+    <span class="pad">Joy-Con</span><span class="pad">SNES / N64 / Genesis (NSO)</span>
+    <span class="pad">GameCube</span><span class="pad">Wii Remote &amp; Classic</span>
+    <span class="pad">Wii U Pro</span><span class="pad">DualShock 4</span>
+    <span class="pad">DualSense (Edge)</span><span class="pad">Xbox (360 / One / Series)</span>
+    <span class="pad">Kabelgebundene Switch-Pads</span>
+  </div>
+
+  <h2>Was N-Connect kann</h2>
+  <div class="grid">
+    <div class="card"><h3>Virtuelle Xbox-360-/DS4-Controller</h3><p>Spiele sehen ein Standard-Pad – höchste Kompatibilität ohne Konfiguration pro Spiel.</p></div>
+    <div class="card"><h3>Koppeln direkt in der App</h3><p>Nintendo-, PlayStation- und Xbox-Controller per Bluetooth direkt aus N-Connect koppeln – ohne Windows-Menü.</p></div>
+    <div class="card"><h3>Belegung &amp; Profile</h3><p>Tasten frei mappen, Turbo und Makros, je Controller und Spiel Profile speichern – auf Deutsch und Englisch.</p></div>
+    <div class="card"><h3>Gyro &amp; Motion</h3><p>Bewegungssteuerung auf Stick oder Maus legen – inklusive Flick-Stick für Shooter.</p></div>
+    <div class="card"><h3>Rumble, Akku, LEDs</h3><p>Vibration geht an den echten Controller zurück, Akkustand und Spieler-LEDs werden angezeigt.</p></div>
+    <div class="card"><h3>Kein Doppel-Input</h3><p>Original-Controller werden vor Spielen versteckt (HidHide) – Xbox-Pads laufen nativ über XInput.</p></div>
+  </div>
+
+  <h2>In drei Schritten loslegen</h2>
+  <ol class="steps">
+    <li><b>Installieren:</b> Setup herunterladen und ausführen – ViGEmBus und HidHide werden mitinstalliert.</li>
+    <li><b>Koppeln:</b> Controller in den Kopplungsmodus versetzen und in N-Connect unter „Controller koppeln“ auswählen.</li>
+    <li><b>Spielen:</b> Der Controller erscheint in der Übersicht und steht in jedem Spiel als Xbox-/DS4-Pad bereit.</li>
+  </ol>
+
+  <footer>
+    <p>N-Connect ist Open Source. Controller-Marken gehören ihren jeweiligen Inhabern.</p>
+    <p><a href="https://github.com/DevCatSKZ/N-Connect">GitHub</a> · <a href="https://github.com/DevCatSKZ/N-Connect/releases">Alle Releases</a> · <a href="https://github.com/DevCatSKZ/N-Connect/issues">Fehler melden</a></p>
+  </footer>
+</div>
+<script>
+fetch("https://api.github.com/repos/DevCatSKZ/N-Connect/releases/latest")
+  .then(r => r.json())
+  .then(rel => {
+    const asset = (rel.assets || []).find(a => a.name.endsWith(".exe"));
+    if (asset) document.getElementById("dl").href = asset.browser_download_url;
+    document.getElementById("ver").textContent = "Aktuelle Version: " + rel.tag_name;
+  })
+  .catch(() => {});
+</script>
+</body>
+</html>
