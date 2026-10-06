@@ -1103,7 +1103,7 @@ internal sealed class ControllerManager : IAsyncDisposable
             Merge(requester, partner);
     }
 
-    /// <summary>Prüfmodus (--demo): simulierte Controller – ein Pro Controller 2 und ein Joy-Con-2-Paar.</summary>
+    /// <summary>Prüfmodus (--demo): simulierte Controller – Pro Controller 1+2 und je ein Joy-Con-Paar.</summary>
     public void StartDemo()
     {
         Log.Info("Demo-Modus: simulierte Controller werden hinzugefügt");
@@ -1130,10 +1130,13 @@ internal sealed class ControllerManager : IAsyncDisposable
                 Attach(new DemoLink(kind, n++));
             return;
         }
+        // Nintendo-Aufstellung: beide Pro Controller und je ein Joy-Con-Paar pro Generation.
         Attach(new DemoLink(ControllerKind.Pro2, 1));
         Attach(new DemoLink(ControllerKind.JoyCon2Left, 2));
         Attach(new DemoLink(ControllerKind.JoyCon2Right, 3));
-        Attach(new DemoLink(ControllerKind.JoyCon1Right, 4));
+        Attach(new DemoLink(ControllerKind.Pro1, 4));
+        Attach(new DemoLink(ControllerKind.JoyCon1Left, 5));
+        Attach(new DemoLink(ControllerKind.JoyCon1Right, 6));
     }
 
     /// <summary>
