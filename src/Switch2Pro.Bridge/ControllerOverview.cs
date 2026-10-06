@@ -209,7 +209,7 @@ internal sealed class ControllerOverview : Panel
     }
 
     // ---------- Anordnung: zusammengeklappte Karten nebeneinander, wenn Platz ist ----------
-    private const int Gap = 12, MinCardWidth = 640;
+    private const int Gap = 12, MinCardWidth = 700;
 
     private int Available => Math.Max(MinCardWidth, _cards.ClientSize.Width - _cards.Padding.Horizontal - SystemInformation.VerticalScrollBarWidth);
 
@@ -277,6 +277,7 @@ internal sealed class ControllerOverview : Panel
         public int BodyHeight { get; set; }
         private InfoPanel? _details;
         private string? _title;
+        private string? _titleShort;
         private string? _rawTitle;
 
         private ControllerManager Manager => _owner._manager!;
@@ -720,10 +721,9 @@ internal sealed class ControllerOverview : Panel
         protected override void OnLayout(LayoutEventArgs levent)
         {
             const int pad = 20, top = 62;
-            // Schmale Karte: Vibrieren/Trennen nur als Symbol (mit Tooltip), damit der Titel Platz hat.
-            bool narrow = Width < 820;
-            SetText(_identify, narrow ? "" : "Vibrieren");
-            SetText(_disconnect, narrow ? "" : "Trennen");
+            // Vibrieren/Trennen immer als Symbolknöpfe (mit Tooltip), damit der Titel Platz hat.
+            SetText(_identify, "");
+            SetText(_disconnect, "");
             int x = Width - pad;
             foreach (var b in new[] { _settingsButton, _disconnect, _identify })
             {
@@ -780,14 +780,19 @@ internal sealed class ControllerOverview : Panel
             g.DrawPath(pen, path);
             // Titel mit kleinem Pfeil: Klick öffnet Spielerplatz und Umbenennen.
             const TextFormatFlags flags = TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis | TextFormatFlags.NoPrefix;
-            int maxWidth = Math.Max(100, _identify.Left - 50);
-            int width = Math.Min(maxWidth, TextRenderer.MeasureText(g, _title ?? "", UiFonts.Subtitle, new Size(maxWidth, 36), flags).Width);
+            int maxWidth = Math.Max(100, _identify.Left - 40);
+            // Passt „Spieler n · Name“ nicht, zeigt die Karte nur den Controllernamen (Spieler steht in der Leiste oben).
+            string title = _title ?? "";
+            if (_titleShort is { } shortTitle
+                && TextRenderer.MeasureText(g, title, UiFonts.Subtitle).Width > maxWidth)
+                title = shortTitle;
+            int width = Math.Min(maxWidth, TextRenderer.MeasureText(g, title, UiFonts.Subtitle, new Size(maxWidth, 36), flags).Width);
             var titleBox = new Rectangle(20, 14, width, 36);
             if (_titleHover)
                 using (var hover = new SolidBrush(Theme.Current.SurfaceHover))
                 using (var round = Theme.RoundedRect(new RectangleF(titleBox.X - 8, titleBox.Y + 2, titleBox.Width + 34, titleBox.Height - 4), 6))
                     g.FillPath(hover, round);
-            TextRenderer.DrawText(g, _title ?? "", UiFonts.Subtitle, titleBox, TextColor, flags);
+            TextRenderer.DrawText(g, title, UiFonts.Subtitle, titleBox, TextColor, flags);
             TextRenderer.DrawText(g, "▾", UiFonts.Body, new Rectangle(titleBox.Right + 4, 14, 18, 36), MutedColor, TextFormatFlags.VerticalCenter);
             _titleRect = new Rectangle(titleBox.X - 8, titleBox.Y, titleBox.Width + 34, titleBox.Height);
         }
@@ -883,6 +888,7 @@ internal sealed class ControllerOverview : Panel
             {
                 _rawTitle = title;
                 _title = Tr.T(title);
+                _titleShort = Tr.T(player.DisplayName(settings));
                 Invalidate(new Rectangle(0, 0, Width, 60));
             }
 
@@ -1109,7 +1115,7 @@ internal sealed class ControllerOverview : Panel
     {
         private IReadOnlyList<IControllerLink> _links = [];
         private PadInput? _input;
-        private const int LabelWidth = 120, RowHeight = 24;
+        private const int LabelWidth = 104, RowHeight = 26;
 
         /// <summary>Kompakt (Karte): nur Akku, Verbindung, Griff/Maus und gedrückte Tasten; sonst alle Eigenschaften.</summary>
         public bool Compact { get; init; } = true;
@@ -1182,7 +1188,7 @@ internal sealed class ControllerOverview : Panel
                 Row(g, ref y, "Akku", null);
                 if (g is not null)
                     DrawBattery(g, LabelWidth, y - RowHeight, link.LastState);
-                Row(g, ref y, "Verbindung", $"{Transport(link.Transport)} · {link.ReportRate:F0} Berichte/s");
+                Row(g, ref y, "Verbindung", Compact ? Transport(link.Transport) : $"{Transport(link.Transport)} · {link.ReportRate:F0} Berichte/s");
                 if (!Compact)
                 {
                     if (link.Address is { } address)
@@ -1224,8 +1230,11 @@ internal sealed class ControllerOverview : Panel
             {
                 TextRenderer.DrawText(g, Tr.T(label), UiFonts.Body, new Point(0, y), MutedColor, TextFormatFlags.NoPrefix);
                 if (value is not null)
-                    TextRenderer.DrawText(g, Tr.T(value), UiFonts.Body, new Rectangle(LabelWidth, y, Width - LabelWidth, RowHeight),
+                {
+                    int labelW = Math.Max(LabelWidth, TextRenderer.MeasureText(Tr.T(label), UiFonts.Body).Width + 16);
+                    TextRenderer.DrawText(g, Tr.T(value), UiFonts.Body, new Rectangle(labelW, y, Math.Max(40, Width - labelW), RowHeight),
                         TextColor, TextFormatFlags.NoPrefix | TextFormatFlags.EndEllipsis);
+                }
             }
             y += RowHeight;
         }

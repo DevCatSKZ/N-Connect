@@ -53,7 +53,7 @@ internal sealed class PlayerOrderBar : Control, ISelfTranslating, IExtraTexts
     }
 
     private int ChipWidth(string name) =>
-        12 + 26 + 8 + Math.Min(260, TextRenderer.MeasureText(name, UiFonts.Body).Width) + 10 + 2 * Arrow + 8;
+        12 + 26 + 8 + Math.Min(430, TextRenderer.MeasureText(name, UiFonts.Body).Width) + 10 + 2 * Arrow + 8;
 
     /// <summary>Chips zeilenweise anordnen (umbrechen, wenn die Breite nicht reicht).</summary>
     private List<Rectangle> Arrange(int width, out int height)

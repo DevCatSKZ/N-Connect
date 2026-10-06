@@ -36,6 +36,8 @@ internal sealed class PairingDataForm : Form
         MinimizeBox = false;
         ClientSize = new Size(760, 760);
         MinimumSize = new Size(600, 520);
+        AutoScaleDimensions = new SizeF(96F, 96F);
+        AutoScaleMode = AutoScaleMode.Dpi;
         Font = UiFonts.Body;
         KeyPreview = true;
 
@@ -489,6 +491,7 @@ internal static class PasswordDialog
             Text = confirm ? "Kopplungsdaten exportieren" : "Passwort eingeben", StartPosition = FormStartPosition.CenterParent,
             FormBorderStyle = FormBorderStyle.FixedDialog, MinimizeBox = false, MaximizeBox = false, ShowInTaskbar = false,
             ClientSize = new Size(left * 2 + width, confirm ? 336 : 210), Font = UiFonts.Body, KeyPreview = true,
+            AutoScaleDimensions = new SizeF(96F, 96F), AutoScaleMode = AutoScaleMode.Dpi,
         };
         var title = new Label
         {

@@ -887,10 +887,10 @@ internal sealed class NavItem : Control, ISelfTranslating
                  | ControlStyles.Selectable | ControlStyles.StandardClick | ControlStyles.ResizeRedraw, true);
         Text = text;
         _glyph = glyph;
-        Height = 40;
+        Height = 44;
         Cursor = Cursors.Hand;
         TabStop = true;
-        Margin = new Padding(0, 0, 0, 2);
+        Margin = new Padding(0, 0, 0, 4);
         Click += (_, _) => select();
         KeyDown += (_, e) => { if (e.KeyCode is Keys.Enter or Keys.Space) select(); };
     }
@@ -927,7 +927,7 @@ internal sealed class NavItem : Control, ISelfTranslating
         }
         TextRenderer.DrawText(g, _glyph, Glyph.Font(12f), new Rectangle(12, 0, 24, Height), p.Text,
             TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
-        TextRenderer.DrawText(g, Tr.T(Text), UiFonts.Body, new Rectangle(46, 0, Width - 50, Height), p.Text,
+        TextRenderer.DrawText(g, Tr.T(Text), UiFonts.Body, new Rectangle(44, 0, Width - 56, Height), p.Text,
             TextFormatFlags.VerticalCenter | TextFormatFlags.NoPrefix | TextFormatFlags.EndEllipsis);
         if (Focused && ShowFocusCues)
             using (var pen = new Pen(p.Text, 1.5f))
@@ -995,7 +995,7 @@ internal sealed class TextField : Panel
 internal sealed class ScrollPage : Panel
 {
     public StackPanel Content { get; } = new() { Spacing = 0, Padding = new Padding(0, 0, 0, 24) };
-    public int MaxContentWidth { get; set; } = 1000;
+    public int MaxContentWidth { get; set; } = 1240;
 
     public ScrollPage()
     {

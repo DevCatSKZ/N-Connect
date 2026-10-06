@@ -62,6 +62,8 @@ internal sealed class StickCalibrationForm : Form
         MinimizeBox = MaximizeBox = false;
         ShowInTaskbar = false;
         Font = UiFonts.Body;
+        AutoScaleDimensions = new SizeF(96F, 96F);
+        AutoScaleMode = AutoScaleMode.Dpi;
         ClientSize = new Size(600, 420);
 
         int top = 16;

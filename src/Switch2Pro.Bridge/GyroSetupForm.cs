@@ -37,6 +37,8 @@ internal sealed class GyroSetupForm : Form
         MinimizeBox = MaximizeBox = false;
         ShowInTaskbar = false;
         Font = UiFonts.Body;
+        AutoScaleDimensions = new SizeF(96F, 96F);
+        AutoScaleMode = AutoScaleMode.Dpi;
 
         int x = 20, y = 16, right = 380;
         Label Heading(string text)

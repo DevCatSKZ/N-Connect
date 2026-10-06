@@ -41,6 +41,8 @@ internal sealed class IrCameraForm : Form
         StartPosition = FormStartPosition.CenterScreen;
         ClientSize = new Size(660, 540);
         Font = new Font("Segoe UI", 9.5f);
+        AutoScaleDimensions = new SizeF(96F, 96F);
+        AutoScaleMode = AutoScaleMode.Dpi;
         _resolution.Items.AddRange(["40 × 30 (schnell)", "80 × 60", "160 × 120", "320 × 240 (langsam)"]);
         _resolution.SelectedIndex = 1;
         var bar = new FlowLayoutPanel { Dock = DockStyle.Top, Height = 38, Padding = new Padding(6) };

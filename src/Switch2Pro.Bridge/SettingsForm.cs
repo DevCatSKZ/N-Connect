@@ -106,9 +106,10 @@ internal sealed class SettingsForm : Form
 
         Text = "N-Connect";
         StartPosition = FormStartPosition.CenterScreen;
-        Size = new Size(1220, 860);
-        MinimumSize = new Size(940, 600);
+        Size = new Size(1280, 880);
+        MinimumSize = new Size(1060, 660);
         Font = UiFonts.Body;
+        AutoScaleDimensions = new SizeF(96F, 96F);
         AutoScaleMode = AutoScaleMode.Dpi;
 
         Controls.Add(_host);
@@ -151,7 +152,7 @@ internal sealed class SettingsForm : Form
 
     private Control BuildNavigation()
     {
-        var rail = new Panel { Dock = DockStyle.Left, Width = 250, BackColor = Theme.Backdrop };
+        var rail = new Panel { Dock = DockStyle.Left, Width = 286, BackColor = Theme.Backdrop };
         var header = new Panel { Dock = DockStyle.Top, Height = 72, BackColor = Theme.Backdrop };
         var logo = new LogoView { Bounds = new Rectangle(20, 20, 32, 32) };
         var name = new Label { Text = "N-Connect", Font = UiFonts.Subtitle, AutoSize = true, Location = new Point(62, 24), Tag = Tr.UserData };
@@ -171,7 +172,7 @@ internal sealed class SettingsForm : Form
     private void AddPage(string title, string glyph, Control page)
     {
         int index = _pages.Count;
-        var nav = new NavItem(title, glyph, () => ShowPage(index)) { Width = 228, BackColor = Theme.Backdrop };
+        var nav = new NavItem(title, glyph, () => ShowPage(index)) { Width = 258, BackColor = Theme.Backdrop };
         _navList.Controls.Add(nav);
         page.Dock = DockStyle.Fill;
         page.Visible = false;
