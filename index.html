@@ -37,6 +37,11 @@
   .card h3 { font-size: 16px; margin-bottom: 8px; color: var(--accent2); }
   .card p { color: var(--muted); font-size: 14.5px; }
   .pads { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 8px; }
+  .shots { display: grid; grid-template-columns: 1fr; gap: 20px; }
+  .shot { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+  .shot img { display: block; width: 100%; height: auto; }
+  .shot figcaption { padding: 12px 18px; color: var(--muted); font-size: 14px; }
+  .shot-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; margin-top: 20px; }
   .pad { background: var(--panel2); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; font-size: 13.5px; color: var(--text); }
   ol.steps { margin-left: 22px; color: var(--muted); }
   ol.steps li { margin: 10px 0; }
@@ -56,6 +61,28 @@
     </div>
     <span class="ver" id="ver"></span>
   </header>
+
+  <h2>So sieht N-Connect aus</h2>
+  <div class="shots">
+    <figure class="shot">
+      <img src="screenshots/uebersicht.png" alt="N-Connect Übersicht: acht verbundene Controller – GameCube, Switch Pro, DualShock 4, DualSense, Xbox, Wii-Fernbedienung, Wii U Pro und Mega Drive – mit Akkustand, Verbindung und Live-Eingaben">
+      <figcaption>Übersicht mit acht verbundenen Controllern – Live-Grafik, Akkustand, Verbindungsart und Spieler-Reihenfolge.</figcaption>
+    </figure>
+  </div>
+  <div class="shot-grid">
+    <figure class="shot">
+      <img src="screenshots/tastenbelegung.png" alt="Tastenbelegung: jede Taste frei auf Gamepad, Tastatur, Maus, Turbo oder Makro legen, mit Profilen und Shift-Ebene">
+      <figcaption>Tastenbelegung mit Profilen, Shift-Ebene, Turbo und Makros.</figcaption>
+    </figure>
+    <figure class="shot">
+      <img src="screenshots/sticks-vibration.png" alt="Einstellungen Sticks und Vibration: Totzone, Kennlinie, Trigger-Schwellen, Vibrationsstärke, Turbo – allgemein oder je Controller">
+      <figcaption>Sticks, Trigger und Vibration – allgemein oder je Controller.</figcaption>
+    </figure>
+    <figure class="shot">
+      <img src="screenshots/controller-einstellungen.png" alt="Controller-Karte mit Feineinstellungen: Sticks kalibrieren, Totzone, Kennlinie und Vibrationsstärke nur für diesen Controller">
+      <figcaption>Feineinstellung direkt an der Controller-Karte.</figcaption>
+    </figure>
+  </div>
 
   <h2>Unterstützte Controller</h2>
   <div class="pads">
