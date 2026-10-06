@@ -1,5 +1,10 @@
 # Übergabe: N-Connect
 
+> **Laufende Arbeit (04.10.2026): Funktion „Switch-Identität“** – Joy-Con an Switch und PC ohne neues Koppeln,
+> gemeinsam mit Bluepick_RCM. Einstieg: [docs/UEBERGABE-SWITCH-IDENTITAET.md](docs/UEBERGABE-SWITCH-IDENTITAET.md),
+> Details und Protokoll: [docs/SWITCH-IDENTITAET.md](docs/SWITCH-IDENTITAET.md).
+> Zugehörige Dateien: `src/Switch2Pro.Protocol/SwitchBtSave.cs`, `tools/Switch2Pro.BtIdentityProbe/`.
+
 Stand: 06.10.2026. Entwickelt im Repo `sfm` (Branch `ccr-ad005d0f-jon8df`, Ordner `switch2-pro-windows/`);
 veröffentlicht als eigenes Repo **DevCatSKZ/N-Connect** (öffentlich) per `git subtree split`.
 Was das Programm kann und wie man es baut: siehe [README.md](README.md). Vollständige Entwicklerdokumentation
