@@ -35,6 +35,28 @@ Hinweise zur Umgebung:
 - Das Protokoll `%LOCALAPPDATA%\N-Connect\bridge.log` ist die wichtigste Quelle bei Hardwareproblemen. Die
   Prüfhilfen (`--render-ui --demo-all`) schreiben in dasselbe Protokoll („Demo-Modus …“) – nicht verwechseln.
 
+## Zuletzt erledigt (06.10.2026): Darstellung/DPI-Skalierung korrigiert
+
+Nutzer-Meldung „alles klein und gequetscht, Menü-Texte abgeschnitten" (Commit `c78cea5`,
+216/216 Tests grün, DE+EN-Render geprüft):
+
+- **Ursache 1 – fehlende DPI-Basis**: `AutoScaleMode.Dpi` ohne `AutoScaleDimensions` skaliert auf
+  Displays mit 125/150 % nicht; Punkt-Schriften rendern dort größer, während Pixel-Layouts gleich
+  bleiben → abgeschnittene/verquetschte Texte. Jetzt `AutoScaleDimensions = new SizeF(96F, 96F)`
+  in **allen** Fenstern und Dialogen (Settings, Welcome, Pair, PairingData, StickCalibration,
+  GyroSetup, IrCamera, KeyCapture, Inline-Dialoge in `Dialogs.cs`, `Theme.Message`).
+- **Ursache 2 – feste Breiten zu knapp**: Navi-Schiene 250→286 px, Einträge 258×44 px („Sticks &
+  Vibration" passte nie); `ScrollPage.MaxContentWidth` 1000→1240; Fenster 1280×880 (min. 1060×660);
+  Karten min. 700 px; Reihenfolge-Chips Text bis 430 px.
+- **Controller-Karten aufgeräumt**: „Vibrieren"/„Trennen" sind jetzt immer Symbolknöpfe (Tooltips
+  erklären sie), sonst fraßen drei Textknöpfe ~350 px der Titelzeile. Titel fällt bei Platzmangel von
+  „Spieler n · Name" auf den reinen Controllernamen zurück. Info-Zeilen messen die Label-Breite
+  statt fixer Spalte (Label und Wert klebten aneinander); Report-Rate steht nur noch im
+  Details-Tab (kompakte Karte: nur Transport).
+
+Wichtig bei künftigen UI-Beschwerden: immer beides prüfen – echte Engstelle im Layout **und**
+DPI-Skalierung. `--render-ui` zeigt nur 100 %; hohe DPI-Skalierung muss am Nutzer-PC beurteilt werden.
+
 ## Zuletzt erledigt (05.10.2026): Controller-Grafiken überarbeitet
 
 Komplette Grafik-Überarbeitung in `InputView.cs`, `InputView.Photo.cs`, `InputView.Outlines.cs`,
