@@ -193,3 +193,7 @@ Virtueller Controller: [ViGEmBus](https://github.com/nefarius/ViGEmBus), [HidHid
 
 Entwickelt von **devcatskz**. Inoffizielles Projekt, nicht mit Nintendo verbunden. „Nintendo“, „Switch“, „Wii“, „amiibo“ sind Marken von Nintendo;
 „SEGA“ und „Mega Drive“ sind Marken von SEGA.
+
+## Lizenz
+
+[MIT](LICENSE) © devcatskz

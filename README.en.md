@@ -193,3 +193,7 @@ Virtual controller: [ViGEmBus](https://github.com/nefarius/ViGEmBus), [HidHide](
 
 Developed by **devcatskz**. Unofficial project, not affiliated with Nintendo. "Nintendo", "Switch", "Wii", "amiibo" are trademarks of Nintendo;
 "SEGA" and "Mega Drive" are trademarks of SEGA.
+
+## License
+
+[MIT](LICENSE) © devcatskz
