@@ -25,22 +25,25 @@ internal static class Glyph
         return font;
     }
 
-    /// <summary>Symbole mit eigener Vektorzeichnung (schärfer und besser lesbar als die Fontschrift). true = gezeichnet.</summary>
-    public static bool Paint(Graphics g, string glyph, Rectangle bounds, Color color)
+    /// <summary>Symbole mit eigener Vektorzeichnung (schärfer und besser lesbar als die Fontschrift).
+    /// <paramref name="em"/> ist die Schriftgröße, die das Fontsymbol an dieser Stelle hätte – so bleibt
+    /// die Vektorzeichnung genauso groß wie die anderen Symbole. true = gezeichnet.</summary>
+    public static bool Paint(Graphics g, string glyph, Rectangle bounds, Color color, float em = 0)
     {
         g.SmoothingMode = SmoothingMode.AntiAlias;
         if (glyph == Bluetooth)
         {
-            BluetoothMark(g, bounds, color);
+            BluetoothMark(g, bounds, color, em);
             return true;
         }
         return false;
     }
 
     /// <summary>Bluetooth-Rune (ᚼ+ᛒ): Mittelsteg, zwei Dreiecke nach rechts, zwei Striche von links zur Mitte.</summary>
-    private static void BluetoothMark(Graphics g, Rectangle bounds, Color color)
+    private static void BluetoothMark(Graphics g, Rectangle bounds, Color color, float em)
     {
-        float h = Math.Min(bounds.Height * 0.72f, bounds.Width * 1.1f);
+        float h = em > 0 ? em * 96f / 72f : Math.Min(bounds.Height * 0.72f, bounds.Width * 1.1f);
+        h = Math.Min(h, bounds.Height * 0.8f);
         float w = h * 0.82f;
         float x = bounds.X + (bounds.Width - w) / 2f, y = bounds.Y + (bounds.Height - h) / 2f;
         PointF P(float nx, float ny) => new(x + nx * w, y + ny * h);
@@ -354,7 +357,7 @@ internal sealed class SettingRow : Control, IHeightForWidth, IExtraTexts, ISelfT
         if (Parent is SettingsGroup group && group.Controls.GetChildIndex(this) > 0)
             using (var line = new Pen(Theme.Dark ? Color.FromArgb(0x1F, 0x1F, 0x1F) : Color.FromArgb(0xEA, 0xEA, 0xEA)))
                 g.DrawLine(line, 0, 0, Width, 0);
-        if (_glyph is not null && !Glyph.Paint(g, _glyph, new Rectangle(Pad, 0, 24, Height), p.Text))
+        if (_glyph is not null && !Glyph.Paint(g, _glyph, new Rectangle(Pad, 0, 24, Height), p.Text, 13f))
             TextRenderer.DrawText(g, _glyph, Glyph.Font(13f), new Rectangle(Pad, 0, 24, Height), p.Text,
                 TextFormatFlags.VerticalCenter | TextFormatFlags.HorizontalCenter | TextFormatFlags.NoPadding);
         int tw = TextWidth(Width);
@@ -795,7 +798,7 @@ internal sealed class GlyphButton : Control, ISelfTranslating
         int x = (Width - total) / 2;
         if (_glyph is not null)
         {
-            if (!Glyph.Paint(g, _glyph, new Rectangle(x, 0, 18, Height), fore))
+            if (!Glyph.Paint(g, _glyph, new Rectangle(x, 0, 18, Height), fore, 10.5f))
                 TextRenderer.DrawText(g, _glyph, Glyph.Font(10.5f), new Rectangle(x, 0, 16, Height), fore,
                     TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
             x += textW > 0 ? 24 : 16;
@@ -989,7 +992,7 @@ internal sealed class NavItem : Control, ISelfTranslating
             using var accent = new SolidBrush(Theme.Accent);
             g.FillPath(accent, pill);
         }
-        if (!Glyph.Paint(g, _glyph, new Rectangle(12, 0, 24, Height), p.Text))
+        if (!Glyph.Paint(g, _glyph, new Rectangle(12, 0, 24, Height), p.Text, 12f))
             TextRenderer.DrawText(g, _glyph, Glyph.Font(12f), new Rectangle(12, 0, 24, Height), p.Text,
                 TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
         TextRenderer.DrawText(g, Tr.T(Text), UiFonts.Body, new Rectangle(44, 0, Width - 56, Height), p.Text,
