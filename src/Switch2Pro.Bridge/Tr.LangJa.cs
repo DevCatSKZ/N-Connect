@@ -172,6 +172,8 @@ internal static partial class Tr
         ["Quer halten"] = "横に持つ",
         ["Joy-Con trennen"] = "Joy-Con を分離",
         ["Zum Paar verbinden"] = "ペアにする",
+        ["Joy-Con trennen – beide werden einzelne Controller"] = "Joy-Con を分離 – 両方が単体のコントローラーになります",
+        ["Zum Paar verbinden – sucht einen freien Joy-Con"] = "ペアにする – 空いている Joy-Con を探します",
         ["Doppelt angezeigt? Verstecken"] = "二重表示？非表示にする",
         ["amiibo lesen"] = "amiibo を読み取る",
         ["Ring-Con ein"] = "Ring-Con オン",

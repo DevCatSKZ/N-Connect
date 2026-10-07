@@ -52,6 +52,15 @@ Hinweise zur Umgebung:
 5. Screenshots mit dem neuen Build neu rendern (`--render-ui --demo-all`) → `gh-pages` pushen;
    die Seite holt sich Versionsnummer und Download-Link selbst per GitHub-API.
 
+## Zuletzt erledigt (07.10.2026, Nacht II): MIT-Lizenz, Paar-Knopf in der Karte, v1.0.7
+
+- **LICENSE**: MIT (Copyright devcatskz) im Repo; winget-Manifeste auf `License: MIT` +
+  `LicenseUrl` umgestellt und auf Version 1.0.6 mit den echten SHA-256 der Assets aktualisiert.
+- **Joy-Con Paar/Trennen direkt in der Karte** (`ControllerOverview.Card`): neuer Kopf-Knopf
+  `_pairToggle` (Glyph.Swap), nur sichtbar wenn alle Links des Spielers Joy-Con sind – klickt wie
+  der Knopf auf der Joy-Con-Seite (SplitPair/PairWithAnySingle), Tooltip je nach Zustand, Enabled =
+  IsPair || HasPartner. Neue Texte in allen 11 Übersetzungstabellen ergänzt.
+
 ## Zuletzt erledigt (07.10.2026, Nacht): Portable-Updater, Akku-Warnung, winget, v1.0.6
 
 - **Updater kennt jetzt Portable** (`UpdateCheck.FindInstaller` + `TrayApp.InstallUpdateAsync`):

@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://aka.ms/winget-manifest.locale.1.6.0.schema.json
 PackageIdentifier: DevCatSKZ.N-Connect
-PackageVersion: 1.0.5
+PackageVersion: 1.0.6
 PackageLocale: de-DE
 Publisher: devcatskz
 PublisherUrl: https://github.com/DevCatSKZ
@@ -8,7 +8,8 @@ PublisherSupportUrl: https://github.com/DevCatSKZ/N-Connect/issues
 Author: devcatskz
 PackageName: N-Connect
 PackageUrl: https://devcatskz.github.io/N-Connect/
-License: Proprietary
+License: MIT
+LicenseUrl: https://github.com/DevCatSKZ/N-Connect/blob/main/LICENSE
 ShortDescription: Verbindet Nintendo-, PlayStation-, Xbox- und Retro-Controller als virtuelle Xbox-360- oder DualShock-4-Controller mit Windows.
 Description: |-
   N-Connect läuft unauffällig im Infobereich und macht Nintendo- (Switch-1/2-Pro-Controller, Joy-Con,
@@ -25,7 +26,7 @@ Tags:
   - xinput
   - vigem
   - bluetooth
-ReleaseNotesUrl: https://github.com/DevCatSKZ/N-Connect/releases/tag/v1.0.5
+ReleaseNotesUrl: https://github.com/DevCatSKZ/N-Connect/releases/tag/v1.0.6
 Documentations:
   - DocumentLabel: README
     DocumentUrl: https://github.com/DevCatSKZ/N-Connect/blob/main/README.md

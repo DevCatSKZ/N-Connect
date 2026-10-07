@@ -260,6 +260,8 @@ internal sealed class ControllerOverview : Panel
         private readonly InfoPanel _info = new();
         private readonly GlyphButton _identify = new("Vibrieren", Glyph.Vibrate);
         private readonly GlyphButton _disconnect = new("Trennen", Glyph.Power);
+        /// <summary>Bei Joy-Con sichtbar: Paar lösen oder einzelnen Joy-Con zum Paar verbinden.</summary>
+        private readonly GlyphButton _pairToggle = new("Paar", Glyph.Swap);
         private readonly GlyphButton _settingsButton = new("Einstellungen", Glyph.Settings) { Toggle = true, TrailingGlyph = Glyph.ChevronDown };
         private readonly ToolTip _tips = Theme.CreateToolTip();
         private readonly PivotTabs _tabs = new();
@@ -291,7 +293,7 @@ internal sealed class ControllerOverview : Panel
             BackColor = Background;
             Margin = new Padding(0, 0, Gap, Gap);
             Height = 460;
-            foreach (var b in new[] { _identify, _disconnect, _settingsButton })
+            foreach (var b in new[] { _identify, _disconnect, _pairToggle, _settingsButton })
                 b.BackColor = CardColor;
             _tabs.BackColor = CardColor;
             _panel.BackColor = Theme.Backdrop;
@@ -306,12 +308,21 @@ internal sealed class ControllerOverview : Panel
 
             _identify.Click += (_, _) => _player?.IdentifyAsync().Forget("Vibrieren");
             _disconnect.Click += (_, _) => { if (_player is not null) Manager.Disconnect(_player); };
+            _pairToggle.Click += (_, _) =>
+            {
+                if (_player is null)
+                    return;
+                if (_player.IsPair)
+                    Manager.SplitPair(_player);
+                else
+                    Manager.PairWithAnySingle(_player);
+            };
             _settingsButton.Click += (_, _) => { if (_expanded) Collapse(); else Expand(_tabs.SelectedIndex); };
             _tips.SetToolTip(_disconnect, Tr.T("Verbindung trennen. Der Controller verbindet sich beim nächsten Tastendruck wieder."));
             _tips.SetToolTip(_identify, Tr.T("Controller kurz vibrieren lassen – zeigt, welcher Controller dieser Spieler ist."));
             _tips.SetToolTip(_settingsButton, Tr.T("Tastenbelegung und Einstellungen nur für diesen Controller"));
 
-            Controls.AddRange([_view, _info, _identify, _disconnect, _settingsButton, _tabs, _panel]);
+            Controls.AddRange([_view, _info, _identify, _disconnect, _pairToggle, _settingsButton, _tabs, _panel]);
             Tr.Apply(this);
         }
 
@@ -724,9 +735,12 @@ internal sealed class ControllerOverview : Panel
             // Vibrieren/Trennen immer als Symbolknöpfe (mit Tooltip), damit der Titel Platz hat.
             SetText(_identify, "");
             SetText(_disconnect, "");
+            SetText(_pairToggle, "");
             int x = Width - pad;
-            foreach (var b in new[] { _settingsButton, _disconnect, _identify })
+            foreach (var b in new[] { _settingsButton, _disconnect, _pairToggle, _identify })
             {
+                if (!b.Visible)
+                    continue;
                 x -= b.Width;
                 b.Location = new Point(x, 16);
                 x -= 8;
@@ -895,6 +909,21 @@ internal sealed class ControllerOverview : Panel
             var (input, gamepad) = LiveInput(player, settings);
             bool joyCon = links.Count > 0 && links.All(l => l.Kind.IsJoyCon());
             bool upright = links.Count == 1 && joyCon && settings.IsUprightJoyCon(links[0].Address);
+            // Kopf-Knopf nur bei Joy-Con: Paar lösen bzw. zum Paar verbinden, ohne die Karte aufzuklappen.
+            if (_pairToggle.Visible != joyCon)
+            {
+                _pairToggle.Visible = joyCon;
+                PerformLayout();
+            }
+            if (joyCon)
+            {
+                _pairToggle.Enabled = player.IsPair || Manager.HasPartner(player);
+                string tip = Tr.T(player.IsPair
+                    ? "Joy-Con trennen – beide werden einzelne Controller"
+                    : "Zum Paar verbinden – sucht einen freien Joy-Con");
+                if (_tips.GetToolTip(_pairToggle) != tip)
+                    _tips.SetToolTip(_pairToggle, tip);
+            }
             if (joyCon && links.All(l => l.LastState is not null))
             {
                 var parts = links.Select(l => new InputView.JoyConPart(l.Kind, l.LastState!, Player.CalibrationFor(l, settings), l.Info,
