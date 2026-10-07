@@ -40,6 +40,30 @@ Hinweise zur Umgebung:
 - Das Protokoll `%LOCALAPPDATA%\N-Connect\bridge.log` ist die wichtigste Quelle bei Hardwareproblemen. Die
   Prüfhilfen (`--render-ui --demo-all`) schreiben in dasselbe Protokoll („Demo-Modus …“) – nicht verwechseln.
 
+## Zuletzt erledigt (07.10.2026): 12 Sprachen, Logo, Installer-Auswahl, Release v1.0.2
+
+- **Zwölf Sprachen**: `Tr` arbeitet jetzt mit Sprachcodes (`Supported`-Liste in `Tr.cs`), je Sprache
+  eine Tabelle `Tr.Lang<cc>.cs` (ES, FR, IT, PT, NL, PL, RU, JA, ZH, KO). Fallback: Sprache → Englisch →
+  Deutsch. Sprachauswahl in *Allgemein*; `Tr.SetLanguage`/`--lang=xx` für Render-Prüfung.
+- **Sprachquelle beim Start**: `Tr.Init` liest zuerst `HKCU\Software\N-Connect\Language` (schreibt der
+  Installer), sonst Windows-Sprache, sonst Englisch. `Theme.Init` liest analog `...\Theme`
+  („dark"/„light"/„system") – ohne beides gilt Dunkel.
+- **Installer**: Inno-Sprachen per `FileExists`-Guard eingebunden (ISL muss auf dem Runner vorhanden
+  sein); neue eigene Seite „Darstellung“ (Dunkel/Hell/Wie Windows, Standard Dunkel);
+  `CurStepChanged(ssPostInstall)` schreibt Language + Theme nach HKCU.
+- **Neues Logo**: `src/Switch2Pro.Bridge/N-Connect.png` (eingebettete Ressource), `Branding` zeichnet
+  daraus Fenster-/Tray-/Installer-Grafiken; `--render-brand` neu gelaufen (Ico, Wizard-BMPs).
+- **Tray-Menü im Dark Mode**: eigener `ToolStripRenderer` in `Theme.cs` zeichnet Text, Pfeile,
+  Häkchen und Trennlinien in den Theme-Farben (vorher schwarze Schrift auf dunklem Grund).
+- **Bluetooth-Rune** neu als Vektor gezeichnet (Buttons „Controller suchen …“ u. a.).
+- **Light Mode**: `TextMuted` dunkler (#484850) – Sekundärtexte gut lesbar.
+- **README zweisprachig**: `README.md` (Deutsch) + `README.en.md` mit Umschalt-Links.
+- **GitHub Pages** (`gh-pages` im Repo `N-Connect`): komplett neu – Logo-Farbschema (Navy + Neon-Blau/
+  Violett), Sprachwahl mit denselben 12 Sprachen (Browser-Sprache als Standard, `localStorage`),
+  neue Screenshots, Download-Knopf holt das neueste Release-Asset per GitHub-API.
+- **Release v1.0.2** über den Build-Workflow (Tag `v1.0.2` pushen → Installer + Release automatisch).
+- Render-Prüfung aller 12 Sprachen (`--render-ui … --lang=xx`): keine abgeschnittenen Texte.
+
 ## Zuletzt erledigt (06.10.2026): Darstellung/DPI-Skalierung korrigiert
 
 Nutzer-Meldung „alles klein und gequetscht, Menü-Texte abgeschnitten" (Commit `c78cea5`,
