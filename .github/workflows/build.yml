@@ -81,14 +81,26 @@ jobs:
           & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DAppVersion=${{ steps.version.outputs.version }}" installer/N-Connect.iss
           Get-ChildItem out/*.exe
 
+      - name: Portable-Variante packen (ZIP mit EXE + portable.txt)
+        run: |
+          New-Item -ItemType Directory -Force out/portable | Out-Null
+          Copy-Item out/publish/win-x64/N-Connect.exe out/portable/
+          Set-Content out/portable/portable.txt "N-Connect portable: Diese Datei sorgt dafür, dass Einstellungen und Protokoll im Unterordner 'data' neben der EXE liegen statt in %APPDATA%. ViGEmBus/HidHide müssen trotzdem pro PC installiert werden (sonst keine virtuellen Controller)."
+          Compress-Archive -Force out/portable/* "out/N-Connect-Portable-${{ steps.version.outputs.version }}.zip"
+          Get-ChildItem out/*.zip
+
       - uses: actions/upload-artifact@v4
         with:
           name: N-Connect-Setup
-          path: out/N-Connect-Setup-*.exe
+          path: |
+            out/N-Connect-Setup-*.exe
+            out/N-Connect-Portable-*.zip
           if-no-files-found: error
 
       - name: Release anlegen (nur bei Tag v*)
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: out/N-Connect-Setup-*.exe
+          files: |
+            out/N-Connect-Setup-*.exe
+            out/N-Connect-Portable-*.zip

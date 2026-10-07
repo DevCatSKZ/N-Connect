@@ -47,6 +47,12 @@ Bis zu 8 Controller gleichzeitig (Spieler 1–8). Tipp für viele Controller: ei
 
 Voraussetzungen: Windows 10 (2004) oder Windows 11, 64 Bit, Bluetooth 4.0+ (für Switch-2-Controller Bluetooth LE).
 
+**Portable:** Alternativ gibt es im Release `N-Connect-Portable-….zip` – einfach entpacken und `N-Connect.exe`
+starten, keine Installation. Die beiliegende `portable.txt` sorgt dafür, dass Einstellungen und Protokoll im
+Unterordner `data` neben der EXE liegen statt in %APPDATA%. **Achtung:** ViGEmBus und HidHide müssen auf dem PC
+trotzdem einmal installiert werden (z. B. über das Setup oder von den Hersteller-Seiten) – sonst kann die
+portable EXE keine virtuellen Controller erzeugen.
+
 ## Controller verbinden
 
 **Switch 2 (Pro Controller, Joy-Con 2, GameCube):** kurz die **SYNC-Taste** drücken. Nach ein paar Sekunden vibriert
