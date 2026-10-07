@@ -23,6 +23,7 @@
   <ItemGroup>
     <!-- Fenstersymbol mit allen Größen (das Programm-Icon allein liefert nur 32 px). -->
     <EmbeddedResource Include="N-Connect.ico" LogicalName="N-Connect.ico" />
+    <EmbeddedResource Include="N-Connect.png" LogicalName="N-Connect.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Switch2Pro.Protocol\Switch2Pro.Protocol.csproj" />

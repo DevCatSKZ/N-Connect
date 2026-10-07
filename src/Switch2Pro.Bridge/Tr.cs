@@ -1,48 +1,133 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
+using Microsoft.Win32;
 
 namespace Switch2Pro.Bridge;
 
 /// <summary>
-/// Oberfläche auf Englisch: Die App ist auf Deutsch geschrieben; ist Englisch aktiv (Einstellung oder Windows-Sprache
-/// nicht Deutsch), werden sichtbare Texte über diese Tabelle übersetzt – feste Texte 1:1, Meldungen mit Zahlen
-/// und Namen über Muster. Unbekannte Texte bleiben unverändert (nie leer). Das Protokoll bleibt deutsch.
+/// Oberfläche übersetzen: Die App ist auf Deutsch geschrieben; ist eine andere Sprache aktiv (Einstellung oder
+/// Windows-Sprache), werden sichtbare Texte über Tabellen übersetzt – feste Texte 1:1, Meldungen mit Zahlen
+/// und Namen über Muster. Fehlt ein Text in der gewählten Sprache, greifen Englisch und zuletzt Deutsch.
+/// Das Protokoll bleibt deutsch.
 /// </summary>
 internal static partial class Tr
 {
-    /// <summary>Englische Oberfläche aktiv?</summary>
-    public static bool English { get; private set; }
+    /// <summary>Aktive Oberflächensprache (ISO-639-1, z. B. "de", "en", "es").</summary>
+    public static string Lang { get; private set; } = "de";
 
-    /// <summary>Nur für die Prüfhilfe: Texte in der Originalsprache sammeln.</summary>
-    internal static void SetEnglish(bool english) => English = english;
+    /// <summary>Englische Oberfläche aktiv?</summary>
+    public static bool English => Lang == "en";
+
+    /// <summary>Sprachen mit vorhandener Übersetzungstabelle.</summary>
+    public static readonly string[] Supported = ["de", "en", "es", "fr", "it", "pt", "nl", "pl", "ru", "ja", "zh", "ko"];
+
+    /// <summary>Nur für die Prüfhilfe: Sprache direkt setzen.</summary>
+    internal static void SetEnglish(bool english) => Lang = english ? "en" : "de";
+
+    /// <summary>Nur für die Prüfhilfe/Render: Sprache direkt setzen.</summary>
+    internal static void SetLanguage(string? language) => Lang = Normalize(language) ?? "en";
 
     /// <summary>Kennzeichen (Tag) für Steuerelemente/Menüeinträge mit Benutzerdaten (z. B. Profilnamen): nicht übersetzen.</summary>
     public const string UserData = "user-data";
 
-    /// <summary>Sprache festlegen: "de", "en" oder null = wie Windows (Deutsch nur bei deutscher Windows-Sprache).</summary>
-    public static void Init(string? language) =>
-        English = language switch
+    /// <summary>Erlaubten Sprachcode zurückgeben: null = automatisch, unbekannte Codes fallen auf Englisch.</summary>
+    private static string? Normalize(string? language) => language switch
+    {
+        null or "auto" => null,
+        var l when Supported.Contains(l) => l,
+        _ => "en",
+    };
+
+    /// <summary>Sprache festlegen: ISO-Code, "de" oder null/"auto" = wie Windows (unterstützte Sprache, sonst Englisch).</summary>
+    public static void Init(string? language)
+    {
+        string? code = language;
+        if (code is null or "auto")
         {
-            "de" => false,
-            "en" => true,
-            _ => CultureInfo.CurrentUICulture.TwoLetterISOLanguageName != "de",
-        };
+            // Sprachwahl des Installers übernehmen, wenn keine App-Einstellung existiert.
+            try
+            {
+                using var key = Registry.CurrentUser.OpenSubKey(@"Software\N-Connect");
+                code = key?.GetValue("Language") as string;
+            }
+            catch (Exception e) when (e is System.Security.SecurityException or UnauthorizedAccessException or IOException)
+            {
+            }
+            if (code is null)
+            {
+                var iso = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+                code = iso == "pt" && CultureInfo.CurrentUICulture.Name.StartsWith("pt-BR", StringComparison.OrdinalIgnoreCase) ? "pt" : iso;
+            }
+        }
+        Lang = Normalize(code) ?? (Supported.Contains(CultureInfo.CurrentUICulture.TwoLetterISOLanguageName)
+            ? CultureInfo.CurrentUICulture.TwoLetterISOLanguageName : "en");
+    }
+
+    /// <summary>Übersetzungstabelle der aktiven Sprache (null = Deutsch).</summary>
+    private static Dictionary<string, string>? Table(string lang) => lang switch
+    {
+        "en" => Texts,
+        "es" => TextsEs,
+        "fr" => TextsFr,
+        "it" => TextsIt,
+        "pt" => TextsPt,
+        "nl" => TextsNl,
+        "pl" => TextsPl,
+        "ru" => TextsRu,
+        "ja" => TextsJa,
+        "zh" => TextsZh,
+        "ko" => TextsKo,
+        _ => null,
+    };
+
+    /// <summary>Muster-Tabelle der aktiven Sprache (Meldungen mit Platzhaltern); null = englische Muster.</summary>
+    private static (Regex Pattern, Func<Match, string> Replace)[]? PatternsFor(string lang) => lang switch
+    {
+        "en" => Patterns,
+        "es" => PatternsEs,
+        "fr" => PatternsFr,
+        "it" => PatternsIt,
+        "pt" => PatternsPt,
+        "nl" => PatternsNl,
+        "pl" => PatternsPl,
+        "ru" => PatternsRu,
+        "ja" => PatternsJa,
+        "zh" => PatternsZh,
+        "ko" => PatternsKo,
+        _ => null,
+    };
+
+    /// <summary>Wort für „Standard“ in der aktiven Sprache (für das Präfix „Standard: …“).</summary>
+    private static string DefaultWord(string lang)
+    {
+        var table = Table(lang);
+        return table is not null && table.TryGetValue("Standard", out var w) ? w : lang == "de" ? "Standard" : "Default";
+    }
 
     public static string T(string? german)
     {
         if (german is null)
             return "";
-        if (!English || german.Length == 0)
+        var lang = Lang;
+        if (lang == "de" || german.Length == 0)
             return german;
+        var table = Table(lang);
+        if (table is not null && table.TryGetValue(german, out var hit))
+            return hit;
         if (Texts.TryGetValue(german, out var english))
             return english;
         if (german.StartsWith("Standard: ", StringComparison.Ordinal))
-            return "Default: " + T(german["Standard: ".Length..]);
-        foreach (var (pattern, replace) in Patterns)
+            return DefaultWord(lang) + ": " + T(german["Standard: ".Length..]);
+        foreach (var arr in new[] { PatternsFor(lang), Patterns })
         {
-            var m = pattern.Match(german);
-            if (m.Success)
-                return replace(m);
+            if (arr is null)
+                continue;
+            foreach (var (pattern, replace) in arr)
+            {
+                var m = pattern.Match(german);
+                if (m.Success)
+                    return replace(m);
+            }
         }
         // Aus mehreren Sätzen zusammengesetzt (z. B. Problem + Tipp): Satz für Satz übersetzen.
         // Abkürzungen wie „z. B.“ sind kein Satzende.
@@ -65,7 +150,7 @@ internal static partial class Tr
     /// <summary>Alle Texte eines Fensters bzw. Steuerelements (rekursiv) übersetzen, auch Listeneinträge.</summary>
     public static void Apply(Control root)
     {
-        if (!English)
+        if (Lang == "de")
             return;
         if (root.Text is { Length: > 0 } text && root is not (TextBox or ISelfTranslating))
             root.Text = T(text);
@@ -81,7 +166,7 @@ internal static partial class Tr
 
     public static void Apply(ToolStripItemCollection items)
     {
-        if (!English)
+        if (Lang == "de")
             return;
         foreach (ToolStripItem item in items)
         {
