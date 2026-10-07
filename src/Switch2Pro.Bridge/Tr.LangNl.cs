@@ -30,6 +30,12 @@ internal static partial class Tr
         ["Stärke:"] = "Sterkte:",
         ["Stick-Totzone (alle Controller):"] = "Stick-dode zone (alle controllers):",
         ["Beim Verbinden kurz vibrieren"] = "Kort trillen bij verbinden",
+        ["Meldung bei Verbinden"] = "Melding bij verbinden",
+        ["Wer meldet, wenn ein Controller verbunden oder getrennt wird."] = "Kies wie meldt wanneer een controller verbinding maakt of verbreekt.",
+        ["„N-Connect“ zeigt den echten Controller-Namen und schaltet die Gerätemeldungen von Windows ab."] = "\"N-Connect\" toont de echte naam van de controller en schakelt de apparaatmeldings van Windows uit.",
+        ["N-Connect (empfohlen)"] = "N-Connect (aanbevolen)",
+        ["N-Connect und Windows"] = "N-Connect en Windows",
+        ["Keine"] = "Geen",
         ["Gekoppelte Controller per Tastendruck verbinden (ohne SYNC)"] = "Gekoppelde controllers verbinden met een knopdruk (zonder SYNC)",
         ["Automatisch mit Windows starten"] = "Automatisch starten met Windows",
         ["Gyro für Emulatoren bereitstellen (Cemuhook/DSU, Port 26760 – wirkt nach Neustart)"] =

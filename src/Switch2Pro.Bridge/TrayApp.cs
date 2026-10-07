@@ -84,6 +84,16 @@ internal sealed class TrayApp : ApplicationContext
             _balloonUrl = null;
             Balloon(2500, "N-Connect", message, ToolTipIcon.Info);
         }, null);
+        // Verbinden/Trennen: Meldung von N-Connect nur, wenn sie auch gewählt ist (Standard);
+        // die Windows-Gerätemeldungen blendet ToastSenders.Apply ein bzw. aus.
+        _manager.ConnectionNotify += message => _ui.Post(_ =>
+        {
+            if (_settings.ConnectNotify is not (ConnectNotifications.NConnect or ConnectNotifications.Both))
+                return;
+            _balloonUrl = null;
+            Balloon(2500, "N-Connect", message, ToolTipIcon.Info);
+        }, null);
+        ApplyConnectNotify();
         _manager.ControllerConnected += (address, _) => _ui.Post(_ => RememberController(address), null);
         _manager.JoyConModeChanged += (address, single) => _ui.Post(_ =>
         {
@@ -319,6 +329,7 @@ internal sealed class TrayApp : ApplicationContext
         _icon.ContextMenuStrip!.Renderer = Theme.MenuRenderer();
         _icon.ContextMenuStrip.ForeColor = Theme.Current.Text;
         _manager?.ApplyOutputMode(); // allgemein oder je Controller geändert – nur Abweichende werden neu angelegt
+        ApplyConnectNotify();
         if (_settingsForm is { IsDisposed: false } form)
             form.ReloadValues(); // sonst arbeitet das Fenster mit veralteten Profilen weiter
         Log.Info("Einstellungen neu geladen");
@@ -342,6 +353,13 @@ internal sealed class TrayApp : ApplicationContext
                 _settingsWatcher.EnableRaisingEvents = true;
         }
     }
+
+    /// <summary>
+    /// Einstellung „Meldung bei Verbinden“ anwenden: Meldet N-Connect (Standard) oder gar niemand,
+    /// werden die Gerätemeldungen von Windows stummgeschaltet; bei „Windows“ bzw. „Beide“ kommen sie wieder.
+    /// </summary>
+    private void ApplyConnectNotify() =>
+        ToastSenders.Apply(_settings.ConnectNotify is ConnectNotifications.NConnect or ConnectNotifications.None);
 
     private void UpdateTooltip()
     {

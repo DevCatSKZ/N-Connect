@@ -47,6 +47,8 @@ internal sealed class ControllerManager : IAsyncDisposable
     /// <summary>Aktuelle Einstellungen (Namen, Plätze …) – nur lesen.</summary>
     public Settings Settings => _settings();
     public event Action<string>? Notify;
+    /// <summary>Verbinden/Trennen eines Controllers – je nach Einstellung meldet N-Connect oder Windows.</summary>
+    public event Action<string>? ConnectionNotify;
     /// <summary>Ein Joy-Con wurde getrennt (true) bzw. wieder zum Paar gefügt (false) – Adresse zum Merken.</summary>
     public event Action<string, bool>? JoyConModeChanged;
     /// <summary>Ein Switch-2-Controller wurde verbunden (Adresse, Art) – zum Merken für das Wiederverbinden per Tastendruck.</summary>
@@ -153,7 +155,7 @@ internal sealed class ControllerManager : IAsyncDisposable
             // Am USB-Kabel lädt der Controller ohnehin – dort nicht trennen.
             if (Environment.TickCount64 - player.LastActivity < minutes * 60_000L || player.Links.Any(l => l.Transport == Transport.Usb))
                 continue;
-            Notify?.Invoke($"Spieler {player.Index + 1}: nach {minutes} min ohne Eingabe getrennt");
+            ConnectionNotify?.Invoke($"Spieler {player.Index + 1}: nach {minutes} min ohne Eingabe getrennt");
             Disconnect(player, $"nach {minutes} min ohne Eingabe getrennt");
         }
     }
@@ -736,7 +738,7 @@ internal sealed class ControllerManager : IAsyncDisposable
                 if (index < 0)
                 {
                     Log.Warn($"{link.Id}: schon {MaxPlayers} Spieler – Controller wird nicht verwendet");
-                    Notify?.Invoke($"Schon {MaxPlayers} Controller verbunden – {link.Kind.DisplayName()} wird nicht verwendet. Erst einen anderen trennen.");
+                    ConnectionNotify?.Invoke($"Schon {MaxPlayers} Controller verbunden – {link.Kind.DisplayName()} wird nicht verwendet. Erst einen anderen trennen.");
                     _links.TryRemove(link.Id, out _);
                     link.DisposeAsync().AsTask().Forget($"{link.Id}: Trennen");
                     return false;
@@ -760,11 +762,36 @@ internal sealed class ControllerManager : IAsyncDisposable
         if (link.IsLost)
             OnLinkLost(link);
         Log.Info(message);
-        Notify?.Invoke(message);
+        NotifyConnected(link, message);
         ApplyOutputMode(); // Paar mit eigener Ausgabeart des neuen Joy-Con
         QueueHide(link);
         Changed?.Invoke();
         return true;
+    }
+
+    /// <summary>
+    /// „Verbunden“-Meldung. Unsere virtuellen ViGEm-Pads erscheinen zuerst als belegter XInput-Platz und
+    /// werden erst danach als „eigen“ markiert – bei XInput deshalb kurz warten: Hält der Platz noch,
+    /// ist es ein echter Xbox-Controller; ist er inzwischen virtuell (oder schon weg), schweigen wir.
+    /// </summary>
+    private void NotifyConnected(IControllerLink link, string message)
+    {
+        if (!link.Id.StartsWith("XINPUT:", StringComparison.Ordinal))
+        {
+            ConnectionNotify?.Invoke(message);
+            return;
+        }
+        NotifyXInputAsync(link, message).Forget("Verbindungsmeldung");
+    }
+
+    private async Task NotifyXInputAsync(IControllerLink link, string message)
+    {
+        await Task.Delay(1500);
+        if (_disposed || link.IsLost || !_links.ContainsKey(link.Id))
+            return;
+        if (int.TryParse(link.Id.AsSpan(7), out int slot) && XInput.IsVirtual(slot))
+            return; // Geist: eigener virtueller Controller
+        ConnectionNotify?.Invoke(message);
     }
 
     // ---------- Originale vor Spielen und Steam verstecken (HidHide) ----------
@@ -889,9 +916,12 @@ internal sealed class ControllerManager : IAsyncDisposable
             _retryAfter[link.Id] = Environment.TickCount64 + 1500;
             ControllerPairing.NoteDisconnected(link.Address); // eben getrennt ≠ Kopplungsmodus
             Log.Info($"{link.Kind.DisplayName()} getrennt");
-            if (!_disposed)
+            // Geist-Platz: war unser eigener virtueller Controller (ViGEm) – dafür gibt es keine Meldung.
+            bool ghost = link.Id.StartsWith("XINPUT:", StringComparison.Ordinal) &&
+                int.TryParse(link.Id.AsSpan(7), out int ghostSlot) && XInput.IsVirtual(ghostSlot);
+            if (!_disposed && !ghost)
             {
-                Notify?.Invoke($"{link.Kind.DisplayName()} getrennt");
+                ConnectionNotify?.Invoke($"{link.Kind.DisplayName()} getrennt");
                 if (emptied is not null)
                     CompactPlayers();
             }

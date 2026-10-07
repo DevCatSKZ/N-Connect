@@ -30,6 +30,12 @@ internal static partial class Tr
         ["Stärke:"] = "강도:",
         ["Stick-Totzone (alle Controller):"] = "스틱 데드존(모든 컨트롤러):",
         ["Beim Verbinden kurz vibrieren"] = "연결 시 짧게 진동",
+        ["Meldung bei Verbinden"] = "연결 알림",
+        ["Wer meldet, wenn ein Controller verbunden oder getrennt wird."] = "컨트롤러가 연결되거나 끊길 때 알릴 대상을 선택합니다.",
+        ["„N-Connect“ zeigt den echten Controller-Namen und schaltet die Gerätemeldungen von Windows ab."] = "\"N-Connect\"는 실제 컨트롤러 이름을 표시하고 Windows 장치 알림을 끕니다.",
+        ["N-Connect (empfohlen)"] = "N-Connect(권장)",
+        ["N-Connect und Windows"] = "N-Connect 및 Windows",
+        ["Keine"] = "없음",
         ["Gekoppelte Controller per Tastendruck verbinden (ohne SYNC)"] = "페어링된 컨트롤러를 버튼 하나로 연결(SYNC 불필요)",
         ["Automatisch mit Windows starten"] = "Windows 시작 시 자동 실행",
         ["Gyro für Emulatoren bereitstellen (Cemuhook/DSU, Port 26760 – wirkt nach Neustart)"] =
