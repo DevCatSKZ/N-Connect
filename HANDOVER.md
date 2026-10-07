@@ -52,6 +52,21 @@ Hinweise zur Umgebung:
 5. Screenshots mit dem neuen Build neu rendern (`--render-ui --demo-all`) → `gh-pages` pushen;
    die Seite holt sich Versionsnummer und Download-Link selbst per GitHub-API.
 
+## Zuletzt erledigt (07.10.2026, Nacht): Portable-Updater, Akku-Warnung, winget, v1.0.6
+
+- **Updater kennt jetzt Portable** (`UpdateCheck.FindInstaller` + `TrayApp.InstallUpdateAsync`):
+  im portablen Betrieb wird `N-Connect-Portable-….zip` geladen statt der Setup-EXE. Nach dem
+  Download entpackt `PreparePortableUpdate` die neue EXE in den Temp-Ordner und startet ein kleines
+  cmd-Skript, das nach Prozess-Ende die EXE neben der alten ersetzt und N-Connect neu startet –
+  ganz ohne Adminrechte (der Hinweis-Dialog zeigt das entsprechend an).
+- **Akku-Warnung** (`ControllerManager.CheckLowBattery`, läuft im 10-s-Takt): einmal je Verbindung
+  „Akku fast leer (x %)“-Hinweis ab ≤15 %, nicht beim Laden. Meldungen bei Verbinden/Trennen sowie
+  das Tray-Untermenü je Spieler (Vibrieren, Platz, Ausgabeart, Trennen) und Profilwechsel samt
+  „aktiv bei Programm“ gab es bereits – ist jetzt in der Doku vermerkt.
+- **winget-Manifeste** unter `winget/` (Setup + portable ZIP, echte SHA-256 von v1.0.5, AppId aus
+  dem Inno-Skript) plus `winget/README.md` mit Einreich-Anleitung (wingetcreate/PR zu winget-pkgs).
+  License-Feld steht auf „Proprietary“, solange das Repo keine LICENSE hat.
+
 ## Zuletzt erledigt (07.10.2026, spät): Portable-Variante, Release v1.0.5
 
 - **Portable-Modus** (`Paths` in `Log.cs`): Liegt neben `N-Connect.exe` eine `portable.txt` oder ein
