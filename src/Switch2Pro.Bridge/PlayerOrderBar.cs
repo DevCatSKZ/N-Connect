@@ -55,16 +55,17 @@ internal sealed class PlayerOrderBar : Control, ISelfTranslating, IExtraTexts
     private int ChipWidth(string name) =>
         12 + 26 + 8 + Math.Min(430, TextRenderer.MeasureText(name, UiFonts.Body).Width) + 10 + 2 * Arrow + 8;
 
-    /// <summary>Chips zeilenweise anordnen (umbrechen, wenn die Breite nicht reicht).</summary>
+    /// <summary>Chips zeilenweise anordnen (umbrechen, wenn die Breite nicht reicht). Alle gleich breit:
+    /// die breiteste nötige Breite gilt für alle – sieht ruhiger aus und lange Namen passen überall.</summary>
     private List<Rectangle> Arrange(int width, out int height)
     {
         var rects = new List<Rectangle>();
         int top = 12 + TextRenderer.MeasureText(Tr.T(Caption), UiFonts.Small, new Size(Math.Max(100, width - 2 * Pad), 0),
             TextFormatFlags.WordBreak).Height + CaptionGap;
         int x = Pad, y = top;
-        foreach (var (_, name) in _players)
+        int w = _players.Count > 0 ? _players.Max(p => ChipWidth(p.Name)) : 0;
+        foreach (var _ in _players)
         {
-            int w = ChipWidth(name);
             if (x > Pad && x + w > width - Pad)
             {
                 x = Pad;
