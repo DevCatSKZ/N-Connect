@@ -40,6 +40,32 @@ Hinweise zur Umgebung:
 - Das Protokoll `%LOCALAPPDATA%\N-Connect\bridge.log` ist die wichtigste Quelle bei Hardwareproblemen. Die
   Prüfhilfen (`--render-ui --demo-all`) schreiben in dasselbe Protokoll („Demo-Modus …“) – nicht verwechseln.
 
+## Release-Ablauf (fortlaufend, jedes Update)
+
+1. In `sfm` entwickeln, Tests grün (`dotnet test -c Release`).
+2. **Version hochzählen** in `src/Switch2Pro.Bridge/Switch2Pro.Bridge.csproj` (`<Version>`) —
+   sie steuert die lokale Anzeige; CI überschreibt sie beim Veröffentlichen per Tag.
+3. Commit + Push auf den Arbeitsbranch, `git subtree split --prefix=switch2-pro-windows -b sync-out`,
+   in `N-Connect` fetchen + cherry-picken, `main` pushen.
+4. **Tag setzen**: `git tag v<x.y.z> && git push origin v<x.y.z>` → CI baut Installer
+   `N-Connect-Setup-<x.y.z>.exe` und legt das Release automatisch an.
+5. Screenshots mit dem neuen Build neu rendern (`--render-ui --demo-all`) → `gh-pages` pushen;
+   die Seite holt sich Versionsnummer und Download-Link selbst per GitHub-API.
+
+## Zuletzt erledigt (07.10.2026, Abend): Geist-Xbox-Fix, Seite mit 4 dunklen Shots, v1.0.4
+
+- **Geist-Xbox-Controller** (`VirtualPads.cs`): XInput-Platz wurde nur einmal sofort nach
+  `Connect()` gelesen — oft noch nicht vergeben → eigene ViGEm-Pads tauchten als zusätzliche
+  Xbox-Controller auf. Jetzt: sofort + bis 4 s nachlesen + beim ersten Rumble-Feedback markieren.
+- **Reihenfolge-Chips einheitlich breit** (`PlayerOrderBar.Arrange`): alle Chips bekommen die
+  Breite des breitesten, statt je nach Namenslänge.
+- **Lokale Version**: `Switch2Pro.Bridge.csproj` trägt `<Version>` (zuletzt 1.0.3 → Anzeige
+  „Version 1.0.3" auch bei Dev-Builds).
+- **Pages**: nur noch 4 Screenshots, alle dunkel — Übersicht ganz breit, Tastenbelegung +
+  Sticks & Vibration gleich breit daneben, Controller-Einstellungen mittig; `uebersicht-hell.png`
+  entfernt.
+- GitHub-Push lief zeitweise mit „Internal Server Error" — Retries gingen durch, nichts verloren.
+
 ## Zuletzt erledigt (07.10.2026): 12 Sprachen, Logo, Installer-Auswahl, Release v1.0.2
 
 - **Zwölf Sprachen**: `Tr` arbeitet jetzt mit Sprachcodes (`Supported`-Liste in `Tr.cs`), je Sprache
