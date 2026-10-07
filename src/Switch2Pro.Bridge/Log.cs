@@ -2,9 +2,32 @@ namespace Switch2Pro.Bridge;
 
 internal static class Paths
 {
-    public static string SettingsDir { get; } = Folder(Environment.SpecialFolder.ApplicationData);
+    /// <summary>
+    /// Portable Betrieb: Liegt neben der EXE eine <c>portable.txt</c> oder ein Ordner <c>data</c>,
+    /// wandern Einstellungen und Protokoll dorthin statt nach %APPDATA%/%LOCALAPPDATA%.
+    /// </summary>
+    public static string? PortableDir { get; } = DetectPortable();
+    public static bool IsPortable => PortableDir is not null;
+
+    public static string SettingsDir { get; } = PortableDir ?? Folder(Environment.SpecialFolder.ApplicationData);
     public static string SettingsFile { get; } = Path.Combine(SettingsDir, "settings.json");
-    public static string LogDir { get; } = Folder(Environment.SpecialFolder.LocalApplicationData);
+    public static string LogDir { get; } = PortableDir ?? Folder(Environment.SpecialFolder.LocalApplicationData);
+
+    private static string? DetectPortable()
+    {
+        try
+        {
+            string? dir = Path.GetDirectoryName(Environment.ProcessPath);
+            if (dir is null)
+                return null;
+            string data = Path.Combine(dir, "data");
+            return File.Exists(Path.Combine(dir, "portable.txt")) || Directory.Exists(data) ? data : null;
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException)
+        {
+            return null;
+        }
+    }
 
     /// <summary>Ordner „N-Connect“; der Ordner der Vorversion („Switch2ProBridge“) wird einmalig übernommen.</summary>
     private static string Folder(Environment.SpecialFolder root)

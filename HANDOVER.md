@@ -52,6 +52,19 @@ Hinweise zur Umgebung:
 5. Screenshots mit dem neuen Build neu rendern (`--render-ui --demo-all`) → `gh-pages` pushen;
    die Seite holt sich Versionsnummer und Download-Link selbst per GitHub-API.
 
+## Zuletzt erledigt (07.10.2026, spät): Portable-Variante, Release v1.0.5
+
+- **Portable-Modus** (`Paths` in `Log.cs`): Liegt neben `N-Connect.exe` eine `portable.txt` oder ein
+  Ordner `data`, wandern `settings.json`, `bridge.log` und Sicherungen in `data\` statt nach
+  %APPDATA%/%LOCALAPPDATA%. `Settings.Save` legt den Ordner selbst an. Getestet: Render-Lauf aus
+  einem Testordner schrieb `data\bridge.log` korrekt neben die EXE.
+- **CI**: Der Workflow packt jetzt `N-Connect-Portable-<Version>.zip` (EXE + `portable.txt` mit
+  Hinweistext) und hängt sie ans Release. **Einschränkung**: ViGEmBus/HidHide sind Kerneltreiber und
+  müssen pro PC installiert bleiben — ohne sie startet die App, erzeugt aber keine virtuellen
+  Controller (zeigt den bekannten „ViGEmBus fehlt“-Hinweis mit Download-Link).
+- Linux-Port wurde besprochen und verworfen: App hängt komplett an Windows (WinForms, WinRT-BLE,
+  ViGEmBus, XInput); unter Linux laufen Switch-Controller nativ per `hid-nintendo` + Steam Input.
+
 ## Zuletzt erledigt (07.10.2026, Abend): Geist-Xbox-Fix, Seite mit 4 dunklen Shots, v1.0.4
 
 - **Geist-Xbox-Controller** (`VirtualPads.cs`): XInput-Platz wurde nur einmal sofort nach
