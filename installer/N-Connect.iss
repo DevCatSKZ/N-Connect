@@ -55,6 +55,41 @@ RestartApplications=no
 [Languages]
 Name: "german"; MessagesFile: "compiler:Languages\German.isl"
 Name: "english"; MessagesFile: "compiler:Default.isl"
+; Weitere Sprachen nur aufnehmen, wenn die ISL-Datei der installierten Inno-Version sie mitbringt.
+#define InnoLangDir GetEnv("ProgramFiles(x86)") + "\Inno Setup 6\Languages"
+#if FileExists(InnoLangDir + "\Spanish.isl")
+Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"
+#endif
+#if FileExists(InnoLangDir + "\French.isl")
+Name: "french"; MessagesFile: "compiler:Languages\French.isl"
+#endif
+#if FileExists(InnoLangDir + "\Italian.isl")
+Name: "italian"; MessagesFile: "compiler:Languages\Italian.isl"
+#endif
+#if FileExists(InnoLangDir + "\Portuguese.isl")
+Name: "portuguese"; MessagesFile: "compiler:Languages\Portuguese.isl"
+#endif
+#if FileExists(InnoLangDir + "\BrazilianPortuguese.isl")
+Name: "brazilianportuguese"; MessagesFile: "compiler:Languages\BrazilianPortuguese.isl"
+#endif
+#if FileExists(InnoLangDir + "\Dutch.isl")
+Name: "dutch"; MessagesFile: "compiler:Languages\Dutch.isl"
+#endif
+#if FileExists(InnoLangDir + "\Polish.isl")
+Name: "polish"; MessagesFile: "compiler:Languages\Polish.isl"
+#endif
+#if FileExists(InnoLangDir + "\Russian.isl")
+Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl"
+#endif
+#if FileExists(InnoLangDir + "\Japanese.isl")
+Name: "japanese"; MessagesFile: "compiler:Languages\Japanese.isl"
+#endif
+#if FileExists(InnoLangDir + "\ChineseSimplified.isl")
+Name: "chinesesimplified"; MessagesFile: "compiler:Languages\ChineseSimplified.isl"
+#endif
+#if FileExists(InnoLangDir + "\Korean.isl")
+Name: "korean"; MessagesFile: "compiler:Languages\Korean.isl"
+#endif
 
 [CustomMessages]
 german.InstallingViGEm=Installiere ViGEmBus (virtueller Controller-Treiber) …
@@ -68,6 +103,33 @@ german.InstallingHidHide=Installiere HidHide (verhindert doppelte Controller in 
 english.InstallingHidHide=Installing HidHide (prevents duplicate controllers in Steam and games) …
 german.ConfiguringHidHide=Gebe N-Connect in HidHide frei …
 english.ConfiguringHidHide=Allowing N-Connect in HidHide …
+
+; Seite „Darstellung“ (Programm-Theme): Standard ist Dunkel.
+german.ThemeCaption=Darstellung
+english.ThemeCaption=Appearance
+german.ThemeDescription=Wie soll N-Connect aussehen?
+english.ThemeDescription=How should N-Connect look?
+german.ThemeSubCaption=Wählen Sie das Farbschema des Programms:
+english.ThemeSubCaption=Choose the color scheme of the application:
+german.ThemeDark=Dunkel (empfohlen)
+english.ThemeDark=Dark (recommended)
+german.ThemeLight=Hell
+english.ThemeLight=Light
+german.ThemeSystem=Wie Windows
+english.ThemeSystem=Same as Windows
+
+; Rückfall auf Englisch für Sprachen ohne eigene Formulierung (Einträge ohne Sprachpräfix gelten für alle).
+InstallingViGEm=Installing ViGEmBus (virtual controller driver) …
+LaunchNow=Launch now
+ViGEmFailed=ViGEmBus could not be installed. Without it no virtual controller can be created. You can install it manually later: https://github.com/nefarius/ViGEmBus/releases
+InstallingHidHide=Installing HidHide (prevents duplicate controllers in Steam and games) …
+ConfiguringHidHide=Allowing N-Connect in HidHide …
+ThemeCaption=Appearance
+ThemeDescription=How should N-Connect look?
+ThemeSubCaption=Choose the color scheme of the application:
+ThemeDark=Dark (recommended)
+ThemeLight=Light
+ThemeSystem=Same as Windows
 
 [Files]
 Source: "..\out\publish\win-x64\{#AppExe}"; DestDir: "{app}"; Flags: ignoreversion
@@ -160,11 +222,35 @@ end;
 
 var
   HidHideWasMissing: Boolean;
+  ThemePage: TInputOptionWizardPage;
 
 function InitializeSetup: Boolean;
 begin
   HidHideWasMissing := not HidHideInstalled;
   Result := True;
+end;
+
+// Eigene Seite „Darstellung“: das gewählte Programm-Theme landet in der Registry (HKCU\Software\N-Connect\Theme)
+// und wird von der App beim ersten Start gelesen. Standard: Dunkel.
+procedure InitializeWizard;
+begin
+  ThemePage := CreateInputOptionPage(wpSelectTasks,
+    CustomMessage('ThemeCaption'), CustomMessage('ThemeDescription'),
+    CustomMessage('ThemeSubCaption'), True, False);
+  ThemePage.Add(CustomMessage('ThemeDark'));
+  ThemePage.Add(CustomMessage('ThemeLight'));
+  ThemePage.Add(CustomMessage('ThemeSystem'));
+  ThemePage.SelectedValueIndex := 0;
+end;
+
+function ThemeRegValue: String;
+begin
+  case ThemePage.SelectedValueIndex of
+    1: Result := 'light';
+    2: Result := 'system';
+  else
+    Result := 'dark';
+  end;
 end;
 
 function HidHideMissing: Boolean;
@@ -216,10 +302,34 @@ begin
   end;
 end;
 
+// Installersprache -> Sprachcode der App (HKCU\Software\N-Connect\Language, wird beim ersten Start gelesen).
+function InstallerLangCode: String;
+var
+  L: String;
+begin
+  L := ExpandConstant('{language}');
+  if L = 'german' then Result := 'de'
+  else if L = 'spanish' then Result := 'es'
+  else if L = 'french' then Result := 'fr'
+  else if L = 'italian' then Result := 'it'
+  else if (L = 'portuguese') or (L = 'brazilianportuguese') then Result := 'pt'
+  else if L = 'dutch' then Result := 'nl'
+  else if L = 'polish' then Result := 'pl'
+  else if L = 'russian' then Result := 'ru'
+  else if L = 'japanese' then Result := 'ja'
+  else if L = 'chinesesimplified' then Result := 'zh'
+  else if L = 'korean' then Result := 'ko'
+  else Result := 'en';
+end;
+
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
   if CurStep = ssPostInstall then
+  begin
     RegisterHidHideTask;
+    RegWriteStringValue(HKCU, 'Software\N-Connect', 'Language', InstallerLangCode);
+    RegWriteStringValue(HKCU, 'Software\N-Connect', 'Theme', ThemeRegValue);
+  end;
 end;
 
 procedure CheckViGEmResult;

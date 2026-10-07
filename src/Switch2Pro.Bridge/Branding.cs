@@ -39,11 +39,37 @@ internal static class Branding
         return (Icon)temp.Clone();
     }
 
+    private static Bitmap? _logoImage;
+
+    /// <summary>Offizielles Logo-Bild (eingebettetes PNG), sonst null → gezeichnete Variante.</summary>
+    private static Bitmap? LogoImage()
+    {
+        if (_logoImage is not null)
+            return _logoImage;
+        try
+        {
+            var stream = typeof(Branding).Assembly.GetManifestResourceStream("N-Connect.png");
+            if (stream is not null)
+                _logoImage = new Bitmap(stream);
+        }
+        catch (Exception e) when (e is ArgumentException or IOException)
+        {
+        }
+        return _logoImage;
+    }
+
     /// <summary>Logo in das Quadrat <paramref name="r"/> zeichnen.</summary>
     public static void DrawLogo(Graphics g, RectangleF r, bool tile = true)
     {
         g.SmoothingMode = SmoothingMode.AntiAlias;
         g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+        var image = LogoImage();
+        if (image is not null)
+        {
+            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            g.DrawImage(image, r);
+            return;
+        }
         float s = r.Width;
         PointF P(float x, float y) => new(r.X + x * s, r.Y + y * s);
         RectangleF R(float x, float y, float w, float h) => new(r.X + x * s, r.Y + y * s, w * s, h * s);

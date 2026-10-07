@@ -108,7 +108,7 @@ internal static class RenderCheck
     public static void RenderUi(string folder)
     {
         Directory.CreateDirectory(folder);
-        string lang = Tr.English ? "en" : "de";
+        string lang = Tr.Lang;
         string variant = (Environment.GetCommandLineArgs().Contains("--demo-all") ? "_alle" : Environment.GetCommandLineArgs().Contains("--demo-retro") ? "_retro" : "")
                          + (Environment.GetCommandLineArgs().Contains("--wide") ? "_breit" : "");
         var log = new List<string>();

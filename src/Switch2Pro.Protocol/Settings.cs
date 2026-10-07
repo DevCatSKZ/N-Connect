@@ -583,7 +583,7 @@ public sealed class Settings
         TurboRate = Fin(TurboRate, 2f, 30f, 12f);
         if (Theme is not (null or "dark" or "light" or "system"))
             Theme = null;
-        if (Language is not (null or "de" or "en"))
+        if (Language is not (null or "de" or "en" or "es" or "fr" or "it" or "pt" or "nl" or "pl" or "ru" or "ja" or "zh" or "ko"))
             Language = null;
         if (!Enum.IsDefined(GyroStick))
             GyroStick = GyroStickMode.Off;

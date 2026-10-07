@@ -47,9 +47,11 @@ internal static class Theme
     /// <summary>Mica-Titelleiste aktiv (Einstellung an und Windows 11).</summary>
     public static bool Mica { get; private set; }
 
-    /// <summary>Darstellung festlegen: "dark" (Standard), "light" oder "system"; Mica nur ab Windows 11.</summary>
+    /// <summary>Darstellung festlegen: "dark" (Standard), "light" oder "system"; Mica nur ab Windows 11.
+    /// Ohne App-Einstellung (null) gilt die Themawahl des Installers aus der Registry, sonst Dunkel.</summary>
     public static void Init(string? mode, bool transparency)
     {
+        mode ??= InstallerTheme();
         bool dark = mode switch
         {
             "light" => false,
@@ -62,6 +64,20 @@ internal static class Theme
         // Nutzerwahl beliebig aus (z. B. pink).
         Accent = dark ? Color.FromArgb(0, 140, 220) : Color.FromArgb(0, 120, 212);
         Mica = transparency && OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22621);
+    }
+
+    /// <summary>Themawahl des Installers (HKCU\Software\N-Connect\Theme): "dark", "light" oder "system".</summary>
+    private static string? InstallerTheme()
+    {
+        try
+        {
+            using var key = Registry.CurrentUser.OpenSubKey(@"Software\N-Connect");
+            return key?.GetValue("Theme") is string v && v is "dark" or "light" or "system" ? v : null;
+        }
+        catch (Exception e) when (e is System.Security.SecurityException or UnauthorizedAccessException or IOException)
+        {
+            return null;
+        }
     }
 
     private static bool WindowsUsesLightApps()
@@ -315,7 +331,62 @@ internal static class Theme
         return form.ShowDialog(owner);
     }
 
-    public static ToolStripRenderer MenuRenderer() => new ToolStripProfessionalRenderer(new MenuColors()) { RoundedEdges = true };
+    public static ToolStripRenderer MenuRenderer() => new ThemeMenuRenderer();
+
+    /// <summary>
+    /// Menü-Renderer für beide Farbmodi: Zeichnet neben dem Hintergrund auch Text, Tastaturkürzel,
+    /// Pfeile, Häkchen und Trennlinien in den Theme-Farben – sonst bleibt der Text im dunklen Modus schwarz.
+    /// Gilt über den Farbtabellen-Mechanismus auch für alle Untermenüs.
+    /// </summary>
+    private sealed class ThemeMenuRenderer : ToolStripProfessionalRenderer
+    {
+        private static Palette P => Current;
+
+        public ThemeMenuRenderer() : base(new MenuColors())
+        {
+            RoundedEdges = true;
+        }
+
+        protected override void OnRenderItemText(ToolStripItemTextRenderEventArgs e)
+        {
+            e.TextColor = e.Item.Enabled ? P.Text : P.TextMuted;
+            base.OnRenderItemText(e);
+        }
+
+        protected override void OnRenderArrow(ToolStripArrowRenderEventArgs e)
+        {
+            e.ArrowColor = e.Item!.Enabled ? P.Text : P.TextMuted;
+            base.OnRenderArrow(e);
+        }
+
+        protected override void OnRenderItemCheck(ToolStripItemImageRenderEventArgs e)
+        {
+            var g = e.Graphics;
+            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            var r = e.ImageRectangle;
+            using var back = new SolidBrush(e.Item.Selected ? ColorTable.CheckSelectedBackground : ColorTable.CheckBackground);
+            g.FillRectangle(back, new Rectangle(r.X - 1, r.Y - 1, r.Width + 2, r.Height + 2));
+            using var pen = new Pen(P.Text, Math.Max(1.5f, r.Height / 8f)) { StartCap = System.Drawing.Drawing2D.LineCap.Round, EndCap = System.Drawing.Drawing2D.LineCap.Round };
+            g.DrawLines(pen,
+            [
+                new PointF(r.X + r.Width * 0.18f, r.Y + r.Height * 0.52f),
+                new PointF(r.X + r.Width * 0.42f, r.Y + r.Height * 0.78f),
+                new PointF(r.X + r.Width * 0.86f, r.Y + r.Height * 0.22f),
+            ]);
+        }
+
+        protected override void OnRenderSeparator(ToolStripSeparatorRenderEventArgs e)
+        {
+            if (e.Vertical || e.Item is not ToolStripSeparator)
+            {
+                base.OnRenderSeparator(e);
+                return;
+            }
+            int y = e.Item.Bounds.Y + e.Item.Bounds.Height / 2;
+            using var pen = new Pen(P.Border);
+            e.Graphics.DrawLine(pen, e.Item.Bounds.X + 28, y, e.Item.Bounds.Right - 6, y);
+        }
+    }
 
     private sealed class MenuColors : ProfessionalColorTable
     {

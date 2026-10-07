@@ -32,11 +32,17 @@ internal static class Program
             RenderCheck.Run(args[render + 1]);
             return;
         }
+        // --lang=xx wählt die Sprache für die Prüfhilfen (Standard: de, --en bleibt als Kurzform).
+        static string LangArg(string[] args)
+        {
+            var a = args.FirstOrDefault(x => x.StartsWith("--lang=", StringComparison.Ordinal));
+            return a is not null ? a["--lang=".Length..] : args.Contains("--en") ? "en" : "de";
+        }
         int renderUi = Array.IndexOf(args, "--render-ui");
         if (renderUi >= 0 && renderUi + 1 < args.Length)
         {
             ApplicationConfiguration.Initialize();
-            Tr.Init(args.Contains("--en") ? "en" : "de");
+            Tr.SetLanguage(LangArg(args));
             Theme.Init(args.Contains("--light") ? "light" : "dark", transparency: false);
             RenderCheck.RenderUi(args[renderUi + 1]);
             return;
@@ -46,7 +52,7 @@ internal static class Program
         if (dump >= 0 && dump + 1 < args.Length)
         {
             ApplicationConfiguration.Initialize();
-            Tr.Init(args.Contains("--en") ? "en" : "de");
+            Tr.SetLanguage(LangArg(args));
             Theme.Init(args.Contains("--light") ? "light" : "dark", transparency: false);
             RenderCheck.DumpTexts(args[dump + 1]);
             return;

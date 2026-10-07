@@ -2,12 +2,16 @@
 
 # N-Connect
 
+**Deutsch** · [English](README.en.md)
+
 Nintendo-, **PlayStation- und Xbox-Controller** am PC nutzen und verwalten – in **Windows, Steam,
 Xbox-/Game-Pass-Spielen, Epic, Emulatoren** und allen anderen Programmen, die Controller unterstützen.
 Jeder Controller erscheint als **Xbox-360-Controller** (oder auf Wunsch als **DualShock 4** mit
 Bewegungssteuerung).
 
-Einmal installieren, Controller verbinden, spielen. Die Oberfläche gibt es auf Deutsch und Englisch.
+Einmal installieren, Controller verbinden, spielen. Die Oberfläche gibt es in zwölf Sprachen –
+Deutsch, Englisch, Spanisch, Französisch, Italienisch, Portugiesisch, Niederländisch, Polnisch,
+Russisch, Japanisch, Chinesisch und Koreanisch (folgt der Windows-Sprache oder der Wahl im Setup).
 
 ## Unterstützte Controller
 

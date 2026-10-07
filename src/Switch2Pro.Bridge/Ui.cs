@@ -24,6 +24,35 @@ internal static class Glyph
             Fonts[size] = font = new Font("Segoe MDL2 Assets", size, GraphicsUnit.Point);
         return font;
     }
+
+    /// <summary>Symbole mit eigener Vektorzeichnung (schärfer und besser lesbar als die Fontschrift). true = gezeichnet.</summary>
+    public static bool Paint(Graphics g, string glyph, Rectangle bounds, Color color)
+    {
+        g.SmoothingMode = SmoothingMode.AntiAlias;
+        if (glyph == Bluetooth)
+        {
+            BluetoothMark(g, bounds, color);
+            return true;
+        }
+        return false;
+    }
+
+    /// <summary>Bluetooth-Rune (ᚼ+ᛒ): Mittelsteg, zwei Dreiecke nach rechts, zwei Striche von links zur Mitte.</summary>
+    private static void BluetoothMark(Graphics g, Rectangle bounds, Color color)
+    {
+        float h = Math.Min(bounds.Height * 0.72f, bounds.Width * 1.1f);
+        float w = h * 0.82f;
+        float x = bounds.X + (bounds.Width - w) / 2f, y = bounds.Y + (bounds.Height - h) / 2f;
+        PointF P(float nx, float ny) => new(x + nx * w, y + ny * h);
+        var top = P(0.5f, 0f); var mid = P(0.5f, 0.5f); var bot = P(0.5f, 1f);
+        var r1 = P(0.98f, 0.26f); var r2 = P(0.98f, 0.74f);
+        var l1 = P(0.02f, 0.26f); var l2 = P(0.02f, 0.74f);
+        using var pen = new Pen(color, Math.Max(1.6f, h * 0.11f)) { StartCap = LineCap.Round, EndCap = LineCap.Round };
+        g.DrawLine(pen, top, bot);
+        g.DrawLine(pen, top, r1); g.DrawLine(pen, r1, mid);
+        g.DrawLine(pen, mid, r2); g.DrawLine(pen, r2, bot);
+        g.DrawLine(pen, l1, mid); g.DrawLine(pen, l2, mid);
+    }
 }
 
 /// <summary>Schriften der Oberfläche: „Segoe UI Variable“ (Windows 11), sonst „Segoe UI“.</summary>
@@ -325,7 +354,7 @@ internal sealed class SettingRow : Control, IHeightForWidth, IExtraTexts, ISelfT
         if (Parent is SettingsGroup group && group.Controls.GetChildIndex(this) > 0)
             using (var line = new Pen(Theme.Dark ? Color.FromArgb(0x1F, 0x1F, 0x1F) : Color.FromArgb(0xEA, 0xEA, 0xEA)))
                 g.DrawLine(line, 0, 0, Width, 0);
-        if (_glyph is not null)
+        if (_glyph is not null && !Glyph.Paint(g, _glyph, new Rectangle(Pad, 0, 24, Height), p.Text))
             TextRenderer.DrawText(g, _glyph, Glyph.Font(13f), new Rectangle(Pad, 0, 24, Height), p.Text,
                 TextFormatFlags.VerticalCenter | TextFormatFlags.HorizontalCenter | TextFormatFlags.NoPadding);
         int tw = TextWidth(Width);
@@ -766,8 +795,9 @@ internal sealed class GlyphButton : Control, ISelfTranslating
         int x = (Width - total) / 2;
         if (_glyph is not null)
         {
-            TextRenderer.DrawText(g, _glyph, Glyph.Font(10.5f), new Rectangle(x, 0, 16, Height), fore,
-                TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
+            if (!Glyph.Paint(g, _glyph, new Rectangle(x, 0, 18, Height), fore))
+                TextRenderer.DrawText(g, _glyph, Glyph.Font(10.5f), new Rectangle(x, 0, 16, Height), fore,
+                    TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
             x += textW > 0 ? 24 : 16;
         }
         if (textW > 0)
@@ -959,8 +989,9 @@ internal sealed class NavItem : Control, ISelfTranslating
             using var accent = new SolidBrush(Theme.Accent);
             g.FillPath(accent, pill);
         }
-        TextRenderer.DrawText(g, _glyph, Glyph.Font(12f), new Rectangle(12, 0, 24, Height), p.Text,
-            TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
+        if (!Glyph.Paint(g, _glyph, new Rectangle(12, 0, 24, Height), p.Text))
+            TextRenderer.DrawText(g, _glyph, Glyph.Font(12f), new Rectangle(12, 0, 24, Height), p.Text,
+                TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
         TextRenderer.DrawText(g, Tr.T(Text), UiFonts.Body, new Rectangle(44, 0, Width - 56, Height), p.Text,
             TextFormatFlags.VerticalCenter | TextFormatFlags.NoPrefix | TextFormatFlags.EndEllipsis);
         if (Focused && ShowFocusCues)

@@ -39,7 +39,18 @@ internal sealed class Player : IDisposable
         var links = Links;
         var names = links.Select(l => settings.NameFor(l.Address)).Where(n => n is not null).ToList();
         if (names.Count == 0)
-            return links is [{ ProductName: { } product }] ? product : Kind.DisplayName();
+        {
+            if (links is [{ ProductName: { } product }])
+                return product;
+            if (links.Count == 2)
+            {
+                if (links.All(l => l.Kind is ControllerKind.JoyCon2Left or ControllerKind.JoyCon2Right))
+                    return "Nintendo Switch 2 Joy-Con (L+R)";
+                if (links.All(l => l.Kind is ControllerKind.JoyCon1Left or ControllerKind.JoyCon1Right))
+                    return "Nintendo Switch Joy-Con (L+R)";
+            }
+            return Kind.DisplayName();
+        }
         return links.Count == 2 && names.Count == 1 ? $"{names[0]} (Joy-Con-Paar)" : string.Join(" + ", names);
     }
 
