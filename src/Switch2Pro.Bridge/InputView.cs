@@ -139,7 +139,8 @@ internal sealed partial class InputView : Control
         bool switch2 = p?.Kind == ControllerKind.Pro2;
         if (switch2)
             SquareKey(g, f.P(955, 650), On(ProButtons.C), "C");
-        PlayerLeds(g, f.P(830, 120));
+        // Spieler-LEDs sitzen unten mittig zwischen den Griffen (wie am Original), nicht oben.
+        PlayerLeds(g, f.P(953, 712));
 
         Gyro(g, p?.Motion);
 
