@@ -172,6 +172,8 @@ internal static partial class Tr
         ["Quer halten"] = "가로로 들기",
         ["Joy-Con trennen"] = "Joy-Con 분리",
         ["Zum Paar verbinden"] = "페어로 결합",
+        ["Joy-Con trennen – beide werden einzelne Controller"] = "Joy-Con 분리 – 둘 다 개별 컨트롤러가 됩니다",
+        ["Zum Paar verbinden – sucht einen freien Joy-Con"] = "페어로 결합 – 사용 가능한 Joy-Con을 찾습니다",
         ["Doppelt angezeigt? Verstecken"] = "중복 표시? 숨기기",
         ["amiibo lesen"] = "amiibo 읽기",
         ["Ring-Con ein"] = "Ring-Con 켜기",

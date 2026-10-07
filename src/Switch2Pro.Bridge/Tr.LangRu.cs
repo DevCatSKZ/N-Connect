@@ -172,6 +172,8 @@ internal static partial class Tr
         ["Quer halten"] = "Держать горизонтально",
         ["Joy-Con trennen"] = "Разъединить Joy-Con",
         ["Zum Paar verbinden"] = "Объединить в пару",
+        ["Joy-Con trennen – beide werden einzelne Controller"] = "Разделить Joy-Con – оба станут отдельными контроллерами",
+        ["Zum Paar verbinden – sucht einen freien Joy-Con"] = "Объединить в пару – ищет свободный Joy-Con",
         ["Doppelt angezeigt? Verstecken"] = "Отображается дважды? Скрыть",
         ["amiibo lesen"] = "Считать amiibo",
         ["Ring-Con ein"] = "Включить Ring-Con",

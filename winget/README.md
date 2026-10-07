@@ -34,7 +34,6 @@ wingetcreate update DevCatSKZ.N-Connect -v 1.0.6 -u <Setup-URL> <Zip-URL>
 
 ## Hinweise
 
-- `License` steht auf `Proprietary`, weil das Repo noch keine LICENSE-Datei hat – sollte eine
-  gewählt werden (z. B. MIT), hier und im Repo ergänzen.
+- `License: MIT` – passt zur `LICENSE` im Repo (MIT seit Oktober 2026).
 - Der ZIP-Eintrag installiert die portable EXE (`winget install … --installer-type zip` bzw. als
   Alternative zum Setup). ViGEmBus/HidHide kommen aus dem Inno-Setup – das ZIP enthält sie nicht.
