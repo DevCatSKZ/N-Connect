@@ -55,7 +55,7 @@ internal sealed class Xbox360Pad : IVirtualPad
 {
     private readonly IXbox360Controller _pad;
     private readonly object _gate = new();
-    private bool _disposed;
+    private volatile bool _disposed;
 
     public event Action<byte, byte>? Rumble;
     public event Action<byte, byte, byte>? Lightbar { add { } remove { } }
@@ -81,24 +81,48 @@ internal sealed class Xbox360Pad : IVirtualPad
         _pad.AutoSubmitReport = false;
         _pad.FeedbackReceived += OnFeedback;
         _pad.Connect();
-        // Platz sofort merken: Feedback kommt erst beim ersten Rumble, der Slot ist aber ab Connect fest.
-        // Als „virtuell“ markiert, damit die XInput-Suche ihn nicht als echten Xbox-Controller ansieht.
+        // Platz merken und als „virtuell“ kennzeichnen, damit die XInput-Suche unser eigenes Pad nicht
+        // für einen echten Xbox-Controller hält. UserIndex ist direkt nach Connect() oft noch nicht
+        // vergeben – dann kurz im Hintergrund nachlesen, sonst bliebe ein Geist-Controller in der Übersicht.
+        if (!TryMarkVirtual())
+        {
+            Task.Run(async () =>
+            {
+                for (int i = 0; i < 80 && !_disposed && !TryMarkVirtual(); i++)
+                    await Task.Delay(50);
+                if (!_disposed && _slot < 0)
+                    Log.Warn("Xbox-Pad: Platz nicht lesbar – XInput-Slot nicht als virtuell markiert");
+            });
+        }
+    }
+
+    /// <summary>Den XInput-Platz des virtuellen Pads lesen und als „eigen“ markieren; false, wenn noch unbekannt.</summary>
+    private bool TryMarkVirtual()
+    {
         try
         {
-            _slot = (int)_pad.UserIndex;
-            if (_slot is >= 0 and <= 3)
-                XInput.SetVirtualSlot(_slot, true);
+            int slot = (int)_pad.UserIndex;
+            if (slot is >= 0 and <= 3)
+            {
+                _slot = slot;
+                XInput.SetVirtualSlot(slot, true);
+                _playerIndexAssigned?.Invoke(slot);
+                return true;
+            }
         }
-        catch (Exception e)
+        catch (Exception e) when (e is not OutOfMemoryException)
         {
-            Log.Warn($"Xbox-Pad: Platz nicht lesbar ({Log.Reason(e)})");
         }
+        return false;
     }
 
     private void OnFeedback(object? sender, Xbox360FeedbackReceivedEventArgs e)
     {
         Rumble?.Invoke(e.LargeMotor, e.SmallMotor);
         _slot = e.LedNumber;
+        // Auch hier markieren: kam die Platzmeldung zuerst über Feedback, ist der Slot damit sicher bekannt.
+        if (e.LedNumber is >= 0 and <= 3)
+            XInput.SetVirtualSlot(e.LedNumber, true);
         _playerIndexAssigned?.Invoke(e.LedNumber);
     }
 
