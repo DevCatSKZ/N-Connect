@@ -412,8 +412,9 @@ internal sealed class TrayApp : ApplicationContext
     {
         if (_update is not { Setup: { } setup } update || _updating)
             return;
+        bool portable = setup.IsZip;
         if (Tr.Show(null, $"Version {update.Version} herunterladen und installieren? N-Connect wird dafür kurz beendet und " +
-                          "danach wieder gestartet. Windows fragt dabei nach Administratorrechten.",
+                          "danach wieder gestartet." + (portable ? "" : " Windows fragt dabei nach Administratorrechten."),
                 "N-Connect aktualisieren", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
             return;
         _updating = true;
@@ -427,6 +428,19 @@ internal sealed class TrayApp : ApplicationContext
                 if (Tr.Show(null, "Der Download hat nicht geklappt oder die Datei war fehlerhaft. Die Release-Seite im Browser öffnen?",
                         "N-Connect aktualisieren", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
                     Open(update.Url);
+                return;
+            }
+            if (portable)
+            {
+                // ZIP: neue EXE neben die laufende kopieren – geht erst, nachdem dieser Prozess beendet ist.
+                // Ein kleines Skript wartet darauf, ersetzt die Datei und startet N-Connect wieder.
+                if (!PreparePortableUpdate(path))
+                {
+                    Log.Warn("Update: ZIP konnte nicht entpackt werden");
+                    return;
+                }
+                Log.Info($"Update auf {update.Version}: portable EXE vorbereitet, N-Connect wird beendet");
+                ExitThread();
                 return;
             }
             try
@@ -446,6 +460,44 @@ internal sealed class TrayApp : ApplicationContext
         finally
         {
             _updating = false;
+        }
+    }
+
+    /// <summary>
+    /// Portable-Update: ZIP entpacken, ein Hilfsskript schreiben, das nach unserem Prozess-Ende die neue EXE
+    /// neben die alte kopiert und N-Connect wieder startet. Liefert false, wenn das ZIP kein N-Connect.exe enthielt.
+    /// </summary>
+    private bool PreparePortableUpdate(string zipPath)
+    {
+        try
+        {
+            string dir = Path.Combine(Path.GetTempPath(), "N-Connect-Update", "portable");
+            if (Directory.Exists(dir))
+                Directory.Delete(dir, recursive: true);
+            System.IO.Compression.ZipFile.ExtractToDirectory(zipPath, dir);
+            string? exe = Directory.GetFiles(dir, "N-Connect.exe", SearchOption.AllDirectories).FirstOrDefault();
+            string? target = Environment.ProcessPath;
+            if (exe is null || target is null)
+                return false;
+            string script = Path.Combine(Path.GetTempPath(), "N-Connect-Update", "update.cmd");
+            int pid = Environment.ProcessId;
+            File.WriteAllText(script,
+                "@echo off\r\n" +
+                $":wait\r\n" +
+                $"tasklist /FI \"PID eq {pid}\" | findstr /C:\" {pid} \" >nul\r\n" +
+                "if not errorlevel 1 (timeout /t 1 /nobreak >nul & goto wait)\r\n" +
+                $"copy /y \"{exe}\" \"{target}\" >nul\r\n" +
+                $"start \"\" \"{target}\"\r\n" +
+                "del \"%~f0\"\r\n");
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("cmd.exe", $"/c \"{script}\"")
+                { CreateNoWindow = true, UseShellExecute = false, WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden });
+            return true;
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or System.ComponentModel.Win32Exception
+                                      or InvalidDataException or ArgumentException)
+        {
+            Log.Warn($"Update: portable EXE nicht vorbereitet: {Log.Reason(e)}");
+            return false;
         }
     }
 

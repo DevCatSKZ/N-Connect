@@ -15,23 +15,29 @@ internal static class UpdateCheck
     private const string Releases = "https://api.github.com/repos/DevCatSKZ/N-Connect/releases?per_page=30";
     private const string TagPrefix = "v";
 
-    /// <summary>Gefundene Version: Seite des Releases und – falls vorhanden – der Installer als Datei.</summary>
+    /// <summary>Gefundene Version: Seite des Releases und – falls vorhanden – die passende Paket-Datei.</summary>
     public sealed record Update(Version Version, string Url, Installer? Setup = null);
 
-    /// <summary>Installer-Datei eines Releases (Name, Download-Adresse, Größe, SHA-256 als Hex – falls GitHub sie liefert).</summary>
-    public sealed record Installer(string Name, string Url, long Size, string? Sha256);
+    /// <summary>Paket-Datei eines Releases (Name, Download-Adresse, Größe, SHA-256 als Hex – falls GitHub sie liefert).
+    /// Installiert: „N-Connect-Setup-….exe“; portable: „N-Connect-Portable-….zip“.</summary>
+    public sealed record Installer(string Name, string Url, long Size, string? Sha256)
+    {
+        public bool IsZip => Name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase);
+    }
 
-    /// <summary>Installer unter den Dateien eines Releases: „N-Connect-Setup-….exe“.</summary>
+    /// <summary>Paket unter den Dateien eines Releases: Setup-EXE, in der portablen Variante das ZIP.</summary>
     private static Installer? FindInstaller(JsonElement release)
     {
+        string prefix = Paths.IsPortable ? "N-Connect-Portable" : "N-Connect-Setup";
+        string extension = Paths.IsPortable ? ".zip" : ".exe";
         if (!release.TryGetProperty("assets", out var assets) || assets.ValueKind != JsonValueKind.Array)
             return null;
         foreach (var asset in assets.EnumerateArray())
         {
             string? name = asset.TryGetProperty("name", out var n) ? n.GetString() : null;
             string? url = asset.TryGetProperty("browser_download_url", out var u) ? u.GetString() : null;
-            if (name is null || url is null || !name.StartsWith("N-Connect-Setup", StringComparison.OrdinalIgnoreCase)
-                || !name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) || !IsGitHub(url))
+            if (name is null || url is null || !name.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)
+                || !name.EndsWith(extension, StringComparison.OrdinalIgnoreCase) || !IsGitHub(url))
                 continue;
             long size = asset.TryGetProperty("size", out var s) && s.TryGetInt64(out long v) ? v : 0;
             // GitHub liefert „digest“: "sha256:…" für neuere Uploads.
