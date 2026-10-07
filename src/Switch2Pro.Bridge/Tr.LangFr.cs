@@ -30,6 +30,12 @@ internal static partial class Tr
         ["Stärke:"] = "Intensité :",
         ["Stick-Totzone (alle Controller):"] = "Zone morte du stick (toutes les manettes) :",
         ["Beim Verbinden kurz vibrieren"] = "Vibrer brièvement à la connexion",
+        ["Meldung bei Verbinden"] = "Notification de connexion",
+        ["Wer meldet, wenn ein Controller verbunden oder getrennt wird."] = "Choisissez qui notifie lorsqu’une manette se connecte ou se déconnecte.",
+        ["„N-Connect“ zeigt den echten Controller-Namen und schaltet die Gerätemeldungen von Windows ab."] = "\"N-Connect\" affiche le vrai nom de la manette et désactive les notifications de périphériques de Windows.",
+        ["N-Connect (empfohlen)"] = "N-Connect (recommandé)",
+        ["N-Connect und Windows"] = "N-Connect et Windows",
+        ["Keine"] = "Aucune",
         ["Gekoppelte Controller per Tastendruck verbinden (ohne SYNC)"] = "Connecter les manettes appairées d'une pression sur un bouton (sans SYNC)",
         ["Automatisch mit Windows starten"] = "Démarrer automatiquement avec Windows",
         ["Gyro für Emulatoren bereitstellen (Cemuhook/DSU, Port 26760 – wirkt nach Neustart)"] =

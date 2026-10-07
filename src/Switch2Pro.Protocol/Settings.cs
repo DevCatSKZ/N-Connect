@@ -58,6 +58,19 @@ public enum ExtraButtonTarget
 /// <summary>Welcher Joy-Con eines Paars die Bewegungsdaten liefert.</summary>
 public enum GyroSource { Right, Left }
 
+/// <summary>Wer meldet, wenn ein Controller verbunden oder getrennt wird.</summary>
+public enum ConnectNotifications
+{
+    /// <summary>N-Connect zeigt die Meldung (mit dem echten Controller-Namen); Gerätemeldungen von Windows aus.</summary>
+    NConnect,
+    /// <summary>Nur die Gerätemeldung von Windows; N-Connect meldet beim Verbinden/Trennen nichts.</summary>
+    Windows,
+    /// <summary>Beide Meldungen (N-Connect und Windows).</summary>
+    Both,
+    /// <summary>Keine Meldung beim Verbinden/Trennen.</summary>
+    None,
+}
+
 /// <summary>Wann der Gyro den rechten Stick steuert (zusätzlich zu den Tasten-Aktionen „Gyro-Stick“).</summary>
 public enum GyroStickMode
 {
@@ -258,6 +271,11 @@ public sealed class Settings
 
     /// <summary>Kurz „Klick“ vibrieren, wenn der Controller verbunden ist.</summary>
     public bool ConnectFeedback { get; set; } = true;
+    /// <summary>
+    /// Meldung beim Verbinden/Trennen: N-Connect (Standard, zeigt den echten Controller-Namen und schaltet die
+    /// Gerätemeldungen von Windows ab), nur Windows, beide oder keine.
+    /// </summary>
+    public ConnectNotifications ConnectNotify { get; set; } = ConnectNotifications.NConnect;
     /// <summary>
     /// Bekannte Controller per Tastendruck wieder verbinden (ohne SYNC). Achtung: Läuft das Programm,
     /// verbindet sich ein bekannter Controller dann mit dem PC statt mit der Switch 2.
@@ -462,6 +480,7 @@ public sealed class Settings
         CombineJoyCons = other.CombineJoyCons;
         DsuServer = other.DsuServer;
         ConnectFeedback = other.ConnectFeedback;
+        ConnectNotify = other.ConnectNotify;
         AutoReconnect = other.AutoReconnect;
         AutoPair = other.AutoPair;
         KnownControllers = [.. other.KnownControllers];

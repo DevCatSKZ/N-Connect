@@ -30,6 +30,12 @@ internal static partial class Tr
         ["Stärke:"] = "Сила:",
         ["Stick-Totzone (alle Controller):"] = "Мёртвая зона стика (все контроллеры):",
         ["Beim Verbinden kurz vibrieren"] = "Краткая вибрация при подключении",
+        ["Meldung bei Verbinden"] = "Уведомление о подключении",
+        ["Wer meldet, wenn ein Controller verbunden oder getrennt wird."] = "Выберите, кто уведомляет при подключении или отключении контроллера.",
+        ["„N-Connect“ zeigt den echten Controller-Namen und schaltet die Gerätemeldungen von Windows ab."] = "\"N-Connect\" показывает настоящее имя контроллера и отключает уведомления устройств Windows.",
+        ["N-Connect (empfohlen)"] = "N-Connect (рекомендуется)",
+        ["N-Connect und Windows"] = "N-Connect и Windows",
+        ["Keine"] = "Нет",
         ["Gekoppelte Controller per Tastendruck verbinden (ohne SYNC)"] = "Подключать сопряжённые контроллеры нажатием кнопки (без SYNC)",
         ["Automatisch mit Windows starten"] = "Запускать автоматически с Windows",
         ["Gyro für Emulatoren bereitstellen (Cemuhook/DSU, Port 26760 – wirkt nach Neustart)"] =
