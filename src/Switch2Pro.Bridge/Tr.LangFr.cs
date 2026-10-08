@@ -538,6 +538,7 @@ internal static partial class Tr
             "Manettes Switch 1, NSO et Wii : appuyez sur le bouton SYNC – N-Connect les appaire tout seul.\n" +
             "Ou cherchez et appairez directement ici :",
         ["Controller suchen …"] = "Chercher des manettes …",
+        ["Kein Controller verbunden"] = "Aucune manette connectée",
         ["Switch-1-, NSO- und Wii-Controller suchen und koppeln (SYNC-Taste drücken)."] =
             "Chercher et appairer des manettes Switch 1, NSO et Wii (appuyez sur le bouton SYNC).",
         ["Neue Controller automatisch koppeln"] = "Appairer automatiquement les nouvelles manettes",

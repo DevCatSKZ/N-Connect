@@ -191,6 +191,16 @@ internal static class RenderCheck
                     Full(scroll.Content, Path.Combine(folder, $"ui_{i}_inhalt{variant}_{lang}.png"));
             }
 
+            // Unterpunkt-Filter: auf der letzten Seite jede Gruppe einzeln zeigen (Navigation → Bereich).
+            if (pages[^1].Page is ScrollPage last)
+                foreach (var heading in last.Content.Controls.OfType<Heading>().Where(h => !h.IsPage))
+                {
+                    last.ShowOnly(heading.Text);
+                    Full(last.Content, Path.Combine(folder,
+                        $"ui_{pages.Count - 1}_bereich_{string.Join('_', heading.Text.Split(' '))}{variant}_{lang}.png"));
+                }
+            (pages[^1].Page as ScrollPage)?.ShowOnly(null);
+
             // Fenster „Kopplungsdaten“ mit einer nachgebauten Switch-SD-Karte (ausgedachte Daten, Ordner im Temp-Verzeichnis).
             string sd = Path.Combine(Path.GetTempPath(), "nconnect-render-sd");
             Directory.CreateDirectory(Path.Combine(sd, "Nintendo"));

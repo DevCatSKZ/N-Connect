@@ -538,6 +538,7 @@ internal static partial class Tr
             "Kontrolery Switch 1, NSO i Wii: naciśnij przycisk SYNC – N-Connect paruje je sam.\n" +
             "Albo wyszukaj i sparuj bezpośrednio tutaj:",
         ["Controller suchen …"] = "Szukaj kontrolerów …",
+        ["Kein Controller verbunden"] = "Brak połączonego kontrolera",
         ["Switch-1-, NSO- und Wii-Controller suchen und koppeln (SYNC-Taste drücken)."] =
             "Wyszukaj i sparuj kontrolery Switch 1, NSO i Wii (naciśnij przycisk SYNC).",
         ["Neue Controller automatisch koppeln"] = "Automatycznie paruj nowe kontrolery",

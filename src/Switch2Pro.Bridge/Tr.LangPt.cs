@@ -538,6 +538,7 @@ internal static partial class Tr
             "Comandos Switch 1, NSO e Wii: prima o botão SYNC – o N-Connect emparelha-os sozinho.\n" +
             "Ou procure e emparelhe diretamente aqui:",
         ["Controller suchen …"] = "Procurar comandos …",
+        ["Kein Controller verbunden"] = "Nenhum comando ligado",
         ["Switch-1-, NSO- und Wii-Controller suchen und koppeln (SYNC-Taste drücken)."] =
             "Procurar e emparelhar comandos Switch 1, NSO e Wii (prima o botão SYNC).",
         ["Neue Controller automatisch koppeln"] = "Emparelhar automaticamente novos comandos",

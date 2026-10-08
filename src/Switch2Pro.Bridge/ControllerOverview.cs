@@ -192,6 +192,7 @@ internal sealed class ControllerOverview : Panel
                 card.BodyHeight = body;
                 card.PerformLayout();
             }
+        ApplyCardFilter();
     }
 
     internal Control? FirstCard => _byPlayer.Values.FirstOrDefault();
@@ -200,6 +201,27 @@ internal sealed class ControllerOverview : Panel
     internal IReadOnlyList<Control> Cards => _cards.Controls.Cast<Control>().ToList();
 
     internal static bool ExpandCard(Control card, int tab) => ((Card)card).Expand(tab);
+
+    /// <summary>Gefilterter Spieler – Unterpunkt in der Navigation zeigt nur seine Karte; null = alle.</summary>
+    private Player? _cardFilter;
+
+    /// <summary>Nur die Karte dieses Spielers zeigen; null = alle Karten.</summary>
+    internal void ShowOnlyCard(Player? player)
+    {
+        _cardFilter = player;
+        ApplyCardFilter();
+    }
+
+    /// <summary>Kartenfilter anwenden; fällt weg, wenn der gefilterte Controller nicht mehr verbunden ist.</summary>
+    private void ApplyCardFilter()
+    {
+        if (_cardFilter is { } f && !_byPlayer.Keys.Any(k => ReferenceEquals(k, f)))
+            _cardFilter = null;
+        foreach (var (p, card) in _byPlayer)
+            card.Visible = _cardFilter is null || ReferenceEquals(p, _cardFilter);
+        if (_cardFilter is not null)
+            _order.Visible = _pairBar.Visible = false;
+    }
 
     /// <summary>Für die Prüfhilfe: Einstellungen der ersten Karte aufklappen und einen Reiter wählen.</summary>
     internal void ExpandFirst(int tab)
