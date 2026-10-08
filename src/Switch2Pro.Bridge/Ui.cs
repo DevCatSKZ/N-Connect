@@ -150,6 +150,21 @@ internal class StackPanel : Panel, IHeightForWidth
             PerformLayout();
     }
 
+    /// <summary>Sichtbarkeit aller Kinder auf einmal neu setzen – nur ein Layout-Durchlauf statt je Kind einer.</summary>
+    public void SetShownAll(Func<Control, bool> shown)
+    {
+        SuspendLayout();
+        _hidden.Clear();
+        foreach (Control c in Controls)
+        {
+            bool s = shown(c);
+            if (!s)
+                _hidden.Add(c);
+            c.Visible = s;
+        }
+        ResumeLayout(true);
+    }
+
     public bool IsShown(Control child) => !_hidden.Contains(child);
 
     private static int ChildHeight(Control c, int width) =>
@@ -248,6 +263,7 @@ internal sealed class Heading : Control, IHeightForWidth, ISelfTranslating
         SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint
                  | ControlStyles.ResizeRedraw, true);
         Text = text;
+        IsPage = page;
         _subtitle = subtitle;
         _font = page ? UiFonts.Title : hint ? UiFonts.Small : UiFonts.Strong;
         _hint = hint;
@@ -255,6 +271,9 @@ internal sealed class Heading : Control, IHeightForWidth, ISelfTranslating
         Margin = page ? new Padding(0, 0, 0, 8) : new Padding(2, 14, 0, 2);
         TabStop = false;
     }
+
+    /// <summary>Seitenüberschrift (groß) – im Gegensatz zu den Gruppenüberschriften darunter.</summary>
+    internal bool IsPage { get; }
 
     private string Sub => _subtitle is null ? "" : Tr.T(_subtitle);
 
@@ -942,11 +961,12 @@ internal sealed class PivotTabs : Control, IExtraTexts, ISelfTranslating
     }
 }
 
-/// <summary>Eintrag der linken Navigationsleiste (Symbol und Text, gewählt mit Akzentstrich links).</summary>
+/// <summary>Eintrag der linken Navigationsleiste (Symbol und Text, gewählt mit Akzentstrich links).
+/// Mit <see cref="Expandable"/> zeigt er rechts einen Pfeil und klappt Unterpunkte auf bzw. zu.</summary>
 internal sealed class NavItem : Control, ISelfTranslating
 {
     private readonly string _glyph;
-    private bool _hover, _selected;
+    private bool _hover, _selected, _expanded;
 
     public NavItem(string text, string glyph, Action select)
     {
@@ -958,7 +978,13 @@ internal sealed class NavItem : Control, ISelfTranslating
         Cursor = Cursors.Hand;
         TabStop = true;
         Margin = new Padding(0, 0, 0, 4);
-        Click += (_, _) => select();
+        MouseDown += (_, e) =>
+        {
+            if (e.Button == MouseButtons.Left && Expandable && e.X >= Width - 34)
+                ExpandToggled?.Invoke();
+            else
+                select();
+        };
         KeyDown += (_, e) => { if (e.KeyCode is Keys.Enter or Keys.Space) select(); };
     }
 
@@ -967,6 +993,18 @@ internal sealed class NavItem : Control, ISelfTranslating
         get => _selected;
         set { _selected = value; Invalidate(); }
     }
+
+    /// <summary>Hat Unterpunkte: Pfeil rechts, Klick darauf meldet <see cref="ExpandToggled"/>.</summary>
+    public bool Expandable { get; set; }
+
+    public bool Expanded
+    {
+        get => _expanded;
+        set { _expanded = value; Invalidate(); }
+    }
+
+    /// <summary>Klick auf den Pfeil rechts (Auf-/Zuklappen ohne die Seite zu wechseln).</summary>
+    public event Action? ExpandToggled;
 
     protected override void OnMouseEnter(EventArgs e) { base.OnMouseEnter(e); _hover = true; Invalidate(); }
     protected override void OnMouseLeave(EventArgs e) { base.OnMouseLeave(e); _hover = false; Invalidate(); }
@@ -997,10 +1035,71 @@ internal sealed class NavItem : Control, ISelfTranslating
                 TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
         TextRenderer.DrawText(g, Tr.T(Text), UiFonts.Body, new Rectangle(44, 0, Width - 56, Height), p.Text,
             TextFormatFlags.VerticalCenter | TextFormatFlags.NoPrefix | TextFormatFlags.EndEllipsis);
+        if (Expandable)
+            TextRenderer.DrawText(g, _expanded ? Glyph.ChevronUp : Glyph.ChevronDown, Glyph.Font(9f),
+                new Rectangle(Width - 32, 0, 24, Height), p.TextMuted,
+                TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
         if (Focused && ShowFocusCues)
             using (var pen = new Pen(p.Text, 1.5f))
             using (var path = Theme.RoundedRect(RectangleF.Inflate(r, -1, -1), 5))
                 g.DrawPath(pen, path);
+    }
+}
+
+/// <summary>Eingerückter Unterpunkt in der linken Navigation (verbundene Controller, Abschnitte einer Seite).
+/// Ohne Aktion ist er deaktiviert gezeichnet (z. B. „Kein Controller verbunden“).</summary>
+internal sealed class NavSubItem : Control, ISelfTranslating
+{
+    private bool _hover, _selected;
+
+    public NavSubItem(string text, Action? select)
+    {
+        SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint
+                 | ControlStyles.Selectable | ControlStyles.ResizeRedraw, true);
+        Text = text;
+        Height = 32;
+        Enabled = select is not null;
+        Cursor = select is null ? Cursors.Default : Cursors.Hand;
+        TabStop = select is not null;
+        Margin = new Padding(0, 0, 0, 2);
+        if (select is not null)
+        {
+            Click += (_, _) => select();
+            KeyDown += (_, e) => { if (e.KeyCode is Keys.Enter or Keys.Space) select(); };
+        }
+    }
+
+    /// <summary>Gewählter Unterpunkt: Akzentmarke links, gleiche Füllung wie <see cref="NavItem.Selected"/>.</summary>
+    public bool Selected
+    {
+        get => _selected;
+        set { _selected = value; Invalidate(); }
+    }
+
+    protected override void OnMouseEnter(EventArgs e) { base.OnMouseEnter(e); _hover = true; Invalidate(); }
+    protected override void OnMouseLeave(EventArgs e) { base.OnMouseLeave(e); _hover = false; Invalidate(); }
+
+    protected override void OnPaint(PaintEventArgs e)
+    {
+        var g = e.Graphics;
+        var p = Theme.Current;
+        g.Clear(BackColor);
+        g.SmoothingMode = SmoothingMode.AntiAlias;
+        if (_selected || (_hover && Enabled))
+        {
+            using var path = Theme.RoundedRect(new RectangleF(0.5f, 0.5f, Width - 1.5f, Height - 1.5f), 5);
+            using var brush = new SolidBrush(_selected ? p.SurfaceHover : Theme.Blend(BackColor, p.Text, 0.05f));
+            g.FillPath(brush, path);
+        }
+        if (_selected)
+        {
+            using var pill = Theme.RoundedRect(new RectangleF(24, Height / 2f - 8, 3, 16), 1.5f);
+            using var accent = new SolidBrush(Theme.Accent);
+            g.FillPath(accent, pill);
+        }
+        TextRenderer.DrawText(g, Tr.T(Text), UiFonts.Small, new Rectangle(48, 0, Width - 62, Height),
+            Enabled ? p.Text : p.TextMuted,
+            TextFormatFlags.VerticalCenter | TextFormatFlags.NoPrefix | TextFormatFlags.EndEllipsis);
     }
 }
 
@@ -1096,5 +1195,35 @@ internal sealed class ScrollPage : Panel
             group.Controls.Add(row);
         Content.Controls.Add(group);
         return group;
+    }
+
+    /// <summary>Nur die Gruppe mit dieser Überschrift zeigen (Unterpunkt in der Navigation); null = ganze Seite.</summary>
+    public void ShowOnly(string? section)
+    {
+        // Zugehörigkeit vorberechnen – eine Überschrift startet eine Gruppe, alles danach gehört dazu.
+        var show = new Dictionary<Control, bool>();
+        bool inSection = section is null, found = section is null;
+        foreach (Control c in Content.Controls)
+        {
+            if (c is Heading { IsPage: true })
+            {
+                show[c] = true; // Seitentitel bleibt immer sichtbar
+                continue;
+            }
+            if (c is Heading h)
+            {
+                inSection = section is null || h.Text == section;
+                found |= h.Text == section;
+            }
+            show[c] = inSection;
+        }
+        if (!found)
+        {
+            ShowOnly(null);
+            return;
+        }
+        Content.SetShownAll(c => !show.TryGetValue(c, out bool s) || s);
+        if (section is not null)
+            AutoScrollPosition = Point.Empty;
     }
 }

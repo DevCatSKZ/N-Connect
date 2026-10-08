@@ -24,7 +24,7 @@ internal sealed class SettingsForm : UiForm
 
     // ---------- Seiten und Navigation ----------
     public const int PageControllers = 0, PageMapping = 1, PageSticks = 2, PageGyro = 3, PageJoyCon = 4, PageGeneral = 5;
-    private readonly List<(NavItem Nav, Control Page)> _pages = [];
+    private readonly List<(NavItem Nav, Control Page, List<NavSubItem> Subs)> _pages = [];
     private readonly Panel _host = new() { Dock = DockStyle.Fill };
     private int _page = -1;
 
@@ -128,6 +128,7 @@ internal sealed class SettingsForm : UiForm
         AddPage("Allgemein", Glyph.Settings, BuildGeneralPage());
 
         WireEvents();
+        RefreshControllerSubs();
         LoadValues();
         Theme.Apply(this);
         Tr.Apply(this);
@@ -178,12 +179,105 @@ internal sealed class SettingsForm : UiForm
     private void AddPage(string title, string glyph, Control page)
     {
         int index = _pages.Count;
-        var nav = new NavItem(title, glyph, () => ShowPage(index)) { Width = 258, BackColor = Theme.Backdrop };
+        var nav = new NavItem(title, glyph, () => SelectPage(index)) { Width = 258, BackColor = Theme.Backdrop };
+        nav.ExpandToggled += () => ToggleSubs(index);
         _navList.Controls.Add(nav);
+        var subs = new List<NavSubItem>();
+        // Unterpunkte = die Gruppenüberschriften der Seite; die Controller-Seite bekommt stattdessen
+        // dynamisch je einen Eintrag pro verbundenem Controller (RefreshControllerSubs).
+        if (page is ScrollPage scroll)
+            foreach (var heading in scroll.Content.Controls.OfType<Heading>().Where(h => !h.IsPage))
+            {
+                string section = heading.Text;
+                var sub = new NavSubItem(section, () => SelectPage(index, section))
+                    { Width = 258, BackColor = Theme.Backdrop, Visible = false };
+                _navList.Controls.Add(sub);
+                subs.Add(sub);
+            }
+        nav.Expandable = subs.Count > 0 || index == PageControllers;
         page.Dock = DockStyle.Fill;
         page.Visible = false;
         _host.Controls.Add(page);
-        _pages.Add((nav, page));
+        _pages.Add((nav, page, subs));
+    }
+
+    /// <summary>Seite wählen – klappt ihre Unterpunkte auf. Mit <paramref name="section"/> (Unterpunkt) nur
+    /// diese Gruppe zeigen, ohne die ganze Seite; Unterpunkt markieren, alle anderen abwählen.</summary>
+    private void SelectPage(int page, string? section = null, Player? onlyPlayer = null)
+    {
+        if (_pages[page].Nav is { Expandable: true, Expanded: false })
+            ToggleSubs(page);
+        // Erst filtern, dann einblenden: sonst zeichnet die Seite einmal komplett und baut sich sichtbar um.
+        if (_pages[page].Page is ScrollPage scroll)
+            scroll.ShowOnly(section);
+        if (page == PageControllers)
+            _overview.ShowOnlyCard(onlyPlayer);
+        ShowPage(page);
+        foreach (var (_, _, subs) in _pages)
+            foreach (var sub in subs)
+                sub.Selected = false;
+        foreach (var sub in _controllerSubs)
+            sub.Selected = false;
+        if (section is not null)
+            if (_pages[page].Subs.FirstOrDefault(s => s.Text == section) is { } chosen)
+                chosen.Selected = true;
+    }
+
+    /// <summary>Unterpunkte einer Seite auf- bzw. zuklappen.</summary>
+    private void ToggleSubs(int page)
+    {
+        var nav = _pages[page].Nav;
+        nav.Expanded = !nav.Expanded;
+        _navList.SuspendLayout();
+        foreach (var sub in _pages[page].Subs)
+            sub.Visible = nav.Expanded;
+        if (page == PageControllers)
+            foreach (var sub in _controllerSubs)
+                sub.Visible = nav.Expanded;
+        _navList.ResumeLayout(true);
+    }
+
+    /// <summary>Unterpunkte der Controller-Seite: je verbundenem Controller ein Eintrag, der zu seiner Karte springt.</summary>
+    private readonly List<NavSubItem> _controllerSubs = [];
+    private string _controllerSig = "\u0001";
+
+    private void RefreshControllerSubs()
+    {
+        var players = _manager?.Players;
+        string sig = players is null ? "?" : string.Join("\u001f", players.Select(p => $"{p.Index}:{p.DisplayName(_settings)}"));
+        if (sig == _controllerSig)
+            return;
+        _controllerSig = sig;
+        _navList.SuspendLayout();
+        foreach (var sub in _controllerSubs)
+        {
+            _navList.Controls.Remove(sub);
+            sub.Dispose();
+        }
+        _controllerSubs.Clear();
+        var nav = _pages[PageControllers].Nav;
+        int pos = _navList.Controls.GetChildIndex(nav) + 1;
+        if (players is { Count: > 0 })
+            foreach (var player in players)
+            {
+                var p = player;
+                NavSubItem sub = null!;
+                sub = new NavSubItem($"{p.Index + 1} · {p.DisplayName(_settings)}",
+                        () => { SelectPage(PageControllers, onlyPlayer: p); sub.Selected = true; })
+                    { Width = 258, BackColor = Theme.Backdrop, Visible = nav.Expanded };
+                _navList.Controls.Add(sub);
+                _navList.Controls.SetChildIndex(sub, pos++);
+                _controllerSubs.Add(sub);
+            }
+        else
+        {
+            var sub = new NavSubItem("Kein Controller verbunden", null)
+                { Width = 258, BackColor = Theme.Backdrop, Visible = nav.Expanded };
+            _navList.Controls.Add(sub);
+            _navList.Controls.SetChildIndex(sub, pos);
+            _controllerSubs.Add(sub);
+        }
+        _navList.ResumeLayout();
     }
 
     private Control BuildOverviewPage()
@@ -395,11 +489,13 @@ internal sealed class SettingsForm : UiForm
             return;
         long start = Environment.TickCount64;
         _page = page;
+        _host.SuspendLayout();
         for (int i = 0; i < _pages.Count; i++)
         {
             _pages[i].Page.Visible = i == page;
             _pages[i].Nav.Selected = i == page;
         }
+        _host.ResumeLayout(true);
         if (page == PageControllers)
             _overview.UpdateView();
         if (page is PageMapping or PageSticks)
@@ -447,6 +543,7 @@ internal sealed class SettingsForm : UiForm
     {
         if (WindowState == FormWindowState.Minimized)
             return;
+        RefreshControllerSubs();
         if (_page == PageControllers)
             _overview.UpdateView();
         else if (_page == PageMapping)

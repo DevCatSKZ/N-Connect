@@ -538,6 +538,7 @@ internal static partial class Tr
             "Switch 1, NSO 및 Wii 컨트롤러: SYNC 버튼을 누르세요 – N-Connect가 자동으로 페어링합니다.\n" +
             "또는 여기에서 직접 검색 및 페어링:",
         ["Controller suchen …"] = "컨트롤러 검색 …",
+        ["Kein Controller verbunden"] = "연결된 컨트롤러 없음",
         ["Switch-1-, NSO- und Wii-Controller suchen und koppeln (SYNC-Taste drücken)."] =
             "Switch 1, NSO 및 Wii 컨트롤러 검색 및 페어링(SYNC 버튼 누르기).",
         ["Neue Controller automatisch koppeln"] = "새 컨트롤러 자동 페어링",

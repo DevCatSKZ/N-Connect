@@ -538,6 +538,7 @@ internal static partial class Tr
             "Switch 1-, NSO- en Wii-controllers: druk op de SYNC-knop – N-Connect koppelt ze zelf.\n" +
             "Of hier gericht zoeken en koppelen:",
         ["Controller suchen …"] = "Controllers zoeken …",
+        ["Kein Controller verbunden"] = "Geen controller verbonden",
         ["Switch-1-, NSO- und Wii-Controller suchen und koppeln (SYNC-Taste drücken)."] =
             "Switch 1-, NSO- en Wii-controllers zoeken en koppelen (druk op de SYNC-knop).",
         ["Neue Controller automatisch koppeln"] = "Nieuwe controllers automatisch koppelen",

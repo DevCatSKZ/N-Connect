@@ -538,6 +538,7 @@ internal static partial class Tr
             "Controller Switch 1, NSO e Wii: premi il pulsante SYNC – N-Connect li associa da solo.\n" +
             "Oppure cerca e associa direttamente qui:",
         ["Controller suchen …"] = "Cerca controller …",
+        ["Kein Controller verbunden"] = "Nessun controller connesso",
         ["Switch-1-, NSO- und Wii-Controller suchen und koppeln (SYNC-Taste drücken)."] =
             "Cerca e associa controller Switch 1, NSO e Wii (premi il pulsante SYNC).",
         ["Neue Controller automatisch koppeln"] = "Associa automaticamente i nuovi controller",
