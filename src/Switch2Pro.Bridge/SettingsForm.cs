@@ -160,10 +160,9 @@ internal sealed class SettingsForm : UiForm
     private Control BuildNavigation()
     {
         var rail = new Panel { Dock = DockStyle.Left, Width = 286, BackColor = Theme.Backdrop };
-        var header = new Panel { Dock = DockStyle.Top, Height = 72, BackColor = Theme.Backdrop };
-        var logo = new LogoView { Bounds = new Rectangle(20, 20, 32, 32) };
-        var name = new Label { Text = "N-Connect", Font = UiFonts.Subtitle, AutoSize = true, Location = new Point(62, 24), Tag = Tr.UserData };
-        header.Controls.AddRange([logo, name]);
+        var header = new Panel { Dock = DockStyle.Top, Height = 62, BackColor = Theme.Backdrop };
+        var name = new Label { Text = "N-Connect", Font = UiFonts.Subtitle, AutoSize = true, Location = new Point(22, 16), Tag = Tr.UserData };
+        header.Controls.Add(name);
         var version = new Label
         {
             Dock = DockStyle.Bottom, Height = 36, Padding = new Padding(22, 0, 0, 10), TextAlign = ContentAlignment.MiddleLeft,

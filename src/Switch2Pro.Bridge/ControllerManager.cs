@@ -1180,11 +1180,11 @@ internal sealed class ControllerManager : IAsyncDisposable
                 Attach(new DemoLink(kind, n++));
             return;
         }
-        // Nintendo-Aufstellung: beide Pro Controller und je ein Joy-Con-Paar pro Generation.
+        // Nintendo-Aufstellung: Pro Controller 2, Switch-2-Joy-Con-Paar, Wii-Fernbedienung, Switch-1-Joy-Con-Paar.
         Attach(new DemoLink(ControllerKind.Pro2, 1));
         Attach(new DemoLink(ControllerKind.JoyCon2Left, 2));
         Attach(new DemoLink(ControllerKind.JoyCon2Right, 3));
-        Attach(new DemoLink(ControllerKind.Pro1, 4));
+        Attach(new DemoLink(ControllerKind.WiiRemote, 4));
         Attach(new DemoLink(ControllerKind.JoyCon1Left, 5));
         Attach(new DemoLink(ControllerKind.JoyCon1Right, 6));
     }
