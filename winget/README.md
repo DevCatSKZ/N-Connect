@@ -13,7 +13,7 @@ wingetcreate submit .\winget\   # forkt winget-pkgs, legt den Pull Request an
 ```
 
 oder per Hand: Fork von `microsoft/winget-pkgs`, die vier Dateien nach
-`manifests/d/DevCatSKZ/N-Connect/1.0.17/` kopieren, PR öffnen. Die Moderation dort
+`manifests/d/DevCatSKZ/N-Connect/1.0.18/` kopieren, PR öffnen. Die Moderation dort
 prüft die Manifeste automatisch (Validation-Pipeline) – dauert meist wenige Tage.
 
 ## Vor jedem Release aktualisieren
@@ -23,13 +23,13 @@ prüft die Manifeste automatisch (Validation-Pipeline) – dauert meist wenige T
 - `InstallerSha256` neu rechnen:
 
 ```powershell
-Get-FileHash .\N-Connect-Setup-1.0.17.exe; Get-FileHash .\N-Connect-Portable-1.0.17.zip
+Get-FileHash .\N-Connect-Setup-1.0.18.exe; Get-FileHash .\N-Connect-Portable-1.0.18.zip
 ```
 
 Alternativ die Manifeste frisch erzeugen lassen:
 
 ```
-wingetcreate update DevCatSKZ.N-Connect -v 1.0.17 -u <Setup-URL> <Zip-URL>
+wingetcreate update DevCatSKZ.N-Connect -v 1.0.18 -u <Setup-URL> <Zip-URL>
 ```
 
 ## Hinweise
