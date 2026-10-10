@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.6.0.schema.json
 PackageIdentifier: DevCatSKZ.N-Connect
-PackageVersion: 1.0.14
+PackageVersion: 1.0.15
 PackageLocale: en-US
 Publisher: devcatskz
 PublisherUrl: https://github.com/DevCatSKZ
@@ -26,7 +26,7 @@ Tags:
   - xinput
   - vigem
   - bluetooth
-ReleaseNotesUrl: https://github.com/DevCatSKZ/N-Connect/releases/tag/v1.0.14
+ReleaseNotesUrl: https://github.com/DevCatSKZ/N-Connect/releases/tag/v1.0.15
 Documentations:
   - DocumentLabel: README
     DocumentUrl: https://github.com/DevCatSKZ/N-Connect/blob/main/README.en.md
