@@ -28,7 +28,7 @@ ESP32-Firmware die Controller annimmt.
 | Joy-Con 1, Pro Controller 1, NSO-Controller, Wii, DualShock 4, DualSense | ❌ | klassisches Bluetooth (BR/EDR), das der S3 nicht hat. Ein **Ur-ESP32** (ESP32-WROOM-32) könnte es, bräuchte aber die Link-Keys aus der Windows-Registrierung (nur mit SYSTEM-Rechten lesbar) – nicht umgesetzt |
 | Xbox-Controller (BLE) | ❌ (vorerst) | verschlüsselte Standardkopplung (LTK/IRK aus Windows nötig) |
 
-Der Export führt alle bekannten Controller auf und markiert, welche übernehmbar sind (`supportedOnEsp32S3`).
+Der Export führt alle bekannten Controller auf und markiert, welche übernehmbar sind (`supportedBle`).
 
 ## 3. So benutzt du es
 
@@ -75,7 +75,7 @@ ZIP `N-Connect-ESP32-<PC>.zip`:
       "kind": "Pro2",
       "productId": 8297,
       "name": "Nintendo Switch 2 Pro Controller",
-      "supportedOnEsp32S3": true,
+      "supportedBle": true,
       "playerSlot": 0,
       "output": "Xbox360",
       "singleJoyCon": false,
@@ -83,15 +83,19 @@ ZIP `N-Connect-ESP32-<PC>.zip`:
       "stickLeft": { "x": { "neutral": 2048, "max": 1400, "min": 1300 }, "y": { "neutral": 2048, "max": 1400, "min": 1300 } },
       "gyroBias": { "x": 1.5, "y": -2, "z": 0.25 }
     },
-    { "address": "DD:EE:FF:00:11:22", "kind": "Pro1", "supportedOnEsp32S3": false,
+    { "address": "DD:EE:FF:00:11:22", "kind": "Pro1", "supportedBle": false,
       "note": "Klassisches Bluetooth oder verschlüsselte Kopplung – mit dem ESP32-S3 nicht übernehmbar" }
   ]
 }
 ```
 
 - Adressen immer `AA:BB:CC:DD:EE:FF`, höchstes Byte zuerst (wie Windows sie anzeigt).
-- `kind` = Name aus `ControllerKind`; `Unknown`, wenn N-Connect den Controller seit Version 1.0.18 noch nicht
-  verbunden gesehen hat (N-Connect merkt sich die Art beim Verbinden in `Settings.ControllerKinds`).
+- Aufgenommen werden alle Controller, die N-Connect kennt **oder** die in Windows gekoppelt sind und deren Name auf
+  einen Controller schließen lässt (`WindowsBtDevices` liest nur Adresse und Name aus der Registrierung, keine
+  Schlüssel). So erscheinen auch Controller, die N-Connect noch nie verbunden hat.
+- `kind` = Name aus `ControllerKind`; `Unknown`, wenn die Art weder bekannt (`Settings.ControllerKinds`, beim
+  Verbinden gemerkt) noch aus dem Windows-Namen (`BtDeviceNames.KindFromName`) ableitbar ist.
+- `transport` = `BLE` oder `Classic`; `supportedBle` nur bei Switch-2-Controllern (BLE, unverschlüsselt).
 - Felder ohne Wert fehlen. Kalibrierwerte sind 12-Bit-Rohwerte wie in [PROTOKOLLE 0](PROTOKOLLE.md).
 
 ### 4.2 `nconnect_pairing.h`

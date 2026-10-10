@@ -281,11 +281,25 @@ kleben; ggf. Aufschrift weglassen statt verschieben.
   fremde Hosts ab → ESP32 muss die **Adresse des PC-Sticks übernehmen** (`esp_iface_mac_addr_set(…, ESP_MAC_BT)` vor
   dem BT-Start; in IDF 6.1 vorhanden). Keine Schlüssel, kein Adminrecht nötig. Klassische Controller (Joy-Con 1, Pro 1,
   DS4/DS5, Wii) gehen mit dem S3 nicht (kein BR/EDR); Xbox-BLE bräuchte LTK/IRK – beides nicht umgesetzt.
-- Umgesetzt: *Kopplungsdaten → Für ESP32 exportieren* (`Esp32Export`, ZIP mit JSON, `nconnect_pairing.h`,
-  LIESMICH), `Settings.ControllerKinds` (Art je Adresse beim Verbinden), 8 Tests, Doku **docs/ESP32.md**
-  (Prinzip, Format, Firmware-Leitfaden NimBLE, Fehlersuche).
-- Offen: ESP32-Firmware (Weg A „Funkadapter für N-Connect“ per USB-CDC – braucht neue Verbindungsart in N-Connect –
-  oder Weg B „eigenständiges USB-Gamepad“), Test mit echter Hardware.
+- Zweite Platine: **Nordic nRF52840-Dongle** (PCA10059, VID 1915 / PID 521F, am PC als COM15 erkannt, nicht
+  verändert). Auch nur BLE → gleiche Grenzen wie der S3.
+- Umgesetzt (N-Connect): *Kopplungsdaten → **Für ESP32 exportieren** / **Für nRF52840 exportieren*** (`Esp32Export`,
+  `PairingDataForm.ExportBoard(Board)`, ZIP mit JSON, `nconnect_pairing.h`, LIESMICH je Platine). Aufgenommen werden
+  Controller aus `Settings.ControllerKinds` (Art beim Verbinden gemerkt, `RememberKind`) **und** in Windows
+  gekoppelte Controller nach Name (`WindowsBtDevices` liest nur Adresse+Name aus `BTHPORT\Parameters\Devices`,
+  `BtDeviceNames.KindFromName`) – **keine Schlüssel, kein Adminrecht**. 18 Tests. Doku **docs/ESP32.md**,
+  **docs/NRF52840.md**.
+- **Bewusst nicht gebaut:** Auslesen der Bluetooth-Link-Keys aus `BTHPORT\Parameters\Keys` (nur SYSTEM, Helfer mit
+  Adminrecht). Bringt für die BLE-only-Platinen des Nutzers nichts (Switch-2-Controller brauchen keinen Schlüssel;
+  klassische Controller kann der S3/nRF52840 ohnehin nicht). Nicht wieder anfangen.
+- Erkenntnis „immer alle Controller, egal welches Gerät“: Alle Platinen dieselbe **Host-Adresse** übernehmen lassen;
+  neue Controller am PC (SYNC) werben dann für dieselbe Adresse und verbinden sich mit jeder Platine **ohne erneutes
+  Flashen** (die Firmware nimmt jeden Switch-2-Controller an, der für `NCONNECT_HOST_ADDR_LE` wirbt; die
+  Controllertabelle ist nur für Namen/Kalibrierung). Neu-Export/-Flash nur für Zusatzdaten oder geänderte Adresse.
+- Offen: Firmware (ESP32: ESP-IDF/NimBLE; nRF52840: nRF Connect SDK/Zephyr oder Adafruit Bluefruit). Datenweg zum
+  zweiten PC: Weg A „Funkadapter für N-Connect“ per USB-CDC (braucht neue Verbindungsart in N-Connect) oder Weg B
+  „eigenständiges USB-Gamepad“. Test mit echter Hardware. **Flashen nur nach ausdrücklicher Freigabe des Nutzers für
+  eine konkrete Firmware.**
 
 **Technisch offen (bisheriger Stand):**
 - **Flackernde Tests:** einmal 3 Fehlschläge, danach 7 Läufe hintereinander grün – Ursache nicht untersucht.

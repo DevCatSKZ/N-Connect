@@ -13,6 +13,7 @@ geschätzt oder nicht mit echter Hardware geprüft ist, steht das ausdrücklich 
 | [PROTOKOLLE.md](PROTOKOLLE.md) | Alle Controller-Protokolle bis auf Byte-Ebene: Switch 2 (BLE/USB), Switch 1/NSO, Wii, Kabel-Pads, DSU, DS4 |
 | [PORTIERUNG.md](PORTIERUNG.md) | Was plattformunabhängig ist, was Windows-spezifisch ist und was es auf anderen Systemen stattdessen gibt |
 | [ESP32.md](ESP32.md) | ESP32-S3 als zweiter „Bluetooth-Stick“: Export der Kopplungsdaten, Prinzip, Firmware-Leitfaden (ESP-IDF/NimBLE) |
+| [NRF52840.md](NRF52840.md) | Nordic-nRF52840-Dongle als zweiter „Bluetooth-Stick“: Unterschiede zum ESP32, Zephyr/Bluefruit, „immer alle Controller“ |
 
 Für Nutzer: [../README.md](../README.md). Übergabe-/Arbeitsstand: [../HANDOVER.md](../HANDOVER.md).
 

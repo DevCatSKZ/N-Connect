@@ -43,8 +43,8 @@ public class Esp32ExportTests
         Assert.Equal(Host, p.HostAddress);
         Assert.Equal(4, p.Controllers.Count);
         // Übernehmbare zuerst
-        Assert.True(p.Controllers[0].SupportedOnEsp32S3);
-        Assert.True(p.Controllers[1].SupportedOnEsp32S3);
+        Assert.True(p.Controllers[0].SupportedBle);
+        Assert.True(p.Controllers[1].SupportedBle);
         var pro = p.Controllers.Single(c => c.Address == "AA:BB:CC:00:11:22");
         Assert.Equal(0x2069, pro.ProductId);
         Assert.Equal("Lenas \"Pro\"", pro.Name);
@@ -54,11 +54,11 @@ public class Esp32ExportTests
         Assert.Null(pro.StickRight);
         Assert.True(p.Controllers.Single(c => c.Address == "AA:BB:CC:33:44:55").SingleJoyCon);
         var classic = p.Controllers.Single(c => c.Address == "DD:EE:FF:00:11:22");
-        Assert.False(classic.SupportedOnEsp32S3);
+        Assert.False(classic.SupportedBle);
         Assert.NotNull(classic.Note);
         var unknown = p.Controllers.Single(c => c.Address == "11:22:33:44:55:66");
         Assert.Equal("Unknown", unknown.Kind);
-        Assert.False(unknown.SupportedOnEsp32S3);
+        Assert.False(unknown.SupportedBle);
     }
 
     [Fact]
@@ -117,5 +117,39 @@ public class Esp32ExportTests
         Assert.Equal("NULL", Esp32Export.CString(null));
         Assert.Equal("\"a\\\\b\\n\"", Esp32Export.CString("a\\b\n"));
         Assert.Equal("\"Jöy\"", Esp32Export.CString("Jöy"));
+    }
+
+    [Theory]
+    [InlineData("Pro Controller", ControllerKind.Pro1)]
+    [InlineData("Joy-Con (L)", ControllerKind.JoyCon1Left)]
+    [InlineData("Joy-Con 2 (R)", ControllerKind.JoyCon2Right)]
+    [InlineData("Nintendo RVL-CNT-01", ControllerKind.WiiRemote)]
+    [InlineData("Nintendo RVL-CNT-01-UC", ControllerKind.WiiUPro)]
+    [InlineData("Wireless Controller", ControllerKind.DualShock4)]
+    [InlineData("Xbox Wireless Controller", ControllerKind.XboxController)]
+    [InlineData("Galaxy Buds3 Pro", ControllerKind.Unknown)]
+    [InlineData("", ControllerKind.Unknown)]
+    public void KindFromName_ErkenntController(string name, ControllerKind expected) =>
+        Assert.Equal(expected, BtDeviceNames.KindFromName(name));
+
+    [Fact]
+    public void Build_NimmtInWindowsGekoppelteControllerAuf_OhneSchluessel()
+    {
+        // In Windows gekoppelt, aber von N-Connect noch nie verbunden: nur über den Namen erkannt.
+        var windows = new[]
+        {
+            new WindowsBtDevice { Address = "12:34:56:78:9A:BC", Name = "Pro Controller 2" },
+            new WindowsBtDevice { Address = "DE:AD:BE:EF:00:01", Name = "Galaxy Buds3 Pro" }, // kein Controller
+            new WindowsBtDevice { Address = "DE:AD:BE:EF:00:02", Name = "Pro Controller" },    // klassisch
+        };
+        var p = Esp32Export.Build(new Settings(), Host, "PC", windows: windows);
+        var pro2 = p.Controllers.Single(c => c.Address == "12:34:56:78:9A:BC");
+        Assert.Equal("Pro2", pro2.Kind);
+        Assert.True(pro2.SupportedBle);
+        Assert.Equal("BLE", pro2.Transport);
+        Assert.DoesNotContain(p.Controllers, c => c.Address == "DE:AD:BE:EF:00:01"); // Kopfhörer ausgelassen
+        var classic = p.Controllers.Single(c => c.Address == "DE:AD:BE:EF:00:02");
+        Assert.Equal("Classic", classic.Transport);
+        Assert.False(classic.SupportedBle);
     }
 }

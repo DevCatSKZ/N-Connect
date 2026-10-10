@@ -123,8 +123,9 @@ Next time, **pressing any button** is enough to connect.
 - **Export diagnostics** (*General → Advanced*): log and system info as a ZIP for bug reports.
 - Original controllers are hidden from Steam and games, so no controller shows up twice.
 - Take over pairing data from the Switch or move it to another PC.
-- **Export for ESP32:** use your Switch 2 controllers with an ESP32-S3 too (e.g. on a second PC) without re-pairing –
-  guide (German): [docs/ESP32.md](docs/ESP32.md).
+- **Export for ESP32 / nRF52840:** use your Switch 2 controllers with an ESP32-S3 or a Nordic nRF52840 dongle too
+  (e.g. on a second PC) without re-pairing – guide (German): [docs/ESP32.md](docs/ESP32.md),
+  [docs/NRF52840.md](docs/NRF52840.md).
 - Easy to read at any display scaling (100 % to 200 %).
 
 </details>

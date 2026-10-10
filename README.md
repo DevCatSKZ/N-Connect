@@ -123,8 +123,9 @@ Danach reicht beim nächsten Mal **ein beliebiger Tastendruck** zum Verbinden.
 - **Diagnose exportieren** (*Allgemein → Erweitert*): Protokoll und Systeminfos als ZIP für Fehlermeldungen.
 - Original-Controller werden vor Steam und Spielen versteckt, damit kein Controller doppelt erscheint.
 - Kopplungsdaten von der Switch übernehmen oder auf einen anderen PC übertragen.
-- **Für ESP32 exportieren:** Switch-2-Controller auch an einem ESP32-S3 nutzen (z. B. an einem zweiten PC), ohne neu zu
-  koppeln – Anleitung: [docs/ESP32.md](docs/ESP32.md).
+- **Für ESP32 / nRF52840 exportieren:** Switch-2-Controller auch an einem ESP32-S3 oder Nordic-nRF52840-Dongle nutzen
+  (z. B. an einem zweiten PC), ohne neu zu koppeln – Anleitung: [docs/ESP32.md](docs/ESP32.md),
+  [docs/NRF52840.md](docs/NRF52840.md).
 - Gut lesbar bei jeder Bildschirmskalierung (100 % bis 200 %).
 
 </details>
