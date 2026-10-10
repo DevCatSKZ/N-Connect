@@ -62,7 +62,10 @@ internal sealed class PairingDataForm : UiForm
                 Action("Exportieren …", Glyph.Export, Export), Glyph.Export),
             new SettingRow("Für ESP32 exportieren", "Adresse dieses Bluetooth-Adapters und die Switch-2-Controller für einen ESP32-S3, " +
                 "der sich als dieser PC ausgibt – Controller verbinden sich dann ohne neues SYNC (Anleitung im ZIP)",
-                Action("ESP32-Export …", Glyph.Cube, ExportEsp32), Glyph.Cube),
+                Action("ESP32-Export …", Glyph.Cube, () => ExportBoard(Board.Esp32)), Glyph.Cube),
+            new SettingRow("Für nRF52840 exportieren", "Dieselben Daten für einen Nordic-nRF52840-Dongle (nRF Connect SDK/Zephyr " +
+                "oder Adafruit Bluefruit) – auch er gibt sich als dieser PC aus (Anleitung im ZIP)",
+                Action("nRF52840-Export …", Glyph.Cube, () => ExportBoard(Board.Nrf52840)), Glyph.Device),
             new SettingRow("Sicherung wiederherstellen", "Vor jedem „Übernehmen“ wird automatisch eine Sicherung angelegt",
                 Action("Wiederherstellen …", Glyph.Undo, Restore), Glyph.Undo),
             _adapter);
@@ -482,11 +485,15 @@ internal sealed class PairingDataForm : UiForm
             "Kopplungsdaten", MessageBoxButtons.OK, MessageBoxIcon.Information);
     }
 
+    /// <summary>Platine, für die exportiert wird (Inhalt gleich, Dateiname und Kurzanleitung unterschiedlich).</summary>
+    private enum Board { Esp32, Nrf52840 }
+
     /// <summary>
-    /// ESP32-Export: ZIP mit nconnect-esp32.json, nconnect_pairing.h (ESP-IDF) und einer kurzen Anleitung. Enthält keine
-    /// Schlüssel – nur die Adresse dieses Adapters (der ESP32 übernimmt sie) und die bekannten Controller.
+    /// Export für einen Mikrocontroller (ESP32-S3 oder nRF52840), der sich als dieser PC ausgibt: ZIP mit
+    /// nconnect-esp32.json, nconnect_pairing.h und einer Kurzanleitung. Enthält keine Schlüssel – nur die Adresse dieses
+    /// Adapters (die Platine übernimmt sie) und die bekannten Controller.
     /// </summary>
-    private void ExportEsp32()
+    private void ExportBoard(Board board)
     {
         if (_adapterAddress is null)
         {
@@ -494,13 +501,15 @@ internal sealed class PairingDataForm : UiForm
                 "Kopplungsdaten", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
-        var profile = Esp32Export.Build(_settings, _adapterAddress, Environment.MachineName);
+        bool nrf = board == Board.Nrf52840;
+        // Auch in Windows gekoppelte Controller aufnehmen, die N-Connect noch nicht verbunden hat (nur Namen, keine Schlüssel).
+        var profile = Esp32Export.Build(_settings, _adapterAddress, Environment.MachineName, windows: WindowsBtDevices.Read());
         using var save = new SaveFileDialog
         {
             Filter = Tr.T("ZIP-Datei") + " (*.zip)|*.zip",
-            FileName = $"N-Connect-ESP32-{Environment.MachineName}.zip",
+            FileName = $"N-Connect-{(nrf ? "nRF52840" : "ESP32")}-{Environment.MachineName}.zip",
             InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
-            Title = Tr.T("ESP32-Export speichern"),
+            Title = Tr.T(nrf ? "nRF52840-Export speichern" : "ESP32-Export speichern"),
         };
         if (save.ShowDialog(this) != DialogResult.OK)
             return;
@@ -517,20 +526,20 @@ internal sealed class PairingDataForm : UiForm
             }
             Add(Esp32Export.JsonFile, Esp32Export.ToJson(profile));
             Add(Esp32Export.HeaderFile, Esp32Export.ToHeader(profile, version));
-            Add("LIESMICH.txt", Esp32Readme(profile));
+            Add("LIESMICH.txt", BoardReadme(profile, board));
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {
             Tr.Show(this, $"Speichern fehlgeschlagen: {e.Message}", "Kopplungsdaten", MessageBoxButtons.OK, MessageBoxIcon.Error);
             return;
         }
-        int supported = profile.Controllers.Count(c => c.SupportedOnEsp32S3);
-        Log.Info($"ESP32-Export: {supported} von {profile.Controllers.Count} Controllern übernehmbar");
+        int supported = profile.Controllers.Count(c => c.SupportedBle);
+        Log.Info($"{board}-Export: {supported} von {profile.Controllers.Count} Controllern übernehmbar");
         var sb = new System.Text.StringBuilder();
-        sb.AppendLine(Tr.T("ESP32-Export gespeichert:")).AppendLine();
-        sb.AppendLine($"  •  {Tr.T("Adresse für den ESP32")}: {profile.HostAddress}");
+        sb.AppendLine(Tr.T(nrf ? "nRF52840-Export gespeichert:" : "ESP32-Export gespeichert:")).AppendLine();
+        sb.AppendLine($"  •  {Tr.T(nrf ? "Adresse für den nRF52840" : "Adresse für den ESP32")}: {profile.HostAddress}");
         foreach (var c in profile.Controllers)
-            sb.AppendLine($"  •  {NameOf(c.Name ?? c.Kind)}  {c.Address}  ({Tr.T(c.SupportedOnEsp32S3 ? "übernehmbar" : "nicht übernehmbar")})");
+            sb.AppendLine($"  •  {NameOf(c.Name ?? c.Kind)}  {c.Address}  ({Tr.T(c.SupportedBle ? "übernehmbar" : "nicht übernehmbar")})");
         if (supported == 0)
             sb.AppendLine().AppendLine(Tr.T("Noch kein Switch-2-Controller bekannt: einmal per SYNC mit N-Connect koppeln und neu exportieren."));
         ShowText(sb.ToString());
@@ -538,37 +547,67 @@ internal sealed class PairingDataForm : UiForm
         catch (System.ComponentModel.Win32Exception) { }
     }
 
-    /// <summary>Kurze Anleitung im ZIP (die ausführliche steht in docs/ESP32.md).</summary>
-    private static string Esp32Readme(Esp32Profile profile) => string.Join("\n",
-        "N-Connect – ESP32-Export",
-        "========================",
-        "",
-        $"Adresse des PC-Bluetooth-Adapters: {profile.HostAddress}",
-        $"Exportiert: {profile.Created.ToLocalTime():yyyy-MM-dd HH:mm} auf {profile.SourcePc}",
-        "",
-        "Was ist das?",
-        "Switch-2-Controller merken sich beim SYNC mit N-Connect die Adresse dieses Bluetooth-Adapters und werben danach",
-        "nur noch für ihn. Übernimmt ein ESP32-S3 genau diese Adresse, verbinden sich die Controller auch mit ihm – ohne",
-        "neues SYNC. Zurück am PC verbinden sie sich wieder dort. Es sind keine geheimen Schlüssel nötig.",
-        "",
-        "Dateien:",
-        $"  {Esp32Export.HeaderFile}   in das ESP-IDF-Projekt einbinden (Host-Adresse + Controllertabelle)",
-        $"  {Esp32Export.JsonFile}  alle Angaben maschinenlesbar (auch nicht übernehmbare Controller)",
-        "",
-        "Im ESP32 (ESP-IDF, NimBLE):",
-        "  1. esp_iface_mac_addr_set(NCONNECT_HOST_ADDR, ESP_MAC_BT);   // VOR nimble_port_init()",
-        "  2. Passiv nach Werbung mit Herstellerkennung 0x0553 suchen; Byte 10-15 (ohne Kennung) == NCONNECT_HOST_ADDR_LE",
-        "  3. Verbinden (öffentliche Adresse, kein Pairing), Befehle wie N-Connect senden, Eingaben abonnieren.",
-        "",
-        "Wichtig:",
-        "  - PC mit diesem Stick und ESP32 nicht gleichzeitig in Reichweite betreiben (gleiche Adresse) – sonst verbindet",
-        "    sich der Controller mit dem, der schneller ist. Am PC dafür N-Connect beenden oder Bluetooth ausschalten.",
-        "  - Nur Switch-2-Controller (Bluetooth LE). Joy-Con 1, Pro Controller 1, PlayStation und Wii brauchen klassisches",
-        "    Bluetooth, das der ESP32-S3 nicht hat.",
-        "  - Neues SYNC an einer Konsole oder einem anderen PC ändert die gemerkte Adresse – dann wieder mit N-Connect koppeln.",
-        "",
-        "Ausführliche Anleitung mit Protokoll: https://github.com/DevCatSKZ/N-Connect/blob/main/docs/ESP32.md",
-        "");
+    /// <summary>Kurze Anleitung im ZIP (die ausführliche steht in docs/ESP32.md bzw. docs/NRF52840.md).</summary>
+    private static string BoardReadme(Esp32Profile profile, Board board)
+    {
+        bool nrf = board == Board.Nrf52840;
+        string name = nrf ? "nRF52840" : "ESP32-S3";
+        var lines = new List<string>
+        {
+            $"N-Connect – Export für {name}",
+            "==============================",
+            "",
+            $"Adresse des PC-Bluetooth-Adapters: {profile.HostAddress}",
+            $"Exportiert: {profile.Created.ToLocalTime():yyyy-MM-dd HH:mm} auf {profile.SourcePc}",
+            "",
+            "Was ist das?",
+            "Switch-2-Controller merken sich beim SYNC mit N-Connect die Adresse dieses Bluetooth-Adapters und werben danach",
+            $"nur noch für ihn. Übernimmt der {name} genau diese Adresse, verbinden sich die Controller auch mit ihm – ohne",
+            "neues SYNC. Zurück am PC verbinden sie sich wieder dort. Es sind keine geheimen Schlüssel nötig.",
+            "",
+            "Dateien:",
+            $"  {Esp32Export.HeaderFile}   in das Firmware-Projekt einbinden (Host-Adresse + Controllertabelle)",
+            $"  {Esp32Export.JsonFile}  alle Angaben maschinenlesbar (auch nicht übernehmbare Controller)",
+            "",
+        };
+        if (nrf)
+        {
+            lines.AddRange([
+                "Im nRF52840 – nRF Connect SDK / Zephyr:",
+                "  1. Öffentliche Adresse setzen, VOR bt_enable():",
+                "       Zephyr-Controller (CONFIG_BT_LL_SW_SPLIT):  bt_ctlr_set_public_addr(NCONNECT_HOST_ADDR_LE);",
+                "       SoftDevice Controller (NCS):  HCI-Herstellerbefehl „Zephyr Write BD_ADDR“ (CONFIG_BT_HCI_VS) mit",
+                "       NCONNECT_HOST_ADDR_LE – siehe docs/NRF52840.md",
+                "  2. CONFIG_BT_CENTRAL=y, CONFIG_BT_GATT_CLIENT=y; Verbindungen mit der öffentlichen Identität (BT_ID_DEFAULT).",
+                "Im nRF52840 – Arduino mit Adafruit Bluefruit (Bootloader/UF2):",
+                "  ble_gap_addr_t a = { .addr_type = BLE_GAP_ADDR_TYPE_PUBLIC };",
+                "  memcpy(a.addr, NCONNECT_HOST_ADDR_LE, 6);  Bluefruit.setAddr(&a);   // nach Bluefruit.begin()",
+                "Danach:",
+            ]);
+        }
+        else
+        {
+            lines.AddRange([
+                "Im ESP32-S3 (ESP-IDF, NimBLE):",
+                "  1. esp_iface_mac_addr_set(NCONNECT_HOST_ADDR, ESP_MAC_BT);   // VOR nimble_port_init()",
+            ]);
+        }
+        lines.AddRange([
+            "  - Passiv nach Werbung mit Herstellerkennung 0x0553 suchen; Byte 10-15 (ohne Kennung) == NCONNECT_HOST_ADDR_LE",
+            "  - Verbinden (öffentliche Adresse, kein Pairing), Befehle wie N-Connect senden, Eingaben abonnieren.",
+            "",
+            "Wichtig:",
+            $"  - PC mit diesem Stick und {name} nicht gleichzeitig in Reichweite betreiben (gleiche Adresse) – sonst verbindet",
+            "    sich der Controller mit dem, der schneller ist. Am PC dafür N-Connect beenden oder Bluetooth ausschalten.",
+            "  - Nur Switch-2-Controller (Bluetooth LE). Joy-Con 1, Pro Controller 1, PlayStation und Wii brauchen klassisches",
+            $"    Bluetooth, das der {name} nicht hat.",
+            "  - Neues SYNC an einer Konsole oder einem anderen PC ändert die gemerkte Adresse – dann wieder mit N-Connect koppeln.",
+            "",
+            "Ausführliche Anleitung mit Protokoll: https://github.com/DevCatSKZ/N-Connect/blob/main/docs/" + (nrf ? "NRF52840.md" : "ESP32.md"),
+            "",
+        ]);
+        return string.Join("\n", lines);
+    }
 }
 
 /// <summary>Passwort für die Übertragungsdatei (beim Export mit Wiederholung und Wahl, ob Schlüssel mitkommen).</summary>

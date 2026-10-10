@@ -16,9 +16,14 @@ public sealed record Esp32Controller
     public int? ProductId { get; init; }
     /// <summary>Anzeigename (eigener Name oder Name der Art).</summary>
     public string? Name { get; init; }
-    /// <summary>Kann ein ESP32-S3 ihn ohne neues SYNC übernehmen? (Nur Switch-2-Controller: Bluetooth LE ohne Verschlüsselung.)</summary>
-    public bool SupportedOnEsp32S3 { get; init; }
-    /// <summary>Warum nicht (bei <see cref="SupportedOnEsp32S3"/> = false).</summary>
+    /// <summary>"BLE" oder "Classic" (klassisches Bluetooth); null = unbekannt.</summary>
+    public string? Transport { get; init; }
+    /// <summary>
+    /// Kann eine reine BLE-Platine (ESP32-S3, nRF52840) ihn ohne neues SYNC übernehmen? Nur Switch-2-Controller:
+    /// Bluetooth LE ohne Verschlüsselung, es zählt nur die Host-Adresse – kein Schlüssel nötig.
+    /// </summary>
+    public bool SupportedBle { get; init; }
+    /// <summary>Hinweis, warum (noch) nicht übernehmbar bzw. was zu beachten ist.</summary>
     public string? Note { get; init; }
     /// <summary>Gewünschter Spielerplatz 0–7, falls festgelegt.</summary>
     public int? PlayerSlot { get; init; }
@@ -80,10 +85,12 @@ public static class Esp32Export
 
     /// <summary>
     /// Export aus den Einstellungen. <paramref name="live"/>: Arten der gerade verbundenen Controller (Adresse → Art),
-    /// ergänzt die gemerkten Arten. Controller ohne bekannte Art erscheinen mit „Unknown“ und einem Hinweis.
+    /// ergänzt die gemerkten Arten. <paramref name="windows"/>: in Windows gekoppelte Geräte (Name, ggf. Schlüssel) –
+    /// Controller darunter werden aufgenommen, auch wenn N-Connect sie noch nicht verbunden gesehen hat; andere Geräte
+    /// (Kopfhörer, Tastatur …) nur, wenn ihre Adresse als Controller bekannt ist. Unbekannte Art = „Unknown“ mit Hinweis.
     /// </summary>
     public static Esp32Profile Build(Settings settings, string hostAddress, string? pcName,
-        IReadOnlyDictionary<string, ControllerKind>? live = null)
+        IReadOnlyDictionary<string, ControllerKind>? live = null, IEnumerable<WindowsBtDevice>? windows = null)
     {
         if (!BtAddress.TryNormalize(hostAddress, out var host) || BtAddress.IsEmpty(host))
             throw new ArgumentException("Keine gültige Adresse des Bluetooth-Adapters.", nameof(hostAddress));
@@ -95,15 +102,35 @@ public static class Esp32Export
             if (BtAddress.TryNormalize(address, out var a) && kind != ControllerKind.Unknown)
                 kinds[a] = kind;
 
+        var devices = new Dictionary<string, WindowsBtDevice>(StringComparer.OrdinalIgnoreCase);
+        foreach (var d in windows ?? [])
+            if (BtAddress.TryNormalize(d.Address, out var a))
+                devices[a] = d with { Address = a };
+
         var addresses = new List<string>();
-        foreach (var raw in settings.KnownControllers.Concat(kinds.Keys))
+        void Add(string raw)
+        {
             if (BtAddress.TryNormalize(raw, out var a) && !BtAddress.IsEmpty(a) && !addresses.Contains(a))
                 addresses.Add(a);
+        }
+        foreach (var raw in settings.KnownControllers.Concat(kinds.Keys))
+            Add(raw);
+        foreach (var d in devices.Values.Where(d => BtDeviceNames.KindFromName(d.Name) != ControllerKind.Unknown))
+            Add(d.Address);
 
         var controllers = addresses.Select(a =>
         {
+            devices.TryGetValue(a, out var device);
             var kind = kinds.GetValueOrDefault(a, ControllerKind.Unknown);
-            bool supported = kind.IsSwitch2();
+            if (kind == ControllerKind.Unknown)
+                kind = BtDeviceNames.KindFromName(device?.Name);
+            string? transport = kind == ControllerKind.Unknown ? null : BtDeviceNames.IsBle(kind) ? "BLE" : "Classic";
+            // Übernehmbar ohne neues SYNC: nur Switch-2-Controller (BLE, unverschlüsselt, es zählt nur die Host-Adresse).
+            bool ble = kind.IsSwitch2();
+            string? note = ble ? null
+                : kind == ControllerKind.Unknown ? "Art unbekannt – einmal mit N-Connect verbinden und neu exportieren"
+                : transport == "Classic" ? "Klassisches Bluetooth – von einem ESP32-S3 oder nRF52840 (nur BLE) nicht übernehmbar"
+                : "Verschlüsselte BLE-Kopplung (Standard-Pairing) – nicht ohne neues Koppeln übernehmbar";
             settings.StickCalibrations.TryGetValue($"{a}|L", out var left);
             settings.StickCalibrations.TryGetValue($"{a}|R", out var right);
             bool hasLeft = settings.StickCalibrations.ContainsKey($"{a}|L");
@@ -113,11 +140,10 @@ public static class Esp32Export
                 Address = a,
                 Kind = kind.ToString(),
                 ProductId = ProductId(kind),
-                Name = settings.NameFor(a) ?? (kind == ControllerKind.Unknown ? null : kind.DisplayName()),
-                SupportedOnEsp32S3 = supported,
-                Note = supported ? null
-                    : kind == ControllerKind.Unknown ? "Art unbekannt – einmal mit N-Connect verbinden und neu exportieren"
-                    : "Klassisches Bluetooth oder verschlüsselte Kopplung – mit dem ESP32-S3 nicht übernehmbar",
+                Name = settings.NameFor(a) ?? device?.Name ?? (kind == ControllerKind.Unknown ? null : kind.DisplayName()),
+                Transport = transport,
+                SupportedBle = ble,
+                Note = note,
                 PlayerSlot = settings.PlayerSlots.TryGetValue(a, out int slot) ? slot : null,
                 Output = settings.ControllerOutputs.TryGetValue(a, out var output) ? output.ToString() : null,
                 SingleJoyCon = settings.SingleJoyCons.Any(s => BtAddress.Same(s, a)),
@@ -128,7 +154,7 @@ public static class Esp32Export
             };
         })
         // Übernehmbare zuerst, dann nach Adresse – stabile Reihenfolge für Vergleiche zwischen zwei Exporten.
-        .OrderByDescending(c => c.SupportedOnEsp32S3).ThenBy(c => c.Address, StringComparer.Ordinal).ToList();
+        .OrderByDescending(c => c.SupportedBle).ThenBy(c => c.Address, StringComparer.Ordinal).ToList();
 
         return new Esp32Profile { SourcePc = pcName, HostAddress = host, Controllers = controllers };
     }
@@ -178,14 +204,14 @@ public static class Esp32Export
     public static string ToHeader(Esp32Profile profile, string? appVersion = null)
     {
         byte[] host = AddressBytes(profile.HostAddress);
-        var supported = profile.Controllers.Where(c => c.SupportedOnEsp32S3).ToList();
+        var supported = profile.Controllers.Where(c => c.SupportedBle).ToList();
         var sb = new StringBuilder();
         void L(string line = "") => sb.Append(line).Append('\n');
         L("// Erzeugt von N-Connect" + (appVersion is null ? "" : $" {appVersion}") +
           $" am {profile.Created.ToLocalTime():yyyy-MM-dd HH:mm} auf {profile.SourcePc ?? "?"} – nicht von Hand ändern, neu exportieren.");
-        L("// Anleitung: https://github.com/DevCatSKZ/N-Connect/blob/main/docs/ESP32.md");
-        L("// Enthält keine geheimen Schlüssel: Switch-2-Controller verbinden sich unverschlüsselt mit dem Host,");
-        L("// für den sie werben. Übernimmt der ESP32 die Host-Adresse, verbindet er sich ohne neues SYNC.");
+        L("// Anleitung: https://github.com/DevCatSKZ/N-Connect/blob/main/docs/ESP32.md (ESP32) bzw. docs/NRF52840.md (nRF52840)");
+        L("// Enthält keine geheimen Schlüssel: Switch-2-Controller verbinden sich unverschlüsselt mit dem Host, für den sie");
+        L("// werben. Übernimmt die Platine die Host-Adresse, verbindet sie sich ohne neues SYNC.");
         L("#pragma once");
         L();
         L("#include <stdint.h>");
@@ -193,11 +219,12 @@ public static class Esp32Export
         L($"#define NCONNECT_EXPORT_VERSION {profile.Version}");
         L($"#define NCONNECT_HOST_ADDR_STR \"{profile.HostAddress}\"");
         L();
-        L("// Adresse des PC-Bluetooth-Adapters, höchstes Byte zuerst – so für esp_iface_mac_addr_set(mac, ESP_MAC_BT)");
+        L("// Adresse des PC-Bluetooth-Adapters, höchstes Byte zuerst – ESP32: esp_iface_mac_addr_set(mac, ESP_MAC_BT)");
         L("// VOR esp_bt_controller_init() bzw. nimble_port_init().");
         L($"static const uint8_t NCONNECT_HOST_ADDR[6] = {CArray(host)};");
         L("// Dieselbe Adresse, niedrigstes Byte zuerst – so steht sie in Byte 10–15 der Herstellerdaten (Kennung 0x0553,");
-        L("// ohne die 2 Kennungs-Bytes) und in NimBLE ble_addr_t.val.");
+        L("// ohne die 2 Kennungs-Bytes), in NimBLE ble_addr_t.val, Zephyr bt_addr_t.val / bt_ctlr_set_public_addr() und");
+        L("// nRF-SoftDevice ble_gap_addr_t.addr.");
         L($"static const uint8_t NCONNECT_HOST_ADDR_LE[6] = {CArray(host.Reverse())};");
         L();
         L("#define NCONNECT_PID_PRO2        0x2069");

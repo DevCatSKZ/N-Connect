@@ -63,6 +63,12 @@ internal static partial class Tr
         ["übernehmbar"] = "이전 가능",
         ["nicht übernehmbar"] = "이전 불가",
         ["Noch kein Switch-2-Controller bekannt: einmal per SYNC mit N-Connect koppeln und neu exportieren."] = "아직 알려진 Switch 2 컨트롤러가 없습니다. SYNC로 N-Connect와 한 번 페어링한 다음 다시 내보내세요.",
+        ["Für nRF52840 exportieren"] = "nRF52840용으로 내보내기",
+        ["Dieselben Daten für einen Nordic-nRF52840-Dongle (nRF Connect SDK/Zephyr oder Adafruit Bluefruit) – auch er gibt sich als dieser PC aus (Anleitung im ZIP)"] = "Nordic nRF52840 동글용(nRF Connect SDK/Zephyr 또는 Adafruit Bluefruit)으로 같은 데이터를 내보냅니다. 이것도 이 PC로 위장합니다(안내는 ZIP 안에 있음)",
+        ["nRF52840-Export …"] = "nRF52840 내보내기 …",
+        ["nRF52840-Export speichern"] = "nRF52840 내보내기 저장",
+        ["nRF52840-Export gespeichert:"] = "nRF52840 내보내기를 저장했습니다:",
+        ["Adresse für den nRF52840"] = "nRF52840용 주소",
         // ---------- Status-Kopfzeile, Ansicht ----------
         ["Farbschema"] = "색 구성표",
         ["Farben für Akzente, Knöpfe, Flächen und Ränder."] = "강조색, 버튼, 배경, 테두리 색상.",

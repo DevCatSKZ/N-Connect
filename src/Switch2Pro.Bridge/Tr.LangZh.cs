@@ -63,6 +63,12 @@ internal static partial class Tr
         ["übernehmbar"] = "可迁移",
         ["nicht übernehmbar"] = "不可迁移",
         ["Noch kein Switch-2-Controller bekannt: einmal per SYNC mit N-Connect koppeln und neu exportieren."] = "尚无已知的 Switch 2 控制器：请先通过 SYNC 与 N-Connect 配对一次，然后重新导出。",
+        ["Für nRF52840 exportieren"] = "导出到 nRF52840",
+        ["Dieselben Daten für einen Nordic-nRF52840-Dongle (nRF Connect SDK/Zephyr oder Adafruit Bluefruit) – auch er gibt sich als dieser PC aus (Anleitung im ZIP)"] = "为 Nordic nRF52840 加密狗（nRF Connect SDK/Zephyr 或 Adafruit Bluefruit）导出相同数据——它同样冒充此电脑（说明见 ZIP）",
+        ["nRF52840-Export …"] = "nRF52840 导出 …",
+        ["nRF52840-Export speichern"] = "保存 nRF52840 导出",
+        ["nRF52840-Export gespeichert:"] = "nRF52840 导出已保存：",
+        ["Adresse für den nRF52840"] = "nRF52840 使用的地址",
         // ---------- Status-Kopfzeile, Ansicht ----------
         ["Farbschema"] = "配色方案",
         ["Farben für Akzente, Knöpfe, Flächen und Ränder."] = "强调色、按钮、背景和边框的颜色。",

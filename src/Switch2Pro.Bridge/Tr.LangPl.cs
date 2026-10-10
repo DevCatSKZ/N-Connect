@@ -63,6 +63,12 @@ internal static partial class Tr
         ["übernehmbar"] = "do przeniesienia",
         ["nicht übernehmbar"] = "nie do przeniesienia",
         ["Noch kein Switch-2-Controller bekannt: einmal per SYNC mit N-Connect koppeln und neu exportieren."] = "Brak znanych kontrolerów Switch 2: sparuj jeden raz z N-Connect przez SYNC i wyeksportuj ponownie.",
+        ["Für nRF52840 exportieren"] = "Eksport dla nRF52840",
+        ["Dieselben Daten für einen Nordic-nRF52840-Dongle (nRF Connect SDK/Zephyr oder Adafruit Bluefruit) – auch er gibt sich als dieser PC aus (Anleitung im ZIP)"] = "Te same dane dla dongla Nordic nRF52840 (nRF Connect SDK/Zephyr lub Adafruit Bluefruit) – on także podaje się za ten komputer (instrukcja w pliku ZIP)",
+        ["nRF52840-Export …"] = "Eksport nRF52840 …",
+        ["nRF52840-Export speichern"] = "Zapisz eksport nRF52840",
+        ["nRF52840-Export gespeichert:"] = "Eksport nRF52840 zapisany:",
+        ["Adresse für den nRF52840"] = "Adres dla nRF52840",
         // ---------- Status-Kopfzeile, Ansicht ----------
         ["Farbschema"] = "Schemat kolorów",
         ["Farben für Akzente, Knöpfe, Flächen und Ränder."] = "Kolory akcentów, przycisków, powierzchni i obramowań.",

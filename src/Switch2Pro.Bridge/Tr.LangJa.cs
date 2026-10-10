@@ -63,6 +63,12 @@ internal static partial class Tr
         ["übernehmbar"] = "引き継ぎ可",
         ["nicht übernehmbar"] = "引き継ぎ不可",
         ["Noch kein Switch-2-Controller bekannt: einmal per SYNC mit N-Connect koppeln und neu exportieren."] = "Switch 2 コントローラーがまだ登録されていません。一度 SYNC で N-Connect とペアリングしてから再度エクスポートしてください。",
+        ["Für nRF52840 exportieren"] = "nRF52840 用にエクスポート",
+        ["Dieselben Daten für einen Nordic-nRF52840-Dongle (nRF Connect SDK/Zephyr oder Adafruit Bluefruit) – auch er gibt sich als dieser PC aus (Anleitung im ZIP)"] = "Nordic nRF52840 ドングル用（nRF Connect SDK/Zephyr または Adafruit Bluefruit）に同じデータを書き出します。こちらもこの PC になりすまします（手順は ZIP 内）",
+        ["nRF52840-Export …"] = "nRF52840 エクスポート …",
+        ["nRF52840-Export speichern"] = "nRF52840 エクスポートを保存",
+        ["nRF52840-Export gespeichert:"] = "nRF52840 エクスポートを保存しました:",
+        ["Adresse für den nRF52840"] = "nRF52840 用のアドレス",
         // ---------- Status-Kopfzeile, Ansicht ----------
         ["Farbschema"] = "配色",
         ["Farben für Akzente, Knöpfe, Flächen und Ränder."] = "アクセント、ボタン、背景、枠線の色。",
