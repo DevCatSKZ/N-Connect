@@ -166,7 +166,7 @@ internal static class RenderCheck
             var cards = form.Overview.Cards;
             for (int c = 0; c < cards.Count; c++)
             {
-                for (int tab = 0; tab < 6; tab++)
+                for (int tab = 0; tab < 7; tab++)
                 {
                     sw.Restart();
                     bool shown = ControllerOverview.ExpandCard(cards[c], tab);
@@ -265,6 +265,14 @@ internal static class RenderCheck
                     Snap(gyro, "gyro");
             using (var pairing = new PairForm(null) { Preview = Tr.T(ControllerKind.JoyCon1Left.DisplayName()) })
                 Snap(pairing, "koppeln");
+            // Einblendung beim Verbinden (läuft hier auf dem unsichtbaren Desktop, stört also niemanden).
+            if (manager?.Players.FirstOrDefault(p => p.Links.Count > 0) is { } overlayPlayer)
+            {
+                ConnectOverlay.ShowFor(overlayPlayer, overlayPlayer.Links[0], new Settings());
+                Pump();
+                if (Application.OpenForms.OfType<ConnectOverlay>().LastOrDefault() is { } overlay)
+                    Full(overlay, Path.Combine(folder, $"ui_einblendung{variant}_{lang}.png"));
+            }
 
             // Meldungsfenster im Design: kurz anzeigen, abfotografieren, schließen.
             var shot = new System.Windows.Forms.Timer { Interval = 400 };
