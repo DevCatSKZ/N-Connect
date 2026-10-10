@@ -3,473 +3,763 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>N-Connect – Nintendo-Controller unter Windows</title>
-<meta name="description" content="N-Connect bringt Nintendo-, PlayStation- und Xbox-Controller zuverlässig in Windows-Spiele – mit virtuellen Controllern, Gyro, Rumble und Profilen.">
+<title>N-Connect – Controller am PC einfach verbinden</title>
+<meta name="description" content="Nintendo-, PlayStation- und Xbox-Controller am PC: einfach verbinden und in jedem Spiel nutzen. Kostenlos, Open Source, 12 Sprachen.">
+<meta name="theme-color" content="#202020">
+<meta property="og:type" content="website">
+<meta property="og:title" content="N-Connect – Controller am PC einfach verbinden">
+<meta property="og:description" content="Nintendo-, PlayStation- und Xbox-Controller am PC: einfach verbinden und in jedem Spiel nutzen. Kostenlos und Open Source.">
+<meta property="og:image" content="https://devcatskz.github.io/N-Connect/screenshots/uebersicht.png">
+<meta property="og:url" content="https://devcatskz.github.io/N-Connect/">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="logo.png">
 <style>
+  /* Farben wie Windows 11 (Fluent): dunkel #202020 mit Windows-Blau, hell automatisch nach Systemeinstellung */
   :root {
-    /* Farbwelt des Logos: dunkles Navy, Neon-Blau und Violett */
-    --bg: #070b1a; --panel: #0e1530; --panel2: #141c42; --line: #263066;
-    --text: #eaf0ff; --muted: #93a0cc;
-    --blue: #38bdf8; --violet: #a78bfa; --accent: #6ea8ff;
-    --glow-b: rgba(56,189,248,.35); --glow-v: rgba(167,139,250,.30);
+    color-scheme: dark light;
+    --bg: #202020; --layer: #2b2b2b; --layer2: #323232; --stroke: #3d3d3d; --stroke-soft: #2f2f2f;
+    --text: #ffffff; --muted: #c5c5c5; --faint: #9a9a9a;
+    --accent: #4cc2ff; --accent-hover: #47b1e8; --on-accent: #000000; --accent-soft: rgba(76,194,255,.12);
+    --shadow: 0 16px 48px rgba(0,0,0,.45);
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f3f3f3; --layer: #fbfbfb; --layer2: #ffffff; --stroke: #e0e0e0; --stroke-soft: #ebebeb;
+      --text: #1b1b1b; --muted: #5c5c5c; --faint: #767676;
+      --accent: #005fb8; --accent-hover: #1a6fc0; --on-accent: #ffffff; --accent-soft: rgba(0,95,184,.08);
+      --shadow: 0 16px 48px rgba(0,0,0,.14);
+    }
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; scroll-padding-top: 72px; }
   body {
-    font-family: "Segoe UI", system-ui, sans-serif;
-    background:
-      radial-gradient(1000px 500px at 80% -10%, rgba(167,139,250,.16) 0%, transparent 55%),
-      radial-gradient(900px 500px at 15% -5%, rgba(56,189,248,.14) 0%, transparent 55%),
-      var(--bg);
-    color: var(--text); line-height: 1.6; min-height: 100vh;
+    font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.55; font-size: 16px;
+    -webkit-font-smoothing: antialiased;
   }
-  .wrap { max-width: 980px; margin: 0 auto; padding: 40px 24px 64px; }
-  .topbar { display: flex; justify-content: flex-end; }
-  select#lang {
-    background: var(--panel); color: var(--text); border: 1px solid var(--line);
-    border-radius: 8px; padding: 6px 10px; font-size: 14px;
-  }
-  header { text-align: center; padding: 24px 0 40px; }
-  header img.brand { width: 120px; height: 120px; border-radius: 28px;
-    box-shadow: 0 0 40px var(--glow-b), 0 0 80px var(--glow-v); }
-  .logo { font-size: 52px; font-weight: 700; letter-spacing: -1px; margin-top: 18px; }
-  .logo span { background: linear-gradient(90deg, var(--blue), var(--violet));
-    -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .tagline { color: var(--muted); font-size: 19px; margin-top: 10px; }
-  .cta { display: flex; gap: 14px; justify-content: center; margin-top: 32px; flex-wrap: wrap; }
-  .btn {
-    display: inline-flex; align-items: center; gap: 10px; padding: 14px 28px;
-    border-radius: 10px; font-size: 16px; font-weight: 600; text-decoration: none;
-    border: 1px solid var(--line); transition: transform .12s ease, box-shadow .12s ease;
-  }
-  .btn:hover { transform: translateY(-2px); }
-  .btn-primary { background: linear-gradient(135deg, var(--blue), var(--violet)); color: #fff;
-    box-shadow: 0 8px 28px var(--glow-v); }
-  .btn-ghost { background: var(--panel); color: var(--text); }
-  .ver { display: block; text-align: center; margin-top: 12px; color: var(--muted); font-size: 13px; min-height: 18px; }
-  h2 { font-size: 26px; margin: 56px 0 20px; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
-  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 22px; }
-  .card h3 { font-size: 16px; margin-bottom: 8px; color: var(--blue); }
-  .card p { color: var(--muted); font-size: 14.5px; }
-  .pads { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 8px; }
-  .shots { display: grid; grid-template-columns: 1fr; gap: 20px; }
-  .shot { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
-  .shot img { display: block; width: 100%; height: auto; }
-  .shot figcaption { padding: 12px 18px; color: var(--muted); font-size: 14px; }
-  .shot-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 20px; }
-  .shot-grid .shot-tall { grid-column: 1 / -1; max-width: 480px; justify-self: center; width: 100%; }
-  @media (max-width: 720px) { .shot-grid { grid-template-columns: 1fr; } }
-  .pad { background: var(--panel2); border: 1px solid var(--line); border-radius: 999px;
-    padding: 6px 14px; font-size: 13.5px; color: var(--text); }
-  ol.steps { margin-left: 22px; color: var(--muted); }
-  ol.steps li { margin: 10px 0; }
-  ol.steps b { color: var(--text); }
-  footer { margin-top: 64px; text-align: center; color: var(--muted); font-size: 13px;
-    border-top: 1px solid var(--line); padding-top: 24px; }
-  a { color: var(--blue); }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+  /* Kopfzeile */
+  .nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 85%, transparent);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid var(--stroke-soft); }
+  .nav .wrap { display: flex; align-items: center; gap: 24px; height: 60px; }
+  .brand { display: flex; align-items: center; gap: 10px; color: var(--text); font-weight: 600; font-size: 17px; }
+  .brand:hover { text-decoration: none; }
+  .brand img { width: 30px; height: 30px; }
+  .nav-links { display: flex; gap: 20px; margin-left: auto; }
+  .nav-links a { color: var(--muted); font-size: 15px; }
+  .nav-links a:hover { color: var(--text); text-decoration: none; }
+  select#lang { background: var(--layer); color: var(--text); border: 1px solid var(--stroke);
+    border-radius: 6px; padding: 6px 8px; font: inherit; font-size: 14px; cursor: pointer; }
+  @media (max-width: 720px) { .nav-links { display: none; } select#lang { margin-left: auto; } }
+
+  /* Startbereich */
+  .hero { text-align: center; padding: 64px 0 40px; }
+  .hero img.icon { width: 104px; height: 104px; filter: drop-shadow(0 10px 28px rgba(0,120,212,.35)); }
+  .hero h1 { font-family: "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif; font-size: clamp(36px, 6vw, 56px);
+    font-weight: 600; letter-spacing: -.5px; margin-top: 18px; }
+  .hero .tagline { color: var(--muted); font-size: clamp(17px, 2.4vw, 21px); max-width: 680px; margin: 10px auto 0; }
+  .cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 32px; }
+  .btn { display: inline-flex; align-items: center; gap: 10px; padding: 12px 24px; border-radius: 6px;
+    font-size: 16px; font-weight: 600; border: 1px solid transparent; transition: background .12s ease; }
+  .btn:hover { text-decoration: none; }
+  .btn-primary { background: var(--accent); color: var(--on-accent); }
+  .btn-primary:hover { background: var(--accent-hover); }
+  .btn-secondary { background: var(--layer); color: var(--text); border-color: var(--stroke); }
+  .btn-secondary:hover { background: var(--layer2); }
+  .btn svg { width: 18px; height: 18px; }
+  .meta { color: var(--faint); font-size: 14px; margin-top: 14px; min-height: 22px; }
+  .hint { max-width: 640px; margin: 22px auto 0; background: var(--accent-soft); border: 1px solid var(--stroke);
+    border-radius: 8px; padding: 12px 16px; font-size: 14px; color: var(--muted); text-align: left; }
+  .hint b { color: var(--text); }
+
+  /* Fensterrahmen für Screenshots */
+  .window { background: var(--layer); border: 1px solid var(--stroke); border-radius: 10px; overflow: hidden;
+    box-shadow: var(--shadow); }
+  .window img { display: block; width: 100%; height: auto; }
+  .hero-shot { margin: 48px auto 0; max-width: 980px; }
+
+  /* Abschnitte */
+  section { padding: 56px 0 8px; }
+  h2 { font-family: "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif; font-size: clamp(26px, 3.4vw, 32px);
+    font-weight: 600; margin-bottom: 8px; }
+  .lead { color: var(--muted); margin-bottom: 24px; max-width: 720px; }
+  .cards { display: grid; gap: 12px; }
+  .cards.three { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  .cards.four { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+  .card { background: var(--layer); border: 1px solid var(--stroke-soft); border-radius: 8px; padding: 20px; }
+  .card h3 { font-size: 17px; font-weight: 600; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+  .card p { color: var(--muted); font-size: 15px; }
+  .step-no { display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%;
+    background: var(--accent); color: var(--on-accent); font-weight: 700; font-size: 15px; flex: none; }
+  .ico { display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: 8px;
+    background: var(--accent-soft); font-size: 19px; flex: none; }
+  .note { color: var(--muted); font-size: 14px; margin-top: 14px; }
+  .note b { color: var(--text); }
+
+  /* Weitere Ansichten */
+  .gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; align-items: start; }
+  .gallery figure.tall { grid-row: span 2; }
+  figure figcaption { color: var(--muted); font-size: 14px; margin-top: 10px; }
+  @media (max-width: 760px) { .gallery { grid-template-columns: 1fr; } .gallery figure.tall { grid-row: auto; } }
+
+  /* Controller-Liste */
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { background: var(--layer); border: 1px solid var(--stroke-soft); border-radius: 999px;
+    padding: 7px 14px; font-size: 14.5px; }
+
+  /* Fragen */
+  details { background: var(--layer); border: 1px solid var(--stroke-soft); border-radius: 8px; margin-bottom: 8px; }
+  summary { cursor: pointer; padding: 16px 20px; font-weight: 600; list-style: none; display: flex;
+    justify-content: space-between; gap: 16px; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "⌄"; color: var(--muted); transition: transform .15s ease; }
+  details[open] summary::after { transform: rotate(180deg); }
+  details p { padding: 0 20px 16px; color: var(--muted); }
+  details p b { color: var(--text); }
+
+  footer { margin-top: 72px; padding: 28px 0 40px; border-top: 1px solid var(--stroke-soft); color: var(--faint);
+    font-size: 14px; text-align: center; }
+  footer .links { margin-top: 8px; display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="topbar">
-    <select id="lang" aria-label="Language / Sprache"></select>
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="#top"><img src="logo.png" alt="">N-Connect</a>
+    <nav class="nav-links">
+      <a href="#features" data-i="navFeatures"></a>
+      <a href="#connect" data-i="navConnect"></a>
+      <a href="#controllers" data-i="navControllers"></a>
+      <a href="#faq" data-i="navFaq"></a>
+    </nav>
+    <select id="lang" aria-label="Sprache / Language"></select>
   </div>
-  <header>
-    <img class="brand" src="logo.png" alt="N-Connect Logo">
-    <div class="logo">N-<span>Connect</span></div>
+</header>
+
+<main id="top" class="wrap">
+  <div class="hero">
+    <img class="icon" src="logo.png" alt="N-Connect">
+    <h1>N-Connect</h1>
     <p class="tagline" data-i="tagline"></p>
     <div class="cta">
-      <a id="dl" class="btn btn-primary" href="https://github.com/DevCatSKZ/N-Connect/releases/latest">⬇ <span data-i="download"></span></a>
-      <a class="btn btn-ghost" href="https://github.com/DevCatSKZ/N-Connect" data-i="source"></a>
+      <a id="dl" class="btn btn-primary" href="https://github.com/DevCatSKZ/N-Connect/releases/latest">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 4.5 10.5 3.4v8.1H3V4.5Zm8.5-1.2L21 2v9.5h-9.5V3.3ZM3 12.5h7.5v8.1L3 19.5v-7Zm8.5 0H21V22l-9.5-1.3v-8.2Z"/></svg>
+        <span data-i="download"></span></a>
+      <a id="dlzip" class="btn btn-secondary" href="https://github.com/DevCatSKZ/N-Connect/releases/latest" data-i="portable"></a>
     </div>
-    <span class="ver" id="ver"></span>
-  </header>
-
-  <h2 data-i="shotsTitle"></h2>
-  <div class="shots">
-    <figure class="shot">
-      <img src="screenshots/uebersicht.png" data-i-alt="shot1alt" alt="">
-      <figcaption data-i="shot1cap"></figcaption>
-    </figure>
-  </div>
-  <div class="shot-grid">
-    <figure class="shot">
-      <img src="screenshots/tastenbelegung.png" data-i-alt="shot3alt" alt="">
-      <figcaption data-i="shot3cap"></figcaption>
-    </figure>
-    <figure class="shot">
-      <img src="screenshots/sticks-vibration.png" data-i-alt="shot4alt" alt="">
-      <figcaption data-i="shot4cap"></figcaption>
-    </figure>
-    <figure class="shot shot-tall">
-      <img src="screenshots/controller-einstellungen.png" data-i-alt="shot5alt" alt="">
-      <figcaption data-i="shot5cap"></figcaption>
-    </figure>
+    <p class="meta"><span data-i="meta"></span><span id="ver"></span></p>
+    <p class="hint" data-i="smartscreen"></p>
+    <div class="window hero-shot">
+      <img src="screenshots/uebersicht.png" data-i-alt="shotAlt" alt="" width="1220" height="900">
+    </div>
   </div>
 
-  <h2 data-i="padsTitle"></h2>
-  <div class="pads">
-    <span class="pad">Switch 2 Pro Controller</span><span class="pad">Switch Pro Controller</span>
-    <span class="pad">Joy-Con</span><span class="pad">SNES / N64 / Genesis (NSO)</span>
-    <span class="pad">GameCube</span><span class="pad">Wii Remote &amp; Classic</span>
-    <span class="pad">Wii U Pro</span><span class="pad">DualShock 4</span>
-    <span class="pad">DualSense (Edge)</span><span class="pad">Xbox (360 / One / Series)</span>
-    <span class="pad" data-i="padWired"></span>
-  </div>
+  <section id="start">
+    <h2 data-i="stepsTitle"></h2>
+    <div class="cards three">
+      <div class="card"><h3><span class="step-no">1</span><span data-i="s1h"></span></h3><p data-i="s1p"></p></div>
+      <div class="card"><h3><span class="step-no">2</span><span data-i="s2h"></span></h3><p data-i="s2p"></p></div>
+      <div class="card"><h3><span class="step-no">3</span><span data-i="s3h"></span></h3><p data-i="s3p"></p></div>
+    </div>
+  </section>
 
-  <h2 data-i="featTitle"></h2>
-  <div class="grid">
-    <div class="card"><h3 data-i="f1h"></h3><p data-i="f1p"></p></div>
-    <div class="card"><h3 data-i="f2h"></h3><p data-i="f2p"></p></div>
-    <div class="card"><h3 data-i="f3h"></h3><p data-i="f3p"></p></div>
-    <div class="card"><h3 data-i="f4h"></h3><p data-i="f4p"></p></div>
-    <div class="card"><h3 data-i="f5h"></h3><p data-i="f5p"></p></div>
-    <div class="card"><h3 data-i="f6h"></h3><p data-i="f6p"></p></div>
-  </div>
+  <section id="features">
+    <h2 data-i="featTitle"></h2>
+    <p class="lead" data-i="featLead"></p>
+    <div class="cards four">
+      <div class="card"><h3><span class="ico">🎮</span><span data-i="f1h"></span></h3><p data-i="f1p"></p></div>
+      <div class="card"><h3><span class="ico">👥</span><span data-i="f2h"></span></h3><p data-i="f2p"></p></div>
+      <div class="card"><h3><span class="ico">🔋</span><span data-i="f3h"></span></h3><p data-i="f3p"></p></div>
+      <div class="card"><h3><span class="ico">⌨️</span><span data-i="f4h"></span></h3><p data-i="f4p"></p></div>
+      <div class="card"><h3><span class="ico">🎯</span><span data-i="f5h"></span></h3><p data-i="f5p"></p></div>
+      <div class="card"><h3><span class="ico">🕹️</span><span data-i="f6h"></span></h3><p data-i="f6p"></p></div>
+      <div class="card"><h3><span class="ico">🩹</span><span data-i="f7h"></span></h3><p data-i="f7p"></p></div>
+      <div class="card"><h3><span class="ico">🔄</span><span data-i="f8h"></span></h3><p data-i="f8p"></p></div>
+    </div>
+  </section>
 
-  <h2 data-i="stepsTitle"></h2>
-  <ol class="steps">
-    <li><b data-i="s1b"></b> <span data-i="s1"></span></li>
-    <li><b data-i="s2b"></b> <span data-i="s2"></span></li>
-    <li><b data-i="s3b"></b> <span data-i="s3"></span></li>
-  </ol>
+  <section id="connect">
+    <h2 data-i="connectTitle"></h2>
+    <div class="cards three">
+      <div class="card"><h3 data-i="c1h"></h3><p data-i="c1p"></p></div>
+      <div class="card"><h3 data-i="c2h"></h3><p data-i="c2p"></p></div>
+      <div class="card"><h3 data-i="c3h"></h3><p data-i="c3p"></p></div>
+      <div class="card"><h3 data-i="c4h"></h3><p data-i="c4p"></p></div>
+      <div class="card"><h3 data-i="c5h"></h3><p data-i="c5p"></p></div>
+    </div>
+    <p class="note" data-i="connectNote"></p>
+  </section>
 
-  <footer>
+  <section id="views">
+    <h2 data-i="galleryTitle"></h2>
+    <div class="gallery">
+      <figure>
+        <div class="window"><img src="screenshots/tastenbelegung.png" data-i-alt="g1alt" alt="" loading="lazy" width="1220" height="900"></div>
+        <figcaption data-i="g1cap"></figcaption>
+      </figure>
+      <figure class="tall">
+        <div class="window"><img src="screenshots/controller-einstellungen.png" data-i-alt="g3alt" alt="" loading="lazy" width="820" height="1649"></div>
+        <figcaption data-i="g3cap"></figcaption>
+      </figure>
+      <figure>
+        <div class="window"><img src="screenshots/sticks-vibration.png" data-i-alt="g2alt" alt="" loading="lazy" width="1220" height="900"></div>
+        <figcaption data-i="g2cap"></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section id="controllers">
+    <h2 data-i="padsTitle"></h2>
+    <p class="lead" data-i="padsLead"></p>
+    <div class="chips">
+      <span class="chip">Switch 2 Pro Controller</span><span class="chip">Joy-Con 2</span>
+      <span class="chip">GameCube (Switch 2)</span><span class="chip">Switch Pro Controller</span>
+      <span class="chip">Joy-Con</span><span class="chip">NES · SNES · N64 · Mega Drive (NSO)</span>
+      <span class="chip">Wii Remote · Nunchuk · Classic</span><span class="chip">Wii U Pro Controller</span>
+      <span class="chip">DualShock 4</span><span class="chip">DualSense · DualSense Edge</span>
+      <span class="chip">Xbox 360 · One · Series · Elite</span><span class="chip" data-i="padWired"></span>
+    </div>
+  </section>
+
+  <section id="faq">
+    <h2 data-i="faqTitle"></h2>
+    <details><summary data-i="q1"></summary><p data-i="a1"></p></details>
+    <details><summary data-i="q2"></summary><p data-i="a2"></p></details>
+    <details><summary data-i="q3"></summary><p data-i="a3"></p></details>
+    <details><summary data-i="q4"></summary><p data-i="a4"></p></details>
+    <details><summary data-i="q5"></summary><p data-i="a5"></p></details>
+    <details><summary data-i="q6"></summary><p data-i="a6"></p></details>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
     <p data-i="legal"></p>
-    <p><a href="https://github.com/DevCatSKZ/N-Connect">GitHub</a> · <a href="https://github.com/DevCatSKZ/N-Connect/releases" data-i="allReleases"></a> · <a href="https://github.com/DevCatSKZ/N-Connect/issues" data-i="bugs"></a></p>
-  </footer>
-</div>
+    <p class="links">
+      <a href="https://github.com/DevCatSKZ/N-Connect" data-i="source"></a>
+      <a href="https://github.com/DevCatSKZ/N-Connect/releases" data-i="allReleases"></a>
+      <a href="https://github.com/DevCatSKZ/N-Connect/issues" data-i="bugs"></a>
+    </p>
+  </div>
+</footer>
+
 <script>
 const I18N = {
-de: { name:"Deutsch", tagline:"Nintendo-, PlayStation- und Xbox-Controller zuverlässig in Windows-Spielen.<br>Einmal koppeln – überall spielen.", download:"N-Connect herunterladen", source:"Quellcode auf GitHub",
-  shotsTitle:"So sieht N-Connect aus",
-  shot1alt:"N-Connect Übersicht: Switch 2 Pro Controller, Switch-2-Joy-Con-Paar, Switch Pro Controller und Switch-1-Joy-Con-Paar verbunden – mit Akkustand, Verbindung und Live-Eingaben",
-  shot1cap:"Übersicht: Switch 2 Pro Controller, Joy-Con-Paare beider Generationen und Switch Pro Controller – mit Live-Grafik, Akkustand und Spieler-Reihenfolge.",
-  shot2alt:"N-Connect im hellen Modus: dieselbe Übersicht mit vier verbundenen Nintendo-Controllern",
-  shot2cap:"Dieselbe Übersicht im hellen Modus – dunkel, hell oder wie Windows wählbar.",
-  shot3alt:"Tastenbelegung: jede Taste frei auf Gamepad, Tastatur, Maus, Turbo oder Makro legen, mit Profilen und Shift-Ebene",
-  shot3cap:"Tastenbelegung mit Profilen, Shift-Ebene, Turbo und Makros.",
-  shot4alt:"Einstellungen Sticks und Vibration: Totzone, Kennlinie, Trigger-Schwellen, Vibrationsstärke, Turbo – allgemein oder je Controller",
-  shot4cap:"Sticks, Trigger und Vibration – allgemein oder je Controller.",
-  shot5alt:"Controller-Karte mit Feineinstellungen: Sticks kalibrieren, Totzone, Kennlinie und Vibrationsstärke nur für diesen Controller",
-  shot5cap:"Feineinstellung direkt an der Controller-Karte.",
-  padsTitle:"Unterstützte Controller", padWired:"Kabelgebundene Switch-Pads",
-  featTitle:"Was N-Connect kann",
-  f1h:"Virtuelle Xbox-360-/DS4-Controller", f1p:"Spiele sehen ein Standard-Pad – höchste Kompatibilität ohne Konfiguration pro Spiel.",
-  f2h:"Koppeln direkt in der App", f2p:"Nintendo-, PlayStation- und Xbox-Controller per Bluetooth direkt aus N-Connect koppeln – ohne Windows-Menü.",
-  f3h:"Belegung & Profile", f3p:"Tasten frei mappen, Turbo und Makros, je Controller und Spiel Profile speichern – in zwölf Sprachen.",
-  f4h:"Gyro & Motion", f4p:"Bewegungssteuerung auf Stick oder Maus legen – inklusive Flick-Stick für Shooter.",
-  f5h:"Rumble, Akku, LEDs", f5p:"Vibration geht an den echten Controller zurück, Akkustand und Spieler-LEDs werden angezeigt.",
-  f6h:"Kein Doppel-Input", f6p:"Original-Controller werden vor Spielen versteckt (HidHide) – Xbox-Pads laufen nativ über XInput.",
-  stepsTitle:"In drei Schritten loslegen",
-  s1b:"Installieren:", s1:"Setup herunterladen und ausführen – ViGEmBus und HidHide werden mitinstalliert.",
-  s2b:"Koppeln:", s2:"Controller in den Kopplungsmodus versetzen und in N-Connect unter „Controller koppeln“ auswählen.",
-  s3b:"Spielen:", s3:"Der Controller erscheint in der Übersicht und steht in jedem Spiel als Xbox-/DS4-Pad bereit.",
-  legal:"N-Connect ist Open Source. Controller-Marken gehören ihren jeweiligen Inhabern.", allReleases:"Alle Releases", bugs:"Fehler melden", version:"Aktuelle Version: " },
-en: { name:"English", tagline:"Nintendo, PlayStation and Xbox controllers working reliably in Windows games.<br>Pair once – play anywhere.", download:"Download N-Connect", source:"Source on GitHub",
-  shotsTitle:"What N-Connect looks like",
-  shot1alt:"N-Connect overview: Switch 2 Pro Controller, Switch 2 Joy-Con pair, Switch Pro Controller and Switch 1 Joy-Con pair connected – with battery, connection and live input",
-  shot1cap:"Overview: Switch 2 Pro Controller, Joy-Con pairs of both generations and Switch Pro Controller – live graphics, battery level and player order.",
-  shot2alt:"N-Connect in light mode: the same overview with four connected Nintendo controllers",
-  shot2cap:"The same overview in light mode – dark, light or same as Windows selectable.",
-  shot3alt:"Button mapping: freely assign every button to gamepad, keyboard, mouse, turbo or macro, with profiles and a shift layer",
-  shot3cap:"Button mapping with profiles, shift layer, turbo and macros.",
-  shot4alt:"Stick and rumble settings: deadzone, curve, trigger thresholds, rumble strength, turbo – general or per controller",
-  shot4cap:"Sticks, triggers and rumble – general or per controller.",
-  shot5alt:"Controller card with fine-tuning: calibrate sticks, deadzone, curve and rumble strength just for this controller",
-  shot5cap:"Fine-tuning right on the controller card.",
-  padsTitle:"Supported controllers", padWired:"Wired Switch pads",
-  featTitle:"What N-Connect does",
-  f1h:"Virtual Xbox 360 / DS4 controllers", f1p:"Games see a standard pad – maximum compatibility without per-game setup.",
-  f2h:"Pairing inside the app", f2p:"Pair Nintendo, PlayStation and Xbox controllers via Bluetooth right from N-Connect – no Windows menu.",
-  f3h:"Mappings & profiles", f3p:"Remap buttons freely, turbo and macros, save profiles per controller and game – in twelve languages.",
-  f4h:"Gyro & motion", f4p:"Map motion to stick or mouse – including flick stick for shooters.",
-  f5h:"Rumble, battery, LEDs", f5p:"Rumble goes back to the real controller; battery level and player LEDs are shown.",
-  f6h:"No double input", f6p:"Original controllers are hidden from games (HidHide) – Xbox pads run natively via XInput.",
-  stepsTitle:"Get started in three steps",
-  s1b:"Install:", s1:"Download and run the setup – ViGEmBus and HidHide are installed along.",
-  s2b:"Pair:", s2:"Put the controller into pairing mode and pick it under “Pair controller” in N-Connect.",
-  s3b:"Play:", s3:"The controller appears in the overview and is ready as an Xbox/DS4 pad in every game.",
-  legal:"N-Connect is open source. Controller brands belong to their respective owners.", allReleases:"All releases", bugs:"Report a bug", version:"Latest version: " },
-es: { name:"Español", tagline:"Mandos de Nintendo, PlayStation y Xbox funcionando de forma fiable en juegos de Windows.<br>Empareja una vez – juega en todas partes.", download:"Descargar N-Connect", source:"Código en GitHub",
-  shotsTitle:"Así se ve N-Connect",
-  shot1alt:"Vista general de N-Connect: Switch 2 Pro Controller, par Joy-Con de Switch 2, Switch Pro Controller y par Joy-Con de Switch 1 conectados",
-  shot1cap:"Vista general: Switch 2 Pro Controller, pares Joy-Con de ambas generaciones y Switch Pro Controller – gráficos en vivo, batería y orden de jugadores.",
-  shot2alt:"N-Connect en modo claro: la misma vista con cuatro mandos Nintendo conectados",
-  shot2cap:"La misma vista en modo claro – oscuro, claro o como Windows.",
-  shot3alt:"Asignación de botones: cada botón a mando, teclado, ratón, turbo o macro, con perfiles y capa Shift",
-  shot3cap:"Asignación de botones con perfiles, capa Shift, turbo y macros.",
-  shot4alt:"Ajustes de sticks y vibración: zona muerta, curva, umbrales de gatillo, fuerza, turbo – general o por mando",
-  shot4cap:"Sticks, gatillos y vibración – general o por mando.",
-  shot5alt:"Tarjeta del mando con ajustes finos: calibrar sticks, zona muerta, curva y vibración solo para este mando",
-  shot5cap:"Ajuste fino directamente en la tarjeta del mando.",
-  padsTitle:"Mandos compatibles", padWired:"Mandos Switch por cable",
-  featTitle:"Lo que hace N-Connect",
-  f1h:"Mandos virtuales Xbox 360 / DS4", f1p:"Los juegos ven un mando estándar – máxima compatibilidad sin configuración por juego.",
-  f2h:"Emparejamiento en la app", f2p:"Empareja mandos de Nintendo, PlayStation y Xbox por Bluetooth desde N-Connect – sin menús de Windows.",
-  f3h:"Mapeos y perfiles", f3p:"Reasigna botones libremente, turbo y macros, perfiles por mando y juego – en doce idiomas.",
-  f4h:"Giroscopio y movimiento", f4p:"Asigna el movimiento al stick o al ratón – incluido flick stick para shooters.",
-  f5h:"Vibración, batería, LEDs", f5p:"La vibración llega al mando real; se muestran batería y LEDs de jugador.",
-  f6h:"Sin entrada doble", f6p:"Los mandos originales se ocultan a los juegos (HidHide) – los Xbox funcionan nativos por XInput.",
-  stepsTitle:"Empieza en tres pasos",
-  s1b:"Instalar:", s1:"Descarga y ejecuta el setup – ViGEmBus y HidHide se instalan junto.",
-  s2b:"Emparejar:", s2:"Pon el mando en modo de emparejamiento y elígelo en «Emparejar mando» en N-Connect.",
-  s3b:"Jugar:", s3:"El mando aparece en la vista general y está listo como mando Xbox/DS4 en cada juego.",
-  legal:"N-Connect es código abierto. Las marcas de mandos pertenecen a sus respectivos dueños.", allReleases:"Todas las versiones", bugs:"Reportar un error", version:"Versión actual: " },
-fr: { name:"Français", tagline:"Manettes Nintendo, PlayStation et Xbox fiables dans les jeux Windows.<br>Appairez une fois – jouez partout.", download:"Télécharger N-Connect", source:"Code source sur GitHub",
-  shotsTitle:"Voici N-Connect",
-  shot1alt:"Vue d'ensemble de N-Connect : Switch 2 Pro Controller, paire Joy-Con Switch 2, Switch Pro Controller et paire Joy-Con Switch 1 connectés",
-  shot1cap:"Vue d'ensemble : Switch 2 Pro Controller, paires Joy-Con des deux générations et Switch Pro Controller – graphismes en direct, batterie et ordre des joueurs.",
-  shot2alt:"N-Connect en mode clair : la même vue avec quatre manettes Nintendo connectées",
-  shot2cap:"La même vue en mode clair – sombre, clair ou comme Windows au choix.",
-  shot3alt:"Attribution des touches : chaque touche librement sur manette, clavier, souris, turbo ou macro, avec profils et couche Shift",
-  shot3cap:"Attribution des touches avec profils, couche Shift, turbo et macros.",
-  shot4alt:"Réglages sticks et vibration : zone morte, courbe, seuils de gâchette, intensité, turbo – général ou par manette",
-  shot4cap:"Sticks, gâchettes et vibration – général ou par manette.",
-  shot5alt:"Carte de manette avec réglages fins : calibrer les sticks, zone morte, courbe et vibration rien que pour cette manette",
-  shot5cap:"Réglage fin directement sur la carte de la manette.",
-  padsTitle:"Manettes prises en charge", padWired:"Manettes Switch filaires",
-  featTitle:"Ce que fait N-Connect",
-  f1h:"Manettes virtuelles Xbox 360 / DS4", f1p:"Les jeux voient une manette standard – compatibilité maximale sans réglage par jeu.",
-  f2h:"Appairage dans l'app", f2p:"Appairez les manettes Nintendo, PlayStation et Xbox en Bluetooth depuis N-Connect – sans menu Windows.",
-  f3h:"Attributions et profils", f3p:"Réattribuez les touches librement, turbo et macros, profils par manette et par jeu – en douze langues.",
-  f4h:"Gyroscope et mouvement", f4p:"Assignez le mouvement au stick ou à la souris – flick stick inclus pour les shooters.",
-  f5h:"Vibration, batterie, LED", f5p:"La vibration revient à la vraie manette ; batterie et LED de joueur sont affichées.",
-  f6h:"Pas de double entrée", f6p:"Les manettes d'origine sont masquées aux jeux (HidHide) – les manettes Xbox tournent en natif via XInput.",
-  stepsTitle:"Démarrez en trois étapes",
-  s1b:"Installer :", s1:"Téléchargez et lancez le setup – ViGEmBus et HidHide s'installent avec.",
-  s2b:"Appairer :", s2:"Mettez la manette en mode appairage et choisissez-la sous « Appairer une manette » dans N-Connect.",
-  s3b:"Jouer :", s3:"La manette apparaît dans la vue d'ensemble, prête comme manette Xbox/DS4 dans chaque jeu.",
-  legal:"N-Connect est open source. Les marques de manettes appartiennent à leurs détenteurs.", allReleases:"Toutes les versions", bugs:"Signaler un bug", version:"Version actuelle : " },
-it: { name:"Italiano", tagline:"Controller Nintendo, PlayStation e Xbox affidabili nei giochi Windows.<br>Associa una volta – gioca ovunque.", download:"Scarica N-Connect", source:"Codice su GitHub",
-  shotsTitle:"Ecco N-Connect",
-  shot1alt:"Panoramica di N-Connect: Switch 2 Pro Controller, coppia Joy-Con di Switch 2, Switch Pro Controller e coppia Joy-Con di Switch 1 collegati",
-  shot1cap:"Panoramica: Switch 2 Pro Controller, coppie Joy-Con di entrambe le generazioni e Switch Pro Controller – grafica live, batteria e ordine giocatori.",
-  shot2alt:"N-Connect in modalità chiara: la stessa panoramica con quattro controller Nintendo collegati",
-  shot2cap:"La stessa panoramica in modalità chiara – scuro, chiaro o come Windows.",
-  shot3alt:"Mappatura dei tasti: ogni tasto liberamente su gamepad, tastiera, mouse, turbo o macro, con profili e livello Shift",
-  shot3cap:"Mappatura dei tasti con profili, livello Shift, turbo e macro.",
-  shot4alt:"Impostazioni stick e vibrazione: zona morta, curva, soglie grilletti, intensità, turbo – generale o per controller",
-  shot4cap:"Stick, grilletti e vibrazione – generale o per controller.",
-  shot5alt:"Scheda del controller con regolazioni fini: calibra stick, zona morta, curva e vibrazione solo per questo controller",
-  shot5cap:"Regolazione fine direttamente sulla scheda del controller.",
-  padsTitle:"Controller supportati", padWired:"Pad Switch con cavo",
-  featTitle:"Cosa fa N-Connect",
-  f1h:"Controller virtuali Xbox 360 / DS4", f1p:"I giochi vedono un pad standard – massima compatibilità senza configurazione per gioco.",
-  f2h:"Associazione nell'app", f2p:"Associa controller Nintendo, PlayStation e Xbox via Bluetooth direttamente da N-Connect – senza menu di Windows.",
-  f3h:"Mappature e profili", f3p:"Rimappa i tasti liberamente, turbo e macro, profili per controller e gioco – in dodici lingue.",
-  f4h:"Giroscopio e movimento", f4p:"Assegna il movimento a stick o mouse – flick stick incluso per gli sparatutto.",
-  f5h:"Vibrazione, batteria, LED", f5p:"La vibrazione torna al controller reale; batteria e LED giocatore sono visibili.",
-  f6h:"Niente input doppio", f6p:"I controller originali vengono nascosti ai giochi (HidHide) – i pad Xbox girano in nativo via XInput.",
-  stepsTitle:"Inizia in tre passi",
-  s1b:"Installa:", s1:"Scarica ed esegui il setup – ViGEmBus e HidHide vengono installati insieme.",
-  s2b:"Associa:", s2:"Metti il controller in modalità associazione e selezionalo in «Associa controller» in N-Connect.",
-  s3b:"Gioca:", s3:"Il controller appare nella panoramica, pronto come pad Xbox/DS4 in ogni gioco.",
-  legal:"N-Connect è open source. I marchi dei controller appartengono ai rispettivi proprietari.", allReleases:"Tutte le versioni", bugs:"Segnala un bug", version:"Versione attuale: " },
-pt: { name:"Português", tagline:"Controlos Nintendo, PlayStation e Xbox a funcionar de forma fiável em jogos Windows.<br>Emparelha uma vez – joga em todo o lado.", download:"Descarregar N-Connect", source:"Código no GitHub",
-  shotsTitle:"Assim é o N-Connect",
-  shot1alt:"Vista geral do N-Connect: Switch 2 Pro Controller, par Joy-Con da Switch 2, Switch Pro Controller e par Joy-Con da Switch 1 ligados",
-  shot1cap:"Vista geral: Switch 2 Pro Controller, pares Joy-Con de ambas as gerações e Switch Pro Controller – gráficos ao vivo, bateria e ordem de jogadores.",
-  shot2alt:"N-Connect em modo claro: a mesma vista com quatro controlos Nintendo ligados",
-  shot2cap:"A mesma vista em modo claro – escuro, claro ou como o Windows.",
-  shot3alt:"Atribuição de botões: cada botão livremente para gamepad, teclado, rato, turbo ou macro, com perfis e camada Shift",
-  shot3cap:"Atribuição de botões com perfis, camada Shift, turbo e macros.",
-  shot4alt:"Definições de sticks e vibração: zona morta, curva, limiares de gatilho, intensidade, turbo – geral ou por controlo",
-  shot4cap:"Sticks, gatilhos e vibração – geral ou por controlo.",
-  shot5alt:"Cartão do controlo com ajustes finos: calibrar sticks, zona morta, curva e vibração só para este controlo",
-  shot5cap:"Ajuste fino diretamente no cartão do controlo.",
-  padsTitle:"Controlos suportados", padWired:"Comandos Switch com fio",
-  featTitle:"O que o N-Connect faz",
-  f1h:"Controlos virtuais Xbox 360 / DS4", f1p:"Os jogos veem um comando padrão – máxima compatibilidade sem configuração por jogo.",
-  f2h:"Emparelhamento na app", f2p:"Emparelha controlos Nintendo, PlayStation e Xbox por Bluetooth diretamente do N-Connect – sem menus do Windows.",
-  f3h:"Mapeamentos e perfis", f3p:"Remapeia botões livremente, turbo e macros, perfis por controlo e jogo – em doze idiomas.",
-  f4h:"Giroscópio e movimento", f4p:"Atribui o movimento ao stick ou ao rato – flick stick incluído para shooters.",
-  f5h:"Vibração, bateria, LEDs", f5p:"A vibração vai para o controlo real; bateria e LEDs de jogador são mostrados.",
-  f6h:"Sem entrada dupla", f6p:"Os controlos originais ficam ocultos dos jogos (HidHide) – os comandos Xbox funcionam nativamente via XInput.",
-  stepsTitle:"Começa em três passos",
-  s1b:"Instalar:", s1:"Descarrega e executa o setup – ViGEmBus e HidHide são instalados junto.",
-  s2b:"Emparelhar:", s2:"Põe o controlo em modo de emparelhamento e escolhe-o em «Emparelhar controlo» no N-Connect.",
-  s3b:"Jogar:", s3:"O controlo aparece na vista geral, pronto como comando Xbox/DS4 em cada jogo.",
-  legal:"O N-Connect é open source. As marcas dos controlos pertencem aos respetivos donos.", allReleases:"Todas as versões", bugs:"Reportar um erro", version:"Versão atual: " },
-nl: { name:"Nederlands", tagline:"Nintendo-, PlayStation- en Xbox-controllers betrouwbaar in Windows-games.<br>Eenmalig koppelen – overal spelen.", download:"N-Connect downloaden", source:"Broncode op GitHub",
-  shotsTitle:"Zo ziet N-Connect eruit",
-  shot1alt:"N-Connect-overzicht: Switch 2 Pro Controller, Switch-2-Joy-Con-paar, Switch Pro Controller en Switch-1-Joy-Con-paar verbonden",
-  shot1cap:"Overzicht: Switch 2 Pro Controller, Joy-Con-paren van beide generaties en Switch Pro Controller – live beeld, accu en spelersvolgorde.",
-  shot2alt:"N-Connect in lichte modus: hetzelfde overzicht met vier verbonden Nintendo-controllers",
-  shot2cap:"Hetzelfde overzicht in lichte modus – donker, licht of zoals Windows.",
-  shot3alt:"Knoptoewijzing: elke knop vrij naar gamepad, toetsenbord, muis, turbo of macro, met profielen en Shift-laag",
-  shot3cap:"Knoptoewijzing met profielen, Shift-laag, turbo en macro's.",
-  shot4alt:"Stick- en trilinstellingen: dode zone, curve, triggerdrempels, sterkte, turbo – algemeen of per controller",
-  shot4cap:"Sticks, triggers en trilling – algemeen of per controller.",
-  shot5alt:"Controllerkaart met fijnafstelling: sticks kalibreren, dode zone, curve en trilling alleen voor deze controller",
-  shot5cap:"Fijnafstelling direct op de controllerkaart.",
-  padsTitle:"Ondersteunde controllers", padWired:"Switch-pads met kabel",
-  featTitle:"Wat N-Connect doet",
-  f1h:"Virtuele Xbox 360-/DS4-controllers", f1p:"Games zien een standaardpad – maximale compatibiliteit zonder instelling per game.",
-  f2h:"Koppelen in de app", f2p:"Koppel Nintendo-, PlayStation- en Xbox-controllers via Bluetooth direct vanuit N-Connect – zonder Windows-menu.",
-  f3h:"Toewijzingen en profielen", f3p:"Wijs knoppen vrij toe, turbo en macro's, profielen per controller en game – in twaalf talen.",
-  f4h:"Gyro en beweging", f4p:"Wijs beweging toe aan stick of muis – inclusief flick stick voor shooters.",
-  f5h:"Trilling, accu, leds", f5p:"Trilling gaat terug naar de echte controller; accu en spelersleds worden getoond.",
-  f6h:"Geen dubbele invoer", f6p:"Originele controllers worden voor games verborgen (HidHide) – Xbox-pads draaien native via XInput.",
-  stepsTitle:"In drie stappen aan de slag",
-  s1b:"Installeren:", s1:"Download en voer de setup uit – ViGEmBus en HidHide worden meegeïnstalleerd.",
-  s2b:"Koppelen:", s2:"Zet de controller in koppelmodus en kies hem onder „Controller koppelen“ in N-Connect.",
-  s3b:"Spelen:", s3:"De controller verschijnt in het overzicht, klaar als Xbox-/DS4-pad in elke game.",
-  legal:"N-Connect is open source. Controllermerken behoren toe aan hun eigenaren.", allReleases:"Alle releases", bugs:"Bug melden", version:"Huidige versie: " },
-pl: { name:"Polski", tagline:"Kontrolery Nintendo, PlayStation i Xbox działające niezawodnie w grach Windows.<br>Sparuj raz – graj wszędzie.", download:"Pobierz N-Connect", source:"Kod źródłowy na GitHub",
-  shotsTitle:"Tak wygląda N-Connect",
-  shot1alt:"Przegląd N-Connect: Switch 2 Pro Controller, para Joy-Con Switch 2, Switch Pro Controller i para Joy-Con Switch 1 podłączone",
-  shot1cap:"Przegląd: Switch 2 Pro Controller, pary Joy-Con obu generacji i Switch Pro Controller – podgląd na żywo, bateria i kolejność graczy.",
-  shot2alt:"N-Connect w trybie jasnym: ten sam przegląd z czterema podłączonymi kontrolerami Nintendo",
-  shot2cap:"Ten sam przegląd w trybie jasnym – ciemny, jasny lub jak Windows.",
-  shot3alt:"Mapowanie przycisków: każdy przycisk dowolnie na gamepad, klawiaturę, mysz, turbo lub makro, z profilami i warstwą Shift",
-  shot3cap:"Mapowanie przycisków z profilami, warstwą Shift, turbo i makrami.",
-  shot4alt:"Ustawienia drążków i wibracji: martwa strefa, krzywa, progi triggerów, siła, turbo – ogólnie lub per kontroler",
-  shot4cap:"Drążki, triggery i wibracje – ogólnie lub per kontroler.",
-  shot5alt:"Karta kontrolera z dostrajaniem: kalibracja drążków, martwa strefa, krzywa i wibracje tylko dla tego kontrolera",
-  shot5cap:"Dostrajanie bezpośrednio na karcie kontrolera.",
-  padsTitle:"Obsługiwane kontrolery", padWired:"Przewodowe pady Switch",
-  featTitle:"Co robi N-Connect",
-  f1h:"Wirtualne kontrolery Xbox 360 / DS4", f1p:"Gry widzą standardowy pad – maksymalna kompatybilność bez konfiguracji per gra.",
-  f2h:"Parowanie w aplikacji", f2p:"Sparuj kontrolery Nintendo, PlayStation i Xbox przez Bluetooth prosto z N-Connect – bez menu Windows.",
-  f3h:"Mapowania i profile", f3p:"Dowolne przypisywanie przycisków, turbo i makra, profile per kontroler i gra – w dwunastu językach.",
-  f4h:"Żyroskop i ruch", f4p:"Przypisz ruch do drążka lub myszy – flick stick w zestawie dla strzelanek.",
-  f5h:"Wibracje, bateria, LED", f5p:"Wibracje wracają do prawdziwego kontrolera; bateria i LED-y gracza są widoczne.",
-  f6h:"Bez podwójnego wejścia", f6p:"Oryginalne kontrolery są ukrywane przed grami (HidHide) – pady Xbox działają natywnie przez XInput.",
-  stepsTitle:"Zacznij w trzech krokach",
-  s1b:"Zainstaluj:", s1:"Pobierz i uruchom instalator – ViGEmBus i HidHide instalują się razem.",
-  s2b:"Sparuj:", s2:"Włącz tryb parowania na kontrolerze i wybierz go w „Sparuj kontroler” w N-Connect.",
-  s3b:"Graj:", s3:"Kontroler pojawi się w przeglądzie, gotowy jako pad Xbox/DS4 w każdej grze.",
-  legal:"N-Connect to open source. Marki kontrolerów należą do ich właścicieli.", allReleases:"Wszystkie wydania", bugs:"Zgłoś błąd", version:"Aktualna wersja: " },
-ru: { name:"Русский", tagline:"Контроллеры Nintendo, PlayStation и Xbox надёжно работают в играх Windows.<br>Сопрягите один раз – играйте везде.", download:"Скачать N-Connect", source:"Исходный код на GitHub",
-  shotsTitle:"Так выглядит N-Connect",
-  shot1alt:"Обзор N-Connect: Switch 2 Pro Controller, пара Joy-Con Switch 2, Switch Pro Controller и пара Joy-Con Switch 1 подключены",
-  shot1cap:"Обзор: Switch 2 Pro Controller, пары Joy-Con обоих поколений и Switch Pro Controller – живое изображение, батарея и порядок игроков.",
-  shot2alt:"N-Connect в светлом режиме: тот же обзор с четырьмя подключёнными контроллерами Nintendo",
-  shot2cap:"Тот же обзор в светлом режиме – тёмный, светлый или как в Windows.",
-  shot3alt:"Назначение кнопок: каждую кнопку свободно на геймпад, клавиатуру, мышь, турбо или макрос, с профилями и слоем Shift",
-  shot3cap:"Назначение кнопок с профилями, слоем Shift, турбо и макросами.",
-  shot4alt:"Настройки стиков и вибрации: мёртвая зона, кривая, пороги триггеров, сила, турбо – общие или для контроллера",
-  shot4cap:"Стики, триггеры и вибрация – общие или для каждого контроллера.",
-  shot5alt:"Карточка контроллера с тонкой настройкой: калибровка стиков, мёртвая зона, кривая и вибрация только для этого контроллера",
-  shot5cap:"Тонкая настройка прямо на карточке контроллера.",
-  padsTitle:"Поддерживаемые контроллеры", padWired:"Проводные пады Switch",
-  featTitle:"Что умеет N-Connect",
-  f1h:"Виртуальные контроллеры Xbox 360 / DS4", f1p:"Игры видят стандартный пэд – максимальная совместимость без настройки под каждую игру.",
-  f2h:"Сопряжение в приложении", f2p:"Сопрягайте контроллеры Nintendo, PlayStation и Xbox по Bluetooth прямо из N-Connect – без меню Windows.",
-  f3h:"Назначения и профили", f3p:"Свободное переназначение кнопок, турбо и макросы, профили для контроллера и игры – на двенадцати языках.",
-  f4h:"Гироскоп и движение", f4p:"Назначьте движение на стик или мышь – включая flick stick для шутеров.",
-  f5h:"Вибрация, батарея, LED", f5p:"Вибрация возвращается на настоящий контроллер; показываются батарея и LED игрока.",
-  f6h:"Без двойного ввода", f6p:"Оригинальные контроллеры скрываются от игр (HidHide) – пэды Xbox работают нативно через XInput.",
-  stepsTitle:"Начните в три шага",
-  s1b:"Установите:", s1:"Скачайте и запустите установщик – ViGEmBus и HidHide ставятся вместе.",
-  s2b:"Сопрягите:", s2:"Переведите контроллер в режим сопряжения и выберите его в «Сопрячь контроллер» в N-Connect.",
-  s3b:"Играйте:", s3:"Контроллер появится в обзоре и будет готов как пэд Xbox/DS4 в каждой игре.",
-  legal:"N-Connect – открытый код. Торговые марки контроллеров принадлежат их владельцам.", allReleases:"Все версии", bugs:"Сообщить об ошибке", version:"Актуальная версия: " },
-ja: { name:"日本語", tagline:"Nintendo・PlayStation・XboxコントローラーをWindowsゲームで確実に使えるように。<br>一度ペアリングすれば、どこでもプレイ。", download:"N-Connectをダウンロード", source:"GitHubでソースコード",
-  shotsTitle:"N-Connectの画面",
-  shot1alt:"N-Connectの概要：Switch 2 Pro Controller、Switch 2 Joy-Conペア、Switch Pro Controller、Switch 1 Joy-Conペアが接続された状態",
-  shot1cap:"概要：Switch 2 Pro Controller、新旧両世代のJoy-Conペア、Switch Pro Controller – ライブ表示、バッテリー、プレイヤー順。",
-  shot2alt:"ライトモードのN-Connect：4台のNintendoコントローラーが接続された同じ概要画面",
-  shot2cap:"同じ概要をライトモードで – ダーク・ライト・Windows準拠から選べます。",
-  shot3alt:"ボタン割り当て：すべてのボタンをゲームパッド・キーボード・マウス・連射・マクロに自由に割り当て、プロファイルとShiftレイヤー付き",
-  shot3cap:"プロファイル、Shiftレイヤー、連射、マクロ対応のボタン割り当て。",
-  shot4alt:"スティックと振動の設定：デッドゾーン、カーブ、トリガーしきい値、強度、連射 – 全体またはコントローラーごと",
-  shot4cap:"スティック、トリガー、振動 – 全体またはコントローラーごと。",
-  shot5alt:"コントローラーカードの微調整：スティックのキャリブレーション、デッドゾーン、カーブ、振動をこのコントローラーだけに適用",
-  shot5cap:"コントローラーカード上で直接微調整。",
-  padsTitle:"対応コントローラー", padWired:"有線Switchパッド",
-  featTitle:"N-Connectの機能",
-  f1h:"仮想Xbox 360 / DS4コントローラー", f1p:"ゲームには標準パッドとして見えます – ゲームごとの設定なしで最大の互換性。",
-  f2h:"アプリ内ペアリング", f2p:"Nintendo・PlayStation・XboxコントローラーをBluetoothでN-Connectから直接ペアリング – Windowsメニュー不要。",
-  f3h:"割り当てとプロファイル", f3p:"ボタンを自由に割り当て、連射・マクロ、コントローラーとゲームごとのプロファイル – 12か国語対応。",
-  f4h:"ジャイロとモーション", f4p:"モーションをスティックやマウスに割り当て – シューター向けフリックスティック搭載。",
-  f5h:"振動・バッテリー・LED", f5p:"振動は実際のコントローラーに返され、バッテリー残量とプレイヤーLEDを表示。",
-  f6h:"二重入力なし", f6p:"元のコントローラーはゲームから隠されます（HidHide）– XboxパッドはXInputでネイティブ動作。",
-  stepsTitle:"3ステップで開始",
-  s1b:"インストール：", s1:"セットアップをダウンロードして実行 – ViGEmBusとHidHideも一緒にインストール。",
-  s2b:"ペアリング：", s2:"コントローラーをペアリングモードにして、N-Connectの「コントローラーをペアリング」で選択。",
-  s3b:"プレイ：", s3:"コントローラーが概要に表示され、すべてのゲームでXbox/DS4パッドとして使えます。",
-  legal:"N-Connectはオープンソースです。コントローラーの商標は各所有者に帰属します。", allReleases:"すべてのリリース", bugs:"バグを報告", version:"最新バージョン：" },
-zh: { name:"简体中文", tagline:"让 Nintendo、PlayStation 和 Xbox 手柄在 Windows 游戏中可靠工作。<br>配对一次 – 随处畅玩。", download:"下载 N-Connect", source:"GitHub 源代码",
-  shotsTitle:"N-Connect 界面一览",
-  shot1alt:"N-Connect 概览：Switch 2 Pro 手柄、Switch 2 Joy-Con 组合、Switch Pro 手柄和 Switch 1 Joy-Con 组合已连接",
-  shot1cap:"概览：Switch 2 Pro 手柄、两代 Joy-Con 组合和 Switch Pro 手柄 – 实时画面、电量和玩家顺序。",
-  shot2alt:"浅色模式的 N-Connect：连接四个 Nintendo 手柄的同一概览",
-  shot2cap:"浅色模式下的同一概览 – 可选深色、浅色或跟随 Windows。",
-  shot3alt:"按键映射：每个按键可自由分配给手柄、键盘、鼠标、连发或宏，支持配置档和 Shift 层",
-  shot3cap:"按键映射支持配置档、Shift 层、连发和宏。",
-  shot4alt:"摇杆与振动设置：死区、曲线、扳机阈值、强度、连发 – 全局或按手柄",
-  shot4cap:"摇杆、扳机和振动 – 全局或按手柄设置。",
-  shot5alt:"手柄卡片上的精细调节：仅为此手柄校准摇杆、死区、曲线和振动强度",
-  shot5cap:"在手柄卡片上直接精细调节。",
-  padsTitle:"支持的手柄", padWired:"Switch 有线手柄",
-  featTitle:"N-Connect 的功能",
-  f1h:"虚拟 Xbox 360 / DS4 手柄", f1p:"游戏识别为标准手柄 – 无需逐游戏配置即可最大兼容。",
-  f2h:"应用内配对", f2p:"通过蓝牙直接在 N-Connect 中配对 Nintendo、PlayStation 和 Xbox 手柄 – 无需 Windows 菜单。",
-  f3h:"映射与配置档", f3p:"自由重映射按键、连发和宏，按手柄和游戏保存配置档 – 支持十二种语言。",
-  f4h:"陀螺仪与体感", f4p:"将体感映射到摇杆或鼠标 – 含射击游戏的 Flick Stick。",
-  f5h:"振动、电量、LED", f5p:"振动回传到真实手柄；显示电量和玩家 LED。",
-  f6h:"无双重输入", f6p:"原始手柄对游戏隐藏（HidHide）– Xbox 手柄通过 XInput 原生运行。",
+de: { name:"Deutsch", title:"N-Connect – Controller am PC einfach verbinden",
+  navFeatures:"Funktionen", navConnect:"Verbinden", navControllers:"Controller", navFaq:"Hilfe",
+  tagline:"Nintendo-, PlayStation- und Xbox-Controller am PC – einfach verbinden und in jedem Spiel spielen.",
+  download:"Für Windows herunterladen", portable:"Portable Version (ZIP)", meta:"Kostenlos · Windows 10 und 11 · 12 Sprachen", version:" · Version ",
+  smartscreen:"Zeigt Windows beim ersten Start <b>„Der Computer wurde durch Windows geschützt“</b>? Das passiert bei neuen Programmen ohne teures Zertifikat. Auf <b>Weitere Informationen → Trotzdem ausführen</b> klicken – N-Connect ist Open Source.",
+  shotAlt:"N-Connect: Übersicht mit verbundenen Controllern, Akkustand und Live-Anzeige der Tasten",
+  stepsTitle:"In 3 Schritten loslegen",
+  s1h:"Installieren", s1p:"Setup herunterladen und starten. Alles Nötige wird automatisch mitinstalliert.",
+  s2h:"Verbinden", s2p:"Am Controller die SYNC-Taste drücken – N-Connect findet ihn von selbst.",
+  s3h:"Spielen", s3p:"Der Controller funktioniert sofort – in Steam, im Game Pass, in Emulatoren und allen anderen Spielen.",
+  featTitle:"Das kann N-Connect", featLead:"Viele Spiele verstehen nur Xbox-Controller. N-Connect übersetzt deinen Controller, damit jedes Spiel ihn erkennt – und bietet dazu viele praktische Extras.",
+  f1h:"Läuft in jedem Spiel", f1p:"Dein Controller erscheint als Xbox-Controller – oder als PlayStation-Controller mit Bewegungssteuerung.",
+  f2h:"Bis zu 8 Controller", f2p:"Du legst fest, wer Spieler 1, 2, 3 … ist. N-Connect merkt sich die Reihenfolge.",
+  f3h:"Akku im Blick", f3p:"Akkustand für jeden Controller – mit Warnung, bevor er leer ist.",
+  f4h:"Tasten frei belegen", f4p:"Auch mit Tastatur, Maus, Turbo oder Tastenfolgen – mit eigenen Profilen je Spiel.",
+  f5h:"Zielen durch Bewegen", f5p:"Die Bewegungssensoren steuern Kamera oder Maus – ideal für Shooter.",
+  f6h:"Joy-Con wie an der Switch", f6p:"Als Paar oder einzeln, quer oder hochkant – sogar als Maus.",
+  f7h:"Stick-Drift beheben", f7p:"Sticks einfach neu ausmessen. Der Controller selbst bleibt unverändert.",
+  f8h:"Updates mit einem Klick", f8p:"N-Connect meldet sich, wenn es eine neue Version gibt, und aktualisiert sich selbst.",
+  connectTitle:"So verbindest du deinen Controller",
+  c1h:"Switch 2", c1p:"Pro Controller, Joy-Con 2 und GameCube: <b>SYNC-Taste</b> kurz drücken. Pro Controller und GameCube gehen auch per USB-Kabel.",
+  c2h:"Switch", c2p:"Pro Controller, Joy-Con, NES, SNES, N64 und Mega Drive: <b>SYNC-Taste</b> drücken, bis die Lichter laufen.",
+  c3h:"Wii und Wii U", c3p:"Die rote <b>SYNC-Taste</b> drücken – bei der Wii-Fernbedienung im Batteriefach, beim Wii U Pro Controller auf der Unterseite.",
+  c4h:"PlayStation", c4p:"DualShock 4 und DualSense einmal in den <b>Windows-Bluetooth-Einstellungen</b> koppeln oder per USB-Kabel anschließen.",
+  c5h:"Xbox", c5p:"Einfach anschließen – per USB, Bluetooth oder Xbox-Wireless-Adapter.",
+  connectNote:"Beim nächsten Mal reicht <b>ein beliebiger Tastendruck</b>. Switch-2-Controller bitte <b>nicht</b> in den Windows-Bluetooth-Einstellungen hinzufügen – einfach nur SYNC drücken.",
+  galleryTitle:"Weitere Ansichten",
+  g1alt:"Tastenbelegung mit Profilen", g1cap:"Tasten frei belegen – mit Profilen, Turbo und Makros.",
+  g2alt:"Einstellungen für Sticks und Vibration", g2cap:"Sticks, Trigger und Vibration – für alle oder je Controller.",
+  g3alt:"Einstellungen direkt an einem Controller", g3cap:"Alle Einstellungen direkt an jedem Controller.",
+  padsTitle:"Unterstützte Controller", padsLead:"Per Bluetooth oder USB-Kabel – bis zu 8 gleichzeitig.", padWired:"Kabel-Controller von HORI, PowerA, PDP",
+  faqTitle:"Häufige Fragen",
+  q1:"Kostet N-Connect etwas?", a1:"Nein. N-Connect ist kostenlos, ohne Werbung und Open Source (MIT-Lizenz).",
+  q2:"Brauche ich Bluetooth?", a2:"Für kabellose Controller ja – das eingebaute Bluetooth reicht meist. Viele Controller funktionieren auch per USB-Kabel. Für sehr viele Controller gleichzeitig hilft ein guter Bluetooth-Adapter.",
+  q3:"Ein Controller wird in Steam doppelt angezeigt.", a3:"In N-Connect unter <b>Allgemein → Original-Controller verstecken</b> einschalten, die Windows-Abfrage bestätigen und Steam einmal neu starten.",
+  q4:"Kann ich den Controller danach wieder an der Konsole benutzen?", a4:"Ja. Switch-2-Controller einfach an der Konsole einmal neu koppeln, danach geht es dort wie gewohnt.",
+  q5:"Geht es auch ohne Installation?", a5:"Ja, mit der portablen ZIP-Version. Die Treiber ViGEmBus und HidHide müssen auf dem PC aber einmal installiert sein – das Setup erledigt das automatisch.",
+  q6:"Etwas funktioniert nicht – was tun?", a6:"Rechtsklick auf das N-Connect-Symbol unten rechts → <b>Protokoll öffnen</b> und den Inhalt bei einer <a href=\"https://github.com/DevCatSKZ/N-Connect/issues\">Problemmeldung</a> anhängen.",
+  legal:"N-Connect ist ein inoffizielles, kostenloses Open-Source-Projekt von devcatskz und nicht mit Nintendo, Sony oder Microsoft verbunden. Marken gehören ihren Inhabern.",
+  source:"Quellcode auf GitHub", allReleases:"Alle Versionen", bugs:"Problem melden" },
+en: { name:"English", title:"N-Connect – connect controllers to your PC with ease",
+  navFeatures:"Features", navConnect:"Connect", navControllers:"Controllers", navFaq:"Help",
+  tagline:"Nintendo, PlayStation and Xbox controllers on your PC – just connect and play any game.",
+  download:"Download for Windows", portable:"Portable version (ZIP)", meta:"Free · Windows 10 and 11 · 12 languages", version:" · Version ",
+  smartscreen:"Windows shows <b>“Windows protected your PC”</b> on first start? That happens with new programs that don't have an expensive certificate. Click <b>More info → Run anyway</b> – N-Connect is open source.",
+  shotAlt:"N-Connect: overview with connected controllers, battery level and live button display",
+  stepsTitle:"Get started in 3 steps",
+  s1h:"Install", s1p:"Download the setup and run it. Everything it needs is installed automatically.",
+  s2h:"Connect", s2p:"Press the SYNC button on your controller – N-Connect finds it on its own.",
+  s3h:"Play", s3p:"The controller works right away – in Steam, Game Pass, emulators and every other game.",
+  featTitle:"What N-Connect does", featLead:"Many games only understand Xbox controllers. N-Connect translates your controller so every game recognises it – plus lots of handy extras.",
+  f1h:"Works in every game", f1p:"Your controller shows up as an Xbox controller – or as a PlayStation controller with motion controls.",
+  f2h:"Up to 8 controllers", f2p:"You decide who is player 1, 2, 3 … N-Connect remembers the order.",
+  f3h:"Battery at a glance", f3p:"Battery level for every controller – with a warning before it runs out.",
+  f4h:"Remap any button", f4p:"Even to keyboard, mouse, turbo or button sequences – with profiles per game.",
+  f5h:"Aim by moving", f5p:"The motion sensors control the camera or the mouse – ideal for shooters.",
+  f6h:"Joy-Con like on the Switch", f6p:"As a pair or single, sideways or upright – even as a mouse.",
+  f7h:"Fix stick drift", f7p:"Simply re-measure the sticks. The controller itself stays unchanged.",
+  f8h:"One-click updates", f8p:"N-Connect tells you when a new version is out and updates itself.",
+  connectTitle:"How to connect your controller",
+  c1h:"Switch 2", c1p:"Pro Controller, Joy-Con 2 and GameCube: briefly press the <b>SYNC button</b>. Pro Controller and GameCube also work with a USB cable.",
+  c2h:"Switch", c2p:"Pro Controller, Joy-Con, NES, SNES, N64 and Genesis: press the <b>SYNC button</b> until the lights run.",
+  c3h:"Wii and Wii U", c3p:"Press the red <b>SYNC button</b> – in the battery compartment of the Wii Remote, on the bottom of the Wii U Pro Controller.",
+  c4h:"PlayStation", c4p:"Pair DualShock 4 and DualSense once in the <b>Windows Bluetooth settings</b> or connect them with a USB cable.",
+  c5h:"Xbox", c5p:"Just connect it – via USB, Bluetooth or the Xbox Wireless Adapter.",
+  connectNote:"Next time, <b>pressing any button</b> is enough. Please <b>don't</b> add Switch 2 controllers in the Windows Bluetooth settings – just press SYNC.",
+  galleryTitle:"More views",
+  g1alt:"Button mapping with profiles", g1cap:"Remap buttons freely – with profiles, turbo and macros.",
+  g2alt:"Stick and rumble settings", g2cap:"Sticks, triggers and rumble – for all or per controller.",
+  g3alt:"Settings right on a controller", g3cap:"Every setting right on each controller.",
+  padsTitle:"Supported controllers", padsLead:"Via Bluetooth or USB cable – up to 8 at once.", padWired:"Wired controllers by HORI, PowerA, PDP",
+  faqTitle:"Frequently asked questions",
+  q1:"Does N-Connect cost anything?", a1:"No. N-Connect is free, has no ads and is open source (MIT license).",
+  q2:"Do I need Bluetooth?", a2:"For wireless controllers, yes – the built-in Bluetooth is usually enough. Many controllers also work with a USB cable. For lots of controllers at once, a good Bluetooth adapter helps.",
+  q3:"A controller shows up twice in Steam.", a3:"In N-Connect, turn on <b>General → Hide original controllers</b>, confirm the Windows prompt and restart Steam once.",
+  q4:"Can I use the controller on my console again afterwards?", a4:"Yes. Just pair Switch 2 controllers with the console once more, then they work there as usual.",
+  q5:"Does it work without installing?", a5:"Yes, with the portable ZIP version. The ViGEmBus and HidHide drivers still need to be installed on the PC once – the setup does that automatically.",
+  q6:"Something doesn't work – what now?", a6:"Right-click the N-Connect icon in the bottom right → <b>Open log</b> and attach its content to a <a href=\"https://github.com/DevCatSKZ/N-Connect/issues\">bug report</a>.",
+  legal:"N-Connect is an unofficial, free open-source project by devcatskz and is not affiliated with Nintendo, Sony or Microsoft. Trademarks belong to their owners.",
+  source:"Source code on GitHub", allReleases:"All versions", bugs:"Report a problem" },
+es: { name:"Español", title:"N-Connect – conecta tus mandos al PC fácilmente",
+  navFeatures:"Funciones", navConnect:"Conectar", navControllers:"Mandos", navFaq:"Ayuda",
+  tagline:"Mandos de Nintendo, PlayStation y Xbox en tu PC – conéctalos y juega a cualquier juego.",
+  download:"Descargar para Windows", portable:"Versión portable (ZIP)", meta:"Gratis · Windows 10 y 11 · 12 idiomas", version:" · Versión ",
+  smartscreen:"¿Windows muestra <b>«Windows protegió su PC»</b> al iniciar? Ocurre con programas nuevos sin un certificado caro. Haz clic en <b>Más información → Ejecutar de todas formas</b>: N-Connect es de código abierto.",
+  shotAlt:"N-Connect: vista general con mandos conectados, batería y botones en directo",
+  stepsTitle:"Empieza en 3 pasos",
+  s1h:"Instalar", s1p:"Descarga el instalador y ejecútalo. Todo lo necesario se instala automáticamente.",
+  s2h:"Conectar", s2p:"Pulsa el botón SYNC del mando: N-Connect lo encuentra solo.",
+  s3h:"Jugar", s3p:"El mando funciona al instante: en Steam, Game Pass, emuladores y cualquier otro juego.",
+  featTitle:"Qué hace N-Connect", featLead:"Muchos juegos solo entienden mandos de Xbox. N-Connect traduce tu mando para que cualquier juego lo reconozca, con muchos extras prácticos.",
+  f1h:"Funciona en cualquier juego", f1p:"Tu mando aparece como mando de Xbox, o como mando de PlayStation con control de movimiento.",
+  f2h:"Hasta 8 mandos", f2p:"Tú decides quién es el jugador 1, 2, 3… N-Connect recuerda el orden.",
+  f3h:"Batería a la vista", f3p:"Nivel de batería de cada mando, con aviso antes de que se agote.",
+  f4h:"Reasigna cualquier botón", f4p:"Incluso a teclado, ratón, turbo o secuencias de botones, con perfiles por juego.",
+  f5h:"Apunta moviendo", f5p:"Los sensores de movimiento controlan la cámara o el ratón: ideal para shooters.",
+  f6h:"Joy-Con como en la Switch", f6p:"En pareja o solos, en horizontal o vertical, incluso como ratón.",
+  f7h:"Corrige el drift", f7p:"Vuelve a medir los sticks. El mando en sí no se modifica.",
+  f8h:"Actualizaciones con un clic", f8p:"N-Connect avisa cuando hay una nueva versión y se actualiza solo.",
+  connectTitle:"Cómo conectar tu mando",
+  c1h:"Switch 2", c1p:"Pro Controller, Joy-Con 2 y GameCube: pulsa brevemente el <b>botón SYNC</b>. Pro Controller y GameCube también funcionan por cable USB.",
+  c2h:"Switch", c2p:"Pro Controller, Joy-Con, NES, SNES, N64 y Mega Drive: pulsa el <b>botón SYNC</b> hasta que las luces se muevan.",
+  c3h:"Wii y Wii U", c3p:"Pulsa el <b>botón SYNC</b> rojo: en el compartimento de las pilas del Wii Remote, en la parte inferior del Wii U Pro Controller.",
+  c4h:"PlayStation", c4p:"Empareja DualShock 4 y DualSense una vez en la <b>configuración de Bluetooth de Windows</b> o conéctalos por cable USB.",
+  c5h:"Xbox", c5p:"Simplemente conéctalo: por USB, Bluetooth o con el adaptador inalámbrico de Xbox.",
+  connectNote:"La próxima vez basta con <b>pulsar cualquier botón</b>. <b>No</b> añadas los mandos de Switch 2 en la configuración de Bluetooth de Windows: solo pulsa SYNC.",
+  galleryTitle:"Más vistas",
+  g1alt:"Asignación de botones con perfiles", g1cap:"Reasigna botones libremente, con perfiles, turbo y macros.",
+  g2alt:"Ajustes de sticks y vibración", g2cap:"Sticks, gatillos y vibración: para todos o por mando.",
+  g3alt:"Ajustes directamente en un mando", g3cap:"Todos los ajustes directamente en cada mando.",
+  padsTitle:"Mandos compatibles", padsLead:"Por Bluetooth o cable USB, hasta 8 a la vez.", padWired:"Mandos con cable de HORI, PowerA, PDP",
+  faqTitle:"Preguntas frecuentes",
+  q1:"¿N-Connect cuesta algo?", a1:"No. N-Connect es gratis, sin anuncios y de código abierto (licencia MIT).",
+  q2:"¿Necesito Bluetooth?", a2:"Para mandos inalámbricos, sí: el Bluetooth integrado suele bastar. Muchos mandos también funcionan por cable USB. Para muchos mandos a la vez ayuda un buen adaptador Bluetooth.",
+  q3:"Un mando aparece dos veces en Steam.", a3:"En N-Connect activa <b>General → Ocultar mandos originales</b>, confirma el aviso de Windows y reinicia Steam una vez.",
+  q4:"¿Puedo volver a usar el mando en la consola?", a4:"Sí. Empareja de nuevo los mandos de Switch 2 con la consola una vez y funcionarán como siempre.",
+  q5:"¿Funciona sin instalar?", a5:"Sí, con la versión portable en ZIP. Los controladores ViGEmBus y HidHide deben estar instalados una vez en el PC; el instalador lo hace automáticamente.",
+  q6:"Algo no funciona, ¿qué hago?", a6:"Clic derecho en el icono de N-Connect abajo a la derecha → <b>Abrir registro</b> y adjunta su contenido a un <a href=\"https://github.com/DevCatSKZ/N-Connect/issues\">informe de problema</a>.",
+  legal:"N-Connect es un proyecto no oficial, gratuito y de código abierto de devcatskz, sin relación con Nintendo, Sony ni Microsoft. Las marcas pertenecen a sus propietarios.",
+  source:"Código fuente en GitHub", allReleases:"Todas las versiones", bugs:"Informar de un problema" },
+fr: { name:"Français", title:"N-Connect – connectez vos manettes au PC facilement",
+  navFeatures:"Fonctions", navConnect:"Connexion", navControllers:"Manettes", navFaq:"Aide",
+  tagline:"Manettes Nintendo, PlayStation et Xbox sur votre PC – connectez-les et jouez à n'importe quel jeu.",
+  download:"Télécharger pour Windows", portable:"Version portable (ZIP)", meta:"Gratuit · Windows 10 et 11 · 12 langues", version:" · Version ",
+  smartscreen:"Windows affiche <b>« Windows a protégé votre ordinateur »</b> au premier lancement ? Cela arrive avec les nouveaux programmes sans certificat coûteux. Cliquez sur <b>Informations complémentaires → Exécuter quand même</b> – N-Connect est open source.",
+  shotAlt:"N-Connect : vue d'ensemble avec manettes connectées, batterie et boutons en direct",
+  stepsTitle:"Démarrer en 3 étapes",
+  s1h:"Installer", s1p:"Téléchargez le programme d'installation et lancez-le. Tout le nécessaire est installé automatiquement.",
+  s2h:"Connecter", s2p:"Appuyez sur le bouton SYNC de la manette – N-Connect la trouve tout seul.",
+  s3h:"Jouer", s3p:"La manette fonctionne aussitôt – dans Steam, Game Pass, les émulateurs et tous les autres jeux.",
+  featTitle:"Ce que fait N-Connect", featLead:"Beaucoup de jeux ne comprennent que les manettes Xbox. N-Connect traduit votre manette pour que chaque jeu la reconnaisse – avec de nombreux bonus pratiques.",
+  f1h:"Fonctionne dans tous les jeux", f1p:"Votre manette apparaît comme une manette Xbox – ou comme une manette PlayStation avec détection de mouvement.",
+  f2h:"Jusqu'à 8 manettes", f2p:"Vous choisissez qui est le joueur 1, 2, 3… N-Connect retient l'ordre.",
+  f3h:"Batterie en un coup d'œil", f3p:"Niveau de batterie de chaque manette – avec alerte avant qu'elle soit vide.",
+  f4h:"Réassigner chaque bouton", f4p:"Même au clavier, à la souris, au turbo ou à des suites de boutons – avec des profils par jeu.",
+  f5h:"Viser en bougeant", f5p:"Les capteurs de mouvement contrôlent la caméra ou la souris – idéal pour les jeux de tir.",
+  f6h:"Joy-Con comme sur Switch", f6p:"En paire ou seuls, à l'horizontale ou à la verticale – même comme souris.",
+  f7h:"Corriger la dérive des sticks", f7p:"Mesurez simplement les sticks à nouveau. La manette elle-même n'est pas modifiée.",
+  f8h:"Mises à jour en un clic", f8p:"N-Connect vous prévient d'une nouvelle version et se met à jour tout seul.",
+  connectTitle:"Comment connecter votre manette",
+  c1h:"Switch 2", c1p:"Pro Controller, Joy-Con 2 et GameCube : appuyez brièvement sur le <b>bouton SYNC</b>. Pro Controller et GameCube fonctionnent aussi en USB.",
+  c2h:"Switch", c2p:"Pro Controller, Joy-Con, NES, SNES, N64 et Mega Drive : appuyez sur le <b>bouton SYNC</b> jusqu'à ce que les voyants défilent.",
+  c3h:"Wii et Wii U", c3p:"Appuyez sur le <b>bouton SYNC</b> rouge – dans le compartiment à piles de la Wiimote, sous la manette Wii U Pro.",
+  c4h:"PlayStation", c4p:"Associez une fois la DualShock 4 et la DualSense dans les <b>paramètres Bluetooth de Windows</b> ou branchez-les en USB.",
+  c5h:"Xbox", c5p:"Branchez-la simplement – en USB, en Bluetooth ou avec l'adaptateur sans fil Xbox.",
+  connectNote:"La fois suivante, <b>appuyer sur n'importe quel bouton</b> suffit. N'ajoutez <b>pas</b> les manettes Switch 2 dans les paramètres Bluetooth de Windows – appuyez seulement sur SYNC.",
+  galleryTitle:"Autres vues",
+  g1alt:"Assignation des boutons avec profils", g1cap:"Réassignez librement les boutons – avec profils, turbo et macros.",
+  g2alt:"Réglages des sticks et des vibrations", g2cap:"Sticks, gâchettes et vibrations – pour toutes ou par manette.",
+  g3alt:"Réglages directement sur une manette", g3cap:"Tous les réglages directement sur chaque manette.",
+  padsTitle:"Manettes prises en charge", padsLead:"En Bluetooth ou par câble USB – jusqu'à 8 à la fois.", padWired:"Manettes filaires HORI, PowerA, PDP",
+  faqTitle:"Questions fréquentes",
+  q1:"N-Connect est-il payant ?", a1:"Non. N-Connect est gratuit, sans publicité et open source (licence MIT).",
+  q2:"Ai-je besoin du Bluetooth ?", a2:"Pour les manettes sans fil, oui – le Bluetooth intégré suffit généralement. Beaucoup de manettes fonctionnent aussi en USB. Pour de nombreuses manettes à la fois, un bon adaptateur Bluetooth aide.",
+  q3:"Une manette apparaît deux fois dans Steam.", a3:"Dans N-Connect, activez <b>Général → Masquer les manettes d'origine</b>, confirmez la demande de Windows et redémarrez Steam une fois.",
+  q4:"Puis-je réutiliser la manette sur ma console ?", a4:"Oui. Associez simplement à nouveau les manettes Switch 2 à la console, puis elles fonctionnent comme d'habitude.",
+  q5:"Est-ce que ça marche sans installation ?", a5:"Oui, avec la version portable ZIP. Les pilotes ViGEmBus et HidHide doivent toutefois être installés une fois sur le PC – le programme d'installation s'en charge.",
+  q6:"Quelque chose ne marche pas – que faire ?", a6:"Clic droit sur l'icône N-Connect en bas à droite → <b>Ouvrir le journal</b> et joignez son contenu à un <a href=\"https://github.com/DevCatSKZ/N-Connect/issues\">signalement</a>.",
+  legal:"N-Connect est un projet non officiel, gratuit et open source de devcatskz, sans lien avec Nintendo, Sony ou Microsoft. Les marques appartiennent à leurs propriétaires.",
+  source:"Code source sur GitHub", allReleases:"Toutes les versions", bugs:"Signaler un problème" },
+it: { name:"Italiano", title:"N-Connect – collega i controller al PC con facilità",
+  navFeatures:"Funzioni", navConnect:"Collegare", navControllers:"Controller", navFaq:"Aiuto",
+  tagline:"Controller Nintendo, PlayStation e Xbox sul PC – collegali e gioca a qualsiasi gioco.",
+  download:"Scarica per Windows", portable:"Versione portable (ZIP)", meta:"Gratis · Windows 10 e 11 · 12 lingue", version:" · Versione ",
+  smartscreen:"Windows mostra <b>«PC protetto da Windows»</b> al primo avvio? Succede con i programmi nuovi senza un certificato costoso. Fai clic su <b>Ulteriori informazioni → Esegui comunque</b>: N-Connect è open source.",
+  shotAlt:"N-Connect: panoramica con controller collegati, batteria e tasti in tempo reale",
+  stepsTitle:"Inizia in 3 passi",
+  s1h:"Installa", s1p:"Scarica il programma di installazione e avvialo. Tutto il necessario viene installato automaticamente.",
+  s2h:"Collega", s2p:"Premi il tasto SYNC sul controller: N-Connect lo trova da solo.",
+  s3h:"Gioca", s3p:"Il controller funziona subito: in Steam, Game Pass, emulatori e qualsiasi altro gioco.",
+  featTitle:"Cosa fa N-Connect", featLead:"Molti giochi capiscono solo i controller Xbox. N-Connect traduce il tuo controller perché ogni gioco lo riconosca, con tanti extra utili.",
+  f1h:"Funziona in ogni gioco", f1p:"Il tuo controller appare come controller Xbox, o come controller PlayStation con sensori di movimento.",
+  f2h:"Fino a 8 controller", f2p:"Decidi tu chi è il giocatore 1, 2, 3… N-Connect ricorda l'ordine.",
+  f3h:"Batteria sempre visibile", f3p:"Livello della batteria di ogni controller, con avviso prima che si scarichi.",
+  f4h:"Rimappa ogni tasto", f4p:"Anche su tastiera, mouse, turbo o sequenze di tasti, con profili per gioco.",
+  f5h:"Mira muovendoti", f5p:"I sensori di movimento controllano la visuale o il mouse: ideale per gli sparatutto.",
+  f6h:"Joy-Con come su Switch", f6p:"In coppia o singoli, in orizzontale o in verticale, persino come mouse.",
+  f7h:"Correggi il drift", f7p:"Misura di nuovo gli stick. Il controller stesso non viene modificato.",
+  f8h:"Aggiornamenti con un clic", f8p:"N-Connect ti avvisa quando c'è una nuova versione e si aggiorna da solo.",
+  connectTitle:"Come collegare il controller",
+  c1h:"Switch 2", c1p:"Pro Controller, Joy-Con 2 e GameCube: premi brevemente il <b>tasto SYNC</b>. Pro Controller e GameCube funzionano anche via cavo USB.",
+  c2h:"Switch", c2p:"Pro Controller, Joy-Con, NES, SNES, N64 e Mega Drive: premi il <b>tasto SYNC</b> finché le luci scorrono.",
+  c3h:"Wii e Wii U", c3p:"Premi il <b>tasto SYNC</b> rosso: nel vano batterie del Wii Remote, sotto il Wii U Pro Controller.",
+  c4h:"PlayStation", c4p:"Associa una volta DualShock 4 e DualSense nelle <b>impostazioni Bluetooth di Windows</b> o collegali via cavo USB.",
+  c5h:"Xbox", c5p:"Basta collegarlo: via USB, Bluetooth o adattatore wireless Xbox.",
+  connectNote:"La volta successiva basta <b>premere un tasto qualsiasi</b>. <b>Non</b> aggiungere i controller Switch 2 nelle impostazioni Bluetooth di Windows: premi solo SYNC.",
+  galleryTitle:"Altre schermate",
+  g1alt:"Mappatura dei tasti con profili", g1cap:"Rimappa liberamente i tasti, con profili, turbo e macro.",
+  g2alt:"Impostazioni di stick e vibrazione", g2cap:"Stick, grilletti e vibrazione: per tutti o per controller.",
+  g3alt:"Impostazioni direttamente su un controller", g3cap:"Tutte le impostazioni direttamente su ogni controller.",
+  padsTitle:"Controller supportati", padsLead:"Via Bluetooth o cavo USB, fino a 8 contemporaneamente.", padWired:"Controller cablati HORI, PowerA, PDP",
+  faqTitle:"Domande frequenti",
+  q1:"N-Connect costa qualcosa?", a1:"No. N-Connect è gratuito, senza pubblicità e open source (licenza MIT).",
+  q2:"Mi serve il Bluetooth?", a2:"Per i controller wireless sì: di solito basta il Bluetooth integrato. Molti controller funzionano anche via cavo USB. Per molti controller insieme aiuta un buon adattatore Bluetooth.",
+  q3:"Un controller appare due volte in Steam.", a3:"In N-Connect attiva <b>Generale → Nascondi i controller originali</b>, conferma la richiesta di Windows e riavvia Steam una volta.",
+  q4:"Posso riusare il controller sulla console?", a4:"Sì. Associa di nuovo i controller Switch 2 alla console una volta e funzioneranno come sempre.",
+  q5:"Funziona senza installazione?", a5:"Sì, con la versione portable ZIP. I driver ViGEmBus e HidHide devono però essere installati una volta sul PC: il programma di installazione lo fa in automatico.",
+  q6:"Qualcosa non funziona: che faccio?", a6:"Clic destro sull'icona di N-Connect in basso a destra → <b>Apri registro</b> e allega il contenuto a una <a href=\"https://github.com/DevCatSKZ/N-Connect/issues\">segnalazione</a>.",
+  legal:"N-Connect è un progetto non ufficiale, gratuito e open source di devcatskz, non affiliato a Nintendo, Sony o Microsoft. I marchi appartengono ai rispettivi proprietari.",
+  source:"Codice sorgente su GitHub", allReleases:"Tutte le versioni", bugs:"Segnala un problema" },
+pt: { name:"Português", title:"N-Connect – ligue os comandos ao PC com facilidade",
+  navFeatures:"Funções", navConnect:"Ligar", navControllers:"Comandos", navFaq:"Ajuda",
+  tagline:"Comandos Nintendo, PlayStation e Xbox no PC – basta ligar e jogar qualquer jogo.",
+  download:"Transferir para Windows", portable:"Versão portátil (ZIP)", meta:"Gratuito · Windows 10 e 11 · 12 idiomas", version:" · Versão ",
+  smartscreen:"O Windows mostra <b>«O Windows protegeu o seu PC»</b> no primeiro arranque? Acontece com programas novos sem um certificado caro. Clique em <b>Mais informações → Executar mesmo assim</b> – o N-Connect é open source.",
+  shotAlt:"N-Connect: vista geral com comandos ligados, bateria e botões em tempo real",
+  stepsTitle:"Comece em 3 passos",
+  s1h:"Instalar", s1p:"Transfira o instalador e execute-o. Tudo o que é necessário é instalado automaticamente.",
+  s2h:"Ligar", s2p:"Prima o botão SYNC do comando – o N-Connect encontra-o sozinho.",
+  s3h:"Jogar", s3p:"O comando funciona logo – no Steam, Game Pass, emuladores e em todos os outros jogos.",
+  featTitle:"O que o N-Connect faz", featLead:"Muitos jogos só entendem comandos Xbox. O N-Connect traduz o seu comando para que todos os jogos o reconheçam – com muitos extras práticos.",
+  f1h:"Funciona em qualquer jogo", f1p:"O seu comando aparece como comando Xbox – ou como comando PlayStation com controlo de movimento.",
+  f2h:"Até 8 comandos", f2p:"Decide quem é o jogador 1, 2, 3… O N-Connect memoriza a ordem.",
+  f3h:"Bateria à vista", f3p:"Nível de bateria de cada comando – com aviso antes de acabar.",
+  f4h:"Reatribuir qualquer botão", f4p:"Até para teclado, rato, turbo ou sequências de botões – com perfis por jogo.",
+  f5h:"Apontar com movimento", f5p:"Os sensores de movimento controlam a câmara ou o rato – ideal para jogos de tiros.",
+  f6h:"Joy-Con como na Switch", f6p:"Em par ou sozinhos, na horizontal ou vertical – até como rato.",
+  f7h:"Corrigir o drift", f7p:"Volte a medir os manípulos. O comando em si não é alterado.",
+  f8h:"Atualizações num clique", f8p:"O N-Connect avisa quando há uma nova versão e atualiza-se sozinho.",
+  connectTitle:"Como ligar o seu comando",
+  c1h:"Switch 2", c1p:"Pro Controller, Joy-Con 2 e GameCube: prima brevemente o <b>botão SYNC</b>. Pro Controller e GameCube também funcionam por cabo USB.",
+  c2h:"Switch", c2p:"Pro Controller, Joy-Con, NES, SNES, N64 e Mega Drive: prima o <b>botão SYNC</b> até as luzes correrem.",
+  c3h:"Wii e Wii U", c3p:"Prima o <b>botão SYNC</b> vermelho – no compartimento das pilhas do Wii Remote, na parte de baixo do Wii U Pro Controller.",
+  c4h:"PlayStation", c4p:"Emparelhe o DualShock 4 e o DualSense uma vez nas <b>definições de Bluetooth do Windows</b> ou ligue-os por cabo USB.",
+  c5h:"Xbox", c5p:"Basta ligar – por USB, Bluetooth ou adaptador sem fios Xbox.",
+  connectNote:"Da próxima vez basta <b>premir qualquer botão</b>. <b>Não</b> adicione comandos Switch 2 nas definições de Bluetooth do Windows – prima apenas SYNC.",
+  galleryTitle:"Mais vistas",
+  g1alt:"Atribuição de botões com perfis", g1cap:"Reatribua botões livremente – com perfis, turbo e macros.",
+  g2alt:"Definições de manípulos e vibração", g2cap:"Manípulos, gatilhos e vibração – para todos ou por comando.",
+  g3alt:"Definições diretamente num comando", g3cap:"Todas as definições diretamente em cada comando.",
+  padsTitle:"Comandos suportados", padsLead:"Por Bluetooth ou cabo USB – até 8 ao mesmo tempo.", padWired:"Comandos com fios HORI, PowerA, PDP",
+  faqTitle:"Perguntas frequentes",
+  q1:"O N-Connect custa alguma coisa?", a1:"Não. O N-Connect é gratuito, sem publicidade e open source (licença MIT).",
+  q2:"Preciso de Bluetooth?", a2:"Para comandos sem fios, sim – o Bluetooth integrado normalmente chega. Muitos comandos também funcionam por cabo USB. Para muitos comandos ao mesmo tempo, ajuda um bom adaptador Bluetooth.",
+  q3:"Um comando aparece duas vezes no Steam.", a3:"No N-Connect, ative <b>Geral → Ocultar comandos originais</b>, confirme o pedido do Windows e reinicie o Steam uma vez.",
+  q4:"Posso voltar a usar o comando na consola?", a4:"Sim. Emparelhe novamente os comandos Switch 2 com a consola uma vez e funcionam como sempre.",
+  q5:"Funciona sem instalar?", a5:"Sim, com a versão portátil ZIP. Os controladores ViGEmBus e HidHide têm de estar instalados uma vez no PC – o instalador faz isso automaticamente.",
+  q6:"Algo não funciona – e agora?", a6:"Clique com o botão direito no ícone do N-Connect em baixo à direita → <b>Abrir registo</b> e anexe o conteúdo a um <a href=\"https://github.com/DevCatSKZ/N-Connect/issues\">relatório de problema</a>.",
+  legal:"O N-Connect é um projeto não oficial, gratuito e open source de devcatskz, sem ligação à Nintendo, Sony ou Microsoft. As marcas pertencem aos seus proprietários.",
+  source:"Código-fonte no GitHub", allReleases:"Todas as versões", bugs:"Comunicar um problema" },
+nl: { name:"Nederlands", title:"N-Connect – controllers eenvoudig verbinden met je pc",
+  navFeatures:"Functies", navConnect:"Verbinden", navControllers:"Controllers", navFaq:"Hulp",
+  tagline:"Nintendo-, PlayStation- en Xbox-controllers op je pc – gewoon verbinden en elk spel spelen.",
+  download:"Downloaden voor Windows", portable:"Draagbare versie (ZIP)", meta:"Gratis · Windows 10 en 11 · 12 talen", version:" · Versie ",
+  smartscreen:"Toont Windows bij de eerste start <b>„Uw pc is beveiligd door Windows”</b>? Dat gebeurt bij nieuwe programma's zonder duur certificaat. Klik op <b>Meer informatie → Toch uitvoeren</b> – N-Connect is open source.",
+  shotAlt:"N-Connect: overzicht met verbonden controllers, batterijniveau en live knopweergave",
+  stepsTitle:"In 3 stappen aan de slag",
+  s1h:"Installeren", s1p:"Download de setup en start hem. Alles wat nodig is, wordt automatisch meegeïnstalleerd.",
+  s2h:"Verbinden", s2p:"Druk op de SYNC-knop van de controller – N-Connect vindt hem vanzelf.",
+  s3h:"Spelen", s3p:"De controller werkt meteen – in Steam, Game Pass, emulators en alle andere spellen.",
+  featTitle:"Wat N-Connect doet", featLead:"Veel spellen begrijpen alleen Xbox-controllers. N-Connect vertaalt je controller zodat elk spel hem herkent – met veel handige extra's.",
+  f1h:"Werkt in elk spel", f1p:"Je controller verschijnt als Xbox-controller – of als PlayStation-controller met bewegingsbesturing.",
+  f2h:"Tot 8 controllers", f2p:"Jij bepaalt wie speler 1, 2, 3 … is. N-Connect onthoudt de volgorde.",
+  f3h:"Batterij in beeld", f3p:"Batterijniveau van elke controller – met een waarschuwing voordat hij leeg is.",
+  f4h:"Elke knop vrij instellen", f4p:"Ook met toetsenbord, muis, turbo of knopreeksen – met profielen per spel.",
+  f5h:"Richten door te bewegen", f5p:"De bewegingssensoren sturen de camera of de muis – ideaal voor shooters.",
+  f6h:"Joy-Con zoals op de Switch", f6p:"Als paar of los, liggend of staand – zelfs als muis.",
+  f7h:"Stick-drift verhelpen", f7p:"Meet de sticks gewoon opnieuw. De controller zelf blijft ongewijzigd.",
+  f8h:"Updates met één klik", f8p:"N-Connect meldt een nieuwe versie en werkt zichzelf bij.",
+  connectTitle:"Zo verbind je je controller",
+  c1h:"Switch 2", c1p:"Pro Controller, Joy-Con 2 en GameCube: druk kort op de <b>SYNC-knop</b>. Pro Controller en GameCube werken ook via een USB-kabel.",
+  c2h:"Switch", c2p:"Pro Controller, Joy-Con, NES, SNES, N64 en Mega Drive: druk op de <b>SYNC-knop</b> tot de lampjes lopen.",
+  c3h:"Wii en Wii U", c3p:"Druk op de rode <b>SYNC-knop</b> – in het batterijvak van de Wii Remote, aan de onderkant van de Wii U Pro Controller.",
+  c4h:"PlayStation", c4p:"Koppel DualShock 4 en DualSense één keer in de <b>Bluetooth-instellingen van Windows</b> of sluit ze aan met een USB-kabel.",
+  c5h:"Xbox", c5p:"Gewoon aansluiten – via USB, Bluetooth of de Xbox Wireless Adapter.",
+  connectNote:"De volgende keer is <b>op een willekeurige knop drukken</b> genoeg. Voeg Switch 2-controllers <b>niet</b> toe in de Bluetooth-instellingen van Windows – druk alleen op SYNC.",
+  galleryTitle:"Meer weergaven",
+  g1alt:"Knoptoewijzing met profielen", g1cap:"Knoppen vrij instellen – met profielen, turbo en macro's.",
+  g2alt:"Instellingen voor sticks en trillen", g2cap:"Sticks, triggers en trillen – voor alle of per controller.",
+  g3alt:"Instellingen direct bij een controller", g3cap:"Alle instellingen direct bij elke controller.",
+  padsTitle:"Ondersteunde controllers", padsLead:"Via Bluetooth of USB-kabel – tot 8 tegelijk.", padWired:"Bedrade controllers van HORI, PowerA, PDP",
+  faqTitle:"Veelgestelde vragen",
+  q1:"Kost N-Connect iets?", a1:"Nee. N-Connect is gratis, zonder reclame en open source (MIT-licentie).",
+  q2:"Heb ik Bluetooth nodig?", a2:"Voor draadloze controllers wel – het ingebouwde Bluetooth volstaat meestal. Veel controllers werken ook via een USB-kabel. Voor veel controllers tegelijk helpt een goede Bluetooth-adapter.",
+  q3:"Een controller verschijnt dubbel in Steam.", a3:"Zet in N-Connect <b>Algemeen → Originele controllers verbergen</b> aan, bevestig de vraag van Windows en start Steam één keer opnieuw.",
+  q4:"Kan ik de controller daarna weer op de console gebruiken?", a4:"Ja. Koppel Switch 2-controllers gewoon nog één keer met de console, daarna werken ze daar zoals altijd.",
+  q5:"Werkt het ook zonder installatie?", a5:"Ja, met de draagbare ZIP-versie. De stuurprogramma's ViGEmBus en HidHide moeten wel één keer op de pc geïnstalleerd zijn – de setup doet dat automatisch.",
+  q6:"Iets werkt niet – wat nu?", a6:"Klik met rechts op het N-Connect-pictogram rechtsonder → <b>Logboek openen</b> en voeg de inhoud toe aan een <a href=\"https://github.com/DevCatSKZ/N-Connect/issues\">probleemmelding</a>.",
+  legal:"N-Connect is een onofficieel, gratis open-sourceproject van devcatskz en niet verbonden met Nintendo, Sony of Microsoft. Merken zijn eigendom van hun eigenaren.",
+  source:"Broncode op GitHub", allReleases:"Alle versies", bugs:"Probleem melden" },
+pl: { name:"Polski", title:"N-Connect – łatwe podłączanie kontrolerów do PC",
+  navFeatures:"Funkcje", navConnect:"Łączenie", navControllers:"Kontrolery", navFaq:"Pomoc",
+  tagline:"Kontrolery Nintendo, PlayStation i Xbox na PC – po prostu połącz i graj w dowolną grę.",
+  download:"Pobierz dla Windows", portable:"Wersja przenośna (ZIP)", meta:"Za darmo · Windows 10 i 11 · 12 języków", version:" · Wersja ",
+  smartscreen:"Windows pokazuje przy pierwszym uruchomieniu <b>„System Windows ochronił ten komputer”</b>? Tak bywa z nowymi programami bez drogiego certyfikatu. Kliknij <b>Więcej informacji → Uruchom mimo to</b> – N-Connect jest open source.",
+  shotAlt:"N-Connect: przegląd z połączonymi kontrolerami, poziomem baterii i przyciskami na żywo",
+  stepsTitle:"Zacznij w 3 krokach",
+  s1h:"Zainstaluj", s1p:"Pobierz instalator i uruchom go. Wszystko, co potrzebne, zostanie zainstalowane automatycznie.",
+  s2h:"Połącz", s2p:"Naciśnij przycisk SYNC na kontrolerze – N-Connect sam go znajdzie.",
+  s3h:"Graj", s3p:"Kontroler działa od razu – w Steam, Game Pass, emulatorach i wszystkich innych grach.",
+  featTitle:"Co potrafi N-Connect", featLead:"Wiele gier rozumie tylko kontrolery Xbox. N-Connect tłumaczy twój kontroler tak, by każda gra go rozpoznała – z wieloma przydatnymi dodatkami.",
+  f1h:"Działa w każdej grze", f1p:"Twój kontroler jest widoczny jako kontroler Xbox – albo jako kontroler PlayStation ze sterowaniem ruchem.",
+  f2h:"Do 8 kontrolerów", f2p:"Ty decydujesz, kto jest graczem 1, 2, 3… N-Connect zapamiętuje kolejność.",
+  f3h:"Bateria pod kontrolą", f3p:"Poziom baterii każdego kontrolera – z ostrzeżeniem, zanim się rozładuje.",
+  f4h:"Dowolne przypisanie przycisków", f4p:"Także klawiatura, mysz, turbo lub sekwencje przycisków – z profilami dla gier.",
+  f5h:"Celowanie ruchem", f5p:"Czujniki ruchu sterują kamerą lub myszą – idealne do strzelanek.",
+  f6h:"Joy-Con jak na Switchu", f6p:"W parze lub osobno, poziomo lub pionowo – nawet jako mysz.",
+  f7h:"Usuń dryf gałek", f7p:"Po prostu zmierz gałki ponownie. Sam kontroler pozostaje niezmieniony.",
+  f8h:"Aktualizacje jednym kliknięciem", f8p:"N-Connect informuje o nowej wersji i sam się aktualizuje.",
+  connectTitle:"Jak połączyć kontroler",
+  c1h:"Switch 2", c1p:"Pro Controller, Joy-Con 2 i GameCube: krótko naciśnij <b>przycisk SYNC</b>. Pro Controller i GameCube działają też przez kabel USB.",
+  c2h:"Switch", c2p:"Pro Controller, Joy-Con, NES, SNES, N64 i Mega Drive: naciśnij <b>przycisk SYNC</b>, aż diody zaczną migać.",
+  c3h:"Wii i Wii U", c3p:"Naciśnij czerwony <b>przycisk SYNC</b> – w komorze baterii Wii Remote, na spodzie Wii U Pro Controller.",
+  c4h:"PlayStation", c4p:"Sparuj DualShock 4 i DualSense raz w <b>ustawieniach Bluetooth systemu Windows</b> lub podłącz kablem USB.",
+  c5h:"Xbox", c5p:"Po prostu podłącz – przez USB, Bluetooth lub adapter bezprzewodowy Xbox.",
+  connectNote:"Następnym razem wystarczy <b>nacisnąć dowolny przycisk</b>. <b>Nie</b> dodawaj kontrolerów Switch 2 w ustawieniach Bluetooth systemu Windows – naciśnij tylko SYNC.",
+  galleryTitle:"Więcej widoków",
+  g1alt:"Przypisanie przycisków z profilami", g1cap:"Dowolnie przypisuj przyciski – z profilami, turbo i makrami.",
+  g2alt:"Ustawienia gałek i wibracji", g2cap:"Gałki, spusty i wibracje – dla wszystkich lub dla każdego kontrolera.",
+  g3alt:"Ustawienia bezpośrednio przy kontrolerze", g3cap:"Wszystkie ustawienia bezpośrednio przy każdym kontrolerze.",
+  padsTitle:"Obsługiwane kontrolery", padsLead:"Przez Bluetooth lub kabel USB – do 8 naraz.", padWired:"Kontrolery przewodowe HORI, PowerA, PDP",
+  faqTitle:"Częste pytania",
+  q1:"Czy N-Connect coś kosztuje?", a1:"Nie. N-Connect jest darmowy, bez reklam i open source (licencja MIT).",
+  q2:"Czy potrzebuję Bluetooth?", a2:"Dla kontrolerów bezprzewodowych tak – zwykle wystarczy wbudowany Bluetooth. Wiele kontrolerów działa też przez kabel USB. Przy wielu kontrolerach naraz pomoże dobry adapter Bluetooth.",
+  q3:"Kontroler widać w Steam dwa razy.", a3:"W N-Connect włącz <b>Ogólne → Ukryj oryginalne kontrolery</b>, potwierdź pytanie systemu Windows i uruchom Steam ponownie.",
+  q4:"Czy mogę potem znów używać kontrolera na konsoli?", a4:"Tak. Sparuj kontrolery Switch 2 jeszcze raz z konsolą, a potem działają jak zwykle.",
+  q5:"Czy działa bez instalacji?", a5:"Tak, w wersji przenośnej ZIP. Sterowniki ViGEmBus i HidHide muszą jednak być raz zainstalowane na PC – instalator robi to automatycznie.",
+  q6:"Coś nie działa – co robić?", a6:"Kliknij prawym przyciskiem ikonę N-Connect w prawym dolnym rogu → <b>Otwórz dziennik</b> i dołącz jego treść do <a href=\"https://github.com/DevCatSKZ/N-Connect/issues\">zgłoszenia problemu</a>.",
+  legal:"N-Connect to nieoficjalny, darmowy projekt open source autorstwa devcatskz, niezwiązany z Nintendo, Sony ani Microsoft. Znaki towarowe należą do ich właścicieli.",
+  source:"Kod źródłowy na GitHubie", allReleases:"Wszystkie wersje", bugs:"Zgłoś problem" },
+ru: { name:"Русский", title:"N-Connect – простое подключение контроллеров к ПК",
+  navFeatures:"Возможности", navConnect:"Подключение", navControllers:"Контроллеры", navFaq:"Помощь",
+  tagline:"Контроллеры Nintendo, PlayStation и Xbox на ПК – просто подключите и играйте в любую игру.",
+  download:"Скачать для Windows", portable:"Портативная версия (ZIP)", meta:"Бесплатно · Windows 10 и 11 · 12 языков", version:" · Версия ",
+  smartscreen:"При первом запуске Windows показывает <b>«Система Windows защитила ваш компьютер»</b>? Так бывает с новыми программами без дорогого сертификата. Нажмите <b>Подробнее → Выполнить в любом случае</b> – N-Connect с открытым исходным кодом.",
+  shotAlt:"N-Connect: обзор с подключёнными контроллерами, зарядом и кнопками в реальном времени",
+  stepsTitle:"Начните за 3 шага",
+  s1h:"Установить", s1p:"Скачайте установщик и запустите его. Всё необходимое установится автоматически.",
+  s2h:"Подключить", s2p:"Нажмите кнопку SYNC на контроллере – N-Connect найдёт его сам.",
+  s3h:"Играть", s3p:"Контроллер сразу работает – в Steam, Game Pass, эмуляторах и всех остальных играх.",
+  featTitle:"Что умеет N-Connect", featLead:"Многие игры понимают только контроллеры Xbox. N-Connect «переводит» ваш контроллер, чтобы его узнала любая игра, – и добавляет много полезного.",
+  f1h:"Работает в любой игре", f1p:"Ваш контроллер виден как контроллер Xbox – или как контроллер PlayStation с датчиками движения.",
+  f2h:"До 8 контроллеров", f2p:"Вы решаете, кто игрок 1, 2, 3… N-Connect запоминает порядок.",
+  f3h:"Заряд на виду", f3p:"Заряд каждого контроллера – с предупреждением, пока он не сел.",
+  f4h:"Любые назначения кнопок", f4p:"Даже на клавиатуру, мышь, турбо или последовательности кнопок – с профилями для игр.",
+  f5h:"Прицеливание движением", f5p:"Датчики движения управляют камерой или мышью – идеально для шутеров.",
+  f6h:"Joy-Con как на Switch", f6p:"Парой или по одному, горизонтально или вертикально – даже как мышь.",
+  f7h:"Устранение дрейфа стиков", f7p:"Просто откалибруйте стики заново. Сам контроллер не изменяется.",
+  f8h:"Обновления в один клик", f8p:"N-Connect сообщает о новой версии и обновляется сам.",
+  connectTitle:"Как подключить контроллер",
+  c1h:"Switch 2", c1p:"Pro Controller, Joy-Con 2 и GameCube: коротко нажмите <b>кнопку SYNC</b>. Pro Controller и GameCube работают и по USB-кабелю.",
+  c2h:"Switch", c2p:"Pro Controller, Joy-Con, NES, SNES, N64 и Mega Drive: нажмите <b>кнопку SYNC</b>, пока не побегут огоньки.",
+  c3h:"Wii и Wii U", c3p:"Нажмите красную <b>кнопку SYNC</b> – в батарейном отсеке Wii Remote, на нижней стороне Wii U Pro Controller.",
+  c4h:"PlayStation", c4p:"Один раз выполните сопряжение DualShock 4 и DualSense в <b>параметрах Bluetooth Windows</b> или подключите их USB-кабелем.",
+  c5h:"Xbox", c5p:"Просто подключите – по USB, Bluetooth или через беспроводной адаптер Xbox.",
+  connectNote:"В следующий раз достаточно <b>нажать любую кнопку</b>. <b>Не</b> добавляйте контроллеры Switch 2 в параметрах Bluetooth Windows – просто нажмите SYNC.",
+  galleryTitle:"Другие экраны",
+  g1alt:"Назначение кнопок с профилями", g1cap:"Свободное назначение кнопок – с профилями, турбо и макросами.",
+  g2alt:"Настройки стиков и вибрации", g2cap:"Стики, триггеры и вибрация – для всех или для каждого контроллера.",
+  g3alt:"Настройки прямо у контроллера", g3cap:"Все настройки прямо у каждого контроллера.",
+  padsTitle:"Поддерживаемые контроллеры", padsLead:"По Bluetooth или USB-кабелю – до 8 одновременно.", padWired:"Проводные контроллеры HORI, PowerA, PDP",
+  faqTitle:"Частые вопросы",
+  q1:"N-Connect платный?", a1:"Нет. N-Connect бесплатный, без рекламы и с открытым исходным кодом (лицензия MIT).",
+  q2:"Нужен ли Bluetooth?", a2:"Для беспроводных контроллеров – да, обычно хватает встроенного Bluetooth. Многие контроллеры работают и по USB-кабелю. Для большого числа контроллеров поможет хороший Bluetooth-адаптер.",
+  q3:"Контроллер в Steam отображается дважды.", a3:"В N-Connect включите <b>Общие → Скрыть оригинальные контроллеры</b>, подтвердите запрос Windows и один раз перезапустите Steam.",
+  q4:"Можно ли потом снова использовать контроллер на консоли?", a4:"Да. Просто ещё раз выполните сопряжение контроллеров Switch 2 с консолью – и они работают как обычно.",
+  q5:"Работает ли без установки?", a5:"Да, в портативной версии ZIP. Но драйверы ViGEmBus и HidHide должны быть один раз установлены на ПК – установщик делает это автоматически.",
+  q6:"Что-то не работает – что делать?", a6:"Щёлкните правой кнопкой по значку N-Connect справа внизу → <b>Открыть журнал</b> и приложите его содержимое к <a href=\"https://github.com/DevCatSKZ/N-Connect/issues\">сообщению о проблеме</a>.",
+  legal:"N-Connect – неофициальный бесплатный проект с открытым исходным кодом от devcatskz, не связанный с Nintendo, Sony или Microsoft. Товарные знаки принадлежат их владельцам.",
+  source:"Исходный код на GitHub", allReleases:"Все версии", bugs:"Сообщить о проблеме" },
+ja: { name:"日本語", title:"N-Connect – コントローラーを PC にかんたん接続",
+  navFeatures:"機能", navConnect:"接続", navControllers:"コントローラー", navFaq:"ヘルプ",
+  tagline:"Nintendo・PlayStation・Xbox のコントローラーを PC で。つなぐだけで、どんなゲームでも遊べます。",
+  download:"Windows 版をダウンロード", portable:"ポータブル版 (ZIP)", meta:"無料 · Windows 10 / 11 · 12 言語", version:" · バージョン ",
+  smartscreen:"初回起動時に <b>「Windows によって PC が保護されました」</b> と表示されたら？ 高価な証明書のない新しいプログラムで起こります。<b>詳細情報 → 実行</b> をクリックしてください。N-Connect はオープンソースです。",
+  shotAlt:"N-Connect：接続中のコントローラー、バッテリー残量、ボタン入力のリアルタイム表示",
+  stepsTitle:"3 ステップで始める",
+  s1h:"インストール", s1p:"セットアップをダウンロードして実行。必要なものはすべて自動でインストールされます。",
+  s2h:"接続", s2p:"コントローラーの SYNC ボタンを押すだけ。N-Connect が自動で見つけます。",
+  s3h:"プレイ", s3p:"すぐに使えます。Steam、Game Pass、エミュレーターなど、あらゆるゲームで。",
+  featTitle:"N-Connect でできること", featLead:"多くのゲームは Xbox コントローラーしか認識しません。N-Connect はお使いのコントローラーをどのゲームでも使えるように変換し、便利な機能も備えています。",
+  f1h:"どのゲームでも使える", f1p:"コントローラーは Xbox コントローラーとして、またはモーション操作付きの PlayStation コントローラーとして認識されます。",
+  f2h:"最大 8 台", f2p:"プレイヤー 1、2、3… を自由に決められ、順番は記憶されます。",
+  f3h:"バッテリーがひと目でわかる", f3p:"各コントローラーの残量を表示し、切れる前にお知らせします。",
+  f4h:"ボタンを自由に割り当て", f4p:"キーボード、マウス、連射、ボタンの組み合わせにも。ゲームごとのプロファイル付き。",
+  f5h:"動かして狙う", f5p:"モーションセンサーでカメラやマウスを操作。シューターに最適です。",
+  f6h:"Switch と同じ Joy-Con", f6p:"2 本セットでも 1 本ずつでも、横持ちでも縦持ちでも。マウスとしても使えます。",
+  f7h:"スティックのドリフトを解消", f7p:"スティックを測り直すだけ。コントローラー本体は変更されません。",
+  f8h:"ワンクリックで更新", f8p:"新しいバージョンが出るとお知らせし、自動で更新します。",
+  connectTitle:"コントローラーのつなぎ方",
+  c1h:"Switch 2", c1p:"Pro コントローラー、Joy-Con 2、ゲームキューブ：<b>SYNC ボタン</b>を短く押します。Pro コントローラーとゲームキューブは USB ケーブルでも使えます。",
+  c2h:"Switch", c2p:"Pro コントローラー、Joy-Con、ファミコン、スーファミ、64、メガドライブ：ランプが流れるまで <b>SYNC ボタン</b>を押します。",
+  c3h:"Wii / Wii U", c3p:"赤い <b>SYNC ボタン</b>を押します。Wii リモコンは電池ボックス内、Wii U PRO コントローラーは裏側です。",
+  c4h:"PlayStation", c4p:"DualShock 4 と DualSense は <b>Windows の Bluetooth 設定</b>で一度ペアリングするか、USB ケーブルで接続します。",
+  c5h:"Xbox", c5p:"USB、Bluetooth、Xbox ワイヤレス アダプターでつなぐだけです。",
+  connectNote:"次回からは<b>どれかのボタンを押すだけ</b>で接続します。Switch 2 のコントローラーは Windows の Bluetooth 設定に追加<b>しないで</b>ください。SYNC を押すだけで大丈夫です。",
+  galleryTitle:"その他の画面",
+  g1alt:"プロファイル付きのボタン割り当て", g1cap:"プロファイル、連射、マクロでボタンを自由に割り当て。",
+  g2alt:"スティックと振動の設定", g2cap:"スティック、トリガー、振動を全体またはコントローラーごとに設定。",
+  g3alt:"コントローラーごとの設定", g3cap:"すべての設定を各コントローラーから直接。",
+  padsTitle:"対応コントローラー", padsLead:"Bluetooth または USB ケーブルで、同時に最大 8 台。", padWired:"HORI、PowerA、PDP の有線コントローラー",
+  faqTitle:"よくある質問",
+  q1:"N-Connect は有料ですか？", a1:"いいえ。N-Connect は無料・広告なしのオープンソースです（MIT ライセンス）。",
+  q2:"Bluetooth は必要ですか？", a2:"ワイヤレスのコントローラーには必要です。通常は内蔵の Bluetooth で十分です。多くのコントローラーは USB ケーブルでも使えます。たくさん同時につなぐなら、性能のよい Bluetooth アダプターがおすすめです。",
+  q3:"Steam でコントローラーが 2 つ表示されます。", a3:"N-Connect で <b>全般 → 元のコントローラーを隠す</b> をオンにし、Windows の確認を許可して Steam を一度再起動してください。",
+  q4:"あとでまたゲーム機で使えますか？", a4:"はい。Switch 2 のコントローラーはゲーム機ともう一度ペアリングすれば、いつも通り使えます。",
+  q5:"インストールなしで使えますか？", a5:"はい、ポータブル版 (ZIP) で使えます。ただし ViGEmBus と HidHide のドライバーは PC に一度インストールが必要です。セットアップなら自動で入ります。",
+  q6:"うまく動かないときは？", a6:"右下の N-Connect アイコンを右クリック → <b>ログを開く</b> で内容を確認し、<a href=\"https://github.com/DevCatSKZ/N-Connect/issues\">不具合の報告</a>に添付してください。",
+  legal:"N-Connect は devcatskz による非公式・無料のオープンソース プロジェクトで、Nintendo、Sony、Microsoft とは関係ありません。商標は各所有者に帰属します。",
+  source:"GitHub のソースコード", allReleases:"すべてのバージョン", bugs:"問題を報告" },
+zh: { name:"中文", title:"N-Connect – 轻松将手柄连接到电脑",
+  navFeatures:"功能", navConnect:"连接", navControllers:"手柄", navFaq:"帮助",
+  tagline:"在电脑上使用任天堂、PlayStation 和 Xbox 手柄——连上就能玩任何游戏。",
+  download:"下载 Windows 版", portable:"便携版 (ZIP)", meta:"免费 · Windows 10 和 11 · 12 种语言", version:" · 版本 ",
+  smartscreen:"首次启动时 Windows 显示 <b>“Windows 已保护你的电脑”</b>？没有昂贵证书的新程序都会这样。点击 <b>更多信息 → 仍要运行</b> 即可——N-Connect 是开源软件。",
+  shotAlt:"N-Connect：显示已连接手柄、电量和实时按键的总览",
   stepsTitle:"三步开始",
-  s1b:"安装：", s1:"下载并运行安装程序 – ViGEmBus 和 HidHide 会一并安装。",
-  s2b:"配对：", s2:"将手柄设为配对模式，在 N-Connect 的“配对手柄”中选择。",
-  s3b:"游玩：", s3:"手柄出现在概览中，在每个游戏里都可作为 Xbox/DS4 手柄使用。",
-  legal:"N-Connect 是开源软件。手柄商标归各自所有者所有。", allReleases:"所有版本", bugs:"报告问题", version:"当前版本：" },
-ko: { name:"한국어", tagline:"Nintendo, PlayStation, Xbox 컨트롤러를 Windows 게임에서 안정적으로 사용하세요.<br>한 번 페어링하면 어디서나 플레이.", download:"N-Connect 다운로드", source:"GitHub 소스 코드",
-  shotsTitle:"N-Connect 화면",
-  shot1alt:"N-Connect 개요: Switch 2 Pro 컨트롤러, Switch 2 Joy-Con 쌍, Switch Pro 컨트롤러, Switch 1 Joy-Con 쌍이 연결된 모습",
-  shot1cap:"개요: Switch 2 Pro 컨트롤러, 양 세대 Joy-Con 쌍, Switch Pro 컨트롤러 – 실시간 화면, 배터리, 플레이어 순서.",
-  shot2alt:"라이트 모드의 N-Connect: 4개의 Nintendo 컨트롤러가 연결된 동일한 개요",
-  shot2cap:"라이트 모드의 동일한 개요 – 다크, 라이트 또는 Windows와 동일하게 선택 가능.",
-  shot3alt:"버튼 매핑: 모든 버튼을 게임패드, 키보드, 마우스, 터보, 매크로에 자유롭게 할당, 프로필과 Shift 레이어 지원",
-  shot3cap:"프로필, Shift 레이어, 터보, 매크로를 지원하는 버튼 매핑.",
-  shot4alt:"스틱 및 진동 설정: 데드존, 커브, 트리거 임계값, 강도, 터보 – 전체 또는 컨트롤러별",
-  shot4cap:"스틱, 트리거, 진동 – 전체 또는 컨트롤러별 설정.",
-  shot5alt:"컨트롤러 카드의 세부 조정: 이 컨트롤러만을 위한 스틱 보정, 데드존, 커브, 진동 강도",
-  shot5cap:"컨트롤러 카드에서 바로 세부 조정.",
-  padsTitle:"지원 컨트롤러", padWired:"유선 Switch 패드",
-  featTitle:"N-Connect 기능",
-  f1h:"가상 Xbox 360 / DS4 컨트롤러", f1p:"게임에는 표준 패드로 표시됩니다 – 게임별 설정 없이 최대 호환성.",
-  f2h:"앱 내 페어링", f2p:"Nintendo, PlayStation, Xbox 컨트롤러를 Bluetooth로 N-Connect에서 바로 페어링 – Windows 메뉴 불필요.",
-  f3h:"매핑과 프로필", f3p:"버튼 자유 재배치, 터보와 매크로, 컨트롤러·게임별 프로필 저장 – 12개 언어 지원.",
-  f4h:"자이로와 모션", f4p:"모션을 스틱이나 마우스에 할당 – 슈터용 플릭 스틱 포함.",
-  f5h:"진동, 배터리, LED", f5p:"진동은 실제 컨트롤러로 전달되고 배터리와 플레이어 LED가 표시됩니다.",
-  f6h:"이중 입력 없음", f6p:"원본 컨트롤러는 게임에서 숨겨집니다(HidHide) – Xbox 패드는 XInput으로 네이티브 동작.",
-  stepsTitle:"세 단계로 시작",
-  s1b:"설치:", s1:"설치 프로그램을 다운로드해 실행 – ViGEmBus와 HidHide가 함께 설치됩니다.",
-  s2b:"페어링:", s2:"컨트롤러를 페어링 모드로 두고 N-Connect의 „컨트롤러 페어링“에서 선택하세요.",
-  s3b:"플레이:", s3:"컨트롤러가 개요에 표시되고 모든 게임에서 Xbox/DS4 패드로 사용됩니다.",
-  legal:"N-Connect는 오픈 소스입니다. 컨트롤러 상표는 각 소유자에게 있습니다.", allReleases:"모든 릴리스", bugs:"버그 신고", version:"최신 버전: " }
+  s1h:"安装", s1p:"下载安装程序并运行。所需组件会自动一并安装。",
+  s2h:"连接", s2p:"按下手柄上的 SYNC 键——N-Connect 会自动找到它。",
+  s3h:"开玩", s3p:"手柄立即可用——Steam、Game Pass、模拟器以及所有其他游戏。",
+  featTitle:"N-Connect 能做什么", featLead:"很多游戏只认 Xbox 手柄。N-Connect 会转换你的手柄，让每款游戏都能识别——还有许多实用功能。",
+  f1h:"所有游戏都能用", f1p:"你的手柄会被识别为 Xbox 手柄，或带体感的 PlayStation 手柄。",
+  f2h:"最多 8 个手柄", f2p:"由你决定谁是玩家 1、2、3……N-Connect 会记住顺序。",
+  f3h:"电量一目了然", f3p:"显示每个手柄的电量，电量快用完时提醒你。",
+  f4h:"任意按键映射", f4p:"也可映射到键盘、鼠标、连发或按键序列——每款游戏都可设置配置文件。",
+  f5h:"体感瞄准", f5p:"用体感传感器控制视角或鼠标——非常适合射击游戏。",
+  f6h:"和 Switch 一样的 Joy-Con", f6p:"成对或单独、横握或竖握——甚至可当鼠标使用。",
+  f7h:"修复摇杆漂移", f7p:"只需重新校准摇杆，手柄本身不会被修改。",
+  f8h:"一键更新", f8p:"有新版本时 N-Connect 会提醒你并自动更新。",
+  connectTitle:"如何连接手柄",
+  c1h:"Switch 2", c1p:"Pro 手柄、Joy-Con 2 和 GameCube：短按 <b>SYNC 键</b>。Pro 手柄和 GameCube 也可用 USB 线连接。",
+  c2h:"Switch", c2p:"Pro 手柄、Joy-Con、NES、SNES、N64 和 Mega Drive：按住 <b>SYNC 键</b>直到指示灯开始流动。",
+  c3h:"Wii 和 Wii U", c3p:"按下红色 <b>SYNC 键</b>——Wii 遥控器在电池仓内，Wii U Pro 手柄在底部。",
+  c4h:"PlayStation", c4p:"在 <b>Windows 蓝牙设置</b>中配对一次 DualShock 4 和 DualSense，或用 USB 线连接。",
+  c5h:"Xbox", c5p:"直接连接即可——USB、蓝牙或 Xbox 无线适配器均可。",
+  connectNote:"下次只需<b>按任意键</b>即可连接。请<b>不要</b>在 Windows 蓝牙设置中添加 Switch 2 手柄——只需按 SYNC。",
+  galleryTitle:"更多界面",
+  g1alt:"带配置文件的按键映射", g1cap:"自由映射按键——支持配置文件、连发和宏。",
+  g2alt:"摇杆和振动设置", g2cap:"摇杆、扳机和振动——可统一设置，也可按手柄设置。",
+  g3alt:"直接在手柄上的设置", g3cap:"所有设置都可直接在每个手柄上完成。",
+  padsTitle:"支持的手柄", padsLead:"通过蓝牙或 USB 线——最多同时 8 个。", padWired:"HORI、PowerA、PDP 有线手柄",
+  faqTitle:"常见问题",
+  q1:"N-Connect 收费吗？", a1:"不收费。N-Connect 免费、无广告且开源（MIT 许可证）。",
+  q2:"需要蓝牙吗？", a2:"无线手柄需要——一般内置蓝牙就够了。许多手柄也可用 USB 线连接。同时连接很多手柄时，一个好的蓝牙适配器会有帮助。",
+  q3:"Steam 中手柄显示了两次。", a3:"在 N-Connect 中打开 <b>常规 → 隐藏原始控制器</b>，确认 Windows 提示并重启一次 Steam。",
+  q4:"之后还能在主机上使用手柄吗？", a4:"可以。只需将 Switch 2 手柄与主机重新配对一次，之后照常使用。",
+  q5:"不安装能用吗？", a5:"可以，使用便携版 ZIP。但 ViGEmBus 和 HidHide 驱动需要在电脑上安装一次——安装程序会自动完成。",
+  q6:"遇到问题怎么办？", a6:"右键点击右下角的 N-Connect 图标 → <b>打开日志</b>，并将内容附在<a href=\"https://github.com/DevCatSKZ/N-Connect/issues\">问题报告</a>中。",
+  legal:"N-Connect 是 devcatskz 开发的非官方免费开源项目，与任天堂、索尼或微软无关。商标归各自所有者所有。",
+  source:"GitHub 上的源代码", allReleases:"所有版本", bugs:"报告问题" },
+ko: { name:"한국어", title:"N-Connect – PC에 컨트롤러를 간편하게 연결",
+  navFeatures:"기능", navConnect:"연결", navControllers:"컨트롤러", navFaq:"도움말",
+  tagline:"닌텐도, PlayStation, Xbox 컨트롤러를 PC에서 – 연결만 하면 어떤 게임이든 플레이할 수 있습니다.",
+  download:"Windows용 다운로드", portable:"포터블 버전 (ZIP)", meta:"무료 · Windows 10 및 11 · 12개 언어", version:" · 버전 ",
+  smartscreen:"처음 실행할 때 <b>“Windows의 PC 보호”</b>가 표시되나요? 비싼 인증서가 없는 새 프로그램에서 나타납니다. <b>추가 정보 → 실행</b>을 클릭하세요. N-Connect는 오픈 소스입니다.",
+  shotAlt:"N-Connect: 연결된 컨트롤러, 배터리 잔량, 실시간 버튼 표시가 있는 개요",
+  stepsTitle:"3단계로 시작하기",
+  s1h:"설치", s1p:"설치 프로그램을 다운로드해 실행하세요. 필요한 것은 모두 자동으로 설치됩니다.",
+  s2h:"연결", s2p:"컨트롤러의 SYNC 버튼을 누르세요. N-Connect가 알아서 찾습니다.",
+  s3h:"플레이", s3p:"컨트롤러를 바로 사용할 수 있습니다. Steam, Game Pass, 에뮬레이터 등 모든 게임에서.",
+  featTitle:"N-Connect의 기능", featLead:"많은 게임은 Xbox 컨트롤러만 인식합니다. N-Connect는 어떤 게임에서도 인식되도록 컨트롤러를 변환하고, 다양한 편의 기능도 제공합니다.",
+  f1h:"모든 게임에서 동작", f1p:"컨트롤러가 Xbox 컨트롤러로, 또는 모션 기능이 있는 PlayStation 컨트롤러로 인식됩니다.",
+  f2h:"최대 8개", f2p:"플레이어 1, 2, 3…을 직접 정할 수 있고, 순서는 기억됩니다.",
+  f3h:"배터리 한눈에 확인", f3p:"컨트롤러별 배터리 잔량을 표시하고, 다 떨어지기 전에 알려 줍니다.",
+  f4h:"버튼 자유 설정", f4p:"키보드, 마우스, 연사, 버튼 조합까지. 게임별 프로필도 지원합니다.",
+  f5h:"움직여서 조준", f5p:"모션 센서로 화면이나 마우스를 조작합니다. 슈팅 게임에 딱입니다.",
+  f6h:"Switch와 같은 Joy-Con", f6p:"한 쌍이나 하나씩, 가로나 세로로. 마우스로도 쓸 수 있습니다.",
+  f7h:"스틱 쏠림 해결", f7p:"스틱을 다시 측정하기만 하면 됩니다. 컨트롤러 자체는 바뀌지 않습니다.",
+  f8h:"클릭 한 번으로 업데이트", f8p:"새 버전이 나오면 알려 주고 스스로 업데이트합니다.",
+  connectTitle:"컨트롤러 연결 방법",
+  c1h:"Switch 2", c1p:"Pro 컨트롤러, Joy-Con 2, 게임큐브: <b>SYNC 버튼</b>을 짧게 누르세요. Pro 컨트롤러와 게임큐브는 USB 케이블로도 연결됩니다.",
+  c2h:"Switch", c2p:"Pro 컨트롤러, Joy-Con, NES, SNES, N64, 메가 드라이브: 불빛이 흐를 때까지 <b>SYNC 버튼</b>을 누르세요.",
+  c3h:"Wii 및 Wii U", c3p:"빨간 <b>SYNC 버튼</b>을 누르세요. Wii 리모컨은 배터리 칸 안, Wii U Pro 컨트롤러는 아래쪽에 있습니다.",
+  c4h:"PlayStation", c4p:"DualShock 4와 DualSense는 <b>Windows Bluetooth 설정</b>에서 한 번 페어링하거나 USB 케이블로 연결하세요.",
+  c5h:"Xbox", c5p:"USB, Bluetooth 또는 Xbox 무선 어댑터로 연결하기만 하면 됩니다.",
+  connectNote:"다음부터는 <b>아무 버튼이나 누르면</b> 연결됩니다. Switch 2 컨트롤러는 Windows Bluetooth 설정에 추가하지 <b>마세요</b>. SYNC만 누르면 됩니다.",
+  galleryTitle:"다른 화면",
+  g1alt:"프로필이 있는 버튼 설정", g1cap:"프로필, 연사, 매크로로 버튼을 자유롭게 설정.",
+  g2alt:"스틱과 진동 설정", g2cap:"스틱, 트리거, 진동을 전체 또는 컨트롤러별로 설정.",
+  g3alt:"컨트롤러별 설정", g3cap:"모든 설정을 각 컨트롤러에서 바로.",
+  padsTitle:"지원 컨트롤러", padsLead:"Bluetooth 또는 USB 케이블로 최대 8개까지 동시에.", padWired:"HORI, PowerA, PDP 유선 컨트롤러",
+  faqTitle:"자주 묻는 질문",
+  q1:"N-Connect는 유료인가요?", a1:"아니요. N-Connect는 무료이며 광고가 없고 오픈 소스입니다(MIT 라이선스).",
+  q2:"Bluetooth가 필요한가요?", a2:"무선 컨트롤러에는 필요합니다. 보통 내장 Bluetooth로 충분합니다. 많은 컨트롤러는 USB 케이블로도 동작합니다. 여러 개를 동시에 연결하려면 좋은 Bluetooth 어댑터가 도움이 됩니다.",
+  q3:"Steam에 컨트롤러가 두 개로 보입니다.", a3:"N-Connect에서 <b>일반 → 원본 컨트롤러 숨기기</b>를 켜고 Windows 확인 창을 승인한 뒤 Steam을 한 번 다시 시작하세요.",
+  q4:"나중에 다시 게임기에서 쓸 수 있나요?", a4:"네. Switch 2 컨트롤러를 게임기와 한 번 다시 페어링하면 평소처럼 사용할 수 있습니다.",
+  q5:"설치 없이도 되나요?", a5:"네, 포터블 ZIP 버전으로 가능합니다. 다만 ViGEmBus와 HidHide 드라이버는 PC에 한 번 설치되어 있어야 하며, 설치 프로그램이 자동으로 설치합니다.",
+  q6:"잘 안 될 때는 어떻게 하나요?", a6:"오른쪽 아래 N-Connect 아이콘을 마우스 오른쪽 버튼으로 클릭 → <b>로그 열기</b>를 선택하고 내용을 <a href=\"https://github.com/DevCatSKZ/N-Connect/issues\">문제 신고</a>에 첨부해 주세요.",
+  legal:"N-Connect는 devcatskz의 비공식 무료 오픈 소스 프로젝트이며 닌텐도, 소니, 마이크로소프트와 관련이 없습니다. 상표는 각 소유자에게 있습니다.",
+  source:"GitHub 소스 코드", allReleases:"모든 버전", bugs:"문제 신고" }
 };
 const order = ["de","en","es","fr","it","pt","nl","pl","ru","ja","zh","ko"];
 const sel = document.getElementById("lang");
 order.forEach(c => { const o = document.createElement("option"); o.value = c; o.textContent = I18N[c].name; sel.appendChild(o); });
 let relTag = null;
 function apply(code) {
-  const t = I18N[code] || I18N.en;
+  const t = I18N[code] || I18N.en, en = I18N.en;
+  const get = k => t[k] !== undefined ? t[k] : en[k];
   document.documentElement.lang = code;
-  document.querySelectorAll("[data-i]").forEach(el => { if (t[el.dataset.i] !== undefined) el.innerHTML = t[el.dataset.i]; });
-  document.querySelectorAll("[data-i-alt]").forEach(el => { if (t[el.dataset.iAlt]) el.alt = t[el.dataset.iAlt]; });
-  document.title = code === "de" ? "N-Connect – Nintendo-Controller unter Windows" : "N-Connect – Nintendo controllers on Windows";
-  if (relTag) document.getElementById("ver").textContent = t.version + relTag;
-  localStorage.setItem("nc-lang", code);
+  document.querySelectorAll("[data-i]").forEach(el => { const v = get(el.dataset.i); if (v !== undefined) el.innerHTML = v; });
+  document.querySelectorAll("[data-i-alt]").forEach(el => { const v = get(el.dataset.iAlt); if (v) el.alt = v; });
+  document.title = get("title");
+  document.getElementById("ver").textContent = relTag ? get("version") + relTag.replace(/^v/, "") : "";
+  try { localStorage.setItem("nc-lang", code); } catch (e) {}
 }
-const saved = localStorage.getItem("nc-lang");
+let saved = null; try { saved = localStorage.getItem("nc-lang"); } catch (e) {}
 const nav = (navigator.language || "en").slice(0, 2).toLowerCase();
-const start = saved || (I18N[nav] ? nav : "en");
+const start = saved && I18N[saved] ? saved : (I18N[nav] ? nav : "en");
 sel.value = start; apply(start);
 sel.addEventListener("change", () => apply(sel.value));
 
+// Neueste Version: Download-Knöpfe direkt auf Setup bzw. portable ZIP zeigen lassen.
 fetch("https://api.github.com/repos/DevCatSKZ/N-Connect/releases/latest")
   .then(r => r.json())
   .then(rel => {
-    const asset = (rel.assets || []).find(a => a.name.endsWith(".exe"));
-    if (asset) document.getElementById("dl").href = asset.browser_download_url;
-    relTag = rel.tag_name;
-    const t = I18N[sel.value] || I18N.en;
-    document.getElementById("ver").textContent = t.version + relTag;
+    const assets = rel.assets || [];
+    const setup = assets.find(a => /Setup.*\.exe$/i.test(a.name)) || assets.find(a => a.name.endsWith(".exe"));
+    const zip = assets.find(a => /Portable.*\.zip$/i.test(a.name));
+    if (setup) document.getElementById("dl").href = setup.browser_download_url;
+    if (zip) document.getElementById("dlzip").href = zip.browser_download_url;
+    relTag = rel.tag_name || null;
+    apply(sel.value);
   })
   .catch(() => {});
 </script>
