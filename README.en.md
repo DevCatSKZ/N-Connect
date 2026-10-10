@@ -82,10 +82,17 @@ is created.
 - **Overview** with live graphics of every controller (shape and button positions from product photos, original
   colours, pressed buttons light up), battery, connection, serial number, firmware. Two columns in a wide window,
   all cards equally tall.
+- **Status bar** above the cards: how many controllers are connected, whether Bluetooth is ready, which battery is
+  lowest, how games see the controllers (Xbox 360 / DualShock 4) and whether the originals are hidden.
+- **Compact view** ("Large | Compact" switch): smaller cards, up to four side by side – eight controllers fit almost
+  without scrolling.
 - **Settings right on the controller card** (expand "Settings"): buttons, fine-tuning, gyro, Joy-Con, extras,
   details – each only for that controller.
 - **Assign a button by pressing it:** click the keyboard icon behind any button and press the key you want.
-- **Windows 11-style interface:** dark (default), light or same as Windows; accent colour in brand blue, Mica title bar.
+- **Interface in the neon look of the logo:** dark (default), light or same as Windows; navy tones with a neon
+  blue → violet gradient, Mica title bar. Smooth animations (switches, hover, battery bars); cards light up when a
+  controller connects and glow while a button is pressed – you see at once which card belongs to which controller.
+  With animation effects turned off in Windows, everything stays still.
 - Buttons per controller: **Disconnect**, **Rumble** (which controller is which player?), **Calibrate gyro**,
   Joy-Con **split/join**, **upright/sideways**, **read amiibo**, **Ring-Con**, **IR camera**,
   **"Shown twice? Hide"** (HidHide).
@@ -179,7 +186,8 @@ Build it yourself: .NET 8 SDK, then `dotnet test tests/Switch2Pro.Protocol.Tests
 The installer is built by the workflow `.github/workflows/switch2-pro-windows.yml`.
 Build the installer locally: Inno Setup 6, then `ISCC.exe installer\N-Connect.iss` (output in `out\`).
 Check helpers: `N-Connect.exe --render <folder>` (all controller graphics as PNG), `--render-ui <folder>` (all pages
-and cards, light/dark, `--lang=xx` for the language; `--wide` for wide windows), `--render-brand <folder>` (logo,
+and cards; `--light` for light mode, `--lang=xx` for the language, `--wide` for wide windows, `--compact` for the
+compact view), `--render-brand <folder>` (logo,
 icon, installer images), `--demo` / `--demo-all` / `--demo-retro` (simulated controllers).
 
 ### Sources and thanks
