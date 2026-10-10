@@ -61,6 +61,9 @@ internal sealed class ControllerManager : IAsyncDisposable
     /// <summary>Bluetooth-Adresse dieses PCs (für Kopplung und Wiederverbinden per Tastendruck).</summary>
     private ulong _hostAddress;
 
+    /// <summary>Funkadapter (ESP32/nRF52840) über USB, falls eingeschaltet.</summary>
+    private AdapterConnection? _adapter;
+
     public ControllerManager(Func<Settings> settings, PadFactory factory)
     {
         _settings = settings;
@@ -154,6 +157,46 @@ internal sealed class ControllerManager : IAsyncDisposable
     {
         await StartBluetoothAsync();
         Track(Task.Run(() => HidScanLoopAsync(_cts.Token)));
+        ApplyAdapterSetting();
+    }
+
+    /// <summary>
+    /// Funkadapter (ESP32/nRF52840) nach der Einstellung starten oder stoppen. Jeder Controller am Adapter wird wie ein
+    /// normaler Controller eingehängt (<see cref="Attach"/>); die Eingaben kommen über USB statt über BLE.
+    /// </summary>
+    public void ApplyAdapterSetting()
+    {
+        if (_disposed)
+            return;
+        var s = _settings();
+        if (!s.UseAdapter)
+        {
+            _adapter?.Dispose();
+            _adapter = null;
+            return;
+        }
+        if (_adapter is not null)
+            return;
+        var adapter = new AdapterConnection();
+        adapter.ControllerArrived += link =>
+        {
+            if (!Attach(link))
+                link.MarkLost();
+        };
+        _adapter = adapter;
+        Track(Task.Run(async () =>
+        {
+            try
+            {
+                var port = await adapter.StartAsync(s.AdapterPort, _cts.Token);
+                if (port is null && !_disposed)
+                    Notify?.Invoke("Kein Funkadapter gefunden. Ist der ESP32/nRF52840 angeschlossen und die N-Connect-Firmware aufgespielt?");
+            }
+            catch (Exception e) when (e is not OperationCanceledException)
+            {
+                Log.Warn($"Funkadapter: {Log.Reason(e)}");
+            }
+        }));
     }
 
     private void Track(Task task)
@@ -1216,6 +1259,8 @@ internal sealed class ControllerManager : IAsyncDisposable
     public async ValueTask DisposeAsync()
     {
         _disposed = true;
+        _adapter?.Dispose();
+        _adapter = null;
         _restartTimer.Dispose();
         _inactivityTimer.Dispose();
         _cts.Cancel();
