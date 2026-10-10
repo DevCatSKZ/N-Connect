@@ -242,6 +242,17 @@ internal static class Theme
         ApplyControls(form);
     }
 
+    /// <summary>Rahmenloses Fenster (z. B. Einblendung) mit abgerundeten Ecken und passender Titelleistenfarbe (Windows 11).</summary>
+    public static void ApplyRoundCorners(Form form)
+    {
+        if (!form.IsHandleCreated)
+            return;
+        int round = 2; // DWMWCP_ROUND
+        DwmSetWindowAttribute(form.Handle, DWMWA_WINDOW_CORNER_PREFERENCE, ref round, 4);
+        int dark = Dark ? 1 : 0;
+        DwmSetWindowAttribute(form.Handle, DWMWA_USE_IMMERSIVE_DARK_MODE, ref dark, 4);
+    }
+
     /// <summary>Farben auf alle Steuerelemente (rekursiv); auch für später erzeugte aufrufen.</summary>
     public static void ApplyControls(Control root)
     {

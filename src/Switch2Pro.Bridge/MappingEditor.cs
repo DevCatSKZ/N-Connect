@@ -170,7 +170,17 @@ internal static class MappingChoices
         yield return new Choice("🎮  Xbox Game Bar (Win+G)", "Key:Win+G");
         yield return new Choice("🔊  Lauter", "Key:VolUp");
         yield return new Choice("🔉  Leiser", "Key:VolDown");
+        yield return new Choice("🔇  Ton aus/an", "Key:Mute");
         yield return new Choice("⏯  Wiedergabe/Pause", "Key:PlayPause");
+        yield return new Choice("⏭  Nächster Titel", "Key:NextTrack");
+        yield return new Choice("⏮  Vorheriger Titel", "Key:PrevTrack");
+        // Für Zusatztasten wie die C-Taste (Switch 2 Pro Controller) oder die Rücktasten.
+        yield return new Choice("🎙  Mikrofon stumm (Win+Alt+K)", "Key:Win+Alt+K");
+        yield return new Choice("🎙  Discord: Mikrofon stumm (Strg+Umschalt+M)", "Key:Ctrl+Shift+M");
+        yield return new Choice("🎧  Discord: Ton aus (Strg+Umschalt+D)", "Key:Ctrl+Shift+D");
+        yield return new Choice("🖥  Desktop anzeigen (Win+D)", "Key:Win+D");
+        yield return new Choice("🗂  Taskansicht (Win+Tab)", "Key:Win+Tab");
+        yield return new Choice("↔  Zum letzten Fenster (Alt+Tab)", "Key:Alt+Tab");
     }
 
     /// <summary>Alle Einträge für eine Taste und der Index der aktuellen Belegung.</summary>

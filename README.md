@@ -69,6 +69,9 @@ Danach reicht beim nächsten Mal **ein beliebiger Tastendruck** zum Verbinden.
 - 🎯 **Zielen durch Bewegen** – die Bewegungssensoren steuern Kamera oder Maus, ideal für Shooter.
 - 🕹️ **Joy-Con wie an der Switch** – als Paar oder einzeln, quer oder hochkant.
 - 🩹 **Stick-Drift beheben** – Sticks einfach neu ausmessen.
+- 🧪 **Controller testen** – Sticks, Trigger, Bewegungssensoren und Tasten live prüfen, z. B. beim Gebrauchtkauf.
+- 🖱️ **Desktop-Modus** (zum Einschalten) – läuft kein Spiel, steuert der Controller Maus und Tastatur. Ideal für den
+  PC am Fernseher.
 - 🔄 **Updates mit einem Klick** – N-Connect meldet sich, wenn es eine neue Version gibt.
 - 🌍 **12 Sprachen** und ein **Design wie Windows 11** – hell, dunkel und vier weitere Farbschemata.
 
@@ -102,9 +105,20 @@ Danach reicht beim nächsten Mal **ein beliebiger Tastendruck** zum Verbinden.
 - **Joy-Con 2 als Maus:** auf die Schienenkante stellen.
 - amiibo lesen, Ring-Con und IR-Kamera (Switch-Joy-Con), Nunchuk und Classic Controller (Wii).
 
+### Desktop-Modus (unter *Allgemein*, standardmäßig aus)
+- Läuft kein Spiel, steuert der Controller Windows: linker Stick = Maus, rechter Stick = Scrollen, A = Klick,
+  B = Rechtsklick, X = Taskansicht, Y = Bildschirmtastatur, Steuerkreuz = Pfeiltasten, LB/RB = zurück/vor,
+  Start = Enter, Back = Esc, HOME = Startmenü, RT halten = präziser Zeiger.
+- In Vollbildspielen und Programmen mit eigenem Profil automatisch aus. **Back + Start** 1 Sekunde halten pausiert ihn.
+
 ### Komfort
 - Startet mit Windows unsichtbar im Infobereich; Menü dort mit Vibrieren, Spielerplatz und Trennen je Controller.
-- Meldung beim Verbinden und Trennen, automatisches Trennen nach Inaktivität (spart Akku).
+- Einblendung beim Verbinden (Spieler, Controller, Akku – abschaltbar), Meldung beim Trennen, automatisches Trennen
+  nach Inaktivität (spart Akku).
+- **Controller testen** (Reiter „Test“ an jeder Karte): Sticks mit Rundheitsanzeige, Trigger, Bewegungssensoren,
+  Tasten, Berichtsrate, Vibration.
+- Fertige Tastenvorlagen, z. B. für die C-Taste: Mikrofon stumm, Discord stumm/taub, Desktop anzeigen, Titel vor/zurück.
+- **Diagnose exportieren** (*Allgemein → Erweitert*): Protokoll und Systeminfos als ZIP für Fehlermeldungen.
 - Original-Controller werden vor Steam und Spielen versteckt, damit kein Controller doppelt erscheint.
 - Kopplungsdaten von der Switch übernehmen oder auf einen anderen PC übertragen.
 - Gut lesbar bei jeder Bildschirmskalierung (100 % bis 200 %).
@@ -126,6 +140,11 @@ Danach reicht beim nächsten Mal **ein beliebiger Tastendruck** zum Verbinden.
 | DualShock 4 · DualSense · DualSense Edge | ✅ | ✅ | Touchpad, Gyro, Lichtleiste |
 | Xbox 360 · One · Series · Elite | ✅ | ✅ | läuft direkt, N-Connect zeigt Akku und Belegung |
 | Kabel-Controller von HORI, PowerA, PDP; Nachbauten (z. B. 8BitDo) im Switch-Modus | ✅ | je nach Modell | |
+
+> [!NOTE]
+> **Hast du einen Kabel-Controller von HORI, PowerA oder PDP?** Diese Modelle sind noch nicht mit echter Hardware
+> getestet. Bitte [kurz melden](https://github.com/DevCatSKZ/N-Connect/issues), ob deiner funktioniert – am besten mit
+> *Allgemein → Erweitert → Diagnose exportieren*.
 
 > [!NOTE]
 > **Viele Controller gleichzeitig?** Einfache Bluetooth-Sticks schaffen oft nur 2–3 Controller. Für mehr empfiehlt
@@ -170,8 +189,9 @@ Das Setup einfach noch einmal ausführen. Der Treiber sorgt dafür, dass Spiele 
 <details>
 <summary><b>Etwas anderes funktioniert nicht</b></summary>
 
-Rechtsklick auf das N-Connect-Symbol unten rechts → **Protokoll öffnen** und den Inhalt bei einer
-[Fehlermeldung](https://github.com/DevCatSKZ/N-Connect/issues) anhängen.
+Unter **Allgemein → Erweitert → Diagnose exportieren** eine ZIP-Datei erstellen und bei einer
+[Fehlermeldung](https://github.com/DevCatSKZ/N-Connect/issues) anhängen. Sie enthält Protokoll, Einstellungen und
+Systeminfos, aber keine Kopplungsschlüssel.
 </details>
 
 ## Portable Version

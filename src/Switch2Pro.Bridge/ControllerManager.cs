@@ -49,6 +49,8 @@ internal sealed class ControllerManager : IAsyncDisposable
     public event Action<string>? Notify;
     /// <summary>Verbinden/Trennen eines Controllers – je nach Einstellung meldet N-Connect oder Windows.</summary>
     public event Action<string>? ConnectionNotify;
+    /// <summary>Controller wurde verbunden (gleichzeitig mit der Verbindungsmeldung) – für die Einblendung am Bildschirmrand.</summary>
+    public event Action<IControllerLink>? LinkConnected;
     /// <summary>Ein Joy-Con wurde getrennt (true) bzw. wieder zum Paar gefügt (false) – Adresse zum Merken.</summary>
     public event Action<string, bool>? JoyConModeChanged;
     /// <summary>Ein Switch-2-Controller wurde verbunden (Adresse, Art) – zum Merken für das Wiederverbinden per Tastendruck.</summary>
@@ -760,6 +762,7 @@ internal sealed class ControllerManager : IAsyncDisposable
         if (!link.Id.StartsWith("XINPUT:", StringComparison.Ordinal))
         {
             ConnectionNotify?.Invoke(message);
+            LinkConnected?.Invoke(link);
             return;
         }
         NotifyXInputAsync(link, message).Forget("Verbindungsmeldung");
@@ -773,6 +776,7 @@ internal sealed class ControllerManager : IAsyncDisposable
         if (int.TryParse(link.Id.AsSpan(7), out int slot) && XInput.IsVirtual(slot))
             return; // Geist: eigener virtueller Controller
         ConnectionNotify?.Invoke(message);
+        LinkConnected?.Invoke(link);
     }
 
     // ---------- Originale vor Spielen und Steam verstecken (HidHide) ----------
