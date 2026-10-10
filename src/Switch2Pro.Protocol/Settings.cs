@@ -400,16 +400,28 @@ public sealed class Settings
         AllowTrailingCommas = true,
     };
 
+    /// <summary>Sicherung der vorletzten gespeicherten Fassung (wird beim Speichern ersetzt).</summary>
+    public static string BackupPath(string path) => path + ".bak";
+
     public static Settings Load(string path)
     {
         try
         {
             if (File.Exists(path))
-                return (JsonSerializer.Deserialize<Settings>(File.ReadAllText(path), JsonOptions) ?? new Settings()).Sanitized();
+                return Parse(File.ReadAllText(path));
         }
         catch (Exception e) when (e is JsonException or IOException or UnauthorizedAccessException)
         {
-            // Kaputte Datei: mit Standardwerten weiterlaufen, Datei nicht überschreiben.
+            // Kaputte Datei (z. B. Stromausfall beim Speichern einer älteren Version): die Sicherung nehmen, sonst mit
+            // Standardwerten weiterlaufen und die Datei nicht überschreiben.
+            try
+            {
+                if (File.Exists(BackupPath(path)))
+                    return Parse(File.ReadAllText(BackupPath(path)));
+            }
+            catch (Exception backupError) when (backupError is JsonException or IOException or UnauthorizedAccessException)
+            {
+            }
             return new Settings { LoadError = e.Message };
         }
         var fresh = new Settings();
@@ -424,10 +436,39 @@ public sealed class Settings
         return fresh;
     }
 
+    private static Settings Parse(string json) =>
+        (JsonSerializer.Deserialize<Settings>(json, JsonOptions) ?? throw new JsonException("leere Einstellungen")).Sanitized();
+
+    /// <summary>
+    /// Sicher speichern: erst in eine temporäre Datei schreiben, dann in einem Schritt austauschen (die bisherige Fassung
+    /// wird zur Sicherung <see cref="BackupPath"/>). So bleibt bei Absturz oder Stromausfall immer eine vollständige
+    /// Datei übrig – vorher konnte eine halb geschriebene settings.json alle Profile und Belegungen kosten.
+    /// </summary>
     public void Save(string path)
     {
-        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
-        File.WriteAllText(path, JsonSerializer.Serialize(this, JsonOptions));
+        Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path))!);
+        string temp = path + ".tmp";
+        using (var stream = new FileStream(temp, FileMode.Create, FileAccess.Write, FileShare.None))
+        using (var writer = new StreamWriter(stream, new System.Text.UTF8Encoding(false)))
+        {
+            writer.Write(JsonSerializer.Serialize(this, JsonOptions));
+            writer.Flush();
+            stream.Flush(flushToDisk: true);
+        }
+        if (File.Exists(path))
+        {
+            try
+            {
+                File.Replace(temp, path, BackupPath(path), ignoreMetadataErrors: true);
+                return;
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException or PlatformNotSupportedException)
+            {
+                // Manche Laufwerke (z. B. Netzwerk) können Replace nicht: Sicherung kopieren, dann ersetzen.
+                File.Copy(path, BackupPath(path), overwrite: true);
+            }
+        }
+        File.Move(temp, path, overwrite: true);
     }
 
     /// <summary>Übernimmt alle Werte aus <paramref name="other"/>.</summary>

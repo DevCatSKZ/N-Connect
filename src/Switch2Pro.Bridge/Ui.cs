@@ -256,6 +256,17 @@ internal class UiForm : Form
         base.OnLoad(e);
     }
 
+    /// <summary>
+    /// Fenster auf einen Monitor mit anderer Skalierung gezogen: nicht von WinForms umskalieren lassen. Schriften und
+    /// alle Maße (UiScale) richten sich einheitlich nach der System-Skalierung; ein nachträgliches Umskalieren einzelner
+    /// Teile würde Text und Felder auseinanderbringen.
+    /// </summary>
+    protected override void OnDpiChanged(DpiChangedEventArgs e)
+    {
+        e.Cancel = true;
+        base.OnDpiChanged(e);
+    }
+
     protected override void CreateHandle()
     {
         var previous = Dpi.BeginPerMonitorV2();

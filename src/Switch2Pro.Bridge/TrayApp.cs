@@ -112,12 +112,16 @@ internal sealed class TrayApp : ApplicationContext
 
         _settingsWatcher = new FileSystemWatcher(Paths.SettingsDir, Path.GetFileName(Paths.SettingsFile))
         {
-            NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size,
+            NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size | NotifyFilters.FileName,
             EnableRaisingEvents = true,
         };
         // Editoren speichern oft in mehreren Schritten: entprellen statt die Oberfläche zu blockieren.
         _reloadTimer.Tick += (_, _) => { _reloadTimer.Stop(); ReloadSettings(); };
-        _settingsWatcher.Changed += (_, _) => _ui.Post(_ => { _reloadTimer.Stop(); _reloadTimer.Start(); }, null);
+        void Changed(object? sender, FileSystemEventArgs e) => _ui.Post(_ => { _reloadTimer.Stop(); _reloadTimer.Start(); }, null);
+        _settingsWatcher.Changed += Changed;
+        // Viele Editoren (und N-Connect selbst) speichern über eine Zwischendatei, die die alte ersetzt.
+        _settingsWatcher.Created += Changed;
+        _settingsWatcher.Renamed += (s, e) => Changed(s, e);
 
         if (_settings.LoadError is not null)
             Balloon(5000, "Einstellungen fehlerhaft",
