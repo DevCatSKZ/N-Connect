@@ -161,8 +161,7 @@ internal sealed class SettingsForm : UiForm
     {
         var rail = new Panel { Dock = DockStyle.Left, Width = 286, BackColor = Theme.Backdrop };
         var header = new Panel { Dock = DockStyle.Top, Height = 62, BackColor = Theme.Backdrop };
-        var name = new Label { Text = "N-Connect", Font = UiFonts.Subtitle, AutoSize = true, Location = new Point(22, 16), Tag = Tr.UserData };
-        header.Controls.Add(name);
+        header.Controls.Add(new Wordmark { Location = new Point(22, 14), BackColor = Theme.Backdrop });
         var version = new Label
         {
             Dock = DockStyle.Bottom, Height = 36, Padding = new Padding(22, 0, 0, 10), TextAlign = ContentAlignment.MiddleLeft,

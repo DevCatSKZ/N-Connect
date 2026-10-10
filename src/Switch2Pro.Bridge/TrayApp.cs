@@ -499,14 +499,26 @@ internal sealed class TrayApp : ApplicationContext
                 return false;
             string script = Path.Combine(Path.GetTempPath(), "N-Connect-Update", "update.cmd");
             int pid = Environment.ProcessId;
+            // „%“ in Pfaden würde cmd als Variable lesen.
+            static string Batch(string path) => path.Replace("%", "%%");
+            // UTF-8 ohne BOM + chcp 65001: sonst liest cmd Umlaute im Pfad (z. B. Benutzername „Jürgen“) in der
+            // OEM-Codepage falsch und findet weder die neue noch die alte EXE. Kopieren mehrmals versuchen, weil die
+            // EXE kurz nach Prozess-Ende noch gesperrt sein kann.
             File.WriteAllText(script,
                 "@echo off\r\n" +
-                $":wait\r\n" +
+                "chcp 65001 >nul\r\n" +
+                ":wait\r\n" +
                 $"tasklist /FI \"PID eq {pid}\" | findstr /C:\" {pid} \" >nul\r\n" +
                 "if not errorlevel 1 (timeout /t 1 /nobreak >nul & goto wait)\r\n" +
-                $"copy /y \"{exe}\" \"{target}\" >nul\r\n" +
-                $"start \"\" \"{target}\"\r\n" +
-                "del \"%~f0\"\r\n");
+                "set tries=0\r\n" +
+                ":copy\r\n" +
+                $"copy /y \"{Batch(exe)}\" \"{Batch(target)}\" >nul && goto run\r\n" +
+                "set /a tries+=1\r\n" +
+                "if %tries% lss 10 (timeout /t 1 /nobreak >nul & goto copy)\r\n" +
+                ":run\r\n" +
+                $"start \"\" \"{Batch(target)}\"\r\n" +
+                "(goto) 2>nul & del \"%~f0\"\r\n",
+                new System.Text.UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("cmd.exe", $"/c \"{script}\"")
                 { CreateNoWindow = true, UseShellExecute = false, WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden });
             return true;

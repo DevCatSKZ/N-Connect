@@ -7,6 +7,18 @@ internal static partial class Tr
     {
         // ---------- Fenster, Reiter, Abschnitte ----------
         ["Controller"] = "Controllers",
+        // ---------- Status-Kopfzeile, Ansicht ----------
+        ["bereit"] = "ready",
+        ["nicht verfügbar"] = "not available",
+        ["Niedrigster Akku"] = "Lowest battery",
+        ["lädt"] = "charging",
+        ["gemischt"] = "mixed",
+        ["Original-Controller"] = "Original controllers",
+        ["versteckt"] = "hidden",
+        ["sichtbar"] = "visible",
+        ["HidHide fehlt"] = "HidHide missing",
+        ["Groß"] = "Large",
+        ["Kompakt"] = "Compact",
         ["Einstellungen (optional)"] = "Settings (optional)",
         ["1. Windows und Spiele sehen den Controller als …"] = "1. Windows and games see the controller as …",
         ["2. Tasten A/B/X/Y"] = "2. A/B/X/Y buttons",

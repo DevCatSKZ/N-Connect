@@ -9,6 +9,18 @@ internal static partial class Tr
     {
         // ---------- Fenster, Reiter, Abschnitte ----------
         ["Controller"] = "Comandos",
+        // ---------- Status-Kopfzeile, Ansicht ----------
+        ["bereit"] = "pronto",
+        ["nicht verfügbar"] = "indisponível",
+        ["Niedrigster Akku"] = "Bateria mais baixa",
+        ["lädt"] = "a carregar",
+        ["gemischt"] = "misto",
+        ["Original-Controller"] = "Comandos originais",
+        ["versteckt"] = "ocultos",
+        ["sichtbar"] = "visíveis",
+        ["HidHide fehlt"] = "HidHide em falta",
+        ["Groß"] = "Grande",
+        ["Kompakt"] = "Compacto",
         ["Einstellungen (optional)"] = "Definições (opcional)",
         ["1. Windows und Spiele sehen den Controller als …"] = "1. O Windows e os jogos veem o comando como …",
         ["2. Tasten A/B/X/Y"] = "2. Botões A/B/X/Y",

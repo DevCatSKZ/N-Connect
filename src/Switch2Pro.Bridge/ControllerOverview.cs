@@ -44,6 +44,9 @@ internal sealed class ControllerOverview : Panel
     private readonly Dictionary<Player, Card> _byPlayer = [];
     /// <summary>Spieler-Reihenfolge (ab zwei Spielern sichtbar).</summary>
     private readonly PlayerOrderBar _order;
+    /// <summary>Statusleiste ganz oben (Anzahl, Bluetooth, Akku, Ausgabe, HidHide) mit Umschalter Groß/Kompakt.</summary>
+    private readonly StatusBand _status = new();
+    private bool Compact => _settings().CompactCards;
 
     public ControllerOverview(ControllerManager? manager, Func<Settings> settings, MappingContext mapping, Action save, Action<int> showPage, Action? pair = null)
     {
@@ -66,6 +69,17 @@ internal sealed class ControllerOverview : Panel
         Controls.Add(_empty);
         _order = new PlayerOrderBar((player, target) => _manager?.MovePlayer(player, target)) { Visible = false };
         Controls.Add(_order);
+        _status.View.SelectedIndex = Compact ? 1 : 0;
+        _status.View.SelectedIndexChanged += (_, _) =>
+        {
+            _settings().CompactCards = _status.View.SelectedIndex == 1;
+            _save();
+            foreach (var card in _byPlayer.Values)
+                card.Compact = Compact;
+            LayoutCards();
+            UpdateView();
+        };
+        Controls.Add(_status);
         Theme.DarkScroll(_cards);
         Tr.Apply(_empty);
         Tr.Apply(_pairBar);
@@ -163,6 +177,8 @@ internal sealed class ControllerOverview : Panel
         _cards.Visible = players.Count > 0;
         _pairBar.Visible = players.Count > 0 && _pair is not null;
         _order.SetPlayers(players, _settings());
+        _status.Visible = _cardFilter is null;
+        _status.SetTiles(StatusBand.Build(_manager, players, _settings()));
         foreach (var gone in _byPlayer.Keys.Except(players).ToList())
         {
             _cards.Controls.Remove(_byPlayer[gone]);
@@ -173,7 +189,7 @@ internal sealed class ControllerOverview : Panel
         {
             if (!_byPlayer.TryGetValue(p, out var card))
             {
-                card = new Card(this);
+                card = new Card(this) { Compact = Compact };
                 _byPlayer[p] = card;
                 _cards.Controls.Add(card);
                 card.Width = CardWidth(card);
@@ -220,7 +236,7 @@ internal sealed class ControllerOverview : Panel
         foreach (var (p, card) in _byPlayer)
             card.Visible = _cardFilter is null || ReferenceEquals(p, _cardFilter);
         if (_cardFilter is not null)
-            _order.Visible = _pairBar.Visible = false;
+            _order.Visible = _pairBar.Visible = _status.Visible = false;
     }
 
     /// <summary>Für die Prüfhilfe: Einstellungen der ersten Karte aufklappen und einen Reiter wählen.</summary>
@@ -231,15 +247,19 @@ internal sealed class ControllerOverview : Panel
     }
 
     // ---------- Anordnung: zusammengeklappte Karten nebeneinander, wenn Platz ist ----------
-    private const int Gap = 12, MinCardWidth = 700;
+    private const int Gap = 12, MinCardWidth = 700, MinCompactWidth = 400;
 
     private int Available => Math.Max(MinCardWidth, _cards.ClientSize.Width - _cards.Padding.Horizontal - SystemInformation.VerticalScrollBarWidth);
 
     private int CardWidth(Card card)
     {
         int full = Available - Gap;
-        bool twoColumns = Available >= 2 * MinCardWidth + 2 * Gap;
-        return card.IsExpanded || !twoColumns ? full : (Available - 2 * Gap) / 2;
+        if (card.IsExpanded)
+            return full;
+        // Kompakt: so viele Spalten wie passen (höchstens 4), sonst zwei große nebeneinander, wenn Platz ist.
+        int min = Compact ? MinCompactWidth : MinCardWidth;
+        int columns = Math.Clamp((Available + Gap) / (min + Gap), 1, Compact ? 4 : 2);
+        return (Available - columns * Gap) / columns;
     }
 
     private void LayoutCards()
@@ -307,6 +327,24 @@ internal sealed class ControllerOverview : Panel
         private ControllerManager Manager => _owner._manager!;
         private Settings CurrentSettings => _owner._settings();
 
+        /// <summary>Kompakte Übersicht: kleine Grafik, nur Akku/Verbindung/Im Spiel; aufgeklappt wieder groß.</summary>
+        public bool Compact
+        {
+            get => _compact;
+            set
+            {
+                if (_compact == value)
+                    return;
+                _compact = value;
+                PerformLayout();
+                Invalidate();
+            }
+        }
+
+        private bool _compact;
+        /// <summary>Aufleuchten nach dem Verbinden (1 → 0) und Leuchten bei Eingaben (0–1) – Rand im Neon-Verlauf.</summary>
+        private readonly Anim _pulse, _active;
+
         public Card(ControllerOverview owner)
         {
             _owner = owner;
@@ -315,6 +353,8 @@ internal sealed class ControllerOverview : Panel
             BackColor = Background;
             Margin = new Padding(0, 0, Gap, Gap);
             Height = 460;
+            _pulse = new Anim(this, 0, speed: 2.2f);
+            _active = new Anim(this, 0, speed: 7f);
             foreach (var b in new[] { _identify, _disconnect, _pairToggle, _settingsButton })
                 b.BackColor = CardColor;
             _tabs.BackColor = CardColor;
@@ -754,10 +794,13 @@ internal sealed class ControllerOverview : Panel
         protected override void OnLayout(LayoutEventArgs levent)
         {
             const int pad = 20, top = 62;
-            // Vibrieren/Trennen immer als Symbolknöpfe (mit Tooltip), damit der Titel Platz hat.
+            bool compact = _compact && !_expanded;
+            _info.Minimal = compact;
+            // Vibrieren/Trennen immer als Symbolknöpfe (mit Tooltip), damit der Titel Platz hat; kompakt auch „Einstellungen“.
             SetText(_identify, "");
             SetText(_disconnect, "");
             SetText(_pairToggle, "");
+            SetText(_settingsButton, compact ? "" : "Einstellungen");
             int x = Width - pad;
             foreach (var b in new[] { _settingsButton, _disconnect, _pairToggle, _identify })
             {
@@ -768,10 +811,10 @@ internal sealed class ControllerOverview : Panel
                 x -= 8;
             }
             // Grafik wächst mit der Karte (Seitenverhältnis der Zeichnung 580 × 430).
-            int viewWidth = Math.Clamp((Width - 2 * pad) * 46 / 100, 280, 380);
+            int viewWidth = compact ? Math.Clamp((Width - 2 * pad) * 44 / 100, 160, 230) : Math.Clamp((Width - 2 * pad) * 46 / 100, 280, 380);
             _view.Bounds = new Rectangle(pad - 4, top, viewWidth, viewWidth * 430 / 580);
-            _info.Location = new Point(_view.Right + 20, top + 8); // Infospalte immer oben bündig
-            _info.Width = Math.Max(240, Width - _info.Left - pad);
+            _info.Location = new Point(_view.Right + (compact ? 12 : 20), top + 8); // Infospalte immer oben bündig
+            _info.Width = Math.Max(compact ? 140 : 240, Width - _info.Left - pad);
             NaturalBodyHeight = Math.Max(_view.Bottom, _info.Bottom) + 12;
             // Gleich hohe Karten nebeneinander: Grafik im (ggf. höheren) Feld senkrecht mittig.
             int bodyBottom = Math.Max(NaturalBodyHeight, _expanded ? 0 : BodyHeight);
@@ -812,18 +855,51 @@ internal sealed class ControllerOverview : Panel
                 }
                 g.ResetClip();
             }
-            using var pen = new Pen(Theme.Current.Border, 1f);
-            g.DrawPath(pen, path);
+            // Rand: normal dezent; nach dem Verbinden und bei Eingaben leuchtet er im Neon-Verlauf (innen weicher Schein).
+            float glow = Math.Max(_pulse.Value, _active.Value * 0.7f);
+            if (glow > 0.01f)
+            {
+                g.SetClip(path);
+                Theme.Glow(g, path, glow, 5);
+                g.ResetClip();
+                using var brush = Theme.AccentBrush(path.GetBounds(), 30);
+                brush.LinearColors =
+                [
+                    Theme.Blend(Theme.Current.Border, Theme.Accent, glow),
+                    Theme.Blend(Theme.Current.Border, Theme.Accent2, glow),
+                ];
+                using var neon = new Pen(brush, 1f + glow * 0.6f);
+                g.DrawPath(neon, path);
+            }
+            else
+            {
+                using var pen = new Pen(Theme.Current.Border, 1f);
+                g.DrawPath(pen, path);
+            }
             // Titel mit kleinem Pfeil: Klick öffnet Spielerplatz und Umbenennen.
             const TextFormatFlags flags = TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis | TextFormatFlags.NoPrefix;
             int maxWidth = Math.Max(100, _identify.Left - 40);
             // Passt „Spieler n · Name“ nicht, zeigt die Karte nur den Controllernamen (Spieler steht in der Leiste oben).
             string title = _title ?? "";
-            if (_titleShort is { } shortTitle
+            int left = 20;
+            if (_compact && !_expanded && _player is { } numbered)
+            {
+                // Kompakt: Spielernummer als Abzeichen (wie in der Reihenfolge-Leiste), daneben nur der Name.
+                title = _titleShort ?? title;
+                var badge = new Rectangle(20, 14 + (36 - 24) / 2, 24, 24);
+                using (var back = numbered.Index == 0 ? (Brush)Theme.AccentBrush(badge, 45) : new SolidBrush(Theme.Current.SurfaceHover))
+                    g.FillEllipse(back, badge);
+                TextRenderer.DrawText(g, (numbered.Index + 1).ToString(), UiFonts.Strong, badge,
+                    numbered.Index == 0 ? Theme.OnAccent : TextColor,
+                    TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
+                left = badge.Right + 10;
+                maxWidth -= left - 20;
+            }
+            else if (_titleShort is { } shortTitle
                 && TextRenderer.MeasureText(g, title, UiFonts.Subtitle).Width > maxWidth)
                 title = shortTitle;
             int width = Math.Min(maxWidth, TextRenderer.MeasureText(g, title, UiFonts.Subtitle, new Size(maxWidth, 36), flags).Width);
-            var titleBox = new Rectangle(20, 14, width, 36);
+            var titleBox = new Rectangle(left, 14, width, 36);
             if (_titleHover)
                 using (var hover = new SolidBrush(Theme.Current.SurfaceHover))
                 using (var round = Theme.RoundedRect(new RectangleF(titleBox.X - 8, titleBox.Y + 2, titleBox.Width + 34, titleBox.Height - 4), 6))
@@ -917,6 +993,12 @@ internal sealed class ControllerOverview : Panel
 
         public void Show(Player player, Settings settings)
         {
+            if (_player is null)
+            {
+                // Neu verbunden: Rand leuchtet kurz auf und klingt aus.
+                _pulse.Snap(1);
+                _pulse.Target = 0;
+            }
             _player = player;
             var links = player.Links;
             string title = $"Spieler {player.Index + 1}  ·  {player.DisplayName(settings)}" + (player.GyroMouseActive ? "  ·  Gyro-Maus" : "") + (player.GyroStickActive ? "  ·  Gyro-Stick" : "");
@@ -929,6 +1011,8 @@ internal sealed class ControllerOverview : Panel
             }
 
             var (input, gamepad) = LiveInput(player, settings);
+            // Karte glüht, solange am Controller eine Taste gedrückt ist – zeigt sofort, welche Karte zu welchem gehört.
+            _active.Target = input is { } live && live.Buttons != ProButtons.None ? 1 : 0;
             bool joyCon = links.Count > 0 && links.All(l => l.Kind.IsJoyCon());
             bool upright = links.Count == 1 && joyCon && settings.IsUprightJoyCon(links[0].Address);
             // Kopf-Knopf nur bei Joy-Con: Paar lösen bzw. zum Paar verbinden, ohne die Karte aufzuklappen.
@@ -1238,7 +1322,7 @@ internal sealed class ControllerOverview : Panel
                 }
                 Row(g, ref y, "Akku", null);
                 if (g is not null)
-                    DrawBattery(g, LabelWidth, y - RowHeight, link.LastState);
+                    DrawBattery(g, LabelWidth, y - RowHeight, link.LastState, BatteryShown(link));
                 Row(g, ref y, "Verbindung", Compact ? Transport(link.Transport) : $"{Transport(link.Transport)} · {link.ReportRate:F0} Berichte/s");
                 if (!Compact)
                 {
@@ -1269,10 +1353,34 @@ internal sealed class ControllerOverview : Panel
                     g.DrawPath(pen, path);
                 }
             }
+            if (Minimal)
+                return y; // kompakte Karte: gedrückte Tasten zeigt die Grafik
+            var kind = _links.Count == 1 ? _links[0].Kind : ControllerKind.JoyConPair;
             var pressed = _input is null ? [] : Enum.GetValues<ProButtons>()
-                .Where(b => b != ProButtons.None && _input.Has(b)).Select(ButtonName).ToList();
+                .Where(b => b != ProButtons.None && _input.Has(b)).Select(b => ButtonName(b, kind)).ToList();
             Row(g, ref y, "Gedrückt", pressed.Count == 0 ? "–" : string.Join("  ", pressed));
             return y;
+        }
+
+        /// <summary>Kompakte Übersicht: ohne Zeile „Gedrückt“.</summary>
+        public bool Minimal { get; set; }
+
+        /// <summary>Angezeigter Füllstand je Controller – gleitet zum echten Wert (beim Verbinden füllt sich der Balken).</summary>
+        private readonly Dictionary<IControllerLink, Anim> _battery = [];
+
+        private float BatteryShown(IControllerLink link)
+        {
+            int percent = link.LastState?.BatteryPercent is { } raw ? Math.Min(raw, 100) : -1;
+            if (percent < 0)
+                return -1;
+            if (!_battery.TryGetValue(link, out var anim))
+            {
+                foreach (var gone in _battery.Keys.Except(_links).ToList())
+                    _battery.Remove(gone);
+                _battery[link] = anim = new Anim(this, 0, speed: 4f);
+            }
+            anim.Target = percent;
+            return anim.Value;
         }
 
         private void Row(Graphics? g, ref int y, string label, string? value)
@@ -1290,7 +1398,7 @@ internal sealed class ControllerOverview : Panel
             y += RowHeight;
         }
 
-        private static void DrawBattery(Graphics g, int x, int y, ControllerState? st)
+        private static void DrawBattery(Graphics g, int x, int y, ControllerState? st, float shown)
         {
             var frame = new RectangleF(x, y + 3, 40, 15);
             using (var path = Theme.RoundedRect(frame, 3))
@@ -1299,11 +1407,10 @@ internal sealed class ControllerOverview : Panel
             using (var tip = new SolidBrush(MutedColor))
                 g.FillRectangle(tip, frame.Right + 1, frame.Y + 4.5f, 2.5f, 6);
             int percent = st?.BatteryPercent is { } raw ? Math.Min(raw, 100) : -1;
-            if (percent >= 0)
+            if (percent >= 0 && shown >= 0)
             {
-                var level = percent < 15 ? Color.FromArgb(235, 80, 70) : percent < 35 ? Color.FromArgb(240, 180, 40) : Color.FromArgb(70, 200, 110);
-                using var fill = new SolidBrush(level);
-                using var bar = Theme.RoundedRect(new RectangleF(frame.X + 2.5f, frame.Y + 2.5f, Math.Max(2, (frame.Width - 5) * percent / 100f), frame.Height - 5), 1.5f);
+                using var fill = new SolidBrush(StatusBand.BatteryColor(percent));
+                using var bar = Theme.RoundedRect(new RectangleF(frame.X + 2.5f, frame.Y + 2.5f, Math.Max(2, (frame.Width - 5) * shown / 100f), frame.Height - 5), 1.5f);
                 g.FillPath(fill, bar);
             }
             string text = percent < 0 ? "unbekannt"
@@ -1319,18 +1426,37 @@ internal sealed class ControllerOverview : Panel
             _ => "USB",
         };
 
-        private static string ButtonName(ProButtons b) => b switch
+        /// <summary>Kurzname einer gedrückten Taste so, wie sie auf diesem Controller heißt (Kreuz, LB, SR …), schon übersetzt.</summary>
+        private static string ButtonName(ProButtons b, ControllerKind kind)
         {
-            ProButtons.LeftStick => "L-Stick",
-            ProButtons.RightStick => "R-Stick",
-            ProButtons.Minus => "−",
-            ProButtons.Plus => "+",
-            ProButtons.Capture => "Aufnahme",
-            ProButtons.Up => "▲",
-            ProButtons.Down => "▼",
-            ProButtons.Left => "◀",
-            ProButtons.Right => "▶",
-            _ => b.ToString(),
-        };
+            switch (b)
+            {
+                case ProButtons.Up: return "▲";
+                case ProButtons.Down: return "▼";
+                case ProButtons.Left: return "◀";
+                case ProButtons.Right: return "▶";
+                case ProButtons.SLLeft or ProButtons.SLRight: return "SL";
+                case ProButtons.SRLeft or ProButtons.SRRight: return "SR";
+            }
+            if (!kind.IsPlayStation() && !kind.IsXbox())
+            {
+                switch (b)
+                {
+                    case ProButtons.LeftStick: return Tr.T("L-Stick");
+                    case ProButtons.RightStick: return Tr.T("R-Stick");
+                    case ProButtons.Minus: return "−";
+                    case ProButtons.Plus: return "+";
+                }
+            }
+            // „Kreuz (unten)“ → „Kreuz“, „Nunchuk Z / Classic ZL“ → „Nunchuk Z“: Erklärungen sind in der Kurzliste überflüssig.
+            string label = Tr.T(ControllerButtons.Label(b, kind));
+            foreach (var cut in new[] { " (", " / " })
+            {
+                int at = label.IndexOf(cut, StringComparison.Ordinal);
+                if (at > 0)
+                    label = label[..at];
+            }
+            return label;
+        }
     }
 }

@@ -12,7 +12,7 @@ namespace Switch2Pro.Bridge;
 /// </summary>
 internal sealed class PlayerOrderBar : Control, ISelfTranslating, IExtraTexts
 {
-    private const int Pad = 12, ChipH = 40, Gap = 8, Arrow = 26, CaptionGap = 8;
+    private const int Pad = 12, ChipH = 34, Gap = 8, Arrow = 24, CaptionGap = 6;
     private const string Caption = "Spieler-Reihenfolge – Spieler 1 ist für Windows, Steam und Spiele der erste Controller. Mit ‹ › umsortieren.";
 
     private readonly Action<Player, int> _move;
@@ -53,28 +53,27 @@ internal sealed class PlayerOrderBar : Control, ISelfTranslating, IExtraTexts
     }
 
     private int ChipWidth(string name) =>
-        12 + 26 + 8 + Math.Min(430, TextRenderer.MeasureText(name, UiFonts.Body).Width) + 10 + 2 * Arrow + 8;
+        10 + 24 + 8 + Math.Min(260, TextRenderer.MeasureText(name, UiFonts.Body).Width) + 8 + 2 * Arrow + 6;
 
-    /// <summary>Chips zeilenweise anordnen (umbrechen, wenn die Breite nicht reicht). Alle gleich breit:
-    /// die breiteste nötige Breite gilt für alle – sieht ruhiger aus und lange Namen passen überall.</summary>
+    /// <summary>Kleinste Chipbreite, ab der umgebrochen wird (lange Namen werden dann gekürzt).</summary>
+    private const int MinChip = 250;
+
+    /// <summary>Chips in möglichst wenigen, gleich vollen Zeilen anordnen (8 Spieler: 2 × 4 statt 3 + 3 + 2). Alle gleich
+    /// breit – die breiteste nötige Breite, höchstens so viel, wie in eine Zeile passt; sieht ruhiger aus.</summary>
     private List<Rectangle> Arrange(int width, out int height)
     {
         var rects = new List<Rectangle>();
         int top = 12 + TextRenderer.MeasureText(Tr.T(Caption), UiFonts.Small, new Size(Math.Max(100, width - 2 * Pad), 0),
             TextFormatFlags.WordBreak).Height + CaptionGap;
-        int x = Pad, y = top;
-        int w = _players.Count > 0 ? _players.Max(p => ChipWidth(p.Name)) : 0;
-        foreach (var _ in _players)
-        {
-            if (x > Pad && x + w > width - Pad)
-            {
-                x = Pad;
-                y += ChipH + Gap;
-            }
-            rects.Add(new Rectangle(x, y, w, ChipH));
-            x += w + Gap;
-        }
-        height = y + ChipH + 6;
+        int count = _players.Count, avail = Math.Max(MinChip, width - 2 * Pad);
+        int maxColumns = Math.Max(1, (avail + Gap) / (MinChip + Gap));
+        int rows = Math.Max(1, (count + maxColumns - 1) / maxColumns);
+        int columns = Math.Max(1, (count + rows - 1) / rows);
+        int natural = count > 0 ? _players.Max(p => ChipWidth(p.Name)) : 0;
+        int w = Math.Min(natural, (avail - (columns - 1) * Gap) / columns);
+        for (int i = 0; i < count; i++)
+            rects.Add(new Rectangle(Pad + i % columns * (w + Gap), top + i / columns * (ChipH + Gap), w, ChipH));
+        height = top + rows * (ChipH + Gap) - Gap + 6;
         return rects;
     }
 
@@ -105,25 +104,28 @@ internal sealed class PlayerOrderBar : Control, ISelfTranslating, IExtraTexts
         {
             var (player, name) = _players[i];
             var r = rects[i];
-            using (var path = Theme.RoundedRect(new RectangleF(r.X + 0.5f, r.Y + 0.5f, r.Width - 1, r.Height - 1), 7))
+            var chip = new RectangleF(r.X + 0.5f, r.Y + 0.5f, r.Width - 1, r.Height - 1);
+            using (var path = Theme.RoundedRect(chip, 7))
             {
                 using var fill = new SolidBrush(p.Surface);
                 g.FillPath(fill, path);
-                using var pen = new Pen(i == 0 ? Theme.Accent : p.Border, i == 0 ? 1.5f : 1f);
+                // Spieler 1 (für Windows/Steam der erste Controller): Rand im Neon-Verlauf.
+                using var border = i == 0 ? (Brush)Theme.AccentBrush(chip) : new SolidBrush(p.Border);
+                using var pen = new Pen(border, i == 0 ? 1.5f : 1f);
                 g.DrawPath(pen, path);
             }
-            // Spielernummer im Kreis (Spieler 1 in Akzentfarbe)
-            var circle = new Rectangle(r.X + 12, r.Y + (ChipH - 26) / 2, 26, 26);
-            using (var back = new SolidBrush(i == 0 ? Theme.Accent : p.SurfaceHover))
+            // Spielernummer im Kreis (Spieler 1 im Neon-Verlauf)
+            var circle = new Rectangle(r.X + 10, r.Y + (ChipH - 24) / 2, 24, 24);
+            using (var back = i == 0 ? (Brush)Theme.AccentBrush(circle, 45) : new SolidBrush(p.SurfaceHover))
                 g.FillEllipse(back, circle);
             TextRenderer.DrawText(g, (player.Index + 1).ToString(), UiFonts.Strong, circle, i == 0 ? Theme.OnAccent : p.Text,
                 TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
-            int textX = circle.Right + 8, textW = r.Right - 8 - 2 * Arrow - 10 - textX;
+            int textX = circle.Right + 8, textW = r.Right - 6 - 2 * Arrow - 8 - textX;
             TextRenderer.DrawText(g, name, UiFonts.Body, new Rectangle(textX, r.Y, textW, ChipH), p.Text,
                 TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis | TextFormatFlags.NoPrefix);
             // ‹ › – mit dem Nachbarn tauschen
-            var left = new Rectangle(r.Right - 8 - 2 * Arrow, r.Y + (ChipH - Arrow) / 2, Arrow, Arrow);
-            var right = new Rectangle(r.Right - 8 - Arrow, left.Y, Arrow, Arrow);
+            var left = new Rectangle(r.Right - 6 - 2 * Arrow, r.Y + (ChipH - Arrow) / 2, Arrow, Arrow);
+            var right = new Rectangle(r.Right - 6 - Arrow, left.Y, Arrow, Arrow);
             DrawArrow(g, left, "‹", i > 0);
             DrawArrow(g, right, "›", i < _players.Count - 1);
             if (i > 0)

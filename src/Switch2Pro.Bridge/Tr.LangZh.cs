@@ -9,6 +9,18 @@ internal static partial class Tr
     {
         // ---------- Fenster, Reiter, Abschnitte ----------
         ["Controller"] = "控制器",
+        // ---------- Status-Kopfzeile, Ansicht ----------
+        ["bereit"] = "就绪",
+        ["nicht verfügbar"] = "不可用",
+        ["Niedrigster Akku"] = "最低电量",
+        ["lädt"] = "充电中",
+        ["gemischt"] = "混合",
+        ["Original-Controller"] = "原始控制器",
+        ["versteckt"] = "已隐藏",
+        ["sichtbar"] = "可见",
+        ["HidHide fehlt"] = "缺少 HidHide",
+        ["Groß"] = "大",
+        ["Kompakt"] = "紧凑",
         ["Einstellungen (optional)"] = "设置（可选）",
         ["1. Windows und Spiele sehen den Controller als …"] = "1. Windows 和游戏将控制器识别为 …",
         ["2. Tasten A/B/X/Y"] = "2. 按键 A/B/X/Y",

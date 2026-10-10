@@ -9,6 +9,18 @@ internal static partial class Tr
     {
         // ---------- Fenster, Reiter, Abschnitte ----------
         ["Controller"] = "Контроллеры",
+        // ---------- Status-Kopfzeile, Ansicht ----------
+        ["bereit"] = "готов",
+        ["nicht verfügbar"] = "недоступен",
+        ["Niedrigster Akku"] = "Минимальный заряд",
+        ["lädt"] = "заряжается",
+        ["gemischt"] = "смешанный",
+        ["Original-Controller"] = "Оригинальные контроллеры",
+        ["versteckt"] = "скрыты",
+        ["sichtbar"] = "видны",
+        ["HidHide fehlt"] = "нет HidHide",
+        ["Groß"] = "Крупно",
+        ["Kompakt"] = "Компактно",
         ["Einstellungen (optional)"] = "Настройки (необязательно)",
         ["1. Windows und Spiele sehen den Controller als …"] = "1. Windows и игры видят контроллер как …",
         ["2. Tasten A/B/X/Y"] = "2. Кнопки A/B/X/Y",

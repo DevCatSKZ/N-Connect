@@ -9,6 +9,18 @@ internal static partial class Tr
     {
         // ---------- Fenster, Reiter, Abschnitte ----------
         ["Controller"] = "컨트롤러",
+        // ---------- Status-Kopfzeile, Ansicht ----------
+        ["bereit"] = "준비됨",
+        ["nicht verfügbar"] = "사용할 수 없음",
+        ["Niedrigster Akku"] = "최저 배터리",
+        ["lädt"] = "충전 중",
+        ["gemischt"] = "혼합",
+        ["Original-Controller"] = "원래 컨트롤러",
+        ["versteckt"] = "숨김",
+        ["sichtbar"] = "표시됨",
+        ["HidHide fehlt"] = "HidHide 없음",
+        ["Groß"] = "크게",
+        ["Kompakt"] = "간단히",
         ["Einstellungen (optional)"] = "설정(선택 사항)",
         ["1. Windows und Spiele sehen den Controller als …"] = "1. Windows와 게임에서 컨트롤러가 다음과 같이 인식됩니다 …",
         ["2. Tasten A/B/X/Y"] = "2. 버튼 A/B/X/Y",

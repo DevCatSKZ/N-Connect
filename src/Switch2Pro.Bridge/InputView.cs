@@ -385,26 +385,41 @@ internal sealed partial class InputView : Control
 
     private void Gyro(Graphics g, Motion? motion)
     {
-        var area = new RectangleF(160, 412, 200, 14);
-        using var font = new Font("Segoe UI", 7.5f, FontStyle.Bold);
-        using var label = new SolidBrush(Color.FromArgb(170, 175, 185));
+        // Die Zeichnung wird auf ~60 % verkleinert – Schrift und Balken darum großzügig, sonst sind sie unlesbar klein.
+        var area = new RectangleF(90, 400, 400, 26);
+        using var font = new Font("Segoe UI Semibold", 14f);
+        using var label = new SolidBrush(Theme.Current.TextMuted);
+        using var center = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
         if (motion is not { } m)
         {
-            using var format = new StringFormat { Alignment = StringAlignment.Center };
-            g.DrawString(Tr.T("Bewegungssensor: keine Daten"), font, label, area, format);
+            g.DrawString(Tr.T("Bewegungssensor: keine Daten"), font, label, area, center);
             return;
         }
-        (string Axis, short Value)[] axes = [("Gyro X", m.GyroX), ("Y", m.GyroY), ("Z", m.GyroZ)];
-        float w = (area.Width - 20) / 3;
+        float gyroW = g.MeasureString("Gyro", font).Width + 6;
+        g.DrawString("Gyro", font, label, new RectangleF(area.X, area.Y, gyroW, area.Height), center);
+        (string Axis, short Value)[] axes = [("X", m.GyroX), ("Y", m.GyroY), ("Z", m.GyroZ)];
+        const float letter = 22, gap = 12;
+        float w = (area.Width - gyroW - 3 * letter - 3 * gap) / 3;
+        float x = area.X + gyroW + gap;
         for (int i = 0; i < 3; i++)
         {
-            var r = new RectangleF(area.X + i * (w + 10), area.Y + 8, w, 8);
+            g.DrawString(axes[i].Axis, font, label, new RectangleF(x, area.Y, letter, area.Height), center);
+            var r = new RectangleF(x + letter, area.Y + area.Height / 2 - 5, w, 10);
+            using (var track = Theme.RoundedRect(r, 5))
             using (var back = new SolidBrush(Theme.Current.Border))
-                g.FillRectangle(back, r);
+                g.FillPath(back, track);
             float v = Math.Clamp(axes[i].Value / 6000f, -1f, 1f) * r.Width / 2;
-            using (var fill = new SolidBrush(Accent))
-                g.FillRectangle(fill, v >= 0 ? r.X + r.Width / 2 : r.X + r.Width / 2 + v, r.Y, Math.Abs(v), r.Height);
-            g.DrawString(axes[i].Axis, font, label, r.X - 1, r.Y - 13);
+            if (MathF.Abs(v) >= 1)
+            {
+                var bar = new RectangleF(v >= 0 ? r.X + r.Width / 2 : r.X + r.Width / 2 + v, r.Y, MathF.Abs(v), r.Height);
+                using var fill = new SolidBrush(Accent);
+                using var path = Theme.RoundedRect(bar, 5);
+                g.FillPath(fill, path);
+            }
+            // Nullmarke in der Mitte
+            using (var tick = new Pen(Theme.Current.TextMuted, 1.5f))
+                g.DrawLine(tick, r.X + r.Width / 2, r.Y - 2, r.X + r.Width / 2, r.Bottom + 2);
+            x += letter + w + gap;
         }
     }
 

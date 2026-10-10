@@ -9,6 +9,18 @@ internal static partial class Tr
     {
         // ---------- Fenster, Reiter, Abschnitte ----------
         ["Controller"] = "Controller",
+        // ---------- Status-Kopfzeile, Ansicht ----------
+        ["bereit"] = "pronto",
+        ["nicht verfügbar"] = "non disponibile",
+        ["Niedrigster Akku"] = "Batteria più bassa",
+        ["lädt"] = "in carica",
+        ["gemischt"] = "misto",
+        ["Original-Controller"] = "Controller originali",
+        ["versteckt"] = "nascosti",
+        ["sichtbar"] = "visibili",
+        ["HidHide fehlt"] = "HidHide mancante",
+        ["Groß"] = "Grande",
+        ["Kompakt"] = "Compatto",
         ["Einstellungen (optional)"] = "Impostazioni (facoltative)",
         ["1. Windows und Spiele sehen den Controller als …"] = "1. Windows e i giochi vedono il controller come …",
         ["2. Tasten A/B/X/Y"] = "2. Pulsanti A/B/X/Y",
