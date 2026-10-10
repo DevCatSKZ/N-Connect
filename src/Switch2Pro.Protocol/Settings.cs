@@ -386,6 +386,19 @@ public sealed class Settings
     /// <summary>Gewünschter Spielerplatz je Controller (Adresse → 0–7); wird beim Verbinden bevorzugt.</summary>
     public Dictionary<string, int> PlayerSlots { get; set; } = new(StringComparer.OrdinalIgnoreCase);
 
+    /// <summary>Art je Controller (Bluetooth-Adresse → Art), beim Verbinden gemerkt – für Exporte (z. B. ESP32).</summary>
+    public Dictionary<string, ControllerKind> ControllerKinds { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>Art eines Controllers merken; true = geändert (dann speichern). Neue Kopie, weil andere Threads lesen.</summary>
+    public bool RememberKind(string address, ControllerKind kind)
+    {
+        if (kind == ControllerKind.Unknown || !BtAddress.TryNormalize(address, out var a)
+            || ControllerKinds.TryGetValue(a, out var known) && known == kind)
+            return false;
+        ControllerKinds = new Dictionary<string, ControllerKind>(ControllerKinds, StringComparer.OrdinalIgnoreCase) { [a] = kind };
+        return true;
+    }
+
     /// <summary>Eigener Name eines Controllers (null = keiner).</summary>
     public string? NameFor(string? address) =>
         address is not null && ControllerNames.TryGetValue(address, out var name) && !string.IsNullOrWhiteSpace(name) ? name : null;
@@ -562,6 +575,7 @@ public sealed class Settings
         ImportedPairings = [.. other.ImportedPairings];
         SwitchCardHint = other.SwitchCardHint;
         ControllerNames = new Dictionary<string, string>(other.ControllerNames, StringComparer.OrdinalIgnoreCase);
+        ControllerKinds = new Dictionary<string, ControllerKind>(other.ControllerKinds, StringComparer.OrdinalIgnoreCase);
         PlayerSlots = new Dictionary<string, int>(other.PlayerSlots, StringComparer.OrdinalIgnoreCase);
         StickCalibrations = new Dictionary<string, StickCalibration>(other.StickCalibrations, StringComparer.OrdinalIgnoreCase);
     }
@@ -703,6 +717,8 @@ public sealed class Settings
             .ToDictionary(n => n.Key, n => n.Value.Trim(), StringComparer.OrdinalIgnoreCase) ?? new(StringComparer.OrdinalIgnoreCase);
         PlayerSlots = PlayerSlots?.Where(s => s.Key is not null && s.Value is >= 0 and < 8)
             .ToDictionary(s => s.Key, s => s.Value, StringComparer.OrdinalIgnoreCase) ?? new(StringComparer.OrdinalIgnoreCase);
+        ControllerKinds = ControllerKinds?.Where(k => k.Key is not null && Enum.IsDefined(k.Value) && k.Value != ControllerKind.Unknown)
+            .ToDictionary(k => k.Key, k => k.Value, StringComparer.OrdinalIgnoreCase) ?? new(StringComparer.OrdinalIgnoreCase);
         ControllerOutputs = ControllerOutputs?.Where(o => o.Key is not null && Enum.IsDefined(o.Value))
             .ToDictionary(o => o.Key, o => o.Value, StringComparer.OrdinalIgnoreCase) ?? new(StringComparer.OrdinalIgnoreCase);
         if (!Enum.IsDefined(OutputMode))

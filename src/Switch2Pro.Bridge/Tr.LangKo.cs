@@ -51,6 +51,18 @@ internal static partial class Tr
         ["N-Connect öffnen"] = "N-Connect 열기",
         ["Position zurücksetzen"] = "위치 초기화",
         ["Widget ausblenden"] = "위젯 숨기기",
+        // ---------- ESP32-Export ----------
+        ["Für ESP32 exportieren"] = "ESP32용으로 내보내기",
+        ["Adresse dieses Bluetooth-Adapters und die Switch-2-Controller für einen ESP32-S3, der sich als dieser PC ausgibt – Controller verbinden sich dann ohne neues SYNC (Anleitung im ZIP)"] = "이 Bluetooth 어댑터의 주소와 Switch 2 컨트롤러를 이 PC로 위장하는 ESP32-S3용으로 내보냅니다. 컨트롤러는 다시 SYNC하지 않아도 연결됩니다(안내는 ZIP 안에 있음)",
+        ["ESP32-Export …"] = "ESP32 내보내기 …",
+        ["Die Adresse des Bluetooth-Adapters ist nicht bekannt. Bluetooth einschalten und das Fenster neu öffnen."] = "Bluetooth 어댑터 주소를 알 수 없습니다. Bluetooth를 켜고 이 창을 다시 여세요.",
+        ["ZIP-Datei"] = "ZIP 파일",
+        ["ESP32-Export speichern"] = "ESP32 내보내기 저장",
+        ["ESP32-Export gespeichert:"] = "ESP32 내보내기를 저장했습니다:",
+        ["Adresse für den ESP32"] = "ESP32용 주소",
+        ["übernehmbar"] = "이전 가능",
+        ["nicht übernehmbar"] = "이전 불가",
+        ["Noch kein Switch-2-Controller bekannt: einmal per SYNC mit N-Connect koppeln und neu exportieren."] = "아직 알려진 Switch 2 컨트롤러가 없습니다. SYNC로 N-Connect와 한 번 페어링한 다음 다시 내보내세요.",
         // ---------- Status-Kopfzeile, Ansicht ----------
         ["Farbschema"] = "색 구성표",
         ["Farben für Akzente, Knöpfe, Flächen und Ränder."] = "강조색, 버튼, 배경, 테두리 색상.",

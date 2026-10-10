@@ -104,6 +104,12 @@ internal sealed class TrayApp : ApplicationContext
             catch (Exception e) { Log.Warn($"Einblendung: {Log.Reason(e)}"); }
         }, null);
         _manager.ControllerConnected += (address, _) => _ui.Post(_ => RememberController(address), null);
+        // Art je Adresse merken (für den ESP32-Export auch, wenn der Controller gerade nicht verbunden ist).
+        _manager.LinkConnected += link => _ui.Post(_ =>
+        {
+            if (link.Address is { } address && _settings.RememberKind(address, link.Kind))
+                SaveSettings();
+        }, null);
         _manager.JoyConModeChanged += (address, single) => _ui.Post(_ =>
         {
             if (_settings.SetSingleJoyCon(address, single))
