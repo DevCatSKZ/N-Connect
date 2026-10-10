@@ -381,13 +381,19 @@ internal static class Theme
         /// </summary>
         private void FitWidth()
         {
-            if (_combo.Items.Count == 0 || Equals(_combo.Tag, Tr.UserData))
+            if (_combo.Items.Count == 0)
                 return;
             int text = _combo.Items.Cast<object>().Max(i => TextRenderer.MeasureText(_combo.GetItemText(i), _combo.Font).Width);
-            int wanted = Math.Min(UiScale.Px(420), text + UiScale.Px(44));
-            if (wanted > _combo.Width)
-                _combo.Width = wanted;
-            _combo.DropDownWidth = Math.Max(_combo.Width, text + UiScale.Px(24));
+            // Das Feld selbst nur verbreitern, wenn es allein rechts in einer Einstellungszeile steht – neben Knöpfen
+            // (Profilzeile) oder in festen Layouts (Tastenbelegung, Dialoge) würde es sonst Nachbarn überdecken.
+            if (_combo.Parent is SettingRow row && row.Content == _combo && !Equals(_combo.Tag, Tr.UserData))
+            {
+                int wanted = Math.Min(UiScale.Px(420), text + UiScale.Px(44));
+                if (wanted > _combo.Width)
+                    _combo.Width = wanted;
+            }
+            // Die aufgeklappte Liste darf immer so breit wie ihr längster Eintrag werden (überdeckt nichts dauerhaft).
+            _combo.DropDownWidth = Math.Max(_combo.Width, Math.Min(UiScale.Px(520), text + UiScale.Px(24)));
         }
 
         protected override void WndProc(ref Message m)
