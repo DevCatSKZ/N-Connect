@@ -424,6 +424,12 @@ Bis zu **8 Spieler** gleichzeitig (`ControllerManager.MaxPlayers`). Der 9. Contr
 - Fenster `PairingDataForm` im Windows-11-Stil (Gruppen „Übernehmen“, „Inhalt“, „Weitergeben und sichern“, Fußleiste
   mit Akzent-Knopf „Übernehmen“); Inhalt wird selbst gezeichnet (`Report`: Zeilen mit „:“ am Ende = Zwischenüberschrift,
   „  •  “ = Aufzählung). Passwort-Dialog (`PasswordDialog`) ebenso, Eingabefelder als `TextField`.
+- **Für ESP32 exportieren** (`Esp32Export`, `PairingDataForm.ExportEsp32`): ZIP mit `nconnect-esp32.json`,
+  `nconnect_pairing.h` (ESP-IDF) und `LIESMICH.txt`. Inhalt: Adresse des Bluetooth-Adapters (der ESP32 übernimmt sie
+  per `esp_iface_mac_addr_set(…, ESP_MAC_BT)`) und alle bekannten Controller mit Art, Name, Spielerplatz, Ausgabe,
+  Stick-/Gyro-Kalibrierung; übernehmbar sind nur Switch-2-Controller (BLE, unverschlüsselt, Host-Adresse in der
+  Werbung). Keine Schlüssel, kein Adminrecht. Die Art je Adresse merkt sich N-Connect beim Verbinden
+  (`Settings.ControllerKinds`, `RememberKind`). Ausführlich: [ESP32.md](ESP32.md).
 
 ## 14. Programm
 

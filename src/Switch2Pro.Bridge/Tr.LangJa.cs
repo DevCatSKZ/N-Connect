@@ -51,6 +51,18 @@ internal static partial class Tr
         ["N-Connect öffnen"] = "N-Connect を開く",
         ["Position zurücksetzen"] = "位置をリセット",
         ["Widget ausblenden"] = "ウィジェットを非表示",
+        // ---------- ESP32-Export ----------
+        ["Für ESP32 exportieren"] = "ESP32 用にエクスポート",
+        ["Adresse dieses Bluetooth-Adapters und die Switch-2-Controller für einen ESP32-S3, der sich als dieser PC ausgibt – Controller verbinden sich dann ohne neues SYNC (Anleitung im ZIP)"] = "この Bluetooth アダプターのアドレスと Switch 2 コントローラーを、この PC になりすます ESP32-S3 用に書き出します。コントローラーは再 SYNC なしで接続します（手順は ZIP 内）",
+        ["ESP32-Export …"] = "ESP32 エクスポート …",
+        ["Die Adresse des Bluetooth-Adapters ist nicht bekannt. Bluetooth einschalten und das Fenster neu öffnen."] = "Bluetooth アダプターのアドレスが不明です。Bluetooth をオンにしてこのウィンドウを開き直してください。",
+        ["ZIP-Datei"] = "ZIP ファイル",
+        ["ESP32-Export speichern"] = "ESP32 エクスポートを保存",
+        ["ESP32-Export gespeichert:"] = "ESP32 エクスポートを保存しました:",
+        ["Adresse für den ESP32"] = "ESP32 用のアドレス",
+        ["übernehmbar"] = "引き継ぎ可",
+        ["nicht übernehmbar"] = "引き継ぎ不可",
+        ["Noch kein Switch-2-Controller bekannt: einmal per SYNC mit N-Connect koppeln und neu exportieren."] = "Switch 2 コントローラーがまだ登録されていません。一度 SYNC で N-Connect とペアリングしてから再度エクスポートしてください。",
         // ---------- Status-Kopfzeile, Ansicht ----------
         ["Farbschema"] = "配色",
         ["Farben für Akzente, Knöpfe, Flächen und Ränder."] = "アクセント、ボタン、背景、枠線の色。",

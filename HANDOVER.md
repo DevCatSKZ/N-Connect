@@ -15,7 +15,7 @@ Was das Programm kann und wie man es baut: siehe [README.md](README.md). Vollst�
 ```powershell
 cd switch2-pro-windows
 dotnet build -c Release                      # Warnungen gelten als Fehler
-dotnet test -c Release --no-build            # aktuell 219 Tests, alle grün
+dotnet test -c Release --no-build            # aktuell 227 Tests, alle grün
 N-Connect.exe --render <Ordner>              # alle Controller-Grafiken prüfen
 N-Connect.exe --render-ui <Ordner> --demo-all --wide   # alle Seiten/Karten prüfen (auch --demo, --demo-retro, --compact, --light)
 dotnet publish src\Switch2Pro.Bridge -c Release -r win-x64 --self-contained -p:PublishSingleFile=true `
@@ -272,15 +272,20 @@ kleben; ggf. Aufschrift weglassen statt verschieben.
   Installer (entfernt mit der Zeit die SmartScreen-Warnung). Danach möglich: echtes Windows-11-Widget.
 - **Hardware-Tester** für HORI/PowerA/PDP-Kabelpads, DS4/DualSense, Xbox über Bluetooth (Aufruf steht im README).
 
-**Nächstes Vorhaben: ESP32 mit den Kopplungsdaten des PCs** (Nutzerwunsch 10.10.2026, Klärung läuft):
-Controller sollen sich ohne neues SYNC sowohl mit dem PC-Stick als auch mit einem ESP32 verbinden. Weg: N-Connect
-exportiert Adapter-Adresse + Schlüssel je Controller (Windows: `HKLM\SYSTEM\CurrentControlSet\Services\BTHPORT\
-Parameters\Keys\<Adapter>\<Controller>`, klassisch 16-Byte-Link-Key, BLE als Unterschlüssel mit LTK/EDIV/ERand/IRK –
-lesbar nur als SYSTEM, also Hilfsprozess mit Adminrecht). Der ESP32 übernimmt diese Adresse und Schlüssel und gibt
-sich so als der PC aus (gleiches Prinzip wie „Switch-Identität“ mit Bluepick_RCM). Grenzen: klassisches Bluetooth
-(Joy-Con 1, Pro Controller, DS4/DualSense, Wii) nur mit dem **Ur-ESP32** (S2/S3/C3/C6 können nur BLE); PC und ESP32
-dürfen nicht gleichzeitig mit dieser Adresse aktiv sein. Schlüssel nie ins Repo/Protokoll, Export nur auf Wunsch
-und mit Passwort (vorhandenes `.ncpair`-Format hat dafür schon `LinkKey`).
+**ESP32 als zweiter „Bluetooth-Stick“** (Nutzerwunsch 10.10.2026) – **Export fertig**, Firmware offen:
+- Nutzer-Hardware: **ESP32-S3 N16R8 DevKitC-1** (USB 303A:1001 + CH343, eigenes Projekt `C:\Coding\ESP32 Pokemon\…`,
+  ESP-IDF v6.1 unter `C:\Coding\esp-idf`). **Am ESP nichts ändern/flashen, serielle Schnittstelle nicht öffnen**
+  (Nutzer arbeitet daran).
+- Ziel: Switch-2-Controller am PC mit Stick **und** an einem anderen PC mit dem ESP32, ohne neues SYNC.
+- Erkenntnis: Switch-2-Controller verbinden sich unverschlüsselt, werben nach SYNC nur für die Host-Adresse und lehnen
+  fremde Hosts ab → ESP32 muss die **Adresse des PC-Sticks übernehmen** (`esp_iface_mac_addr_set(…, ESP_MAC_BT)` vor
+  dem BT-Start; in IDF 6.1 vorhanden). Keine Schlüssel, kein Adminrecht nötig. Klassische Controller (Joy-Con 1, Pro 1,
+  DS4/DS5, Wii) gehen mit dem S3 nicht (kein BR/EDR); Xbox-BLE bräuchte LTK/IRK – beides nicht umgesetzt.
+- Umgesetzt: *Kopplungsdaten → Für ESP32 exportieren* (`Esp32Export`, ZIP mit JSON, `nconnect_pairing.h`,
+  LIESMICH), `Settings.ControllerKinds` (Art je Adresse beim Verbinden), 8 Tests, Doku **docs/ESP32.md**
+  (Prinzip, Format, Firmware-Leitfaden NimBLE, Fehlersuche).
+- Offen: ESP32-Firmware (Weg A „Funkadapter für N-Connect“ per USB-CDC – braucht neue Verbindungsart in N-Connect –
+  oder Weg B „eigenständiges USB-Gamepad“), Test mit echter Hardware.
 
 **Technisch offen (bisheriger Stand):**
 - **Flackernde Tests:** einmal 3 Fehlschläge, danach 7 Läufe hintereinander grün – Ursache nicht untersucht.

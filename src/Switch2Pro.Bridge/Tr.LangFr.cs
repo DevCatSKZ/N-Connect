@@ -51,6 +51,18 @@ internal static partial class Tr
         ["N-Connect öffnen"] = "Ouvrir N-Connect",
         ["Position zurücksetzen"] = "Réinitialiser la position",
         ["Widget ausblenden"] = "Masquer le widget",
+        // ---------- ESP32-Export ----------
+        ["Für ESP32 exportieren"] = "Exporter pour ESP32",
+        ["Adresse dieses Bluetooth-Adapters und die Switch-2-Controller für einen ESP32-S3, der sich als dieser PC ausgibt – Controller verbinden sich dann ohne neues SYNC (Anleitung im ZIP)"] = "Adresse de cet adaptateur Bluetooth et manettes Switch 2 pour un ESP32-S3 qui se fait passer pour ce PC – les manettes se connectent alors sans nouveau SYNC (instructions dans le ZIP)",
+        ["ESP32-Export …"] = "Export ESP32 …",
+        ["Die Adresse des Bluetooth-Adapters ist nicht bekannt. Bluetooth einschalten und das Fenster neu öffnen."] = "L'adresse de l'adaptateur Bluetooth est inconnue. Activez le Bluetooth et rouvrez cette fenêtre.",
+        ["ZIP-Datei"] = "Fichier ZIP",
+        ["ESP32-Export speichern"] = "Enregistrer l'export ESP32",
+        ["ESP32-Export gespeichert:"] = "Export ESP32 enregistré :",
+        ["Adresse für den ESP32"] = "Adresse pour l'ESP32",
+        ["übernehmbar"] = "transférable",
+        ["nicht übernehmbar"] = "non transférable",
+        ["Noch kein Switch-2-Controller bekannt: einmal per SYNC mit N-Connect koppeln und neu exportieren."] = "Aucune manette Switch 2 connue : associez-en une fois à N-Connect via SYNC, puis exportez à nouveau.",
         // ---------- Status-Kopfzeile, Ansicht ----------
         ["Farbschema"] = "Jeu de couleurs",
         ["Farben für Akzente, Knöpfe, Flächen und Ränder."] = "Couleurs des accents, boutons, surfaces et bordures.",

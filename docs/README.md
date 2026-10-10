@@ -12,6 +12,7 @@ geschätzt oder nicht mit echter Hardware geprüft ist, steht das ausdrücklich 
 | [ARCHITEKTUR.md](ARCHITEKTUR.md) | Projekte, Komponenten, Datenfluss vom Funk bis zum virtuellen Controller, Threads, Einstellungen |
 | [PROTOKOLLE.md](PROTOKOLLE.md) | Alle Controller-Protokolle bis auf Byte-Ebene: Switch 2 (BLE/USB), Switch 1/NSO, Wii, Kabel-Pads, DSU, DS4 |
 | [PORTIERUNG.md](PORTIERUNG.md) | Was plattformunabhängig ist, was Windows-spezifisch ist und was es auf anderen Systemen stattdessen gibt |
+| [ESP32.md](ESP32.md) | ESP32-S3 als zweiter „Bluetooth-Stick“: Export der Kopplungsdaten, Prinzip, Firmware-Leitfaden (ESP-IDF/NimBLE) |
 
 Für Nutzer: [../README.md](../README.md). Übergabe-/Arbeitsstand: [../HANDOVER.md](../HANDOVER.md).
 

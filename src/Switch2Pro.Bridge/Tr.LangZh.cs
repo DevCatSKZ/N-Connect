@@ -51,6 +51,18 @@ internal static partial class Tr
         ["N-Connect öffnen"] = "打开 N-Connect",
         ["Position zurücksetzen"] = "重置位置",
         ["Widget ausblenden"] = "隐藏小组件",
+        // ---------- ESP32-Export ----------
+        ["Für ESP32 exportieren"] = "导出到 ESP32",
+        ["Adresse dieses Bluetooth-Adapters und die Switch-2-Controller für einen ESP32-S3, der sich als dieser PC ausgibt – Controller verbinden sich dann ohne neues SYNC (Anleitung im ZIP)"] = "导出此蓝牙适配器的地址和 Switch 2 控制器，供冒充此电脑的 ESP32-S3 使用——控制器无需重新 SYNC 即可连接（说明见 ZIP）",
+        ["ESP32-Export …"] = "ESP32 导出 …",
+        ["Die Adresse des Bluetooth-Adapters ist nicht bekannt. Bluetooth einschalten und das Fenster neu öffnen."] = "蓝牙适配器地址未知。请打开蓝牙并重新打开此窗口。",
+        ["ZIP-Datei"] = "ZIP 文件",
+        ["ESP32-Export speichern"] = "保存 ESP32 导出",
+        ["ESP32-Export gespeichert:"] = "ESP32 导出已保存：",
+        ["Adresse für den ESP32"] = "ESP32 使用的地址",
+        ["übernehmbar"] = "可迁移",
+        ["nicht übernehmbar"] = "不可迁移",
+        ["Noch kein Switch-2-Controller bekannt: einmal per SYNC mit N-Connect koppeln und neu exportieren."] = "尚无已知的 Switch 2 控制器：请先通过 SYNC 与 N-Connect 配对一次，然后重新导出。",
         // ---------- Status-Kopfzeile, Ansicht ----------
         ["Farbschema"] = "配色方案",
         ["Farben für Akzente, Knöpfe, Flächen und Ränder."] = "强调色、按钮、背景和边框的颜色。",

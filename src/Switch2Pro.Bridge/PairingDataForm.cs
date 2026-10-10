@@ -60,6 +60,9 @@ internal sealed class PairingDataForm : UiForm
         _page.AddGroup("Weitergeben und sichern",
             new SettingRow("Für einen anderen PC exportieren", "Bekannte Controller und Einstellungen je Controller, optional mit Passwort",
                 Action("Exportieren …", Glyph.Export, Export), Glyph.Export),
+            new SettingRow("Für ESP32 exportieren", "Adresse dieses Bluetooth-Adapters und die Switch-2-Controller für einen ESP32-S3, " +
+                "der sich als dieser PC ausgibt – Controller verbinden sich dann ohne neues SYNC (Anleitung im ZIP)",
+                Action("ESP32-Export …", Glyph.Cube, ExportEsp32), Glyph.Cube),
             new SettingRow("Sicherung wiederherstellen", "Vor jedem „Übernehmen“ wird automatisch eine Sicherung angelegt",
                 Action("Wiederherstellen …", Glyph.Undo, Restore), Glyph.Undo),
             _adapter);
@@ -478,6 +481,94 @@ internal sealed class PairingDataForm : UiForm
         Tr.Show(this, "Gespeichert. Die Datei am anderen PC in N-Connect unter „Joy-Con & Wii“ → „Kopplungsdaten“ → „Von einem anderen PC“ öffnen.",
             "Kopplungsdaten", MessageBoxButtons.OK, MessageBoxIcon.Information);
     }
+
+    /// <summary>
+    /// ESP32-Export: ZIP mit nconnect-esp32.json, nconnect_pairing.h (ESP-IDF) und einer kurzen Anleitung. Enthält keine
+    /// Schlüssel – nur die Adresse dieses Adapters (der ESP32 übernimmt sie) und die bekannten Controller.
+    /// </summary>
+    private void ExportEsp32()
+    {
+        if (_adapterAddress is null)
+        {
+            Tr.Show(this, "Die Adresse des Bluetooth-Adapters ist nicht bekannt. Bluetooth einschalten und das Fenster neu öffnen.",
+                "Kopplungsdaten", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
+        }
+        var profile = Esp32Export.Build(_settings, _adapterAddress, Environment.MachineName);
+        using var save = new SaveFileDialog
+        {
+            Filter = Tr.T("ZIP-Datei") + " (*.zip)|*.zip",
+            FileName = $"N-Connect-ESP32-{Environment.MachineName}.zip",
+            InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+            Title = Tr.T("ESP32-Export speichern"),
+        };
+        if (save.ShowDialog(this) != DialogResult.OK)
+            return;
+        try
+        {
+            string version = typeof(PairingDataForm).Assembly.GetName().Version?.ToString(3) ?? "";
+            if (File.Exists(save.FileName))
+                File.Delete(save.FileName);
+            using var zip = System.IO.Compression.ZipFile.Open(save.FileName, System.IO.Compression.ZipArchiveMode.Create);
+            void Add(string name, string text)
+            {
+                using var writer = new StreamWriter(zip.CreateEntry(name).Open(), new System.Text.UTF8Encoding(false));
+                writer.Write(text);
+            }
+            Add(Esp32Export.JsonFile, Esp32Export.ToJson(profile));
+            Add(Esp32Export.HeaderFile, Esp32Export.ToHeader(profile, version));
+            Add("LIESMICH.txt", Esp32Readme(profile));
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            Tr.Show(this, $"Speichern fehlgeschlagen: {e.Message}", "Kopplungsdaten", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return;
+        }
+        int supported = profile.Controllers.Count(c => c.SupportedOnEsp32S3);
+        Log.Info($"ESP32-Export: {supported} von {profile.Controllers.Count} Controllern übernehmbar");
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine(Tr.T("ESP32-Export gespeichert:")).AppendLine();
+        sb.AppendLine($"  •  {Tr.T("Adresse für den ESP32")}: {profile.HostAddress}");
+        foreach (var c in profile.Controllers)
+            sb.AppendLine($"  •  {NameOf(c.Name ?? c.Kind)}  {c.Address}  ({Tr.T(c.SupportedOnEsp32S3 ? "übernehmbar" : "nicht übernehmbar")})");
+        if (supported == 0)
+            sb.AppendLine().AppendLine(Tr.T("Noch kein Switch-2-Controller bekannt: einmal per SYNC mit N-Connect koppeln und neu exportieren."));
+        ShowText(sb.ToString());
+        try { System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{save.FileName}\""); }
+        catch (System.ComponentModel.Win32Exception) { }
+    }
+
+    /// <summary>Kurze Anleitung im ZIP (die ausführliche steht in docs/ESP32.md).</summary>
+    private static string Esp32Readme(Esp32Profile profile) => string.Join("\n",
+        "N-Connect – ESP32-Export",
+        "========================",
+        "",
+        $"Adresse des PC-Bluetooth-Adapters: {profile.HostAddress}",
+        $"Exportiert: {profile.Created.ToLocalTime():yyyy-MM-dd HH:mm} auf {profile.SourcePc}",
+        "",
+        "Was ist das?",
+        "Switch-2-Controller merken sich beim SYNC mit N-Connect die Adresse dieses Bluetooth-Adapters und werben danach",
+        "nur noch für ihn. Übernimmt ein ESP32-S3 genau diese Adresse, verbinden sich die Controller auch mit ihm – ohne",
+        "neues SYNC. Zurück am PC verbinden sie sich wieder dort. Es sind keine geheimen Schlüssel nötig.",
+        "",
+        "Dateien:",
+        $"  {Esp32Export.HeaderFile}   in das ESP-IDF-Projekt einbinden (Host-Adresse + Controllertabelle)",
+        $"  {Esp32Export.JsonFile}  alle Angaben maschinenlesbar (auch nicht übernehmbare Controller)",
+        "",
+        "Im ESP32 (ESP-IDF, NimBLE):",
+        "  1. esp_iface_mac_addr_set(NCONNECT_HOST_ADDR, ESP_MAC_BT);   // VOR nimble_port_init()",
+        "  2. Passiv nach Werbung mit Herstellerkennung 0x0553 suchen; Byte 10-15 (ohne Kennung) == NCONNECT_HOST_ADDR_LE",
+        "  3. Verbinden (öffentliche Adresse, kein Pairing), Befehle wie N-Connect senden, Eingaben abonnieren.",
+        "",
+        "Wichtig:",
+        "  - PC mit diesem Stick und ESP32 nicht gleichzeitig in Reichweite betreiben (gleiche Adresse) – sonst verbindet",
+        "    sich der Controller mit dem, der schneller ist. Am PC dafür N-Connect beenden oder Bluetooth ausschalten.",
+        "  - Nur Switch-2-Controller (Bluetooth LE). Joy-Con 1, Pro Controller 1, PlayStation und Wii brauchen klassisches",
+        "    Bluetooth, das der ESP32-S3 nicht hat.",
+        "  - Neues SYNC an einer Konsole oder einem anderen PC ändert die gemerkte Adresse – dann wieder mit N-Connect koppeln.",
+        "",
+        "Ausführliche Anleitung mit Protokoll: https://github.com/DevCatSKZ/N-Connect/blob/main/docs/ESP32.md",
+        "");
 }
 
 /// <summary>Passwort für die Übertragungsdatei (beim Export mit Wiederholung und Wahl, ob Schlüssel mitkommen).</summary>
