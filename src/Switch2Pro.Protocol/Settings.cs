@@ -254,6 +254,8 @@ public sealed class Settings
     public string? Theme { get; set; }
     /// <summary>Durchscheinender Fensterhintergrund (Mica, ab Windows 11).</summary>
     public bool Transparency { get; set; } = true;
+    /// <summary>Controller-Übersicht kompakt: kleinere Karten (Grafik, Akku, Verbindung), mehrere nebeneinander.</summary>
+    public bool CompactCards { get; set; }
     /// <summary>Sprache der Oberfläche: null = wie Windows, sonst "de" oder "en".</summary>
     public string? Language { get; set; }
 
@@ -468,6 +470,7 @@ public sealed class Settings
         AutostartConfigured = other.AutostartConfigured;
         Theme = other.Theme;
         Transparency = other.Transparency;
+        CompactCards = other.CompactCards;
         Language = other.Language;
         UprightJoyCons = [.. other.UprightJoyCons];
         HiddenDevices = [.. other.HiddenDevices];

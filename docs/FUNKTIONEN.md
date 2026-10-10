@@ -180,13 +180,21 @@ Bis zu **8 Spieler** gleichzeitig (`ControllerManager.MaxPlayers`). Der 9. Contr
 
 ## 3. Übersicht (Controller-Seite)
 
+- **Statusleiste** (`StatusBand`, ganz oben): Kacheln „Verbunden n / 8“, „Bluetooth bereit/nicht verfügbar“,
+  „Niedrigster Akku“ (Prozent, Spieler, ggf. lädt), „Ausgabe“ (Xbox 360 / DualShock 4 / gemischt) und
+  „Original-Controller“ (versteckt / sichtbar / HidHide fehlt; HidHide-Prüfung nur alle 5 s). Bei schmalem Fenster
+  fallen hintere Kacheln weg. Rechts der Umschalter **Groß | Kompakt** (`Settings.CompactCards`).
 - Je Spieler eine **Karte**: Live-Grafik (Form/Tasten nach Produktfotos, Originalfarben aus dem Controller,
   gedrückte Tasten leuchten, Sticks bewegen sich, analoge Trigger füllen sich), Akku, Verbindung (Art +
-  Berichte/s), Griff/Maus (Joy-Con 2), gedrückte Tasten. Zwei Spalten bei breitem Fenster, zugeklappte Karten
-  gleich hoch.
+  Berichte/s), Griff/Maus (Joy-Con 2), gedrückte Tasten (mit den Namen des jeweiligen Controllers: Kreuz/Kreis,
+  A/B/LB, SL/SR …). Zwei Spalten bei breitem Fenster, zugeklappte Karten gleich hoch. **Kompakt**: kleine Grafik,
+  nur Akku/Verbindung/Im Spiel, Spielernummer als Abzeichen, bis zu 4 Spalten (ab 400 px je Karte); aufgeklappt
+  wieder groß. Neu verbundene Karten leuchten kurz im Neon-Verlauf auf, gedrückte Tasten lassen den Rand glühen,
+  Akkubalken füllen sich animiert.
 - **Spieler-Reihenfolge** (`PlayerOrderBar`, ab zwei Spielern über den Karten): je Spieler ein Chip (Nummer, Name,
-  ‹ ›). Spieler 1 ist hervorgehoben – das ist für Windows, Steam und Spiele der erste Controller. ‹ › tauscht mit
-  dem Nachbarn (`ControllerManager.MovePlayer`).
+  ‹ ›), verteilt auf möglichst wenige gleich volle Zeilen (8 Spieler: 2 × 4). Spieler 1 ist mit Neon-Rand
+  hervorgehoben – das ist für Windows, Steam und Spiele der erste Controller. ‹ › tauscht mit dem Nachbarn
+  (`ControllerManager.MovePlayer`).
 - **Titel anklicken** → Menü: einen belegten Spielerplatz wählen (= tauschen) und Controller umbenennen
   (bei einem Paar je Joy-Con).
 - Knöpfe: **Vibrieren** (welcher ist welcher?), **Trennen**, **Einstellungen** (klappt Reiter für genau diesen
@@ -354,7 +362,8 @@ Bis zu **8 Spieler** gleichzeitig (`ControllerManager.MaxPlayers`). Der 9. Contr
 
 - **Anzeige** auf der Karte (mit Spannung bei Switch 2, „⚡ lädt“), im Infobereich-Symbol (niedrigster Stand aller
   Controller, 5-%-Stufen) und im Tooltip/Menü.
-- **Warnung** einmal bei 15 % und einmal bei 5 %; wieder scharf ab 25 % oder beim Laden.
+- **Warnung** einmal bei 15 % und einmal bei 5 %; wieder scharf ab 25 % oder beim Laden (nur `Player.CheckBattery`;
+  die doppelte zweite Warnung aus `ControllerManager` ist entfernt).
 - **Switch 2** meldet nur die Spannung (`BatteryEstimator`):
   - Kennlinie Pro/GameCube 3,30 V = 0 % … 4,15 V = 100 % (Stützpunkte 3600/10, 3700/25, 3800/45, 3900/65, 4000/82);
     Joy-Con 2 3,05 V … 3,36 V (geschätzt). Kaufmännisch gerundet.
@@ -391,11 +400,16 @@ Bis zu **8 Spieler** gleichzeitig (`ControllerManager.MaxPlayers`). Der 9. Contr
 
 - **Autostart** (Standard an beim ersten Start, danach Nutzerentscheidung): HKCU\…\Run mit `--autostart`
   (unsichtbar starten). Zweiter Start zeigt das Fenster der laufenden Instanz.
-- **Darstellung**: Dunkel (Standard), Hell, Wie Windows; Akzentfarbe festes sattes Blau (dunkel:
-  FF008CDC; hell: FF0078D4, etwas tiefer für den Kontrast auf weißen Flächen) – **nicht** `Branding.Blue` (zu cyan)
-  und **nicht** die Windows-Akzentfarbe, die sieht je nach Nutzerwahl beliebig aus (beim Nutzer pink, nicht
-  gewünscht). Schrift
-  darauf nach Kontrast (`Theme.OnAccent`); Mica-Titelleiste ab Windows 11.
+- **Darstellung**: Dunkel (Standard), Hell, Wie Windows. **Neon-Look aus dem Logo**: Flächen in Navy-Tönen,
+  Akzent als Verlauf Neon-Blau → Violett (`Theme.Accent` → `Theme.Accent2`, dunkel FF2F8BFF → FF9B5CFF, hell
+  FF1F6FE0 → FF7B3FE4; Pinsel `Theme.AccentBrush`, Lichtschein `Theme.Glow`). Verlauf auf Schaltern, Segmenten,
+  Akzentknöpfen, Reglern, Reitern, Navigation und dem Schriftzug „N-Connect“ (`Wordmark`, kein Logo – das zeigt
+  schon das Fenstersymbol). **Nicht** die Windows-Akzentfarbe, die sieht je nach Nutzerwahl beliebig aus (beim
+  Nutzer pink, nicht gewünscht). Schrift darauf weiß (`Theme.OnAccent`); Mica-Titelleiste ab Windows 11, ohne Mica
+  Titelleiste und Fensterrand in den Theme-Farben (`DWMWA_CAPTION_COLOR`/`DWMWA_BORDER_COLOR`).
+- **Animationen** (`Anim`): weiche Übergänge für Hover, Schalter (Knopf gleitet), Segmente (Marke gleitet),
+  Akkubalken, Aufleuchten/Glühen der Karten. Ein gemeinsamer Takt läuft nur, solange sich etwas bewegt. Aus, wenn
+  Windows-Animationseffekte abgeschaltet sind und bei den Prüfhilfen `--render…` (Endzustände).
 - **Logo/Icon**: In der Oberfläche direkt in Zielgröße gezeichnet (`LogoView`), Fenstersymbol aus der eingebetteten
   ICO-Datei mit allen Größen (nicht `ExtractAssociatedIcon` – nur 32 px, verkleinert pixelig). Die ICO-Datei
   (`--render-brand`) enthält kleine Größen als 32-Bit-Bitmap, 256 px als PNG; heller Kachelrand erst ab 48 px.

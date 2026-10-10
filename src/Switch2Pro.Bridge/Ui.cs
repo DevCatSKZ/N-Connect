@@ -79,6 +79,34 @@ internal static class UiFonts
     public static Font Title => Get("Segoe UI Variable Display Semibold", "Segoe UI Semibold", 20f, FontStyle.Regular);
 }
 
+/// <summary>Schriftzug „N-Connect“ im Navigationskopf, gefüllt mit dem Neon-Verlauf des Logos.</summary>
+internal sealed class Wordmark : Control, ISelfTranslating
+{
+    public Wordmark()
+    {
+        SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint
+                 | ControlStyles.ResizeRedraw, true);
+        Text = "N-Connect";
+        Size = new Size(200, 34);
+    }
+
+    protected override void OnPaint(PaintEventArgs e)
+    {
+        var g = e.Graphics;
+        g.Clear(BackColor);
+        g.SmoothingMode = SmoothingMode.AntiAlias;
+        var font = UiFonts.Subtitle;
+        using var path = new GraphicsPath();
+        // Schriftgröße in Pixel (Punkt × DPI / 72), damit der Pfad gleich groß wie gezeichneter Text wird.
+        float em = font.SizeInPoints * DeviceDpi / 72f * 1.12f;
+        path.AddString(Text, font.FontFamily, (int)FontStyle.Bold, em, new PointF(0, 4), StringFormat.GenericTypographic);
+        var bounds = path.GetBounds();
+        Theme.Glow(g, path, 0.6f, 3);
+        using var brush = Theme.AccentBrush(bounds);
+        g.FillPath(brush, path);
+    }
+}
+
 /// <summary>Steuerelement, dessen Höhe von der verfügbaren Breite abhängt (umbrechender Text).</summary>
 /// <summary>Zeichnet seinen Text selbst übersetzt (Tr.T beim Zeichnen) – <see cref="Tr.Apply(Control)"/> lässt ihn aus.</summary>
 internal interface ISelfTranslating;
@@ -411,7 +439,9 @@ internal sealed class SettingRow : Control, IHeightForWidth, IExtraTexts, ISelfT
 /// <summary>Ein/Aus-Schalter im Windows-11-Stil (statt Kontrollkästchen).</summary>
 internal sealed class ToggleSwitch : Control, ISelfTranslating
 {
-    private bool _checked;
+    private bool _checked, _hover;
+    /// <summary>0 = aus, 1 = ein (gleitet beim Umschalten).</summary>
+    private readonly Anim _knob;
     public event EventHandler? CheckedChanged;
 
     public ToggleSwitch()
@@ -421,6 +451,7 @@ internal sealed class ToggleSwitch : Control, ISelfTranslating
         Size = new Size(96, 24);
         Cursor = Cursors.Hand;
         TabStop = true;
+        _knob = new Anim(this, 0, speed: 18f);
     }
 
     public bool Checked
@@ -431,10 +462,14 @@ internal sealed class ToggleSwitch : Control, ISelfTranslating
             if (_checked == value)
                 return;
             _checked = value;
+            _knob.Target = value ? 1 : 0;
             Invalidate();
             CheckedChanged?.Invoke(this, EventArgs.Empty);
         }
     }
+
+    protected override void OnMouseEnter(EventArgs e) { base.OnMouseEnter(e); _hover = true; Invalidate(); }
+    protected override void OnMouseLeave(EventArgs e) { base.OnMouseLeave(e); _hover = false; Invalidate(); }
 
     protected override void OnClick(EventArgs e)
     {
@@ -467,19 +502,23 @@ internal sealed class ToggleSwitch : Control, ISelfTranslating
         TextRenderer.DrawText(g, Tr.T(_checked ? "Ein" : "Aus"), UiFonts.Body, new Rectangle(0, 0, (int)track.X - 10, Height),
             Enabled ? p.Text : p.TextMuted, TextFormatFlags.Right | TextFormatFlags.VerticalCenter);
         using var path = Theme.RoundedRect(track, 10);
-        var on = Enabled ? Theme.Accent : p.TextMuted;
-        if (_checked)
-        {
-            using var fill = new SolidBrush(on);
-            g.FillPath(fill, path);
-        }
-        else
+        float t = _knob.Value;
+        // Aus: Umriss; ein: Neon-Verlauf, der beim Umschalten ein- bzw. ausblendet.
+        if (t < 1)
         {
             using var pen = new Pen(Enabled ? p.TextMuted : p.Border, 1.2f);
             g.DrawPath(pen, path);
         }
-        float d = 12, x = _checked ? track.Right - d - 4 : track.X + 4;
-        using (var knob = new SolidBrush(_checked ? Theme.OnAccent : Enabled ? p.TextMuted : p.Border))
+        if (t > 0)
+        {
+            using var fill = Theme.AccentBrush(track, 0, Enabled);
+            fill.LinearColors = [Color.FromArgb((int)(255 * t), fill.LinearColors[0]), Color.FromArgb((int)(255 * t), fill.LinearColors[1])];
+            g.FillPath(fill, path);
+        }
+        float d = 12 + (_hover && Enabled ? 2 : 0);
+        float x = track.X + 4 + (track.Width - 8 - 12) * t - (d - 12) / 2;
+        var knobOff = Enabled ? p.TextMuted : p.Border;
+        using (var knob = new SolidBrush(Theme.Blend(knobOff, Theme.OnAccent, t)))
             g.FillEllipse(knob, x, track.Y + (track.Height - d) / 2, d, d);
         if (Focused && ShowFocusCues)
         {
@@ -595,21 +634,21 @@ internal sealed class Slider : Control, ISelfTranslating
         float f = _max > _min ? (float)(_value - _min) / (_max - _min) : 0;
         float x = t.X + f * t.Width;
         using (var rest = Theme.RoundedRect(t, 2))
-        using (var restBrush = new SolidBrush(Theme.Dark ? Color.FromArgb(0x9A, 0x9A, 0x9A) : Color.FromArgb(0x86, 0x86, 0x86)))
+        using (var restBrush = new SolidBrush(Theme.Blend(p.SurfaceHover, p.TextMuted, 0.55f)))
             g.FillPath(restBrush, rest);
         if (x > t.X + 1)
             using (var done = Theme.RoundedRect(new RectangleF(t.X, t.Y, x - t.X, t.Height), 2))
-            using (var accent = new SolidBrush(Enabled ? Theme.Accent : p.TextMuted))
+            using (var accent = Theme.AccentBrush(t, 0, Enabled)) // Verlauf über die ganze Strecke: rechts wird es violetter
                 g.FillPath(accent, done);
-        // Daumen: Ring in Flächenfarbe, innen Akzentpunkt (größer bei Hover/Ziehen).
+        // Daumen: Ring in Flächenfarbe, innen Akzentpunkt (größer bei Hover/Ziehen) in der Verlaufsfarbe an dieser Stelle.
         const float D = 20;
         var outer = new RectangleF(x - D / 2, Height / 2f - D / 2, D, D);
-        using (var ring = new SolidBrush(Theme.Dark ? Color.FromArgb(0x45, 0x45, 0x45) : Color.White))
+        using (var ring = new SolidBrush(Theme.Dark ? p.SurfaceHover : Color.White))
             g.FillEllipse(ring, outer);
         using (var border = new Pen(p.Border))
             g.DrawEllipse(border, outer);
         float inner = _drag ? 10 : _hover ? 14 : 12;
-        using (var dot = new SolidBrush(Enabled ? Theme.Accent : p.TextMuted))
+        using (var dot = new SolidBrush(Enabled ? Theme.Blend(Theme.Accent, Theme.Accent2, f) : p.TextMuted))
             g.FillEllipse(dot, x - inner / 2, Height / 2f - inner / 2, inner, inner);
         if (Focused && ShowFocusCues)
             using (var pen = new Pen(p.Text, 1.5f))
@@ -625,12 +664,15 @@ internal sealed class Segmented : Control, IExtraTexts, ISelfTranslating
     private readonly string[] _options;
     private int _selected;
     private int _hover = -1;
+    /// <summary>Position der Auswahlmarke als (Bruchteil-)Index – gleitet beim Wechsel zum neuen Feld.</summary>
+    private readonly Anim _slide;
     public event EventHandler? SelectedIndexChanged;
 
     public Segmented(params string[] options)
     {
         SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint
                  | ControlStyles.Selectable, true);
+        _slide = new Anim(this, 0, speed: 16f);
         _options = options;
         TabStop = true;
         Cursor = Cursors.Hand;
@@ -648,6 +690,7 @@ internal sealed class Segmented : Control, IExtraTexts, ISelfTranslating
             if (_selected == value || value < 0 || value >= _options.Length)
                 return;
             _selected = value;
+            _slide.Target = value;
             Invalidate();
             SelectedIndexChanged?.Invoke(this, EventArgs.Empty);
         }
@@ -712,16 +755,26 @@ internal sealed class Segmented : Control, IExtraTexts, ISelfTranslating
             using var pen = new Pen(p.Border);
             g.DrawPath(pen, outer);
         }
+        if (_hover >= 0 && _hover != _selected)
+        {
+            using var cell = Theme.RoundedRect(Cell(_hover), 4);
+            using var brush = new SolidBrush(Theme.Blend(p.SurfaceHover, p.Text, 0.08f));
+            g.FillPath(brush, cell);
+        }
+        // Auswahlmarke zwischen zwei Feldern einblenden (gleitet beim Wechsel).
+        float pos = Math.Clamp(_slide.Value, 0, _options.Length - 1);
+        int a = (int)MathF.Floor(pos), b = Math.Min(_options.Length - 1, a + 1);
+        float f = pos - a;
+        Rectangle ra = Cell(a), rb = Cell(b);
+        var mark = new RectangleF(ra.X + (rb.X - ra.X) * f, ra.Y, ra.Width + (rb.Width - ra.Width) * f, ra.Height);
+        using (var cell = Theme.RoundedRect(mark, 4))
+        using (var brush = Theme.AccentBrush(mark, 0, Enabled))
+            g.FillPath(brush, cell);
         for (int i = 0; i < _options.Length; i++)
         {
             var r = Cell(i);
-            bool sel = i == _selected;
-            if (sel || i == _hover)
-            {
-                using var cell = Theme.RoundedRect(r, 4);
-                using var brush = new SolidBrush(sel ? Theme.Accent : Theme.Blend(p.SurfaceHover, p.Text, 0.08f));
-                g.FillPath(brush, cell);
-            }
+            // Text wird weiß, sobald die Marke das Feld überwiegend bedeckt.
+            bool sel = MathF.Abs(pos - i) < 0.5f;
             TextRenderer.DrawText(g, Tr.T(_options[i]), UiFonts.Body, r, sel ? Theme.OnAccent : p.Text,
                 TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPrefix);
         }
@@ -735,7 +788,7 @@ internal sealed class Segmented : Control, IExtraTexts, ISelfTranslating
 /// <summary>Flacher Knopf mit Symbol und Text (Windows-11-Stil); optional Akzent oder umschaltbar.</summary>
 internal sealed class GlyphButton : Control, ISelfTranslating
 {
-    private bool _hover, _down, _checked;
+    private bool _down, _checked;
     private readonly string? _glyph;
     public bool Accent { get; set; }
     /// <summary>Umschaltknopf (z. B. „Einstellungen“ auf- und zuklappen): gedrückt in Akzentfarbe.</summary>
@@ -753,8 +806,12 @@ internal sealed class GlyphButton : Control, ISelfTranslating
         Height = 32;
         Cursor = Cursors.Hand;
         Margin = new Padding(6, 0, 0, 0);
+        _hoverAnim = new Anim(this);
         FitWidth();
     }
+
+    /// <summary>Hover-Hervorhebung 0–1 (blendet weich ein und aus).</summary>
+    private readonly Anim _hoverAnim;
 
     public bool Checked
     {
@@ -777,8 +834,8 @@ internal sealed class GlyphButton : Control, ISelfTranslating
         Invalidate();
     }
 
-    protected override void OnMouseEnter(EventArgs e) { base.OnMouseEnter(e); _hover = true; Invalidate(); }
-    protected override void OnMouseLeave(EventArgs e) { base.OnMouseLeave(e); _hover = false; _down = false; Invalidate(); }
+    protected override void OnMouseEnter(EventArgs e) { base.OnMouseEnter(e); _hoverAnim.Target = 1; Invalidate(); }
+    protected override void OnMouseLeave(EventArgs e) { base.OnMouseLeave(e); _down = false; _hoverAnim.Target = 0; Invalidate(); }
     protected override void OnMouseDown(MouseEventArgs e) { base.OnMouseDown(e); _down = true; Invalidate(); }
     protected override void OnMouseUp(MouseEventArgs e) { base.OnMouseUp(e); _down = false; Invalidate(); }
     protected override void OnGotFocus(EventArgs e) { base.OnGotFocus(e); Invalidate(); }
@@ -799,16 +856,30 @@ internal sealed class GlyphButton : Control, ISelfTranslating
         g.Clear(BackColor);
         g.SmoothingMode = SmoothingMode.AntiAlias;
         bool accent = Accent || (Toggle && _checked);
-        Color back = accent ? Theme.Accent : p.SurfaceHover;
-        if (Enabled && _down) back = Theme.Blend(back, accent ? Color.Black : p.Text, 0.14f);
-        else if (Enabled && _hover) back = Theme.Blend(back, accent ? Color.White : p.Text, 0.08f);
+        float hover = Enabled ? _hoverAnim.Value : 0;
         var r = new RectangleF(0.5f, 0.5f, Width - 1.5f, Height - 1.5f);
         using (var path = Theme.RoundedRect(r, 5))
         {
-            using var fill = new SolidBrush(back);
-            g.FillPath(fill, path);
-            using var pen = new Pen(accent ? Theme.Blend(back, Color.White, 0.15f) : p.Border);
-            g.DrawPath(pen, path);
+            if (accent)
+            {
+                // Neon-Verlauf; Hover hellt auf, Drücken dunkelt ab.
+                using var fill = Theme.AccentBrush(r, 0, Enabled);
+                var shade = Enabled && _down ? Color.Black : Color.White;
+                float amount = Enabled && _down ? 0.14f : 0.12f * hover;
+                fill.LinearColors = [Theme.Blend(fill.LinearColors[0], shade, amount), Theme.Blend(fill.LinearColors[1], shade, amount)];
+                g.FillPath(fill, path);
+                using var pen = new Pen(Color.FromArgb(Theme.Dark ? 60 : 40, Color.White));
+                g.DrawPath(pen, path);
+            }
+            else
+            {
+                Color back = Theme.Blend(p.SurfaceHover, p.Text, Enabled && _down ? 0.14f : 0.08f * hover);
+                using var fill = new SolidBrush(back);
+                g.FillPath(fill, path);
+                // Rand färbt sich beim Hover leicht zum Akzent.
+                using var pen = new Pen(Theme.Blend(p.Border, Theme.Accent, 0.45f * hover));
+                g.DrawPath(pen, path);
+            }
         }
         var fore = !Enabled ? p.TextMuted : accent ? Theme.OnAccent : p.Text;
         string text = Tr.T(Text);
@@ -950,8 +1021,9 @@ internal sealed class PivotTabs : Control, IExtraTexts, ISelfTranslating
                 TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPrefix);
             if (sel)
             {
-                using var bar = Theme.RoundedRect(new RectangleF(r.X + r.Width / 2f - 10, r.Bottom - 4, 20, 3), 1.5f);
-                using var accent = new SolidBrush(Theme.Accent);
+                var barRect = new RectangleF(r.X + r.Width / 2f - 14, r.Bottom - 4, 28, 3);
+                using var bar = Theme.RoundedRect(barRect, 1.5f);
+                using var accent = Theme.AccentBrush(barRect);
                 g.FillPath(accent, bar);
                 if (Focused && ShowFocusCues)
                     using (var pen = new Pen(p.Text))
@@ -966,7 +1038,7 @@ internal sealed class PivotTabs : Control, IExtraTexts, ISelfTranslating
 internal sealed class NavItem : Control, ISelfTranslating
 {
     private readonly string _glyph;
-    private bool _hover, _selected, _expanded;
+    private bool _selected, _expanded;
 
     public NavItem(string text, string glyph, Action select)
     {
@@ -978,6 +1050,7 @@ internal sealed class NavItem : Control, ISelfTranslating
         Cursor = Cursors.Hand;
         TabStop = true;
         Margin = new Padding(0, 0, 0, 4);
+        _hoverAnim = new Anim(this);
         MouseDown += (_, e) =>
         {
             if (e.Button == MouseButtons.Left && Expandable && e.X >= Width - 34)
@@ -1006,8 +1079,10 @@ internal sealed class NavItem : Control, ISelfTranslating
     /// <summary>Klick auf den Pfeil rechts (Auf-/Zuklappen ohne die Seite zu wechseln).</summary>
     public event Action? ExpandToggled;
 
-    protected override void OnMouseEnter(EventArgs e) { base.OnMouseEnter(e); _hover = true; Invalidate(); }
-    protected override void OnMouseLeave(EventArgs e) { base.OnMouseLeave(e); _hover = false; Invalidate(); }
+    private readonly Anim _hoverAnim;
+
+    protected override void OnMouseEnter(EventArgs e) { base.OnMouseEnter(e); _hoverAnim.Target = 1; Invalidate(); }
+    protected override void OnMouseLeave(EventArgs e) { base.OnMouseLeave(e); _hoverAnim.Target = 0; Invalidate(); }
     protected override void OnGotFocus(EventArgs e) { base.OnGotFocus(e); Invalidate(); }
     protected override void OnLostFocus(EventArgs e) { base.OnLostFocus(e); Invalidate(); }
 
@@ -1018,20 +1093,32 @@ internal sealed class NavItem : Control, ISelfTranslating
         g.Clear(BackColor);
         g.SmoothingMode = SmoothingMode.AntiAlias;
         var r = new RectangleF(0.5f, 0.5f, Width - 1.5f, Height - 1.5f);
-        if (_selected || _hover)
+        if (_selected || _hoverAnim.Value > 0)
         {
-            using var path = Theme.RoundedRect(r, 5);
-            using var brush = new SolidBrush(_selected ? p.SurfaceHover : Theme.Blend(BackColor, p.Text, 0.05f));
-            g.FillPath(brush, path);
+            using var path = Theme.RoundedRect(r, 6);
+            // Gewählt: Fläche mit einem Hauch Neon-Verlauf; Hover: leicht aufgehellt (blendet weich ein).
+            if (_selected)
+            {
+                using var brush = Theme.AccentBrush(r);
+                brush.LinearColors = [Theme.Blend(p.SurfaceHover, Theme.Accent, 0.16f), Theme.Blend(p.SurfaceHover, Theme.Accent2, 0.06f)];
+                g.FillPath(brush, path);
+            }
+            else
+            {
+                using var brush = new SolidBrush(Theme.Blend(BackColor, p.Text, 0.05f * _hoverAnim.Value));
+                g.FillPath(brush, path);
+            }
         }
         if (_selected)
         {
-            using var pill = Theme.RoundedRect(new RectangleF(0, Height / 2f - 8, 3, 16), 1.5f);
-            using var accent = new SolidBrush(Theme.Accent);
+            var pillRect = new RectangleF(0, Height / 2f - 10, 3, 20);
+            using var pill = Theme.RoundedRect(pillRect, 1.5f);
+            using var accent = Theme.AccentBrush(pillRect, 90);
             g.FillPath(accent, pill);
         }
-        if (!Glyph.Paint(g, _glyph, new Rectangle(12, 0, 24, Height), p.Text, 12f))
-            TextRenderer.DrawText(g, _glyph, Glyph.Font(12f), new Rectangle(12, 0, 24, Height), p.Text,
+        var glyphColor = _selected ? Theme.Blend(Theme.Accent, p.Text, Theme.Dark ? 0.35f : 0.1f) : p.Text;
+        if (!Glyph.Paint(g, _glyph, new Rectangle(12, 0, 24, Height), glyphColor, 12f))
+            TextRenderer.DrawText(g, _glyph, Glyph.Font(12f), new Rectangle(12, 0, 24, Height), glyphColor,
                 TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
         TextRenderer.DrawText(g, Tr.T(Text), UiFonts.Body, new Rectangle(44, 0, Width - 56, Height), p.Text,
             TextFormatFlags.VerticalCenter | TextFormatFlags.NoPrefix | TextFormatFlags.EndEllipsis);
@@ -1093,8 +1180,9 @@ internal sealed class NavSubItem : Control, ISelfTranslating
         }
         if (_selected)
         {
-            using var pill = Theme.RoundedRect(new RectangleF(24, Height / 2f - 8, 3, 16), 1.5f);
-            using var accent = new SolidBrush(Theme.Accent);
+            var pillRect = new RectangleF(24, Height / 2f - 8, 3, 16);
+            using var pill = Theme.RoundedRect(pillRect, 1.5f);
+            using var accent = Theme.AccentBrush(pillRect, 90);
             g.FillPath(accent, pill);
         }
         TextRenderer.DrawText(g, Tr.T(Text), UiFonts.Small, new Rectangle(48, 0, Width - 62, Height),
@@ -1152,7 +1240,8 @@ internal sealed class TextField : Panel
         }
         if (Box.Focused)
         {
-            using var accent = new Pen(Theme.Accent, 2f);
+            using var brush = Theme.AccentBrush(new RectangleF(4, Height - 3, Width - 9, 3));
+            using var accent = new Pen(brush, 2f);
             g.DrawLine(accent, 4, Height - 1.5f, Width - 5, Height - 1.5f);
         }
     }

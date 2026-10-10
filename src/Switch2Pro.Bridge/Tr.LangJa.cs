@@ -9,6 +9,18 @@ internal static partial class Tr
     {
         // ---------- Fenster, Reiter, Abschnitte ----------
         ["Controller"] = "コントローラー",
+        // ---------- Status-Kopfzeile, Ansicht ----------
+        ["bereit"] = "準備完了",
+        ["nicht verfügbar"] = "利用不可",
+        ["Niedrigster Akku"] = "最低バッテリー",
+        ["lädt"] = "充電中",
+        ["gemischt"] = "混在",
+        ["Original-Controller"] = "元のコントローラー",
+        ["versteckt"] = "非表示",
+        ["sichtbar"] = "表示",
+        ["HidHide fehlt"] = "HidHide がありません",
+        ["Groß"] = "大",
+        ["Kompakt"] = "コンパクト",
         ["Einstellungen (optional)"] = "設定（任意）",
         ["1. Windows und Spiele sehen den Controller als …"] = "1. Windows とゲームからはこのように見えます …",
         ["2. Tasten A/B/X/Y"] = "2. ボタン A/B/X/Y",

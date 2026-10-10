@@ -9,6 +9,18 @@ internal static partial class Tr
     {
         // ---------- Fenster, Reiter, Abschnitte ----------
         ["Controller"] = "Kontrolery",
+        // ---------- Status-Kopfzeile, Ansicht ----------
+        ["bereit"] = "gotowy",
+        ["nicht verfügbar"] = "niedostępny",
+        ["Niedrigster Akku"] = "Najniższa bateria",
+        ["lädt"] = "ładuje",
+        ["gemischt"] = "mieszane",
+        ["Original-Controller"] = "Oryginalne kontrolery",
+        ["versteckt"] = "ukryte",
+        ["sichtbar"] = "widoczne",
+        ["HidHide fehlt"] = "brak HidHide",
+        ["Groß"] = "Duży",
+        ["Kompakt"] = "Kompaktowy",
         ["Einstellungen (optional)"] = "Ustawienia (opcjonalne)",
         ["1. Windows und Spiele sehen den Controller als …"] = "1. Windows i gry widzą kontroler jako …",
         ["2. Tasten A/B/X/Y"] = "2. Przyciski A/B/X/Y",

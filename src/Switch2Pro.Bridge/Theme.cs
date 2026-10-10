@@ -21,22 +21,53 @@ internal static class Theme
         Color TextMuted,
         Color Canvas);      // Hintergrund der Controller-Grafik
 
+    // Farben aus dem Logo: dunkles Navy als Grund, Neon-Blau → Violett als Akzent.
     public static readonly Palette DarkPalette = new(true,
-        Color.FromArgb(0x20, 0x20, 0x20), Color.FromArgb(0x2B, 0x2B, 0x2B), Color.FromArgb(0x37, 0x37, 0x37),
-        Color.FromArgb(0x45, 0x45, 0x45), Color.FromArgb(0xF3, 0xF3, 0xF3), Color.FromArgb(0xA8, 0xA8, 0xAE),
-        Color.FromArgb(0x24, 0x24, 0x28));
+        Color.FromArgb(0x10, 0x12, 0x1C), Color.FromArgb(0x19, 0x1C, 0x2A), Color.FromArgb(0x24, 0x28, 0x3B),
+        Color.FromArgb(0x30, 0x35, 0x52), Color.FromArgb(0xF2, 0xF4, 0xFA), Color.FromArgb(0xA4, 0xA9, 0xC0),
+        Color.FromArgb(0x15, 0x18, 0x26));
 
     public static readonly Palette LightPalette = new(false,
-        Color.FromArgb(0xF3, 0xF3, 0xF3), Color.FromArgb(0xFB, 0xFB, 0xFB), Color.FromArgb(0xFF, 0xFF, 0xFF),
-        Color.FromArgb(0xE0, 0xE0, 0xE0), Color.FromArgb(0x1B, 0x1B, 0x1B), Color.FromArgb(0x48, 0x48, 0x50),
-        Color.FromArgb(0xEC, 0xEC, 0xF0));
+        Color.FromArgb(0xF1, 0xF2, 0xF8), Color.FromArgb(0xFC, 0xFC, 0xFF), Color.FromArgb(0xFF, 0xFF, 0xFF),
+        Color.FromArgb(0xDA, 0xDC, 0xE8), Color.FromArgb(0x16, 0x18, 0x2A), Color.FromArgb(0x46, 0x49, 0x5E),
+        Color.FromArgb(0xEB, 0xEC, 0xF5));
 
 
     public static Palette Current { get; private set; } = DarkPalette;
     public static bool Dark => Current.Dark;
-    public static Color Accent { get; private set; } = Color.FromArgb(0, 120, 212);
-    /// <summary>Text auf Akzentflächen: schwarz oder weiß, je nachdem was auf der Akzentfarbe besser lesbar ist.</summary>
+    public static Color Accent { get; private set; } = Color.FromArgb(0x2F, 0x8B, 0xFF);
+    /// <summary>Zweite Akzentfarbe (Violett) – Ende des Neon-Verlaufs <see cref="Accent"/> → <see cref="Accent2"/>.</summary>
+    public static Color Accent2 { get; private set; } = Color.FromArgb(0x9B, 0x5C, 0xFF);
+    /// <summary>Text auf Akzentflächen. Beide Verlaufsfarben sind dunkel genug für Weiß.</summary>
     public static Color OnAccent => Luminance(Accent) > 0.36f ? Color.Black : Color.White;
+
+    /// <summary>Neon-Verlauf (Blau → Violett) über ein Rechteck; <paramref name="angle"/> 0 = waagerecht, 90 = senkrecht.</summary>
+    public static LinearGradientBrush AccentBrush(RectangleF r, float angle = 0, bool enabled = true)
+    {
+        var bounds = new RectangleF(r.X, r.Y, Math.Max(1, r.Width), Math.Max(1, r.Height));
+        return enabled
+            ? new LinearGradientBrush(bounds, Accent, Accent2, angle)
+            : new LinearGradientBrush(bounds, Current.TextMuted, Current.TextMuted, angle);
+    }
+
+    /// <summary>Weicher Lichtschein um eine Form (mehrere breiter werdende, blasser werdende Ränder).
+    /// <paramref name="strength"/> 0–1 regelt die Deckkraft (für Ein-/Ausblenden).</summary>
+    public static void Glow(Graphics g, GraphicsPath path, float strength, int size = 6)
+    {
+        if (strength <= 0.01f)
+            return;
+        var bounds = path.GetBounds();
+        for (int i = size; i >= 1; i--)
+        {
+            int alpha = (int)(strength * (Dark ? 70 : 45) * (1f - (i - 1f) / size) / 2.2f);
+            if (alpha <= 0)
+                continue;
+            using var brush = AccentBrush(RectangleF.Inflate(bounds, i, i));
+            brush.LinearColors = [Color.FromArgb(alpha, Accent), Color.FromArgb(alpha, Accent2)];
+            using var pen = new Pen(brush, i * 2f) { LineJoin = LineJoin.Round };
+            g.DrawPath(pen, path);
+        }
+    }
 
     /// <summary>Relative Helligkeit (WCAG) einer Farbe, 0 = schwarz, 1 = weiß.</summary>
     public static float Luminance(Color c)
@@ -59,10 +90,10 @@ internal static class Theme
             _ => true,
         };
         Current = dark ? DarkPalette : LightPalette;
-        // Akzent = sattes Blau (weniger cyan als Branding.Blue – das wirkte zu türkis); im hellen Modus etwas
-        // tiefer für den Kontrast auf weißen Flächen. Nicht die Windows-Akzentfarbe – die sieht je nach
-        // Nutzerwahl beliebig aus (z. B. pink).
-        Accent = dark ? Color.FromArgb(0, 140, 220) : Color.FromArgb(0, 120, 212);
+        // Akzent = Neon-Blau → Violett wie im Logo; im hellen Modus etwas tiefer für den Kontrast auf weißen
+        // Flächen. Nicht die Windows-Akzentfarbe – die sieht je nach Nutzerwahl beliebig aus (z. B. pink).
+        Accent = dark ? Color.FromArgb(0x2F, 0x8B, 0xFF) : Color.FromArgb(0x1F, 0x6F, 0xE0);
+        Accent2 = dark ? Color.FromArgb(0x9B, 0x5C, 0xFF) : Color.FromArgb(0x7B, 0x3F, 0xE4);
         Mica = transparency && OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22621);
     }
 
@@ -110,7 +141,10 @@ internal static class Theme
     [DllImport("uxtheme.dll", CharSet = CharSet.Unicode)]
     private static extern int SetWindowTheme(IntPtr hwnd, string? subApp, string? idList);
 
-    private const int DWMWA_USE_IMMERSIVE_DARK_MODE = 20, DWMWA_WINDOW_CORNER_PREFERENCE = 33, DWMWA_SYSTEMBACKDROP_TYPE = 38;
+    private const int DWMWA_USE_IMMERSIVE_DARK_MODE = 20, DWMWA_WINDOW_CORNER_PREFERENCE = 33, DWMWA_BORDER_COLOR = 34,
+        DWMWA_CAPTION_COLOR = 35, DWMWA_SYSTEMBACKDROP_TYPE = 38;
+
+    private static int ColorRef(Color c) => c.R | (c.G << 8) | (c.B << 16);
 
     /// <summary>
     /// Fenster in die Windows-Darstellung einbinden: Titelleiste hell/dunkel, abgerundete Ecken, Mica-Hintergrund,
@@ -132,6 +166,17 @@ internal static class Theme
             {
                 int backdrop = 2; // Mica
                 DwmSetWindowAttribute(form.Handle, DWMWA_SYSTEMBACKDROP_TYPE, ref backdrop, 4);
+            }
+            else if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000))
+            {
+                // Ohne Mica: Titelleiste in der Fensterfarbe (Navy), sonst steht ein graues Band über dem Inhalt.
+                int caption = ColorRef(Backdrop);
+                DwmSetWindowAttribute(form.Handle, DWMWA_CAPTION_COLOR, ref caption, 4);
+            }
+            if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000))
+            {
+                int border = ColorRef(Current.Border);
+                DwmSetWindowAttribute(form.Handle, DWMWA_BORDER_COLOR, ref border, 4);
             }
         }
         if (form.IsHandleCreated) Frame(); else form.HandleCreated += (_, _) => Frame();

@@ -17,7 +17,7 @@ namespace Switch2Pro.Bridge;
 /// </summary>
 internal sealed class ControllerManager : IAsyncDisposable
 {
-    private const int MaxPlayers = 8;
+    internal const int MaxPlayers = 8;
 
     private readonly Func<Settings> _settings;
     private readonly PadFactory _factory;
@@ -96,23 +96,7 @@ internal sealed class ControllerManager : IAsyncDisposable
 
     /// <summary>Verbindungen, für die schon vor schwachem Bluetooth gewarnt wurde (einmal je Verbindung).</summary>
     private readonly ConcurrentDictionary<IControllerLink, byte> _weakWarned = new();
-    /// <summary>Verbindungen, für die schon „Akku fast leer“ gemeldet wurde (einmal je Verbindung).</summary>
-    private readonly ConcurrentDictionary<IControllerLink, byte> _lowWarned = new();
     private readonly ConcurrentDictionary<IControllerLink, long> _connectedSince = new();
-
-    /// <summary>Einmal je Verbindung warnen, wenn der Akku unter 15 % fällt (beim Laden nicht).</summary>
-    private void CheckLowBattery()
-    {
-        foreach (var link in _links.Values)
-        {
-            if (link.LastState is not { BatteryPercent: >= 0 } state || state.Charging || state.BatteryPercent > 15)
-                continue;
-            if (!_lowWarned.TryAdd(link, 0))
-                continue;
-            Log.Warn($"{link.Id}: Akku fast leer ({state.BatteryPercent} %)");
-            Notify?.Invoke($"{link.Kind.DisplayName()}: Akku fast leer ({state.BatteryPercent} %) – bitte laden oder anschließen.");
-        }
-    }
 
     /// <summary>
     /// Schwache Bluetooth-Verbindung erkennen: Liefert ein Controller nach dem Verbinden dauerhaft weniger als 20 Berichte/s
@@ -139,14 +123,11 @@ internal sealed class ControllerManager : IAsyncDisposable
             _connectedSince.TryRemove(gone, out _);
             _weakWarned.TryRemove(gone, out _);
         }
-        foreach (var gone in _lowWarned.Keys.Where(l => !current.Contains(l)).ToList())
-            _lowWarned.TryRemove(gone, out _);
     }
 
     private void CheckInactivity()
     {
         CheckWeakConnections();
-        CheckLowBattery();
         int minutes = _settings().InactivityMinutes;
         if (minutes <= 0 || _disposed)
             return;

@@ -110,7 +110,8 @@ internal static class RenderCheck
         Directory.CreateDirectory(folder);
         string lang = Tr.Lang;
         string variant = (Environment.GetCommandLineArgs().Contains("--demo-all") ? "_alle" : Environment.GetCommandLineArgs().Contains("--demo-retro") ? "_retro" : "")
-                         + (Environment.GetCommandLineArgs().Contains("--wide") ? "_breit" : "");
+                         + (Environment.GetCommandLineArgs().Contains("--wide") ? "_breit" : "")
+                         + (Environment.GetCommandLineArgs().Contains("--compact") ? "_kompakt" : "");
         var log = new List<string>();
         using var factory = PadFactory.TryCreate();
         ControllerManager? manager = factory is null ? null : new ControllerManager(() => new Settings(), factory);
@@ -119,7 +120,9 @@ internal static class RenderCheck
             manager?.StartDemo();
             // Als echtes Fenster außerhalb des sichtbaren Bereichs anzeigen, damit alle Steuerelemente entstehen.
             var sw = System.Diagnostics.Stopwatch.StartNew();
-            using var form = new SettingsForm(new Settings(), _ => { }, manager, wiiPairing: () => { })
+            // --compact: Controller-Übersicht in der kompakten Ansicht prüfen.
+            var uiSettings = new Settings { CompactCards = Environment.GetCommandLineArgs().Contains("--compact") };
+            using var form = new SettingsForm(uiSettings, _ => { }, manager, wiiPairing: () => { })
             {
                 StartPosition = FormStartPosition.Manual, Location = new Point(-6000, -6000), ShowInTaskbar = false, ShowInactive = true,
                 Size = Environment.GetCommandLineArgs().Contains("--wide") ? new Size(1900, 1040) : new Size(1220, 900),

@@ -9,6 +9,18 @@ internal static partial class Tr
     {
         // ---------- Fenster, Reiter, Abschnitte ----------
         ["Controller"] = "Controllers",
+        // ---------- Status-Kopfzeile, Ansicht ----------
+        ["bereit"] = "gereed",
+        ["nicht verfügbar"] = "niet beschikbaar",
+        ["Niedrigster Akku"] = "Laagste accu",
+        ["lädt"] = "laadt op",
+        ["gemischt"] = "gemengd",
+        ["Original-Controller"] = "Originele controllers",
+        ["versteckt"] = "verborgen",
+        ["sichtbar"] = "zichtbaar",
+        ["HidHide fehlt"] = "HidHide ontbreekt",
+        ["Groß"] = "Groot",
+        ["Kompakt"] = "Compact",
         ["Einstellungen (optional)"] = "Instellingen (optioneel)",
         ["1. Windows und Spiele sehen den Controller als …"] = "1. Windows en games zien de controller als …",
         ["2. Tasten A/B/X/Y"] = "2. Knoppen A/B/X/Y",

@@ -9,6 +9,18 @@ internal static partial class Tr
     {
         // ---------- Fenster, Reiter, Abschnitte ----------
         ["Controller"] = "Manettes",
+        // ---------- Status-Kopfzeile, Ansicht ----------
+        ["bereit"] = "prêt",
+        ["nicht verfügbar"] = "indisponible",
+        ["Niedrigster Akku"] = "Batterie la plus faible",
+        ["lädt"] = "en charge",
+        ["gemischt"] = "mixte",
+        ["Original-Controller"] = "Manettes d'origine",
+        ["versteckt"] = "masquées",
+        ["sichtbar"] = "visibles",
+        ["HidHide fehlt"] = "HidHide manquant",
+        ["Groß"] = "Grand",
+        ["Kompakt"] = "Compact",
         ["Einstellungen (optional)"] = "Paramètres (facultatif)",
         ["1. Windows und Spiele sehen den Controller als …"] = "1. Windows et les jeux voient la manette comme …",
         ["2. Tasten A/B/X/Y"] = "2. Boutons A/B/X/Y",

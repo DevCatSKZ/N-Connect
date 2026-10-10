@@ -17,7 +17,7 @@ cd switch2-pro-windows
 dotnet build -c Release                      # Warnungen gelten als Fehler
 dotnet test -c Release --no-build            # aktuell 216 Tests, alle grün
 N-Connect.exe --render <Ordner>              # alle Controller-Grafiken prüfen
-N-Connect.exe --render-ui <Ordner> --demo-all --wide   # alle Seiten/Karten prüfen (auch --demo, --demo-retro)
+N-Connect.exe --render-ui <Ordner> --demo-all --wide   # alle Seiten/Karten prüfen (auch --demo, --demo-retro, --compact, --light)
 dotnet publish src\Switch2Pro.Bridge -c Release -r win-x64 --self-contained -p:PublishSingleFile=true `
   -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -p:DebugType=none -o out\publish\win-x64
 ISCC.exe installer\N-Connect.iss             # Installer nach out\
@@ -51,6 +51,20 @@ Hinweise zur Umgebung:
    `N-Connect-Setup-<x.y.z>.exe` und legt das Release automatisch an.
 5. Screenshots mit dem neuen Build neu rendern (`--render-ui --demo-all`) → `gh-pages` pushen;
    die Seite holt sich Versionsnummer und Download-Link selbst per GitHub-API.
+
+## Zuletzt erledigt (10.10.2026): Fehlerkorrekturen, Neon-Design, Statusleiste, Kompakt-Ansicht
+
+- **Fehler behoben**: doppelte Akku-Warnung (`ControllerManager.CheckLowBattery` entfernt – `Player.CheckBattery`
+  warnt schon bei 15/5 %, übersetzt); portables Update-Skript scheiterte an Umlauten/`%` im Pfad (jetzt UTF-8 +
+  `chcp 65001`, `%` maskiert, Kopieren bis zu 10× versucht, Selbstlöschen ohne Fehlermeldung); „Gedrückt“ zeigte
+  rohe Enum-Namen (`SRLeft`, Nintendo-Namen bei PlayStation/Xbox) – jetzt Namen des jeweiligen Controllers.
+- **Neon-Design** (Farben aus Logo): Navy-Paletten, Verlauf `Theme.Accent` → `Theme.Accent2`, `Theme.Glow`,
+  Schriftzug `Wordmark` statt Text (Logo bleibt bewusst weg), Titelleiste ohne Mica in Fensterfarbe.
+- **Animationen** (`Anim.cs`): Hover, Schalter, Segmente, Akkubalken, Karten-Aufleuchten beim Verbinden und Glühen
+  bei Tastendruck. Aus bei abgeschalteten Windows-Animationen und bei `--render…`.
+- **Statusleiste** (`StatusBand.cs`) und **Kompakt-Ansicht** (`Settings.CompactCards`, Umschalter in der Leiste,
+  bis 4 Spalten); Reihenfolge-Chips kleiner und gleichmäßig auf Zeilen verteilt; Gyro-Balken lesbar.
+- Neue Texte in allen 11 Übersetzungstabellen (Block „Status-Kopfzeile, Ansicht“). Render-Schalter `--compact`.
 
 ## Zuletzt erledigt (07.10.2026, Nacht II): MIT-Lizenz, Paar-Knopf in der Karte, v1.0.7
 
