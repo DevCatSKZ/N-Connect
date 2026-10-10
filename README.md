@@ -82,10 +82,17 @@ angelegt.
 
 - **Übersicht** mit Live-Grafik jedes Controllers (Form und Tastenlage nach Produktfotos, Originalfarben, gedrückte
   Tasten leuchten), Akku, Verbindung, Seriennummer, Firmware. Bei breitem Fenster zwei Spalten, alle Karten gleich hoch.
+- **Statusleiste** über den Karten: wie viele Controller verbunden sind, ob Bluetooth bereit ist, welcher Akku am
+  leersten ist, wie Spiele die Controller sehen (Xbox 360 / DualShock 4) und ob die Originale versteckt sind.
+- **Kompakt-Ansicht** (Umschalter „Groß | Kompakt“): kleinere Karten, bis zu vier nebeneinander – acht Controller
+  passen fast ohne Scrollen.
 - **Einstellungen direkt an der Controller-Karte** („Einstellungen“ aufklappen): Tasten, Feineinstellung, Gyro,
   Joy-Con, Extras, Details – jeweils nur für diesen Controller.
 - **Taste per Tastendruck belegen:** hinter jeder Taste das Tastatur-Symbol klicken und die gewünschte Taste drücken.
-- **Oberfläche im Windows-11-Stil:** dunkel (Standard), hell oder wie Windows; Akzentfarbe in Marken-Blau, Mica-Titelleiste.
+- **Oberfläche im Neon-Look des Logos:** dunkel (Standard), hell oder wie Windows; Navy-Töne mit Verlauf
+  Neon-Blau → Violett, Mica-Titelleiste. Weiche Animationen (Schalter, Hover, Akkubalken); Karten leuchten beim
+  Verbinden auf und glühen bei Tastendruck – so sieht man sofort, welche Karte zu welchem Controller gehört. Sind die
+  Animationseffekte in Windows abgeschaltet, bleibt alles ruhig.
 - Knöpfe je Controller: **Trennen**, **Vibrieren** (welcher ist welcher Spieler?), **Gyro kalibrieren**,
   Joy-Con **trennen/zusammenfügen**, **hochkant/quer**, **amiibo lesen**, **Ring-Con**, **IR-Kamera**,
   **„Doppelt angezeigt? Verstecken“** (HidHide).
@@ -179,7 +186,8 @@ Selbst bauen: .NET 8 SDK, dann `dotnet test tests/Switch2Pro.Protocol.Tests` und
 Den Installer baut der Workflow `.github/workflows/switch2-pro-windows.yml`.
 Den Installer lokal bauen: Inno Setup 6, dann `ISCC.exe installer\N-Connect.iss` (Ergebnis in `out\`).
 Prüfhilfen: `N-Connect.exe --render <Ordner>` (alle Controller-Grafiken als PNG), `--render-ui <Ordner>` (alle Seiten
-und Karten, hell/dunkel, Deutsch/Englisch; mit `--wide` für breite Fenster), `--render-brand <Ordner>` (Logo, Icon,
+und Karten; `--light` für hell, `--lang=xx` für die Sprache, `--wide` für breite Fenster, `--compact` für die
+Kompakt-Ansicht), `--render-brand <Ordner>` (Logo, Icon,
 Installer-Bilder), `--demo` / `--demo-all` / `--demo-retro` (simulierte Controller).
 
 ### Quellen und Dank
