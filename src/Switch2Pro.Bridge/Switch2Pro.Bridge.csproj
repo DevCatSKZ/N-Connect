@@ -6,7 +6,7 @@
     <Copyright>© devcatskz</Copyright>
     <!-- Angezeigte Version (Einstellungsfenster, Renders). Vor jedem Release-Tag hochzählen;
          der Build-Workflow setzt sie beim Veröffentlichen ohnehin per -p:Version=<Tag>. -->
-    <Version>1.0.17</Version>
+    <Version>1.0.18</Version>
     <OutputType>WinExe</OutputType>
     <!-- 22621 = Windows 11 22H2 SDK (für schnellere BLE-Verbindungsparameter); läuft ab Windows 10 2004. -->
     <TargetFramework>net8.0-windows10.0.22621.0</TargetFramework>
