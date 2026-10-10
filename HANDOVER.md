@@ -15,7 +15,7 @@ Was das Programm kann und wie man es baut: siehe [README.md](README.md). Vollst�
 ```powershell
 cd switch2-pro-windows
 dotnet build -c Release                      # Warnungen gelten als Fehler
-dotnet test -c Release --no-build            # aktuell 216 Tests, alle grün
+dotnet test -c Release --no-build            # aktuell 219 Tests, alle grün
 N-Connect.exe --render <Ordner>              # alle Controller-Grafiken prüfen
 N-Connect.exe --render-ui <Ordner> --demo-all --wide   # alle Seiten/Karten prüfen (auch --demo, --demo-retro, --compact, --light)
 dotnet publish src\Switch2Pro.Bridge -c Release -r win-x64 --self-contained -p:PublishSingleFile=true `
@@ -52,6 +52,22 @@ Hinweise zur Umgebung:
 5. Screenshots mit dem neuen Build neu rendern (`--render-ui --demo-all`) → `gh-pages` pushen;
    die Seite holt sich Versionsnummer und Download-Link selbst per GitHub-API.
 
+## Aktueller Stand (10.10.2026, Nacht): v1.0.17 veröffentlicht
+
+- **Veröffentlicht:** v1.0.16 (Desktop-Modus, Testseite, Einblendung, Diagnose, neue Vorlagen) und **v1.0.17**
+  (Desktop-Widget). Beide CI-Läufe grün, inkl. der neuen Oberflächenprüfung auf GitHub. winget-Manifeste auf
+  **1.0.17** (Prüfsummen aus dem Release nachgerechnet, `winget validate` ok – nur die YAML-Dateien prüfen, die
+  `README.md` im Ordner lässt `winget validate` sonst scheitern).
+- **Desktop-Widget** (`ControllerWidget`, Standard aus, *Allgemein → Desktop-Widget*): Kärtchen im aktiven
+  Farbschema mit Spieler, Name, Verbindung · Ausgabe, Akku; verschiebbar, Rechtsklick-Menü, Doppelklick öffnet
+  N-Connect. Details: docs/FUNKTIONEN.md Abschnitt 11a. Gesteuert über `TrayApp.SyncWidget`.
+- **Prüfhilfe** rendert zusätzlich den Reiter „Test“ (`ui_cardN_6_*`), die Einblendung (`ui_einblendung_*`) und das
+  Widget (`ui_widget_*`, `_kompakt`, `_leer`).
+- **Echtes Widget in der Windows-11-Widgetleiste** geprüft und zurückgestellt: braucht Paket-Identität (MSIX bzw.
+  Sparse Package), und die geht nur mit einem vertrauenswürdig signierten Paket → erst mit Code-Signatur-Zertifikat.
+- **Nächstes Vorhaben (angefragt):** ESP32 mit denselben Kopplungsdaten wie der PC-Bluetooth-Stick, damit
+  Controller ohne neues SYNC am ESP32 laufen – siehe „Offen“.
+
 ## Zuletzt erledigt (10.10.2026, abends): Desktop-Modus, Testseite, Einblendung, Diagnose, CI
 
 - **Desktop-Modus** (Standard aus), **Testseite** (Reiter „Test“), **Einblendung beim Verbinden** (abschaltbar),
@@ -62,7 +78,7 @@ Hinweise zur Umgebung:
   und `SIGNING_CERT_PASSWORD` im Repo N-Connect hinterlegt sind (Settings → Secrets → Actions). Günstige Wege zu einem
   Zertifikat: SignPath.io (kostenlos für Open Source, eigener Ablauf mit deren Action) oder Microsoft Trusted Signing
   (~10 $/Monat; braucht statt PFX die Action `azure/trusted-signing-action`).
-- **winget**: Manifeste gültig (aktuell 1.0.15); Einreichen = PR in microsoft/winget-pkgs (siehe winget/README.md).
+- **winget**: Manifeste gültig (inzwischen 1.0.17); Einreichen = PR in microsoft/winget-pkgs (siehe winget/README.md).
 
 ## Zuletzt erledigt (10.10.2026, später): Windows-Design, Farbschemata, neues Icon, Skalierung, Prüfhilfe
 
@@ -248,13 +264,26 @@ kleben; ggf. Aufschrift weglassen statt verschieben.
 
 ## Offen
 
-- **Push nach GitHub blockiert:** Das Token (Konto `mrskittelz`, Scopes `gist, read:org, repo`) braucht die
-  Berechtigung `workflow`, weil `.github/workflows/build.yml` mit hochgeladen wird. `gh auth refresh -h github.com
-  -s workflow` zeigt einen Einmal-Code für https://github.com/login/device – das muss der **Nutzer** im Browser
-  bestätigen (vom Agenten gestartet, Code `4479-589A`, nicht bestätigt; ggf. neu starten). Danach im Ordner
-  `N-Connect`: `git push -u origin main` (Remote-Repo ist noch leer), dann Release anlegen, z. B.
-  `gh release create v1.0.0 ..\sfm\switch2-pro-windows\out\N-Connect-Setup-1.0.0.exe` (oder Tag pushen – die
-  Workflow-Datei baut bei `v*` selbst ein Release). Erst dann funktioniert das Ein-Klick-Update.
+**Braucht den Nutzer (eigene Konten, nach außen sichtbar – nicht eigenmächtig erledigen):**
+- **winget einreichen:** PR an `microsoft/winget-pkgs` unter dem Konto des Nutzers, Dateien aus `winget/`
+  nach `manifests/d/DevCatSKZ/N-Connect/<Version>/` (Anleitung `winget/README.md`).
+- **Code-Signatur:** Zertifikat besorgen (SignPath.io kostenlos für Open Source oder Microsoft Trusted Signing) und
+  als Secrets `SIGNING_CERT_PFX`/`SIGNING_CERT_PASSWORD` im Repo N-Connect hinterlegen – CI signiert dann App und
+  Installer (entfernt mit der Zeit die SmartScreen-Warnung). Danach möglich: echtes Windows-11-Widget.
+- **Hardware-Tester** für HORI/PowerA/PDP-Kabelpads, DS4/DualSense, Xbox über Bluetooth (Aufruf steht im README).
+
+**Nächstes Vorhaben: ESP32 mit den Kopplungsdaten des PCs** (Nutzerwunsch 10.10.2026, Klärung läuft):
+Controller sollen sich ohne neues SYNC sowohl mit dem PC-Stick als auch mit einem ESP32 verbinden. Weg: N-Connect
+exportiert Adapter-Adresse + Schlüssel je Controller (Windows: `HKLM\SYSTEM\CurrentControlSet\Services\BTHPORT\
+Parameters\Keys\<Adapter>\<Controller>`, klassisch 16-Byte-Link-Key, BLE als Unterschlüssel mit LTK/EDIV/ERand/IRK –
+lesbar nur als SYSTEM, also Hilfsprozess mit Adminrecht). Der ESP32 übernimmt diese Adresse und Schlüssel und gibt
+sich so als der PC aus (gleiches Prinzip wie „Switch-Identität“ mit Bluepick_RCM). Grenzen: klassisches Bluetooth
+(Joy-Con 1, Pro Controller, DS4/DualSense, Wii) nur mit dem **Ur-ESP32** (S2/S3/C3/C6 können nur BLE); PC und ESP32
+dürfen nicht gleichzeitig mit dieser Adresse aktiv sein. Schlüssel nie ins Repo/Protokoll, Export nur auf Wunsch
+und mit Passwort (vorhandenes `.ncpair`-Format hat dafür schon `LinkKey`).
+
+**Technisch offen (bisheriger Stand):**
+- **Flackernde Tests:** einmal 3 Fehlschläge, danach 7 Läufe hintereinander grün – Ursache nicht untersucht.
 - **Joy-Con-1-Belegung im Spiel:** Nutzer meldete „funktionieren nicht korrekt im Spiel“; Ursache war sehr
   wahrscheinlich das versehentliche Trennen (s. o.). Rückmeldung des Nutzers, ob als Paar noch etwas falsch ist,
   steht aus. Tastenbits (`Switch1.cs`) und Paar-Zusammenführung (`Mapping.Merge`) wurden geprüft und sind korrekt.
