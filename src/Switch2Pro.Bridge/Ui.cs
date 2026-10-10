@@ -21,7 +21,7 @@ internal static class Glyph
     public static Font Font(float size)
     {
         if (!Fonts.TryGetValue(size, out var font))
-            Fonts[size] = font = new Font("Segoe MDL2 Assets", size, GraphicsUnit.Point);
+            Fonts[size] = font = new Font("Segoe MDL2 Assets", size * UiScale.Test, GraphicsUnit.Point);
         return font;
     }
 
@@ -42,7 +42,8 @@ internal static class Glyph
     /// <summary>Bluetooth-Rune (ᚼ+ᛒ): Mittelsteg, zwei Dreiecke nach rechts, zwei Striche von links zur Mitte.</summary>
     private static void BluetoothMark(Graphics g, Rectangle bounds, Color color, float em)
     {
-        float h = em > 0 ? em * 96f / 72f : Math.Min(bounds.Height * 0.72f, bounds.Width * 1.1f);
+        // em in Punkt → Pixel bei der aktuellen Skalierung (wie die Fontsymbole daneben).
+        float h = em > 0 ? em * 96f / 72f * UiScale.Factor : Math.Min(bounds.Height * 0.72f, bounds.Width * 1.1f);
         h = Math.Min(h, bounds.Height * 0.8f);
         float w = h * 0.82f;
         float x = bounds.X + (bounds.Width - w) / 2f, y = bounds.Y + (bounds.Height - h) / 2f;
@@ -58,6 +59,57 @@ internal static class Glyph
     }
 }
 
+/// <summary>
+/// Skalierung der selbst gezeichneten Oberfläche. Schriften in Punkt wachsen mit der Windows-Skalierung (125 %, 150 %,
+/// 200 % …); Abstände, Zeilenhöhen und Kacheln, die zur Laufzeit berechnet werden, müssen mitwachsen – sonst ist die
+/// Schrift größer als ihr Feld. <see cref="Px(int)"/> rechnet Werte für 100 % auf die aktuelle Skalierung um.
+/// Die App skaliert vollständig selbst (alle Fenster: AutoScaleMode.None) – feste Größen immer über Px angeben, dann
+/// sehen Fensterteile gleich aus, egal ob sie beim Öffnen oder erst später entstehen.
+/// Prüfhilfe: <c>--scale=1.5</c> bildet 150 % nach (Schriften, Abstände und WinForms-Skalierung), ohne die Anzeige
+/// umzustellen.
+/// </summary>
+internal static class UiScale
+{
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern uint GetDpiForSystem();
+
+    /// <summary>Testfaktor aus <c>--scale=x</c> (1 = keine Simulation).</summary>
+    public static readonly float Test = ParseTest();
+
+    /// <summary>Faktor gegenüber 100 %: System-DPI ÷ 96 × Testfaktor (so wachsen Punkt-Schriften tatsächlich).</summary>
+    public static readonly float Factor = SystemDpi() / 96f * Test;
+
+    public static int Px(int value) => (int)MathF.Round(value * Factor);
+    public static float Px(float value) => value * Factor;
+
+    /// <summary>
+    /// Zur Laufzeit erzeugten Bereich (Controller-Karte, aufgeklappte Reiterseite) einmal so skalieren, wie WinForms es
+    /// beim Öffnen des Fensters mit allen vorhandenen Steuerelementen tut – sonst blieben später erzeugte Teile bei 100 %.
+    /// Vor dem Einfügen in das Fenster aufrufen.
+    /// </summary>
+    public static void ScaleNew(Control control)
+    {
+        if (MathF.Abs(Factor - 1f) > 0.01f)
+            control.Scale(new SizeF(Factor, Factor));
+    }
+
+    /// <summary>Basis für AutoScaleDimensions: 96 DPI, bei der Simulation entsprechend kleiner (WinForms skaliert dann mit).</summary>
+    public static SizeF Dimensions => new(96f / Test, 96f / Test);
+
+    private static float SystemDpi()
+    {
+        try { return OperatingSystem.IsWindowsVersionAtLeast(10, 0, 14393) ? Math.Max(96u, GetDpiForSystem()) : 96f; }
+        catch (EntryPointNotFoundException) { return 96f; }
+    }
+
+    private static float ParseTest()
+    {
+        var arg = Environment.GetCommandLineArgs().FirstOrDefault(a => a.StartsWith("--scale=", StringComparison.Ordinal));
+        return arg is not null && float.TryParse(arg["--scale=".Length..], System.Globalization.NumberStyles.Float,
+            System.Globalization.CultureInfo.InvariantCulture, out float f) && f is >= 1f and <= 3f ? f : 1f;
+    }
+}
+
 /// <summary>Schriften der Oberfläche: „Segoe UI Variable“ (Windows 11), sonst „Segoe UI“.</summary>
 internal static class UiFonts
 {
@@ -68,26 +120,31 @@ internal static class UiFonts
     {
         string name = Variable ? family : fallback;
         if (!Cache.TryGetValue((size, style, name), out var font))
-            Cache[(size, style, name)] = font = new Font(name, size, style, GraphicsUnit.Point);
+            Cache[(size, style, name)] = font = new Font(name, size * UiScale.Test, style, GraphicsUnit.Point);
         return font;
     }
 
-    public static Font Body => Get("Segoe UI Variable Text", "Segoe UI", 9.75f, FontStyle.Regular);
-    public static Font Small => Get("Segoe UI Variable Small", "Segoe UI", 8.75f, FontStyle.Regular);
-    public static Font Strong => Get("Segoe UI Variable Text Semibold", "Segoe UI Semibold", 9.75f, FontStyle.Regular);
-    public static Font Subtitle => Get("Segoe UI Variable Display Semibold", "Segoe UI Semibold", 12.5f, FontStyle.Regular);
-    public static Font Title => Get("Segoe UI Variable Display Semibold", "Segoe UI Semibold", 20f, FontStyle.Regular);
+    // Typografie wie Windows 11 (Fluent): Caption 12 px, Body 14 px, Body Strong 14 px, Body Large 18 px, Title 28 px.
+    public static Font Body => Get("Segoe UI Variable Text", "Segoe UI", 10.5f, FontStyle.Regular);
+    public static Font Small => Get("Segoe UI Variable Small", "Segoe UI", 9f, FontStyle.Regular);
+    public static Font Strong => Get("Segoe UI Variable Text Semibold", "Segoe UI Semibold", 10.5f, FontStyle.Regular);
+    public static Font Subtitle => Get("Segoe UI Variable Display Semibold", "Segoe UI Semibold", 13.5f, FontStyle.Regular);
+    public static Font Title => Get("Segoe UI Variable Display Semibold", "Segoe UI Semibold", 21f, FontStyle.Regular);
 }
 
 /// <summary>Schriftzug „N-Connect“ im Navigationskopf, gefüllt mit dem Neon-Verlauf des Logos.</summary>
 internal sealed class Wordmark : Control, ISelfTranslating
 {
+    /// <summary>Größe (skaliert über UiScale) setzt das Steuerelement selbst – WinForms nur Lage überlassen.</summary>
+    protected override void ScaleControl(SizeF factor, BoundsSpecified specified) =>
+        base.ScaleControl(factor, specified & ~BoundsSpecified.Size);
+
     public Wordmark()
     {
         SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint
                  | ControlStyles.ResizeRedraw, true);
         Text = "N-Connect";
-        Size = new Size(200, 34);
+        Size = new Size(UiScale.Px(200), UiScale.Px(34));
     }
 
     protected override void OnPaint(PaintEventArgs e)
@@ -96,13 +153,20 @@ internal sealed class Wordmark : Control, ISelfTranslating
         g.Clear(BackColor);
         g.SmoothingMode = SmoothingMode.AntiAlias;
         var font = UiFonts.Subtitle;
+        if (!Theme.Neon)
+        {
+            // Windows-Schema: App-Name schlicht und scharf (ClearType) in Textfarbe, wie Windows-Apps.
+            TextRenderer.DrawText(g, Text, font, new Rectangle(0, 0, Width, Height), Theme.Current.Text,
+                TextFormatFlags.VerticalCenter | TextFormatFlags.NoPrefix);
+            return;
+        }
         using var path = new GraphicsPath();
         // Schriftgröße in Pixel (Punkt × DPI / 72), damit der Pfad gleich groß wie gezeichneter Text wird.
         float em = font.SizeInPoints * DeviceDpi / 72f * 1.12f;
-        path.AddString(Text, font.FontFamily, (int)FontStyle.Bold, em, new PointF(0, 4), StringFormat.GenericTypographic);
+        path.AddString(Text, font.FontFamily, (int)FontStyle.Bold, em, new PointF(UiScale.Px(4f), UiScale.Px(4f)), StringFormat.GenericTypographic);
         var bounds = path.GetBounds();
         Theme.Glow(g, path, 0.6f, 3);
-        using var brush = Theme.AccentBrush(bounds);
+        using var brush = Theme.LineBrush(bounds);
         g.FillPath(brush, path);
     }
 }
@@ -148,6 +212,50 @@ internal static class Dpi
 /// <summary>Basis aller Fenster: erzeugt das Handle im PerMonitorV2-Kontext (siehe <see cref="Dpi"/>).</summary>
 internal class UiForm : Form
 {
+    /// <summary>
+    /// Prüfhilfen (<c>--render…</c>, <c>--dump-ui</c>): Fenster nie aktivieren, nicht in Taskleiste/Alt-Tab und immer
+    /// außerhalb des Bildschirms – sonst springen Fokus und Maus des Benutzers, während Bilder entstehen.
+    /// </summary>
+    internal static readonly bool Offscreen = Environment.GetCommandLineArgs()
+        .Any(a => a.StartsWith("--render", StringComparison.Ordinal) || a == "--dump-ui");
+
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern bool LockSetForegroundWindow(uint code);
+
+    /// <summary>Prüfhilfe läuft auf dem eigenen, unsichtbaren Desktop (<see cref="HiddenDesktop"/>).</summary>
+    internal static bool Isolated => HiddenDesktop.Active;
+
+    /// <summary>Prüfhilfe außerhalb des unsichtbaren Desktops (Notfall): Fokuswechsel für diesen Prozess sperren.</summary>
+    internal static void LockForeground()
+    {
+        if (Offscreen && !Isolated)
+            LockSetForegroundWindow(1); // LSFW_LOCK
+    }
+
+    protected override bool ShowWithoutActivation => Offscreen || base.ShowWithoutActivation;
+
+    protected override CreateParams CreateParams
+    {
+        get
+        {
+            var cp = base.CreateParams;
+            if (Offscreen)
+                cp.ExStyle |= 0x08000000 | 0x00000080; // WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW
+            return cp;
+        }
+    }
+
+    protected override void OnLoad(EventArgs e)
+    {
+        if (Offscreen)
+        {
+            StartPosition = FormStartPosition.Manual;
+            Location = new Point(-6000, -6000);
+            ShowInTaskbar = false;
+        }
+        base.OnLoad(e);
+    }
+
     protected override void CreateHandle()
     {
         var previous = Dpi.BeginPerMonitorV2();
@@ -261,7 +369,7 @@ internal class SettingsGroup : StackPanel
 {
     public SettingsGroup()
     {
-        Padding = new Padding(1, 4, 1, 4);
+        Padding = new Padding(UiScale.Px(1), UiScale.Px(4), UiScale.Px(1), UiScale.Px(4));
         Margin = new Padding(0, 0, 0, 0);
         BackColor = Theme.Backdrop;
         ResizeRedraw = true;
@@ -296,7 +404,7 @@ internal sealed class Heading : Control, IHeightForWidth, ISelfTranslating
         _font = page ? UiFonts.Title : hint ? UiFonts.Small : UiFonts.Strong;
         _hint = hint;
         BackColor = Theme.Backdrop;
-        Margin = page ? new Padding(0, 0, 0, 8) : new Padding(2, 14, 0, 2);
+        Margin = page ? new Padding(0, 0, 0, UiScale.Px(8)) : new Padding(UiScale.Px(2), UiScale.Px(14), 0, UiScale.Px(2));
         TabStop = false;
     }
 
@@ -311,6 +419,18 @@ internal sealed class Heading : Control, IHeightForWidth, ISelfTranslating
         if (_subtitle is not null)
             h += TextRenderer.MeasureText(Sub, UiFonts.Body, new Size(width, 0), TextFormatFlags.WordBreak).Height + 4;
         return h;
+    }
+
+    protected override void OnLayout(LayoutEventArgs levent)
+    {
+        base.OnLayout(levent);
+        // Oben angedockt (Kopf der Controller-Seite): Höhe aus dem Text – feste Höhen schneiden bei 150 % die Unterzeile ab.
+        if (Dock == DockStyle.Top && Width > 0)
+        {
+            int h = HeightFor(Width) + UiScale.Px(14);
+            if (Height != h)
+                Height = h;
+        }
     }
 
     protected override void OnPaint(PaintEventArgs e)
@@ -354,6 +474,13 @@ internal sealed class SettingRow : Control, IHeightForWidth, IExtraTexts, ISelfT
         {
             content.BackColor = Theme.Current.Surface;
             Controls.Add(content);
+            // Wächst das Bedienelement (z. B. Auswahlfeld passt sich der Übersetzung an), Zeile und Gruppe neu anordnen.
+            content.Resize += (_, _) =>
+            {
+                PerformLayout();
+                Parent?.PerformLayout();
+                Invalidate();
+            };
         }
     }
 
@@ -373,26 +500,44 @@ internal sealed class SettingRow : Control, IHeightForWidth, IExtraTexts, ISelfT
 
     public IEnumerable<string> ExtraTexts => _description is null ? [] : [Tr.T(_description)];
 
-    private const int Pad = 16;
-    private int TextLeft => _glyph is null ? Pad : Pad + 36;
-    private int ContentWidth => _content is null ? Navigates ? 24 : 0 : _content.Width;
+    private static int Pad => UiScale.Px(16);
+    private int TextLeft => _glyph is null ? Pad : Pad + UiScale.Px(36);
+    private int ContentWidth => _content is null ? Navigates ? UiScale.Px(24) : 0 : _content.Width;
 
-    private int TextWidth(int width) => Math.Max(120, width - TextLeft - ContentWidth - Pad - (_content is null ? 0 : 20));
+    /// <summary>Breites Bedienelement unter den Text statt daneben, wenn daneben zu wenig Platz für den Text bliebe
+    /// (schmales Fenster, hohe Skalierung, lange Übersetzungen) – wie in den Windows-11-Einstellungen.</summary>
+    private bool Stacked(int width) =>
+        _content is not null && width - TextLeft - _content.Width - Pad - UiScale.Px(20) < UiScale.Px(220);
 
-    public int HeightFor(int width)
+    private int TextWidth(int width) => Stacked(width)
+        ? Math.Max(UiScale.Px(120), width - TextLeft - Pad)
+        : Math.Max(UiScale.Px(120), width - TextLeft - ContentWidth - Pad - (_content is null ? 0 : UiScale.Px(20)));
+
+    private int TextHeight(int width)
     {
         int tw = TextWidth(width);
         int h = TextRenderer.MeasureText(Tr.T(Text), UiFonts.Body, new Size(tw, 0), TextFormatFlags.WordBreak).Height;
         if (!string.IsNullOrEmpty(_description))
             h += TextRenderer.MeasureText(Tr.T(_description), UiFonts.Small, new Size(tw, 0), TextFormatFlags.WordBreak).Height + 1;
+        return h;
+    }
+
+    public int HeightFor(int width)
+    {
+        int h = TextHeight(width);
         int contentH = _content?.Height ?? 0;
-        return Math.Max(Math.Max(h, contentH) + 26, string.IsNullOrEmpty(_description) ? 50 : 62);
+        if (Stacked(width))
+            return h + UiScale.Px(10) + contentH + UiScale.Px(26);
+        return Math.Max(Math.Max(h, contentH) + UiScale.Px(26), UiScale.Px(string.IsNullOrEmpty(_description) ? 50 : 62));
     }
 
     protected override void OnLayout(LayoutEventArgs levent)
     {
-        if (_content is not null)
-            _content.Location = new Point(Width - Pad - _content.Width, (Height - _content.Height) / 2);
+        if (_content is null)
+            return;
+        _content.Location = Stacked(Width)
+            ? new Point(TextLeft, Height - UiScale.Px(13) - _content.Height)
+            : new Point(Width - Pad - _content.Width, (Height - _content.Height) / 2);
     }
 
     protected override void OnPaint(PaintEventArgs e)
@@ -402,24 +547,31 @@ internal sealed class SettingRow : Control, IHeightForWidth, IExtraTexts, ISelfT
         g.Clear(_hover && Navigates ? p.SurfaceHover : p.Surface);
         // Trennlinie zur vorigen Zeile in derselben Gruppe.
         if (Parent is SettingsGroup group && group.Controls.GetChildIndex(this) > 0)
-            using (var line = new Pen(Theme.Dark ? Color.FromArgb(0x1F, 0x1F, 0x1F) : Color.FromArgb(0xEA, 0xEA, 0xEA)))
+            using (var line = new Pen(Theme.Divider))
                 g.DrawLine(line, 0, 0, Width, 0);
-        if (_glyph is not null && !Glyph.Paint(g, _glyph, new Rectangle(Pad, 0, 24, Height), p.Text, 13f))
-            TextRenderer.DrawText(g, _glyph, Glyph.Font(13f), new Rectangle(Pad, 0, 24, Height), p.Text,
-                TextFormatFlags.VerticalCenter | TextFormatFlags.HorizontalCenter | TextFormatFlags.NoPadding);
+        // Symbol leicht in der Akzentfarbe getönt – verbindet die Zeilen optisch mit dem Farbschema.
+        var glyphColor = Theme.Neon ? Theme.Blend(p.Text, Theme.AccentLine, 0.35f) : p.Text;
         int tw = TextWidth(Width);
         string title = Tr.T(Text);
         int th = TextRenderer.MeasureText(title, UiFonts.Body, new Size(tw, 0), TextFormatFlags.WordBreak).Height;
         int dh = string.IsNullOrEmpty(_description) ? 0
             : TextRenderer.MeasureText(Tr.T(_description), UiFonts.Small, new Size(tw, 0), TextFormatFlags.WordBreak).Height + 1;
-        int y = (Height - th - dh) / 2;
+        // Untereinander: Text oben, Bedienelement darunter; sonst Text senkrecht mittig.
+        bool stacked = Stacked(Width);
+        int y = stacked ? UiScale.Px(13) : (Height - th - dh) / 2;
+        // Symbol: mittig in der Zeile, untereinander auf Höhe des Titels.
+        int glyphBox = UiScale.Px(24);
+        var glyphRect = stacked ? new Rectangle(Pad, y, glyphBox, th) : new Rectangle(Pad, 0, glyphBox, Height);
+        if (_glyph is not null && !Glyph.Paint(g, _glyph, glyphRect, glyphColor, 13f))
+            TextRenderer.DrawText(g, _glyph, Glyph.Font(13f), glyphRect, glyphColor,
+                TextFormatFlags.VerticalCenter | TextFormatFlags.HorizontalCenter | TextFormatFlags.NoPadding);
         TextRenderer.DrawText(g, title, UiFonts.Body, new Rectangle(TextLeft, y, tw, th), Enabled ? p.Text : p.TextMuted,
             TextFormatFlags.WordBreak | TextFormatFlags.NoPrefix);
         if (dh > 0)
             TextRenderer.DrawText(g, Tr.T(_description), UiFonts.Small, new Rectangle(TextLeft, y + th + 1, tw, dh), p.TextMuted,
                 TextFormatFlags.WordBreak | TextFormatFlags.NoPrefix);
         if (Navigates)
-            TextRenderer.DrawText(g, Glyph.Chevron, Glyph.Font(10f), new Rectangle(Width - Pad - 20, 0, 20, Height), p.Text,
+            TextRenderer.DrawText(g, Glyph.Chevron, Glyph.Font(10f), new Rectangle(Width - Pad - UiScale.Px(20), 0, UiScale.Px(20), Height), p.Text,
                 TextFormatFlags.VerticalCenter | TextFormatFlags.HorizontalCenter);
     }
 
@@ -448,11 +600,17 @@ internal sealed class ToggleSwitch : Control, ISelfTranslating
     {
         SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint
                  | ControlStyles.Selectable | ControlStyles.StandardClick, true);
-        Size = new Size(96, 24);
+        // Breite nach dem längsten übersetzten Zustand („Ein“/„Aus“) plus Schalter; alles in der aktuellen Skalierung.
+        int label = Math.Max(TextRenderer.MeasureText(Tr.T("Ein"), UiFonts.Body).Width, TextRenderer.MeasureText(Tr.T("Aus"), UiFonts.Body).Width);
+        Size = new Size(Math.Max(UiScale.Px(96), label + UiScale.Px(56)), UiScale.Px(24));
         Cursor = Cursors.Hand;
         TabStop = true;
         _knob = new Anim(this, 0, speed: 18f);
     }
+
+    /// <summary>Größe setzt der Schalter selbst (skaliert) – WinForms verschiebt ihn nur, sonst wäre sie doppelt skaliert.</summary>
+    protected override void ScaleControl(SizeF factor, BoundsSpecified specified) =>
+        base.ScaleControl(factor, specified & ~BoundsSpecified.Size);
 
     public bool Checked
     {
@@ -498,10 +656,11 @@ internal sealed class ToggleSwitch : Control, ISelfTranslating
         var p = Theme.Current;
         g.Clear(BackColor);
         g.SmoothingMode = SmoothingMode.AntiAlias;
-        var track = new RectangleF(Width - 42, (Height - 20) / 2f, 40, 20);
-        TextRenderer.DrawText(g, Tr.T(_checked ? "Ein" : "Aus"), UiFonts.Body, new Rectangle(0, 0, (int)track.X - 10, Height),
+        float k = UiScale.Factor;
+        var track = new RectangleF(Width - 42 * k, (Height - 20 * k) / 2f, 40 * k, 20 * k);
+        TextRenderer.DrawText(g, Tr.T(_checked ? "Ein" : "Aus"), UiFonts.Body, new Rectangle(0, 0, (int)(track.X - 10 * k), Height),
             Enabled ? p.Text : p.TextMuted, TextFormatFlags.Right | TextFormatFlags.VerticalCenter);
-        using var path = Theme.RoundedRect(track, 10);
+        using var path = Theme.RoundedRect(track, 10 * k);
         float t = _knob.Value;
         // Aus: Umriss; ein: Neon-Verlauf, der beim Umschalten ein- bzw. ausblendet.
         if (t < 1)
@@ -515,14 +674,14 @@ internal sealed class ToggleSwitch : Control, ISelfTranslating
             fill.LinearColors = [Color.FromArgb((int)(255 * t), fill.LinearColors[0]), Color.FromArgb((int)(255 * t), fill.LinearColors[1])];
             g.FillPath(fill, path);
         }
-        float d = 12 + (_hover && Enabled ? 2 : 0);
-        float x = track.X + 4 + (track.Width - 8 - 12) * t - (d - 12) / 2;
+        float d = (12 + (_hover && Enabled ? 2 : 0)) * k;
+        float x = track.X + 4 * k + (track.Width - 20 * k) * t - (d - 12 * k) / 2;
         var knobOff = Enabled ? p.TextMuted : p.Border;
         using (var knob = new SolidBrush(Theme.Blend(knobOff, Theme.OnAccent, t)))
             g.FillEllipse(knob, x, track.Y + (track.Height - d) / 2, d, d);
         if (Focused && ShowFocusCues)
         {
-            using var focus = Theme.RoundedRect(RectangleF.Inflate(track, 3, 3), 13);
+            using var focus = Theme.RoundedRect(RectangleF.Inflate(track, 3 * k, 3 * k), 13 * k);
             using var pen = new Pen(p.Text, 1.5f);
             g.DrawPath(pen, focus);
         }
@@ -537,15 +696,19 @@ internal sealed class Slider : Control, ISelfTranslating
     public event EventHandler? ValueChanged;
     public Func<int, string> Format { get; set; } = v => v.ToString();
     public int SmallChange { get; set; } = 1;
-    private const int ValueWidth = 76;
+    private static int ValueWidth => UiScale.Px(76);
 
     public Slider()
     {
         SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint
                  | ControlStyles.Selectable, true);
-        Size = new Size(300, 32);
+        Size = new Size(300, UiScale.Px(32));
         TabStop = true;
     }
+
+    /// <summary>Höhe setzt der Regler selbst (skaliert); Breite und Lage skaliert WinForms.</summary>
+    protected override void ScaleControl(SizeF factor, BoundsSpecified specified) =>
+        base.ScaleControl(factor, specified & ~BoundsSpecified.Height);
 
     public int Minimum { get => _min; set { _min = value; Value = _value; Invalidate(); } }
     public int Maximum { get => _max; set { _max = value; Value = _value; Invalidate(); } }
@@ -564,7 +727,7 @@ internal sealed class Slider : Control, ISelfTranslating
         }
     }
 
-    private RectangleF Track => new(10, Height / 2f - 2, Width - ValueWidth - 20, 4);
+    private RectangleF Track => new(UiScale.Px(10f), Height / 2f - UiScale.Px(2f), Width - ValueWidth - UiScale.Px(20), UiScale.Px(4f));
 
     private void SetFromMouse(int x)
     {
@@ -633,26 +796,26 @@ internal sealed class Slider : Control, ISelfTranslating
         var t = Track;
         float f = _max > _min ? (float)(_value - _min) / (_max - _min) : 0;
         float x = t.X + f * t.Width;
-        using (var rest = Theme.RoundedRect(t, 2))
+        using (var rest = Theme.RoundedRect(t, t.Height / 2))
         using (var restBrush = new SolidBrush(Theme.Blend(p.SurfaceHover, p.TextMuted, 0.55f)))
             g.FillPath(restBrush, rest);
         if (x > t.X + 1)
-            using (var done = Theme.RoundedRect(new RectangleF(t.X, t.Y, x - t.X, t.Height), 2))
+            using (var done = Theme.RoundedRect(new RectangleF(t.X, t.Y, x - t.X, t.Height), t.Height / 2))
             using (var accent = Theme.AccentBrush(t, 0, Enabled)) // Verlauf über die ganze Strecke: rechts wird es violetter
                 g.FillPath(accent, done);
         // Daumen: Ring in Flächenfarbe, innen Akzentpunkt (größer bei Hover/Ziehen) in der Verlaufsfarbe an dieser Stelle.
-        const float D = 20;
+        float D = UiScale.Px(20f);
         var outer = new RectangleF(x - D / 2, Height / 2f - D / 2, D, D);
         using (var ring = new SolidBrush(Theme.Dark ? p.SurfaceHover : Color.White))
             g.FillEllipse(ring, outer);
-        using (var border = new Pen(p.Border))
+        using (var border = new Pen(p.ControlBorder))
             g.DrawEllipse(border, outer);
-        float inner = _drag ? 10 : _hover ? 14 : 12;
-        using (var dot = new SolidBrush(Enabled ? Theme.Blend(Theme.Accent, Theme.Accent2, f) : p.TextMuted))
+        float inner = UiScale.Px(_drag ? 10f : _hover ? 14f : 12f);
+        using (var dot = new SolidBrush(Enabled ? Theme.Blend(Theme.AccentLine, Theme.Accent2Line, f) : p.TextMuted))
             g.FillEllipse(dot, x - inner / 2, Height / 2f - inner / 2, inner, inner);
         if (Focused && ShowFocusCues)
             using (var pen = new Pen(p.Text, 1.5f))
-                g.DrawEllipse(pen, RectangleF.Inflate(outer, 2, 2));
+                g.DrawEllipse(pen, RectangleF.Inflate(outer, UiScale.Px(2f), UiScale.Px(2f)));
         TextRenderer.DrawText(g, Tr.T(Format(_value)), UiFonts.Body, new Rectangle(Width - ValueWidth, 0, ValueWidth, Height),
             Enabled ? p.Text : p.TextMuted, TextFormatFlags.Right | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPrefix);
     }
@@ -676,9 +839,16 @@ internal sealed class Segmented : Control, IExtraTexts, ISelfTranslating
         _options = options;
         TabStop = true;
         Cursor = Cursors.Hand;
-        int w = options.Sum(o => TextRenderer.MeasureText(Tr.T(o), UiFonts.Body).Width + 28);
-        Size = new Size(w + 4, 32);
+        int w = options.Sum(o => TextRenderer.MeasureText(Tr.T(o), UiFonts.Body).Width + CellPad);
+        Size = new Size(w + UiScale.Px(4), UiScale.Px(32));
     }
+
+    /// <summary>Innenabstand je Feld (links + rechts), skaliert.</summary>
+    private static int CellPad => UiScale.Px(28);
+
+    /// <summary>Größe ergibt sich aus gemessenem Text und skalierten Abständen – WinForms nur die Lage überlassen.</summary>
+    protected override void ScaleControl(SizeF factor, BoundsSpecified specified) =>
+        base.ScaleControl(factor, specified & ~BoundsSpecified.Size);
 
     public IEnumerable<string> ExtraTexts => _options.Select(Tr.T);
 
@@ -698,10 +868,10 @@ internal sealed class Segmented : Control, IExtraTexts, ISelfTranslating
 
     private Rectangle Cell(int i)
     {
-        int x = 2;
+        int inset = UiScale.Px(2), x = inset;
         for (int k = 0; k < i; k++)
-            x += TextRenderer.MeasureText(Tr.T(_options[k]), UiFonts.Body).Width + 28;
-        return new Rectangle(x, 2, TextRenderer.MeasureText(Tr.T(_options[i]), UiFonts.Body).Width + 28, Height - 4);
+            x += TextRenderer.MeasureText(Tr.T(_options[k]), UiFonts.Body).Width + CellPad;
+        return new Rectangle(x, inset, TextRenderer.MeasureText(Tr.T(_options[i]), UiFonts.Body).Width + CellPad, Height - 2 * inset);
     }
 
     private int HitTest(Point pt)
@@ -748,16 +918,16 @@ internal sealed class Segmented : Control, IExtraTexts, ISelfTranslating
         var p = Theme.Current;
         g.Clear(BackColor);
         g.SmoothingMode = SmoothingMode.AntiAlias;
-        using (var outer = Theme.RoundedRect(new RectangleF(0.5f, 0.5f, Width - 1.5f, Height - 1.5f), 6))
+        using (var outer = Theme.RoundedRect(new RectangleF(0.5f, 0.5f, Width - 1.5f, Height - 1.5f), UiScale.Px(6f)))
         {
             using var back = new SolidBrush(p.SurfaceHover);
             g.FillPath(back, outer);
-            using var pen = new Pen(p.Border);
+            using var pen = new Pen(p.ControlBorder);
             g.DrawPath(pen, outer);
         }
         if (_hover >= 0 && _hover != _selected)
         {
-            using var cell = Theme.RoundedRect(Cell(_hover), 4);
+            using var cell = Theme.RoundedRect(Cell(_hover), UiScale.Px(4f));
             using var brush = new SolidBrush(Theme.Blend(p.SurfaceHover, p.Text, 0.08f));
             g.FillPath(brush, cell);
         }
@@ -767,7 +937,7 @@ internal sealed class Segmented : Control, IExtraTexts, ISelfTranslating
         float f = pos - a;
         Rectangle ra = Cell(a), rb = Cell(b);
         var mark = new RectangleF(ra.X + (rb.X - ra.X) * f, ra.Y, ra.Width + (rb.Width - ra.Width) * f, ra.Height);
-        using (var cell = Theme.RoundedRect(mark, 4))
+        using (var cell = Theme.RoundedRect(mark, UiScale.Px(4f)))
         using (var brush = Theme.AccentBrush(mark, 0, Enabled))
             g.FillPath(brush, cell);
         for (int i = 0; i < _options.Length; i++)
@@ -803,9 +973,9 @@ internal sealed class GlyphButton : Control, ISelfTranslating
         _glyph = glyph;
         Accent = accent;
         TabStop = true;
-        Height = 32;
+        Height = UiScale.Px(32);
         Cursor = Cursors.Hand;
-        Margin = new Padding(6, 0, 0, 0);
+        Margin = new Padding(UiScale.Px(6), 0, 0, 0);
         _hoverAnim = new Anim(this);
         FitWidth();
     }
@@ -822,10 +992,16 @@ internal sealed class GlyphButton : Control, ISelfTranslating
     public void FitWidth()
     {
         string text = Tr.T(Text);
-        int w = 24 + (text.Length > 0 ? TextRenderer.MeasureText(text, UiFonts.Body).Width : 0) + (_glyph is null ? 0 : 24)
-                + (TrailingGlyph is null ? 0 : 20) - (text.Length == 0 ? 10 : 0);
-        Width = Math.Max(text.Length == 0 ? 34 : 64, w);
+        static int S(int v) => UiScale.Px(v);
+        int w = S(24) + (text.Length > 0 ? TextRenderer.MeasureText(text, UiFonts.Body).Width : 0) + (_glyph is null ? 0 : S(24))
+                + (TrailingGlyph is null ? 0 : S(20)) - (text.Length == 0 ? S(10) : 0);
+        Width = Math.Max(S(text.Length == 0 ? 34 : 64), w);
     }
+
+    /// <summary>Größe ergibt sich aus gemessenem Text und skalierten Abständen – WinForms nur die Lage überlassen
+    /// (sonst wären Knöpfe, die beim Öffnen des Fensters schon existieren, doppelt so breit skaliert).</summary>
+    protected override void ScaleControl(SizeF factor, BoundsSpecified specified) =>
+        base.ScaleControl(factor, specified & ~BoundsSpecified.Size);
 
     protected override void OnTextChanged(EventArgs e)
     {
@@ -858,7 +1034,8 @@ internal sealed class GlyphButton : Control, ISelfTranslating
         bool accent = Accent || (Toggle && _checked);
         float hover = Enabled ? _hoverAnim.Value : 0;
         var r = new RectangleF(0.5f, 0.5f, Width - 1.5f, Height - 1.5f);
-        using (var path = Theme.RoundedRect(r, 5))
+        static int S(int v) => UiScale.Px(v);
+        using (var path = Theme.RoundedRect(r, S(5)))
         {
             if (accent)
             {
@@ -873,38 +1050,42 @@ internal sealed class GlyphButton : Control, ISelfTranslating
             }
             else
             {
-                Color back = Theme.Blend(p.SurfaceHover, p.Text, Enabled && _down ? 0.14f : 0.08f * hover);
+                Color back = Theme.Blend(p.SurfaceHover, p.Text, Enabled && _down ? 0.14f : 0.07f * hover);
                 using var fill = new SolidBrush(back);
                 g.FillPath(fill, path);
-                // Rand färbt sich beim Hover leicht zum Akzent.
-                using var pen = new Pen(Theme.Blend(p.Border, Theme.Accent, 0.45f * hover));
+                // Lichtkante oben (im dunklen Modus) gibt dem Knopf etwas Tiefe.
+                if (Theme.Dark && !_down)
+                    using (var shine = new Pen(Color.FromArgb(22, Color.White)))
+                        g.DrawLine(shine, r.X + S(5), r.Y + 1, r.Right - S(5), r.Y + 1);
+                // Rand: kräftiger als Kartenränder, färbt sich beim Hover zum Akzent.
+                using var pen = new Pen(Enabled ? Theme.Blend(p.ControlBorder, Theme.AccentLine, 0.6f * hover) : p.Border);
                 g.DrawPath(pen, path);
             }
         }
         var fore = !Enabled ? p.TextMuted : accent ? Theme.OnAccent : p.Text;
         string text = Tr.T(Text);
         int textW = text.Length > 0 ? TextRenderer.MeasureText(text, UiFonts.Body).Width : 0;
-        int total = (_glyph is null ? 0 : 16) + (_glyph is not null && textW > 0 ? 8 : 0) + textW + (TrailingGlyph is null ? 0 : 18);
+        int total = (_glyph is null ? 0 : S(16)) + (_glyph is not null && textW > 0 ? S(8) : 0) + textW + (TrailingGlyph is null ? 0 : S(18));
         int x = (Width - total) / 2;
         if (_glyph is not null)
         {
-            if (!Glyph.Paint(g, _glyph, new Rectangle(x, 0, 18, Height), fore, 10.5f))
-                TextRenderer.DrawText(g, _glyph, Glyph.Font(10.5f), new Rectangle(x, 0, 16, Height), fore,
+            if (!Glyph.Paint(g, _glyph, new Rectangle(x, 0, S(18), Height), fore, 10.5f))
+                TextRenderer.DrawText(g, _glyph, Glyph.Font(10.5f), new Rectangle(x, 0, S(16), Height), fore,
                     TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
-            x += textW > 0 ? 24 : 16;
+            x += textW > 0 ? S(24) : S(16);
         }
         if (textW > 0)
         {
-            TextRenderer.DrawText(g, text, UiFonts.Body, new Rectangle(x, 0, textW + 2, Height), fore,
+            TextRenderer.DrawText(g, text, UiFonts.Body, new Rectangle(x, 0, textW + S(2), Height), fore,
                 TextFormatFlags.VerticalCenter | TextFormatFlags.NoPrefix | TextFormatFlags.NoPadding);
-            x += textW + 8;
+            x += textW + S(8);
         }
         if (TrailingGlyph is not null)
-            TextRenderer.DrawText(g, TrailingGlyph, Glyph.Font(8f), new Rectangle(x, 0, 12, Height), fore,
+            TextRenderer.DrawText(g, TrailingGlyph, Glyph.Font(8f), new Rectangle(x, 0, S(12), Height), fore,
                 TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
         if (Focused && ShowFocusCues)
             using (var pen = new Pen(p.Text, 1.5f))
-            using (var path = Theme.RoundedRect(RectangleF.Inflate(r, -2, -2), 4))
+            using (var path = Theme.RoundedRect(RectangleF.Inflate(r, -S(2), -S(2)), S(4)))
                 g.DrawPath(pen, path);
     }
 }
@@ -912,6 +1093,10 @@ internal sealed class GlyphButton : Control, ISelfTranslating
 /// <summary>Reiterleiste (Text mit Akzentstrich unter dem gewählten Reiter), z. B. in der Controller-Karte.</summary>
 internal sealed class PivotTabs : Control, IExtraTexts, ISelfTranslating
 {
+    /// <summary>Größe (skaliert über UiScale) setzt das Steuerelement selbst – WinForms nur Lage überlassen.</summary>
+    protected override void ScaleControl(SizeF factor, BoundsSpecified specified) =>
+        base.ScaleControl(factor, specified & ~BoundsSpecified.Height);
+
     private readonly List<(string Text, bool Shown)> _tabs = [];
     private int _selected, _hover = -1;
     public event EventHandler? SelectedIndexChanged;
@@ -920,7 +1105,7 @@ internal sealed class PivotTabs : Control, IExtraTexts, ISelfTranslating
     {
         SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint
                  | ControlStyles.ResizeRedraw | ControlStyles.Selectable, true);
-        Height = 40;
+        Height = UiScale.Px(40);
         TabStop = true;
     }
 
@@ -965,9 +1150,9 @@ internal sealed class PivotTabs : Control, IExtraTexts, ISelfTranslating
         {
             if (!_tabs[i].Shown)
                 continue;
-            int w = TextRenderer.MeasureText(Tr.T(_tabs[i].Text), UiFonts.Strong).Width + 24;
+            int w = TextRenderer.MeasureText(Tr.T(_tabs[i].Text), UiFonts.Strong).Width + UiScale.Px(24);
             yield return (i, new Rectangle(x, 0, w, Height));
-            x += w + 4;
+            x += w + UiScale.Px(4);
         }
     }
 
@@ -1013,7 +1198,7 @@ internal sealed class PivotTabs : Control, IExtraTexts, ISelfTranslating
             bool sel = i == _selected;
             if (i == _hover && !sel)
             {
-                using var hover = Theme.RoundedRect(Rectangle.Inflate(r, 0, -5), 5);
+                using var hover = Theme.RoundedRect(Rectangle.Inflate(r, 0, -UiScale.Px(5)), UiScale.Px(5));
                 using var brush = new SolidBrush(p.SurfaceHover);
                 g.FillPath(brush, hover);
             }
@@ -1021,13 +1206,13 @@ internal sealed class PivotTabs : Control, IExtraTexts, ISelfTranslating
                 TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPrefix);
             if (sel)
             {
-                var barRect = new RectangleF(r.X + r.Width / 2f - 14, r.Bottom - 4, 28, 3);
+                var barRect = new RectangleF(r.X + r.Width / 2f - UiScale.Px(14f), r.Bottom - UiScale.Px(4f), UiScale.Px(28f), UiScale.Px(3f));
                 using var bar = Theme.RoundedRect(barRect, 1.5f);
-                using var accent = Theme.AccentBrush(barRect);
+                using var accent = Theme.LineBrush(barRect);
                 g.FillPath(accent, bar);
                 if (Focused && ShowFocusCues)
                     using (var pen = new Pen(p.Text))
-                        g.DrawRectangle(pen, Rectangle.Inflate(r, -2, -6));
+                        g.DrawRectangle(pen, Rectangle.Inflate(r, -UiScale.Px(2), -UiScale.Px(6)));
             }
         }
     }
@@ -1037,6 +1222,10 @@ internal sealed class PivotTabs : Control, IExtraTexts, ISelfTranslating
 /// Mit <see cref="Expandable"/> zeigt er rechts einen Pfeil und klappt Unterpunkte auf bzw. zu.</summary>
 internal sealed class NavItem : Control, ISelfTranslating
 {
+    /// <summary>Größe (skaliert über UiScale) setzt das Steuerelement selbst – WinForms nur Lage überlassen.</summary>
+    protected override void ScaleControl(SizeF factor, BoundsSpecified specified) =>
+        base.ScaleControl(factor, specified & ~BoundsSpecified.Size);
+
     private readonly string _glyph;
     private bool _selected, _expanded;
 
@@ -1046,14 +1235,14 @@ internal sealed class NavItem : Control, ISelfTranslating
                  | ControlStyles.Selectable | ControlStyles.StandardClick | ControlStyles.ResizeRedraw, true);
         Text = text;
         _glyph = glyph;
-        Height = 44;
+        Height = UiScale.Px(44);
         Cursor = Cursors.Hand;
         TabStop = true;
-        Margin = new Padding(0, 0, 0, 4);
+        Margin = new Padding(0, 0, 0, UiScale.Px(4));
         _hoverAnim = new Anim(this);
         MouseDown += (_, e) =>
         {
-            if (e.Button == MouseButtons.Left && Expandable && e.X >= Width - 34)
+            if (e.Button == MouseButtons.Left && Expandable && e.X >= Width - UiScale.Px(34))
                 ExpandToggled?.Invoke();
             else
                 select();
@@ -1095,12 +1284,18 @@ internal sealed class NavItem : Control, ISelfTranslating
         var r = new RectangleF(0.5f, 0.5f, Width - 1.5f, Height - 1.5f);
         if (_selected || _hoverAnim.Value > 0)
         {
-            using var path = Theme.RoundedRect(r, 6);
+            using var path = Theme.RoundedRect(r, UiScale.Px(6));
             // Gewählt: Fläche mit einem Hauch Neon-Verlauf; Hover: leicht aufgehellt (blendet weich ein).
-            if (_selected)
+            if (_selected && Theme.Neon)
             {
                 using var brush = Theme.AccentBrush(r);
                 brush.LinearColors = [Theme.Blend(p.SurfaceHover, Theme.Accent, 0.16f), Theme.Blend(p.SurfaceHover, Theme.Accent2, 0.06f)];
+                g.FillPath(brush, path);
+            }
+            else if (_selected)
+            {
+                // Wie die Navigation in Windows 11: dezente helle Fläche, Akzent nur in der Marke links.
+                using var brush = new SolidBrush(Theme.Blend(BackColor, p.Text, Theme.Dark ? 0.06f : 0.045f));
                 g.FillPath(brush, path);
             }
             else
@@ -1111,20 +1306,20 @@ internal sealed class NavItem : Control, ISelfTranslating
         }
         if (_selected)
         {
-            var pillRect = new RectangleF(0, Height / 2f - 10, 3, 20);
+            var pillRect = new RectangleF(0, Height / 2f - UiScale.Px(10f), UiScale.Px(3f), UiScale.Px(20f));
             using var pill = Theme.RoundedRect(pillRect, 1.5f);
-            using var accent = Theme.AccentBrush(pillRect, 90);
+            using var accent = Theme.LineBrush(pillRect, 90);
             g.FillPath(accent, pill);
         }
-        var glyphColor = _selected ? Theme.Blend(Theme.Accent, p.Text, Theme.Dark ? 0.35f : 0.1f) : p.Text;
-        if (!Glyph.Paint(g, _glyph, new Rectangle(12, 0, 24, Height), glyphColor, 12f))
-            TextRenderer.DrawText(g, _glyph, Glyph.Font(12f), new Rectangle(12, 0, 24, Height), glyphColor,
+        var glyphColor = _selected && Theme.Neon ? Theme.Blend(Theme.AccentLine, p.Text, Theme.Dark ? 0.2f : 0.1f) : p.Text;
+        if (!Glyph.Paint(g, _glyph, new Rectangle(UiScale.Px(12), 0, UiScale.Px(24), Height), glyphColor, 12f))
+            TextRenderer.DrawText(g, _glyph, Glyph.Font(12f), new Rectangle(UiScale.Px(12), 0, UiScale.Px(24), Height), glyphColor,
                 TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
-        TextRenderer.DrawText(g, Tr.T(Text), UiFonts.Body, new Rectangle(44, 0, Width - 56, Height), p.Text,
+        TextRenderer.DrawText(g, Tr.T(Text), UiFonts.Body, new Rectangle(UiScale.Px(44), 0, Width - UiScale.Px(56), Height), p.Text,
             TextFormatFlags.VerticalCenter | TextFormatFlags.NoPrefix | TextFormatFlags.EndEllipsis);
         if (Expandable)
             TextRenderer.DrawText(g, _expanded ? Glyph.ChevronUp : Glyph.ChevronDown, Glyph.Font(9f),
-                new Rectangle(Width - 32, 0, 24, Height), p.TextMuted,
+                new Rectangle(Width - UiScale.Px(32), 0, UiScale.Px(24), Height), p.TextMuted,
                 TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
         if (Focused && ShowFocusCues)
             using (var pen = new Pen(p.Text, 1.5f))
@@ -1137,6 +1332,10 @@ internal sealed class NavItem : Control, ISelfTranslating
 /// Ohne Aktion ist er deaktiviert gezeichnet (z. B. „Kein Controller verbunden“).</summary>
 internal sealed class NavSubItem : Control, ISelfTranslating
 {
+    /// <summary>Größe (skaliert über UiScale) setzt das Steuerelement selbst – WinForms nur Lage überlassen.</summary>
+    protected override void ScaleControl(SizeF factor, BoundsSpecified specified) =>
+        base.ScaleControl(factor, specified & ~BoundsSpecified.Size);
+
     private bool _hover, _selected;
 
     public NavSubItem(string text, Action? select)
@@ -1144,11 +1343,11 @@ internal sealed class NavSubItem : Control, ISelfTranslating
         SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint
                  | ControlStyles.Selectable | ControlStyles.ResizeRedraw, true);
         Text = text;
-        Height = 32;
+        Height = UiScale.Px(32);
         Enabled = select is not null;
         Cursor = select is null ? Cursors.Default : Cursors.Hand;
         TabStop = select is not null;
-        Margin = new Padding(0, 0, 0, 2);
+        Margin = new Padding(0, 0, 0, UiScale.Px(2));
         if (select is not null)
         {
             Click += (_, _) => select();
@@ -1175,17 +1374,17 @@ internal sealed class NavSubItem : Control, ISelfTranslating
         if (_selected || (_hover && Enabled))
         {
             using var path = Theme.RoundedRect(new RectangleF(0.5f, 0.5f, Width - 1.5f, Height - 1.5f), 5);
-            using var brush = new SolidBrush(_selected ? p.SurfaceHover : Theme.Blend(BackColor, p.Text, 0.05f));
+            using var brush = new SolidBrush(Theme.Blend(BackColor, p.Text, _selected ? (Theme.Dark ? 0.06f : 0.045f) : 0.035f));
             g.FillPath(brush, path);
         }
         if (_selected)
         {
-            var pillRect = new RectangleF(24, Height / 2f - 8, 3, 16);
+            var pillRect = new RectangleF(UiScale.Px(24f), Height / 2f - UiScale.Px(8f), UiScale.Px(3f), UiScale.Px(16f));
             using var pill = Theme.RoundedRect(pillRect, 1.5f);
-            using var accent = Theme.AccentBrush(pillRect, 90);
+            using var accent = Theme.LineBrush(pillRect, 90);
             g.FillPath(accent, pill);
         }
-        TextRenderer.DrawText(g, Tr.T(Text), UiFonts.Small, new Rectangle(48, 0, Width - 62, Height),
+        TextRenderer.DrawText(g, Tr.T(Text), UiFonts.Small, new Rectangle(UiScale.Px(48), 0, Width - UiScale.Px(62), Height),
             Enabled ? p.Text : p.TextMuted,
             TextFormatFlags.VerticalCenter | TextFormatFlags.NoPrefix | TextFormatFlags.EndEllipsis);
     }
@@ -1197,6 +1396,10 @@ internal sealed class NavSubItem : Control, ISelfTranslating
 /// </summary>
 internal sealed class TextField : Panel
 {
+    /// <summary>Größe (skaliert über UiScale) setzt das Steuerelement selbst – WinForms nur Lage überlassen.</summary>
+    protected override void ScaleControl(SizeF factor, BoundsSpecified specified) =>
+        base.ScaleControl(factor, specified & ~BoundsSpecified.Height);
+
     public TextBox Box { get; }
 
     public TextField(TextBox box, int? width = null)
@@ -1204,7 +1407,7 @@ internal sealed class TextField : Panel
         Box = box;
         SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint
                  | ControlStyles.ResizeRedraw, true);
-        Size = new Size(width ?? box.Width, 32);
+        Size = new Size(width ?? box.Width, UiScale.Px(32));
         Location = box.Location;
         box.BorderStyle = BorderStyle.None;
         box.Font = UiFonts.Body;
@@ -1221,7 +1424,7 @@ internal sealed class TextField : Panel
     protected override void OnLayout(LayoutEventArgs levent)
     {
         base.OnLayout(levent);
-        Box.SetBounds(10, (Height - Box.PreferredHeight) / 2 + 1, Math.Max(10, Width - 20), Box.PreferredHeight);
+        Box.SetBounds(UiScale.Px(10), (Height - Box.PreferredHeight) / 2 + 1, Math.Max(10, Width - UiScale.Px(20)), Box.PreferredHeight);
     }
 
     protected override void OnPaint(PaintEventArgs e)
@@ -1235,12 +1438,12 @@ internal sealed class TextField : Panel
         {
             using var fill = new SolidBrush(Box.BackColor);
             g.FillPath(fill, path);
-            using var pen = new Pen(p.Border);
+            using var pen = new Pen(Box.Focused ? Theme.Blend(p.ControlBorder, Theme.AccentLine, 0.85f) : p.ControlBorder);
             g.DrawPath(pen, path);
         }
         if (Box.Focused)
         {
-            using var brush = Theme.AccentBrush(new RectangleF(4, Height - 3, Width - 9, 3));
+            using var brush = Theme.LineBrush(new RectangleF(4, Height - 3, Width - 9, 3));
             using var accent = new Pen(brush, 2f);
             g.DrawLine(accent, 4, Height - 1.5f, Width - 5, Height - 1.5f);
         }
@@ -1250,14 +1453,14 @@ internal sealed class TextField : Panel
 /// <summary>Seite mit senkrechtem Bildlauf; Inhalt (StackPanel) in voller Breite bis zu einer Höchstbreite.</summary>
 internal sealed class ScrollPage : Panel
 {
-    public StackPanel Content { get; } = new() { Spacing = 0, Padding = new Padding(0, 0, 0, 24) };
+    public StackPanel Content { get; } = new() { Spacing = 0, Padding = new Padding(0, 0, 0, UiScale.Px(24)) };
     public int MaxContentWidth { get; set; } = 1240;
 
     public ScrollPage()
     {
         AutoScroll = true;
         BackColor = Theme.Backdrop;
-        Padding = new Padding(28, 20, 28, 0);
+        Padding = new Padding(UiScale.Px(28), UiScale.Px(20), UiScale.Px(28), 0);
         Controls.Add(Content);
         Content.Resize += (_, _) => AdjustScroll();
         Theme.DarkScroll(this);

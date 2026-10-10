@@ -10,6 +10,8 @@ internal static partial class Tr
         // ---------- Fenster, Reiter, Abschnitte ----------
         ["Controller"] = "컨트롤러",
         // ---------- Status-Kopfzeile, Ansicht ----------
+        ["Farbschema"] = "색 구성표",
+        ["Farben für Akzente, Knöpfe, Flächen und Ränder."] = "강조색, 버튼, 배경, 테두리 색상.",
         ["bereit"] = "준비됨",
         ["nicht verfügbar"] = "사용할 수 없음",
         ["Niedrigster Akku"] = "최저 배터리",

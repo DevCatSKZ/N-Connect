@@ -166,7 +166,7 @@ internal sealed partial class InputView
             g.FillRectangle(fill, r.X, r.Y, r.Width * Math.Clamp(value, 0f, 1f), r.Height);
             g.Restore(state);
         }
-        using (var edge = new Pen(on ? Color.FromArgb(160, 235, 255) : Mix(color, Color.Black, 0.35f), 1.2f))
+        using (var edge = new Pen(on ? Mix(Accent, Color.White, 0.6f) : Mix(color, Color.Black, 0.35f), 1.2f))
             g.DrawPath(edge, path);
         var label = on || value > 0.5f ? Color.White : color.GetBrightness() > 0.55f ? Mix(color, Color.Black, 0.6f) : Mix(color, Color.White, 0.7f);
         var captionRect = tucked ? new RectangleF(r.X, r.Y, r.Width, r.Height * 0.5f) : r;
@@ -217,7 +217,7 @@ internal sealed partial class InputView
             g.FillRectangle(fill, xL, bounds.Y, (xR - xL) * Math.Clamp(value, 0f, 1f), bounds.Height);
             g.Restore(clip);
         }
-        using (var edge = new Pen(on ? Color.FromArgb(160, 235, 255) : Mix(color, Color.Black, 0.35f), 1.2f))
+        using (var edge = new Pen(on ? Mix(Accent, Color.White, 0.6f) : Mix(color, Color.Black, 0.35f), 1.2f))
             g.DrawPath(edge, path);
         // Beschriftung auf dem sichtbaren Band direkt unter der gewölbten Oberkante (Bézier-Mitte bei t = 0,5).
         var mid = new PointF((p0.X + 2 * pm.X + p1.X) / 4, (p0.Y + 2 * pm.Y + p1.Y) / 4 + labelDy * f.Scale);

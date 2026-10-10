@@ -19,9 +19,9 @@ internal sealed class StickCalibrationForm : UiForm
     private readonly Action _save;
     private readonly List<StickRef> _sticks;
     private readonly Segmented? _choice;
-    private readonly Canvas _canvas = new() { Size = new Size(300, 300) };
-    private readonly Label _step = new() { AutoSize = false, Size = new Size(250, 120), Font = UiFonts.Body };
-    private readonly Label _result = new() { AutoSize = false, Size = new Size(250, 90), Font = UiFonts.Small };
+    private readonly Canvas _canvas = new() { Size = new Size(UiScale.Px(300), UiScale.Px(300)) };
+    private readonly Label _step = new() { AutoSize = false, Size = new Size(UiScale.Px(250), UiScale.Px(120)), Font = UiFonts.Body };
+    private readonly Label _result = new() { AutoSize = false, Size = new Size(UiScale.Px(250), UiScale.Px(90)), Font = UiFonts.Small };
     private readonly GlyphButton _measure = new("Neu messen", Glyph.Stick, accent: true);
     private readonly GlyphButton _apply = new("Übernehmen", Glyph.Check);
     private readonly GlyphButton _factory = new("Werkswerte", Glyph.Undo);
@@ -62,30 +62,31 @@ internal sealed class StickCalibrationForm : UiForm
         MinimizeBox = MaximizeBox = false;
         ShowInTaskbar = false;
         Font = UiFonts.Body;
-        AutoScaleDimensions = new SizeF(96F, 96F);
-        AutoScaleMode = AutoScaleMode.Dpi;
-        ClientSize = new Size(600, 420);
+        AutoScaleDimensions = UiScale.Dimensions;
+        AutoScaleMode = AutoScaleMode.None;
+        ClientSize = new Size(UiScale.Px(600), UiScale.Px(420));
 
-        int top = 16;
+        static int S(int v) => UiScale.Px(v);
+        int top = S(16);
         if (_sticks.Count > 1)
         {
-            _choice = new Segmented(_sticks.Select(s => s.Title).ToArray()) { Location = new Point(20, top) };
+            _choice = new Segmented(_sticks.Select(s => s.Title).ToArray()) { Location = new Point(S(20), top) };
             _choice.SelectedIndexChanged += (_, _) => SelectStick(_choice.SelectedIndex);
             Controls.Add(_choice);
-            top += 48;
+            top += S(48);
         }
-        _canvas.Location = new Point(20, top);
-        _step.Location = new Point(_canvas.Right + 24, top);
-        _result.Location = new Point(_canvas.Right + 24, _step.Bottom + 8);
-        int buttons = top + _canvas.Height + 16;
-        _measure.Location = new Point(20, buttons);
-        _apply.Location = new Point(_measure.Right + 8, buttons);
-        _factory.Location = new Point(_apply.Right + 8, buttons);
+        _canvas.Location = new Point(S(20), top);
+        _step.Location = new Point(_canvas.Right + S(24), top);
+        _result.Location = new Point(_canvas.Right + S(24), _step.Bottom + S(8));
+        int buttons = top + _canvas.Height + S(16);
+        _measure.Location = new Point(S(20), buttons);
+        _apply.Location = new Point(_measure.Right + S(8), buttons);
+        _factory.Location = new Point(_apply.Right + S(8), buttons);
         _measure.Click += (_, _) => Start();
         _apply.Click += (_, _) => Apply();
         _factory.Click += (_, _) => Factory();
         Controls.AddRange([_canvas, _step, _result, _measure, _apply, _factory]);
-        ClientSize = new Size(Math.Max(600, _factory.Right + 20), buttons + _measure.Height + 20);
+        ClientSize = new Size(Math.Max(S(600), _factory.Right + S(20)), buttons + _measure.Height + S(20));
 
         _timer.Tick += (_, _) => Tick();
         Theme.Apply(this);
@@ -223,7 +224,8 @@ internal sealed class StickCalibrationForm : UiForm
             var p = Theme.Current;
             g.Clear(p.Surface);
             g.SmoothingMode = SmoothingMode.AntiAlias;
-            float r = Math.Min(Width, Height) / 2f - 14, cx = Width / 2f, cy = Height / 2f;
+            float k = UiScale.Factor; // Randabstand und Punktgrößen wachsen mit der Skalierung
+            float r = Math.Min(Width, Height) / 2f - 14 * k, cx = Width / 2f, cy = Height / 2f;
             using (var axis = new Pen(p.Border))
             {
                 g.DrawLine(axis, cx - r, cy, cx + r, cy);
@@ -234,15 +236,15 @@ internal sealed class StickCalibrationForm : UiForm
             if (Edge is { Count: > 0 } edge)
                 using (var dot = new SolidBrush(Theme.Blend(p.Surface, Theme.Accent, 0.7f)))
                     foreach (var (x, y) in edge)
-                        g.FillEllipse(dot, cx + x * r - 3, cy - y * r - 3, 6, 6);
+                        g.FillEllipse(dot, cx + x * r - 3 * k, cy - y * r - 3 * k, 6 * k, 6 * k);
             if (Progress > 0 && Progress < 1)
-                using (var arc = new Pen(Theme.Accent, 4f))
-                    g.DrawArc(arc, cx - r - 8, cy - r - 8, 2 * r + 16, 2 * r + 16, -90, 360 * Progress);
+                using (var arc = new Pen(Theme.Accent, 4f * k))
+                    g.DrawArc(arc, cx - r - 8 * k, cy - r - 8 * k, 2 * r + 16 * k, 2 * r + 16 * k, -90, 360 * Progress);
             float px = cx + Point.X * r, py = cy - Point.Y * r;
             using (var line = new Pen(Theme.Blend(p.Surface, Theme.Accent, 0.5f), 1.5f))
                 g.DrawLine(line, cx, cy, px, py);
             using (var stick = new SolidBrush(Theme.Accent))
-                g.FillEllipse(stick, px - 7, py - 7, 14, 14);
+                g.FillEllipse(stick, px - 7 * k, py - 7 * k, 14 * k, 14 * k);
         }
     }
 }

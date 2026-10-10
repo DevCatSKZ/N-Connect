@@ -112,7 +112,7 @@ internal static class RenderCheck
         string variant = (Environment.GetCommandLineArgs().Contains("--demo-all") ? "_alle" : Environment.GetCommandLineArgs().Contains("--demo-retro") ? "_retro" : "")
                          + (Environment.GetCommandLineArgs().Contains("--wide") ? "_breit" : "")
                          + (Environment.GetCommandLineArgs().Contains("--compact") ? "_kompakt" : "");
-        var log = new List<string>();
+        var log = new List<string> { $"Unsichtbarer Desktop: {(UiForm.Isolated ? "ja" : "nein")}, Skalierung {UiScale.Factor:0.##}" };
         using var factory = PadFactory.TryCreate();
         ControllerManager? manager = factory is null ? null : new ControllerManager(() => new Settings(), factory);
         try
@@ -121,7 +121,10 @@ internal static class RenderCheck
             // Als echtes Fenster außerhalb des sichtbaren Bereichs anzeigen, damit alle Steuerelemente entstehen.
             var sw = System.Diagnostics.Stopwatch.StartNew();
             // --compact: Controller-Übersicht in der kompakten Ansicht prüfen.
-            var uiSettings = new Settings { CompactCards = Environment.GetCommandLineArgs().Contains("--compact") };
+            var uiSettings = new Settings
+            {
+                CompactCards = Environment.GetCommandLineArgs().Contains("--compact"), ColorScheme = Theme.ActiveScheme.Id,
+            };
             using var form = new SettingsForm(uiSettings, _ => { }, manager, wiiPairing: () => { })
             {
                 StartPosition = FormStartPosition.Manual, Location = new Point(-6000, -6000), ShowInTaskbar = false, ShowInactive = true,

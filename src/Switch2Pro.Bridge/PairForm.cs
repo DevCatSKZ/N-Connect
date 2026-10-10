@@ -16,7 +16,7 @@ internal sealed class PairForm : UiForm
     private const int SearchSeconds = 60;
 
     private readonly ControllerManager? _manager;
-    private readonly ScrollPage _page = new() { Padding = new Padding(24, 18, 24, 0), Dock = DockStyle.Fill };
+    private readonly ScrollPage _page = new() { Padding = new Padding(UiScale.Px(24), UiScale.Px(18), UiScale.Px(24), 0), Dock = DockStyle.Fill };
     private readonly SettingRow _status = new("Suche läuft …", null, null, Glyph.Sync);
     private readonly SettingsGroup _connected;
     private readonly Heading _connectedHeading = new("Verbunden");
@@ -37,10 +37,10 @@ internal sealed class PairForm : UiForm
         StartPosition = FormStartPosition.CenterScreen;
         FormBorderStyle = FormBorderStyle.FixedDialog;
         MinimizeBox = MaximizeBox = false;
-        ClientSize = new Size(640, 720);
+        ClientSize = new Size(UiScale.Px(640), UiScale.Px(720));
         Font = UiFonts.Body;
-        AutoScaleDimensions = new SizeF(96F, 96F);
-        AutoScaleMode = AutoScaleMode.Dpi;
+        AutoScaleDimensions = UiScale.Dimensions;
+        AutoScaleMode = AutoScaleMode.None;
         KeyPreview = true;
 
         var content = _page.Content;
@@ -61,7 +61,7 @@ internal sealed class PairForm : UiForm
             new SettingRow("PlayStation: DualShock 4, DualSense", "PS + Teilen bzw. Create halten, bis die Lichtleiste schnell blinkt.", null, Glyph.Gamepad),
             new SettingRow("Xbox über Bluetooth: One S, Series X|S, Elite", "Kopplungstaste oben halten, bis die Xbox-Taste blinkt.", null, Glyph.Gamepad));
 
-        var footer = new Panel { Dock = DockStyle.Bottom, Height = 64, BackColor = Theme.Current.Surface };
+        var footer = new Panel { Dock = DockStyle.Bottom, Height = UiScale.Px(64), BackColor = Theme.Current.Surface };
         footer.Paint += (_, e) =>
         {
             using var pen = new Pen(Theme.Current.Border);
@@ -72,8 +72,8 @@ internal sealed class PairForm : UiForm
         footer.Controls.AddRange([_again, _done]);
         footer.Layout += (_, _) =>
         {
-            _done.Location = new Point(footer.Width - 24 - _done.Width, 16);
-            _again.Location = new Point(_done.Left - 8 - _again.Width, 16);
+            _done.Location = new Point(footer.Width - UiScale.Px(24) - _done.Width, (footer.Height - _done.Height) / 2);
+            _again.Location = new Point(_done.Left - UiScale.Px(8) - _again.Width, (footer.Height - _again.Height) / 2);
         };
         _again.BackColor = _done.BackColor = footer.BackColor;
         _again.Visible = false;

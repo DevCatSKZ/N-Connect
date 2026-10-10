@@ -37,14 +37,14 @@ internal sealed class WelcomeForm : UiForm
         StartPosition = FormStartPosition.CenterScreen;
         FormBorderStyle = FormBorderStyle.FixedDialog;
         MaximizeBox = MinimizeBox = false;
-        Font = new Font("Segoe UI", 10f);
-        AutoScaleDimensions = new SizeF(96F, 96F);
-        AutoScaleMode = AutoScaleMode.Dpi;
-        ClientSize = new Size(700, 440);
+        Font = UiFonts.Body;
+        AutoScaleDimensions = UiScale.Dimensions;
+        AutoScaleMode = AutoScaleMode.None;
+        ClientSize = new Size(UiScale.Px(700), UiScale.Px(440));
 
-        var text = new Label { Dock = DockStyle.Fill, Padding = new Padding(20), Text = Tr.English ? English : German };
+        var text = new Label { Dock = DockStyle.Fill, Padding = new Padding(UiScale.Px(20)), Text = Tr.English ? English : German };
 
-        var buttons = new FlowLayoutPanel { Dock = DockStyle.Bottom, Height = 52, FlowDirection = FlowDirection.RightToLeft, Padding = new Padding(10) };
+        var buttons = new FlowLayoutPanel { Dock = DockStyle.Bottom, Height = UiScale.Px(52), FlowDirection = FlowDirection.RightToLeft, Padding = new Padding(UiScale.Px(10)) };
         var ok = new Button { Text = Tr.T("Verstanden"), AutoSize = true, DialogResult = DialogResult.OK };
         var settings = new Button { Text = Tr.T("Einstellungen öffnen"), AutoSize = true, DialogResult = DialogResult.OK };
         settings.Click += (_, _) => OpenSettings = true;

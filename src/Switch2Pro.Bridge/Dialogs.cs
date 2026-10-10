@@ -8,7 +8,7 @@ internal sealed class KeyCaptureDialog : UiForm
 {
     private readonly Label _shown = new()
     {
-        AutoSize = false, Dock = DockStyle.Top, Height = 60, TextAlign = ContentAlignment.MiddleCenter,
+        AutoSize = false, Dock = DockStyle.Top, Height = UiScale.Px(60), TextAlign = ContentAlignment.MiddleCenter,
         Font = new Font("Segoe UI Semibold", 16f), Text = "…",
     };
 
@@ -23,19 +23,19 @@ internal sealed class KeyCaptureDialog : UiForm
         MinimizeBox = MaximizeBox = false;
         ShowInTaskbar = false;
         KeyPreview = true;
-        ClientSize = new Size(440, 170);
-        Font = new Font("Segoe UI", 9.5f);
-        AutoScaleDimensions = new SizeF(96F, 96F);
-        AutoScaleMode = AutoScaleMode.Dpi;
+        ClientSize = new Size(UiScale.Px(440), UiScale.Px(170));
+        Font = UiFonts.Body;
+        AutoScaleDimensions = UiScale.Dimensions;
+        AutoScaleMode = AutoScaleMode.None;
 
         var hint = new Label
         {
-            AutoSize = false, Dock = DockStyle.Top, Height = 48, TextAlign = ContentAlignment.MiddleCenter,
+            AutoSize = false, Dock = DockStyle.Top, Height = UiScale.Px(48), TextAlign = ContentAlignment.MiddleCenter,
             Text = $"Controller-Taste „{buttonName}“:\nJetzt die gewünschte Taste oder Tastenkombination drücken.",
         };
         var ok = new Button { Text = "Übernehmen", DialogResult = DialogResult.OK, Enabled = false, AutoSize = true };
         var cancel = new Button { Text = "Abbrechen", DialogResult = DialogResult.Cancel, AutoSize = true };
-        var bar = new FlowLayoutPanel { Dock = DockStyle.Bottom, FlowDirection = FlowDirection.RightToLeft, AutoSize = true, Padding = new Padding(8) };
+        var bar = new FlowLayoutPanel { Dock = DockStyle.Bottom, FlowDirection = FlowDirection.RightToLeft, AutoSize = true, Padding = new Padding(UiScale.Px(8)) };
         bar.Controls.Add(cancel);
         bar.Controls.Add(ok);
         Controls.Add(_shown);
@@ -121,16 +121,16 @@ internal static class TurboDialog
         using var form = new UiForm
         {
             Text = "Turbo / Dauerfeuer", StartPosition = FormStartPosition.CenterParent, FormBorderStyle = FormBorderStyle.FixedDialog,
-            MinimizeBox = false, MaximizeBox = false, ShowInTaskbar = false, ClientSize = new Size(440, 170),
-            Font = new Font("Segoe UI", 9.5f),
-            AutoScaleDimensions = new SizeF(96F, 96F), AutoScaleMode = AutoScaleMode.Dpi,
+            MinimizeBox = false, MaximizeBox = false, ShowInTaskbar = false, ClientSize = new Size(UiScale.Px(440), UiScale.Px(170)),
+            Font = UiFonts.Body,
+            AutoScaleDimensions = UiScale.Dimensions, AutoScaleMode = AutoScaleMode.None,
         };
         var info = new Label
         {
             Text = $"Solange „{button}“ gehalten wird, wird diese Taste schnell wiederholt gedrückt\n(Geschwindigkeit unter 5. „Turbo“):",
-            AutoSize = true, Location = new Point(12, 12),
+            AutoSize = true, Location = new Point(UiScale.Px(12), UiScale.Px(12)),
         };
-        var target = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Location = new Point(12, 60), Width = 416 };
+        var target = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Location = new Point(UiScale.Px(12), UiScale.Px(60)), Width = UiScale.Px(416) };
         foreach (var t in Targets)
             target.Items.Add($"Gamepad: {t}");
         target.Items.Add("Tastatur-Taste aufnehmen …");
@@ -165,8 +165,8 @@ internal static class TurboDialog
                 target.SelectedIndex = 0;
             }
         };
-        var ok = new Button { Text = "OK", DialogResult = DialogResult.OK, Location = new Point(256, 120), AutoSize = true };
-        var cancel = new Button { Text = "Abbrechen", DialogResult = DialogResult.Cancel, Location = new Point(342, 120), AutoSize = true };
+        var ok = new Button { Text = "OK", DialogResult = DialogResult.OK, Location = new Point(UiScale.Px(256), UiScale.Px(120)), AutoSize = true };
+        var cancel = new Button { Text = "Abbrechen", DialogResult = DialogResult.Cancel, Location = new Point(UiScale.Px(342), UiScale.Px(120)), AutoSize = true };
         form.Controls.AddRange([info, target, ok, cancel]);
         form.AcceptButton = ok;
         form.CancelButton = cancel;
@@ -191,13 +191,13 @@ internal static class MacroDialog
         using var form = new UiForm
         {
             Text = "Makro (Tastenfolge)", StartPosition = FormStartPosition.CenterParent, FormBorderStyle = FormBorderStyle.FixedDialog,
-            MinimizeBox = false, MaximizeBox = false, ShowInTaskbar = false, ClientSize = new Size(560, 300),
-            Font = new Font("Segoe UI", 9.5f),
-            AutoScaleDimensions = new SizeF(96F, 96F), AutoScaleMode = AutoScaleMode.Dpi,
+            MinimizeBox = false, MaximizeBox = false, ShowInTaskbar = false, ClientSize = new Size(UiScale.Px(560), UiScale.Px(300)),
+            Font = UiFonts.Body,
+            AutoScaleDimensions = UiScale.Dimensions, AutoScaleMode = AutoScaleMode.None,
         };
         var info = new Label
         {
-            AutoSize = true, MaximumSize = new Size(536, 0), Location = new Point(12, 10),
+            AutoSize = true, MaximumSize = new Size(UiScale.Px(536), 0), Location = new Point(UiScale.Px(12), UiScale.Px(10)),
             Text = $"Beim Drücken von „{button}“ wird diese Folge einmal abgespielt. Schritte durch Komma trennen, je Schritt " +
                    "was gehalten wird und wie lange (ms). Gamepad: A B X Y LB RB LT RT Up Down Left Right LS RS Start Back Guide, " +
                    "mehrere gleichzeitig mit +. Tastatur: Key:Ctrl+C. Warten: Pause.\n" +
@@ -206,12 +206,12 @@ internal static class MacroDialog
         var old = ButtonAction.Parse(current);
         var box = new TextBox
         {
-            Location = new Point(12, 120), Width = 536, Height = 80, Multiline = true, ScrollBars = ScrollBars.Vertical,
+            Location = new Point(UiScale.Px(12), UiScale.Px(120)), Width = UiScale.Px(536), Height = UiScale.Px(80), Multiline = true, ScrollBars = ScrollBars.Vertical,
             Text = old.IsMacro ? old.Macro : "A 80, Pause 60, A 80",
         };
-        var status = new Label { AutoSize = true, Location = new Point(12, 210) };
-        var ok = new Button { Text = "OK", DialogResult = DialogResult.OK, Location = new Point(376, 255), AutoSize = true };
-        var cancel = new Button { Text = "Abbrechen", DialogResult = DialogResult.Cancel, Location = new Point(462, 255), AutoSize = true };
+        var status = new Label { AutoSize = true, Location = new Point(UiScale.Px(12), UiScale.Px(210)) };
+        var ok = new Button { Text = "OK", DialogResult = DialogResult.OK, Location = new Point(UiScale.Px(376), UiScale.Px(255)), AutoSize = true };
+        var cancel = new Button { Text = "Abbrechen", DialogResult = DialogResult.Cancel, Location = new Point(UiScale.Px(462), UiScale.Px(255)), AutoSize = true };
         void Check()
         {
             bool valid = MacroScript.TryParse((box.Text ?? "").Replace("\r", "").Replace('\n', ','), out var script);
@@ -240,14 +240,14 @@ internal static class Prompt
         using var form = new UiForm
         {
             Text = title, StartPosition = FormStartPosition.CenterParent, FormBorderStyle = FormBorderStyle.FixedDialog,
-            MinimizeBox = false, MaximizeBox = false, ShowInTaskbar = false, ClientSize = new Size(420, 130),
-            Font = new Font("Segoe UI", 9.5f),
-            AutoScaleDimensions = new SizeF(96F, 96F), AutoScaleMode = AutoScaleMode.Dpi,
+            MinimizeBox = false, MaximizeBox = false, ShowInTaskbar = false, ClientSize = new Size(UiScale.Px(420), UiScale.Px(130)),
+            Font = UiFonts.Body,
+            AutoScaleDimensions = UiScale.Dimensions, AutoScaleMode = AutoScaleMode.None,
         };
-        var label = new Label { Text = question, AutoSize = true, Location = new Point(12, 14) };
-        var box = new TextBox { Text = initial, Location = new Point(12, 40), Width = 396 };
-        var ok = new Button { Text = "OK", DialogResult = DialogResult.OK, Location = new Point(236, 88), AutoSize = true };
-        var cancel = new Button { Text = "Abbrechen", DialogResult = DialogResult.Cancel, Location = new Point(322, 88), AutoSize = true };
+        var label = new Label { Text = question, AutoSize = true, Location = new Point(UiScale.Px(12), UiScale.Px(14)) };
+        var box = new TextBox { Text = initial, Location = new Point(UiScale.Px(12), UiScale.Px(40)), Width = UiScale.Px(396) };
+        var ok = new Button { Text = "OK", DialogResult = DialogResult.OK, Location = new Point(UiScale.Px(236), UiScale.Px(88)), AutoSize = true };
+        var cancel = new Button { Text = "Abbrechen", DialogResult = DialogResult.Cancel, Location = new Point(UiScale.Px(322), UiScale.Px(88)), AutoSize = true };
         form.Controls.AddRange([label, new TextField(box), ok, cancel]);
         form.AcceptButton = ok;
         form.CancelButton = cancel;

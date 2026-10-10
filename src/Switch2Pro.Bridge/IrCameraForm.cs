@@ -11,8 +11,8 @@ namespace Switch2Pro.Bridge;
 internal sealed class IrCameraForm : UiForm
 {
     private readonly Switch1HidLink _link;
-    private readonly ComboBox _resolution = new() { DropDownStyle = ComboBoxStyle.DropDownList, Width = 160 };
-    private readonly Label _status = new() { AutoSize = true, Padding = new Padding(8, 6, 0, 0) };
+    private readonly ComboBox _resolution = new() { DropDownStyle = ComboBoxStyle.DropDownList, Width = UiScale.Px(160) };
+    private readonly Label _status = new() { AutoSize = true, Padding = new Padding(UiScale.Px(8), UiScale.Px(6), 0, 0) };
     private readonly PictureBox _picture = new() { Dock = DockStyle.Fill, BackColor = Color.Black, SizeMode = PictureBoxSizeMode.Zoom };
     private int _frames;
     private DateTime _since = DateTime.UtcNow;
@@ -39,14 +39,14 @@ internal sealed class IrCameraForm : UiForm
         _link = link;
         Text = "IR-Kamera (Joy-Con R)";
         StartPosition = FormStartPosition.CenterScreen;
-        ClientSize = new Size(660, 540);
-        Font = new Font("Segoe UI", 9.5f);
-        AutoScaleDimensions = new SizeF(96F, 96F);
-        AutoScaleMode = AutoScaleMode.Dpi;
+        ClientSize = new Size(UiScale.Px(660), UiScale.Px(540));
+        Font = UiFonts.Body;
+        AutoScaleDimensions = UiScale.Dimensions;
+        AutoScaleMode = AutoScaleMode.None;
         _resolution.Items.AddRange(["40 × 30 (schnell)", "80 × 60", "160 × 120", "320 × 240 (langsam)"]);
         _resolution.SelectedIndex = 1;
-        var bar = new FlowLayoutPanel { Dock = DockStyle.Top, Height = 38, Padding = new Padding(6) };
-        bar.Controls.Add(new Label { Text = "Auflösung:", AutoSize = true, Padding = new Padding(0, 6, 0, 0) });
+        var bar = new FlowLayoutPanel { Dock = DockStyle.Top, Height = UiScale.Px(38), Padding = new Padding(UiScale.Px(6)) };
+        bar.Controls.Add(new Label { Text = "Auflösung:", AutoSize = true, Padding = new Padding(0, UiScale.Px(6), 0, 0) });
         bar.Controls.Add(_resolution);
         bar.Controls.Add(_status);
         Controls.Add(_picture);

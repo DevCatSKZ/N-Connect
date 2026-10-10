@@ -247,7 +247,10 @@ internal sealed class MappingEditor : SettingsGroup
     private IEnumerable<MapRow> Rows => Controls.OfType<MapRow>();
 
     // ---------- Anordnung: bei genug Breite zweispaltig (halb so lang) ----------
-    private const int RowHeight = 44, TwoColumnWidth = 980, ColumnGap = 1;
+    // Zeilenhöhe und Spaltenbreite in der aktuellen Skalierung (Zeile mindestens so hoch wie Auswahlfeld + Rand).
+    private static int RowHeight => UiScale.Px(44);
+    private static int TwoColumnWidth => UiScale.Px(980);
+    private const int ColumnGap = 1;
 
     private static int Columns(int width) => width >= TwoColumnWidth ? 2 : 1;
 
@@ -384,16 +387,17 @@ internal sealed class MappingEditor : SettingsGroup
         public int HeightFor(int width) => RowHeight;
 
         // ---------- Bereiche ----------
-        private int LabelWidth => Math.Clamp(Width * 30 / 100, 120, 240);
-        private Rectangle ResetBounds => new(Width - 16 - 36, (Height - 32) / 2, 36, 32);
-        private Rectangle KeyBounds => new(Width - 16 - 36 - 6 - 36, (Height - 32) / 2, 36, 32);
+        private static int S(int v) => UiScale.Px(v);
+        private int LabelWidth => Math.Clamp(Width * 30 / 100, S(120), S(240));
+        private Rectangle ResetBounds => new(Width - S(16) - S(36), (Height - S(32)) / 2, S(36), S(32));
+        private Rectangle KeyBounds => new(Width - S(16) - S(36) - S(6) - S(36), (Height - S(32)) / 2, S(36), S(32));
 
         private Rectangle ComboBounds
         {
             get
             {
-                int x = 16 + LabelWidth;
-                return new Rectangle(x, (Height - 30) / 2, Math.Max(150, KeyBounds.Left - 10 - x), 30);
+                int x = S(16) + LabelWidth;
+                return new Rectangle(x, (Height - S(30)) / 2, Math.Max(S(150), KeyBounds.Left - S(10) - x), S(30));
             }
         }
 
@@ -416,33 +420,33 @@ internal sealed class MappingEditor : SettingsGroup
         {
             var g = e.Graphics;
             var p = Theme.Current;
-            g.Clear(_pressed ? Theme.Blend(p.Surface, Theme.Accent, 0.28f) : p.Surface);
+            g.Clear(_pressed ? Theme.Blend(p.Surface, Theme.AccentLine, Theme.Dark ? 0.16f : 0.12f) : p.Surface);
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
             if (!_editor.FirstInColumn(this))
-                using (var line = new Pen(Theme.Dark ? Color.FromArgb(0x1F, 0x1F, 0x1F) : Color.FromArgb(0xEA, 0xEA, 0xEA)))
+                using (var line = new Pen(Theme.Divider))
                     g.DrawLine(line, 0, 0, Width, 0);
             if (_pressed)
-                using (var bar = new SolidBrush(Theme.Accent))
-                    g.FillRectangle(bar, 0, 6, 3, Height - 12);
-            TextRenderer.DrawText(g, Tr.T(Text), _pressed ? UiFonts.Strong : UiFonts.Body, new Rectangle(16, 0, LabelWidth - 8, Height),
+                using (var bar = Theme.LineBrush(new RectangleF(0, S(6), S(3), Height - S(12)), 90))
+                    g.FillRectangle(bar, 0, S(6), S(3), Height - S(12));
+            TextRenderer.DrawText(g, Tr.T(Text), _pressed ? UiFonts.Strong : UiFonts.Body, new Rectangle(S(16), 0, LabelWidth - S(8), Height),
                 p.Text, TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis | TextFormatFlags.NoPrefix);
 
             // Auswahlfeld wie eine Windows-11-Auswahlliste; eigene Belegung kräftig, Standard etwas zurückgenommen.
             var combo = ComboBounds;
             bool comboFocus = Focused && _focusPart == Part.Combo;
             var back = _hover == Part.Combo ? Theme.Blend(p.SurfaceHover, p.Text, 0.06f) : p.SurfaceHover;
-            using (var path = Theme.RoundedRect(new RectangleF(combo.X + 0.5f, combo.Y + 0.5f, combo.Width - 1, combo.Height - 1), 4))
+            using (var path = Theme.RoundedRect(new RectangleF(combo.X + 0.5f, combo.Y + 0.5f, combo.Width - 1, combo.Height - 1), S(4)))
             {
                 using var fill = new SolidBrush(back);
                 g.FillPath(fill, path);
-                using var pen = new Pen(comboFocus ? Theme.Accent : p.Border, comboFocus ? 1.5f : 1f);
+                using var pen = new Pen(comboFocus ? Theme.AccentLine : _hover == Part.Combo ? Theme.Blend(p.ControlBorder, Theme.AccentLine, 0.45f) : p.ControlBorder, comboFocus ? 1.5f : 1f);
                 g.DrawPath(pen, path);
             }
             string text = _items.Count > 0 ? _items[_selected].ToString() : "";
-            TextRenderer.DrawText(g, text, _hasOwn ? UiFonts.Strong : UiFonts.Body, new Rectangle(combo.X + 10, combo.Y, combo.Width - 40, combo.Height),
+            TextRenderer.DrawText(g, text, _hasOwn ? UiFonts.Strong : UiFonts.Body, new Rectangle(combo.X + S(10), combo.Y, combo.Width - S(40), combo.Height),
                 _hasOwn ? p.Text : Theme.Blend(p.Text, p.TextMuted, 0.4f),
                 TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis | TextFormatFlags.NoPrefix);
-            TextRenderer.DrawText(g, Glyph.ChevronDown, Glyph.Font(8f), new Rectangle(combo.Right - 28, combo.Y, 20, combo.Height), p.Text,
+            TextRenderer.DrawText(g, Glyph.ChevronDown, Glyph.Font(8f), new Rectangle(combo.Right - S(28), combo.Y, S(20), combo.Height), p.Text,
                 TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
 
             DrawButton(g, KeyBounds, Glyph.Keyboard, Part.Key, true);
@@ -454,15 +458,15 @@ internal sealed class MappingEditor : SettingsGroup
             var p = Theme.Current;
             var back = !enabled ? p.Surface : _down == part ? Theme.Blend(p.SurfaceHover, p.Text, 0.14f)
                 : _hover == part ? Theme.Blend(p.SurfaceHover, p.Text, 0.08f) : p.SurfaceHover;
-            using (var path = Theme.RoundedRect(new RectangleF(r.X + 0.5f, r.Y + 0.5f, r.Width - 1, r.Height - 1), 5))
+            using (var path = Theme.RoundedRect(new RectangleF(r.X + 0.5f, r.Y + 0.5f, r.Width - 1, r.Height - 1), S(5)))
             {
                 using var fill = new SolidBrush(back);
                 g.FillPath(fill, path);
                 bool focus = Focused && _focusPart == part;
-                using var pen = new Pen(focus ? p.Text : p.Border, focus ? 1.5f : 1f);
+                using var pen = new Pen(focus ? p.Text : !enabled ? p.Border : _hover == part ? Theme.Blend(p.ControlBorder, Theme.AccentLine, 0.6f) : p.ControlBorder, focus ? 1.5f : 1f);
                 g.DrawPath(pen, path);
             }
-            TextRenderer.DrawText(g, glyph, Glyph.Font(10.5f), r, enabled ? p.Text : p.Border,
+            TextRenderer.DrawText(g, glyph, Glyph.Font(10.5f), r, enabled ? p.Text : p.ControlBorder,
                 TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
         }
 

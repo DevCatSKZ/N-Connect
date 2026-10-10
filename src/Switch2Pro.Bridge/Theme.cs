@@ -13,33 +13,91 @@ internal static class Theme
 {
     public sealed record Palette(
         bool Dark,
-        Color Window,       // Fensterhintergrund (ohne Mica)
-        Color Surface,      // Karten/Abschnitte
-        Color SurfaceHover, // Eingabefelder, Knöpfe
-        Color Border,
+        Color Window,        // Fensterhintergrund (ohne Mica)
+        Color Surface,       // Karten/Abschnitte
+        Color SurfaceHover,  // Eingabefelder, Knöpfe
+        Color Border,        // dezenter Rand von Karten und Abschnitten
         Color Text,
         Color TextMuted,
-        Color Canvas);      // Hintergrund der Controller-Grafik
+        Color Canvas,        // Hintergrund der Controller-Grafik
+        Color ControlBorder, // kräftigerer Rand von Knöpfen, Eingabe- und Auswahlfeldern
+        Color Accent,        // Verlaufsanfang – Flächen mit weißer Schrift (Kontrast ≥ 4,5 : 1)
+        Color Accent2,       // Verlaufsende
+        Color Pressed);      // gedrückte Tasten in der Controller-Grafik (leuchtend)
 
-    // Farben aus dem Logo: dunkles Navy als Grund, Neon-Blau → Violett als Akzent.
-    public static readonly Palette DarkPalette = new(true,
-        Color.FromArgb(0x10, 0x12, 0x1C), Color.FromArgb(0x19, 0x1C, 0x2A), Color.FromArgb(0x24, 0x28, 0x3B),
-        Color.FromArgb(0x30, 0x35, 0x52), Color.FromArgb(0xF2, 0xF4, 0xFA), Color.FromArgb(0xA4, 0xA9, 0xC0),
-        Color.FromArgb(0x15, 0x18, 0x26));
+    /// <summary>Farbschema: Name und je eine Palette für dunkel und hell. <paramref name="Neon"/>: Verläufe, Leuchten und
+    /// aufgehellte Linien; ohne (Windows) einfarbiger Akzent und ruhige Flächen wie in Windows 11.</summary>
+    public sealed record Scheme(string Id, string Name, Palette DarkPalette, Palette LightPalette, bool Neon = true);
 
-    public static readonly Palette LightPalette = new(false,
-        Color.FromArgb(0xF1, 0xF2, 0xF8), Color.FromArgb(0xFC, 0xFC, 0xFF), Color.FromArgb(0xFF, 0xFF, 0xFF),
-        Color.FromArgb(0xDA, 0xDC, 0xE8), Color.FromArgb(0x16, 0x18, 0x2A), Color.FromArgb(0x46, 0x49, 0x5E),
-        Color.FromArgb(0xEB, 0xEC, 0xF5));
+    private static Color C(int rgb) => Color.FromArgb(255, (rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF);
 
+    private static Palette P(bool dark, int window, int surface, int control, int border, int text, int muted, int canvas,
+        int controlBorder, int accent, int accent2, int pressed) =>
+        new(dark, C(window), C(surface), C(control), C(border), C(text), C(muted), C(canvas), C(controlBorder),
+            C(accent), C(accent2), C(pressed));
 
-    public static Palette Current { get; private set; } = DarkPalette;
+    /// <summary>
+    /// Alle Farbschemata (das erste ist der Standard). Neon-Schemata: Akzente tief genug für weiße Schrift, Linien und
+    /// Leuchten im dunklen Modus aufgehellt (<see cref="AccentLine"/>).
+    /// </summary>
+    public static readonly Scheme[] Schemes =
+    [
+        // Windows (Standard): Farben von Windows 11 (Fluent) – Hintergrund #202020, Karten #2B2B2B, Steuerelemente #373737,
+        // Akzent im Windows-Standardblau (dunkel #4CC2FF mit schwarzer Schrift wie in Windows, hell #005FB8 mit weißer).
+        new("windows", "Windows",
+            P(true, 0x202020, 0x2B2B2B, 0x373737, 0x1D1D1D, 0xFFFFFF, 0xC5C5C5, 0x272727, 0x4A4A4A, 0x4CC2FF, 0x4CC2FF, 0x4CC2FF),
+            P(false, 0xF3F3F3, 0xFBFBFB, 0xFFFFFF, 0xE5E5E5, 0x1B1B1B, 0x5C5C5C, 0xEEEEEE, 0xC8C8C8, 0x005FB8, 0x005FB8, 0x0078D4),
+            Neon: false),
+        // Neon: Farben aus dem Logo – Navy, Neon-Blau → Violett.
+        new("neon", "Neon",
+            P(true, 0x0E1019, 0x171A27, 0x222639, 0x2A2F45, 0xF2F4FA, 0xA0A6BE, 0x131623, 0x4A5378, 0x2B6FF2, 0x7C3AED, 0x00BEFF),
+            P(false, 0xF0F2F8, 0xFCFCFF, 0xFFFFFF, 0xDCDFEA, 0x15172A, 0x4A4E64, 0xEAECF5, 0xA3AAC2, 0x1F5FD6, 0x7444E0, 0x0094E0)),
+        // Aurora: Polarlicht – tiefes Blaugrün, Türkis → Grün.
+        new("aurora", "Aurora",
+            P(true, 0x0A1314, 0x111C1D, 0x1A292A, 0x223435, 0xEEF6F5, 0x9CB3B1, 0x0E1919, 0x416363, 0x0E7490, 0x15803D, 0x2EE6A8),
+            P(false, 0xEEF5F4, 0xFBFEFD, 0xFFFFFF, 0xD4E3E1, 0x122322, 0x455A58, 0xE6EFED, 0x99B7B3, 0x0E7490, 0x15803D, 0x0BA67A)),
+        // Sunset: Abendrot – warmes Pflaume, Orange → Pink.
+        new("sunset", "Sunset",
+            P(true, 0x140E13, 0x1E151B, 0x2A1E26, 0x352731, 0xFAF1F4, 0xBBA5AF, 0x1A1217, 0x5F4658, 0xC2410C, 0xBE185D, 0xFF8A3D),
+            P(false, 0xF8F2F2, 0xFFFCFB, 0xFFFFFF, 0xEADBDC, 0x2A1519, 0x5E494E, 0xF2E8E8, 0xC2A6AA, 0xC2410C, 0xBE185D, 0xF26B1D)),
+        // Joy-Con: Neonrot → Neonblau wie die Joy-Con, neutrales Anthrazit.
+        new("joycon", "Joy-Con",
+            P(true, 0x111113, 0x1A1A1E, 0x25252A, 0x2F2F35, 0xF4F4F6, 0xA8A8B2, 0x161619, 0x585862, 0xD7263D, 0x0A6FC2, 0xFF4B5C),
+            P(false, 0xF2F2F4, 0xFDFDFE, 0xFFFFFF, 0xDEDEE3, 0x18181C, 0x4C4C55, 0xECECF0, 0xA8A8B3, 0xD7263D, 0x0A6FC2, 0xE8364A)),
+    ];
+
+    /// <summary>Paletten des Standardschemas (z. B. zum Erkennen unveränderter Label-Farben).</summary>
+    public static Palette DarkPalette => Schemes[0].DarkPalette;
+    public static Palette LightPalette => Schemes[0].LightPalette;
+
+    public static Palette Current { get; private set; } = Schemes[0].DarkPalette;
+    public static Scheme ActiveScheme { get; private set; } = Schemes[0];
     public static bool Dark => Current.Dark;
-    public static Color Accent { get; private set; } = Color.FromArgb(0x2F, 0x8B, 0xFF);
-    /// <summary>Zweite Akzentfarbe (Violett) – Ende des Neon-Verlaufs <see cref="Accent"/> → <see cref="Accent2"/>.</summary>
-    public static Color Accent2 { get; private set; } = Color.FromArgb(0x9B, 0x5C, 0xFF);
-    /// <summary>Text auf Akzentflächen. Beide Verlaufsfarben sind dunkel genug für Weiß.</summary>
+    public static Color Accent => Current.Accent;
+    /// <summary>Zweite Akzentfarbe – Ende des Verlaufs <see cref="Accent"/> → <see cref="Accent2"/>.</summary>
+    public static Color Accent2 => Current.Accent2;
+    /// <summary>Text auf Akzentflächen: schwarz auf hellem Akzent (Windows dunkel), sonst weiß.</summary>
     public static Color OnAccent => Luminance(Accent) > 0.36f ? Color.Black : Color.White;
+    /// <summary>Gedrückte Tasten in der Controller-Grafik.</summary>
+    public static Color Pressed => Current.Pressed;
+    /// <summary>Neon-Effekte (Verläufe, Leuchten) aktiv? Im Windows-Schema aus.</summary>
+    public static bool Neon => ActiveScheme.Neon;
+
+    /// <summary>Akzent für Linien, Symbole und Leuchten: bei Neon im dunklen Modus aufgehellt (sonst zu dunkel auf dem
+    /// Grund); das Windows-Blau ist dunkel schon hell genug.</summary>
+    public static Color AccentLine => Dark && Neon ? Blend(Accent, Color.White, 0.28f) : Accent;
+    public static Color Accent2Line => Dark && Neon ? Blend(Accent2, Color.White, 0.28f) : Accent2;
+
+    /// <summary>Trennlinie zwischen Zeilen in einer Karte (wie DividerStroke in Windows: leicht heller als die Fläche).</summary>
+    public static Color Divider => Blend(Current.Surface, Current.Text, Dark ? 0.08f : 0.07f);
+
+    /// <summary>Verlauf für Linien (Reiterstrich, Navigationsmarke, Fokuslinie, leuchtende Ränder).</summary>
+    public static LinearGradientBrush LineBrush(RectangleF r, float angle = 0)
+    {
+        var brush = AccentBrush(r, angle);
+        brush.LinearColors = [AccentLine, Accent2Line];
+        return brush;
+    }
 
     /// <summary>Neon-Verlauf (Blau → Violett) über ein Rechteck; <paramref name="angle"/> 0 = waagerecht, 90 = senkrecht.</summary>
     public static LinearGradientBrush AccentBrush(RectangleF r, float angle = 0, bool enabled = true)
@@ -54,7 +112,7 @@ internal static class Theme
     /// <paramref name="strength"/> 0–1 regelt die Deckkraft (für Ein-/Ausblenden).</summary>
     public static void Glow(Graphics g, GraphicsPath path, float strength, int size = 6)
     {
-        if (strength <= 0.01f)
+        if (strength <= 0.01f || !Neon) // Windows-Schema: kein Leuchten
             return;
         var bounds = path.GetBounds();
         for (int i = size; i >= 1; i--)
@@ -63,7 +121,7 @@ internal static class Theme
             if (alpha <= 0)
                 continue;
             using var brush = AccentBrush(RectangleF.Inflate(bounds, i, i));
-            brush.LinearColors = [Color.FromArgb(alpha, Accent), Color.FromArgb(alpha, Accent2)];
+            brush.LinearColors = [Color.FromArgb(alpha, AccentLine), Color.FromArgb(alpha, Accent2Line)];
             using var pen = new Pen(brush, i * 2f) { LineJoin = LineJoin.Round };
             g.DrawPath(pen, path);
         }
@@ -78,9 +136,13 @@ internal static class Theme
     /// <summary>Mica-Titelleiste aktiv (Einstellung an und Windows 11).</summary>
     public static bool Mica { get; private set; }
 
-    /// <summary>Darstellung festlegen: "dark" (Standard), "light" oder "system"; Mica nur ab Windows 11.
-    /// Ohne App-Einstellung (null) gilt die Themawahl des Installers aus der Registry, sonst Dunkel.</summary>
-    public static void Init(string? mode, bool transparency)
+    /// <summary>Schema zu einer Kennung ("neon", "aurora" …); unbekannt oder null = Neon.</summary>
+    public static Scheme SchemeById(string? id) => Schemes.FirstOrDefault(s => s.Id == id) ?? Schemes[0];
+
+    /// <summary>Darstellung festlegen: "dark" (Standard), "light" oder "system"; Farbschema (null = Neon); Mica nur ab
+    /// Windows 11. Ohne App-Einstellung (null) gilt die Themawahl des Installers aus der Registry, sonst Dunkel.
+    /// Nicht die Windows-Akzentfarbe – die sieht je nach Nutzerwahl beliebig aus (z. B. pink).</summary>
+    public static void Init(string? mode, bool transparency, string? scheme = null)
     {
         mode ??= InstallerTheme();
         bool dark = mode switch
@@ -89,11 +151,8 @@ internal static class Theme
             "system" => !WindowsUsesLightApps(),
             _ => true,
         };
-        Current = dark ? DarkPalette : LightPalette;
-        // Akzent = Neon-Blau → Violett wie im Logo; im hellen Modus etwas tiefer für den Kontrast auf weißen
-        // Flächen. Nicht die Windows-Akzentfarbe – die sieht je nach Nutzerwahl beliebig aus (z. B. pink).
-        Accent = dark ? Color.FromArgb(0x2F, 0x8B, 0xFF) : Color.FromArgb(0x1F, 0x6F, 0xE0);
-        Accent2 = dark ? Color.FromArgb(0x9B, 0x5C, 0xFF) : Color.FromArgb(0x7B, 0x3F, 0xE4);
+        ActiveScheme = SchemeById(scheme);
+        Current = dark ? ActiveScheme.DarkPalette : ActiveScheme.LightPalette;
         Mica = transparency && OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22621);
     }
 
@@ -202,7 +261,7 @@ internal static class Theme
                 b.FlatStyle = FlatStyle.Flat;
                 b.BackColor = p.SurfaceHover;
                 b.ForeColor = p.Text;
-                b.FlatAppearance.BorderColor = p.Border;
+                b.FlatAppearance.BorderColor = p.ControlBorder;
                 b.FlatAppearance.MouseOverBackColor = Blend(p.SurfaceHover, p.Text, 0.08f);
                 b.FlatAppearance.MouseDownBackColor = Blend(p.SurfaceHover, p.Text, 0.14f);
                 break;
@@ -225,13 +284,18 @@ internal static class Theme
                 combo.DrawItem += DrawComboItem;
                 if (Dark)
                 {
-                    // Natives dunkles Klappfeld von Windows (auch der Pfeil); die Liste nutzt die dunkle Bildlaufleiste.
+                    // Natives dunkles Klappfeld als Grundlage (dunkle Liste und Bildlaufleiste) …
                     combo.FlatStyle = FlatStyle.Standard;
                     void SetCfd() => SetWindowTheme(combo.Handle, "DarkMode_CFD", null);
                     if (combo.IsHandleCreated) SetCfd(); else combo.HandleCreated += (_, _) => SetCfd();
-                    break;
                 }
-                DarkScroll(combo);
+                else
+                {
+                    DarkScroll(combo);
+                }
+                // … darüber zeichnet ComboSkin das geschlossene Feld in den Theme-Farben (sonst grau von Windows).
+                if (combo.DropDownStyle == ComboBoxStyle.DropDownList && !Skins.TryGetValue(combo, out _))
+                    Skins.Add(combo, new ComboSkin(combo));
                 break;
             case TrackBar track:
                 track.BackColor = Parent(track);
@@ -245,8 +309,8 @@ internal static class Theme
                 label.Tag = MutedTag;
                 break;
             case Label label:
-                if (label.ForeColor == SystemColors.ControlText || label.ForeColor == Color.Empty || label.ForeColor == DarkPalette.Text
-                    || label.ForeColor == LightPalette.Text)
+                if (label.ForeColor == SystemColors.ControlText || label.ForeColor == Color.Empty
+                    || Schemes.Any(s => label.ForeColor == s.DarkPalette.Text || label.ForeColor == s.LightPalette.Text))
                     label.ForeColor = p.Text;
                 break;
             case ScrollableControl scroll when scroll.AutoScroll:
@@ -271,6 +335,121 @@ internal static class Theme
     }
 
     public const string MutedTag = "muted";
+
+    private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<ComboBox, ComboSkin> Skins = new();
+
+    /// <summary>
+    /// Zeichnet das geschlossene Auswahlfeld (DropDownList) selbst – wie ein Eingabefeld: abgerundet, Theme-Fläche,
+    /// kräftiger Rand, Chevron rechts, Akzentrand bei Fokus oder Hover. Windows zeichnet zuerst (Liste, Tastatur, Fokus
+    /// bleiben nativ), danach wird nach jedem WM_PAINT übermalt.
+    /// </summary>
+    private sealed class ComboSkin : NativeWindow
+    {
+        private const int WM_PAINT = 0x000F, WM_NCPAINT = 0x0085, WM_PRINT = 0x0317, WM_PRINTCLIENT = 0x0318;
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetWindowDC(IntPtr hwnd);
+
+        [DllImport("user32.dll")]
+        private static extern int ReleaseDC(IntPtr hwnd, IntPtr hdc);
+        private readonly ComboBox _combo;
+        private bool _hover;
+
+        public ComboSkin(ComboBox combo)
+        {
+            _combo = combo;
+            if (combo.IsHandleCreated)
+                AssignHandle(combo.Handle);
+            combo.HandleCreated += (_, _) =>
+            {
+                AssignHandle(combo.Handle);
+                FitWidth();
+            };
+            combo.HandleDestroyed += (_, _) => ReleaseHandle();
+            combo.MouseEnter += (_, _) => { _hover = true; combo.Invalidate(); };
+            combo.MouseLeave += (_, _) => { _hover = false; combo.Invalidate(); };
+            combo.GotFocus += (_, _) => combo.Invalidate();
+            combo.LostFocus += (_, _) => combo.Invalidate();
+            combo.DropDownClosed += (_, _) => combo.Invalidate();
+            combo.EnabledChanged += (_, _) => combo.Invalidate();
+        }
+
+        /// <summary>
+        /// Breite an den längsten (übersetzten) Eintrag anpassen, damit z. B. „Automatisch (wie Windows)“ oder lange
+        /// Übersetzungen nicht abgekürzt werden; nie schmaler als vorgesehen, höchstens 420 px (skaliert).
+        /// Die aufgeklappte Liste wird mindestens so breit wie ihr längster Eintrag.
+        /// </summary>
+        private void FitWidth()
+        {
+            if (_combo.Items.Count == 0 || Equals(_combo.Tag, Tr.UserData))
+                return;
+            int text = _combo.Items.Cast<object>().Max(i => TextRenderer.MeasureText(_combo.GetItemText(i), _combo.Font).Width);
+            int wanted = Math.Min(UiScale.Px(420), text + UiScale.Px(44));
+            if (wanted > _combo.Width)
+                _combo.Width = wanted;
+            _combo.DropDownWidth = Math.Max(_combo.Width, text + UiScale.Px(24));
+        }
+
+        protected override void WndProc(ref Message m)
+        {
+            base.WndProc(ref m);
+            if (_combo.IsDisposed)
+                return;
+            if (m.Msg is WM_PAINT or WM_NCPAINT)
+            {
+                // Über das ganze Fenster zeichnen (auch den Rahmen außerhalb des Innenbereichs, den Windows hell malt).
+                IntPtr hdc = GetWindowDC(_combo.Handle);
+                if (hdc == IntPtr.Zero)
+                    return;
+                try
+                {
+                    using var g = Graphics.FromHdc(hdc);
+                    Paint(g);
+                }
+                finally
+                {
+                    ReleaseDC(_combo.Handle, hdc);
+                }
+            }
+            else if (m.Msg is WM_PRINT or WM_PRINTCLIENT && m.WParam != IntPtr.Zero)
+            {
+                // DrawToBitmap (Prüfhilfe) zeichnet über WM_PRINT in einen fremden Gerätekontext.
+                using var g = Graphics.FromHdc(m.WParam);
+                Paint(g);
+            }
+        }
+
+        private void Paint(Graphics g)
+        {
+            var p = Current;
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+            var client = new Rectangle(Point.Empty, _combo.Size); // ganzes Fenster inkl. Rahmen
+            // Hintergrund an den runden Ecken: Farbe des Elternelements – zeichnet es sich selbst (SettingRow) und meldet
+            // nur die Windows-Standardfarbe, ist es die Kartenfläche.
+            var parent = Parent(_combo);
+            if (parent == SystemColors.Control || parent.IsEmpty)
+                parent = p.Surface;
+            using (var back = new SolidBrush(parent))
+                g.FillRectangle(back, client);
+            var r = new RectangleF(0.5f, 0.5f, client.Width - 1.5f, client.Height - 1.5f);
+            bool active = _combo.Enabled && (_combo.Focused || _combo.DroppedDown || _hover);
+            using (var path = RoundedRect(r, 5))
+            {
+                using var fill = new SolidBrush(_combo.Enabled ? Blend(p.SurfaceHover, p.Text, _hover ? 0.05f : 0f) : p.Surface);
+                g.FillPath(fill, path);
+                using var pen = new Pen(active ? Blend(p.ControlBorder, AccentLine, _combo.Focused || _combo.DroppedDown ? 0.85f : 0.45f)
+                    : p.ControlBorder);
+                g.DrawPath(pen, path);
+            }
+            var fore = _combo.Enabled ? p.Text : p.TextMuted;
+            string text = (_combo.SelectedIndex >= 0 ? _combo.GetItemText(_combo.SelectedItem) : _combo.Text) ?? "";
+            TextRenderer.DrawText(g, text, _combo.Font, new Rectangle(8, 0, client.Width - 36, client.Height), fore,
+                TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis | TextFormatFlags.NoPrefix);
+            TextRenderer.DrawText(g, Glyph.ChevronDown, Glyph.Font(8f), new Rectangle(client.Width - 28, 0, 22, client.Height),
+                _combo.Enabled ? p.TextMuted : p.ControlBorder,
+                TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
+        }
+    }
 
     /// <summary>Hintergrund des nächsten Elternelements mit eigener Farbe (für TrackBar, die keine Transparenz kann).</summary>
     private static Color Parent(Control c)
@@ -327,11 +506,11 @@ internal static class Theme
         {
             Text = caption, FormBorderStyle = FormBorderStyle.FixedDialog, MinimizeBox = false, MaximizeBox = false,
             ShowInTaskbar = owner is null, StartPosition = owner is null ? FormStartPosition.CenterScreen : FormStartPosition.CenterParent,
-            Font = new Font("Segoe UI", 9.5f), AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink,
-            AutoScaleDimensions = new SizeF(96F, 96F), AutoScaleMode = AutoScaleMode.Dpi,
+            Font = UiFonts.Body, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink,
+            AutoScaleDimensions = UiScale.Dimensions, AutoScaleMode = AutoScaleMode.None,
             Padding = new Padding(0),
         };
-        var layout = new TableLayoutPanel { AutoSize = true, ColumnCount = 2, RowCount = 2, Padding = new Padding(20, 20, 20, 12) };
+        var layout = new TableLayoutPanel { AutoSize = true, ColumnCount = 2, RowCount = 2, Padding = new Padding(UiScale.Px(20), UiScale.Px(20), UiScale.Px(20), UiScale.Px(12)) };
         Icon? symbol = icon switch
         {
             MessageBoxIcon.Error => SystemIcons.Error,
@@ -341,8 +520,8 @@ internal static class Theme
             _ => null,
         };
         if (symbol is not null)
-            layout.Controls.Add(new PictureBox { Image = symbol.ToBitmap(), Size = new Size(32, 32), Margin = new Padding(0, 0, 14, 0) }, 0, 0);
-        layout.Controls.Add(new Label { Text = text, AutoSize = true, MaximumSize = new Size(460, 0), Margin = new Padding(0, 6, 0, 16) }, 1, 0);
+            layout.Controls.Add(new PictureBox { Image = symbol.ToBitmap(), Size = new Size(UiScale.Px(32), UiScale.Px(32)), Margin = new Padding(0, 0, UiScale.Px(14), 0) }, 0, 0);
+        layout.Controls.Add(new Label { Text = text, AutoSize = true, MaximumSize = new Size(UiScale.Px(460), 0), Margin = new Padding(0, UiScale.Px(6), 0, UiScale.Px(16)) }, 1, 0);
 
         var bar = new FlowLayoutPanel { AutoSize = true, FlowDirection = FlowDirection.RightToLeft, Anchor = AnchorStyles.Right, Margin = new Padding(0) };
         (string Text, DialogResult Result)[] choices = buttons switch
@@ -354,7 +533,7 @@ internal static class Theme
         };
         foreach (var (label, result) in choices)
         {
-            var button = new Button { Text = Tr.T(label), DialogResult = result, MinimumSize = new Size(88, 30), AutoSize = true };
+            var button = new Button { Text = Tr.T(label), DialogResult = result, MinimumSize = new Size(UiScale.Px(88), UiScale.Px(30)), AutoSize = true };
             bar.Controls.Add(button);
             if (result is DialogResult.Yes or DialogResult.OK)
                 form.AcceptButton = button;
@@ -366,6 +545,7 @@ internal static class Theme
         layout.SetColumnSpan(bar, 2);
         form.Controls.Add(layout);
         Apply(form);
+        if (!UiForm.Offscreen) // Prüfhilfe: keine Töne
         switch (icon)
         {
             case MessageBoxIcon.Error: System.Media.SystemSounds.Hand.Play(); break;
@@ -465,7 +645,7 @@ internal sealed class NavButton : Control
         Text = Tr.T(text);
         Font = new Font("Segoe UI Semibold", 10.5f);
         Size = new Size(TextRenderer.MeasureText(Text, Font).Width + 36, 38);
-        Margin = new Padding(0, 0, 6, 0);
+        Margin = new Padding(0, 0, UiScale.Px(6), 0);
         Cursor = Cursors.Hand;
         SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint, true);
         BackColor = Theme.Backdrop;
@@ -514,13 +694,13 @@ internal sealed class Section : Panel
     {
         AutoSize = true;
         AutoSizeMode = AutoSizeMode.GrowAndShrink;
-        Padding = new Padding(16, 40, 16, 14);
-        Margin = new Padding(0, 0, 0, 10);
+        Padding = new Padding(UiScale.Px(16), UiScale.Px(40), UiScale.Px(16), UiScale.Px(14));
+        Margin = new Padding(0, 0, 0, UiScale.Px(10));
         BackColor = Theme.Backdrop;
         DoubleBuffered = true;
         _title = new Label
         {
-            Text = title, AutoSize = true, Location = new Point(16, 12), Font = new Font("Segoe UI Semibold", 10.5f),
+            Text = title, AutoSize = true, Location = new Point(UiScale.Px(16), UiScale.Px(12)), Font = UiFonts.Strong,
             BackColor = Theme.Current.Surface, ForeColor = Theme.Current.Text,
         };
         content.BackColor = Theme.Current.Surface;

@@ -10,6 +10,8 @@ internal static partial class Tr
         // ---------- Fenster, Reiter, Abschnitte ----------
         ["Controller"] = "控制器",
         // ---------- Status-Kopfzeile, Ansicht ----------
+        ["Farbschema"] = "配色方案",
+        ["Farben für Akzente, Knöpfe, Flächen und Ränder."] = "强调色、按钮、背景和边框的颜色。",
         ["bereit"] = "就绪",
         ["nicht verfügbar"] = "不可用",
         ["Niedrigster Akku"] = "最低电量",

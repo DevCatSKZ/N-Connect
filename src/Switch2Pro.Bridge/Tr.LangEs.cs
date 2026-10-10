@@ -10,6 +10,8 @@ internal static partial class Tr
         // ---------- Fenster, Reiter, Abschnitte ----------
         ["Controller"] = "Mandos",
         // ---------- Status-Kopfzeile, Ansicht ----------
+        ["Farbschema"] = "Esquema de colores",
+        ["Farben für Akzente, Knöpfe, Flächen und Ränder."] = "Colores de acentos, botones, superficies y bordes.",
         ["bereit"] = "listo",
         ["nicht verfügbar"] = "no disponible",
         ["Niedrigster Akku"] = "Batería más baja",

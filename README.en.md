@@ -89,10 +89,12 @@ is created.
 - **Settings right on the controller card** (expand "Settings"): buttons, fine-tuning, gyro, Joy-Con, extras,
   details – each only for that controller.
 - **Assign a button by pressing it:** click the keyboard icon behind any button and press the key you want.
-- **Interface in the neon look of the logo:** dark (default), light or same as Windows; navy tones with a neon
-  blue → violet gradient, Mica title bar. Smooth animations (switches, hover, battery bars); cards light up when a
-  controller connects and glow while a button is pressed – you see at once which card belongs to which controller.
-  With animation effects turned off in Windows, everything stays still.
+- **Interface like Windows 11:** dark (default), light or same as Windows; colours, typography and controls like the
+  Windows Settings app, Mica title bar. More colour schemes: **Neon**, **Aurora**, **Sunset** and **Joy-Con** (with
+  gradients and glow). Smooth animations (switches, hover, battery bars); cards light up when a controller connects
+  and while a button is pressed – you see at once which card belongs to which controller. With animation effects
+  turned off in Windows, everything stays still.
+- **Easy to read at any display scaling** (100 % to 200 %) and in all 12 languages.
 - Buttons per controller: **Disconnect**, **Rumble** (which controller is which player?), **Calibrate gyro**,
   Joy-Con **split/join**, **upright/sideways**, **read amiibo**, **Ring-Con**, **IR camera**,
   **"Shown twice? Hide"** (HidHide).

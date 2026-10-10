@@ -10,6 +10,8 @@ internal static partial class Tr
         // ---------- Fenster, Reiter, Abschnitte ----------
         ["Controller"] = "Kontrolery",
         // ---------- Status-Kopfzeile, Ansicht ----------
+        ["Farbschema"] = "Schemat kolorów",
+        ["Farben für Akzente, Knöpfe, Flächen und Ränder."] = "Kolory akcentów, przycisków, powierzchni i obramowań.",
         ["bereit"] = "gotowy",
         ["nicht verfügbar"] = "niedostępny",
         ["Niedrigster Akku"] = "Najniższa bateria",

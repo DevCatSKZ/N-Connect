@@ -23,15 +23,44 @@ internal static class Program
             Branding.RenderAll(args[brand + 1]);
             return;
         }
+        // Prüfhilfen öffnen echte Fenster: auf einem eigenen, unsichtbaren Desktop neu starten, damit beim Benutzer
+        // nichts aufgeht und Fokus/Maus unberührt bleiben.
+        int? exitCode = null;
+        try
+        {
+            if (UiForm.Offscreen)
+                exitCode = HiddenDesktop.RunIsolated();
+        }
+        catch (Exception e)
+        {
+            File.AppendAllText(Path.Combine(Path.GetTempPath(), "N-Connect-Pruefhilfe-Fehler.txt"), "Elternprozess: " + e + Environment.NewLine);
+        }
+        if (exitCode is { } code)
+        {
+            Environment.Exit(code);
+            return;
+        }
+        if (HiddenDesktop.Active)
+        {
+            // Auf dem unsichtbaren Desktop sieht niemand eine Fehlermeldung: Fehler in eine Datei schreiben.
+            static void Report(object? error) =>
+                File.AppendAllText(Path.Combine(Path.GetTempPath(), "N-Connect-Pruefhilfe-Fehler.txt"), error + Environment.NewLine);
+            AppDomain.CurrentDomain.UnhandledException += (_, e) => Report(e.ExceptionObject);
+            Application.SetUnhandledExceptionMode(UnhandledExceptionMode.ThrowException);
+        }
         // Prüfhilfe: alle Controller-Grafiken als PNG speichern (ohne Controller, ohne Fenster).
         int render = Array.IndexOf(args, "--render");
         if (render >= 0 && render + 1 < args.Length)
         {
+            UiForm.LockForeground();
             ApplicationConfiguration.Initialize();
-            Theme.Init(args.Contains("--light") ? "light" : "dark", transparency: false);
+            Theme.Init(args.Contains("--light") ? "light" : "dark", transparency: false, SchemeArg(args));
             RenderCheck.Run(args[render + 1]);
             return;
         }
+        // --scheme=xx wählt das Farbschema für die Prüfhilfen (neon, aurora, sunset, joycon).
+        static string? SchemeArg(string[] args) =>
+            args.FirstOrDefault(x => x.StartsWith("--scheme=", StringComparison.Ordinal)) is { } s ? s["--scheme=".Length..] : null;
         // --lang=xx wählt die Sprache für die Prüfhilfen (Standard: de, --en bleibt als Kurzform).
         static string LangArg(string[] args)
         {
@@ -41,9 +70,10 @@ internal static class Program
         int renderUi = Array.IndexOf(args, "--render-ui");
         if (renderUi >= 0 && renderUi + 1 < args.Length)
         {
+            UiForm.LockForeground();
             ApplicationConfiguration.Initialize();
             Tr.SetLanguage(LangArg(args));
-            Theme.Init(args.Contains("--light") ? "light" : "dark", transparency: false);
+            Theme.Init(args.Contains("--light") ? "light" : "dark", transparency: false, SchemeArg(args));
             RenderCheck.RenderUi(args[renderUi + 1]);
             return;
         }
@@ -51,9 +81,10 @@ internal static class Program
         int dump = Array.IndexOf(args, "--dump-ui");
         if (dump >= 0 && dump + 1 < args.Length)
         {
+            UiForm.LockForeground();
             ApplicationConfiguration.Initialize();
             Tr.SetLanguage(LangArg(args));
-            Theme.Init(args.Contains("--light") ? "light" : "dark", transparency: false);
+            Theme.Init(args.Contains("--light") ? "light" : "dark", transparency: false, SchemeArg(args));
             RenderCheck.DumpTexts(args[dump + 1]);
             return;
         }
