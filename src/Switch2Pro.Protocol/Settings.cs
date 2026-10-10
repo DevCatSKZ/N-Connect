@@ -252,6 +252,8 @@ public sealed class Settings
     public bool AutostartConfigured { get; set; }
     /// <summary>Darstellung: "dark" (Standard), "light" oder "system" (wie Windows).</summary>
     public string? Theme { get; set; }
+    /// <summary>Farbschema: "windows" (Standard, null), "neon", "aurora", "sunset" oder "joycon".</summary>
+    public string? ColorScheme { get; set; }
     /// <summary>Durchscheinender Fensterhintergrund (Mica, ab Windows 11).</summary>
     public bool Transparency { get; set; } = true;
     /// <summary>Controller-Übersicht kompakt: kleinere Karten (Grafik, Akku, Verbindung), mehrere nebeneinander.</summary>
@@ -469,6 +471,7 @@ public sealed class Settings
         ConsoleHintShown = other.ConsoleHintShown;
         AutostartConfigured = other.AutostartConfigured;
         Theme = other.Theme;
+        ColorScheme = other.ColorScheme;
         Transparency = other.Transparency;
         CompactCards = other.CompactCards;
         Language = other.Language;

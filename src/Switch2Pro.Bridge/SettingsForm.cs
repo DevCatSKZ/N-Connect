@@ -42,6 +42,7 @@ internal sealed class SettingsForm : UiForm
     private readonly ToggleSwitch _autostart = new();
     private readonly ComboBox _themeMode = Combo(200, "Dunkel", "Hell", "Wie Windows");
     private readonly ToggleSwitch _transparency = new();
+    private readonly SchemePicker _scheme = new();
     private readonly ComboBox _language = Combo(220, "Automatisch (wie Windows)", "Deutsch", "English", "Español",
         "Français", "Italiano", "Português", "Nederlands", "Polski", "Русский", "日本語", "中文 (简体)", "한국어");
 
@@ -89,9 +90,9 @@ internal sealed class SettingsForm : UiForm
     // ---------- Tastenbelegung ----------
     private readonly ComboBox _profileSelect = Combo(240);
     private readonly GlyphButton _profileNew = new("Neu", Glyph.Add);
-    private readonly GlyphButton _profileMore = new("", Glyph.More) { Width = 36 };
+    private readonly GlyphButton _profileMore = new("", Glyph.More) { Width = UiScale.Px(36) };
     private readonly ContextMenuStrip _profileMenu = new();
-    private readonly TextBox _programs = new() { Width = 300, PlaceholderText = "z. B. Cemu.exe, Ryujinx.exe" };
+    private readonly TextBox _programs = new() { Width = UiScale.Px(300), PlaceholderText = "z. B. Cemu.exe, Ryujinx.exe" };
     private readonly GlyphButton _programAdd = new("Wählen …", Glyph.Folder);
     private readonly ComboBox _mapKind = Combo(300);
     private readonly Segmented _layer = new("Normal", "Shift-Ebene");
@@ -112,11 +113,11 @@ internal sealed class SettingsForm : UiForm
 
         Text = "N-Connect";
         StartPosition = FormStartPosition.CenterScreen;
-        Size = new Size(1280, 880);
-        MinimumSize = new Size(1060, 660);
+        Size = new Size(UiScale.Px(1280), UiScale.Px(880));
+        MinimumSize = new Size(UiScale.Px(1060), UiScale.Px(660));
         Font = UiFonts.Body;
-        AutoScaleDimensions = new SizeF(96F, 96F);
-        AutoScaleMode = AutoScaleMode.Dpi;
+        AutoScaleDimensions = UiScale.Dimensions;
+        AutoScaleMode = AutoScaleMode.None;
 
         Controls.Add(_host);
         Controls.Add(BuildNavigation());
@@ -150,21 +151,21 @@ internal sealed class SettingsForm : UiForm
     }
 
     private static Slider Bar(int min, int max, Func<int, string> format, int step = 1) =>
-        new() { Minimum = min, Maximum = max, Format = format, SmallChange = step, Width = 300 };
+        new() { Minimum = min, Maximum = max, Format = format, SmallChange = step, Width = UiScale.Px(300) };
 
     private readonly FlowLayoutPanel _navList = new()
     {
-        FlowDirection = FlowDirection.TopDown, WrapContents = false, Dock = DockStyle.Fill, Padding = new Padding(10, 6, 10, 0),
+        FlowDirection = FlowDirection.TopDown, WrapContents = false, Dock = DockStyle.Fill, Padding = new Padding(UiScale.Px(10), UiScale.Px(6), UiScale.Px(10), 0),
     };
 
     private Control BuildNavigation()
     {
-        var rail = new Panel { Dock = DockStyle.Left, Width = 286, BackColor = Theme.Backdrop };
-        var header = new Panel { Dock = DockStyle.Top, Height = 62, BackColor = Theme.Backdrop };
-        header.Controls.Add(new Wordmark { Location = new Point(22, 14), BackColor = Theme.Backdrop });
+        var rail = new Panel { Dock = DockStyle.Left, Width = UiScale.Px(286), BackColor = Theme.Backdrop };
+        var header = new Panel { Dock = DockStyle.Top, Height = UiScale.Px(62), BackColor = Theme.Backdrop };
+        header.Controls.Add(new Wordmark { Location = new Point(UiScale.Px(22), UiScale.Px(14)), BackColor = Theme.Backdrop });
         var version = new Label
         {
-            Dock = DockStyle.Bottom, Height = 36, Padding = new Padding(22, 0, 0, 10), TextAlign = ContentAlignment.MiddleLeft,
+            Dock = DockStyle.Bottom, Height = UiScale.Px(36), Padding = new Padding(UiScale.Px(22), 0, 0, UiScale.Px(10)), TextAlign = ContentAlignment.MiddleLeft,
             Text = $"Version {UpdateCheck.Current.ToString(3)}", Tag = Theme.MutedTag, ForeColor = SystemColors.GrayText,
         };
         _navList.BackColor = Theme.Backdrop;
@@ -177,7 +178,7 @@ internal sealed class SettingsForm : UiForm
     private void AddPage(string title, string glyph, Control page)
     {
         int index = _pages.Count;
-        var nav = new NavItem(title, glyph, () => SelectPage(index)) { Width = 258, BackColor = Theme.Backdrop };
+        var nav = new NavItem(title, glyph, () => SelectPage(index)) { Width = UiScale.Px(258), BackColor = Theme.Backdrop };
         nav.ExpandToggled += () => ToggleSubs(index);
         _navList.Controls.Add(nav);
         var subs = new List<NavSubItem>();
@@ -188,7 +189,7 @@ internal sealed class SettingsForm : UiForm
             {
                 string section = heading.Text;
                 var sub = new NavSubItem(section, () => SelectPage(index, section))
-                    { Width = 258, BackColor = Theme.Backdrop, Visible = false };
+                    { Width = UiScale.Px(258), BackColor = Theme.Backdrop, Visible = false };
                 _navList.Controls.Add(sub);
                 subs.Add(sub);
             }
@@ -262,7 +263,7 @@ internal sealed class SettingsForm : UiForm
                 NavSubItem sub = null!;
                 sub = new NavSubItem($"{p.Index + 1} · {p.DisplayName(_settings)}",
                         () => { SelectPage(PageControllers, onlyPlayer: p); sub.Selected = true; })
-                    { Width = 258, BackColor = Theme.Backdrop, Visible = nav.Expanded };
+                    { Width = UiScale.Px(258), BackColor = Theme.Backdrop, Visible = nav.Expanded };
                 _navList.Controls.Add(sub);
                 _navList.Controls.SetChildIndex(sub, pos++);
                 _controllerSubs.Add(sub);
@@ -270,7 +271,7 @@ internal sealed class SettingsForm : UiForm
         else
         {
             var sub = new NavSubItem("Kein Controller verbunden", null)
-                { Width = 258, BackColor = Theme.Backdrop, Visible = nav.Expanded };
+                { Width = UiScale.Px(258), BackColor = Theme.Backdrop, Visible = nav.Expanded };
             _navList.Controls.Add(sub);
             _navList.Controls.SetChildIndex(sub, pos);
             _controllerSubs.Add(sub);
@@ -280,11 +281,11 @@ internal sealed class SettingsForm : UiForm
 
     private Control BuildOverviewPage()
     {
-        var page = new Panel { BackColor = Theme.Backdrop, Padding = new Padding(16, 12, 12, 8) };
+        var page = new Panel { BackColor = Theme.Backdrop, Padding = new Padding(UiScale.Px(16), UiScale.Px(12), UiScale.Px(12), UiScale.Px(8)) };
         page.Controls.Add(_overview);
         page.Controls.Add(new Heading("Controller", page: true,
             "Verbundene Controller mit Live-Anzeige. Über „Einstellungen“ an einem Controller passt du genau diesen an.")
-        { Dock = DockStyle.Top, Height = 74, Padding = new Padding(12, 0, 0, 0) });
+        { Dock = DockStyle.Top, Height = UiScale.Px(74), Padding = new Padding(UiScale.Px(12), 0, 0, 0) });
         return page;
     }
 
@@ -341,9 +342,9 @@ internal sealed class SettingsForm : UiForm
         {
             c.Location = new Point(x, (h - c.Height) / 2);
             panel.Controls.Add(c);
-            x += c.Width + 8;
+            x += c.Width + UiScale.Px(8);
         }
-        panel.Size = new Size(x - 8, h);
+        panel.Size = new Size(x - UiScale.Px(8), h);
         return panel;
     }
 
@@ -364,7 +365,7 @@ internal sealed class SettingsForm : UiForm
             Row("Turbo-Geschwindigkeit", "Wie oft pro Sekunde Tasten mit „Turbo“ auslösen.", _turboRate, Glyph.Timer));
         page.AddGroup("Eigene Werte je Controller",
             Row("Controller", "Werte nur für diesen Controller – ohne eigenen Wert gilt der allgemeine.", _tuneKind, Glyph.Gamepad));
-        page.Content.Controls.Add(new Panel { Height = 8, BackColor = Theme.Backdrop });
+        page.Content.Controls.Add(new Panel { Height = UiScale.Px(8), BackColor = Theme.Backdrop });
         page.Content.Controls.Add(_tuning);
         return page;
     }
@@ -465,6 +466,7 @@ internal sealed class SettingsForm : UiForm
             Row("Mit Windows starten", "N-Connect startet unsichtbar im Infobereich.", _autostart, Glyph.Power));
         page.AddGroup("Darstellung und Sprache",
             Row("Farbmodus", null, _themeMode, Glyph.Palette),
+            Row("Farbschema", "Farben für Akzente, Knöpfe, Flächen und Ränder.", _scheme, Glyph.Palette),
             Row("Mica-Effekt", "Durchscheinende Titelleiste (ab Windows 11).", _transparency, Glyph.Palette),
             Row("Sprache / Language", null, _language, Glyph.Globe));
         var reset = new GlyphButton("Zurücksetzen", Glyph.Refresh);
@@ -579,6 +581,7 @@ internal sealed class SettingsForm : UiForm
         _language.SelectedIndexChanged += (_, _) => ChangeLanguage();
         _themeMode.SelectedIndexChanged += (_, _) => ChangeTheme();
         _transparency.CheckedChanged += (_, _) => ChangeTheme();
+        _scheme.SelectedIndexChanged += (_, _) => ChangeTheme();
         _combine.CheckedChanged += (_, _) => Apply(() => _settings.CombineJoyCons = _combine.Checked);
         _mouse.CheckedChanged += (_, _) => Apply(() => _settings.JoyConMouse = _mouse.Checked);
         _mouseSpeed.ValueChanged += (_, _) => Apply(() => _settings.MouseSpeed = _mouseSpeed.Value / 10f);
@@ -672,6 +675,7 @@ internal sealed class SettingsForm : UiForm
         _language.SelectedIndex = Math.Max(0, Array.IndexOf(LanguageCodes, _settings.Language));
         _themeMode.SelectedIndex = _settings.Theme switch { "light" => 1, "system" => 2, _ => 0 };
         _transparency.Checked = _settings.Transparency;
+        _scheme.SelectedIndex = Math.Max(0, Array.IndexOf(Theme.Schemes, Theme.SchemeById(_settings.ColorScheme)));
         _combine.Checked = _settings.CombineJoyCons;
         _mouse.Checked = _settings.JoyConMouse;
         _mouseSpeed.Value = Clamp(_mouseSpeed, _settings.MouseSpeed * 10);
@@ -1016,12 +1020,14 @@ internal sealed class SettingsForm : UiForm
         if (_loading)
             return;
         string? mode = _themeMode.SelectedIndex switch { 1 => "light", 2 => "system", _ => null };
-        if (mode == _settings.Theme && _transparency.Checked == _settings.Transparency)
+        string? scheme = _scheme.SelectedIndex == 0 ? null : _scheme.SelectedId; // Neon = Standard, nicht speichern
+        if (mode == _settings.Theme && _transparency.Checked == _settings.Transparency && scheme == _settings.ColorScheme)
             return;
         _settings.Theme = mode;
         _settings.Transparency = _transparency.Checked;
+        _settings.ColorScheme = scheme;
         _changed(false);
-        Theme.Init(mode, _transparency.Checked);
+        Theme.Init(mode, _transparency.Checked, scheme);
         Reopen();
     }
 
@@ -1051,10 +1057,27 @@ internal sealed class SettingsForm : UiForm
     /// <summary>Prüfhilfe: Fenster zeigen, ohne den Fokus zu übernehmen (Tastatureingaben bleiben beim Benutzer).</summary>
     internal bool ShowInactive { get; init; }
 
-    protected override bool ShowWithoutActivation => ShowInactive;
+    protected override bool ShowWithoutActivation => ShowInactive || base.ShowWithoutActivation;
 
     /// <summary>Seite, auf der ein neu geöffnetes Fenster starten soll (nach Sprach-/Darstellungswechsel).</summary>
     public static int? ReopenPage { get; set; }
+
+    protected override void OnLoad(EventArgs e)
+    {
+        base.OnLoad(e); // hier hat WinForms Größe und Mindestgröße schon auf die Skalierung des Bildschirms gebracht
+        if (UiForm.Offscreen)
+            return;
+        // Bei hoher Skalierung (z. B. 150 % auf Full HD) wäre das Fenster größer als der Bildschirm: auf den
+        // Arbeitsbereich (ohne Taskleiste) begrenzen und mittig setzen.
+        var area = Screen.FromPoint(Cursor.Position).WorkingArea;
+        int width = Math.Min(Width, area.Width - 24), height = Math.Min(Height, area.Height - 24);
+        MinimumSize = new Size(Math.Min(MinimumSize.Width, width), Math.Min(MinimumSize.Height, height));
+        if (width != Width || height != Height)
+        {
+            Size = new Size(width, height);
+            Location = new Point(area.Left + (area.Width - width) / 2, area.Top + (area.Height - height) / 2);
+        }
+    }
 
     protected override void OnShown(EventArgs e)
     {
@@ -1093,6 +1116,8 @@ internal sealed class SettingsForm : UiForm
         defaults.AutostartConfigured = _settings.AutostartConfigured;
         defaults.Theme = _settings.Theme;
         defaults.Transparency = _settings.Transparency;
+        defaults.ColorScheme = _settings.ColorScheme;
+        defaults.CompactCards = _settings.CompactCards;
         defaults.Language = _settings.Language;
         _settings.CopyFrom(defaults);
         _mapping.SelectProfile(null);

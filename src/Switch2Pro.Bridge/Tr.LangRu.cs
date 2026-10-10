@@ -10,6 +10,8 @@ internal static partial class Tr
         // ---------- Fenster, Reiter, Abschnitte ----------
         ["Controller"] = "Контроллеры",
         // ---------- Status-Kopfzeile, Ansicht ----------
+        ["Farbschema"] = "Цветовая схема",
+        ["Farben für Akzente, Knöpfe, Flächen und Ränder."] = "Цвета акцентов, кнопок, поверхностей и рамок.",
         ["bereit"] = "готов",
         ["nicht verfügbar"] = "недоступен",
         ["Niedrigster Akku"] = "Минимальный заряд",

@@ -15,7 +15,14 @@ internal sealed class StatusBand : Control, ISelfTranslating, IExtraTexts
     /// (grün/gelb/rot), <see cref="Battery"/> zeichnet statt des Symbols einen Akku mit diesem Füllstand.</summary>
     public readonly record struct Tile(string Glyph, string Title, string Value, Color? Level = null, int? Battery = null);
 
-    private const int TileH = 56, Gap = 10, Circle = 32;
+    // Maße in der aktuellen Skalierung; die Kachelhöhe richtet sich nach der tatsächlichen Schrifthöhe.
+    private static int S(int v) => UiScale.Px(v);
+    private static int TitleH => TextRenderer.MeasureText("Ag", UiFonts.Small).Height;
+    private static int ValueH => TextRenderer.MeasureText("Ag", UiFonts.Strong).Height;
+    private static int TileH => Math.Max(S(56), TitleH + ValueH + S(14));
+    private static int Gap => S(10);
+    private static int Circle => S(32);
+    private static int TopPad => S(6);
     private IReadOnlyList<Tile> _tiles = [];
     private string _signature = "";
     public Segmented View { get; } = new("Groß", "Kompakt");
@@ -25,11 +32,15 @@ internal sealed class StatusBand : Control, ISelfTranslating, IExtraTexts
         SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint
                  | ControlStyles.ResizeRedraw, true);
         Dock = DockStyle.Top;
-        Height = TileH + 12;
+        Height = TileH + S(12);
         BackColor = Theme.Backdrop;
         View.BackColor = Theme.Backdrop;
         Controls.Add(View);
     }
+
+    /// <summary>Höhe setzt die Leiste selbst (skaliert, nach Schrifthöhe) – WinForms nur Lage und Breite überlassen.</summary>
+    protected override void ScaleControl(SizeF factor, BoundsSpecified specified) =>
+        base.ScaleControl(factor, specified & ~BoundsSpecified.Height);
 
     public IEnumerable<string> ExtraTexts => _tiles.SelectMany(t => new[] { Tr.T(t.Title), Tr.T(t.Value) });
 
@@ -47,14 +58,14 @@ internal sealed class StatusBand : Control, ISelfTranslating, IExtraTexts
     protected override void OnLayout(LayoutEventArgs levent)
     {
         base.OnLayout(levent);
-        View.Location = new Point(Width - 12 - View.Width, 6 + (TileH - View.Height) / 2);
+        View.Location = new Point(Width - S(12) - View.Width, TopPad + (TileH - View.Height) / 2);
     }
 
     private int TileWidth(Tile t)
     {
         int text = Math.Max(TextRenderer.MeasureText(Tr.T(t.Title), UiFonts.Small).Width,
             TextRenderer.MeasureText(Tr.T(t.Value), UiFonts.Strong).Width);
-        return 14 + Circle + 12 + Math.Min(260, text) + 16;
+        return S(14) + Circle + S(12) + Math.Min(S(260), text) + S(16);
     }
 
     protected override void OnPaint(PaintEventArgs e)
@@ -63,21 +74,22 @@ internal sealed class StatusBand : Control, ISelfTranslating, IExtraTexts
         var p = Theme.Current;
         g.Clear(BackColor);
         g.SmoothingMode = SmoothingMode.AntiAlias;
-        int x = 12, right = View.Left - Gap;
+        int x = S(12), right = View.Left - Gap;
+        int textTop = TopPad + (TileH - TitleH - ValueH) / 2;
         foreach (var tile in _tiles)
         {
             int w = TileWidth(tile);
             if (x + w > right)
                 break; // schmales Fenster: hintere Kacheln weglassen statt zu quetschen
-            var r = new RectangleF(x + 0.5f, 6.5f, w - 1, TileH - 1);
-            using (var path = Theme.RoundedRect(r, 8))
+            var r = new RectangleF(x + 0.5f, TopPad + 0.5f, w - 1, TileH - 1);
+            using (var path = Theme.RoundedRect(r, S(8)))
             {
                 using var fill = new SolidBrush(p.Surface);
                 g.FillPath(fill, path);
                 using var pen = new Pen(p.Border);
                 g.DrawPath(pen, path);
             }
-            var circle = new RectangleF(x + 14, 6 + (TileH - Circle) / 2f, Circle, Circle);
+            var circle = new RectangleF(x + S(14), TopPad + (TileH - Circle) / 2f, Circle, Circle);
             using (var disc = Theme.AccentBrush(circle, 45))
             {
                 // Dezenter Kreis: Verlauf stark mit der Fläche gemischt, Symbol in kräftiger Akzentfarbe.
@@ -90,11 +102,11 @@ internal sealed class StatusBand : Control, ISelfTranslating, IExtraTexts
             else if (!Glyph.Paint(g, tile.Glyph, Rectangle.Round(circle), glyphColor, 11f))
                 TextRenderer.DrawText(g, tile.Glyph, Glyph.Font(11f), Rectangle.Round(circle), glyphColor,
                     TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
-            int textX = (int)circle.Right + 12, textW = x + w - 12 - textX;
-            TextRenderer.DrawText(g, Tr.T(tile.Title), UiFonts.Small, new Rectangle(textX, 13, textW, 18), p.TextMuted,
+            int textX = (int)circle.Right + S(12), textW = x + w - S(12) - textX;
+            TextRenderer.DrawText(g, Tr.T(tile.Title), UiFonts.Small, new Rectangle(textX, textTop, textW, TitleH), p.TextMuted,
                 TextFormatFlags.NoPrefix | TextFormatFlags.EndEllipsis);
             var valueColor = tile.Level is { } c && tile.Battery is null ? c : p.Text;
-            TextRenderer.DrawText(g, Tr.T(tile.Value), UiFonts.Strong, new Rectangle(textX, 31, textW, 22), valueColor,
+            TextRenderer.DrawText(g, Tr.T(tile.Value), UiFonts.Strong, new Rectangle(textX, textTop + TitleH, textW, ValueH), valueColor,
                 TextFormatFlags.NoPrefix | TextFormatFlags.EndEllipsis);
             x += w + Gap;
         }
@@ -103,14 +115,15 @@ internal sealed class StatusBand : Control, ISelfTranslating, IExtraTexts
     /// <summary>Kleiner Akku mitten im Kreis, gefüllt nach Ladestand.</summary>
     private static void DrawBattery(Graphics g, RectangleF circle, int percent, Color color)
     {
-        var frame = new RectangleF(circle.X + 7, circle.Y + circle.Height / 2 - 5.5f, 16, 11);
-        using (var path = Theme.RoundedRect(frame, 2.5f))
-        using (var pen = new Pen(Theme.Current.Text, 1.2f))
+        float k = circle.Width / 32f; // Maße relativ zum (skalierten) Kreis
+        var frame = new RectangleF(circle.X + 7 * k, circle.Y + circle.Height / 2 - 5.5f * k, 16 * k, 11 * k);
+        using (var path = Theme.RoundedRect(frame, 2.5f * k))
+        using (var pen = new Pen(Theme.Current.Text, 1.2f * k))
             g.DrawPath(pen, path);
         using (var tip = new SolidBrush(Theme.Current.Text))
-            g.FillRectangle(tip, frame.Right + 0.8f, frame.Y + 3.5f, 1.8f, 4);
+            g.FillRectangle(tip, frame.Right + 0.8f * k, frame.Y + 3.5f * k, 1.8f * k, 4 * k);
         using var fill = new SolidBrush(color);
-        g.FillRectangle(fill, frame.X + 2, frame.Y + 2, Math.Max(1.5f, (frame.Width - 4) * Math.Clamp(percent, 0, 100) / 100f), frame.Height - 4);
+        g.FillRectangle(fill, frame.X + 2 * k, frame.Y + 2 * k, Math.Max(1.5f * k, (frame.Width - 4 * k) * Math.Clamp(percent, 0, 100) / 100f), frame.Height - 4 * k);
     }
 
     /// <summary>Farbe eines Akkustands (wie in den Karten): rot unter 15 %, gelb unter 35 %, sonst grün.</summary>

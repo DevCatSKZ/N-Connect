@@ -89,10 +89,12 @@ angelegt.
 - **Einstellungen direkt an der Controller-Karte** („Einstellungen“ aufklappen): Tasten, Feineinstellung, Gyro,
   Joy-Con, Extras, Details – jeweils nur für diesen Controller.
 - **Taste per Tastendruck belegen:** hinter jeder Taste das Tastatur-Symbol klicken und die gewünschte Taste drücken.
-- **Oberfläche im Neon-Look des Logos:** dunkel (Standard), hell oder wie Windows; Navy-Töne mit Verlauf
-  Neon-Blau → Violett, Mica-Titelleiste. Weiche Animationen (Schalter, Hover, Akkubalken); Karten leuchten beim
-  Verbinden auf und glühen bei Tastendruck – so sieht man sofort, welche Karte zu welchem Controller gehört. Sind die
-  Animationseffekte in Windows abgeschaltet, bleibt alles ruhig.
+- **Oberfläche wie Windows 11:** dunkel (Standard), hell oder wie Windows; Farben, Schrift und Bedienelemente wie in
+  den Windows-Einstellungen, Mica-Titelleiste. Weitere Farbschemata: **Neon**, **Aurora**, **Sunset** und **Joy-Con**
+  (mit Farbverläufen und Leuchten). Weiche Animationen (Schalter, Hover, Akkubalken); Karten leuchten beim Verbinden
+  auf und bei Tastendruck – so sieht man sofort, welche Karte zu welchem Controller gehört. Sind die Animationseffekte
+  in Windows abgeschaltet, bleibt alles ruhig.
+- **Gut lesbar bei jeder Bildschirmskalierung** (100 % bis 200 %) und in allen 12 Sprachen.
 - Knöpfe je Controller: **Trennen**, **Vibrieren** (welcher ist welcher Spieler?), **Gyro kalibrieren**,
   Joy-Con **trennen/zusammenfügen**, **hochkant/quer**, **amiibo lesen**, **Ring-Con**, **IR-Kamera**,
   **„Doppelt angezeigt? Verstecken“** (HidHide).

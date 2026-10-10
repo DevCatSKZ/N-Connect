@@ -18,7 +18,7 @@ internal sealed class PairingDataForm : UiForm
     private readonly Report _preview = new();
     private readonly SettingRow _adapter = new("Bluetooth-Adapter dieses PCs", "wird ermittelt …", glyph: Glyph.Bluetooth);
     private readonly GlyphButton _apply = new("Übernehmen", Glyph.Check);
-    private readonly ScrollPage _page = new() { Padding = new Padding(24, 18, 24, 0) };
+    private readonly ScrollPage _page = new() { Padding = new Padding(UiScale.Px(24), UiScale.Px(18), UiScale.Px(24), 0) };
 
     /// <summary>Gerade angezeigte Daten, die „Übernehmen“ in die Einstellungen schreibt.</summary>
     private PairingExport? _pending;
@@ -34,10 +34,10 @@ internal sealed class PairingDataForm : UiForm
         StartPosition = FormStartPosition.CenterScreen;
         FormBorderStyle = FormBorderStyle.Sizable;
         MinimizeBox = false;
-        ClientSize = new Size(760, 760);
-        MinimumSize = new Size(600, 520);
-        AutoScaleDimensions = new SizeF(96F, 96F);
-        AutoScaleMode = AutoScaleMode.Dpi;
+        ClientSize = new Size(UiScale.Px(760), UiScale.Px(760));
+        MinimumSize = new Size(UiScale.Px(600), UiScale.Px(520));
+        AutoScaleDimensions = UiScale.Dimensions;
+        AutoScaleMode = AutoScaleMode.None;
         Font = UiFonts.Body;
         KeyPreview = true;
 
@@ -123,7 +123,9 @@ internal sealed class PairingDataForm : UiForm
     /// </summary>
     private sealed class Report : Control, IHeightForWidth, ISelfTranslating
     {
-        private const int Pad = 16, Indent = 20, Gap = 8;
+        private static int Pad => UiScale.Px(16);
+        private static int Indent => UiScale.Px(20);
+        private static int Gap => UiScale.Px(8);
         private const string Bullet = "  •  ";
         private const TextFormatFlags Flags = TextFormatFlags.WordBreak | TextFormatFlags.NoPrefix;
 
@@ -154,25 +156,25 @@ internal sealed class PairingDataForm : UiForm
                 string text = bullet ? raw[Bullet.Length..] : raw;
                 var font = !bullet && text.EndsWith(':') ? UiFonts.Strong : UiFonts.Body;
                 int left = Pad + (bullet ? Indent : 0);
-                int h = TextRenderer.MeasureText(text, font, new Size(Math.Max(80, width - left - Pad), 0), Flags).Height + 3;
+                int h = TextRenderer.MeasureText(text, font, new Size(Math.Max(UiScale.Px(80), width - left - Pad), 0), Flags).Height + UiScale.Px(3);
                 yield return (text, font, left, bullet, h);
             }
         }
 
-        public int HeightFor(int width) => 2 * 12 + Lines(width).Sum(l => l.Height);
+        public int HeightFor(int width) => 2 * UiScale.Px(12) + Lines(width).Sum(l => l.Height);
 
         protected override void OnPaint(PaintEventArgs e)
         {
             var g = e.Graphics;
             var p = Theme.Current;
             g.Clear(p.Surface);
-            int y = 12;
+            int y = UiScale.Px(12);
             foreach (var (text, font, left, bullet, h) in Lines(Width))
             {
                 if (bullet)
-                    TextRenderer.DrawText(g, "•", font, new Point(left - 14, y), p.TextMuted, TextFormatFlags.NoPrefix);
+                    TextRenderer.DrawText(g, "•", font, new Point(left - UiScale.Px(14), y), p.TextMuted, TextFormatFlags.NoPrefix);
                 if (text.Length > 0)
-                    TextRenderer.DrawText(g, text, font, new Rectangle(left, y, Math.Max(80, Width - left - Pad), h), p.Text, Flags);
+                    TextRenderer.DrawText(g, text, font, new Rectangle(left, y, Math.Max(UiScale.Px(80), Width - left - Pad), h), p.Text, Flags);
                 y += h;
             }
         }
@@ -187,7 +189,7 @@ internal sealed class PairingDataForm : UiForm
         {
             _buttons = buttons;
             Dock = DockStyle.Bottom;
-            Height = 64;
+            Height = UiScale.Px(64);
             DoubleBuffered = true;
             ResizeRedraw = true;
             BackColor = Theme.Current.Surface;
@@ -195,19 +197,19 @@ internal sealed class PairingDataForm : UiForm
             {
                 b.BackColor = BackColor;
                 if (b is GlyphButton g)
-                    g.Width = Math.Max(g.Width, 110);
+                    g.Width = Math.Max(g.Width, UiScale.Px(110));
                 Controls.Add(b);
             }
         }
 
         protected override void OnLayout(LayoutEventArgs levent)
         {
-            int x = ClientSize.Width - 24;
+            int x = ClientSize.Width - UiScale.Px(24);
             foreach (var b in _buttons.Reverse())
             {
                 x -= b.Width;
                 b.Location = new Point(x, (Height - b.Height) / 2);
-                x -= 8;
+                x -= UiScale.Px(8);
             }
         }
 
@@ -485,46 +487,47 @@ internal static class PasswordDialog
     public static string? Ask(IWin32Window owner, bool confirm, bool keysOffered, out bool includeKeys)
     {
         includeKeys = false;
-        const int left = 24, width = 452;
+        int left = UiScale.Px(24), width = UiScale.Px(452);
         using var form = new UiForm
         {
             Text = confirm ? "Kopplungsdaten exportieren" : "Passwort eingeben", StartPosition = FormStartPosition.CenterParent,
             FormBorderStyle = FormBorderStyle.FixedDialog, MinimizeBox = false, MaximizeBox = false, ShowInTaskbar = false,
-            ClientSize = new Size(left * 2 + width, confirm ? 336 : 210), Font = UiFonts.Body, KeyPreview = true,
-            AutoScaleDimensions = new SizeF(96F, 96F), AutoScaleMode = AutoScaleMode.Dpi,
+            ClientSize = new Size(left * 2 + width, confirm ? UiScale.Px(336) : UiScale.Px(210)), Font = UiFonts.Body, KeyPreview = true,
+            AutoScaleDimensions = UiScale.Dimensions, AutoScaleMode = AutoScaleMode.None,
         };
         var title = new Label
         {
-            AutoSize = true, Location = new Point(left, 18), Font = UiFonts.Subtitle,
+            AutoSize = true, Location = new Point(left, UiScale.Px(18)), Font = UiFonts.Subtitle,
             Text = confirm ? "Kopplungsdaten exportieren" : "Passwort eingeben",
         };
         var info = new Label
         {
-            AutoSize = true, MaximumSize = new Size(width, 0), Location = new Point(left, 52),
+            AutoSize = true, MaximumSize = new Size(width, UiScale.Px(0)), Location = new Point(left, UiScale.Px(52)),
             Text = confirm
                 ? "Passwort (optional). Ohne Passwort steht der Inhalt lesbar in der Datei. Mit Kopplungsschlüsseln ist ein Passwort Pflicht."
                 : "Die Datei ist mit einem Passwort geschützt.",
         };
-        var first = new TextBox { UseSystemPasswordChar = true, Location = new Point(left, confirm ? 100 : 82), Width = width, PlaceholderText = "Passwort" };
-        var second = new TextBox { UseSystemPasswordChar = true, Location = new Point(left, 136), Width = width, PlaceholderText = "Passwort wiederholen", Visible = confirm };
+        var first = new TextBox { UseSystemPasswordChar = true, Location = new Point(left, confirm ? UiScale.Px(100) : UiScale.Px(82)), Width = width, PlaceholderText = "Passwort" };
+        var second = new TextBox { UseSystemPasswordChar = true, Location = new Point(left, UiScale.Px(136)), Width = width, PlaceholderText = "Passwort wiederholen", Visible = confirm };
         var keysLabel = new Label
         {
-            AutoSize = true, MaximumSize = new Size(width - 110, 0), Location = new Point(left, 180), Visible = confirm,
+            AutoSize = true, MaximumSize = new Size(width - UiScale.Px(110), UiScale.Px(0)), Location = new Point(left, UiScale.Px(180)), Visible = confirm,
             Text = keysOffered ? "Kopplungsschlüssel der Switch-Controller mitnehmen" : "Kopplungsschlüssel mitnehmen (erst Switch-SD-Karte einlesen)",
             ForeColor = keysOffered ? SystemColors.ControlText : SystemColors.GrayText,
         };
-        var keys = new ToggleSwitch { Location = new Point(left + width - 96, 176), Visible = confirm, Enabled = keysOffered };
-        var status = new Label { AutoSize = true, Location = new Point(left, 214), Visible = confirm, Font = UiFonts.Small, ForeColor = SystemColors.GrayText };
-        var ok = new GlyphButton("OK", accent: true) { Width = 110 };
-        var cancel = new GlyphButton("Abbrechen") { Width = 110 };
-        var footer = new Panel { Dock = DockStyle.Bottom, Height = 64, BackColor = Theme.Current.Surface };
+        var keys = new ToggleSwitch { Visible = confirm, Enabled = keysOffered };
+        keys.Location = new Point(left + width - keys.Width, UiScale.Px(176));
+        var status = new Label { AutoSize = true, Location = new Point(left, UiScale.Px(214)), Visible = confirm, Font = UiFonts.Small, ForeColor = SystemColors.GrayText };
+        var ok = new GlyphButton("OK", accent: true) { Width = UiScale.Px(110) };
+        var cancel = new GlyphButton("Abbrechen") { Width = UiScale.Px(110) };
+        var footer = new Panel { Dock = DockStyle.Bottom, Height = UiScale.Px(64), BackColor = Theme.Current.Surface };
         footer.Paint += (_, e) =>
         {
             using var pen = new Pen(Theme.Current.Border);
-            e.Graphics.DrawLine(pen, 0, 0, footer.Width, 0);
+            e.Graphics.DrawLine(pen, 0, 0, footer.Width, UiScale.Px(0));
         };
-        cancel.Location = new Point(left + width - cancel.Width, 16);
-        ok.Location = new Point(cancel.Left - 8 - ok.Width, 16);
+        cancel.Location = new Point(left + width - cancel.Width, UiScale.Px(16));
+        ok.Location = new Point(cancel.Left - UiScale.Px(8) - ok.Width, UiScale.Px(16));
         ok.BackColor = cancel.BackColor = footer.BackColor;
         footer.Controls.AddRange([ok, cancel]);
         ok.Click += (_, _) =>

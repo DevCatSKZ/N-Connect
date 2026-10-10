@@ -10,6 +10,8 @@ internal static partial class Tr
         // ---------- Fenster, Reiter, Abschnitte ----------
         ["Controller"] = "Manettes",
         // ---------- Status-Kopfzeile, Ansicht ----------
+        ["Farbschema"] = "Jeu de couleurs",
+        ["Farben für Akzente, Knöpfe, Flächen und Ränder."] = "Couleurs des accents, boutons, surfaces et bordures.",
         ["bereit"] = "prêt",
         ["nicht verfügbar"] = "indisponible",
         ["Niedrigster Akku"] = "Batterie la plus faible",

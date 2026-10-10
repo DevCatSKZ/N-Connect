@@ -400,19 +400,32 @@ Bis zu **8 Spieler** gleichzeitig (`ControllerManager.MaxPlayers`). Der 9. Contr
 
 - **Autostart** (Standard an beim ersten Start, danach Nutzerentscheidung): HKCU\…\Run mit `--autostart`
   (unsichtbar starten). Zweiter Start zeigt das Fenster der laufenden Instanz.
-- **Darstellung**: Dunkel (Standard), Hell, Wie Windows. **Neon-Look aus dem Logo**: Flächen in Navy-Tönen,
-  Akzent als Verlauf Neon-Blau → Violett (`Theme.Accent` → `Theme.Accent2`, dunkel FF2F8BFF → FF9B5CFF, hell
-  FF1F6FE0 → FF7B3FE4; Pinsel `Theme.AccentBrush`, Lichtschein `Theme.Glow`). Verlauf auf Schaltern, Segmenten,
-  Akzentknöpfen, Reglern, Reitern, Navigation und dem Schriftzug „N-Connect“ (`Wordmark`, kein Logo – das zeigt
-  schon das Fenstersymbol). **Nicht** die Windows-Akzentfarbe, die sieht je nach Nutzerwahl beliebig aus (beim
-  Nutzer pink, nicht gewünscht). Schrift darauf weiß (`Theme.OnAccent`); Mica-Titelleiste ab Windows 11, ohne Mica
-  Titelleiste und Fensterrand in den Theme-Farben (`DWMWA_CAPTION_COLOR`/`DWMWA_BORDER_COLOR`).
+- **Darstellung**: Farbmodus Dunkel (Standard), Hell, Wie Windows; dazu **Farbschema** (`Theme.Schemes`,
+  `Settings.ColorScheme`, Auswahl als Vorschau-Kacheln `SchemePicker` unter *Allgemein → Darstellung*):
+  - **Windows** (Standard): Farben von Windows 11/Fluent – Hintergrund #202020, Karten #2B2B2B, Steuerelemente
+    #373737, Akzent Windows-Blau (dunkel #4CC2FF mit schwarzer Schrift wie in Windows, hell #005FB8 mit weißer);
+    keine Verläufe, kein Leuchten (`Theme.Neon` = false), Schriftzug schlicht in Textfarbe.
+  - **Neon** (Navy, Blau → Violett), **Aurora** (Türkis → Grün), **Sunset** (Orange → Pink), **Joy-Con**
+    (Neonrot → Neonblau): Verläufe (`Theme.AccentBrush`/`LineBrush`), Leuchten (`Theme.Glow`), Linien im dunklen
+    Modus aufgehellt (`Theme.AccentLine`).
+  Kontraste nachgerechnet (WCAG): Schrift auf Akzent ≥ 4,5 : 1, Text ≥ 15 : 1, gedämpfter Text ≥ 6 : 1. Knöpfe und
+  Felder haben einen eigenen, kräftigeren Rand (`Palette.ControlBorder`) als Karten; Auswahlfelder zeichnet
+  `Theme.ComboSkin` selbst (Windows malt sie sonst grau), sie wachsen auf den längsten übersetzten Eintrag. Die
+  Controller-Grafik leuchtet in der Schemafarbe (`Palette.Pressed`). **Nicht** die Windows-Akzentfarbe des Nutzers
+  (sieht je nach Wahl beliebig aus). Mica-Titelleiste ab Windows 11, ohne Mica Titelleiste und Rand in Theme-Farben.
+- **Schrift und Skalierung**: Typografie wie Windows 11 (`UiFonts`: 12 / 14 / 14 semibold / 18 / 28 px). Die App
+  skaliert vollständig selbst (`UiScale`, alle Fenster `AutoScaleMode.None`): Faktor = System-DPI ÷ 96, alle festen
+  Maße über `UiScale.Px`. So sehen 100–200 % gleich aus, auch für Teile, die erst später entstehen (Karten, Reiter).
+  Einstellungszeilen legen breite Bedienelemente unter den Text, wenn daneben zu wenig Platz bliebe; das Hauptfenster
+  wird auf den Arbeitsbereich begrenzt (z. B. 150 % auf Full HD).
 - **Animationen** (`Anim`): weiche Übergänge für Hover, Schalter (Knopf gleitet), Segmente (Marke gleitet),
   Akkubalken, Aufleuchten/Glühen der Karten. Ein gemeinsamer Takt läuft nur, solange sich etwas bewegt. Aus, wenn
   Windows-Animationseffekte abgeschaltet sind und bei den Prüfhilfen `--render…` (Endzustände).
-- **Logo/Icon**: In der Oberfläche direkt in Zielgröße gezeichnet (`LogoView`), Fenstersymbol aus der eingebetteten
-  ICO-Datei mit allen Größen (nicht `ExtractAssociatedIcon` – nur 32 px, verkleinert pixelig). Die ICO-Datei
-  (`--render-brand`) enthält kleine Größen als 32-Bit-Bitmap, 256 px als PNG; heller Kachelrand erst ab 48 px.
+- **Logo/Icon**: Vektor im Stil von Windows 11 (`Branding.DrawLogo`): blaue Kachel, weiße Controller-Silhouette,
+  Verbindungssignal; vereinfacht sich bei kleinen Größen (16 px nur Kachel + Silhouette, ab 24 px Steuerkreuz/Tasten,
+  ab 32 px Signal, ab 48 px Lichtkante/Schatten). Fenstersymbol aus der eingebetteten ICO-Datei mit allen Größen
+  (nicht `ExtractAssociatedIcon` – nur 32 px). `--render-brand` erzeugt ICO (kleine Größen als 32-Bit-Bitmap, 256 px
+  als PNG), PNG und Installer-Grafiken, ohne ein Fenster zu öffnen.
 - **Grafiken**: Pfeile (▲▼◀▶) zeichnet `InputView.Caption` als gleich große Dreiecke, die bei gedrehtem Controller
   (quer gehaltener Joy-Con) mitdrehen; alle anderen Beschriftungen bleiben waagerecht lesbar.
 - **Sprache**: Deutsch/Englisch, Standard wie Windows (Übersetzungstabelle + Muster für Texte mit Platzhaltern).

@@ -52,6 +52,17 @@ Hinweise zur Umgebung:
 5. Screenshots mit dem neuen Build neu rendern (`--render-ui --demo-all`) → `gh-pages` pushen;
    die Seite holt sich Versionsnummer und Download-Link selbst per GitHub-API.
 
+## Zuletzt erledigt (10.10.2026, später): Windows-Design, Farbschemata, neues Icon, Skalierung, Prüfhilfe
+
+- **Windows-Design als Standard** (Fluent-Farben, einfarbiger Akzent, kein Leuchten) plus Farbschemata Neon, Aurora,
+  Sunset, Joy-Con (`Theme.Schemes`, `Settings.ColorScheme`, `SchemePicker`). Kontraste nachgerechnet.
+- **Neues App-Icon** als Vektor (`Branding.DrawLogo`), ICO/PNG/Installer-Grafiken per `--render-brand` neu erzeugt.
+- **Skalierung für alle Nutzer**: App skaliert selbst (`UiScale.Px`, `AutoScaleMode.None` überall), Schrift nach
+  Windows-11-Typografie; geprüft bei 100/125/150/200 %, hell/dunkel, Deutsch und Russisch.
+- **Prüfhilfe stört nicht mehr**: `--render-ui/--render/--dump-ui` starten sich auf einem unsichtbaren Desktop neu
+  (`HiddenDesktop`), Fehler dort landen in `%TEMP%\N-Connect-Pruefhilfe-Fehler.txt`. Neue Schalter: `--scale=1.5`
+  (simuliert 150 %), `--scheme=aurora` usw. **Trotzdem vor jedem Lauf beim Nutzer fragen.**
+
 ## Zuletzt erledigt (10.10.2026): Fehlerkorrekturen, Neon-Design, Statusleiste, Kompakt-Ansicht
 
 - **Fehler behoben**: doppelte Akku-Warnung (`ControllerManager.CheckLowBattery` entfernt – `Player.CheckBattery`

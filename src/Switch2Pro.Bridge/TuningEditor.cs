@@ -124,11 +124,11 @@ internal sealed class TuningEditor : SettingsGroup
     private void Add(string title, string glyph, TuningParts part, int min, int max, int step, float scale, Func<int, string> format,
         Func<Settings, ControllerKind, float?> own, Func<Settings, float> general, Action<Settings, ControllerKind, float?> set)
     {
-        var slider = new Slider { Minimum = min, Maximum = max, SmallChange = step, Format = format, Width = 280 };
-        var reset = new GlyphButton("", Glyph.Undo) { Width = 36, Margin = Padding.Empty };
-        var box = new Panel { Size = new Size(slider.Width + 8 + 36, 32) };
+        var slider = new Slider { Minimum = min, Maximum = max, SmallChange = step, Format = format, Width = UiScale.Px(280) };
+        var reset = new GlyphButton("", Glyph.Undo) { Width = UiScale.Px(36), Margin = Padding.Empty };
+        var box = new Panel { Size = new Size(slider.Width + UiScale.Px(8) + reset.Width, UiScale.Px(32)) };
         slider.Location = new Point(0, 0);
-        reset.Location = new Point(slider.Width + 8, 0);
+        reset.Location = new Point(slider.Width + UiScale.Px(8), 0);
         box.Controls.AddRange([slider, reset]);
         var row = new SettingRow(title, null, box, glyph);
         slider.BackColor = reset.BackColor = Theme.Current.Surface;

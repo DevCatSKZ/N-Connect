@@ -25,7 +25,7 @@ internal sealed class ControllerOverview : Panel
     private readonly FlowLayoutPanel _cards = new()
     {
         Dock = DockStyle.Fill, FlowDirection = FlowDirection.LeftToRight, WrapContents = true, AutoScroll = true,
-        BackColor = Background, Padding = new Padding(12, 4, 12, 12),
+        BackColor = Background, Padding = new Padding(UiScale.Px(12), UiScale.Px(4), UiScale.Px(12), UiScale.Px(12)),
     };
     private readonly Panel _empty = new() { Dock = DockStyle.Fill, BackColor = Background, Visible = false };
     private readonly Label _emptyText = new()
@@ -40,7 +40,7 @@ internal sealed class ControllerOverview : Panel
     /// <summary>Suche/Kopplung (Fenster „Controller koppeln“) – Knopf in der Übersicht und Leiste unten.</summary>
     private readonly Action? _pair;
     private readonly GlyphButton? _pairButton;
-    private readonly Panel _pairBar = new() { Dock = DockStyle.Bottom, Height = 52, BackColor = Background, Visible = false };
+    private readonly Panel _pairBar = new() { Dock = DockStyle.Bottom, Height = UiScale.Px(52), BackColor = Background, Visible = false };
     private readonly Dictionary<Player, Card> _byPlayer = [];
     /// <summary>Spieler-Reihenfolge (ab zwei Spielern sichtbar).</summary>
     private readonly PlayerOrderBar _order;
@@ -98,7 +98,7 @@ internal sealed class ControllerOverview : Panel
             var button = new GlyphButton("Controller suchen …", Glyph.Bluetooth, accent: true);
             button.Click += (_, _) => _pair!();
             cell.Controls.Add(button);
-            cell.Height = 44;
+            cell.Height = UiScale.Px(44);
             // Mittig unter dem Text.
             cell.Resize += (_, _) => button.Location = new Point(
                 Math.Max(0, (cell.Width - button.Width) / 2), (cell.Height - button.Height) / 2);
@@ -118,9 +118,9 @@ internal sealed class ControllerOverview : Panel
             AutoSize = false, Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleLeft,
             ForeColor = MutedColor, BackColor = Background, Font = UiFonts.Small,
             Text = "Switch-1-, NSO- und Wii-Controller suchen und koppeln (SYNC-Taste drücken).",
-            Padding = new Padding(8, 0, 0, 0),
+            Padding = new Padding(UiScale.Px(8), 0, 0, 0),
         };
-        var box = new Panel { Dock = DockStyle.Left, Width = _pairButton.Width + 18, BackColor = Background };
+        var box = new Panel { Dock = DockStyle.Left, Width = _pairButton.Width + UiScale.Px(18), BackColor = Background };
         _pairButton.Location = new Point(14, (_pairBar.Height - _pairButton.Height) / 2);
         box.Controls.Add(_pairButton);
         _pairBar.Controls.Add(hint);
@@ -129,14 +129,14 @@ internal sealed class ControllerOverview : Panel
     }
 
     /// <summary>Hinweisleiste oben bei Problemen (kein Bluetooth, ViGEmBus fehlt) mit passender Aktion.</summary>
-    private readonly Panel _banner = new() { Dock = DockStyle.Top, Height = 54, BackColor = Color.FromArgb(120, 40, 40), Visible = false };
+    private readonly Panel _banner = new() { Dock = DockStyle.Top, Height = UiScale.Px(54), BackColor = Color.FromArgb(120, 40, 40), Visible = false };
     private readonly Label _bannerText = new()
     {
-        Dock = DockStyle.Fill, ForeColor = Color.White, TextAlign = ContentAlignment.MiddleLeft, Padding = new Padding(14, 0, 8, 0),
+        Dock = DockStyle.Fill, ForeColor = Color.White, TextAlign = ContentAlignment.MiddleLeft, Padding = new Padding(UiScale.Px(14), 0, UiScale.Px(8), 0),
     };
     private readonly Button _bannerAction = new()
     {
-        Dock = DockStyle.Right, Width = 230, FlatStyle = FlatStyle.Flat, ForeColor = Color.White, BackColor = Color.FromArgb(150, 60, 60),
+        Dock = DockStyle.Right, Width = UiScale.Px(230), FlatStyle = FlatStyle.Flat, ForeColor = Color.White, BackColor = Color.FromArgb(150, 60, 60),
     };
     private string? _bannerShown;
 
@@ -247,7 +247,10 @@ internal sealed class ControllerOverview : Panel
     }
 
     // ---------- Anordnung: zusammengeklappte Karten nebeneinander, wenn Platz ist ----------
-    private const int Gap = 12, MinCardWidth = 700, MinCompactWidth = 400;
+    // Mindestbreiten und Abstände in der aktuellen Skalierung (bei 150 % passen entsprechend weniger Spalten).
+    private static int Gap => UiScale.Px(12);
+    private static int MinCardWidth => UiScale.Px(700);
+    private static int MinCompactWidth => UiScale.Px(400);
 
     private int Available => Math.Max(MinCardWidth, _cards.ClientSize.Width - _cards.Padding.Horizontal - SystemInformation.VerticalScrollBarWidth);
 
@@ -298,7 +301,7 @@ internal sealed class ControllerOverview : Panel
     {
         private const int TabMapping = 0, TabTuning = 1, TabGyro = 2, TabJoyCon = 3, TabExtras = 4, TabDetails = 5;
         private readonly ControllerOverview _owner;
-        private readonly InputView _view = new() { Size = new Size(400, 297) };
+        private readonly InputView _view = new() { Size = new Size(UiScale.Px(400), UiScale.Px(297)) };
         private readonly InfoPanel _info = new();
         private readonly GlyphButton _identify = new("Vibrieren", Glyph.Vibrate);
         private readonly GlyphButton _disconnect = new("Trennen", Glyph.Power);
@@ -352,7 +355,7 @@ internal sealed class ControllerOverview : Panel
             ResizeRedraw = true;
             BackColor = Background;
             Margin = new Padding(0, 0, Gap, Gap);
-            Height = 460;
+            Height = UiScale.Px(460);
             _pulse = new Anim(this, 0, speed: 2.2f);
             _active = new Anim(this, 0, speed: 7f);
             foreach (var b in new[] { _identify, _disconnect, _pairToggle, _settingsButton })
@@ -526,7 +529,7 @@ internal sealed class ControllerOverview : Panel
             return group;
         }
 
-        private static Heading Hint(string text) => new(text, hint: true) { Margin = new Padding(4, 2, 0, 2) };
+        private static Heading Hint(string text) => new(text, hint: true) { Margin = new Padding(UiScale.Px(4), UiScale.Px(2), 0, UiScale.Px(2)) };
 
         private SettingRow Link(string title, string description, int page)
         {
@@ -548,14 +551,14 @@ internal sealed class ControllerOverview : Panel
 
         private Control MappingPage(ControllerKind kind)
         {
-            _profile = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Width = 220, Tag = Tr.UserData };
+            _profile = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Width = UiScale.Px(220), Tag = Tr.UserData };
             _layer = new Segmented("Normal", "Shift-Ebene");
             var manage = new GlyphButton("Profile", Glyph.Layers);
             manage.Click += (_, _) => _owner._showPage(SettingsForm.PageMapping);
             _tips.SetToolTip(manage, Tr.T("Profile anlegen, umbenennen, exportieren …"));
-            var profileBox = new Panel { Size = new Size(_profile.Width + 8 + manage.Width, 32) };
-            _profile.Location = new Point(0, (32 - _profile.Height) / 2);
-            manage.Location = new Point(_profile.Width + 8, 0);
+            var profileBox = new Panel { Size = new Size(_profile.Width + UiScale.Px(8) + manage.Width, UiScale.Px(32)) };
+            _profile.Location = new Point(0, (UiScale.Px(32) - _profile.Height) / 2);
+            manage.Location = new Point(_profile.Width + UiScale.Px(8), 0);
             profileBox.Controls.AddRange([_profile, manage]);
             FillProfiles();
             _profile.SelectedIndexChanged += (_, _) =>
@@ -783,7 +786,7 @@ internal sealed class ControllerOverview : Panel
         /// <summary>Alle Eigenschaften (Adresse, Seriennummer, Firmware …) – in der Karte stehen nur die wichtigsten.</summary>
         private Control DetailsPage()
         {
-            _details = new InfoPanel { Compact = false, Margin = new Padding(16, 12, 16, 12) };
+            _details = new InfoPanel { Compact = false, Margin = new Padding(UiScale.Px(16), UiScale.Px(12), UiScale.Px(16), UiScale.Px(12)) };
             var group = new SettingsGroup();
             group.Controls.Add(_details);
             return Column(group);
@@ -793,7 +796,8 @@ internal sealed class ControllerOverview : Panel
 
         protected override void OnLayout(LayoutEventArgs levent)
         {
-            const int pad = 20, top = 62;
+            static int S(int v) => UiScale.Px(v);
+            int pad = S(20), top = S(62);
             bool compact = _compact && !_expanded;
             _info.Minimal = compact;
             // Vibrieren/Trennen immer als Symbolknöpfe (mit Tooltip), damit der Titel Platz hat; kompakt auch „Einstellungen“.
@@ -807,24 +811,24 @@ internal sealed class ControllerOverview : Panel
                 if (!b.Visible)
                     continue;
                 x -= b.Width;
-                b.Location = new Point(x, 16);
-                x -= 8;
+                b.Location = new Point(x, S(16));
+                x -= S(8);
             }
             // Grafik wächst mit der Karte (Seitenverhältnis der Zeichnung 580 × 430).
-            int viewWidth = compact ? Math.Clamp((Width - 2 * pad) * 44 / 100, 160, 230) : Math.Clamp((Width - 2 * pad) * 46 / 100, 280, 380);
-            _view.Bounds = new Rectangle(pad - 4, top, viewWidth, viewWidth * 430 / 580);
-            _info.Location = new Point(_view.Right + (compact ? 12 : 20), top + 8); // Infospalte immer oben bündig
-            _info.Width = Math.Max(compact ? 140 : 240, Width - _info.Left - pad);
-            NaturalBodyHeight = Math.Max(_view.Bottom, _info.Bottom) + 12;
+            int viewWidth = compact ? Math.Clamp((Width - 2 * pad) * 44 / 100, S(160), S(230)) : Math.Clamp((Width - 2 * pad) * 46 / 100, S(280), S(380));
+            _view.Bounds = new Rectangle(pad - S(4), top, viewWidth, viewWidth * 430 / 580);
+            _info.Location = new Point(_view.Right + S(compact ? 12 : 20), top + S(8)); // Infospalte immer oben bündig
+            _info.Width = Math.Max(S(compact ? 140 : 240), Width - _info.Left - pad);
+            NaturalBodyHeight = Math.Max(_view.Bottom, _info.Bottom) + S(12);
             // Gleich hohe Karten nebeneinander: Grafik im (ggf. höheren) Feld senkrecht mittig.
             int bodyBottom = Math.Max(NaturalBodyHeight, _expanded ? 0 : BodyHeight);
-            _view.Top = top + (bodyBottom - 12 - top - _view.Height) / 2;
+            _view.Top = top + (bodyBottom - S(12) - top - _view.Height) / 2;
             int height = bodyBottom;
             if (_expanded)
             {
                 _divider = bodyBottom;
-                _tabs.SetBounds(pad - 4, bodyBottom + 6, Width - 2 * pad, 40);
-                _panel.SetBounds(pad, _tabs.Bottom + 8, Width - 2 * pad, _panel.HeightFor(Width - 2 * pad));
+                _tabs.SetBounds(pad - S(4), bodyBottom + S(6), Width - 2 * pad, S(40));
+                _panel.SetBounds(pad, _tabs.Bottom + S(8), Width - 2 * pad, _panel.HeightFor(Width - 2 * pad));
                 height = _panel.Bottom + pad;
             }
             if (Height != height)
@@ -838,20 +842,20 @@ internal sealed class ControllerOverview : Panel
         {
             var g = e.Graphics;
             g.SmoothingMode = SmoothingMode.AntiAlias;
-            using var path = Theme.RoundedRect(new RectangleF(0.5f, 0.5f, Width - 1.5f, Height - 1.5f), 8);
+            using var path = Theme.RoundedRect(new RectangleF(0.5f, 0.5f, Width - 1.5f, Height - 1.5f), UiScale.Px(8f));
             using (var fill = new SolidBrush(CardColor))
                 g.FillPath(fill, path);
             if (_expanded)
             {
                 g.SetClip(path);
                 using (var lower = new SolidBrush(CardColor))
-                    g.FillRectangle(lower, 0, _divider, Width, 52);
+                    g.FillRectangle(lower, 0, _divider, Width, UiScale.Px(52));
                 using (var recess = new SolidBrush(Theme.Backdrop))
-                    g.FillRectangle(recess, 0, _divider + 52, Width, Height - _divider - 52);
+                    g.FillRectangle(recess, 0, _divider + UiScale.Px(52), Width, Height - _divider - UiScale.Px(52));
                 using (var line = new Pen(Theme.Current.Border))
                 {
                     g.DrawLine(line, 0, _divider, Width, _divider);
-                    g.DrawLine(line, 0, _divider + 52, Width, _divider + 52);
+                    g.DrawLine(line, 0, _divider + UiScale.Px(52), Width, _divider + UiScale.Px(52));
                 }
                 g.ResetClip();
             }
@@ -865,8 +869,8 @@ internal sealed class ControllerOverview : Panel
                 using var brush = Theme.AccentBrush(path.GetBounds(), 30);
                 brush.LinearColors =
                 [
-                    Theme.Blend(Theme.Current.Border, Theme.Accent, glow),
-                    Theme.Blend(Theme.Current.Border, Theme.Accent2, glow),
+                    Theme.Blend(Theme.Current.Border, Theme.AccentLine, glow),
+                    Theme.Blend(Theme.Current.Border, Theme.Accent2Line, glow),
                 ];
                 using var neon = new Pen(brush, 1f + glow * 0.6f);
                 g.DrawPath(neon, path);
@@ -878,35 +882,36 @@ internal sealed class ControllerOverview : Panel
             }
             // Titel mit kleinem Pfeil: Klick öffnet Spielerplatz und Umbenennen.
             const TextFormatFlags flags = TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis | TextFormatFlags.NoPrefix;
-            int maxWidth = Math.Max(100, _identify.Left - 40);
+            static int S(int v) => UiScale.Px(v);
+            int maxWidth = Math.Max(S(100), _identify.Left - S(40));
             // Passt „Spieler n · Name“ nicht, zeigt die Karte nur den Controllernamen (Spieler steht in der Leiste oben).
             string title = _title ?? "";
-            int left = 20;
+            int left = S(20);
             if (_compact && !_expanded && _player is { } numbered)
             {
                 // Kompakt: Spielernummer als Abzeichen (wie in der Reihenfolge-Leiste), daneben nur der Name.
                 title = _titleShort ?? title;
-                var badge = new Rectangle(20, 14 + (36 - 24) / 2, 24, 24);
+                var badge = new Rectangle(S(20), S(14) + (S(36) - S(24)) / 2, S(24), S(24));
                 using (var back = numbered.Index == 0 ? (Brush)Theme.AccentBrush(badge, 45) : new SolidBrush(Theme.Current.SurfaceHover))
                     g.FillEllipse(back, badge);
                 TextRenderer.DrawText(g, (numbered.Index + 1).ToString(), UiFonts.Strong, badge,
                     numbered.Index == 0 ? Theme.OnAccent : TextColor,
                     TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
-                left = badge.Right + 10;
-                maxWidth -= left - 20;
+                left = badge.Right + S(10);
+                maxWidth -= left - S(20);
             }
             else if (_titleShort is { } shortTitle
                 && TextRenderer.MeasureText(g, title, UiFonts.Subtitle).Width > maxWidth)
                 title = shortTitle;
-            int width = Math.Min(maxWidth, TextRenderer.MeasureText(g, title, UiFonts.Subtitle, new Size(maxWidth, 36), flags).Width);
-            var titleBox = new Rectangle(left, 14, width, 36);
+            int width = Math.Min(maxWidth, TextRenderer.MeasureText(g, title, UiFonts.Subtitle, new Size(maxWidth, S(36)), flags).Width);
+            var titleBox = new Rectangle(left, S(14), width, S(36));
             if (_titleHover)
                 using (var hover = new SolidBrush(Theme.Current.SurfaceHover))
-                using (var round = Theme.RoundedRect(new RectangleF(titleBox.X - 8, titleBox.Y + 2, titleBox.Width + 34, titleBox.Height - 4), 6))
+                using (var round = Theme.RoundedRect(new RectangleF(titleBox.X - S(8), titleBox.Y + S(2), titleBox.Width + S(34), titleBox.Height - S(4)), S(6)))
                     g.FillPath(hover, round);
             TextRenderer.DrawText(g, title, UiFonts.Subtitle, titleBox, TextColor, flags);
-            TextRenderer.DrawText(g, "▾", UiFonts.Body, new Rectangle(titleBox.Right + 4, 14, 18, 36), MutedColor, TextFormatFlags.VerticalCenter);
-            _titleRect = new Rectangle(titleBox.X - 8, titleBox.Y, titleBox.Width + 34, titleBox.Height);
+            TextRenderer.DrawText(g, "▾", UiFonts.Body, new Rectangle(titleBox.Right + S(4), S(14), S(18), S(36)), MutedColor, TextFormatFlags.VerticalCenter);
+            _titleRect = new Rectangle(titleBox.X - S(8), titleBox.Y, titleBox.Width + S(34), titleBox.Height);
         }
 
         private Rectangle _titleRect;
@@ -920,7 +925,7 @@ internal sealed class ControllerOverview : Panel
                 return;
             _titleHover = hover;
             Cursor = hover ? Cursors.Hand : Cursors.Default;
-            Invalidate(new Rectangle(0, 0, Width, 60));
+            Invalidate(new Rectangle(0, 0, Width, UiScale.Px(60)));
         }
 
         protected override void OnMouseLeave(EventArgs e)
@@ -930,7 +935,7 @@ internal sealed class ControllerOverview : Panel
                 return;
             _titleHover = false;
             Cursor = Cursors.Default;
-            Invalidate(new Rectangle(0, 0, Width, 60));
+            Invalidate(new Rectangle(0, 0, Width, UiScale.Px(60)));
         }
 
         protected override void OnMouseClick(MouseEventArgs e)
@@ -1007,7 +1012,7 @@ internal sealed class ControllerOverview : Panel
                 _rawTitle = title;
                 _title = Tr.T(title);
                 _titleShort = Tr.T(player.DisplayName(settings));
-                Invalidate(new Rectangle(0, 0, Width, 60));
+                Invalidate(new Rectangle(0, 0, Width, UiScale.Px(60)));
             }
 
             var (input, gamepad) = LiveInput(player, settings);
@@ -1250,7 +1255,8 @@ internal sealed class ControllerOverview : Panel
     {
         private IReadOnlyList<IControllerLink> _links = [];
         private PadInput? _input;
-        private const int LabelWidth = 104, RowHeight = 26;
+        private static int LabelWidth => UiScale.Px(104);
+        private static int RowHeight => UiScale.Px(26);
 
         /// <summary>Kompakt (Karte): nur Akku, Verbindung, Griff/Maus und gedrückte Tasten; sonst alle Eigenschaften.</summary>
         public bool Compact { get; init; } = true;
@@ -1274,7 +1280,7 @@ internal sealed class ControllerOverview : Panel
         {
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint, true);
             BackColor = CardColor;
-            Height = 270;
+            Height = UiScale.Px(270);
         }
 
         private IReadOnlyList<IControllerLink> _mouse = [];
@@ -1318,7 +1324,7 @@ internal sealed class ControllerOverview : Panel
                 {
                     if (g is not null)
                         TextRenderer.DrawText(g, Tr.T(link.Kind.DisplayName()), UiFonts.Strong, new Point(0, y), Accent, TextFormatFlags.NoPrefix);
-                    y += RowHeight + 2;
+                    y += RowHeight + UiScale.Px(2);
                 }
                 Row(g, ref y, "Akku", null);
                 if (g is not null)
@@ -1337,7 +1343,7 @@ internal sealed class ControllerOverview : Panel
                     Row(g, ref y, "Griff", "Charging Grip – GL/GR aktiv");
                 if (link.Kind is ControllerKind.JoyCon2Left or ControllerKind.JoyCon2Right)
                     Row(g, ref y, "Maus", _mouse.Contains(link) ? "aktiv (liegt auf dem Tisch)" : "bereit (auf den Tisch legen)");
-                y += 8;
+                y += UiScale.Px(8);
             }
             if (_game is { } game)
             {
@@ -1345,8 +1351,8 @@ internal sealed class ControllerOverview : Panel
                 if (g is not null && game.Lightbar is { } color)
                 {
                     // Lichtleiste, die das Spiel gesetzt hat, als kleiner Balken hinter dem Text.
-                    int x = LabelWidth + TextRenderer.MeasureText(Tr.T(game.Text), UiFonts.Body).Width + 8;
-                    using var path = Theme.RoundedRect(new RectangleF(x, y - RowHeight + 5, 28, 12), 4);
+                    int x = LabelWidth + TextRenderer.MeasureText(Tr.T(game.Text), UiFonts.Body).Width + UiScale.Px(8);
+                    using var path = Theme.RoundedRect(new RectangleF(x, y - RowHeight + UiScale.Px(5), UiScale.Px(28), UiScale.Px(12)), UiScale.Px(4));
                     using var fill = new SolidBrush(color);
                     g.FillPath(fill, path);
                     using var pen = new Pen(Theme.Current.Border);
@@ -1390,8 +1396,8 @@ internal sealed class ControllerOverview : Panel
                 TextRenderer.DrawText(g, Tr.T(label), UiFonts.Body, new Point(0, y), MutedColor, TextFormatFlags.NoPrefix);
                 if (value is not null)
                 {
-                    int labelW = Math.Max(LabelWidth, TextRenderer.MeasureText(Tr.T(label), UiFonts.Body).Width + 16);
-                    TextRenderer.DrawText(g, Tr.T(value), UiFonts.Body, new Rectangle(labelW, y, Math.Max(40, Width - labelW), RowHeight),
+                    int labelW = Math.Max(LabelWidth, TextRenderer.MeasureText(Tr.T(label), UiFonts.Body).Width + UiScale.Px(16));
+                    TextRenderer.DrawText(g, Tr.T(value), UiFonts.Body, new Rectangle(labelW, y, Math.Max(UiScale.Px(40), Width - labelW), RowHeight),
                         TextColor, TextFormatFlags.NoPrefix | TextFormatFlags.EndEllipsis);
                 }
             }
@@ -1400,22 +1406,24 @@ internal sealed class ControllerOverview : Panel
 
         private static void DrawBattery(Graphics g, int x, int y, ControllerState? st, float shown)
         {
-            var frame = new RectangleF(x, y + 3, 40, 15);
-            using (var path = Theme.RoundedRect(frame, 3))
-            using (var pen = new Pen(MutedColor, 1.3f))
+            float k = UiScale.Factor;
+            // Akku auf Höhe der Textzeile (alle Maße wachsen mit der Skalierung).
+            var frame = new RectangleF(x, y + 3 * k, 40 * k, 15 * k);
+            using (var path = Theme.RoundedRect(frame, 3 * k))
+            using (var pen = new Pen(MutedColor, 1.3f * k))
                 g.DrawPath(pen, path);
             using (var tip = new SolidBrush(MutedColor))
-                g.FillRectangle(tip, frame.Right + 1, frame.Y + 4.5f, 2.5f, 6);
+                g.FillRectangle(tip, frame.Right + k, frame.Y + 4.5f * k, 2.5f * k, 6 * k);
             int percent = st?.BatteryPercent is { } raw ? Math.Min(raw, 100) : -1;
             if (percent >= 0 && shown >= 0)
             {
                 using var fill = new SolidBrush(StatusBand.BatteryColor(percent));
-                using var bar = Theme.RoundedRect(new RectangleF(frame.X + 2.5f, frame.Y + 2.5f, Math.Max(2, (frame.Width - 5) * shown / 100f), frame.Height - 5), 1.5f);
+                using var bar = Theme.RoundedRect(new RectangleF(frame.X + 2.5f * k, frame.Y + 2.5f * k, Math.Max(2 * k, (frame.Width - 5 * k) * shown / 100f), frame.Height - 5 * k), 1.5f * k);
                 g.FillPath(fill, bar);
             }
             string text = percent < 0 ? "unbekannt"
                 : $"{percent} %{(st!.BatteryMillivolts > 0 ? $"  ({st.BatteryMillivolts / 1000.0:F2} V)" : "")}{(st.Charging ? "  ⚡ lädt" : "")}";
-            TextRenderer.DrawText(g, Tr.T(text), UiFonts.Body, new Point(x + 52, y), TextColor, TextFormatFlags.NoPrefix);
+            TextRenderer.DrawText(g, Tr.T(text), UiFonts.Body, new Point(x + UiScale.Px(52), y), TextColor, TextFormatFlags.NoPrefix);
         }
 
         private static string Transport(Transport t) => t switch

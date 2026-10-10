@@ -30,7 +30,7 @@ internal sealed class TrayApp : ApplicationContext
         bool firstRun = !File.Exists(Paths.SettingsFile);
         _settings = Settings.Load(Paths.SettingsFile);
         Tr.Init(_settings.Language);
-        Theme.Init(_settings.Theme, _settings.Transparency);
+        Theme.Init(_settings.Theme, _settings.Transparency, _settings.ColorScheme);
         EnableAutostartOnce();
         if (_settings.LoadError is { } err)
             Log.Warn($"settings.json fehlerhaft, nutze Standardwerte: {err}");
@@ -247,7 +247,7 @@ internal sealed class TrayApp : ApplicationContext
         _pairingData = new PairingDataForm(_settings, () =>
         {
             SaveSettings();
-            Theme.Init(_settings.Theme, _settings.Transparency);
+            Theme.Init(_settings.Theme, _settings.Transparency, _settings.ColorScheme);
             if (_settingsForm is { IsDisposed: false } form)
                 form.ReloadValues();
         }, card);
@@ -325,7 +325,7 @@ internal sealed class TrayApp : ApplicationContext
         }
         // Werte übernehmen statt das Objekt zu ersetzen – das offene Einstellungsfenster arbeitet darauf.
         _settings.CopyFrom(fresh);
-        Theme.Init(_settings.Theme, _settings.Transparency);
+        Theme.Init(_settings.Theme, _settings.Transparency, _settings.ColorScheme);
         _icon.ContextMenuStrip!.Renderer = Theme.MenuRenderer();
         _icon.ContextMenuStrip.ForeColor = Theme.Current.Text;
         _manager?.ApplyOutputMode(); // allgemein oder je Controller geändert – nur Abweichende werden neu angelegt

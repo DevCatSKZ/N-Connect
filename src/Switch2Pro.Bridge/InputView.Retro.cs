@@ -64,7 +64,7 @@ internal sealed partial class InputView
         }
         using (var brush = new SolidBrush(on ? Accent : color))
             g.FillPath(brush, path);
-        using (var edge = new Pen(on ? Color.FromArgb(160, 235, 255) : Mix(color, Color.Black, 0.35f), 1.3f))
+        using (var edge = new Pen(on ? Mix(Accent, Color.White, 0.6f) : Mix(color, Color.Black, 0.35f), 1.3f))
             g.DrawPath(edge, path);
         Caption(g, new RectangleF(c.X - r, c.Y - r, r * 2, r * 2), text, r * 0.6f, on ? Color.White : textColor ?? Color.White);
     }

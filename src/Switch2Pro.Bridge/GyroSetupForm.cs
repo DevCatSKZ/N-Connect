@@ -15,12 +15,12 @@ internal sealed class GyroSetupForm : UiForm
     private readonly Func<Settings> _settings;
     private readonly Action _save;
     private readonly GlyphButton _calibrate = new("Nullpunkt messen", Glyph.Gauge, accent: true);
-    private readonly Label _calibrateState = new() { AutoSize = false, Size = new Size(300, 40), Font = UiFonts.Small };
+    private readonly Label _calibrateState = new() { AutoSize = false, Size = new Size(UiScale.Px(300), UiScale.Px(40)), Font = UiFonts.Small };
     private readonly Segmented _mode = new("Nur per Taste", "Immer", "Beim Zielen (ZL/LT)");
-    private readonly Slider _speed = new() { Minimum = 40, Maximum = 600, SmallChange = 10, Width = 320, Format = v => $"{v} °/s" };
-    private readonly Slider _minimum = new() { Minimum = 0, Maximum = 40, Width = 320, Format = v => $"{v} %" };
+    private readonly Slider _speed = new() { Minimum = 40, Maximum = 600, SmallChange = 10, Width = UiScale.Px(320), Format = v => $"{v} °/s" };
+    private readonly Slider _minimum = new() { Minimum = 0, Maximum = 40, Width = UiScale.Px(320), Format = v => $"{v} %" };
     private readonly ToggleSwitch _invert = new();
-    private readonly Preview _preview = new() { Size = new Size(300, 300) };
+    private readonly Preview _preview = new() { Size = new Size(UiScale.Px(300), UiScale.Px(300)) };
     private readonly GlyphButton _center = new("Mitte", Glyph.Refresh);
     private readonly System.Windows.Forms.Timer _timer = new() { Interval = 16 };
     private bool _loading;
@@ -37,64 +37,67 @@ internal sealed class GyroSetupForm : UiForm
         MinimizeBox = MaximizeBox = false;
         ShowInTaskbar = false;
         Font = UiFonts.Body;
-        AutoScaleDimensions = new SizeF(96F, 96F);
-        AutoScaleMode = AutoScaleMode.Dpi;
+        AutoScaleDimensions = UiScale.Dimensions;
+        AutoScaleMode = AutoScaleMode.None;
 
-        int x = 20, y = 16, right = 380;
+        int x = UiScale.Px(20), y = UiScale.Px(16), right = UiScale.Px(380);
         Label Heading(string text)
         {
             var l = new Label { Text = text, AutoSize = true, Font = UiFonts.Strong, Location = new Point(x, y) };
             Controls.Add(l);
-            y += 28;
+            y += UiScale.Px(28);
             return l;
         }
         Label Note(string text, int width = 340)
         {
-            var l = new Label { Text = text, AutoSize = false, Size = new Size(width, 36), Font = UiFonts.Small, Location = new Point(x, y) };
+            var l = new Label { Text = text, AutoSize = false, Size = new Size(UiScale.Px(width), UiScale.Px(36)), Font = UiFonts.Small, Location = new Point(x, y) };
             Controls.Add(l);
-            y += 38;
+            y += UiScale.Px(38);
             return l;
         }
 
         Heading("1  Nullpunkt");
         Note("Controller flach auf den Tisch legen, nicht berühren – verhindert, dass das Ziel von selbst wandert.");
         _calibrate.Location = new Point(x, y);
-        _calibrateState.Location = new Point(x, y + 40);
+        _calibrateState.Location = new Point(x, y + UiScale.Px(40));
         _calibrate.Click += async (_, _) => await CalibrateAsync();
         Controls.AddRange([_calibrate, _calibrateState]);
-        y += 80;
+        y += UiScale.Px(80);
 
         Heading("2  Wann zielt der Gyro?");
         _mode.Location = new Point(x, y);
         Controls.Add(_mode);
-        y += 44;
+        y += UiScale.Px(44);
         Note("„Beim Zielen“: nur solange ZL (linker Trigger) gehalten wird – wie in vielen Shootern.");
 
         Heading("3  Empfindlichkeit");
-        Controls.Add(new Label { Text = "Voller Ausschlag ab", AutoSize = true, Location = new Point(x, y + 6) });
-        _speed.Location = new Point(x + 140, y);
+        // Beschriftungsspalte so breit wie der längste (übersetzte) Text – feste 140 px reichten nicht für alle Sprachen.
+        int col = new[] { "Voller Ausschlag ab", "Mindestausschlag", "Hoch/runter umkehren" }
+            .Max(t => TextRenderer.MeasureText(Tr.T(t), UiFonts.Body).Width) + UiScale.Px(16);
+        Controls.Add(new Label { Text = "Voller Ausschlag ab", AutoSize = true, Location = new Point(x, y + UiScale.Px(6)) });
+        _speed.Location = new Point(x + col, y);
         Controls.Add(_speed);
-        y += 40;
-        Controls.Add(new Label { Text = "Mindestausschlag", AutoSize = true, Location = new Point(x, y + 6) });
-        _minimum.Location = new Point(x + 140, y);
+        y += UiScale.Px(40);
+        Controls.Add(new Label { Text = "Mindestausschlag", AutoSize = true, Location = new Point(x, y + UiScale.Px(6)) });
+        _minimum.Location = new Point(x + col, y);
         Controls.Add(_minimum);
-        y += 40;
-        Controls.Add(new Label { Text = "Hoch/runter umkehren", AutoSize = true, Location = new Point(x, y + 6) });
-        _invert.Location = new Point(x + 140, y);
+        y += UiScale.Px(40);
+        Controls.Add(new Label { Text = "Hoch/runter umkehren", AutoSize = true, Location = new Point(x, y + UiScale.Px(6)) });
+        _invert.Location = new Point(x + col, y);
         Controls.Add(_invert);
-        y += 44;
+        y += UiScale.Px(44);
         Note("Kleinerer Wert bei „Voller Ausschlag ab“ = empfindlicher. „Mindestausschlag“ überwindet die Totzone des Spiels.", 460);
 
-        _preview.Location = new Point(x + right + 120, 16);
-        _center.Location = new Point(_preview.Left, _preview.Bottom + 8);
+        _preview.Location = new Point(Math.Max(x + right + UiScale.Px(120), x + col + _speed.Width + UiScale.Px(24)), UiScale.Px(16));
+        _center.Location = new Point(_preview.Left, _preview.Bottom + UiScale.Px(8));
         _center.Click += (_, _) => _preview.Recenter();
         Controls.AddRange([_preview, _center]);
         Controls.Add(new Label
         {
             Text = "Vorschau: Fadenkreuz folgt dem Controller (unabhängig von Schritt 2).", AutoSize = false,
-            Size = new Size(300, 36), Font = UiFonts.Small, Location = new Point(_preview.Left, _center.Bottom + 8),
+            Size = new Size(UiScale.Px(300), UiScale.Px(36)), Font = UiFonts.Small, Location = new Point(_preview.Left, _center.Bottom + UiScale.Px(8)),
         });
-        ClientSize = new Size(_preview.Right + 20, Math.Max(y, _center.Bottom + 60) + 12);
+        ClientSize = new Size(_preview.Right + UiScale.Px(20), Math.Max(y, _center.Bottom + UiScale.Px(60)) + UiScale.Px(12));
 
         LoadValues();
         _mode.SelectedIndexChanged += (_, _) => Change(s => s.GyroStick = _mode.SelectedIndex switch

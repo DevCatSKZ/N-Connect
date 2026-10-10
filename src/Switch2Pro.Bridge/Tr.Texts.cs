@@ -8,6 +8,8 @@ internal static partial class Tr
         // ---------- Fenster, Reiter, Abschnitte ----------
         ["Controller"] = "Controllers",
         // ---------- Status-Kopfzeile, Ansicht ----------
+        ["Farbschema"] = "Colour scheme",
+        ["Farben für Akzente, Knöpfe, Flächen und Ränder."] = "Colours for accents, buttons, surfaces and borders.",
         ["bereit"] = "ready",
         ["nicht verfügbar"] = "not available",
         ["Niedrigster Akku"] = "Lowest battery",

@@ -25,8 +25,9 @@ internal sealed partial class InputView : Control
 
     /// <summary>Hintergrund der Grafik = Kartenfarbe der Darstellung (dunkel/hell).</summary>
     private static Color Back => Theme.Current.Surface;
-    private static readonly Color Accent = Color.FromArgb(0, 190, 255);
-    private static readonly Color AccentGlow = Color.FromArgb(110, 0, 190, 255);
+    // Gedrückte Tasten leuchten in der Farbe des Farbschemas (Neon: Cyan, Aurora: Mint, Sunset: Orange, Joy-Con: Rot).
+    private static Color Accent => Theme.Pressed;
+    private static Color AccentGlow => Color.FromArgb(110, Theme.Pressed);
 
     public InputView()
     {
@@ -163,7 +164,7 @@ internal sealed partial class InputView : Control
         }
         using (var fill = new SolidBrush(on ? Accent : Mix(_body, Color.Black, 0.28f)))
             g.FillPath(fill, path);
-        using (var edge = new Pen(on ? Color.FromArgb(160, 235, 255) : Mix(_body, Color.White, 0.18f), 1.2f))
+        using (var edge = new Pen(on ? Mix(Accent, Color.White, 0.6f) : Mix(_body, Color.White, 0.18f), 1.2f))
             g.DrawPath(edge, path);
         Caption(g, r, text, Math.Clamp(r.Height * 0.42f, 7f, 9f), on ? Color.White : Mix(_body, Color.White, 0.7f));
     }
@@ -435,7 +436,7 @@ internal sealed partial class InputView : Control
         }
         using (var brush = new SolidBrush(on ? Accent : idle))
             g.FillPath(brush, path);
-        using var edge = new Pen(on ? Color.FromArgb(160, 235, 255) : KeyEdge, 1.2f);
+        using var edge = new Pen(on ? Mix(Accent, Color.White, 0.6f) : KeyEdge, 1.2f);
         g.DrawPath(edge, path);
     }
 

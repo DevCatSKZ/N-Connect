@@ -6,14 +6,12 @@ using System.Drawing.Text;
 namespace Switch2Pro.Bridge;
 
 /// <summary>
-/// Logo von N-Connect: ein „N“ aus zwei Controller-Hälften (links blau, rechts rot) mit weißer Diagonale auf einer
-/// dunklen, abgerundeten Kachel. Wird zur Laufzeit gezeichnet (Infobereich, Fenster) und per <c>--render-brand</c>
-/// als Programm-Icon und Installer-Grafiken gespeichert.
+/// Logo von N-Connect im Stil von Windows 11: weiße Controller-Silhouette mit Verbindungssignal auf einer blauen,
+/// abgerundeten Kachel. Wird als Vektor gezeichnet (Fenster, Infobereich) und per <c>--render-brand</c> als
+/// Programm-Icon und Installer-Grafiken gespeichert (ohne Fenster).
 /// </summary>
 internal static class Branding
 {
-    public static readonly Color Blue = Color.FromArgb(0, 180, 240);
-    public static readonly Color Red = Color.FromArgb(255, 70, 70);
 
     private static Icon? _appIcon;
 
@@ -39,77 +37,91 @@ internal static class Branding
         return (Icon)temp.Clone();
     }
 
-    private static Bitmap? _logoImage;
+    // Farben des App-Icons (Windows-Blau, Kachel von hell oben nach tief unten).
+    private static readonly Color TileTop = Color.FromArgb(0x4C, 0xB4, 0xFF);
+    private static readonly Color TileBottom = Color.FromArgb(0x00, 0x5A, 0xD0);
+    private static readonly Color Ink = Color.FromArgb(0x0B, 0x4F, 0xB5); // Details auf der weißen Silhouette
 
-    /// <summary>Offizielles Logo-Bild (eingebettetes PNG), sonst null → gezeichnete Variante.</summary>
-    private static Bitmap? LogoImage()
-    {
-        if (_logoImage is not null)
-            return _logoImage;
-        try
-        {
-            var stream = typeof(Branding).Assembly.GetManifestResourceStream("N-Connect.png");
-            if (stream is not null)
-                _logoImage = new Bitmap(stream);
-        }
-        catch (Exception e) when (e is ArgumentException or IOException)
-        {
-        }
-        return _logoImage;
-    }
-
-    /// <summary>Logo in das Quadrat <paramref name="r"/> zeichnen.</summary>
+    /// <summary>
+    /// App-Icon im Stil von Windows 11: abgerundete Kachel im Windows-Blau, weiße Controller-Silhouette, darüber ein
+    /// Verbindungssignal. Vektor – in jeder Größe scharf; kleine Größen lassen Details weg (16 px: nur Kachel und
+    /// Silhouette, ab 24 px Steuerkreuz und Tasten, ab 32 px Signal, ab 48 px Lichtkante und Schatten).
+    /// </summary>
     public static void DrawLogo(Graphics g, RectangleF r, bool tile = true)
     {
         g.SmoothingMode = SmoothingMode.AntiAlias;
         g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-        var image = LogoImage();
-        if (image is not null)
-        {
-            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-            g.DrawImage(image, r);
-            return;
-        }
         float s = r.Width;
         PointF P(float x, float y) => new(r.X + x * s, r.Y + y * s);
         RectangleF R(float x, float y, float w, float h) => new(r.X + x * s, r.Y + y * s, w * s, h * s);
 
         if (tile)
         {
-            using var tilePath = Theme.RoundedRect(r, s * 0.22f);
-            using (var back = new LinearGradientBrush(r, Color.FromArgb(52, 55, 70), Color.FromArgb(22, 23, 30), LinearGradientMode.Vertical))
+            using var tilePath = Theme.RoundedRect(r, s * 0.23f);
+            using (var back = new LinearGradientBrush(r, TileTop, TileBottom, LinearGradientMode.Vertical))
                 g.FillPath(back, tilePath);
-            if (s >= 48) // bei kleinen Größen wirkt der helle Rand wie ein pixeliger weißer Saum
+            if (s >= 48)
             {
-                using var border = new Pen(Color.FromArgb(45, 255, 255, 255), Math.Max(1f, s / 64f));
-                using var inner = Theme.RoundedRect(RectangleF.Inflate(r, -border.Width / 2, -border.Width / 2), s * 0.21f);
-                g.DrawPath(border, inner);
+                // Lichtkante oben und leicht dunklerer Rand – gibt der Kachel Tiefe wie bei Windows-11-Icons.
+                using var edge = new Pen(Color.FromArgb(70, 0, 30, 90), Math.Max(1f, s / 96f));
+                g.DrawPath(edge, tilePath);
+                using var shine = new LinearGradientBrush(r, Color.FromArgb(28, 255, 255, 255), Color.FromArgb(0, 255, 255, 255),
+                    LinearGradientMode.Vertical);
+                using var upper = Theme.RoundedRect(R(0.02f, 0.02f, 0.96f, 0.5f), s * 0.21f);
+                g.FillPath(shine, upper);
             }
         }
 
-        // Diagonale des „N“ (unter den beiden Hälften).
-        using (var white = new SolidBrush(Color.FromArgb(245, 245, 250)))
-            g.FillPolygon(white, [P(0.27f, 0.20f), P(0.44f, 0.20f), P(0.73f, 0.80f), P(0.56f, 0.80f)]);
+        // Controller-Silhouette: Körper und zwei Griffe als eine Fläche (Winding = Vereinigung).
+        using (var pad = new GraphicsPath(FillMode.Winding))
+        {
+            pad.AddPath(Theme.RoundedRect(R(0.15f, 0.40f, 0.70f, 0.29f), s * 0.145f), false);
+            pad.AddEllipse(R(0.155f, 0.50f, 0.235f, 0.30f));
+            pad.AddEllipse(R(0.61f, 0.50f, 0.235f, 0.30f));
+            if (tile && s >= 48)
+            {
+                // weicher Schatten unter der Silhouette
+                using var shadowMatrix = new Matrix();
+                shadowMatrix.Translate(0, s * 0.025f);
+                using var shadow = (GraphicsPath)pad.Clone();
+                shadow.Transform(shadowMatrix);
+                using var shadowBrush = new SolidBrush(Color.FromArgb(55, 0, 20, 70));
+                g.FillPath(shadowBrush, shadow);
+            }
+            using var white = new SolidBrush(Color.FromArgb(0xF7, 0xFA, 0xFF));
+            g.FillPath(white, pad);
+        }
 
-        DrawHalf(g, R(0.18f, 0.17f, 0.21f, 0.66f), Blue, stickAt: 0.30f, s);
-        DrawHalf(g, R(0.61f, 0.17f, 0.21f, 0.66f), Red, stickAt: 0.68f, s);
-    }
+        if (s >= 24)
+        {
+            // Steuerkreuz links, vier Tasten rechts.
+            using var ink = new SolidBrush(Ink);
+            using (var dpad = new GraphicsPath(FillMode.Winding))
+            {
+                dpad.AddPath(Theme.RoundedRect(R(0.235f, 0.512f, 0.15f, 0.05f), s * 0.012f), false);
+                dpad.AddPath(Theme.RoundedRect(R(0.285f, 0.462f, 0.05f, 0.15f), s * 0.012f), false);
+                g.FillPath(ink, dpad);
+            }
+            float b = 0.042f;
+            foreach (var (x, y) in new[] { (0.69f, 0.47f), (0.75f, 0.537f), (0.69f, 0.604f), (0.63f, 0.537f) })
+                g.FillEllipse(ink, R(x - b / 2, y - b / 2, b, b));
+        }
 
-    private static void DrawHalf(Graphics g, RectangleF r, Color color, float stickAt, float size)
-    {
-        using var path = Theme.RoundedRect(r, r.Width * 0.5f);
-        using (var fill = new LinearGradientBrush(r, ControlPaint.Light(color, 0.25f), ControlPaint.Dark(color, 0.08f), LinearGradientMode.Vertical))
-            g.FillPath(fill, path);
-        if (size < 24)
-            return; // zu klein für Details
-        // Stick als dunkler Punkt mit hellem Rand, wie bei einem Joy-Con.
-        float d = r.Width * 0.56f;
-        float cy = r.Y + r.Height * (stickAt - 0.17f) / 0.66f;
-        var stick = new RectangleF(r.X + (r.Width - d) / 2, cy - d / 2, d, d);
-        using (var dark = new SolidBrush(Color.FromArgb(40, 42, 52)))
-            g.FillEllipse(dark, stick);
-        using (var ring = new Pen(Color.FromArgb(90, 255, 255, 255), Math.Max(1f, size / 96f)))
-            g.DrawEllipse(ring, stick);
+        if (s >= 32)
+        {
+            // Verbindungssignal über dem Controller: Punkt und zwei Bögen.
+            float w = Math.Max(1.5f, s * 0.04f);
+            using var pen = new Pen(Color.FromArgb(0xF7, 0xFA, 0xFF), w) { StartCap = LineCap.Round, EndCap = LineCap.Round };
+            var center = P(0.5f, 0.355f);
+            foreach (float radius in new[] { 0.085f, 0.15f })
+            {
+                float rr = radius * s;
+                g.DrawArc(pen, center.X - rr, center.Y - rr, rr * 2, rr * 2, 232, 76);
+            }
+            float d = s * 0.055f;
+            using var dot = new SolidBrush(Color.FromArgb(0xF7, 0xFA, 0xFF));
+            g.FillEllipse(dot, center.X - d / 2, center.Y - d / 2, d, d);
+        }
     }
 
     /// <summary>Logo als quadratisches Bild mit transparentem Rand.</summary>
@@ -147,10 +159,9 @@ internal static class Branding
         g.SmoothingMode = SmoothingMode.AntiAlias;
         g.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
         var all = new Rectangle(0, 0, w, h);
-        using (var back = new LinearGradientBrush(all, Color.FromArgb(30, 32, 42), Color.FromArgb(12, 13, 18), LinearGradientMode.Vertical))
+        using (var back = new LinearGradientBrush(all, Color.FromArgb(0x2B, 0x2B, 0x2B), Color.FromArgb(0x1A, 0x1A, 0x1A), LinearGradientMode.Vertical))
             g.FillRectangle(back, all);
-        Glow(g, new PointF(w * 0.05f, h * 0.18f), w * 0.9f, Blue, 70);
-        Glow(g, new PointF(w * 0.98f, h * 0.88f), w * 0.95f, Red, 60);
+        Glow(g, new PointF(w * 0.5f, h * 0.30f), w * 0.85f, TileTop, 55); // dezenter blauer Schein hinter dem Icon
 
         float logo = 84 * k;
         DrawLogo(g, new RectangleF((w - logo) / 2, h * 0.20f, logo, logo));
@@ -160,13 +171,13 @@ internal static class Branding
         using var center = new StringFormat { Alignment = StringAlignment.Center };
         float y = h * 0.20f + logo + 18 * k;
         g.DrawString("N-Connect", title, Brushes.White, new RectangleF(0, y, w, 30 * k), center);
-        using (var muted = new SolidBrush(Color.FromArgb(175, 178, 190)))
+        using (var muted = new SolidBrush(Color.FromArgb(0xC5, 0xC5, 0xC5)))
             g.DrawString("Switch · Switch 2 · Wii · Wii U\nController für Windows", sub, muted,
                 new RectangleF(6 * k, y + 30 * k, w - 12 * k, 40 * k), center);
 
-        // Feine Linie in den Controller-Farben am unteren Rand.
+        // Feine Akzentlinie im Windows-Blau am unteren Rand.
         float barY = h - 10 * k;
-        using (var bar = new LinearGradientBrush(new RectangleF(0, barY, w, 3 * k), Blue, Red, LinearGradientMode.Horizontal))
+        using (var bar = new LinearGradientBrush(new RectangleF(0, barY, w, 3 * k), TileTop, TileBottom, LinearGradientMode.Horizontal))
             g.FillRectangle(bar, 24 * k, barY, w - 48 * k, 3 * k);
         return bmp;
     }
