@@ -31,7 +31,7 @@ internal sealed class ConnectOverlay : Form
         AutoScaleMode = AutoScaleMode.None;
         BackColor = Theme.Current.Surface;
         DoubleBuffered = true;
-        Size = new Size(UiScale.Px(340), UiScale.Px(76));
+        Size = new Size(UiScale.Px(400), UiScale.Px(76));
         Opacity = 0;
         _timer.Tick += (_, _) => Animate();
     }

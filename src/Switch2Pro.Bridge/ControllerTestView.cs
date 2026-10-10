@@ -22,7 +22,7 @@ internal sealed class ControllerTestView : Control, ISelfTranslating, IExtraText
     {
         SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint
                  | ControlStyles.ResizeRedraw, true);
-        Height = UiScale.Px(300);
+        Height = UiScale.Px(268);
     }
 
     public IEnumerable<string> ExtraTexts => new[] { "Linker Stick", "Rechter Stick", "Trigger", "Bewegung", "Rundheit", "Gedrückt" }.Select(Tr.T);
