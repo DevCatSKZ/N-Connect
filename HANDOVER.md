@@ -52,6 +52,18 @@ Hinweise zur Umgebung:
 5. Screenshots mit dem neuen Build neu rendern (`--render-ui --demo-all`) → `gh-pages` pushen;
    die Seite holt sich Versionsnummer und Download-Link selbst per GitHub-API.
 
+## Zuletzt erledigt (10.10.2026, abends): Desktop-Modus, Testseite, Einblendung, Diagnose, CI
+
+- **Desktop-Modus** (Standard aus), **Testseite** (Reiter „Test“), **Einblendung beim Verbinden** (abschaltbar),
+  **Diagnose exportieren**, neue Tastenvorlagen – Details in docs/FUNKTIONEN.md Abschnitt 11a.
+- **Einstellungen sicher speichern** (Zwischendatei + `settings.json.bak`, Wiederherstellung beim Laden).
+- **CI**: rendert bei jedem Build die Oberfläche (Artefakt „UI-Bilder“, blockiert nichts) und **signiert** App und
+  Installer, sobald die Secrets `SIGNING_CERT_PFX` (PFX als Base64: `[Convert]::ToBase64String([IO.File]::ReadAllBytes("cert.pfx"))`)
+  und `SIGNING_CERT_PASSWORD` im Repo N-Connect hinterlegt sind (Settings → Secrets → Actions). Günstige Wege zu einem
+  Zertifikat: SignPath.io (kostenlos für Open Source, eigener Ablauf mit deren Action) oder Microsoft Trusted Signing
+  (~10 $/Monat; braucht statt PFX die Action `azure/trusted-signing-action`).
+- **winget**: Manifeste gültig (aktuell 1.0.15); Einreichen = PR in microsoft/winget-pkgs (siehe winget/README.md).
+
 ## Zuletzt erledigt (10.10.2026, später): Windows-Design, Farbschemata, neues Icon, Skalierung, Prüfhilfe
 
 - **Windows-Design als Standard** (Fluent-Farben, einfarbiger Akzent, kein Leuchten) plus Farbschemata Neon, Aurora,

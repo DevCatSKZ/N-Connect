@@ -77,6 +77,15 @@ internal static class WindowsInput
             Send(Mouse(MOUSEEVENTF_WHEEL, data: amount));
     }
 
+    private const uint MOUSEEVENTF_HWHEEL = 0x1000;
+
+    /// <summary>Waagerechtes Mausrad: 120 = eine Raste nach rechts.</summary>
+    public static void HorizontalWheel(int amount)
+    {
+        if (amount != 0)
+            Send(Mouse(MOUSEEVENTF_HWHEEL, data: amount));
+    }
+
     // ---------- Tastatur ----------
 
     private static INPUT Key(ushort vk, bool up) => new()
@@ -130,6 +139,8 @@ internal static class WindowsInput
                 "VOLDOWN" or "LEISER" => 0xAE,
                 "MUTE" or "STUMM" => 0xAD,
                 "PLAYPAUSE" => 0xB3,
+                "NEXTTRACK" => 0xB0,
+                "PREVTRACK" => 0xB1,
                 var s when s.Length == 1 && char.IsAsciiLetterOrDigit(s[0]) => s[0],
                 var s when s.Length >= 2 && s[0] == 'F' && int.TryParse(s[1..], out int f) && f is >= 1 and <= 24 => (ushort)(0x70 + f - 1),
                 var s when s.StartsWith("NUM") && s.Length == 4 && char.IsAsciiDigit(s[3]) => (ushort)(0x60 + s[3] - '0'),

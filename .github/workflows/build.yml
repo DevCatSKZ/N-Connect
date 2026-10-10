@@ -17,6 +17,10 @@ jobs:
   installer:
     runs-on: windows-latest
     timeout-minutes: 30
+    env:
+      # Code-Signatur (optional): Zertifikat als Secrets hinterlegen, dann signieren die Schritte unten automatisch.
+      SIGNING_CERT_PFX: ${{ secrets.SIGNING_CERT_PFX }}
+      SIGNING_CERT_PASSWORD: ${{ secrets.SIGNING_CERT_PASSWORD }}
     defaults:
       run:
         shell: pwsh
@@ -43,6 +47,45 @@ jobs:
           -p:EnableCompressionInSingleFile=true -p:DebugType=none
           -p:Version=${{ steps.version.outputs.version }}
           -o out/publish/win-x64
+
+      # Code-Signatur (entfernt die SmartScreen-Warnung „Der Computer wurde durch Windows geschützt“ mit der Zeit):
+      # nur, wenn ein Zertifikat als Secret hinterlegt ist – SIGNING_CERT_PFX (PFX als Base64) und SIGNING_CERT_PASSWORD.
+      - name: App signieren (falls Zertifikat hinterlegt)
+        if: env.SIGNING_CERT_PFX != ''
+        run: |
+          [IO.File]::WriteAllBytes("$env:RUNNER_TEMP\sign.pfx", [Convert]::FromBase64String($env:SIGNING_CERT_PFX))
+          $signtool = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin\*\x64\signtool.exe" | Sort-Object FullName -Descending | Select-Object -First 1
+          & $signtool.FullName sign /f "$env:RUNNER_TEMP\sign.pfx" /p $env:SIGNING_CERT_PASSWORD /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 /d "N-Connect" out/publish/win-x64/N-Connect.exe
+          if ($LASTEXITCODE -ne 0) { throw "Signieren fehlgeschlagen" }
+
+      # Automatische Bildprüfung: Oberfläche in mehreren Varianten rendern (unsichtbarer Desktop). Stürzt die Oberfläche
+      # dabei ab, fällt es hier auf; die Bilder liegen als Artefakt „UI-Bilder“ zum Durchsehen bereit. Blockiert kein Release.
+      - name: Oberfläche prüfen (Bilder rendern)
+        continue-on-error: true
+        run: |
+          $exe = "out/publish/win-x64/N-Connect.exe"
+          $runs = @(
+            @{ Dir = "de-100"; Args = "--demo-all --wide" },
+            @{ Dir = "ru-150"; Args = "--demo-all --scale=1.5 --lang=ru" },
+            @{ Dir = "en-hell"; Args = "--demo --light --lang=en" }
+          )
+          $failed = 0
+          foreach ($r in $runs) {
+            $p = Start-Process $exe -ArgumentList "--render-ui out/ui-check/$($r.Dir) $($r.Args)" -PassThru -Wait
+            $count = (Get-ChildItem "out/ui-check/$($r.Dir)" -Filter *.png -ErrorAction SilentlyContinue).Count
+            Write-Host "$($r.Dir): Exitcode $($p.ExitCode), $count Bilder"
+            # Ohne ViGEmBus (GitHub-Server) gibt es keine Demo-Controller und daher weniger Bilder.
+            if ($p.ExitCode -ne 0 -or $count -lt 8) { $failed++ }
+          }
+          if ($failed -gt 0) { throw "$failed Prüfläufe fehlgeschlagen" }
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        continue-on-error: true
+        with:
+          name: UI-Bilder
+          path: out/ui-check
+          if-no-files-found: ignore
 
       - name: ViGEmBus-Installer holen (offizielles Release v1.22.0)
         env:
@@ -80,6 +123,16 @@ jobs:
         run: |
           & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DAppVersion=${{ steps.version.outputs.version }}" installer/N-Connect.iss
           Get-ChildItem out/*.exe
+
+      - name: Installer signieren (falls Zertifikat hinterlegt)
+        if: env.SIGNING_CERT_PFX != ''
+        run: |
+          $signtool = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin\*\x64\signtool.exe" | Sort-Object FullName -Descending | Select-Object -First 1
+          Get-ChildItem out/N-Connect-Setup-*.exe | ForEach-Object {
+            & $signtool.FullName sign /f "$env:RUNNER_TEMP\sign.pfx" /p $env:SIGNING_CERT_PASSWORD /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 /d "N-Connect Setup" $_.FullName
+            if ($LASTEXITCODE -ne 0) { throw "Signieren fehlgeschlagen" }
+          }
+          Remove-Item "$env:RUNNER_TEMP\sign.pfx" -Force
 
       - name: Portable-Variante packen (ZIP mit EXE + portable.txt)
         run: |

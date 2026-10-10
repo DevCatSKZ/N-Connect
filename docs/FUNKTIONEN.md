@@ -376,6 +376,28 @@ Bis zu **8 Spieler** gleichzeitig (`ControllerManager.MaxPlayers`). Der 9. Contr
     Kabel steckt/Pause, `00` = kein Kabel. Alle 30 s Spannung und Rohbytes im Protokoll.
 - **Switch 1/NSO**: Stufe 0–8 → 0–100 %; **Wii**: 0–200 → 0–100 %; **Wii U Pro**: Stufe 0–4.
 
+## 11a. Desktop-Modus, Testseite, Einblendung, Diagnose
+
+- **Desktop-Modus** (`DesktopControl`, `Settings.DesktopMode`, Standard **aus**; Zeigergeschwindigkeit
+  `DesktopPointerSpeed` 25–300 %): verfügbar, wenn eingeschaltet, kein Programm mit eigenem Profil im Vordergrund
+  (`DetectedProfile`) und das Vordergrundfenster nicht den ganzen Monitor bedeckt (Vollbild/randlos; Desktop und
+  Taskleiste zählen nicht; Prüfung höchstens alle 300 ms). Arbeitet in `Player.OnState` hinter der Tastenbelegung
+  (Xbox-Abbild, also nach Lage): linker Stick = Zeiger (Totzone 15 %, Kennlinie 2,2, RT = ×0,3), rechter Stick =
+  Scrollen (auch waagerecht), A/B/RS = Links-/Rechts-/Mittelklick, X = Win+Tab, Y = Bildschirmtastatur (osk.exe
+  an/aus), Steuerkreuz = Pfeiltasten mit eigener Wiederholung (0,4 s, dann 60 ms), LB/RB = Alt+Links/Rechts,
+  Start/Back = Enter/Esc beim Loslassen, HOME = Win. Back + Start 1 s halten pausiert/setzt fort (Meldung). Solange
+  aktiv: Spiel bekommt Neutralstellung, Tastatur-Belegungen, Sonderaktionen und Flick-Stick ruhen; beim Verlassen
+  wird alles losgelassen.
+- **Testseite** (`ControllerTestView`, Reiter „Test“ der Karte): Sticks mit Live-Punkt und Rundheitslinie (48
+  Richtungen, Abweichung ab ¾ abgedeckt), Trigger, Gyro/Beschleunigung, gedrückte Tasten, Berichtsrate; Knöpfe
+  „Vibration testen“ und „Kreis zurücksetzen“.
+- **Einblendung beim Verbinden** (`ConnectOverlay`, `Settings.ConnectOverlay`, Standard an; Ereignis
+  `ControllerManager.LinkConnected`): Kärtchen oben rechts, ohne Fokus, klickdurchlässig, 3 s, stapelt sich.
+- **Diagnose exportieren** (`Diagnostics`, *Allgemein → Erweitert*): ZIP mit bridge.log(+.1), settings.json und
+  system.txt (Version, Windows, Sprache, Skalierung, Treiber, Controller). Einstellungen enthalten keine Schlüssel.
+- **Tastenvorlagen** für Zusatztasten: Mikrofon stumm (Win+Alt+K), Discord Strg+Umschalt+M/D, Win+D, Win+Tab,
+  Alt+Tab, Ton aus, Titel vor/zurück (`NextTrack`/`PrevTrack`).
+
 ## 12. Infobereich (Taskleiste)
 
 - Linksklick: Fenster. Rechtsklick: Menü mit je Spieler einem Untermenü (Vibrieren, Spielerplatz, Trennen),

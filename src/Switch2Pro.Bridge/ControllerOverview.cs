@@ -299,7 +299,7 @@ internal sealed class ControllerOverview : Panel
     /// </summary>
     private sealed class Card : Panel
     {
-        private const int TabMapping = 0, TabTuning = 1, TabGyro = 2, TabJoyCon = 3, TabExtras = 4, TabDetails = 5;
+        private const int TabMapping = 0, TabTuning = 1, TabGyro = 2, TabJoyCon = 3, TabExtras = 4, TabDetails = 5, TabTest = 6;
         private readonly ControllerOverview _owner;
         private readonly InputView _view = new() { Size = new Size(UiScale.Px(400), UiScale.Px(297)) };
         private readonly InfoPanel _info = new();
@@ -311,7 +311,7 @@ internal sealed class ControllerOverview : Panel
         private readonly ToolTip _tips = Theme.CreateToolTip();
         private readonly PivotTabs _tabs = new();
         private readonly StackPanel _panel = new() { Spacing = 0 };
-        private readonly Control?[] _tabPages = new Control?[6];
+        private readonly Control?[] _tabPages = new Control?[7];
         private Player? _player;
         private ControllerKind _builtFor = ControllerKind.Unknown;
         private bool _expanded;
@@ -368,6 +368,7 @@ internal sealed class ControllerOverview : Panel
             _tabs.Add("Joy-Con");
             _tabs.Add("Extras");
             _tabs.Add("Details");
+            _tabs.Add("Test");
             _tabs.Visible = _panel.Visible = false;
             _tabs.SelectedIndexChanged += (_, _) => ShowTab();
 
@@ -462,6 +463,7 @@ internal sealed class ControllerOverview : Panel
             _tabs.SetShown(TabJoyCon, links.Count > 0 && links.All(l => l.Kind.IsJoyCon()));
             _tabs.SetShown(TabExtras, ExtrasAvailable(CurrentSettings));
             _details = null;
+            _test = null;
         }
 
         private Control? BuildTab(int tab, ControllerKind kind) => tab switch
@@ -472,6 +474,7 @@ internal sealed class ControllerOverview : Panel
             TabJoyCon => JoyConPage(),
             TabExtras => ExtrasPage(),
             TabDetails => DetailsPage(),
+            TabTest => TestPage(),
             _ => null,
         };
 
@@ -784,6 +787,27 @@ internal sealed class ControllerOverview : Panel
         }
 
         /// <summary>Alle Eigenschaften (Adresse, Seriennummer, Firmware …) – in der Karte stehen nur die wichtigsten.</summary>
+        // Test: Sticks, Trigger, Bewegung und Tasten live ansehen (misst nur, ändert nichts).
+        private ControllerTestView? _test;
+
+        private Control TestPage()
+        {
+            _test = new ControllerTestView { BackColor = Theme.Current.Surface, Margin = new Padding(UiScale.Px(8), UiScale.Px(4), UiScale.Px(8), UiScale.Px(4)) };
+            var vibrate = new GlyphButton("Vibration testen", Glyph.Vibrate);
+            vibrate.Click += (_, _) => _player?.IdentifyAsync().Forget("Vibrieren");
+            var reset = new GlyphButton("Kreis zurücksetzen", Glyph.Refresh);
+            reset.Click += (_, _) => _test?.ResetCircles();
+            var buttons = new Panel { Size = new Size(vibrate.Width + UiScale.Px(8) + reset.Width, vibrate.Height) };
+            vibrate.Location = new Point(0, 0);
+            reset.Location = new Point(vibrate.Width + UiScale.Px(8), 0);
+            buttons.Controls.AddRange([vibrate, reset]);
+            var group = new SettingsGroup();
+            group.Controls.Add(_test);
+            return Column(group,
+                Group(Row("Controller testen", "Sticks einmal langsam ganz im Kreis drehen – die Linie zeigt, wie rund sie laufen. " +
+                    "Gedrückte Tasten erscheinen unten in der Anzeige.", buttons, Glyph.Gamepad)));
+        }
+
         private Control DetailsPage()
         {
             _details = new InfoPanel { Compact = false, Margin = new Padding(UiScale.Px(16), UiScale.Px(12), UiScale.Px(16), UiScale.Px(12)) };
@@ -1063,6 +1087,8 @@ internal sealed class ControllerOverview : Panel
             _info.Show(links, input, mouse);
             if (_expanded && _details is { Visible: true } details)
                 details.Show(links, input, mouse);
+            if (_expanded && _test is { Visible: true } test)
+                test.Show(input, links);
 
             if (_expanded)
             {

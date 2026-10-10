@@ -258,6 +258,12 @@ public sealed class Settings
     public bool Transparency { get; set; } = true;
     /// <summary>Controller-Übersicht kompakt: kleinere Karten (Grafik, Akku, Verbindung), mehrere nebeneinander.</summary>
     public bool CompactCards { get; set; }
+    /// <summary>Desktop-Modus: ohne Spiel im Vordergrund steuert der Controller Maus und Tastatur (Standard aus).</summary>
+    public bool DesktopMode { get; set; }
+    /// <summary>Zeigergeschwindigkeit im Desktop-Modus in Prozent (25–300, Standard 100).</summary>
+    public int DesktopPointerSpeed { get; set; } = 100;
+    /// <summary>Kurze Einblendung am Bildschirmrand, wenn ein Controller verbunden wird (Spieler, Name, Akku).</summary>
+    public bool ConnectOverlay { get; set; } = true;
     /// <summary>Sprache der Oberfläche: null = wie Windows, sonst "de" oder "en".</summary>
     public string? Language { get; set; }
 
@@ -515,6 +521,9 @@ public sealed class Settings
         ColorScheme = other.ColorScheme;
         Transparency = other.Transparency;
         CompactCards = other.CompactCards;
+        DesktopMode = other.DesktopMode;
+        DesktopPointerSpeed = other.DesktopPointerSpeed;
+        ConnectOverlay = other.ConnectOverlay;
         Language = other.Language;
         UprightJoyCons = [.. other.UprightJoyCons];
         HiddenDevices = [.. other.HiddenDevices];
@@ -620,6 +629,7 @@ public sealed class Settings
         RumbleStrength = float.IsFinite(RumbleStrength) ? Math.Clamp(RumbleStrength, 0f, 1f) : 0.8f;
         StickDeadzone = float.IsFinite(StickDeadzone) ? Math.Clamp(StickDeadzone, 0f, 0.5f) : 0.06f;
         MouseSpeed = float.IsFinite(MouseSpeed) ? Math.Clamp(MouseSpeed, 0.1f, 10f) : 2.5f;
+        DesktopPointerSpeed = Math.Clamp(DesktopPointerSpeed, 25, 300);
         AllowedControllers ??= [];
         KnownControllers ??= [];
         SingleJoyCons ??= [];

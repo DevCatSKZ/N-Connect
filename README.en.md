@@ -68,6 +68,9 @@ Next time, **pressing any button** is enough to connect.
 - 🎯 **Aim by moving** – the motion sensors control the camera or the mouse, ideal for shooters.
 - 🕹️ **Joy-Con like on the Switch** – as a pair or single, sideways or upright.
 - 🩹 **Fix stick drift** – simply re-measure the sticks.
+- 🧪 **Test your controller** – check sticks, triggers, motion sensors and buttons live, e.g. when buying used.
+- 🖱️ **Desktop mode** (opt-in) – when no game is running, the controller drives mouse and keyboard. Ideal for a PC
+  on the TV.
 - 🔄 **One-click updates** – N-Connect tells you when a new version is out.
 - 🌍 **12 languages** and a **Windows 11 look** – light, dark and four more colour schemes.
 
@@ -101,9 +104,21 @@ Next time, **pressing any button** is enough to connect.
 - **Joy-Con 2 as a mouse:** stand it on its rail edge.
 - Read amiibo, Ring-Con and IR camera (Switch Joy-Con), Nunchuk and Classic Controller (Wii).
 
+### Desktop mode (under *General*, off by default)
+- When no game is running, the controller controls Windows: left stick = mouse, right stick = scroll, A = click,
+  B = right-click, X = task view, Y = on-screen keyboard, D-pad = arrow keys, LB/RB = back/forward, Start = Enter,
+  Back = Esc, HOME = Start menu, hold RT = precise pointer.
+- Switches off automatically in full-screen games and programs with their own profile. Hold **Back + Start** for
+  1 second to pause it.
+
 ### Comfort
 - Starts with Windows, hidden in the notification area; its menu offers vibrate, player slot and disconnect per controller.
-- Notification on connect and disconnect, automatic disconnect after inactivity (saves battery).
+- Pop-up on connect (player, controller, battery – can be turned off), notification on disconnect, automatic
+  disconnect after inactivity (saves battery).
+- **Test controller** ("Test" tab on every card): sticks with roundness display, triggers, motion sensors, buttons,
+  report rate, rumble.
+- Ready-made button actions, e.g. for the C button: mute microphone, Discord mute/deafen, show desktop, next/previous track.
+- **Export diagnostics** (*General → Advanced*): log and system info as a ZIP for bug reports.
 - Original controllers are hidden from Steam and games, so no controller shows up twice.
 - Take over pairing data from the Switch or move it to another PC.
 - Easy to read at any display scaling (100 % to 200 %).
@@ -125,6 +140,11 @@ Next time, **pressing any button** is enough to connect.
 | DualShock 4 · DualSense · DualSense Edge | ✅ | ✅ | touchpad, gyro, light bar |
 | Xbox 360 · One · Series · Elite | ✅ | ✅ | works directly, N-Connect shows battery and mapping |
 | Wired controllers from HORI, PowerA, PDP; clones (e.g. 8BitDo) in Switch mode | ✅ | depends on model | |
+
+> [!NOTE]
+> **Do you have a wired controller from HORI, PowerA or PDP?** These models haven't been tested with real hardware
+> yet. Please [let us know](https://github.com/DevCatSKZ/N-Connect/issues) whether yours works – ideally with
+> *General → Advanced → Export diagnostics*.
 
 > [!NOTE]
 > **Lots of controllers at once?** Simple Bluetooth dongles often handle only 2–3 controllers. For more, use a good
@@ -168,8 +188,9 @@ Simply run the setup again. This driver is what lets games see the controller.
 <details>
 <summary><b>Something else doesn't work</b></summary>
 
-Right-click the N-Connect icon in the bottom right → **Open log** and attach its content to a
-[bug report](https://github.com/DevCatSKZ/N-Connect/issues).
+Use **General → Advanced → Export diagnostics** to create a ZIP file and attach it to a
+[bug report](https://github.com/DevCatSKZ/N-Connect/issues). It contains the log, settings and system info, but no
+pairing keys.
 </details>
 
 ## Portable version

@@ -94,6 +94,14 @@ internal sealed class TrayApp : ApplicationContext
             Balloon(2500, "N-Connect", message, ToolTipIcon.Info);
         }, null);
         ApplyConnectNotify();
+        // Einblendung beim Verbinden (abschaltbar unter Allgemein → Verbinden).
+        _manager.LinkConnected += link => _ui.Post(_ =>
+        {
+            if (!_settings.ConnectOverlay || _manager.Players.FirstOrDefault(p => p.Links.Contains(link)) is not { } player)
+                return;
+            try { ConnectOverlay.ShowFor(player, link, _settings); }
+            catch (Exception e) { Log.Warn($"Einblendung: {Log.Reason(e)}"); }
+        }, null);
         _manager.ControllerConnected += (address, _) => _ui.Post(_ => RememberController(address), null);
         _manager.JoyConModeChanged += (address, single) => _ui.Post(_ =>
         {

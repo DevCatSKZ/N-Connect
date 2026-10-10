@@ -35,6 +35,9 @@ internal sealed class SettingsForm : UiForm
     private readonly ToggleSwitch _autoReconnect = new();
     private readonly ToggleSwitch _autoPair = new();
     private readonly ToggleSwitch _connectFeedback = new();
+    private readonly ToggleSwitch _connectOverlay = new();
+    private readonly ToggleSwitch _desktopMode = new();
+    private readonly Slider _desktopSpeed = Bar(25, 300, v => $"{v} %", step: 5);
     private readonly ComboBox _notifyMode = Combo(240, "N-Connect (empfohlen)", "Windows", "N-Connect und Windows", "Keine");
     private readonly ComboBox _inactivity = Combo(160);
     private static readonly int[] InactivityChoices = [0, 5, 10, 15, 30, 60];
@@ -460,10 +463,17 @@ internal sealed class SettingsForm : UiForm
             Row("Gezielt suchen", "Sucht eine Minute lang nach Controllern im Kopplungsmodus.", pair, Glyph.Bluetooth),
             Row("Per Tastendruck verbinden", "Gekoppelte Controller verbinden sich ohne SYNC-Taste.", _autoReconnect, Glyph.Bluetooth),
             Row("Beim Verbinden kurz vibrieren", null, _connectFeedback, Glyph.Vibrate),
+            Row("Einblendung beim Verbinden", "Kurze Anzeige am Bildschirmrand mit Spieler, Controller und Akkustand.", _connectOverlay, Glyph.Info),
             Row("Meldung bei Verbinden", "Wer meldet, wenn ein Controller verbunden oder getrennt wird. „N-Connect“ zeigt den " +
                 "echten Controller-Namen und schaltet die Gerätemeldungen von Windows ab.", _notifyMode, Glyph.Info),
             Row("Ohne Eingabe trennen nach", "Spart Akku, wenn ein Controller liegen bleibt.", _inactivity, Glyph.Timer),
             Row("Mit Windows starten", "N-Connect startet unsichtbar im Infobereich.", _autostart, Glyph.Power));
+        page.AddGroup("Desktop-Modus",
+            Row("Desktop-Modus", "Läuft kein Spiel, steuert der Controller Windows: linker Stick = Maus, rechter Stick = Scrollen, " +
+                "A = Klick, B = Rechtsklick, X = Taskansicht, Y = Bildschirmtastatur, Steuerkreuz = Pfeiltasten, LB/RB = zurück/vor, " +
+                "Start = Enter, Back = Esc, HOME = Startmenü. Back + Start 1 Sekunde halten pausiert ihn. In Vollbildspielen und " +
+                "Programmen mit eigenem Profil ist er automatisch aus.", _desktopMode, Glyph.Mouse),
+            Row("Zeigergeschwindigkeit", "RT gedrückt halten macht den Zeiger langsam und genau.", _desktopSpeed, Glyph.Pointer));
         page.AddGroup("Darstellung und Sprache",
             Row("Farbmodus", null, _themeMode, Glyph.Palette),
             Row("Farbschema", "Farben für Akzente, Knöpfe, Flächen und Ränder.", _scheme, Glyph.Palette),
@@ -471,13 +481,43 @@ internal sealed class SettingsForm : UiForm
             Row("Sprache / Language", null, _language, Glyph.Globe));
         var reset = new GlyphButton("Zurücksetzen", Glyph.Refresh);
         reset.Click += (_, _) => ResetAll();
+        var diagnose = new GlyphButton("Exportieren …", Glyph.Export);
+        diagnose.Click += (_, _) => ExportDiagnostics();
         page.AddGroup("Erweitert",
+            Row("Diagnose exportieren", "Protokoll, Einstellungen und Systeminfos als ZIP-Datei – zum Anhängen an eine Fehlermeldung. " +
+                "Enthält keine Kopplungsschlüssel.", diagnose, Glyph.Info),
             Row("Gyro für Emulatoren (DSU)", "Cemuhook-Server auf Port 26760 – wirkt nach einem Neustart von N-Connect.", _dsu, Glyph.Rotate),
             Row("Nach Updates suchen", "Beim Start auf GitHub nach einer neuen Version suchen.", _updates, Glyph.Sync),
             Row("HidHide aktuell halten", "Beim Start nach einer neuen HidHide-Version suchen. Installiert wird nur nach Rückfrage " +
                 "(geprüfter Download vom Hersteller, Neustart nötig).", _hidHideUpdates, Glyph.Sync),
             Row("Alles auf Standard", "Tastenbelegungen und Werte zurücksetzen. Gekoppelte Controller bleiben erhalten.", reset, Glyph.Refresh));
         return page;
+    }
+
+    /// <summary>Diagnose-ZIP speichern (Vorschlag: Desktop) und den Ordner mit der markierten Datei öffnen.</summary>
+    private void ExportDiagnostics()
+    {
+        using var dialog = new SaveFileDialog
+        {
+            Title = Tr.T("Diagnose exportieren"),
+            Filter = "ZIP (*.zip)|*.zip",
+            FileName = $"N-Connect-Diagnose-{DateTime.Now:yyyyMMdd-HHmm}.zip",
+            InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+        };
+        if (dialog.ShowDialog(this) != DialogResult.OK)
+            return;
+        try
+        {
+            Diagnostics.Export(dialog.FileName, _manager);
+            Log.Info($"Diagnose exportiert: {dialog.FileName}");
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("explorer.exe", $"/select,\"{dialog.FileName}\"")
+                { UseShellExecute = true });
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or System.ComponentModel.Win32Exception)
+        {
+            Log.Warn($"Diagnose exportieren: {Log.Reason(e)}");
+            Tr.Show(this, $"Speichern fehlgeschlagen: {e.Message}", "N-Connect", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        }
     }
 
     // ---------- Seiten ----------
@@ -564,6 +604,9 @@ internal sealed class SettingsForm : UiForm
         _rumbleStrength.ValueChanged += (_, _) => Apply(() => _settings.RumbleStrength = _rumbleStrength.Value / 100f);
         _deadzone.ValueChanged += (_, _) => { Apply(() => _settings.StickDeadzone = _deadzone.Value / 100f); RefreshTuning(); };
         _connectFeedback.CheckedChanged += (_, _) => Apply(() => _settings.ConnectFeedback = _connectFeedback.Checked);
+        _connectOverlay.CheckedChanged += (_, _) => Apply(() => _settings.ConnectOverlay = _connectOverlay.Checked);
+        _desktopMode.CheckedChanged += (_, _) => { Apply(() => _settings.DesktopMode = _desktopMode.Checked); _desktopSpeed.Enabled = _desktopMode.Checked; };
+        _desktopSpeed.ValueChanged += (_, _) => Apply(() => _settings.DesktopPointerSpeed = _desktopSpeed.Value);
         _notifyMode.SelectedIndexChanged += (_, _) =>
             Apply(() => _settings.ConnectNotify = (ConnectNotifications)Math.Max(0, _notifyMode.SelectedIndex));
         _autoReconnect.CheckedChanged += (_, _) => Apply(() => _settings.AutoReconnect = _autoReconnect.Checked);
@@ -663,6 +706,10 @@ internal sealed class SettingsForm : UiForm
         _rumbleStrength.Value = Clamp(_rumbleStrength, _settings.RumbleStrength * 100);
         _deadzone.Value = Clamp(_deadzone, _settings.StickDeadzone * 100);
         _connectFeedback.Checked = _settings.ConnectFeedback;
+        _connectOverlay.Checked = _settings.ConnectOverlay;
+        _desktopMode.Checked = _settings.DesktopMode;
+        _desktopSpeed.Value = _settings.DesktopPointerSpeed;
+        _desktopSpeed.Enabled = _settings.DesktopMode;
         _notifyMode.SelectedIndex = Math.Clamp((int)_settings.ConnectNotify, 0, _notifyMode.Items.Count - 1);
         _autoReconnect.Checked = _settings.AutoReconnect;
         _autoPair.Checked = _settings.AutoPair;

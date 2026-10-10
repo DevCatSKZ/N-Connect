@@ -329,7 +329,26 @@ internal sealed class Player : IDisposable
                 Log.Info($"Spieler {Index + 1}: erste Eingabe am virtuellen Controller ({Kind.DisplayName()})");
             var keys = output.Keys;
             gamepad = ApplyMacros(gamepad, output.Macros, keys);
-            UpdateSpecials(output.Specials, motionFresh ? input.Motion : null, settings);
+            // Desktop-Modus (falls eingeschaltet und kein Spiel im Vordergrund): der Controller steuert Maus und
+            // Tastatur; das Spiel bekommt Neutralstellung, Belegungen und Sonderaktionen ruhen.
+            bool desktop = false;
+            if (DesktopControl.IsAvailable(settings))
+            {
+                _desktop ??= new DesktopControl(message => Warning?.Invoke(message));
+                desktop = _desktop.Process(gamepad, settings);
+                _desktopUsed = true;
+            }
+            else if (_desktopUsed)
+            {
+                _desktop?.Leave();
+                _desktopUsed = false;
+            }
+            if (desktop)
+            {
+                gamepad = default;
+                keys = [];
+            }
+            UpdateSpecials(desktop ? SpecialAction.None : output.Specials, motionFresh && !desktop ? input.Motion : null, settings);
             if (settings.WiiPointerMouse && state.Pointer is { } pointer)
                 MovePointer(pointer);
             // Gyro als rechter Stick: immer, beim Zielen (linker Trigger) oder per Taste (halten/ein-aus).
@@ -342,7 +361,7 @@ internal sealed class Player : IDisposable
                 ThreadPool.QueueUserWorkItem(_ => Changed?.Invoke());
             }
             // Flick-Stick: der rechte Stick dreht per Maus; ans Spiel geht dann nur noch der Gyro-Anteil.
-            if (settings.FlickStick)
+            if (settings.FlickStick && !desktop)
             {
                 Flick(input.RightX, input.RightY, settings);
                 gamepad = gamepad with { RightX = 0, RightY = 0 };
@@ -494,6 +513,9 @@ internal sealed class Player : IDisposable
     public bool GyroMouseActive { get; private set; }
 
     private bool _gyroStickToggled;
+    /// <summary>Desktop-Modus dieses Spielers (entsteht erst, wenn er gebraucht wird).</summary>
+    private DesktopControl? _desktop;
+    private bool _desktopUsed;
 
     /// <summary>Steuert der Gyro gerade den rechten Stick?</summary>
     public bool GyroStickActive { get; private set; }
@@ -849,6 +871,7 @@ internal sealed class Player : IDisposable
         {
             UpdateHotkeys([]);          // keine Taste darf gedrückt bleiben
             ReleaseSpecials();          // auch keine Maustaste
+            _desktop?.Leave();          // Desktop-Modus: Maustasten und Pfeiltasten loslassen
             StopRumble();
             DsuServer.Instance?.Clear(Index);
             pad = _pad;
