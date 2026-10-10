@@ -18,6 +18,7 @@ internal sealed class TrayApp : ApplicationContext
     private readonly SwitchCardWatcher? _cardWatcher;
     private Settings _settings;
     private SettingsForm? _settingsForm;
+    private ControllerWidget? _widget;
     private Font? _boldFont;
     private DsuServer? _dsu;
     private readonly System.Windows.Forms.Timer _reloadTimer = new() { Interval = 300 };
@@ -136,6 +137,7 @@ internal sealed class TrayApp : ApplicationContext
                 "settings.json konnte nicht gelesen werden – es gelten die Standardwerte.", ToolTipIcon.Warning);
         UpdateTooltip();
         BuildMenu();
+        SyncWidget();
         _profileTimer.Tick += (_, _) => DetectProfile();
         _profileTimer.Start();
         _icon.BalloonTipClicked += (_, _) =>
@@ -318,6 +320,7 @@ internal sealed class TrayApp : ApplicationContext
         _settingsForm = new SettingsForm(_settings, outputChanged =>
         {
             SaveSettings();
+            SyncWidget();
             if (outputChanged)
                 _manager?.ApplyOutputMode();
         }, _manager, ShowWiiPairing, () => ShowPairingData(null));
@@ -344,7 +347,43 @@ internal sealed class TrayApp : ApplicationContext
         ApplyConnectNotify();
         if (_settingsForm is { IsDisposed: false } form)
             form.ReloadValues(); // sonst arbeitet das Fenster mit veralteten Profilen weiter
+        SyncWidget();
         Log.Info("Einstellungen neu geladen");
+    }
+
+    /// <summary>Desktop-Widget nach den Einstellungen zeigen, ausblenden oder auffrischen (Farbschema, Optionen).</summary>
+    private void SyncWidget()
+    {
+        if (_manager is null)
+            return;
+        if (!_settings.DesktopWidget)
+        {
+            _widget?.Close();
+            _widget = null;
+            return;
+        }
+        if (_widget is { IsDisposed: false } widget)
+        {
+            widget.UpdateContent(force: true);
+            return;
+        }
+        try
+        {
+            // Änderungen aus dem Widget-Menü (Position, Optionen) speichern und im offenen Einstellungsfenster zeigen.
+            _widget = new ControllerWidget(_manager, () => _settings, () =>
+            {
+                SaveSettings();
+                SyncWidget();
+                if (_settingsForm is { IsDisposed: false } form)
+                    form.ReloadValues();
+            }, ShowSettings);
+            _widget.Show();
+        }
+        catch (Exception e)
+        {
+            Log.Warn($"Desktop-Widget: {Log.Reason(e)}");
+            _widget = null;
+        }
     }
 
     private void SaveSettings()
@@ -899,6 +938,7 @@ internal sealed class TrayApp : ApplicationContext
         _autoPairCts.Cancel();
         _icon.Visible = false;
         _settingsForm?.Close();
+        _widget?.Close();
         _settingsWatcher?.Dispose();
         _cardWatcher?.Dispose();
         _pairingData?.Close();

@@ -38,6 +38,10 @@ internal sealed class SettingsForm : UiForm
     private readonly ToggleSwitch _connectOverlay = new();
     private readonly ToggleSwitch _desktopMode = new();
     private readonly Slider _desktopSpeed = Bar(25, 300, v => $"{v} %", step: 5);
+    private readonly ToggleSwitch _widget = new();
+    private readonly ToggleSwitch _widgetOnTop = new();
+    private readonly ToggleSwitch _widgetCompact = new();
+    private readonly Slider _widgetOpacity = Bar(40, 100, v => $"{v} %", step: 5);
     private readonly ComboBox _notifyMode = Combo(240, "N-Connect (empfohlen)", "Windows", "N-Connect und Windows", "Keine");
     private readonly ComboBox _inactivity = Combo(160);
     private static readonly int[] InactivityChoices = [0, 5, 10, 15, 30, 60];
@@ -474,6 +478,12 @@ internal sealed class SettingsForm : UiForm
                 "Start = Enter, Back = Esc, HOME = Startmenü. Back + Start 1 Sekunde halten pausiert ihn. In Vollbildspielen und " +
                 "Programmen mit eigenem Profil ist er automatisch aus.", _desktopMode, Glyph.Mouse),
             Row("Zeigergeschwindigkeit", "RT gedrückt halten macht den Zeiger langsam und genau.", _desktopSpeed, Glyph.Pointer));
+        page.AddGroup("Desktop-Widget",
+            Row("Desktop-Widget", "Kleines Kärtchen auf dem Desktop: verbundene Controller, Akku, Verbindung und Ausgabe auf einen Blick. " +
+                "Mit der Maus verschieben, Rechtsklick für Optionen, Doppelklick öffnet N-Connect.", _widget, Glyph.Layers),
+            Row("Immer im Vordergrund", "Widget bleibt über allen Fenstern sichtbar (sonst nur auf dem Desktop).", _widgetOnTop, Glyph.Eye),
+            Row("Kompakte Ansicht", "Eine Zeile je Controller: Spieler, Name und Akku.", _widgetCompact, Glyph.Sliders),
+            Row("Deckkraft", null, _widgetOpacity, Glyph.Palette));
         page.AddGroup("Darstellung und Sprache",
             Row("Farbmodus", null, _themeMode, Glyph.Palette),
             Row("Farbschema", "Farben für Akzente, Knöpfe, Flächen und Ränder.", _scheme, Glyph.Palette),
@@ -607,6 +617,10 @@ internal sealed class SettingsForm : UiForm
         _connectOverlay.CheckedChanged += (_, _) => Apply(() => _settings.ConnectOverlay = _connectOverlay.Checked);
         _desktopMode.CheckedChanged += (_, _) => { Apply(() => _settings.DesktopMode = _desktopMode.Checked); _desktopSpeed.Enabled = _desktopMode.Checked; };
         _desktopSpeed.ValueChanged += (_, _) => Apply(() => _settings.DesktopPointerSpeed = _desktopSpeed.Value);
+        _widget.CheckedChanged += (_, _) => { Apply(() => _settings.DesktopWidget = _widget.Checked); EnableWidgetRows(); };
+        _widgetOnTop.CheckedChanged += (_, _) => Apply(() => _settings.WidgetOnTop = _widgetOnTop.Checked);
+        _widgetCompact.CheckedChanged += (_, _) => Apply(() => _settings.WidgetCompact = _widgetCompact.Checked);
+        _widgetOpacity.ValueChanged += (_, _) => Apply(() => _settings.WidgetOpacity = _widgetOpacity.Value);
         _notifyMode.SelectedIndexChanged += (_, _) =>
             Apply(() => _settings.ConnectNotify = (ConnectNotifications)Math.Max(0, _notifyMode.SelectedIndex));
         _autoReconnect.CheckedChanged += (_, _) => Apply(() => _settings.AutoReconnect = _autoReconnect.Checked);
@@ -710,6 +724,11 @@ internal sealed class SettingsForm : UiForm
         _desktopMode.Checked = _settings.DesktopMode;
         _desktopSpeed.Value = _settings.DesktopPointerSpeed;
         _desktopSpeed.Enabled = _settings.DesktopMode;
+        _widget.Checked = _settings.DesktopWidget;
+        _widgetOnTop.Checked = _settings.WidgetOnTop;
+        _widgetCompact.Checked = _settings.WidgetCompact;
+        _widgetOpacity.Value = _settings.WidgetOpacity;
+        EnableWidgetRows();
         _notifyMode.SelectedIndex = Math.Clamp((int)_settings.ConnectNotify, 0, _notifyMode.Items.Count - 1);
         _autoReconnect.Checked = _settings.AutoReconnect;
         _autoPair.Checked = _settings.AutoPair;
@@ -1052,6 +1071,10 @@ internal sealed class SettingsForm : UiForm
         _changed(false);
         _mapping.Refresh(); // „Standard: …“ neu beschriften
     }
+
+    /// <summary>Widget-Optionen nur bedienbar, solange das Widget eingeschaltet ist.</summary>
+    private void EnableWidgetRows() =>
+        _widgetOnTop.Enabled = _widgetCompact.Enabled = _widgetOpacity.Enabled = _widget.Checked;
 
     private void Apply(Action change)
     {
