@@ -57,6 +57,7 @@ internal sealed class SettingsForm : UiForm
     private static readonly string?[] LanguageCodes =
         [null, "de", "en", "es", "fr", "it", "pt", "nl", "pl", "ru", "ja", "zh", "ko"];
     private readonly ToggleSwitch _dsu = new();
+    private readonly ToggleSwitch _useAdapter = new();
     private readonly ToggleSwitch _updates = new();
     private readonly ToggleSwitch _hidHideUpdates = new();
 
@@ -496,6 +497,8 @@ internal sealed class SettingsForm : UiForm
         page.AddGroup("Erweitert",
             Row("Diagnose exportieren", "Protokoll, Einstellungen und Systeminfos als ZIP-Datei – zum Anhängen an eine Fehlermeldung. " +
                 "Enthält keine Kopplungsschlüssel.", diagnose, Glyph.Info),
+            Row("Funkadapter (ESP32/nRF52840)", "Controller, die an einem per USB angeschlossenen Funkadapter hängen, als Spieler anzeigen. " +
+                "Der Adapter muss die N-Connect-Firmware tragen (siehe docs/ESP32.md bzw. NRF52840.md).", _useAdapter, Glyph.Device),
             Row("Gyro für Emulatoren (DSU)", "Cemuhook-Server auf Port 26760 – wirkt nach einem Neustart von N-Connect.", _dsu, Glyph.Rotate),
             Row("Nach Updates suchen", "Beim Start auf GitHub nach einer neuen Version suchen.", _updates, Glyph.Sync),
             Row("HidHide aktuell halten", "Beim Start nach einer neuen HidHide-Version suchen. Installiert wird nur nach Rückfrage " +
@@ -633,6 +636,7 @@ internal sealed class SettingsForm : UiForm
         };
         _autostart.CheckedChanged += (_, _) => { if (!_loading) Autostart.Set(_autostart.Checked); };
         _dsu.CheckedChanged += (_, _) => Apply(() => _settings.DsuServer = _dsu.Checked);
+        _useAdapter.CheckedChanged += (_, _) => Apply(() => _settings.UseAdapter = _useAdapter.Checked);
         _updates.CheckedChanged += (_, _) => Apply(() => _settings.CheckForUpdates = _updates.Checked);
         _hidHideUpdates.CheckedChanged += (_, _) => Apply(() => _settings.CheckHidHideUpdates = _hidHideUpdates.Checked);
         _language.SelectedIndexChanged += (_, _) => ChangeLanguage();
@@ -736,6 +740,7 @@ internal sealed class SettingsForm : UiForm
         _autostart.Checked = Autostart.IsEnabled || Autostart.IsEnabledForAllUsers;
         _autostart.Enabled = !Autostart.IsEnabledForAllUsers; // alte Installation: für alle Benutzer eingetragen
         _dsu.Checked = _settings.DsuServer;
+        _useAdapter.Checked = _settings.UseAdapter;
         _updates.Checked = _settings.CheckForUpdates;
         _hidHideUpdates.Checked = _settings.CheckHidHideUpdates;
         _language.SelectedIndex = Math.Max(0, Array.IndexOf(LanguageCodes, _settings.Language));

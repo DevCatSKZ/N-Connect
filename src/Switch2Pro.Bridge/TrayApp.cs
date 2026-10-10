@@ -350,6 +350,7 @@ internal sealed class TrayApp : ApplicationContext
         _icon.ContextMenuStrip!.Renderer = Theme.MenuRenderer();
         _icon.ContextMenuStrip.ForeColor = Theme.Current.Text;
         _manager?.ApplyOutputMode(); // allgemein oder je Controller geändert – nur Abweichende werden neu angelegt
+        _manager?.ApplyAdapterSetting();
         ApplyConnectNotify();
         if (_settingsForm is { IsDisposed: false } form)
             form.ReloadValues(); // sonst arbeitet das Fenster mit veralteten Profilen weiter

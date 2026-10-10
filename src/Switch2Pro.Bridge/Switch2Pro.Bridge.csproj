@@ -22,6 +22,8 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Nefarius.ViGEm.Client" Version="1.21.256" />
+    <!-- Serielle Verbindung zum Funkadapter (ESP32/nRF52840) über USB-CDC. -->
+    <PackageReference Include="System.IO.Ports" Version="8.0.0" />
   </ItemGroup>
   <ItemGroup>
     <!-- Fenstersymbol mit allen Größen (das Programm-Icon allein liefert nur 32 px). -->
