@@ -71,6 +71,8 @@ Next time, **pressing any button** is enough to connect.
 - 🧪 **Test your controller** – check sticks, triggers, motion sensors and buttons live, e.g. when buying used.
 - 🖱️ **Desktop mode** (opt-in) – when no game is running, the controller drives mouse and keyboard. Ideal for a PC
   on the TV.
+- 🪟 **Desktop widget** (opt-in) – a small card on the desktop with all controllers, battery and connection,
+  in your chosen colour scheme.
 - 🔄 **One-click updates** – N-Connect tells you when a new version is out.
 - 🌍 **12 languages** and a **Windows 11 look** – light, dark and four more colour schemes.
 

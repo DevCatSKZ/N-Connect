@@ -397,6 +397,13 @@ Bis zu **8 Spieler** gleichzeitig (`ControllerManager.MaxPlayers`). Der 9. Contr
   system.txt (Version, Windows, Sprache, Skalierung, Treiber, Controller). Einstellungen enthalten keine Schlüssel.
 - **Tastenvorlagen** für Zusatztasten: Mikrofon stumm (Win+Alt+K), Discord Strg+Umschalt+M/D, Win+D, Win+Tab,
   Alt+Tab, Ton aus, Titel vor/zurück (`NextTrack`/`PrevTrack`).
+- **Desktop-Widget** (`ControllerWidget`, `Settings.DesktopWidget`, Standard **aus**; *Allgemein → Desktop-Widget*):
+  rahmenloses Kärtchen im aktiven Farbschema (Neon: Akzentlinie oben) mit Spieler, Name, Verbindung · Ausgabe und
+  Akku (leerster Akku des Spielers, Blitz beim Laden); Kopf zeigt Anzahl bzw. aktives Profil. Ohne Fokus, nicht in
+  der Taskleiste; mit der Maus verschiebbar (`WidgetX`/`WidgetY`, ungültige Position → oben rechts), Rechtsklick:
+  N-Connect öffnen, Immer im Vordergrund (`WidgetOnTop`), Kompakte Ansicht (`WidgetCompact`), Deckkraft
+  (`WidgetOpacity` 40–100 %), Position zurücksetzen, ausblenden. Doppelklick öffnet N-Connect. Aktualisiert sich
+  jede Sekunde, zeichnet nur bei Änderungen neu (`TrayApp.SyncWidget`).
 
 ## 12. Infobereich (Taskleiste)
 

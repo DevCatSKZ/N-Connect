@@ -264,6 +264,17 @@ public sealed class Settings
     public int DesktopPointerSpeed { get; set; } = 100;
     /// <summary>Kurze Einblendung am Bildschirmrand, wenn ein Controller verbunden wird (Spieler, Name, Akku).</summary>
     public bool ConnectOverlay { get; set; } = true;
+    /// <summary>Desktop-Widget: kleines Kärtchen mit Controllern, Akku und Ausgabe auf dem Desktop (Standard aus).</summary>
+    public bool DesktopWidget { get; set; }
+    /// <summary>Widget immer im Vordergrund statt nur auf dem Desktop.</summary>
+    public bool WidgetOnTop { get; set; }
+    /// <summary>Widget kompakt: eine Zeile je Controller ohne Verbindung und Ausgabe.</summary>
+    public bool WidgetCompact { get; set; }
+    /// <summary>Deckkraft des Widgets in Prozent (40–100, Standard 95).</summary>
+    public int WidgetOpacity { get; set; } = 95;
+    /// <summary>Position des Widgets (linke obere Ecke, Bildschirmpixel); null = oben rechts.</summary>
+    public int? WidgetX { get; set; }
+    public int? WidgetY { get; set; }
     /// <summary>Sprache der Oberfläche: null = wie Windows, sonst "de" oder "en".</summary>
     public string? Language { get; set; }
 
@@ -524,6 +535,12 @@ public sealed class Settings
         DesktopMode = other.DesktopMode;
         DesktopPointerSpeed = other.DesktopPointerSpeed;
         ConnectOverlay = other.ConnectOverlay;
+        DesktopWidget = other.DesktopWidget;
+        WidgetOnTop = other.WidgetOnTop;
+        WidgetCompact = other.WidgetCompact;
+        WidgetOpacity = other.WidgetOpacity;
+        WidgetX = other.WidgetX;
+        WidgetY = other.WidgetY;
         Language = other.Language;
         UprightJoyCons = [.. other.UprightJoyCons];
         HiddenDevices = [.. other.HiddenDevices];
@@ -630,6 +647,7 @@ public sealed class Settings
         StickDeadzone = float.IsFinite(StickDeadzone) ? Math.Clamp(StickDeadzone, 0f, 0.5f) : 0.06f;
         MouseSpeed = float.IsFinite(MouseSpeed) ? Math.Clamp(MouseSpeed, 0.1f, 10f) : 2.5f;
         DesktopPointerSpeed = Math.Clamp(DesktopPointerSpeed, 25, 300);
+        WidgetOpacity = Math.Clamp(WidgetOpacity, 40, 100);
         AllowedControllers ??= [];
         KnownControllers ??= [];
         SingleJoyCons ??= [];

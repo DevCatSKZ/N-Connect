@@ -72,6 +72,8 @@ Danach reicht beim nächsten Mal **ein beliebiger Tastendruck** zum Verbinden.
 - 🧪 **Controller testen** – Sticks, Trigger, Bewegungssensoren und Tasten live prüfen, z. B. beim Gebrauchtkauf.
 - 🖱️ **Desktop-Modus** (zum Einschalten) – läuft kein Spiel, steuert der Controller Maus und Tastatur. Ideal für den
   PC am Fernseher.
+- 🪟 **Desktop-Widget** (zum Einschalten) – kleines Kärtchen auf dem Desktop mit allen Controllern, Akku und
+  Verbindung, im gewählten Farbschema.
 - 🔄 **Updates mit einem Klick** – N-Connect meldet sich, wenn es eine neue Version gibt.
 - 🌍 **12 Sprachen** und ein **Design wie Windows 11** – hell, dunkel und vier weitere Farbschemata.
 

@@ -265,6 +265,18 @@ internal static class RenderCheck
                     Snap(gyro, "gyro");
             using (var pairing = new PairForm(null) { Preview = Tr.T(ControllerKind.JoyCon1Left.DisplayName()) })
                 Snap(pairing, "koppeln");
+            // Desktop-Widget: normal, kompakt und ohne Controller.
+            foreach (var (name, compact, empty) in new[] { ("widget", false, false), ("widget_kompakt", true, false), ("widget_leer", false, true) })
+            {
+                var widgetSettings = new Settings { DesktopWidget = true, WidgetCompact = compact, WidgetOpacity = 100 };
+                using var widget = new ControllerWidget(empty ? null : manager, () => widgetSettings, () => { }, () => { })
+                    { Location = new Point(-6000, -6000) };
+                widget.Show();
+                Pump();
+                Full(widget, Path.Combine(folder, $"ui_{name}{variant}_{lang}.png"));
+                widget.Close();
+            }
+
             // Einblendung beim Verbinden (läuft hier auf dem unsichtbaren Desktop, stört also niemanden).
             if (manager?.Players.FirstOrDefault(p => p.Links.Count > 0) is { } overlayPlayer)
             {
