@@ -296,10 +296,19 @@ kleben; ggf. Aufschrift weglassen statt verschieben.
   neue Controller am PC (SYNC) werben dann für dieselbe Adresse und verbinden sich mit jeder Platine **ohne erneutes
   Flashen** (die Firmware nimmt jeden Switch-2-Controller an, der für `NCONNECT_HOST_ADDR_LE` wirbt; die
   Controllertabelle ist nur für Namen/Kalibrierung). Neu-Export/-Flash nur für Zusatzdaten oder geänderte Adresse.
-- Offen: Firmware (ESP32: ESP-IDF/NimBLE; nRF52840: nRF Connect SDK/Zephyr oder Adafruit Bluefruit). Datenweg zum
-  zweiten PC: Weg A „Funkadapter für N-Connect“ per USB-CDC (braucht neue Verbindungsart in N-Connect) oder Weg B
-  „eigenständiges USB-Gamepad“. Test mit echter Hardware. **Flashen nur nach ausdrücklicher Freigabe des Nutzers für
-  eine konkrete Firmware.**
+- **Gewählter Weg (Nutzer 10.10.2026): Weg A** – „der Dongle wird als normales Gerät erkannt, alle darüber
+  verbundenen Controller zeigt N-Connect an“. Der Adapter verbindet die Controller per BLE (gibt sich als PC-Adapter
+  aus) und reicht den **rohen Bericht 0x05** über USB-CDC an N-Connect; N-Connect parst ihn mit dem vorhandenen
+  `InputReports.TryParseReport05` und zeigt jeden Controller als normalen Spieler.
+- **Stufe 1 fertig & getestet:** gemeinsames USB-Protokoll `AdapterProtocol` (SLIP + CRC16-CCITT; Nachrichten
+  Hello/Connected/Disconnected/Input und SetHost/Ping/Rumble/PlayerLed), `AdapterFrameReader`, 9 Tests (246 gesamt),
+  Referenz **docs/ADAPTER-PROTOKOLL.md**. Code liegt dormant in `Switch2Pro.Protocol`, noch nicht verdrahtet.
+- **Stufe 2 offen (N-Connect):** neue Verbindungsart `AdapterLink : IControllerLink` über den COM-Port + Anbindung in
+  `ControllerManager` (Attach bei `Connected`, StateReceived je `Input`, `SetRumble`/Spieler-LED zurück als Frame),
+  Einstellung (Port + an/aus) und eine UI-Zeile. Transport am besten `BluetoothLE` lassen (kein neuer Enum-Wert, der
+  USB-Dedup-Check greift mangels Seriennummer nicht). **Erst sinnvoll testbar, wenn die Firmware läuft.**
+- **Stufe 3 offen (Firmware):** ESP32 ESP-IDF/NimBLE bzw. nRF52840 Zephyr/Bluefruit, nach ADAPTER-PROTOKOLL.md.
+  **Flashen nur nach ausdrücklicher Freigabe für eine konkrete Firmware; vorher die jetzige Dongle-Firmware sichern.**
 
 **Technisch offen (bisheriger Stand):**
 - **Flackernde Tests:** einmal 3 Fehlschläge, danach 7 Läufe hintereinander grün – Ursache nicht untersucht.
