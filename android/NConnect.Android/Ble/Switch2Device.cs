@@ -322,13 +322,18 @@ public sealed class Switch2Device : IDisposable
 
     // ---------- Rückrufe ----------
 
-    private void OnNotify(UUID? uuid, byte[]? data)
+    /// <summary>
+    /// Benachrichtigung zuordnen – über das Merkmal-Objekt selbst, nicht über <c>Uuid</c>: Jeder Uuid-Abruf erzeugt ein
+    /// neues Java-Objekt; bei ~90 Eingaben/s häufen sich sonst Java-Verweise, die Laufzeit erzwingt ständig
+    /// Speicherbereinigungen und die App friert ein.
+    /// </summary>
+    private void OnNotify(BluetoothGattCharacteristic? characteristic, byte[]? data)
     {
-        if (data is null || uuid is null)
+        if (data is null || characteristic is null)
             return;
-        if (_input is not null && uuid.Equals(_input.Uuid))
+        if (_input is not null && (ReferenceEquals(characteristic, _input) || characteristic.Equals(_input)))
             OnInput(data);
-        else if (_response is not null && uuid.Equals(_response.Uuid))
+        else if (_response is not null && (ReferenceEquals(characteristic, _response) || characteristic.Equals(_response)))
             OnResponse(data);
     }
 
@@ -503,13 +508,13 @@ public sealed class Switch2Device : IDisposable
 
         // Ab Android 13 kommt der Wert direkt mit; der alte Rückruf wird dann nicht zusätzlich ausgewertet.
         public override void OnCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, byte[] value) =>
-            owner.OnNotify(characteristic.Uuid, value);
+            owner.OnNotify(characteristic, value);
 
 #pragma warning disable CA1422, CS0672
         public override void OnCharacteristicChanged(BluetoothGatt? gatt, BluetoothGattCharacteristic? characteristic)
         {
             if (!OperatingSystem.IsAndroidVersionAtLeast(33))
-                owner.OnNotify(characteristic?.Uuid, characteristic?.GetValue());
+                owner.OnNotify(characteristic, characteristic?.GetValue());
         }
 #pragma warning restore CA1422, CS0672
     }
