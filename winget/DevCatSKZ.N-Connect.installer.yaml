@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.6.0.schema.json
 PackageIdentifier: DevCatSKZ.N-Connect
-PackageVersion: 1.0.19
+PackageVersion: 1.0.20
 InstallerLocale: en-US
 Platform:
   - Windows.Desktop
@@ -10,13 +10,13 @@ InstallModes:
   - silent
   - silentWithProgress
 UpgradeBehavior: install
-ReleaseDate: "2026-10-10"
+ReleaseDate: "2026-10-11"
 Installers:
   - Architecture: x64
     InstallerType: inno
     Scope: machine
-    InstallerUrl: https://github.com/DevCatSKZ/N-Connect/releases/download/v1.0.19/N-Connect-Setup-1.0.19.exe
-    InstallerSha256: 18DF01696A7BFEDB491359742D793EAB0EFB411A97524BC29875CC9C91CA554C
+    InstallerUrl: https://github.com/DevCatSKZ/N-Connect/releases/download/v1.0.20/N-Connect-Setup-1.0.20.exe
+    InstallerSha256: 6190D50A9864B3757878B0882D18F8F6B2DCC06635D9A80C6DCC508D08218711
     InstallerSwitches:
       Silent: /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
       SilentWithProgress: /SILENT /SUPPRESSMSGBOXES /NORESTART
@@ -30,7 +30,7 @@ Installers:
     NestedInstallerFiles:
       - RelativeFilePath: N-Connect.exe
         PortableCommandAlias: N-Connect
-    InstallerUrl: https://github.com/DevCatSKZ/N-Connect/releases/download/v1.0.19/N-Connect-Portable-1.0.19.zip
-    InstallerSha256: 06D8C1420D70E3E2BCD578CFD491DB0254401E1F8AED797BA820F497BA9E88B9
+    InstallerUrl: https://github.com/DevCatSKZ/N-Connect/releases/download/v1.0.20/N-Connect-Portable-1.0.20.zip
+    InstallerSha256: 7BE4530B937F8F1DAC5363C142B0BECEAB6181971C483DDD36082CDCCE7752FA
 ManifestType: installer
 ManifestVersion: 1.6.0
