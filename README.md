@@ -4,11 +4,12 @@
 
 # N-Connect
 
-**Nintendo-, PlayStation- und Xbox-Controller am PC – einfach verbinden und spielen.**
+**Nintendo-, PlayStation- und Xbox-Controller am PC und am Fernseher – einfach verbinden und spielen.**
 
 [![Download](https://img.shields.io/github/v/release/DevCatSKZ/N-Connect?label=Download&style=for-the-badge&color=0078D4)](https://github.com/DevCatSKZ/N-Connect/releases/latest)
 
 ![Windows 10 | 11](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?style=flat-square)
+![Kodi | LibreELEC](https://img.shields.io/badge/Kodi-LibreELEC-0078D4?style=flat-square)
 ![12 Sprachen](https://img.shields.io/badge/Sprachen-12-0078D4?style=flat-square)
 [![Lizenz: MIT](https://img.shields.io/badge/Lizenz-MIT-0078D4?style=flat-square)](LICENSE)
 ![Kostenlos](https://img.shields.io/badge/kostenlos-ohne%20Werbung-0078D4?style=flat-square)
@@ -26,6 +27,32 @@ Spiel ihn erkennt** – egal ob Switch 2, Switch, Wii, PlayStation oder Xbox. Da
 Pass, bei Epic, in Emulatoren und in allen anderen Spielen mit Controller-Unterstützung.
 
 Einmal installieren, Controller verbinden, spielen. N-Connect läuft unauffällig im Hintergrund.
+
+## Plattformen
+
+| Plattform | Stand | So bekommst du es |
+|---|---|---|
+| 🪟 **Windows 10 / 11** | ✅ stabil | [`N-Connect-Setup`](https://github.com/DevCatSKZ/N-Connect/releases/latest) |
+| 📺 **Kodi / LibreELEC** – Raspberry Pi 2–5, 64-Bit-Boxen, PC | ✅ neu | über das **[DevCatSKZ Repository](https://github.com/DevCatSKZ/kodi-repo)** – mit automatischen Updates |
+| 🤖 **Android** | 🚧 in Entwicklung | – |
+
+## N-Connect für Kodi / LibreELEC
+
+Am Fernseher mit **LibreELEC**: Das Plugin läuft unsichtbar im Hintergrund und verbindet jederzeit neue Controller.
+- **Switch-2-Controller** werden Xbox-Controller für Kodi, RetroArch und Spiele, inklusive Joy-Con-Paar, Vibration und
+  Spieler-LEDs.
+- **Xbox-, PlayStation-, Switch-1-, Wii- und 8BitDo-Controller** koppelt es automatisch, sobald sie im Kopplungsmodus
+  sind. Ein Umweg über die Bluetooth-Einstellungen ist nicht nötig.
+- Dazu kommen Akku-Warnung, Controller-Tasten für Kodi-Aktionen (z. B. Capture = Bildschirmfoto), feste Spielerplätze,
+  Gyro für Emulatoren (DSU) und 12 Sprachen.
+
+1. Kodi > Einstellungen > System > Add-ons: „Unbekannte Quellen“ einschalten.
+2. **[repository.devcatskz.zip](https://github.com/DevCatSKZ/kodi-repo/raw/main/repository.devcatskz.zip)** über „Aus ZIP-Datei installieren“ installieren.
+3. „Aus Repository installieren“ > **DevCatSKZ Repository** > **N-Connect (LibreELEC/Linux)**.
+4. SYNC am Controller drücken – fertig.
+
+Einzelne Downloads je Gerät und alle Details: [DevCatSKZ Repository](https://github.com/DevCatSKZ/kodi-repo) ·
+technische Doku: [docs/LINUX-KODI.md](docs/LINUX-KODI.md).
 
 ## In 3 Schritten loslegen
 
@@ -219,6 +246,8 @@ src/Switch2Pro.Protocol   Protokolle (plattformunabhängig, mit Tests)
 src/Switch2Pro.Bridge     Windows-App: Verbindungen, virtuelle Controller, Oberfläche, Übersetzung
 tests/                    xUnit-Tests
 installer/                Inno-Setup-Skript
+linux/                    N-Connect für Linux/LibreELEC (Dienst) und das Kodi-Plugin service.nconnect
+android/                  N-Connect für Android (in Entwicklung)
 ```
 
 **Bauen** (.NET 8 SDK):

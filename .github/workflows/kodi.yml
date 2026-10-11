@@ -1,0 +1,71 @@
+# Baut das Kodi-Plugin „N-Connect (LibreELEC/Linux)“ für alle Geräte und veröffentlicht es.
+# - Jeder Lauf: ZIPs als Artefakt „Kodi-Plugin“.
+# - Tag „v1.2.3“: ZIPs zusätzlich am GitHub-Release; neue Plugin-Version (addon.xml) ins DevCatSKZ Repository
+#   (github.com/DevCatSKZ/kodi-repo) – dort holt Kodi sie automatisch. Zugang über das Secret KODI_REPO_TOKEN
+#   (fein abgestufter Token, nur kodi-repo, „Contents: Read and write“; Deploy-Schlüssel sind in der Organisation aus).
+name: N-Connect – Kodi-Plugin
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    tags: ["v*"]
+    paths: ["linux/**", "src/Switch2Pro.Protocol/**", ".github/workflows/kodi.yml"]
+permissions:
+  contents: write
+concurrency:
+  group: kodi-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  kodi:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: "Plugin bauen (LibreELEC: x86_64, arm64, arm)"
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File linux/build-kodi-addon.ps1
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Kodi-Plugin
+          path: out/kodi/*.zip
+
+      - name: An das GitHub-Release hängen
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = "${{ github.ref_name }}"
+          # Das Windows-Release legt der andere Workflow an; falls er noch läuft, kurz warten.
+          for ($i = 0; $i -lt 30 -and -not (gh release view $tag 2>$null); $i++) { Start-Sleep 20 }
+          if (-not (gh release view $tag 2>$null)) { gh release create $tag --title "N-Connect $tag" --notes "Kodi-Plugin" }
+          gh release upload $tag (Get-ChildItem out/kodi -Filter 'N-Connect-Kodi-*.zip').FullName --clobber
+
+      - name: Ins DevCatSKZ Repository legen
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          # Fein abgestufter Token: nur Repository DevCatSKZ/kodi-repo, Berechtigung „Contents: Read and write“.
+          KODI_REPO_TOKEN: ${{ secrets.KODI_REPO_TOKEN }}
+        run: |
+          if (-not $env:KODI_REPO_TOKEN) { Write-Host "Kein KODI_REPO_TOKEN – Repository wird nicht aktualisiert."; exit 0 }
+          git clone --depth 1 "https://x-access-token:$($env:KODI_REPO_TOKEN)@github.com/DevCatSKZ/kodi-repo.git" $env:RUNNER_TEMP/kodi-repo
+          powershell -NoProfile -ExecutionPolicy Bypass -File linux/build-kodi-addon.ps1 -Repo -RepoDir $env:RUNNER_TEMP/kodi-repo
+          cd $env:RUNNER_TEMP/kodi-repo
+          git config user.name devcatskz
+          git config user.email devcatskz@gmail.com
+          git add -A
+          if (git status --porcelain) {
+            git commit -m "N-Connect ${{ github.ref_name }}"
+            git push
+          } else {
+            Write-Host "Keine Änderung (gleiche Plugin-Version)."
+          }

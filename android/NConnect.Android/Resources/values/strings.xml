@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">N-Connect</string>
+    <string name="touch_service_description">Ermöglicht N-Connect, Tasten deines Controllers als Bildschirmberührungen auszuführen (Touch-Modus). Es werden keine Inhalte gelesen oder gespeichert.</string>
+</resources>

@@ -2,6 +2,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
+using Switch2Pro.Protocol;
 
 namespace Switch2Pro.Bridge;
 
@@ -31,40 +32,18 @@ internal static class Theme
 
     private static Color C(int rgb) => Color.FromArgb(255, (rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF);
 
-    private static Palette P(bool dark, int window, int surface, int control, int border, int text, int muted, int canvas,
-        int controlBorder, int accent, int accent2, int pressed) =>
-        new(dark, C(window), C(surface), C(control), C(border), C(text), C(muted), C(canvas), C(controlBorder),
-            C(accent), C(accent2), C(pressed));
+    private static Palette ToPalette(PaletteColors p) =>
+        new(p.Dark, C(p.Window), C(p.Surface), C(p.SurfaceHover), C(p.Border), C(p.Text), C(p.TextMuted), C(p.Canvas),
+            C(p.ControlBorder), C(p.Accent), C(p.Accent2), C(p.Pressed));
 
     /// <summary>
-    /// Alle Farbschemata (das erste ist der Standard). Neon-Schemata: Akzente tief genug für weiße Schrift, Linien und
-    /// Leuchten im dunklen Modus aufgehellt (<see cref="AccentLine"/>).
+    /// Alle Farbschemata (das erste ist der Standard). Die Farben stehen in der gemeinsamen Bibliothek
+    /// (<see cref="ColorSchemes"/>), damit Windows und Android gleich aussehen. Neon-Schemata: Akzente tief genug für weiße
+    /// Schrift, Linien und Leuchten im dunklen Modus aufgehellt (<see cref="AccentLine"/>).
     /// </summary>
-    public static readonly Scheme[] Schemes =
-    [
-        // Windows (Standard): Farben von Windows 11 (Fluent) – Hintergrund #202020, Karten #2B2B2B, Steuerelemente #373737,
-        // Akzent im Windows-Standardblau (dunkel #4CC2FF mit schwarzer Schrift wie in Windows, hell #005FB8 mit weißer).
-        new("windows", "Windows",
-            P(true, 0x202020, 0x2B2B2B, 0x373737, 0x1D1D1D, 0xFFFFFF, 0xC5C5C5, 0x272727, 0x4A4A4A, 0x4CC2FF, 0x4CC2FF, 0x4CC2FF),
-            P(false, 0xF3F3F3, 0xFBFBFB, 0xFFFFFF, 0xE5E5E5, 0x1B1B1B, 0x5C5C5C, 0xEEEEEE, 0xC8C8C8, 0x005FB8, 0x005FB8, 0x0078D4),
-            Neon: false),
-        // Neon: Farben aus dem Logo – Navy, Neon-Blau → Violett.
-        new("neon", "Neon",
-            P(true, 0x0E1019, 0x171A27, 0x222639, 0x2A2F45, 0xF2F4FA, 0xA0A6BE, 0x131623, 0x4A5378, 0x2B6FF2, 0x7C3AED, 0x00BEFF),
-            P(false, 0xF0F2F8, 0xFCFCFF, 0xFFFFFF, 0xDCDFEA, 0x15172A, 0x4A4E64, 0xEAECF5, 0xA3AAC2, 0x1F5FD6, 0x7444E0, 0x0094E0)),
-        // Aurora: Polarlicht – tiefes Blaugrün, Türkis → Grün.
-        new("aurora", "Aurora",
-            P(true, 0x0A1314, 0x111C1D, 0x1A292A, 0x223435, 0xEEF6F5, 0x9CB3B1, 0x0E1919, 0x416363, 0x0E7490, 0x15803D, 0x2EE6A8),
-            P(false, 0xEEF5F4, 0xFBFEFD, 0xFFFFFF, 0xD4E3E1, 0x122322, 0x455A58, 0xE6EFED, 0x99B7B3, 0x0E7490, 0x15803D, 0x0BA67A)),
-        // Sunset: Abendrot – warmes Pflaume, Orange → Pink.
-        new("sunset", "Sunset",
-            P(true, 0x140E13, 0x1E151B, 0x2A1E26, 0x352731, 0xFAF1F4, 0xBBA5AF, 0x1A1217, 0x5F4658, 0xC2410C, 0xBE185D, 0xFF8A3D),
-            P(false, 0xF8F2F2, 0xFFFCFB, 0xFFFFFF, 0xEADBDC, 0x2A1519, 0x5E494E, 0xF2E8E8, 0xC2A6AA, 0xC2410C, 0xBE185D, 0xF26B1D)),
-        // Joy-Con: Neonrot → Neonblau wie die Joy-Con, neutrales Anthrazit.
-        new("joycon", "Joy-Con",
-            P(true, 0x111113, 0x1A1A1E, 0x25252A, 0x2F2F35, 0xF4F4F6, 0xA8A8B2, 0x161619, 0x585862, 0xD7263D, 0x0A6FC2, 0xFF4B5C),
-            P(false, 0xF2F2F4, 0xFDFDFE, 0xFFFFFF, 0xDEDEE3, 0x18181C, 0x4C4C55, 0xECECF0, 0xA8A8B3, 0xD7263D, 0x0A6FC2, 0xE8364A)),
-    ];
+    public static readonly Scheme[] Schemes = ColorSchemes.All
+        .Select(s => new Scheme(s.Id, s.Name, ToPalette(s.DarkPalette), ToPalette(s.LightPalette), s.Neon))
+        .ToArray();
 
     /// <summary>Paletten des Standardschemas (z. B. zum Erkennen unveränderter Label-Farben).</summary>
     public static Palette DarkPalette => Schemes[0].DarkPalette;

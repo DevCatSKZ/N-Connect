@@ -1,0 +1,48 @@
+[B]Before you start[/B]
+Bluetooth must be on: LibreELEC settings > Bluetooth > enable. A Raspberry Pi 4/5 has Bluetooth built in; otherwise a USB Bluetooth stick works (Bluetooth 5.0 or newer recommended).
+
+[B]First connection (once per controller)[/B]
+1. Press the small round SYNC button on the controller until the lights run.
+   • Pro Controller 2: on top, next to the USB-C port
+   • Joy-Con 2: on the flat inner side between SL and SR
+   • GameCube controller (Switch 2): on top of the controller
+2. After a few seconds "Player 1: … connected" appears. The controller now works as an Xbox controller in Kodi and games.
+3. N-Connect pairs the controller with this device at the same time.
+
+[B]Reconnecting[/B]
+Just press any button (e.g. HOME) – no SYNC needed. This works as long as the controller has not been paired with another device using SYNC.
+
+[B]Other controllers (Xbox, PlayStation, Switch 1, 8BitDo …)[/B]
+N-Connect pairs them automatically – just put them into pairing mode:
+   • Xbox: press the pair button on top until the Xbox logo flashes quickly
+   • PlayStation 4: hold SHARE + PS until the light bar flashes
+   • PlayStation 5: hold CREATE + PS until the light flashes
+   • Switch 1 Pro Controller / Joy-Con: press the SYNC button
+   • 8BitDo: pairing button or as described in its manual (Switch or X-input mode)
+   • Wii Remote / Wii U Pro Controller: press the red SYNC button (in the battery compartment or on the back)
+After that, a button press reconnects them. In the N-Connect menu you can disconnect or forget them.
+
+[B]Joy-Con[/B]
+A left and a right Joy-Con are combined into one controller automatically. For two players with one sideways Joy-Con each: Settings > Controller > turn off "Combine".
+
+[B]Back to the Switch 2 or a PC[/B]
+A controller remembers only one device. On the Switch 2: attach the controller or press SYNC in "Controllers" > "Change Grip/Order". To use it here again afterwards: press SYNC.
+
+[B]Using Kodi[/B]
+D-pad/stick: move · bottom button: select · right button: back (with the "By position" layout).
+To change the mapping: Kodi settings > System > Input > Configure attached controllers.
+
+[B]Controller buttons in Kodi[/B]
+Capture takes a screenshot, the C button opens the N-Connect menu. Change this under Settings > Kodi > Controller buttons in Kodi (also for the GL/GR back buttons of the Pro Controller 2). When a battery runs low, N-Connect shows a warning.
+
+[B]Player slots and gyro for emulators[/B]
+Every controller gets the same player slot again the next time it connects. Emulators such as Dolphin, Cemu or Citra receive the motion data via DSU/Cemuhook (port 26760) – choose "DSU" or "Cemuhook" with 127.0.0.1 as motion source in the emulator. Settings > Emulators.
+
+[B]Games (RetroArch, Moonlight …)[/B]
+The controller shows up as an "Xbox 360 Controller" everywhere and needs no mapping. Rumble works if the game supports it.
+
+[B]Problems?[/B]
+• Nothing happens on SYNC: run the diagnostics (shows whether Bluetooth and the virtual controller are ready).
+• Message "paired with another device": press SYNC to pair it here again.
+• Input lag: move closer to the Bluetooth adapter; a USB extension cable for the stick helps against USB 3 interference.
+• Show the log and attach it when reporting a problem: github.com/DevCatSKZ/N-Connect/issues

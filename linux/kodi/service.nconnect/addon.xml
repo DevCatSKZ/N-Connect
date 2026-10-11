@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="service.nconnect" name="N-Connect (LibreELEC/Linux)" version="0.3.0" provider-name="devcatskz">
+  <requires>
+    <import addon="xbmc.python" version="3.0.1"/>
+  </requires>
+  <!-- Dienst: startet N-Connect mit Kodi und hält die Controller verbunden. -->
+  <extension point="xbmc.service" library="service.py"/>
+  <!-- Programm-Eintrag: Status, Controller trennen, Anleitung, Diagnose. -->
+  <extension point="xbmc.python.script" library="default.py">
+    <provides>executable</provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <platform>linux</platform>
+    <summary lang="de_DE">Switch-2-Controller (Joy-Con 2, Pro Controller 2, GameCube) für Kodi</summary>
+    <summary lang="en_GB">Switch 2 controllers (Joy-Con 2, Pro Controller 2, GameCube) for Kodi</summary>
+    <summary lang="es_ES">Mandos de Switch 2 (Joy-Con 2, Pro Controller 2, GameCube) y otros mandos Bluetooth para Kodi</summary>
+    <summary lang="fr_FR">Manettes Switch 2 (Joy-Con 2, Pro Controller 2, GameCube) et autres manettes Bluetooth pour Kodi</summary>
+    <summary lang="it_IT">Controller Switch 2 (Joy-Con 2, Pro Controller 2, GameCube) e altri controller Bluetooth per Kodi</summary>
+    <summary lang="pt_PT">Comandos Switch 2 (Joy-Con 2, Pro Controller 2, GameCube) e outros comandos Bluetooth para o Kodi</summary>
+    <summary lang="pt_BR">Controles do Switch 2 (Joy-Con 2, Pro Controller 2, GameCube) e outros controles Bluetooth para o Kodi</summary>
+    <summary lang="nl_NL">Switch 2-controllers (Joy-Con 2, Pro Controller 2, GameCube) en andere Bluetooth-controllers voor Kodi</summary>
+    <summary lang="pl_PL">Kontrolery Switch 2 (Joy-Con 2, Pro Controller 2, GameCube) i inne kontrolery Bluetooth dla Kodi</summary>
+    <summary lang="ru_RU">Контроллеры Switch 2 (Joy-Con 2, Pro Controller 2, GameCube) и другие Bluetooth-контроллеры для Kodi</summary>
+    <summary lang="ja_JP">Kodi 用 Switch 2 コントローラー（Joy-Con 2、Pro コントローラー 2、ゲームキューブ）とその他の Bluetooth コントローラー</summary>
+    <summary lang="zh_CN">适用于 Kodi 的 Switch 2 手柄（Joy-Con 2、Pro 手柄 2、GameCube）及其他蓝牙手柄</summary>
+    <summary lang="ko_KR">Kodi용 Switch 2 컨트롤러 (Joy-Con 2, Pro 컨트롤러 2, 게임큐브) 및 기타 블루투스 컨트롤러</summary>
+    <description lang="de_DE">N-Connect verbindet Nintendo-Switch-2-Controller per Bluetooth mit LibreELEC und Kodi. Jeder Controller erscheint als Xbox-360-Controller – Kodi, RetroArch und Spiele erkennen ihn ohne Einrichtung. Joy-Con werden automatisch zu einem Paar zusammengefasst, Vibration und Spieler-LEDs funktionieren, nach dem ersten Koppeln genügt ein Tastendruck zum Verbinden.[CR][CR]Zum Koppeln die kleine SYNC-Taste am Controller drücken.</description>
+    <description lang="en_GB">N-Connect connects Nintendo Switch 2 controllers to LibreELEC and Kodi over Bluetooth. Each controller shows up as an Xbox 360 controller, so Kodi, RetroArch and games recognise it without setup. Joy-Con are combined into a pair automatically, rumble and player LEDs work, and after the first pairing a single button press reconnects.[CR][CR]To pair, press the small SYNC button on the controller.</description>
+    <disclaimer lang="de_DE">Kein offizielles Produkt von Nintendo. Benötigt Bluetooth (LibreELEC-Einstellungen > Bluetooth aktivieren).</disclaimer>
+    <disclaimer lang="en_GB">Not an official Nintendo product. Requires Bluetooth (LibreELEC settings > enable Bluetooth).</disclaimer>
+    <license>MIT</license>
+    <source>https://github.com/DevCatSKZ/N-Connect</source>
+    <website>https://github.com/DevCatSKZ/N-Connect</website>
+    <news>0.3.0: Wii-Fernbedienung und Wii U Pro Controller koppeln, Gyro für Emulatoren (DSU/Cemuhook), feste Spielerplätze[CR]0.2.1:Name zeigt das System (LibreELEC/Linux), Downloads je Gerät[CR]0.2.0:Xbox-, PlayStation- und Switch-1-Controller automatisch koppeln, Hintergrundsuche abschaltbar, Akku-Warnung, Controller-Tasten für Kodi-Aktionen, 12 Sprachen, Update-Repository[CR]0.1.0: Erste Version für LibreELEC/Kodi</news>
+    <assets>
+      <icon>resources/icon.png</icon>
+    </assets>
+  </extension>
+</addon>

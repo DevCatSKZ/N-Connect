@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Bedienungshilfe für den Touch-Modus: darf nur Gesten ausführen, liest keine Fensterinhalte. -->
+<accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:description="@string/touch_service_description"
+    android:canPerformGestures="true"
+    android:canRetrieveWindowContent="false"
+    android:accessibilityEventTypes="typeWindowStateChanged"
+    android:accessibilityFeedbackType="feedbackGeneric"
+    android:notificationTimeout="100" />

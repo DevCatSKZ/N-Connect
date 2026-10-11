@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <!-- Material 3, folgt dem hellen/dunklen Systemdesign. Die Titelleiste baut jede Seite selbst (BaseActivity). -->
+  <style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
+    <item name="colorPrimary">@color/nc_primary</item>
+    <item name="colorOnPrimary">#FFFFFF</item>
+    <item name="colorSecondary">@color/nc_accent</item>
+    <item name="android:statusBarColor">@android:color/transparent</item>
+    <item name="android:navigationBarColor">@android:color/transparent</item>
+  </style>
+</resources>
