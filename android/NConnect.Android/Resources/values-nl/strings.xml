@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Erzeugt von android/i18n/generate.py -->
+<resources>
+    <string name="touch_service_description">Laat N-Connect de knoppen van je controller uitvoeren als schermaanrakingen (aanraakmodus). Er wordt geen inhoud gelezen of opgeslagen.</string>
+    <string name="touch_service_label">N-Connect aanraakbediening</string>
+    <string name="setup_title">N-Connect instellen</string>
+</resources>

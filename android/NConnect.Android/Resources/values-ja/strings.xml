@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Erzeugt von android/i18n/generate.py -->
+<resources>
+    <string name="touch_service_description">N-Connect がコントローラーのボタンを画面タッチとして実行できるようにします（タッチモード）。内容の読み取りや保存は一切行いません。</string>
+    <string name="touch_service_label">N-Connect タッチ操作</string>
+    <string name="setup_title">N-Connect のセットアップ</string>
+</resources>

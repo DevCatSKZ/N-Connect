@@ -251,7 +251,7 @@ public sealed class ControllerService : Service
         device.Lost += OnLost;
         KnownControllers.Remember(device.Address, device.Kind, device.SerialNumber);
         if (!pairing)
-            player.AttachOutput(OutputRouter.CreatePad(player.Index, $"N-Connect Spieler {player.Index + 1}"));
+            player.AttachOutput(OutputRouter.CreatePad(player.Index, L.F("N-Connect Spieler {0}", player.Index + 1)));
         _ = device.SetPlayerAsync(player.Index);
         _ = device.PlayConnectFeedbackAsync();
         Log.Info(pairing ? $"Joy-Con zusammengefasst (Spieler {player.Index + 1})"
@@ -335,7 +335,7 @@ public sealed class ControllerService : Service
         await Task.Run(() =>
         {
             foreach (var p in players)
-                p.AttachOutput(OutputRouter.CreatePad(p.Index, $"N-Connect Spieler {p.Index + 1}"));
+                p.AttachOutput(OutputRouter.CreatePad(p.Index, L.F("N-Connect Spieler {0}", p.Index + 1)));
         });
         RaiseChanged();
     }
@@ -387,9 +387,9 @@ public sealed class ControllerService : Service
     {
         if (!OperatingSystem.IsAndroidVersionAtLeast(26))
             return;
-        var channel = new NotificationChannel(Channel, "Controller-Verbindung", NotificationImportance.Low)
+        var channel = new NotificationChannel(Channel, L.T("Controller-Verbindung"), NotificationImportance.Low)
         {
-            Description = "Zeigt, welche Controller verbunden sind, solange N-Connect im Hintergrund läuft.",
+            Description = L.T("Zeigt, welche Controller verbunden sind, solange N-Connect im Hintergrund läuft."),
         };
         channel.SetShowBadge(false);
         GetSystemService(NotificationService)!.JavaCast<NotificationManager>()!.CreateNotificationChannel(channel);
@@ -401,8 +401,8 @@ public sealed class ControllerService : Service
         string title = players.Count switch
         {
             0 => BluetoothOn ? "Warte auf Controller" : "Bluetooth ist aus",
-            1 => $"{players[0].Name} verbunden",
-            _ => $"{players.Count} Controller verbunden",
+            1 => L.F("{0} verbunden", players[0].Name),
+            _ => L.F("{0} Controller verbunden", players.Count),
         };
         string text = players.Count == 0
             ? (BluetoothOn ? "SYNC-Taste drücken oder eine Taste an einem gekoppelten Controller." : "Schalte Bluetooth ein, damit N-Connect Controller findet.")
@@ -412,8 +412,8 @@ public sealed class ControllerService : Service
             PendingIntentFlags.Immutable | PendingIntentFlags.UpdateCurrent);
         var builder = new NotificationCompat.Builder(this, Channel)
             .SetSmallIcon(Resource.Drawable.ic_stat_controller)!
-            .SetContentTitle(title)!
-            .SetContentText(text)!
+            .SetContentTitle(L.T(title))!
+            .SetContentText(L.T(text))!
             .SetOngoing(true)!
             .SetOnlyAlertOnce(true)!
             .SetContentIntent(open)!
@@ -421,8 +421,8 @@ public sealed class ControllerService : Service
             .SetColor(UI.Look.C(UI.Look.P(this).Accent).ToArgb())!
             .SetPriority(NotificationCompat.PriorityLow)!;
         if (AppPrefs.TouchEnabled || AppPrefs.Mode == OutputPath.Touch)
-            builder.AddAction(0, "Touch-Layout bearbeiten", ServiceIntent(ActionEditTouch, 1));
-        builder.AddAction(0, "Beenden", ServiceIntent(ActionStop, 2));
+            builder.AddAction(0, L.T("Touch-Layout bearbeiten"), ServiceIntent(ActionEditTouch, 1));
+        builder.AddAction(0, L.T("Beenden"), ServiceIntent(ActionStop, 2));
         return builder.Build()!;
     }
 

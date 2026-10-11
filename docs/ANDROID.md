@@ -1,6 +1,7 @@
 # N-Connect für Android
 
-Stand: 11.10.2026 · Version 0.1.0 (in Entwicklung, noch nicht veröffentlicht) · Projekt `android/NConnect.Android`
+Stand: 11.10.2026 · Version **0.9.0 (Beta)**, veröffentlicht als signierte APK am GitHub-Release v1.0.20 · Projekt
+`android/NConnect.Android`
 
 N-Connect für Android verbindet **Switch-2-Controller** (Pro Controller 2, Joy-Con 2, GameCube-Controller) per
 Bluetooth LE mit Android-Geräten und gibt sie als **virtuellen Xbox-Controller** an Spiele, Emulatoren und
@@ -19,13 +20,15 @@ Sie sprechen kein HID, sondern ein eigenes BLE-GATT-Protokoll, das Android von s
 | Virtueller Xbox-Controller über UHID (Shizuku) | ✅ von Android als Gamepad erkannt (Test im Assistenten), Tasten/Achsen geprüft |
 | Einrichtungs-Assistent, Berechtigungen mit Direktsprüngen | ✅ auf dem Pixel durchgeklickt |
 | Farbschemata wie Windows (gemeinsame Quelle) | ✅ |
-| Switch-2-Controller verbinden | ⚠️ **verbindet, bricht nach wenigen Sekunden ab** (Status 147 = Verbindungs-Timeout) – Ursache offen, siehe „Offene Punkte“ |
-| Wiederverbinden ohne SYNC | ⚠️ noch nicht erreicht (hängt mit dem Abbruch zusammen) |
+| Switch-2-Controller verbinden und spielen | ✅ auf dem Pixel 10a geprüft (vom Nutzer bestätigt), keine Hänger beim Minimieren |
+| Gekoppelte Controller merken (Liste mit Name, Seriennummer, „Vergessen“) | ✅ `Core/KnownControllers.cs` |
+| Wiederverbinden ohne SYNC | ⚙️ eingebaut (braucht die eigene BT-Adresse: Shizuku/Root oder Eingabe) |
 | Root-Weg | ⚙️ gebaut, mangels gerootetem Gerät ungetestet |
-| Touch-Steuerung + Overlay-Editor | ⚙️ gebaut, auf dem Gerät noch nicht geprüft |
+| Touch-Steuerung + Overlay-Editor | ⚙️ gebaut, auf dem Gerät noch nicht vollständig geprüft |
 | Zweites Testgerät Samsung Galaxy A52s (One UI) | ⚙️ verbunden, noch nicht getestet |
-| Übersetzungen | nur Deutsch |
-| Signiertes Release / Verteilung | offen |
+| Kodi: DevCatSKZ Repository einrichten/herunterladen | ✅ Hilfe › Kodi |
+| Übersetzungen | ✅ 12 Sprachen wie Windows (de, en, es, fr, it, pt, nl, pl, ru, ja, zh, ko), im Emulator geprüft |
+| Signiertes Release / Verteilung | ✅ 0.9.0 Beta als APK am GitHub-Release v1.0.20 |
 
 ## Aufbau
 
@@ -36,6 +39,10 @@ android/NConnect.Android/
   AppPrefs.cs               App-Einstellungen (SharedPreferences) + Settings (geteilte JSON-Klasse)
   Log.cs                    Logcat + Speicher + Datei files/nconnect.log
   Texts.cs                  gemeinsame Nutzertexte (Android-Begriffe)
+  L.cs, L.Texts.cs          Übersetzung (L.T/L.F); L.Texts.cs erzeugt android/i18n/generate.py
+  Core/KnownControllers.cs  gekoppelte Controller (files/known_controllers.json)
+  Core/HangWatchdog.cs      meldet Hänger des UI-Threads ≥ 2 s mit Stack ins Protokoll
+  Kodi/KodiRepository.cs    DevCatSKZ Repository herunterladen oder per Shell direkt in Kodi legen
   Ble/Switch2Scanner.cs     BLE-Suche, Nintendo-Herstellerdaten 0x0553 (Kopf 01 00 03 7E)
   Ble/Switch2Device.cs      GATT-Verbindung – Portierung von Switch2BleLink (Windows)
   Core/Player.cs            Spielerplatz: Paar/einzeln → Belegung → Gyro-Stick → Ausgabe
@@ -128,6 +135,33 @@ Eigene BT-Adresse: Normale Apps dürfen sie nicht lesen; mit Shizuku/Root per `s
   `Settings.Theme`); Neon-Schemata mit Verlauf auf Hauptknöpfen. App-Symbol aus dem Website-Logo (512 px).
 - Systemseiten-Sprünge zentral in `UI/SystemPages.cs` (immer mit Rückfall).
 
+## Übersetzung (12 Sprachen)
+
+Wie unter Windows ist die Oberfläche **auf Deutsch geschrieben**; sichtbare Texte laufen durch `L.T("deutscher Text")`
+bzw. bei Werten durch Vorlagen `L.F("Spieler {0} · {1}", …)`. Die Sprache folgt der Systemsprache (oder der
+App-Sprache aus den Android-Einstellungen), unbekannte Sprachen fallen auf Englisch zurück.
+
+- Die Bausteine in `UI/Ui.cs` (Title, Body, Caption, Section, Rich, Button, Toast …) übersetzen selbst – Texte dort
+  einfach deutsch übergeben. Außerhalb davon (Dialoge, Benachrichtigung, Menü, Touch-Editor) `L.T` direkt nutzen.
+- **Neue oder geänderte Texte:** in `android/i18n/*.json` eintragen (`{"deutsch": {"en": …, "es": …, …}}`) und
+  `python android/i18n/generate.py` ausführen. Das Skript prüft, dass alle 11 Sprachen da sind und die Platzhalter
+  `{0}` stimmen, und schreibt `L.Texts.cs` sowie `Resources/values-xx/strings.xml` (Name der Bedienungshilfe,
+  Titel des Assistenten). `00-windows.json` enthält die aus der Windows-App übernommenen Texte.
+- Testen ohne Systemsprache zu ändern: `adb shell cmd locale set-app-locales com.devcatskz.nconnect --locales fr-FR`,
+  App neu starten.
+- Der Name des virtuellen Controllers ist übersetzt („N-Connect Player 1“, „N-Connect Joueur 1“ …); für ru/ja/zh/ko
+  bewusst englisch, damit Emulatoren keine Probleme mit nicht-lateinischen Gerätenamen haben.
+
+## Release
+
+- Version in `NConnect.Android.csproj`: `ApplicationDisplayVersion` (0.9.0) und `ApplicationVersion` (9) – bei jeder
+  veröffentlichten APK erhöhen.
+- Signatur: `%USERPROFILE%\.nconnect\nconnect-release.jks` + `signing.props` (wird von der csproj importiert, falls
+  vorhanden). **Nie ins Repository oder in die CI** – deshalb baut die CI keine APK.
+- `dotnet publish -c Release` → `bin/Release/net10.0-android/publish/com.devcatskz.nconnect-Signed.apk`, als
+  `N-Connect-Android-<Version>.apk` an das GitHub-Release hängen (`gh release upload v1.0.x …`). README/Webseite
+  verlinken die APK mit fester Versionsnummer – Links bei einer neuen APK anpassen.
+
 ## Bauen, installieren, testen
 
 ```powershell
@@ -151,12 +185,8 @@ dotnet build -t:Install -c Debug "-p:AdbTarget=-s adb-R5CRA1GQW0Z-ECDAJk._adb-tl
 
 ## Offene Punkte
 
-1. **Verbindungsabbruch** nach wenigen Sekunden (Eingaben stoppen, dann Status 147). Mit dem Datei-Protokoll prüfen,
-   bei welchem Einrichtungsschritt. Hauptverdacht: Android verbindet mit einer **wechselnden Zufallsadresse (RPA,
-   LE-Privacy)**, Windows mit der festen PC-Adresse. Wird der Controller per 0x15 auf die öffentliche Adresse gekoppelt,
-   passt die Verbindungsadresse nicht – der Controller könnte die Verbindung verwerfen. Weitere Kandidaten:
-   Verbindungsparameter (`High`), parallele Suche während der Einrichtung.
-2. Wiederverbinden ohne SYNC (folgt aus 1).
-3. Touch-Steuerung und Editor auf dem Gerät testen; Samsung-Gerät testen; Root-Weg testen.
-4. Übersetzungen (die Windows-App hat 12 Sprachen), signierte Release-APK, Verteilung (GitHub-Release, ggf. F-Droid).
+1. Rückmeldungen zur Beta sammeln (verschiedene Hersteller, v. a. Samsung/One UI).
+2. Wiederverbinden ohne SYNC über längere Zeit und nach Handy-Neustart prüfen.
+3. Touch-Steuerung und Editor auf dem Gerät vollständig testen; Root-Weg testen.
+4. Verteilung über F-Droid oder Play Store prüfen; Hinweis auf neue Versionen in der App.
 5. Profile pro Spiel, Makros, weitere Controller-Arten (GameCube-Trigger prüfen).

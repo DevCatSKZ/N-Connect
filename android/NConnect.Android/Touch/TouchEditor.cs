@@ -64,7 +64,7 @@ public sealed class TouchEditor(TouchService service, Action onClosed)
 
         var hint = new TextView(_ctx)
         {
-            Text = "Ziehe die Punkte auf die Bildschirmtasten des Spiels.\nGedrückt halten entfernt einen Punkt.",
+            Text = L.T("Ziehe die Punkte auf die Bildschirmtasten des Spiels.\nGedrückt halten entfernt einen Punkt."),
             Gravity = GravityFlags.Center,
             TextSize = 13,
         };
@@ -88,7 +88,7 @@ public sealed class TouchEditor(TouchService service, Action onClosed)
 
     private MaterialButton Button(string text)
     {
-        var b = new MaterialButton(_ctx) { Text = text };
+        var b = new MaterialButton(_ctx) { Text = L.T(text) };
         var lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent);
         lp.SetMargins(Dp(4), 0, Dp(4), 0);
         b.LayoutParameters = lp;
@@ -101,7 +101,7 @@ public sealed class TouchEditor(TouchService service, Action onClosed)
         var used = _layout.Bindings.Select(b => b.Control).ToHashSet();
         var free = Choices.Where(c => !used.Contains(c.Control)).ToList();
         for (int i = 0; i < free.Count; i++)
-            menu.Menu!.Add(0, i, i, free[i].Text);
+            menu.Menu!.Add(0, i, i, L.T(free[i].Text));
         menu.MenuItemClick += (_, e) =>
         {
             var (w, h) = service.ScreenSize();
@@ -161,7 +161,7 @@ public sealed class TouchEditor(TouchService service, Action onClosed)
             _layout.Bindings.Remove(b);
             _root?.RemoveView(bubble);
             _bubbles.Remove(b);
-            Toast($"{TouchLayout.Label(b.Control)} entfernt");
+            Toast(L.F("{0} entfernt", TouchLayout.Label(b.Control)));
         };
         _bubbles[b] = bubble;
         _root!.AddView(bubble, 0, lp); // unter der Werkzeugleiste
@@ -175,7 +175,7 @@ public sealed class TouchEditor(TouchService service, Action onClosed)
         return d;
     }
 
-    private void Toast(string text) => global::Android.Widget.Toast.MakeText(service, text, ToastLength.Short)!.Show();
+    private void Toast(string text) => global::Android.Widget.Toast.MakeText(service, L.T(text), ToastLength.Short)!.Show();
 
     private int Dp(int dp) => (int)(dp * _density + 0.5f);
 

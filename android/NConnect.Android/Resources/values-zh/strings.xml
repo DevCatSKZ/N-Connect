@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Erzeugt von android/i18n/generate.py -->
+<resources>
+    <string name="touch_service_description">允许 N-Connect 将控制器的按键作为屏幕触摸执行（触控模式）。不会读取或存储任何内容。</string>
+    <string name="touch_service_label">N-Connect 触控操作</string>
+    <string name="setup_title">设置 N-Connect</string>
+</resources>

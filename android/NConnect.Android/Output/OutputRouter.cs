@@ -144,9 +144,9 @@ public static class OutputRouter
     public static string Describe()
     {
         bool touch = AppPrefs.Mode == OutputPath.Touch || AppPrefs.TouchEnabled;
-        string pad = Shell is null ? "" : $"Virtueller Xbox-Controller ({Shell.Name})";
-        string tap = touch ? (TouchService.Instance is null ? "Touch (Bedienungshilfe aus)" : "Touch-Steuerung") : "";
+        string pad = Shell is null ? "" : L.F("Virtueller Xbox-Controller ({0})", Shell.Name);
+        string tap = touch ? L.T(TouchService.Instance is null ? "Touch (Bedienungshilfe aus)" : "Touch-Steuerung") : "";
         string both = string.Join(" + ", new[] { pad, tap }.Where(s => s.Length > 0));
-        return both.Length > 0 ? both : "Keine Ausgabe eingerichtet";
+        return both.Length > 0 ? both : L.T("Keine Ausgabe eingerichtet");
     }
 }

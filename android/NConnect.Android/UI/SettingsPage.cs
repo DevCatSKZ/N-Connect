@@ -14,7 +14,7 @@ namespace NConnect.Android.UI;
 /// <summary>Einstellungen in Gruppen: Ausgabe, Controller, Bewegungssteuerung, Verbindung, Allgemein.</summary>
 public sealed class SettingsPage(MainActivity host) : IPage
 {
-    public string Title => "Einstellungen";
+    public string Title => L.T("Einstellungen");
 
     private static Settings S => AppPrefs.Settings;
 
@@ -67,17 +67,17 @@ public sealed class SettingsPage(MainActivity host) : IPage
         col.AddView(Ui.SliderRow(host, "Vibrationsstärke", v => $"{v * 100:0} %", S.RumbleStrength, 0.1f, 1f, 0.05f,
             v => { S.RumbleStrength = v; AppPrefs.SaveSettings(); }));
         col.AddView(Ui.SliderRow(host, "Stick-Totzone",
-            v => v < 0.005f ? "Aus – jede kleinste Bewegung zählt" : $"{v * 100:0} % – kleine Bewegungen um die Mitte werden ignoriert",
+            v => v < 0.005f ? L.T("Aus – jede kleinste Bewegung zählt") : L.F("{0} % – kleine Bewegungen um die Mitte werden ignoriert", (v * 100).ToString("0")),
             S.StickDeadzone, 0f, 0.3f, 0.01f, v => { S.StickDeadzone = v; AppPrefs.SaveSettings(); }));
         col.AddView(Ui.SliderRow(host, "Trigger-Totzone (ZL/ZR)",
-            v => $"{v * 100:0} % – erst ab hier zählt der Trigger als gedrückt",
+            v => L.F("{0} % – erst ab hier zählt der Trigger als gedrückt", (v * 100).ToString("0")),
             S.TriggerDeadzone, 0f, 0.4f, 0.01f, v => { S.TriggerDeadzone = v; AppPrefs.SaveSettings(); }));
 
         // ---- Bewegungssteuerung ----
         col.AddView(Ui.Section(host, "BEWEGUNGSSTEUERUNG"));
         col.AddView(Ui.ClickRow(host, "Gyro-Zielen", GyroText(S.GyroStick), ChooseGyro));
         col.AddView(Ui.SliderRow(host, "Gyro-Empfindlichkeit",
-            v => $"Volle Stickauslenkung bei {v:0} °/s – kleiner = empfindlicher",
+            v => L.F("Volle Stickauslenkung bei {0} °/s – kleiner = empfindlicher", v.ToString("0")),
             S.GyroStickFullSpeed, 40f, 400f, 10f, v => { S.GyroStickFullSpeed = v; AppPrefs.SaveSettings(); }));
         col.AddView(Ui.SwitchRow(host, "Gyro hoch/runter umkehren", "Für Spiele mit umgekehrter Kamera.",
             S.GyroStickInvertY, on => { S.GyroStickInvertY = on; AppPrefs.SaveSettings(); }));
@@ -89,13 +89,13 @@ public sealed class SettingsPage(MainActivity host) : IPage
             on => AppPrefs.AutoStart = on));
         string address = AppPrefs.HostAddress ?? "";
         col.AddView(Ui.ClickRow(host, "Bluetooth-Adresse dieses Geräts",
-            address.Length > 0 ? $"{address} – Controller verbinden sich ohne SYNC neu"
+            address.Length > 0 ? L.F("{0} – Controller verbinden sich ohne SYNC neu", address)
                 : "Unbekannt – ohne sie muss bei jeder Verbindung SYNC gedrückt werden", EditAddress));
 
         // ---- Darstellung (wie N-Connect für Windows) ----
         col.AddView(Ui.Section(host, "DARSTELLUNG"));
         col.AddView(Ui.ClickRow(host, "Farbschema",
-            $"{Look.Scheme.Name} – dieselben Schemata wie in N-Connect für Windows", ChooseScheme));
+            L.F("{0} – dieselben Schemata wie in N-Connect für Windows", Look.Scheme.Name), ChooseScheme));
         col.AddView(Ui.ClickRow(host, "Hell oder dunkel",
             Look.Modes.First(m => m.Id == Look.Mode).Label, ChooseMode));
 
@@ -105,7 +105,7 @@ public sealed class SettingsPage(MainActivity host) : IPage
             () => host.StartActivity(new Intent(host, typeof(SetupWizardActivity)))));
         col.AddView(Ui.ClickRow(host, "Belegung zurücksetzen", "Alle Controller-Einstellungen auf die Standardwerte.", ResetSettings));
         string version = host.PackageManager!.GetPackageInfo(host.PackageName!, 0)!.VersionName ?? "?";
-        col.AddView(Ui.ClickRow(host, "Über N-Connect", $"Version {version} · Open Source (MIT) · von devcatskz",
+        col.AddView(Ui.ClickRow(host, "Über N-Connect", L.F("Version {0} · Open Source (MIT) · von devcatskz", version),
             () => host.StartActivity(new Intent(Intent.ActionView, global::Android.Net.Uri.Parse("https://github.com/DevCatSKZ/N-Connect")))));
         return scroll;
     }
@@ -124,10 +124,10 @@ public sealed class SettingsPage(MainActivity host) : IPage
     private void ChooseOutputPath()
     {
         OutputPath[] options = [OutputPath.Shizuku, OutputPath.Root, OutputPath.Touch, OutputPath.Auto];
-        string[] labels = ["Shizuku (empfohlen, ohne Root)", "Root", "Touch-Steuerung", "Automatisch"];
+        string[] labels = [L.T("Shizuku (empfohlen, ohne Root)"), "Root", L.T("Touch-Steuerung"), L.T("Automatisch")];
         int current = Array.IndexOf(options, AppPrefs.Mode);
         new MaterialAlertDialogBuilder(host)
-            .SetTitle("Wie sollen Spiele deine Controller sehen?")!
+            .SetTitle(L.T("Wie sollen Spiele deine Controller sehen?"))!
             .SetSingleChoiceItems(labels, current, (s, e) =>
             {
                 ((global::Android.App.Dialog)s!).Dismiss();
@@ -136,15 +136,15 @@ public sealed class SettingsPage(MainActivity host) : IPage
                 // Neuer Weg braucht evtl. Einrichtung (Shizuku-Freigabe, Root-Dialog, Bedienungshilfe).
                 host.StartActivity(new Intent(host, typeof(SetupWizardActivity)).PutExtra(SetupWizardActivity.ExtraStartAtOutput, true));
             })!
-            .SetNegativeButton("Abbrechen", (_, _) => { })!
+            .SetNegativeButton(L.T("Abbrechen"), (_, _) => { })!
             .Show();
     }
 
     private void ChooseLayout()
     {
-        string[] labels = ["Nach Position (Xbox-Stil, untere Taste = A)", "Nach Beschriftung (wie an der Switch)"];
+        string[] labels = [L.T("Nach Position (Xbox-Stil, untere Taste = A)"), L.T("Nach Beschriftung (wie an der Switch)")];
         new MaterialAlertDialogBuilder(host)
-            .SetTitle("Tastenbelegung A/B/X/Y")!
+            .SetTitle(L.T("Tastenbelegung A/B/X/Y"))!
             .SetSingleChoiceItems(labels, S.Layout == FaceButtonLayout.Xbox ? 0 : 1, (s, e) =>
             {
                 S.Layout = e.Which == 0 ? FaceButtonLayout.Xbox : FaceButtonLayout.Switch2;
@@ -158,9 +158,9 @@ public sealed class SettingsPage(MainActivity host) : IPage
     private void ChooseGyro()
     {
         GyroStickMode[] modes = [GyroStickMode.Off, GyroStickMode.WhileAiming, GyroStickMode.Always];
-        string[] labels = ["Aus", "Beim Zielen (ZL gedrückt)", "Immer"];
+        string[] labels = [L.T("Aus"), L.T("Beim Zielen (ZL gedrückt)"), L.T("Immer")];
         new MaterialAlertDialogBuilder(host)
-            .SetTitle("Gyro-Zielen")!
+            .SetTitle(L.T("Gyro-Zielen"))!
             .SetSingleChoiceItems(labels, Array.IndexOf(modes, S.GyroStick), (s, e) =>
             {
                 S.GyroStick = modes[e.Which];
@@ -175,7 +175,7 @@ public sealed class SettingsPage(MainActivity host) : IPage
     {
         var schemes = ColorSchemes.All;
         new MaterialAlertDialogBuilder(host)
-            .SetTitle("Farbschema")!
+            .SetTitle(L.T("Farbschema"))!
             .SetSingleChoiceItems(schemes.Select(s => s.Name).ToArray(), Array.IndexOf(schemes, Look.Scheme), (s, e) =>
             {
                 S.ColorScheme = schemes[e.Which].Id;
@@ -183,14 +183,14 @@ public sealed class SettingsPage(MainActivity host) : IPage
                 ((global::Android.App.Dialog)s!).Dismiss();
                 host.Recreate(); // ganze Oberfläche im neuen Schema
             })!
-            .SetNegativeButton("Abbrechen", (_, _) => { })!
+            .SetNegativeButton(L.T("Abbrechen"), (_, _) => { })!
             .Show();
     }
 
     private void ChooseMode()
     {
         new MaterialAlertDialogBuilder(host)
-            .SetTitle("Hell oder dunkel")!
+            .SetTitle(L.T("Hell oder dunkel"))!
             .SetSingleChoiceItems(Look.Modes.Select(m => m.Label).ToArray(), Array.FindIndex(Look.Modes, m => m.Id == Look.Mode), (s, e) =>
             {
                 S.Theme = Look.Modes[e.Which].Id;
@@ -199,13 +199,13 @@ public sealed class SettingsPage(MainActivity host) : IPage
                 Look.ApplyNightMode();
                 host.Recreate();
             })!
-            .SetNegativeButton("Abbrechen", (_, _) => { })!
+            .SetNegativeButton(L.T("Abbrechen"), (_, _) => { })!
             .Show();
     }
 
     private void EditAddress()
     {
-        var layout = new TextInputLayout(host) { Hint = "z. B. 04:C8:B0:F5:B2:27" };
+        var layout = new TextInputLayout(host) { Hint = L.T("z. B. 04:C8:B0:F5:B2:27") };
         var input = new TextInputEditText(layout.Context!) { Text = AppPrefs.HostAddress ?? "" };
         input.InputType = InputTypes.ClassText | InputTypes.TextFlagCapCharacters;
         layout.AddView(input);
@@ -216,9 +216,9 @@ public sealed class SettingsPage(MainActivity host) : IPage
                                      "Einstellungen → Über das Telefon → Bluetooth-Adresse."));
         box.AddView(layout);
         new MaterialAlertDialogBuilder(host)
-            .SetTitle("Bluetooth-Adresse dieses Geräts")!
+            .SetTitle(L.T("Bluetooth-Adresse dieses Geräts"))!
             .SetView(box)!
-            .SetPositiveButton("Speichern", (_, _) =>
+            .SetPositiveButton(L.T("Speichern"), (_, _) =>
             {
                 string text = input.Text?.Trim() ?? "";
                 if (text.Length == 0)
@@ -229,35 +229,35 @@ public sealed class SettingsPage(MainActivity host) : IPage
                     Ui.Toast(host, "Ungültige Adresse – Format: 12 Hex-Zeichen, z. B. 04:C8:B0:F5:B2:27");
                 host.Rebuild();
             })!
-            .SetNegativeButton("Abbrechen", (_, _) => { })!
+            .SetNegativeButton(L.T("Abbrechen"), (_, _) => { })!
             .Show();
     }
 
     private void ResetSettings()
     {
         new MaterialAlertDialogBuilder(host)
-            .SetTitle("Belegung zurücksetzen?")!
-            .SetMessage("Alle Controller-Einstellungen (Tasten, Sticks, Gyro, Vibration) werden auf die Standardwerte gesetzt. " +
-                        "Kopplungen und Ausgabeweg bleiben erhalten.")!
-            .SetPositiveButton("Zurücksetzen", (_, _) =>
+            .SetTitle(L.T("Belegung zurücksetzen?"))!
+            .SetMessage(L.T("Alle Controller-Einstellungen (Tasten, Sticks, Gyro, Vibration) werden auf die Standardwerte gesetzt. " +
+                        "Kopplungen und Ausgabeweg bleiben erhalten."))!
+            .SetPositiveButton(L.T("Zurücksetzen"), (_, _) =>
             {
                 S.CopyFrom(new Settings());
                 AppPrefs.SaveSettings();
                 host.Rebuild();
                 Ui.Toast(host, "Standardwerte wiederhergestellt");
             })!
-            .SetNegativeButton("Abbrechen", (_, _) => { })!
+            .SetNegativeButton(L.T("Abbrechen"), (_, _) => { })!
             .Show();
     }
 
     private void AskEnableTouchService()
     {
         new MaterialAlertDialogBuilder(host)
-            .SetTitle("Touch-Steuerung einschalten")!
-            .SetMessage("Tippe in der folgenden Liste auf „N-Connect Touch-Steuerung“ (ggf. unter „Installierte Apps“) " +
-                        "und schalte sie ein. N-Connect führt damit nur Berührungen aus und liest keine Inhalte.")!
-            .SetPositiveButton("Zu den Bedienungshilfen", (_, _) => TouchService.OpenSystemSettings(host))!
-            .SetNegativeButton("Später", (_, _) => { })!
+            .SetTitle(L.T("Touch-Steuerung einschalten"))!
+            .SetMessage(L.T("Tippe in der folgenden Liste auf „N-Connect Touch-Steuerung“ (ggf. unter „Installierte Apps“) " +
+                        "und schalte sie ein. N-Connect führt damit nur Berührungen aus und liest keine Inhalte."))!
+            .SetPositiveButton(L.T("Zu den Bedienungshilfen"), (_, _) => TouchService.OpenSystemSettings(host))!
+            .SetNegativeButton(L.T("Später"), (_, _) => { })!
             .Show();
     }
 }
