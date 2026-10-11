@@ -7,6 +7,21 @@ internal static partial class Tr
 {
     private static readonly Dictionary<string, string> TextsPl = new(StringComparer.Ordinal)
     {
+        // ---------- Kodi (DevCatSKZ Repository) ----------
+        ["Kodi"] = "Kodi",
+        ["In Kodi einrichten"] = "Skonfiguruj w Kodi",
+        ["Kodi herunterladen …"] = "Pobierz Kodi …",
+        ["Das DevCatSKZ Repository liegt jetzt in Kodi. Starte Kodi (neu) und schalte es ein: Add-ons → Meine Add-ons → Add-on-Repository → DevCatSKZ Repository → Aktivieren."] = "DevCatSKZ Repository jest już w Kodi. Uruchom (ponownie) Kodi i włącz je: Dodatki → Moje dodatki → Repozytorium dodatków → DevCatSKZ Repository → Włącz.",
+        ["Download fehlgeschlagen – bitte die Internetverbindung prüfen."] = "Pobieranie nie powiodło się – sprawdź połączenie z internetem.",
+        ["Einrichten fehlgeschlagen – der Kodi-Ordner ist nicht beschreibbar. Nutze „Repository herunterladen“."] = "Konfiguracja nie powiodła się – folder Kodi nie jest zapisywalny. Użyj „Pobierz repozytorium”.",
+        ["Herunterladen …"] = "Pobierz …",
+        ["DevCatSKZ Repository in Kodi einrichten"] = "Skonfiguruj DevCatSKZ Repository w Kodi",
+        ["Legt das Repository direkt in Kodi ab. Darüber kommen unsere Kodi-Plugins mit automatischen Updates. Danach in Kodi: Add-ons → Meine Add-ons → Add-on-Repository → DevCatSKZ Repository → Aktivieren."] = "Umieszcza repozytorium bezpośrednio w Kodi. Dzięki niemu otrzymasz nasze wtyczki do Kodi z automatycznymi aktualizacjami. Następnie w Kodi: Dodatki → Moje dodatki → Repozytorium dodatków → DevCatSKZ Repository → Włącz.",
+        ["Kodi ist auf diesem PC nicht installiert. Mit Kodi für Windows funktionieren deine Controller auch ohne Plugin – sie erscheinen dort als Xbox-Controller."] = "Kodi nie jest zainstalowane na tym komputerze. W Kodi dla Windows twoje kontrolery działają nawet bez wtyczki – widoczne są tam jako kontrolery Xbox.",
+        ["Repository herunterladen"] = "Pobierz repozytorium",
+        ["Speichert repository.devcatskz.zip im Download-Ordner – zum Installieren auf einem anderen Gerät über „Aus ZIP-Datei installieren“."] = "Zapisuje repository.devcatskz.zip w folderze Pobrane – do instalacji na innym urządzeniu przez „Zainstaluj z pliku zip”.",
+        ["Kodi-Plugin für LibreELEC"] = "Wtyczka Kodi dla LibreELEC",
+        ["Für Raspberry Pi und andere Geräte mit LibreELEC: N-Connect als Kodi-Plugin (alle Geräte). Am einfachsten über das DevCatSKZ Repository."] = "Dla Raspberry Pi i innych urządzeń z LibreELEC: N-Connect jako wtyczka Kodi (wszystkie urządzenia). Najprościej przez DevCatSKZ Repository.",
         // ---------- Fenster, Reiter, Abschnitte ----------
         ["Controller"] = "Kontrolery",
         // ---------- Desktop-Modus, Testseite, Vorlagen, Diagnose ----------

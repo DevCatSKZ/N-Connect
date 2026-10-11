@@ -7,6 +7,21 @@ internal static partial class Tr
 {
     private static readonly Dictionary<string, string> TextsRu = new(StringComparer.Ordinal)
     {
+        // ---------- Kodi (DevCatSKZ Repository) ----------
+        ["Kodi"] = "Kodi",
+        ["In Kodi einrichten"] = "Установить в Kodi",
+        ["Kodi herunterladen …"] = "Скачать Kodi …",
+        ["Das DevCatSKZ Repository liegt jetzt in Kodi. Starte Kodi (neu) und schalte es ein: Add-ons → Meine Add-ons → Add-on-Repository → DevCatSKZ Repository → Aktivieren."] = "DevCatSKZ Repository теперь в Kodi. Запустите (перезапустите) Kodi и включите его: Дополнения → Мои дополнения → Репозиторий дополнений → DevCatSKZ Repository → Включить.",
+        ["Download fehlgeschlagen – bitte die Internetverbindung prüfen."] = "Не удалось скачать – проверьте подключение к интернету.",
+        ["Einrichten fehlgeschlagen – der Kodi-Ordner ist nicht beschreibbar. Nutze „Repository herunterladen“."] = "Не удалось установить – папка Kodi недоступна для записи. Используйте «Скачать репозиторий».",
+        ["Herunterladen …"] = "Скачать …",
+        ["DevCatSKZ Repository in Kodi einrichten"] = "Установить DevCatSKZ Repository в Kodi",
+        ["Legt das Repository direkt in Kodi ab. Darüber kommen unsere Kodi-Plugins mit automatischen Updates. Danach in Kodi: Add-ons → Meine Add-ons → Add-on-Repository → DevCatSKZ Repository → Aktivieren."] = "Помещает репозиторий прямо в Kodi. Через него приходят наши плагины для Kodi с автоматическими обновлениями. Затем в Kodi: Дополнения → Мои дополнения → Репозиторий дополнений → DevCatSKZ Repository → Включить.",
+        ["Kodi ist auf diesem PC nicht installiert. Mit Kodi für Windows funktionieren deine Controller auch ohne Plugin – sie erscheinen dort als Xbox-Controller."] = "Kodi не установлен на этом ПК. С Kodi для Windows ваши контроллеры работают и без плагина – там они видны как контроллеры Xbox.",
+        ["Repository herunterladen"] = "Скачать репозиторий",
+        ["Speichert repository.devcatskz.zip im Download-Ordner – zum Installieren auf einem anderen Gerät über „Aus ZIP-Datei installieren“."] = "Сохраняет repository.devcatskz.zip в папку «Загрузки» – для установки на другом устройстве через «Установить из zip-файла».",
+        ["Kodi-Plugin für LibreELEC"] = "Плагин Kodi для LibreELEC",
+        ["Für Raspberry Pi und andere Geräte mit LibreELEC: N-Connect als Kodi-Plugin (alle Geräte). Am einfachsten über das DevCatSKZ Repository."] = "Для Raspberry Pi и других устройств с LibreELEC: N-Connect как плагин Kodi (все устройства). Проще всего через DevCatSKZ Repository.",
         // ---------- Fenster, Reiter, Abschnitte ----------
         ["Controller"] = "Контроллеры",
         // ---------- Desktop-Modus, Testseite, Vorlagen, Diagnose ----------
