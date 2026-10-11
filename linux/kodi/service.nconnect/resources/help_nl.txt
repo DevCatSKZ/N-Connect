@@ -1,0 +1,48 @@
+[B]Voordat je begint[/B]
+Bluetooth moet aan staan: LibreELEC-instellingen > Bluetooth > inschakelen. Een Raspberry Pi 4/5 heeft ingebouwde Bluetooth; anders werkt een USB-Bluetooth-stick (Bluetooth 5.0 of nieuwer aanbevolen).
+
+[B]Eerste verbinding (eenmalig per controller)[/B]
+1. Druk op het kleine ronde SYNC-knopje van de controller tot de lampjes lopen.
+   • Pro Controller 2: bovenop, naast de USB-C-poort
+   • Joy-Con 2: aan de vlakke binnenkant tussen SL en SR
+   • GameCube-controller (Switch 2): bovenop de controller
+2. Na een paar seconden verschijnt „Speler 1: … verbonden”. De controller werkt nu als Xbox-controller in Kodi en games.
+3. N-Connect koppelt de controller tegelijk aan dit apparaat.
+
+[B]Opnieuw verbinden[/B]
+Druk gewoon op een willekeurige knop (bijv. HOME) – zonder SYNC. Dat werkt zolang de controller niet via SYNC aan een ander apparaat is gekoppeld.
+
+[B]Andere controllers (Xbox, PlayStation, Switch 1, 8BitDo …)[/B]
+N-Connect koppelt ze automatisch – zet ze gewoon in koppelmodus:
+   • Xbox: druk op de koppelknop bovenop tot het Xbox-logo snel knippert
+   • PlayStation 4: houd SHARE + PS ingedrukt tot de lichtbalk knippert
+   • PlayStation 5: houd MAKEN + PS ingedrukt tot het lampje knippert
+   • Switch 1 Pro Controller / Joy-Con: druk op de SYNC-knop
+   • 8BitDo: koppelknop of volgens de handleiding (Switch- of X-input-modus)
+   • Wii-afstandsbediening / Wii U Pro Controller: druk op de rode SYNC-knop (in het batterijvak of achterop)
+Daarna volstaat één druk op een knop om ze opnieuw te verbinden. In het N-Connect-menu kun je ze loskoppelen of vergeten.
+
+[B]Joy-Con[/B]
+Een linker en een rechter Joy-Con worden automatisch samengevoegd tot één controller. Voor twee spelers met elk één horizontale Joy-Con: Instellingen > Controller > „Combineren” uitzetten.
+
+[B]Terug naar de Switch 2 of een pc[/B]
+Een controller onthoudt maar één apparaat. Op de Switch 2: sluit de controller aan of druk op SYNC in „Controllers” > „Grip/volgorde wijzigen”. Om hem daarna hier weer te gebruiken: druk op SYNC.
+
+[B]Kodi bedienen[/B]
+Richtingsknoppen/stick: bewegen · onderste knop: selecteren · rechterknop: terug (met de indeling „Volgens positie”).
+Indeling wijzigen: Kodi-instellingen > Systeem > Invoer > Aangesloten controllers configureren.
+
+[B]Controllerknoppen in Kodi[/B]
+Opname maakt een schermafbeelding, de C-knop opent het N-Connect-menu. Wijzigen via Instellingen > Kodi > Controllerknoppen in Kodi (ook voor de GL/GR-achterknoppen van de Pro Controller 2). Bij een bijna lege batterij toont N-Connect een waarschuwing.
+
+[B]Spelersplaatsen en gyroscoop voor emulators[/B]
+Elke controller krijgt bij opnieuw verbinden weer dezelfde spelersplaats. Emulators zoals Dolphin, Cemu of Citra ontvangen de bewegingsgegevens via DSU/Cemuhook (poort 26760) – kies in de emulator „DSU” of „Cemuhook” met 127.0.0.1 als bewegingsbron. Instellingen > Emulators.
+
+[B]Games (RetroArch, Moonlight …)[/B]
+De controller verschijnt overal als „Xbox 360 Controller” en hoeft niet te worden ingesteld. Trillen werkt als de game het ondersteunt.
+
+[B]Problemen?[/B]
+• Er gebeurt niets bij SYNC: voer de diagnose uit (toont of Bluetooth en de virtuele controller klaar zijn).
+• Melding „gekoppeld aan een ander apparaat”: druk op SYNC om hem hier opnieuw te koppelen.
+• Vertraging: ga dichter bij de Bluetooth-adapter zitten; een USB-verlengkabel voor de stick helpt tegen USB 3-storing.
+• Toon het logboek en voeg het toe bij het melden van een probleem: github.com/DevCatSKZ/N-Connect/issues

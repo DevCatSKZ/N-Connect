@@ -1,0 +1,874 @@
+using System.Collections.Concurrent;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using Linux.Bluetooth;
+using NConnect.Linux.Ble;
+using NConnect.Linux.Core;
+using NConnect.Linux.Output;
+using Switch2Pro.Protocol;
+
+namespace NConnect.Linux;
+
+/// <summary>
+/// Der Dienst: wartet auf einen Bluetooth-Adapter, sucht Switch-2-Controller, verbindet sie und legt je Spieler einen
+/// virtuellen Xbox-360-Controller an. Schreibt den Zustand nach status.json, meldet Ereignisse als JSON-Zeilen auf
+/// stdout und nimmt Befehle zeilenweise über stdin an (für das Kodi-Add-on):
+///   reload | disconnect &lt;Spieler 1…8&gt; | disconnect-all | status
+/// </summary>
+public sealed class Daemon : IAsyncDisposable
+{
+    private const int QuietMs = 15000;
+    private static readonly JsonSerializerOptions StatusJson = new() { WriteIndented = true };
+
+    private readonly string _dataDir;
+    private readonly string? _adapterName;
+    private readonly string _settingsPath;
+    private readonly string _statusPath;
+    private readonly List<Player> _players = [];
+    private readonly ConcurrentDictionary<string, byte> _connecting = new();
+    private readonly ConcurrentDictionary<string, FoundController> _elsewhere = new();
+    private readonly ConcurrentDictionary<string, long> _quietUntil = new();
+    private readonly SemaphoreSlim _statusSignal = new(0, int.MaxValue);
+    private readonly object _stdoutLock = new();
+    private volatile Settings _settings;
+    private FileSystemWatcher? _settingsWatcher;
+    private CancellationTokenSource? _session;
+    private Switch2Scanner? _scanner;
+    private string _adapterState = "starting";
+    private string? _adapterAddress;
+    private int _adapterIndex;
+    private ulong _hostAddress;
+
+    public Daemon(string dataDir, string? adapterName)
+    {
+        _dataDir = dataDir;
+        _adapterName = adapterName;
+        _settingsPath = Path.Combine(dataDir, "settings.json");
+        _statusPath = Path.Combine(dataDir, "status.json");
+        _settings = Settings.Load(_settingsPath);
+        if (_settings.LoadError is { } error)
+            Log.Warn($"settings.json nicht lesbar ({error}) – Standardwerte");
+    }
+
+    private Settings CurrentSettings() => _settings;
+
+    public async Task RunAsync(CancellationToken stop)
+    {
+        WatchSettings();
+        ApplyDsu();
+        _ = Task.Run(() => StatusWriterAsync(stop), stop);
+        _ = Task.Run(() => ReadCommandsAsync(stop), stop);
+        _ = Task.Run(() => InactivityAsync(stop), stop);
+        RequestStatus();
+
+        // Eine „Sitzung“ je verfügbarem Adapter. Verschwindet er (Bluetooth aus, bluetoothd neu gestartet, Dongle
+        // gezogen), werden alle Controller getrennt und es wird erneut gewartet.
+        while (!stop.IsCancellationRequested)
+        {
+            try
+            {
+                await RunSessionAsync(stop).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) when (stop.IsCancellationRequested)
+            {
+                break;
+            }
+            catch (Exception e)
+            {
+                Log.Warn($"Bluetooth nicht verfügbar: {Log.Reason(e)}");
+            }
+            await EndSessionAsync().ConfigureAwait(false);
+            await Task.Delay(5000, stop).ConfigureAwait(false);
+        }
+    }
+
+    private async Task RunSessionAsync(CancellationToken stop)
+    {
+        var adapter = await FindAdapterAsync().ConfigureAwait(false);
+        if (adapter is null)
+        {
+            SetAdapterState("missing");
+            return;
+        }
+        if (!await adapter.GetPoweredAsync().ConfigureAwait(false))
+        {
+            SetAdapterState("off");
+            return;
+        }
+        _adapterAddress = await adapter.GetAddressAsync().ConfigureAwait(false);
+        _hostAddress = ParseAddress(_adapterAddress);
+        _adapterIndex = int.TryParse(AdapterId(adapter).Replace("hci", ""), out int index) ? index : 0;
+        Log.Info($"Bluetooth-Adapter {AdapterId(adapter)} ({_adapterAddress})");
+        SetAdapterState("on");
+
+        _session = CancellationTokenSource.CreateLinkedTokenSource(stop);
+        _gamepads = new GamepadManager(adapter) { Enabled = AutoPairGamepads() };
+        _gamepads.Changed += OnGamepadChanged;
+        if (_agent is null)
+        {
+            try
+            {
+                var agent = new PairingAgent();
+                await agent.RegisterAsync().ConfigureAwait(false);
+                _agent = agent;
+            }
+            catch (Exception e)
+            {
+                Log.Warn($"Kopplungs-Agent nicht angemeldet ({Log.Reason(e)}) – Gamepads mit Bestätigung koppeln evtl. nicht");
+            }
+        }
+        _gamepads.Agent = _agent;
+        _scanner = new Switch2Scanner(adapter) { IncludeClassic = _gamepads.Enabled };
+        _scanner.Found += OnFound;
+        _scanner.Seen += _gamepads.OnSeen;
+        _backgroundScan = LinuxSetting("BackgroundScan", true);
+        if (ShouldScan)
+            await _scanner.StartAsync().ConfigureAwait(false);
+        else
+            Log.Info("Hintergrundsuche ist aus – gesucht wird nur auf Anforderung");
+        await RefreshGamepadsAsync().ConfigureAwait(false);
+        RequestStatus();
+
+        // Adapter überwachen: aus- oder weggefallen → Sitzung beenden.
+        int ticks = 0;
+        while (!_session.IsCancellationRequested)
+        {
+            await Task.Delay(3000, _session.Token).ConfigureAwait(false);
+            if (!await adapter.GetPoweredAsync().ConfigureAwait(false))
+            {
+                Log.Info("Bluetooth wurde ausgeschaltet");
+                SetAdapterState("off");
+                return;
+            }
+            if (ShouldScan)
+            {
+                // Manche Programme (Kodis Bluetooth-Seite) beenden die Suche – dann neu starten.
+                if (!_scanner.Scanning || !await adapter.GetDiscoveringAsync().ConfigureAwait(false))
+                {
+                    _scanner.MarkStopped();
+                    await _scanner.StartAsync().ConfigureAwait(false);
+                    RequestStatus();
+                }
+                // Sicherheitsnetz: „Discovering“ kann true melden, obwohl der Chip nicht mehr sucht – jede Minute auffrischen.
+                if (++ticks % 20 == 0)
+                    KickScan();
+            }
+            else if (_scanner.Scanning)
+            {
+                await _scanner.StopAsync().ConfigureAwait(false); // Suche auf Anforderung abgelaufen
+                RequestStatus();
+            }
+            await RefreshGamepadsAsync().ConfigureAwait(false);
+            CheckBatteries();
+        }
+    }
+
+    // ---------- Spielerzuordnung (slots.json: Adresse → Spieler 0…7) ----------
+
+    private Dictionary<string, int>? _slots;
+
+    private string SlotsPath => Path.Combine(_dataDir, "slots.json");
+
+    private int? RememberedSlot(string address)
+    {
+        lock (_stdoutLock)
+        {
+            _slots ??= LoadSlots();
+            return _slots.TryGetValue(address, out int slot) ? slot : null;
+        }
+    }
+
+    private void RememberSlot(string address, int slot)
+    {
+        lock (_stdoutLock)
+        {
+            _slots ??= LoadSlots();
+            if (_slots.TryGetValue(address, out int old) && old == slot)
+                return;
+            _slots[address] = slot;
+            try
+            {
+                string temp = SlotsPath + ".tmp";
+                File.WriteAllText(temp, JsonSerializer.Serialize(_slots, StatusJson));
+                File.Move(temp, SlotsPath, overwrite: true);
+            }
+            catch (Exception e)
+            {
+                Log.Warn($"slots.json: {Log.Reason(e)}");
+            }
+        }
+    }
+
+    private Dictionary<string, int> LoadSlots()
+    {
+        try
+        {
+            if (File.Exists(SlotsPath) && JsonSerializer.Deserialize<Dictionary<string, int>>(File.ReadAllText(SlotsPath)) is { } d)
+                return new Dictionary<string, int>(d.Where(kv => kv.Value is >= 0 and < 8), StringComparer.OrdinalIgnoreCase);
+        }
+        catch (Exception)
+        {
+            // kaputte Datei: neu beginnen
+        }
+        return new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+    }
+
+    // ---------- DSU-Server (Gyro für Emulatoren) ----------
+
+    private void ApplyDsu()
+    {
+        bool want = _settings.DsuServer;
+        bool network = LinuxSetting("DsuNetwork", false);
+        var current = DsuServer.Instance;
+        if (current is not null && (!want || current.Network != network))
+            current.Dispose();
+        if (want && DsuServer.Instance is null)
+            DsuServer.Start(network);
+    }
+
+    // ---------- Akku-Warnung ----------
+
+    private static readonly int[] BatteryThresholds = [20, 10];
+    private readonly Dictionary<string, int> _batteryWarned = [];
+
+    /// <summary>
+    /// Meldet einmal bei 20 % und einmal bei 10 % (Ereignis „battery-low“) – für Switch-2-Controller und andere
+    /// Gamepads. Beim Laden oder wenn der Akku wieder über der Schwelle liegt, wird die Warnung zurückgesetzt.
+    /// </summary>
+    private void CheckBatteries()
+    {
+        if (!LinuxSetting("BatteryWarning", true))
+            return;
+        List<Player> players;
+        lock (_players)
+            players = [.. _players];
+        var seen = new HashSet<string>();
+        foreach (var p in players)
+            if (p.Devices.FirstOrDefault()?.Address is { } key)
+            {
+                seen.Add(key);
+                Check(key, p.Name, p.BatteryPercent, p.Charging, p.Index + 1);
+            }
+        foreach (var g in _gamepads?.Known ?? [])
+            if (g.Connected)
+            {
+                seen.Add(g.Address);
+                Check(g.Address, g.Name, g.Battery, charging: false, player: 0);
+            }
+        foreach (var gone in _batteryWarned.Keys.Where(k => !seen.Contains(k)).ToList())
+            _batteryWarned.Remove(gone);
+
+        void Check(string key, string name, int battery, bool charging, int player)
+        {
+            if (battery < 0)
+                return;
+            int warned = _batteryWarned.GetValueOrDefault(key, 101);
+            if (charging || battery > warned + 5)
+            {
+                _batteryWarned.Remove(key); // geladen: später wieder warnen
+                return;
+            }
+            int threshold = BatteryThresholds.Where(t => battery <= t).DefaultIfEmpty(101).Min();
+            if (threshold < warned)
+            {
+                _batteryWarned[key] = threshold;
+                Log.Info($"{name}: Akku schwach ({battery} %)");
+                Emit("battery-low", new JsonObject { ["name"] = name, ["battery"] = battery, ["player"] = player });
+            }
+        }
+    }
+
+    // ---------- Suche: ständig oder auf Anforderung ----------
+
+    private const int OnDemandScanMs = 120_000;
+    private volatile bool _backgroundScan = true;
+    private long _scanUntil;
+
+    private bool ShouldScan => _backgroundScan || Environment.TickCount64 < Interlocked.Read(ref _scanUntil);
+
+    /// <summary>Befehl „scan“: bei abgeschalteter Hintergrundsuche 2 Minuten lang suchen.</summary>
+    private async Task ScanNowAsync()
+    {
+        Interlocked.Exchange(ref _scanUntil, Environment.TickCount64 + OnDemandScanMs);
+        if (_scanner is { Scanning: false } scanner)
+            await scanner.StartAsync().ConfigureAwait(false);
+        Log.Info("Suche auf Anforderung (2 Minuten)");
+        RequestStatus();
+    }
+
+    // ---------- Andere Gamepads (Xbox, PlayStation, Switch 1 …) ----------
+
+    private GamepadManager? _gamepads;
+    private PairingAgent? _agent;
+
+    private bool AutoPairGamepads() => LinuxSetting("AutoPairGamepads", true);
+
+    /// <summary>Linux-eigene Einstellung in settings.json (nicht Teil der gemeinsamen Settings-Klasse).</summary>
+    private bool LinuxSetting(string key, bool fallback)
+    {
+        try
+        {
+            if (File.Exists(_settingsPath) && JsonNode.Parse(File.ReadAllText(_settingsPath),
+                    documentOptions: new JsonDocumentOptions { CommentHandling = JsonCommentHandling.Skip, AllowTrailingCommas = true })
+                is JsonObject o && o[key] is JsonValue v && v.TryGetValue(out bool b))
+                return b;
+        }
+        catch (Exception)
+        {
+            // Standard
+        }
+        return fallback;
+    }
+
+    private async Task RefreshGamepadsAsync()
+    {
+        if (_gamepads is null)
+            return;
+        var before = _gamepads.Known;
+        try
+        {
+            await _gamepads.RefreshAsync().ConfigureAwait(false);
+        }
+        catch (Exception e)
+        {
+            Log.Warn($"Gamepads: {Log.Reason(e)}");
+        }
+        if (!before.SequenceEqual(_gamepads.Known))
+            RequestStatus();
+    }
+
+    private void OnGamepadChanged(string what, string address, string name)
+    {
+        Emit("gamepad-" + what, new JsonObject { ["address"] = address, ["name"] = name });
+        if (what is "paired" or "pair-failed")
+            KickScan();
+        RequestStatus();
+    }
+
+    private async Task<Adapter?> FindAdapterAsync()
+    {
+        var adapters = await BlueZManager.GetAdaptersAsync().ConfigureAwait(false);
+        return _adapterName is null ? adapters.FirstOrDefault()
+            : adapters.FirstOrDefault(a => string.Equals(AdapterId(a), _adapterName, StringComparison.OrdinalIgnoreCase));
+    }
+
+    /// <summary>„hci0“ – Linux.Bluetooth liefert als Name den D-Bus-Pfad („/org/bluez/hci0“).</summary>
+    private static string AdapterId(Adapter adapter) => adapter.Name.Split('/').Last();
+
+    private async Task EndSessionAsync()
+    {
+        _session?.Cancel();
+        if (_scanner is not null)
+        {
+            _scanner.Found -= OnFound;
+            if (_gamepads is not null)
+                _scanner.Seen -= _gamepads.OnSeen;
+            try
+            {
+                await _scanner.DisposeAsync().ConfigureAwait(false);
+            }
+            catch (Exception)
+            {
+                // D-Bus weg
+            }
+            _scanner = null;
+        }
+        await DisconnectAllAsync(quiet: false).ConfigureAwait(false);
+        if (_gamepads is not null)
+            _gamepads.Changed -= OnGamepadChanged;
+        _gamepads = null;
+        if (_agent is not null)
+        {
+            await _agent.UnregisterAsync().ConfigureAwait(false);
+            _agent = null;
+        }
+        _elsewhere.Clear();
+        _session?.Dispose();
+        _session = null;
+    }
+
+    // ---------- Controller finden und verbinden ----------
+
+    private void OnFound(FoundController f)
+    {
+        bool forUs = f.SyncMode || (_hostAddress != 0 && f.Host == _hostAddress);
+        if (!forUs)
+        {
+            if (_elsewhere.TryAdd(f.Address, f))
+            {
+                Log.Info($"{f.Address}: {f.Kind.DisplayName()} ist mit einem anderen Gerät gekoppelt (SYNC drücken)");
+                Emit("elsewhere", new JsonObject { ["address"] = f.Address, ["kind"] = f.Kind.ToString(), ["name"] = f.Kind.DisplayName() });
+                RequestStatus();
+            }
+            return;
+        }
+        if (_elsewhere.TryRemove(f.Address, out _))
+            RequestStatus();
+        if (_quietUntil.TryGetValue(f.Address, out long until) && Environment.TickCount64 < until)
+            return;
+        if (_session is not { } session || IsConnected(f.Address) || !_connecting.TryAdd(f.Address, 0))
+            return;
+        ulong pairHost = f.SyncMode && _settings.AutoPair ? _hostAddress : 0;
+        _ = ConnectAsync(f, pairHost, session.Token);
+    }
+
+    private bool IsConnected(string address)
+    {
+        lock (_players)
+            return _players.Any(p => p.Devices.Any(d => d.Address == address));
+    }
+
+    private async Task ConnectAsync(FoundController f, ulong pairHost, CancellationToken ct)
+    {
+        Log.Info($"{f.Address}: {f.Kind.DisplayName()} gefunden{(f.SyncMode ? " (SYNC)" : "")}, verbinde …");
+        Emit("connecting", new JsonObject { ["address"] = f.Address, ["name"] = f.Kind.DisplayName() });
+        RequestStatus();
+        try
+        {
+            var device = await Switch2Device.ConnectAsync(_adapterAddress!, _adapterIndex, f.Address, f.AddressType, f.Kind,
+                pairHost, ct).ConfigureAwait(false);
+            if (device.IsLost)
+            {
+                Log.Warn($"{f.Address}: während der Einrichtung getrennt – nicht übernommen");
+                await device.DisposeAsync().ConfigureAwait(false);
+                return;
+            }
+            AddToPlayer(device);
+        }
+        catch (Exception e) when (!ct.IsCancellationRequested)
+        {
+            Log.Error($"{f.Address}: Verbindung fehlgeschlagen", e);
+            Emit("failed", new JsonObject { ["address"] = f.Address, ["name"] = f.Kind.DisplayName(), ["reason"] = e.Message });
+        }
+        catch (Exception)
+        {
+            // Dienst wird beendet
+        }
+        finally
+        {
+            _connecting.TryRemove(f.Address, out _);
+            KickScan();
+            RequestStatus();
+        }
+    }
+
+    private int _kickPending;
+
+    /// <summary>Suche nach einem Verbindungsaufbau/-abbau neu starten (siehe <see cref="Switch2Scanner.RestartAsync"/>).</summary>
+    private void KickScan()
+    {
+        if (Interlocked.Exchange(ref _kickPending, 1) == 1)
+            return;
+        _ = Task.Run(async () =>
+        {
+            await Task.Delay(500).ConfigureAwait(false); // mehrere Ereignisse kurz hintereinander bündeln
+            Interlocked.Exchange(ref _kickPending, 0);
+            try
+            {
+                if (_scanner is { } scanner)
+                    await scanner.RestartAsync().ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                Log.Warn($"Suche neu starten: {Log.Reason(e)}");
+            }
+        });
+    }
+
+    private void AddToPlayer(Switch2Device device)
+    {
+        var settings = _settings;
+        Player player;
+        bool pairing = false;
+        lock (_players)
+        {
+            var partner = settings.CombineJoyCons && !settings.IsSingleJoyCon(device.Address)
+                ? _players.FirstOrDefault(p => p.CanPairWith(device))
+                : null;
+            if (partner is not null)
+            {
+                player = partner;
+                pairing = true;
+            }
+            else
+            {
+                // Spielerzuordnung merken: derselbe Controller bekommt wieder seinen Platz, wenn er frei ist.
+                int index = RememberedSlot(device.Address) is { } slot && _players.All(p => p.Index != slot)
+                    ? slot
+                    : Enumerable.Range(0, 8).First(i => _players.All(p => p.Index != i));
+                player = new Player(index, CurrentSettings);
+                player.KodiButtonPressed += (p, b) =>
+                    Emit("button", new JsonObject { ["player"] = p.Index + 1, ["button"] = b.ToString() });
+                _players.Add(player);
+                _players.Sort((a, b) => a.Index.CompareTo(b.Index));
+            }
+            player.Add(device);
+        }
+        RememberSlot(device.Address, player.Index);
+        device.StateReceived += player.OnState;
+        device.Lost += OnLost;
+        if (!pairing)
+        {
+            try
+            {
+                player.AttachOutput(UInputPad.Create($"nconnect/player{player.Index + 1}"));
+            }
+            catch (Exception e)
+            {
+                Log.Error($"Spieler {player.Index + 1}: virtueller Controller nicht angelegt", e);
+                Emit("error", new JsonObject { ["reason"] = e.Message });
+            }
+        }
+        if (settings.GameLeds)
+            _ = device.SetPlayerAsync(player.Index);
+        if (settings.ConnectFeedback)
+            _ = device.PlayConnectFeedbackAsync();
+        Log.Info(pairing ? $"Joy-Con zusammengefasst (Spieler {player.Index + 1})"
+            : $"{device.Kind.DisplayName()} verbunden (Spieler {player.Index + 1})");
+        Emit(pairing ? "paired" : "connected", new JsonObject
+        {
+            ["player"] = player.Index + 1,
+            ["name"] = player.Name,
+            ["address"] = device.Address,
+            ["kind"] = device.Kind.ToString(),
+        });
+        RequestStatus();
+    }
+
+    private void OnLost(Switch2Device device) => _ = Task.Run(async () =>
+    {
+        Player? emptied = null;
+        int index;
+        lock (_players)
+        {
+            var player = _players.FirstOrDefault(p => p.Devices.Contains(device));
+            if (player is null)
+                return;
+            index = player.Index;
+            player.Remove(device);
+            if (player.Devices.Count == 0)
+            {
+                _players.Remove(player);
+                emptied = player;
+            }
+        }
+        await device.DisposeAsync().ConfigureAwait(false);
+        if (emptied is not null)
+            await emptied.DisposeAsync().ConfigureAwait(false);
+        Log.Info($"{device.Kind.DisplayName()} getrennt (Spieler {index + 1})");
+        Emit("disconnected", new JsonObject { ["player"] = index + 1, ["name"] = device.Kind.DisplayName(), ["address"] = device.Address });
+        KickScan();
+        RequestStatus();
+    });
+
+    private async Task DisconnectPlayerAsync(int index, string reason)
+    {
+        Player? player;
+        lock (_players)
+        {
+            player = _players.FirstOrDefault(p => p.Index == index);
+            if (player is null)
+                return;
+            _players.Remove(player);
+        }
+        Quiet(player);
+        string name = player.Name;
+        await player.DisposeAsync().ConfigureAwait(false);
+        Log.Info($"Spieler {index + 1} getrennt ({reason})");
+        Emit("disconnected", new JsonObject { ["player"] = index + 1, ["name"] = name, ["reason"] = reason });
+        KickScan();
+        RequestStatus();
+    }
+
+    private async Task DisconnectAllAsync(bool quiet)
+    {
+        List<Player> all;
+        lock (_players)
+        {
+            all = [.. _players];
+            _players.Clear();
+        }
+        foreach (var p in all)
+        {
+            if (quiet)
+                Quiet(p);
+            await p.DisposeAsync().ConfigureAwait(false);
+        }
+        if (all.Count > 0)
+            RequestStatus();
+    }
+
+    private void Quiet(Player player)
+    {
+        long until = Environment.TickCount64 + QuietMs;
+        foreach (var d in player.Devices.ToList())
+            _quietUntil[d.Address] = until;
+    }
+
+    /// <summary>Nach <see cref="Settings.InactivityMinutes"/> ohne Eingabe trennen (spart Akku, wie unter Windows).</summary>
+    private async Task InactivityAsync(CancellationToken stop)
+    {
+        try
+        {
+            while (!stop.IsCancellationRequested)
+            {
+                await Task.Delay(30000, stop).ConfigureAwait(false);
+                int minutes = _settings.InactivityMinutes;
+                if (minutes <= 0)
+                    continue;
+                List<Player> idle;
+                lock (_players)
+                    idle = _players.Where(p => Environment.TickCount64 - p.LastActivityTicks > minutes * 60000L).ToList();
+                foreach (var p in idle)
+                    await DisconnectPlayerAsync(p.Index, $"{minutes} min ohne Eingabe").ConfigureAwait(false);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+    }
+
+    // ---------- Einstellungen ----------
+
+    private void WatchSettings()
+    {
+        try
+        {
+            _settingsWatcher = new FileSystemWatcher(_dataDir, "settings.json")
+            {
+                NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.Size,
+            };
+            _settingsWatcher.Changed += (_, _) => ReloadSettingsSoon();
+            _settingsWatcher.Created += (_, _) => ReloadSettingsSoon();
+            _settingsWatcher.Renamed += (_, _) => ReloadSettingsSoon();
+            _settingsWatcher.EnableRaisingEvents = true;
+        }
+        catch (Exception e)
+        {
+            Log.Warn($"Einstellungen werden nicht überwacht: {Log.Reason(e)}");
+        }
+    }
+
+    private int _reloadPending;
+
+    private void ReloadSettingsSoon()
+    {
+        if (Interlocked.Exchange(ref _reloadPending, 1) == 1)
+            return;
+        _ = Task.Run(async () =>
+        {
+            await Task.Delay(300).ConfigureAwait(false); // Schreibvorgang abschließen lassen
+            Interlocked.Exchange(ref _reloadPending, 0);
+            ReloadSettings();
+        });
+    }
+
+    private void ReloadSettings()
+    {
+        var fresh = Settings.Load(_settingsPath);
+        if (fresh.LoadError is { } error)
+        {
+            Log.Warn($"settings.json nicht lesbar ({error}) – bisherige Einstellungen bleiben");
+            return;
+        }
+        _settings = fresh;
+        Log.Info("Einstellungen neu geladen");
+        ApplyDsu();
+        bool background = LinuxSetting("BackgroundScan", true);
+        if (background != _backgroundScan)
+        {
+            _backgroundScan = background;
+            Log.Info($"Hintergrundsuche: {(background ? "an" : "aus")}"); // die Überwachungsschleife startet/stoppt die Suche
+        }
+        if (_gamepads is { } gamepads && _scanner is { } scanner)
+        {
+            bool auto = AutoPairGamepads();
+            if (auto != gamepads.Enabled)
+            {
+                gamepads.Enabled = auto;
+                scanner.IncludeClassic = auto;
+                Log.Info($"Andere Controller automatisch koppeln: {(auto ? "an" : "aus")}");
+                KickScan();
+            }
+        }
+        RequestStatus();
+    }
+
+    // ---------- Befehle (stdin) ----------
+
+    private async Task ReadCommandsAsync(CancellationToken stop)
+    {
+        try
+        {
+            using var reader = new StreamReader(Console.OpenStandardInput());
+            while (!stop.IsCancellationRequested)
+            {
+                string? line = await reader.ReadLineAsync(stop).ConfigureAwait(false);
+                if (line is null)
+                    return; // kein stdin (systemd) – nur Statusdatei und Signale
+                await HandleCommandAsync(line.Trim()).ConfigureAwait(false);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception e)
+        {
+            Log.Warn($"Befehle: {Log.Reason(e)}");
+        }
+    }
+
+    private async Task HandleCommandAsync(string line)
+    {
+        string[] parts = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        switch (parts.FirstOrDefault())
+        {
+            case "reload":
+                ReloadSettings();
+                break;
+            case "disconnect" when parts.Length > 1 && int.TryParse(parts[1], out int player):
+                await DisconnectPlayerAsync(player - 1, "von Hand").ConfigureAwait(false);
+                break;
+            case "disconnect-all":
+                await DisconnectAllAsync(quiet: true).ConfigureAwait(false);
+                Emit("disconnected-all", new JsonObject());
+                break;
+            case "status":
+                RequestStatus();
+                break;
+            case "scan":
+                await ScanNowAsync().ConfigureAwait(false);
+                break;
+            case "gamepad-disconnect" when parts.Length > 1 && _gamepads is { } g1:
+                await g1.DisconnectAsync(parts[1]).ConfigureAwait(false);
+                await RefreshGamepadsAsync().ConfigureAwait(false);
+                break;
+            case "gamepad-forget" when parts.Length > 1 && _gamepads is { } g2:
+                await g2.ForgetAsync(parts[1]).ConfigureAwait(false);
+                Log.Info($"{parts[1]}: Kopplung gelöscht");
+                await RefreshGamepadsAsync().ConfigureAwait(false);
+                break;
+            case null:
+                break;
+            default:
+                Log.Warn($"Unbekannter Befehl: {line}");
+                break;
+        }
+    }
+
+    // ---------- Status und Ereignisse ----------
+
+    private void SetAdapterState(string state)
+    {
+        if (_adapterState == state)
+            return;
+        _adapterState = state;
+        Emit("bluetooth", new JsonObject { ["state"] = state });
+        RequestStatus();
+    }
+
+    private void Emit(string name, JsonObject data)
+    {
+        data["event"] = name;
+        string line = data.ToJsonString();
+        lock (_stdoutLock)
+        {
+            Console.Out.WriteLine(line);
+            Console.Out.Flush();
+        }
+    }
+
+    private void RequestStatus() => _statusSignal.Release();
+
+    /// <summary>Schreibt status.json bei Änderungen (gebündelt) und alle 5 s (Akku, Berichtsrate).</summary>
+    private async Task StatusWriterAsync(CancellationToken stop)
+    {
+        try
+        {
+            while (!stop.IsCancellationRequested)
+            {
+                await _statusSignal.WaitAsync(5000, stop).ConfigureAwait(false);
+                await Task.Delay(100, stop).ConfigureAwait(false);
+                while (_statusSignal.CurrentCount > 0)
+                    _statusSignal.Wait(0);
+                WriteStatus("running");
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+    }
+
+    private void WriteStatus(string state)
+    {
+        List<Player> players;
+        lock (_players)
+            players = [.. _players];
+        var status = new JsonObject
+        {
+            ["state"] = state,
+            ["version"] = typeof(Daemon).Assembly.GetName().Version?.ToString(3),
+            ["bluetooth"] = _adapterState,
+            ["adapter"] = _adapterAddress,
+            ["scanning"] = _scanner?.Scanning == true,
+            ["connecting"] = new JsonArray([.. _connecting.Keys.Select(a => (JsonNode)a)]),
+            ["players"] = new JsonArray([.. players.Select(p => (JsonNode)new JsonObject
+            {
+                ["player"] = p.Index + 1,
+                ["name"] = p.Name,
+                ["battery"] = p.BatteryPercent,
+                ["charging"] = p.Charging,
+                ["devices"] = new JsonArray([.. p.Devices.ToList().Select(d => (JsonNode)new JsonObject
+                {
+                    ["address"] = d.Address,
+                    ["kind"] = d.Kind.ToString(),
+                    ["name"] = d.Kind.DisplayName(),
+                    ["battery"] = d.LastState?.BatteryPercent ?? -1,
+                    ["serial"] = d.SerialNumber,
+                    ["firmware"] = d.Firmware,
+                    ["rate"] = Math.Round(d.ReportRate),
+                })]),
+            })]),
+            ["elsewhere"] = new JsonArray([.. _elsewhere.Values.Select(f => (JsonNode)new JsonObject
+            {
+                ["address"] = f.Address,
+                ["name"] = f.Kind.DisplayName(),
+            })]),
+            ["autoPairGamepads"] = _gamepads?.Enabled ?? false,
+            ["backgroundScan"] = _backgroundScan,
+            ["gamepads"] = new JsonArray([.. (_gamepads?.Known ?? []).Select(g => (JsonNode)new JsonObject
+            {
+                ["address"] = g.Address,
+                ["name"] = g.Name,
+                ["connected"] = g.Connected,
+                ["battery"] = g.Battery,
+            })]),
+        };
+        try
+        {
+            string temp = _statusPath + ".tmp";
+            File.WriteAllText(temp, status.ToJsonString(StatusJson));
+            File.Move(temp, _statusPath, overwrite: true);
+        }
+        catch (Exception e)
+        {
+            Log.Warn($"status.json: {Log.Reason(e)}");
+        }
+    }
+
+    private static ulong ParseAddress(string? text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+            return 0;
+        string hex = text.Replace(":", "").Trim();
+        return hex.Length == 12 && ulong.TryParse(hex, System.Globalization.NumberStyles.HexNumber, null, out ulong v) ? v : 0;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        _settingsWatcher?.Dispose();
+        await EndSessionAsync().ConfigureAwait(false);
+        DsuServer.Instance?.Dispose();
+        WriteStatus("stopped");
+    }
+}

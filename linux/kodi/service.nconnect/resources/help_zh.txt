@@ -1,0 +1,48 @@
+[B]开始之前[/B]
+必须开启蓝牙：LibreELEC 设置 > 蓝牙 > 启用。Raspberry Pi 4/5 内置蓝牙；否则可使用 USB 蓝牙适配器（建议蓝牙 5.0 或更新版本）。
+
+[B]首次连接（每个手柄一次）[/B]
+1. 按手柄上的小圆形 SYNC 键，直到指示灯依次闪烁。
+   • Pro 手柄 2：顶部，USB-C 接口旁边
+   • Joy-Con 2：内侧平面，SL 与 SR 之间
+   • GameCube 手柄（Switch 2）：手柄顶部
+2. 几秒后会显示“玩家 1：… 已连接”。手柄现在可在 Kodi 和游戏中作为 Xbox 手柄使用。
+3. N-Connect 会同时将手柄与本设备配对。
+
+[B]重新连接[/B]
+只需按任意键（例如 HOME）– 无需 SYNC。只要手柄没有通过 SYNC 与其他设备配对，就可以这样连接。
+
+[B]其他手柄（Xbox、PlayStation、Switch 1、8BitDo …）[/B]
+N-Connect 会自动配对 – 只需让手柄进入配对模式：
+   • Xbox：按顶部的配对键，直到 Xbox 标志快速闪烁
+   • PlayStation 4：按住 SHARE + PS，直到灯条闪烁
+   • PlayStation 5：按住“创建” + PS，直到指示灯闪烁
+   • Switch 1 Pro 手柄 / Joy-Con：按 SYNC 键
+   • 8BitDo：按配对键或参照说明书（Switch 或 X-input 模式）
+   • Wii 遥控器 / Wii U Pro 手柄：按红色 SYNC 键（在电池仓内或背面）
+之后按任意键即可重新连接。可在 N-Connect 菜单中断开或忘记这些手柄。
+
+[B]Joy-Con[/B]
+左右 Joy-Con 会自动合并为一个手柄。若两名玩家各用一个横握的 Joy-Con：设置 > 手柄 > 关闭“合并”。
+
+[B]回到 Switch 2 或电脑[/B]
+手柄只能记住一台设备。在 Switch 2 上：装上手柄，或在“手柄” > “更改握法/顺序”中按 SYNC。之后若要在这里再次使用：按 SYNC。
+
+[B]使用 Kodi[/B]
+十字键/摇杆：移动 · 下方按键：选择 · 右侧按键：返回（使用“按位置”布局时）。
+更改映射：Kodi 设置 > 系统 > 输入 > 配置已连接的手柄。
+
+[B]Kodi 中的手柄按键[/B]
+截图键截取屏幕，C 键打开 N-Connect 菜单。可在 设置 > Kodi > Kodi 中的手柄按键 中更改（也适用于 Pro 手柄 2 的背键 GL/GR）。电量不足时，N-Connect 会显示警告。
+
+[B]玩家位置和模拟器陀螺仪[/B]
+每个手柄重新连接时都会回到相同的玩家位置。Dolphin、Cemu、Citra 等模拟器通过 DSU/Cemuhook（端口 26760）接收动作数据 – 在模拟器中选择“DSU”或“Cemuhook”（127.0.0.1）作为体感来源。设置 > 模拟器。
+
+[B]游戏（RetroArch、Moonlight …）[/B]
+手柄在所有地方都显示为“Xbox 360 Controller”，无需设置。如果游戏支持，振动也可使用。
+
+[B]遇到问题？[/B]
+• 按 SYNC 没有反应：运行诊断（显示蓝牙和虚拟手柄是否就绪）。
+• 提示“已与其他设备配对”：按 SYNC 即可在此重新配对。
+• 输入延迟：靠近蓝牙适配器；为适配器使用 USB 延长线可减少 USB 3 干扰。
+• 报告问题时请显示并附上日志：github.com/DevCatSKZ/N-Connect/issues

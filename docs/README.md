@@ -14,6 +14,8 @@ geschätzt oder nicht mit echter Hardware geprüft ist, steht das ausdrücklich 
 | [PORTIERUNG.md](PORTIERUNG.md) | Was plattformunabhängig ist, was Windows-spezifisch ist und was es auf anderen Systemen stattdessen gibt |
 | [ESP32.md](ESP32.md) | ESP32-S3 als zweiter „Bluetooth-Stick“: Export der Kopplungsdaten, Prinzip, Firmware-Leitfaden (ESP-IDF/NimBLE) |
 | [NRF52840.md](NRF52840.md) | Nordic-nRF52840-Dongle als zweiter „Bluetooth-Stick“: Unterschiede zum ESP32, Zephyr/Bluefruit, „immer alle Controller“ |
+| [ANDROID.md](ANDROID.md) | N-Connect für Android: Stand, Aufbau, virtueller Xbox-Controller ohne Root (UHID + Shizuku), Touch, Bauen/Testen, offene Punkte |
+| [LINUX-KODI.md](LINUX-KODI.md) | N-Connect für Linux/LibreELEC: Dienst über BlueZ + uinput (Xbox 360), Kodi-Add-on `service.nconnect`, Bauen, VM-Test |
 
 Für Nutzer: [../README.md](../README.md). Übergabe-/Arbeitsstand: [../HANDOVER.md](../HANDOVER.md).
 

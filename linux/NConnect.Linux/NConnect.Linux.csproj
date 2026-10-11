@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- N-Connect für Linux (LibreELEC/Kodi, Raspberry Pi OS, Steam Deck …): Dienst ohne Oberfläche.
+       Switch-2-Controller über BlueZ (D-Bus), Ausgabe als virtueller Xbox-360-Controller über /dev/uinput.
+       Teilt sich die Protokoll-Bibliothek mit Windows und Android. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>nconnect</AssemblyName>
+    <RootNamespace>NConnect.Linux</RootNamespace>
+    <Version>0.1.0</Version>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!-- LibreELEC hat kein ICU: Kulturdaten werden nicht gebraucht. -->
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <RuntimeIdentifiers>linux-x64;linux-arm64;linux-arm</RuntimeIdentifiers>
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <DebugType>none</DebugType>
+    <UseSystemResourceKeys>true</UseSystemResourceKeys>
+    <!-- Kleiner fürs Add-on: nur das Laufzeit-Framework wird gekürzt. Die eigenen Bibliotheken bleiben vollständig,
+         weil Tmds.DBus Proxys per Reflection erzeugt und die Einstellungen per Reflection (JSON) gelesen werden. -->
+    <PublishTrimmed>true</PublishTrimmed>
+    <TrimMode>partial</TrimMode>
+    <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
+    <SuppressTrimAnalysisWarnings>true</SuppressTrimAnalysisWarnings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <TrimmerRootAssembly Include="Switch2Pro.Protocol" />
+    <TrimmerRootAssembly Include="Linux.Bluetooth" />
+    <TrimmerRootAssembly Include="Tmds.DBus" />
+    <TrimmerRootAssembly Include="nconnect" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Switch2Pro.Protocol\Switch2Pro.Protocol.csproj" />
+    <!-- 6.x nutzt das gepatchte Tmds.DBus (≥ 0.92, CVE-2026-39959); 5.67.1 hängt an der verwundbaren 0.20. -->
+    <PackageReference Include="Linux.Bluetooth" Version="6.0.0-pre3" />
+    <PackageReference Include="Tmds.DBus" Version="0.95.1" />
+  </ItemGroup>
+</Project>

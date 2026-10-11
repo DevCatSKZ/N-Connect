@@ -1,0 +1,48 @@
+[B]Zanim zaczniesz[/B]
+Bluetooth musi być włączony: ustawienia LibreELEC > Bluetooth > włącz. Raspberry Pi 4/5 ma wbudowany Bluetooth; w innym przypadku wystarczy klucz USB Bluetooth (zalecany Bluetooth 5.0 lub nowszy).
+
+[B]Pierwsze połączenie (raz na kontroler)[/B]
+1. Naciśnij mały okrągły przycisk SYNC na kontrolerze, aż diody zaczną migać po kolei.
+   • Pro Controller 2: na górze, obok portu USB-C
+   • Joy-Con 2: na płaskiej wewnętrznej stronie, między SL i SR
+   • Kontroler GameCube (Switch 2): na górze kontrolera
+2. Po kilku sekundach pojawi się „Gracz 1: połączono …”. Kontroler działa teraz w Kodi i grach jak kontroler Xbox.
+3. N-Connect jednocześnie paruje kontroler z tym urządzeniem.
+
+[B]Ponowne łączenie[/B]
+Wystarczy nacisnąć dowolny przycisk (np. HOME) – bez SYNC. Działa to, dopóki kontroler nie zostanie sparowany przez SYNC z innym urządzeniem.
+
+[B]Inne kontrolery (Xbox, PlayStation, Switch 1, 8BitDo …)[/B]
+N-Connect paruje je automatycznie – wystarczy włączyć tryb parowania:
+   • Xbox: naciśnij przycisk parowania na górze, aż logo zacznie szybko migać
+   • PlayStation 4: przytrzymaj SHARE + PS, aż pasek świetlny zacznie migać
+   • PlayStation 5: przytrzymaj UTWÓRZ + PS, aż światło zacznie migać
+   • Pro Controller / Joy-Con ze Switch 1: naciśnij przycisk SYNC
+   • 8BitDo: przycisk parowania lub zgodnie z instrukcją (tryb Switch lub X-input)
+   • Wiilot / Wii U Pro Controller: naciśnij czerwony przycisk SYNC (w komorze baterii lub z tyłu)
+Potem wystarczy nacisnąć przycisk, aby połączyć je ponownie. W menu N-Connect możesz je rozłączyć lub zapomnieć.
+
+[B]Joy-Con[/B]
+Lewy i prawy Joy-Con są automatycznie łączone w jeden kontroler. Dla dwóch graczy z jednym poziomym Joy-Con każdy: Ustawienia > Kontroler > wyłącz „Połącz”.
+
+[B]Powrót do Switch 2 lub PC[/B]
+Kontroler pamięta tylko jedno urządzenie. Na Switch 2: podłącz kontroler albo naciśnij SYNC w „Kontrolery” > „Zmień chwyt/kolejność”. Aby znów używać go tutaj: naciśnij SYNC.
+
+[B]Obsługa Kodi[/B]
+Krzyżak/gałka: poruszanie · dolny przycisk: wybór · prawy przycisk: wstecz (przy układzie „Według pozycji”).
+Zmiana przypisania: ustawienia Kodi > System > Wejście > Konfiguruj podłączone kontrolery.
+
+[B]Przyciski kontrolera w Kodi[/B]
+Przycisk zrzutu robi zrzut ekranu, przycisk C otwiera menu N-Connect. Można to zmienić w Ustawienia > Kodi > Przyciski kontrolera w Kodi (także dla tylnych przycisków GL/GR w Pro Controller 2). Gdy bateria się rozładowuje, N-Connect wyświetla ostrzeżenie.
+
+[B]Miejsca graczy i żyroskop dla emulatorów[/B]
+Każdy kontroler po ponownym połączeniu dostaje to samo miejsce gracza. Emulatory, takie jak Dolphin, Cemu czy Citra, otrzymują dane ruchu przez DSU/Cemuhook (port 26760) – wybierz w emulatorze źródło ruchu „DSU” lub „Cemuhook” z adresem 127.0.0.1. Ustawienia > Emulatory.
+
+[B]Gry (RetroArch, Moonlight …)[/B]
+Kontroler jest wszędzie widoczny jako „Xbox 360 Controller” i nie wymaga konfiguracji. Wibracje działają, jeśli gra je obsługuje.
+
+[B]Problemy?[/B]
+• Nic się nie dzieje po SYNC: uruchom diagnostykę (pokazuje, czy Bluetooth i wirtualny kontroler są gotowe).
+• Komunikat „sparowany z innym urządzeniem”: naciśnij SYNC, aby sparować go tutaj ponownie.
+• Opóźnienia: zbliż się do adaptera Bluetooth; przedłużacz USB dla klucza pomaga przy zakłóceniach USB 3.
+• Pokaż dziennik i dołącz go przy zgłaszaniu problemu: github.com/DevCatSKZ/N-Connect/issues

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <color name="nc_primary">#E4002B</color>
+  <color name="nc_accent">#00A3E0</color>
+  <color name="nc_ok">#2E7D32</color>
+  <color name="nc_warn">#E65100</color>
+</resources>

@@ -262,6 +262,39 @@ kleben; ggf. Aufschrift weglassen statt verschieben.
   (Xbox-Platz → Spieler-LED, DS4-Lichtleiste → HOME-LED/Karte): FUNKTIONEN 7.1/7.2. Mit echter Hardware und Spielen
   **nicht** geprüft (Flick-Stick braucht ein Spiel mit Maussteuerung; Werte der Testdrehung je Spiel).
 
+## Android-Version (Stand 11.10.2026, in Entwicklung)
+
+Projekt `android/NConnect.Android` (.NET 10 für Android, nutzt `Switch2Pro.Protocol` unverändert). Ausführlich:
+**[docs/ANDROID.md](docs/ANDROID.md)**.
+
+- **Geht:** virtueller **Xbox-One-S-Controller ohne Root** über den Shell-Befehl `hid` (UHID) mit **Shizuku**
+  (Android meldet Gamepad + Vibration + Akku; DS4/DualSense scheitern am Kernel-Treiber). Einrichtungs-Assistent mit
+  Direktsprüngen in die Systemseiten, Hauptfenster Controller/Einstellungen/Hilfe, Farbschemata wie Windows
+  (gemeinsam in `ColorSchemes.cs`, `Theme.cs` liest daraus), App-Symbol aus dem Website-Logo.
+- **Offen:** Switch-2-Controller verbinden, **brechen aber nach Sekunden ab** (Status 147); Verdacht LE-Privacy
+  (Android verbindet mit Zufallsadresse, Kopplung 0x15 nutzt die feste Adresse). Wiederverbinden ohne SYNC, Touch,
+  Root, Samsung-Test, Übersetzungen, Release.
+- **Testgeräte** per Wireless-adb: Pixel 10a (Android 17) und Galaxy A52s. Shizuku vom PC starten, Protokoll per
+  `run-as … cat files/nconnect.log` (Befehle in docs/ANDROID.md). Screenshots nur, wenn N-Connect im Vordergrund ist.
+- Neue gemeinsame Dateien: `XboxBtReport.cs`, `ColorSchemes.cs` (+ Tests, jetzt 275). Noch **nicht committet**.
+
+## Linux/LibreELEC-Version (Stand 11.10.2026, in Entwicklung)
+
+Programm `linux/NConnect.Linux` (`nconnect`, .NET 10, BlueZ über D-Bus → uinput „Microsoft X-Box 360 pad“) und das
+Kodi-Add-on `linux/kodi/service.nconnect`. Ausführlich: **[docs/LINUX-KODI.md](docs/LINUX-KODI.md)**.
+
+- **Bauen:** `powershell -File linux/build-kodi-addon.ps1` → `out/kodi/service.nconnect-0.1.0[-rid].zip`
+  (x64/arm64/arm, je ca. 6 MB).
+- **In der LibreELEC-12.2.1-VM geprüft** (QEMU aus `vm/`, ohne Installation, ohne Fenster):
+  - Selbsttest, virtueller Controller (evdev-Fähigkeiten + Vibration).
+  - Add-on-Logik mit Kodi-Nachbau: Einstellungen, Kodi-Belegung, Neustart nach Absturz, Menü/Diagnose de/en,
+    sauberes Beenden.
+- **Offen:**
+  - Echte Hardware (Pi + Controller).
+  - Kodi-Oberfläche: in der VM nur mit GL-Fenster möglich.
+  - Add-on-Repository/Release-Workflow.
+- Noch **nicht committet**.
+
 ## Offen
 
 **Braucht den Nutzer (eigene Konten, nach außen sichtbar – nicht eigenmächtig erledigen):**
