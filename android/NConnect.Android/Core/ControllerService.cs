@@ -201,7 +201,9 @@ public sealed class ControllerService : Service
         RaiseChanged();
         try
         {
-            var device = await Switch2Device.ConnectAsync(this, f.Device, f.Kind, pairHost, _cts.Token).ConfigureAwait(false);
+            var adapter = Switch2Scanner.Adapter(this) ?? throw new InvalidOperationException("Bluetooth ist nicht verfügbar.");
+            var remote = adapter.GetRemoteDevice(f.Address) ?? throw new InvalidOperationException("Controller nicht gefunden.");
+            var device = await Switch2Device.ConnectAsync(this, remote, f.Kind, pairHost, _cts.Token).ConfigureAwait(false);
             if (device.IsLost)
             {
                 Log.Warn($"{f.Address}: während der Einrichtung getrennt – nicht übernommen");

@@ -64,7 +64,9 @@ public sealed class MainActivity : AppCompatActivity
         _nav.Menu!.Add(0, TabControllers, 0, "Controller")!.SetIcon(Resource.Drawable.ic_nav_controller);
         _nav.Menu.Add(0, TabSettings, 1, "Einstellungen")!.SetIcon(Resource.Drawable.ic_nav_settings);
         _nav.Menu.Add(0, TabHelp, 2, "Hilfe")!.SetIcon(Resource.Drawable.ic_nav_help);
-        _nav.ItemSelected += (_, e) => { Show(e.Item.ItemId); e.Handled = true; };
+        // Antippen eines Reiters: nur die Seite wechseln – NICHT SelectedItemId setzen. Das löst die Auswahl erneut aus
+        // (die Leiste hat sich in diesem Moment noch nicht umgestellt) und führte zu einer Endlosschleife: App hing.
+        _nav.ItemSelected += (_, e) => { ShowPage(e.Item.ItemId); e.Handled = true; };
         root.AddView(_nav, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
         SetContentView(root);
         Chrome.Apply(this, root, _toolbar, _nav);
@@ -75,7 +77,6 @@ public sealed class MainActivity : AppCompatActivity
         _pages[TabControllers] = new ControllersPage(this);
         _pages[TabSettings] = new SettingsPage(this);
         _pages[TabHelp] = new HelpPage(this);
-        _nav.SelectedItemId = TabControllers;
         Show(TabControllers);
 
         OnBackPressedDispatcher.AddCallback(this, new BackToControllers(this));
@@ -92,16 +93,39 @@ public sealed class MainActivity : AppCompatActivity
             Permissions.Request(this);
     }
 
+    /// <summary>Seite wechseln und den Reiter in der Leiste mitziehen (Aufruf aus dem Code, z. B. „Zurück“).</summary>
     public void Show(int tab)
     {
-        if (!_pages.TryGetValue(tab, out var page))
+        if (!ShowPage(tab))
             return;
+        if (_nav.SelectedItemId != tab)
+        {
+            _selectingInCode = true;
+            try
+            {
+                _nav.SelectedItemId = tab; // löst ItemSelected aus – dort wird dank _selectingInCode nichts mehr getan
+            }
+            finally
+            {
+                _selectingInCode = false;
+            }
+        }
+    }
+
+    private bool _selectingInCode;
+
+    /// <summary>Nur den Seiteninhalt tauschen. false = unbekannter Reiter.</summary>
+    private bool ShowPage(int tab)
+    {
+        if (!_pages.TryGetValue(tab, out var page))
+            return false;
+        if (_selectingInCode && ReferenceEquals(page, _page))
+            return true;
         _page = page;
         _toolbar.Title = page.Title;
         _content.RemoveAllViews();
         _content.AddView(page.Build());
-        if (_nav.SelectedItemId != tab)
-            _nav.SelectedItemId = tab;
+        return true;
     }
 
     public void ShowControllers() => Show(TabControllers);

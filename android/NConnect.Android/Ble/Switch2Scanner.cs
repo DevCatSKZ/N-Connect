@@ -6,12 +6,11 @@ using Switch2Pro.Protocol;
 
 namespace NConnect.Android.Ble;
 
-/// <summary>Ein werbender Switch-2-Controller.</summary>
+/// <summary>Ein werbender Switch-2-Controller (nur Daten – kein Java-Objekt, siehe <see cref="Switch2Scanner"/>).</summary>
 /// <param name="Host">Gerät, für das er wirbt (0 = SYNC-Modus, für alle).</param>
-public sealed record FoundController(BluetoothDevice Device, ControllerKind Kind, ulong Host, int Rssi)
+public sealed record FoundController(string Address, ControllerKind Kind, ulong Host, int Rssi)
 {
     public bool SyncMode => Host == 0;
-    public string Address => Device.Address ?? "?";
 }
 
 /// <summary>
@@ -79,17 +78,43 @@ public sealed class Switch2Scanner
         Log.Info("Suche beendet");
     }
 
+    private readonly Dictionary<string, (long Ticks, ulong Host)> _lastSeen = [];
+
+    /// <summary>
+    /// Ein Suchergebnis auswerten. Wichtig: Jedes Ergebnis erzeugt Java-Objekte (ScanResult, BluetoothDevice, ScanRecord),
+    /// die hier sofort wieder freigegeben werden – sonst sammeln sich bei werbenden Controllern (zig Meldungen pro
+    /// Sekunde) Tausende Java-Verweise an, die Laufzeit erzwingt laufend Speicherbereinigungen und die Oberfläche
+    /// friert ein („App reagiert nicht“). Wiederholte Meldungen desselben Controllers höchstens einmal pro Sekunde.
+    /// </summary>
     private void OnResult(ScanResult result)
     {
-        var device = result.Device;
-        var data = result.ScanRecord?.GetManufacturerSpecificData(Gatt.NintendoCompanyId);
-        if (device is null || data is null)
-            return;
-        var kind = Advertisement.Kind(Gatt.NintendoCompanyId, data);
-        if (kind == ControllerKind.Unknown)
-            return;
-        ulong host = Advertisement.IsSyncMode(data) ? 0 : Advertisement.HostAddress(data);
-        Found?.Invoke(new FoundController(device, kind, host, result.Rssi));
+        try
+        {
+            string? address;
+            using (var device = result.Device)
+                address = device?.Address;
+            byte[]? data;
+            using (var record = result.ScanRecord)
+                data = record?.GetManufacturerSpecificData(Gatt.NintendoCompanyId);
+            if (address is null || data is null)
+                return;
+            var kind = Advertisement.Kind(Gatt.NintendoCompanyId, data);
+            if (kind == ControllerKind.Unknown)
+                return;
+            ulong host = Advertisement.IsSyncMode(data) ? 0 : Advertisement.HostAddress(data);
+            long now = System.Environment.TickCount64;
+            lock (_lastSeen)
+            {
+                if (_lastSeen.TryGetValue(address, out var last) && last.Host == host && now - last.Ticks < 1000)
+                    return;
+                _lastSeen[address] = (now, host);
+            }
+            Found?.Invoke(new FoundController(address, kind, host, result.Rssi));
+        }
+        finally
+        {
+            result.Dispose();
+        }
     }
 
     private sealed class Callback(Switch2Scanner owner) : ScanCallback
