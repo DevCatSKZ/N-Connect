@@ -46,6 +46,37 @@ Controller. Die Kernel-Treiber von LibreELEC (xpad, hid-microsoft, hid-playstati
 - **Menü:** Die Gamepads erscheinen mit Verbindungsstatus und Akku; Aktionen „Trennen“ und „Vergessen“.
 - **Einstellung:** „Andere Controller automatisch koppeln“ (`AutoPairGamepads`, Standard: an).
 
+## Wii, DSU-Gyro, Spielerplätze, Akku, Tasten (ab 0.2/0.3)
+
+- **Wii-Fernbedienung / Wii U Pro:** Die feste Wii-PIN (umgedrehte Adapter-Adresse) setzt BlueZ selbst; das Modul
+  „wiimote“ ist in LibreELEC enthalten (geprüft). Den Rest erledigt der Kernel-Treiber `hid-wiimote`. N-Connect lässt
+  „Nintendo RVL-CNT…“ deshalb einfach durch.
+- **DSU/Cemuhook-Server** ([Output/DsuServer.cs](../linux/NConnect.Linux/Output/DsuServer.cs)):
+  - Portierung der Windows-Fassung. Port 26760, standardmäßig nur lokal; `DsuNetwork` öffnet ihn fürs Heimnetz.
+  - Geprüft auf dem Pi mit einem Test-Client: 89 Pakete/s mit echten Gyro- und Beschleunigungswerten.
+- **Feste Spielerplätze:** In `slots.json` im Datenordner steht Adresse → Spieler. Ist der gemerkte Platz frei, wird
+  er wieder vergeben.
+- **Akku-Warnung:** Das Ereignis `battery-low` kommt einmal bei 20 % und einmal bei 10 %. Nach dem Laden wird zurückgesetzt.
+- **Controller-Tasten:** Bei Capture, C, GL und GR sendet der Dienst das Ereignis `button`. Das Add-on führt dann die
+  eingestellte Kodi-Aktion aus (`common.BUTTON_ACTIONS`).
+
+## DevCatSKZ Repository und Release
+
+- **Öffentliches Repo:** [github.com/DevCatSKZ/kodi-repo](https://github.com/DevCatSKZ/kodi-repo).
+  - Kodi-Add-on `repository.devcatskz` mit dem Anzeigenamen „DevCatSKZ Repository“.
+  - Der Index wird mit `tools/build_repo.py` erzeugt; die zwei neuesten Versionen je Add-on bleiben erhalten.
+  - In `downloads/` liegen die Einzel-ZIPs je Gerät.
+- **Lokal veröffentlichen:** `linux/build-kodi-addon.ps1 -Repo` legt die ZIPs in die Arbeitskopie `..\kodi-repo` (neben
+  sfm und N-Connect). Danach in kodi-repo committen und pushen.
+- **CI** ([.github/workflows/kodi.yml](../.github/workflows/kodi.yml)):
+  - Jeder Push auf `linux/**` erzeugt das Artefakt „Kodi-Plugin“.
+  - Ein Tag `v…` hängt die ZIPs ans Release und legt die Plugin-Version ins Repository. Dafür braucht es das Secret
+    **`KODI_REPO_TOKEN`**: ein fein abgestufter Token, nur für `DevCatSKZ/kodi-repo`, „Contents: Read and write“.
+    Deploy-Schlüssel sind in der Organisation abgeschaltet. Ohne das Secret wird dieser Schritt übersprungen.
+- **Version des Plugins:** Sie steht in `linux/kodi/service.nconnect/addon.xml` und ist unabhängig von der
+  Windows-Version. Kodi aktualisiert nur, wenn sie steigt, und nur bei Installationen aus dem Repository, nicht bei
+  Installationen per ZIP.
+
 ## Hintergrundsuche
 
 - **Einstellung „Ständig nach Controllern suchen“** (`BackgroundScan`, Standard: an).

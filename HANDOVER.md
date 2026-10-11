@@ -289,11 +289,16 @@ Kodi-Add-on `linux/kodi/service.nconnect`. Ausführlich: **[docs/LINUX-KODI.md](
   - Selbsttest, virtueller Controller (evdev-Fähigkeiten + Vibration).
   - Add-on-Logik mit Kodi-Nachbau: Einstellungen, Kodi-Belegung, Neustart nach Absturz, Menü/Diagnose de/en,
     sauberes Beenden.
+- **Auf echter Hardware geprüft:** Raspberry Pi 4 (LibreELEC 12.2.1) mit Pro Controller 2 und Joy-Con 2 – SYNC,
+  Wiederverbinden, Joy-Con-Paar, ~89 Hz, DSU-Gyro, gemerkte Spielerplätze, Kodi-Menü/Anleitung (de).
+- **Veröffentlicht:** Plugin 0.3.0 im **DevCatSKZ Repository** (github.com/DevCatSKZ/kodi-repo), dazu Webseite und
+  README mit Plattform-Abschnitt. CI: `.github/workflows/kodi.yml`. Für Tags wird das Secret `KODI_REPO_TOKEN`
+  gebraucht (siehe docs/LINUX-KODI.md).
 - **Offen:**
-  - Echte Hardware (Pi + Controller).
-  - Kodi-Oberfläche: in der VM nur mit GL-Fenster möglich.
-  - Add-on-Repository/Release-Workflow.
-- Noch **nicht committet**.
+  - Ungetestet: Xbox-, PlayStation-, Switch-1- und Wii-Kopplung, Vibration im Spiel, Pi 2/3 (arm).
+  - Begleit-Plugin für Kodi unter Windows und Android.
+- Committet (sfm `319ce94`, N-Connect `992ccdf6`). Die nRF52840-Firmware-Dateien bewusst **nicht**: Captures mit
+  Geräteadressen, Kopplungsdaten.
 
 ## Offen
 
