@@ -13,7 +13,7 @@ namespace NConnect.Android.UI;
 /// <summary>Anleitungen zum Aufklappen – in Alltagssprache, mit Knöpfen direkt zum richtigen Ort.</summary>
 public sealed class HelpPage(MainActivity host) : IPage
 {
-    public string Title => "Hilfe";
+    public string Title => L.T("Hilfe");
 
     public View Build()
     {
@@ -135,18 +135,18 @@ public sealed class HelpPage(MainActivity host) : IPage
         bool kodi = KodiRepository.IsKodiInstalled(host);
         bool direct = OutputRouter.Shell is { } s && s.HasPermission();
         string html =
-            "Über das <b>DevCatSKZ Repository</b> bekommst du unsere Kodi-Plugins – mit automatischen Updates.<br><br>" +
+            L.T("Über das <b>DevCatSKZ Repository</b> bekommst du unsere Kodi-Plugins – mit automatischen Updates.<br><br>") +
             (kodi
                 ? (direct
-                    ? "<b>Direkt einrichten</b> legt das Repository in Kodi ab (über " + OutputRouter.Shell!.Name + "). " +
-                      "Danach in Kodi: <b>Add-ons → Meine Add-ons → Add-on-Repository → DevCatSKZ Repository → Aktivieren</b>.<br><br>"
+                    ? L.F("<b>Direkt einrichten</b> legt das Repository in Kodi ab (über {0}). " +
+                          "Danach in Kodi: <b>Add-ons → Meine Add-ons → Add-on-Repository → DevCatSKZ Repository → Aktivieren</b>.<br><br>",
+                        OutputRouter.Shell!.Name)
                     : "") +
-                  "<b>Herunterladen</b> speichert die Datei im Download-Ordner. Danach in Kodi:<br>" +
-                  "<b>1.</b> Einstellungen → System → Add-ons → <b>Unbekannte Quellen</b> einschalten.<br>" +
-                  "<b>2.</b> Add-ons → Paket-Symbol → <b>Aus ZIP-Datei installieren</b> → Download → " +
-                  "<i>" + KodiRepository.ZipName + "</i>.<br>" +
-                  "<b>3.</b> „Aus Repository installieren“ → <b>DevCatSKZ Repository</b>."
-                : "Kodi ist auf diesem Gerät nicht installiert.");
+                  L.F("<b>Herunterladen</b> speichert die Datei im Download-Ordner. Danach in Kodi:<br>" +
+                      "<b>1.</b> Einstellungen → System → Add-ons → <b>Unbekannte Quellen</b> einschalten.<br>" +
+                      "<b>2.</b> Add-ons → Paket-Symbol → <b>Aus ZIP-Datei installieren</b> → Download → <i>{0}</i>.<br>" +
+                      "<b>3.</b> „Aus Repository installieren“ → <b>DevCatSKZ Repository</b>.", KodiRepository.ZipName)
+                : L.T("Kodi ist auf diesem Gerät nicht installiert."));
         View buttons = kodi
             ? Ui.Buttons(host,
                 direct ? Ui.Button(host, "Direkt einrichten", () => _ = InstallDirectAsync()) : Ui.Button(host, "Herunterladen", () => _ = DownloadAsync()),
@@ -168,11 +168,11 @@ public sealed class HelpPage(MainActivity host) : IPage
         {
             string where = await KodiRepository.SaveToDownloadsAsync(host);
             host.RunOnUiThread(() => new MaterialAlertDialogBuilder(host)
-                .SetTitle("Heruntergeladen")!
-                .SetMessage($"Gespeichert unter: {where}\n\nIn Kodi: Add-ons → Paket-Symbol → „Aus ZIP-Datei installieren“ → " +
-                            "Download → " + KodiRepository.ZipName + ".\n(Vorher in Kodi „Unbekannte Quellen“ erlauben.)")!
-                .SetPositiveButton("Kodi öffnen", (_, _) => KodiRepository.OpenKodi(host))!
-                .SetNegativeButton("Schließen", (_, _) => { })!
+                .SetTitle(L.T("Heruntergeladen"))!
+                .SetMessage(L.F("Gespeichert unter: {0}\n\nIn Kodi: Add-ons → Paket-Symbol → „Aus ZIP-Datei installieren“ → " +
+                            "Download → {1}.\n(Vorher in Kodi „Unbekannte Quellen“ erlauben.)", where, KodiRepository.ZipName))!
+                .SetPositiveButton(L.T("Kodi öffnen"), (_, _) => KodiRepository.OpenKodi(host))!
+                .SetNegativeButton(L.T("Schließen"), (_, _) => { })!
                 .Show());
         }
         catch (Exception e)
@@ -191,12 +191,12 @@ public sealed class HelpPage(MainActivity host) : IPage
         {
             await KodiRepository.InstallDirectAsync(host, shell);
             host.RunOnUiThread(() => new MaterialAlertDialogBuilder(host)
-                .SetTitle("Fast fertig")!
-                .SetMessage("Das Repository liegt jetzt in Kodi. Öffne Kodi und schalte es ein:\n" +
+                .SetTitle(L.T("Fast fertig"))!
+                .SetMessage(L.T("Das Repository liegt jetzt in Kodi. Öffne Kodi und schalte es ein:\n" +
                             "Add-ons → Meine Add-ons → Add-on-Repository → DevCatSKZ Repository → Aktivieren.\n\n" +
-                            "Läuft Kodi gerade, beende es vorher einmal ganz.")!
-                .SetPositiveButton("Kodi öffnen", (_, _) => KodiRepository.OpenKodi(host))!
-                .SetNegativeButton("Schließen", (_, _) => { })!
+                            "Läuft Kodi gerade, beende es vorher einmal ganz."))!
+                .SetPositiveButton(L.T("Kodi öffnen"), (_, _) => KodiRepository.OpenKodi(host))!
+                .SetNegativeButton(L.T("Schließen"), (_, _) => { })!
                 .Show());
         }
         catch (Exception e)
@@ -254,10 +254,10 @@ public sealed class HelpPage(MainActivity host) : IPage
         scroll.AddView(text);
         scroll.Post(() => scroll.FullScroll(FocusSearchDirection.Down));
         new MaterialAlertDialogBuilder(host)
-            .SetTitle("Protokoll")!
+            .SetTitle(L.T("Protokoll"))!
             .SetView(scroll)!
-            .SetPositiveButton("Teilen", (_, _) => ShareLog())!
-            .SetNegativeButton("Schließen", (_, _) => { })!
+            .SetPositiveButton(L.T("Teilen"), (_, _) => ShareLog())!
+            .SetNegativeButton(L.T("Schließen"), (_, _) => { })!
             .Show();
     }
 
@@ -269,6 +269,6 @@ public sealed class HelpPage(MainActivity host) : IPage
         intent.PutExtra(Intent.ExtraText, "N-Connect für Android – Protokoll\nAndroid " + global::Android.OS.Build.VERSION.Release + ", " +
                                           global::Android.OS.Build.Manufacturer + " " + global::Android.OS.Build.Model + "\n" +
                                           $"Ausgabe: {OutputRouter.Describe()}\n\n{LogText()}");
-        host.StartActivity(Intent.CreateChooser(intent, "Protokoll teilen"));
+        host.StartActivity(Intent.CreateChooser(intent, L.T("Protokoll teilen")));
     }
 }

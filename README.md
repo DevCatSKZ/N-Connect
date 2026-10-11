@@ -4,11 +4,12 @@
 
 # N-Connect
 
-**Nintendo-, PlayStation- und Xbox-Controller am PC und am Fernseher – einfach verbinden und spielen.**
+**Nintendo-, PlayStation- und Xbox-Controller am PC, am Handy und am Fernseher – einfach verbinden und spielen.**
 
 [![Download](https://img.shields.io/github/v/release/DevCatSKZ/N-Connect?label=Download&style=for-the-badge&color=0078D4)](https://github.com/DevCatSKZ/N-Connect/releases/latest)
 
 ![Windows 10 | 11](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?style=flat-square)
+![Android 8+ | Beta](https://img.shields.io/badge/Android-8%2B%20%C2%B7%20Beta-0078D4?style=flat-square)
 ![Kodi | LibreELEC](https://img.shields.io/badge/Kodi-LibreELEC-0078D4?style=flat-square)
 ![12 Sprachen](https://img.shields.io/badge/Sprachen-12-0078D4?style=flat-square)
 [![Lizenz: MIT](https://img.shields.io/badge/Lizenz-MIT-0078D4?style=flat-square)](LICENSE)
@@ -28,13 +29,43 @@ Pass, bei Epic, in Emulatoren und in allen anderen Spielen mit Controller-Unters
 
 Einmal installieren, Controller verbinden, spielen. N-Connect läuft unauffällig im Hintergrund.
 
-## Plattformen
+## Download
 
-| Plattform | Stand | So bekommst du es |
-|---|---|---|
-| 🪟 **Windows 10 / 11** | ✅ stabil | [`N-Connect-Setup`](https://github.com/DevCatSKZ/N-Connect/releases/latest) |
-| 📺 **Kodi / LibreELEC** – Raspberry Pi 2–5, 64-Bit-Boxen, PC | ✅ neu | über das **[DevCatSKZ Repository](https://github.com/DevCatSKZ/kodi-repo)** – mit automatischen Updates |
-| 🤖 **Android** | 🚧 in Entwicklung | – |
+| Plattform | Stand | Download | Anleitung |
+|---|---|---|---|
+| 🪟 **Windows 10 / 11** (64 Bit) | ✅ stabil | [**N-Connect-Setup**](https://github.com/DevCatSKZ/N-Connect/releases/latest) (empfohlen) · [Portable-ZIP](https://github.com/DevCatSKZ/N-Connect/releases/latest) | [In 3 Schritten loslegen](#windows-in-3-schritten-loslegen) |
+| 🤖 **Android 8 oder neuer** | 🧪 Beta 0.9.0 | [**N-Connect-Android-0.9.0.apk**](https://github.com/DevCatSKZ/N-Connect/releases/download/v1.0.20/N-Connect-Android-0.9.0.apk) | [N-Connect für Android](#n-connect-für-android-beta) |
+| 📺 **Kodi / LibreELEC** – Raspberry Pi 2–5, 64-Bit-Boxen, PC | ✅ stabil | über das [**DevCatSKZ Repository**](https://github.com/DevCatSKZ/kodi-repo) (automatische Updates) · einzelne ZIPs je Gerät auf der [Release-Seite](https://github.com/DevCatSKZ/N-Connect/releases/latest) | [N-Connect für Kodi](#n-connect-für-kodi--libreelec) |
+
+Alle Versionen sind kostenlos, ohne Werbung und in 12 Sprachen – die Sprache richtet sich automatisch nach dem System.
+
+## N-Connect für Android (Beta)
+
+Spiele mit deinen **Switch-2-Controllern** (Pro Controller 2, Joy-Con 2 einzeln oder als Paar, GameCube-Controller)
+auf Handy oder Tablet. N-Connect macht daraus einen **echten Xbox-Controller**, den Android-Spiele, Emulatoren
+(Dolphin, PPSSPP, RetroArch, Eden …) und Cloud-Gaming (Xbox Cloud, GeForce NOW, Steam Link) direkt verstehen –
+mit Vibration, Gyro-Zielen, Akkuanzeige und gemerkten Controllern. Für Spiele ohne Controller-Unterstützung gibt es
+zusätzlich eine **Touch-Steuerung**, die Bildschirmknöpfe antippt.
+
+1. **[APK herunterladen](https://github.com/DevCatSKZ/N-Connect/releases/download/v1.0.20/N-Connect-Android-0.9.0.apk)**
+   und öffnen. Android fragt einmal, ob der Browser Apps installieren darf → **Zulassen**. Warnt Play Protect vor
+   einer unbekannten App: **Weitere Details → Trotzdem installieren** (die App ist Open Source und signiert).
+2. **N-Connect öffnen** – der Einrichtungsassistent führt durch Bluetooth-Berechtigung, Benachrichtigungen und Akku.
+3. **Ausgabeweg wählen:**
+   - **Shizuku (empfohlen, ohne Root):** [Shizuku](https://play.google.com/store/apps/details?id=moe.shizuku.privileged.api)
+     aus dem Play Store installieren · Einstellungen › Über das Telefon › 7× auf *Build-Nummer* tippen ·
+     in den Entwickleroptionen **Kabelloses Debugging** einschalten (WLAN nötig) · in Shizuku „Über kabelloses
+     Debugging starten“ › **Kopplung** und danach **Starten** · zurück in N-Connect **Zugriff erlauben**.
+     Nach jedem Neustart des Handys einmal in Shizuku auf „Starten“ tippen.
+   - **Root** (Magisk, KernelSU, APatch): im Assistenten wählen und im Root-Dialog erlauben – funktioniert dauerhaft.
+   - **Touch-Steuerung:** nur eine Bedienungshilfe einschalten; kein echter Controller, aber für jedes Spiel.
+4. **SYNC-Taste** am Controller gedrückt halten, bis die Lichter laufen – fertig. Danach verbindet ein Tastendruck.
+
+> [!NOTE]
+> Xbox-, PlayStation- und ältere Switch-Controller funktionieren unter Android meist schon direkt über die
+> Bluetooth-Einstellungen; N-Connect für Android ist für die Switch-2-Controller gedacht. Es ist eine **Beta** –
+> Rückmeldungen und Fehler bitte als [Issue](https://github.com/DevCatSKZ/N-Connect/issues) (Protokoll: Hilfe ›
+> Diagnose › Teilen).
 
 ## N-Connect für Kodi / LibreELEC
 
@@ -56,7 +87,7 @@ Schneller geht es aus N-Connect selbst: **Windows** › Einstellungen › Allgem
 Einzelne Downloads je Gerät und alle Details: [DevCatSKZ Repository](https://github.com/DevCatSKZ/kodi-repo) ·
 technische Doku: [docs/LINUX-KODI.md](docs/LINUX-KODI.md).
 
-## In 3 Schritten loslegen
+## Windows: in 3 Schritten loslegen
 
 | | |
 |:---:|---|
@@ -249,7 +280,7 @@ src/Switch2Pro.Bridge     Windows-App: Verbindungen, virtuelle Controller, Oberf
 tests/                    xUnit-Tests
 installer/                Inno-Setup-Skript
 linux/                    N-Connect für Linux/LibreELEC (Dienst) und das Kodi-Plugin service.nconnect
-android/                  N-Connect für Android (in Entwicklung)
+android/                  N-Connect für Android (Beta; Übersetzungen in android/i18n)
 ```
 
 **Bauen** (.NET 8 SDK):

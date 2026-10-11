@@ -13,7 +13,7 @@ namespace NConnect.Android.UI;
 /// </summary>
 public static class Look
 {
-    public static readonly (string Id, string Label)[] Modes = [("system", "Wie das System"), ("dark", "Dunkel"), ("light", "Hell")];
+    public static (string Id, string Label)[] Modes => [("system", L.T("Wie das System")), ("dark", L.T("Dunkel")), ("light", L.T("Hell"))];
 
     /// <summary>Gespeicherter Modus; ohne Einstellung folgt Android dem System (unter Windows: dunkel).</summary>
     public static string Mode => AppPrefs.Settings.Theme is "dark" or "light" or "system" ? AppPrefs.Settings.Theme! : "system";

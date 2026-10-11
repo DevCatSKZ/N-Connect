@@ -61,9 +61,9 @@ public sealed class MainActivity : AppCompatActivity
         _content = new FrameLayout(this);
         root.AddView(_content, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, 0, 1f));
         _nav = new BottomNavigationView(this);
-        _nav.Menu!.Add(0, TabControllers, 0, "Controller")!.SetIcon(Resource.Drawable.ic_nav_controller);
-        _nav.Menu.Add(0, TabSettings, 1, "Einstellungen")!.SetIcon(Resource.Drawable.ic_nav_settings);
-        _nav.Menu.Add(0, TabHelp, 2, "Hilfe")!.SetIcon(Resource.Drawable.ic_nav_help);
+        _nav.Menu!.Add(0, TabControllers, 0, L.T("Controller"))!.SetIcon(Resource.Drawable.ic_nav_controller);
+        _nav.Menu.Add(0, TabSettings, 1, L.T("Einstellungen"))!.SetIcon(Resource.Drawable.ic_nav_settings);
+        _nav.Menu.Add(0, TabHelp, 2, L.T("Hilfe"))!.SetIcon(Resource.Drawable.ic_nav_help);
         // Antippen eines Reiters: nur die Seite wechseln – NICHT SelectedItemId setzen. Das löst die Auswahl erneut aus
         // (die Leiste hat sich in diesem Moment noch nicht umgestellt) und führte zu einer Endlosschleife: App hing.
         _nav.ItemSelected += (_, e) => { ShowPage(e.Item.ItemId); e.Handled = true; };
@@ -122,7 +122,7 @@ public sealed class MainActivity : AppCompatActivity
         if (_selectingInCode && ReferenceEquals(page, _page))
             return true;
         _page = page;
-        _toolbar.Title = page.Title;
+        _toolbar.Title = page.Title; // Seiten liefern ihren Titel schon übersetzt
         _content.RemoveAllViews();
         _content.AddView(page.Build());
         return true;

@@ -11,7 +11,7 @@ namespace NConnect.Android.Touch;
 /// Layout-Editor über dem laufenden Spiel. Liest keine Fensterinhalte (siehe res/xml/touch_service.xml).
 /// Der Nutzer schaltet sie einmalig unter Einstellungen → Bedienungshilfen → N-Connect ein.
 /// </summary>
-[Service(Label = "N-Connect Touch-Steuerung", Permission = "android.permission.BIND_ACCESSIBILITY_SERVICE", Exported = true)]
+[Service(Label = "@string/touch_service_label", Permission = "android.permission.BIND_ACCESSIBILITY_SERVICE", Exported = true)]
 [IntentFilter(["android.accessibilityservice.AccessibilityService"])]
 [MetaData("android.accessibilityservice", Resource = "@xml/touch_service")]
 public sealed class TouchService : AccessibilityService

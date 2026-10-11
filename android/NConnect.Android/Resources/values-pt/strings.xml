@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Erzeugt von android/i18n/generate.py -->
+<resources>
+    <string name="touch_service_description">Permite ao N-Connect executar os botões do seu comando como toques no ecrã (modo tátil). Nenhum conteúdo é lido ou guardado.</string>
+    <string name="touch_service_label">Controlo tátil do N-Connect</string>
+    <string name="setup_title">Configurar o N-Connect</string>
+</resources>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Erzeugt von android/i18n/generate.py -->
+<resources>
+    <string name="touch_service_description">Lets N-Connect perform your controller\'s buttons as screen touches (touch mode). No content is read or stored.</string>
+    <string name="touch_service_label">N-Connect touch controls</string>
+    <string name="setup_title">Set up N-Connect</string>
+</resources>

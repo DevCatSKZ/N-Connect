@@ -22,7 +22,7 @@ namespace NConnect.Android.UI;
 /// Einrichtungs-Assistent (erster Start, später über Einstellungen erneut): Berechtigungen, Ausgabeweg wählen
 /// (Shizuku, Root oder Touch), diesen Weg Schritt für Schritt einrichten und testen, ersten Controller verbinden.
 /// </summary>
-[Activity(Label = "Einrichtung", Theme = "@style/AppTheme", Exported = false,
+[Activity(Label = "@string/setup_title", Theme = "@style/AppTheme", Exported = false,
     ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize | ConfigChanges.UiMode)]
 public sealed class SetupWizardActivity : AppCompatActivity
 {
@@ -45,7 +45,7 @@ public sealed class SetupWizardActivity : AppCompatActivity
         base.OnCreate(savedInstanceState);
         WindowCompat.SetDecorFitsSystemWindows(Window!, false);
         var root = Ui.Column(this);
-        _toolbar = new MaterialToolbar(this) { Title = "N-Connect einrichten" };
+        _toolbar = new MaterialToolbar(this) { Title = L.T("N-Connect einrichten") };
         root.AddView(_toolbar);
         _progress = new LinearProgressIndicator(this) { Max = StepCount };
         root.AddView(_progress, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
@@ -121,13 +121,13 @@ public sealed class SetupWizardActivity : AppCompatActivity
         _signature = Signature();
         _progress.SetProgressCompat(_step + 1, true);
         _back.Visibility = _step == StepWelcome ? ViewStates.Invisible : ViewStates.Visible;
-        _next.Text = _step switch
+        _next.Text = L.T(_step switch
         {
             StepWelcome => "Los geht's",
             StepPermissions when !Permissions.HasBluetooth(this) => "Erlauben",
             StepDone => "Fertig",
             _ => "Weiter",
-        };
+        });
         var (scroll, col) = Ui.Page(this);
         switch (_step)
         {
@@ -222,7 +222,7 @@ public sealed class SetupWizardActivity : AppCompatActivity
     private View Option(OutputPath path, string title, string text, string note)
     {
         bool selected = AppPrefs.Mode == path;
-        var card = (MaterialCardView)Ui.Card(this, Ui.Title(this, (selected ? "◉  " : "○  ") + title), Ui.Space(this, 4),
+        var card = (MaterialCardView)Ui.Card(this, Ui.Title(this, (selected ? "◉  " : "○  ") + L.T(title)), Ui.Space(this, 4),
             Ui.Body(this, text), Ui.Space(this, 6), Ui.Caption(this, note));
         card.Checkable = true;
         card.Checked = selected;
@@ -365,8 +365,8 @@ public sealed class SetupWizardActivity : AppCompatActivity
         {
             var card = Ui.Card(this);
             foreach (var p in players)
-                Ui.Inner(card).AddView(Ui.StatusRow(this, PathState.Ready, $"{p.Name} verbunden",
-                    $"Spieler {p.Index + 1} · {Texts.Battery(p.BatteryPercent, p.Charging)}"));
+                Ui.Inner(card).AddView(Ui.StatusRow(this, PathState.Ready, L.F("{0} verbunden", p.Name),
+                    L.F("Spieler {0} · {1}", p.Index + 1, Texts.Battery(p.BatteryPercent, p.Charging))));
             col.AddView(card);
             col.AddView(Ui.Caption(this, "Du kannst weitere Controller verbinden oder auf „Weiter“ tippen."));
         }
@@ -380,12 +380,15 @@ public sealed class SetupWizardActivity : AppCompatActivity
         col.AddView(Ui.Card(this,
             Ui.Title(this, "Gut zu wissen"),
             Ui.Space(this, 4),
-            Ui.Body(this, "• Gekoppelte Controller verbinden sich per Tastendruck von selbst wieder.\n" +
-                          "• Im Spiel heißt der Controller „N-Connect Spieler 1“.\n" +
-                          (AppPrefs.Mode == OutputPath.Shizuku ? "• Nach einem Neustart: Shizuku einmal öffnen und „Starten“ tippen.\n" : "") +
-                          (AppPrefs.TouchEnabled || AppPrefs.Mode == OutputPath.Touch
-                              ? "• Touch-Layout: im Spiel die Benachrichtigung herunterziehen → „Touch-Layout bearbeiten“.\n" : "") +
-                          "• Anleitungen und Problemlösungen findest du unter „Hilfe“.")));
+            Ui.Body(this, string.Join("\n", new[]
+            {
+                "• Gekoppelte Controller verbinden sich per Tastendruck von selbst wieder.",
+                "• Im Spiel heißt der Controller „N-Connect Spieler 1“.",
+                AppPrefs.Mode == OutputPath.Shizuku ? "• Nach einem Neustart: Shizuku einmal öffnen und „Starten“ tippen." : "",
+                AppPrefs.TouchEnabled || AppPrefs.Mode == OutputPath.Touch
+                    ? "• Touch-Layout: im Spiel die Benachrichtigung herunterziehen → „Touch-Layout bearbeiten“." : "",
+                "• Anleitungen und Problemlösungen findest du unter „Hilfe“.",
+            }.Where(s => s.Length > 0).Select(L.T)))));
     }
 
     // ---------- Aktionen ----------
@@ -403,7 +406,7 @@ public sealed class SetupWizardActivity : AppCompatActivity
             }
             else
             {
-                RunOnUiThread(() => Ui.Toast(this, $"{shell.Name}: Zugriff wurde nicht erlaubt"));
+                RunOnUiThread(() => Ui.Toast(this, L.F("{0}: Zugriff wurde nicht erlaubt", shell.Name)));
             }
         }
         finally
@@ -445,7 +448,7 @@ public sealed class SetupWizardActivity : AppCompatActivity
         catch (Exception e)
         {
             Log.Error("Test virtueller Controller", e);
-            message = $"Test fehlgeschlagen: {e.Message}";
+            message = L.F("Test fehlgeschlagen: {0}", e.Message);
         }
         finally
         {
@@ -453,8 +456,8 @@ public sealed class SetupWizardActivity : AppCompatActivity
         }
         RunOnUiThread(() =>
         {
-            new MaterialAlertDialogBuilder(this).SetTitle("Test")!.SetMessage(message)!
-                .SetPositiveButton("OK", (_, _) => { })!.Show();
+            new MaterialAlertDialogBuilder(this).SetTitle(L.T("Test"))!.SetMessage(L.T(message))!
+                .SetPositiveButton(L.T("OK"), (_, _) => { })!.Show();
             Show();
         });
     }
@@ -462,17 +465,17 @@ public sealed class SetupWizardActivity : AppCompatActivity
     private void ShowShizukuGuide()
     {
         new MaterialAlertDialogBuilder(this)
-            .SetTitle("Shizuku starten")!
-            .SetMessage("1. Einstellungen → Über das Telefon → 7× auf „Build-Nummer“ tippen (Entwickleroptionen an).\n\n" +
+            .SetTitle(L.T("Shizuku starten"))!
+            .SetMessage(L.T("1. Einstellungen → Über das Telefon → 7× auf „Build-Nummer“ tippen (Entwickleroptionen an).\n\n" +
                         "2. Mit einem WLAN verbinden. Einstellungen → System → Entwickleroptionen → „Kabelloses Debugging“ einschalten.\n\n" +
                         "3. Shizuku öffnen → „Über kabelloses Debugging starten“ → „Kopplung“. Shizuku zeigt eine Benachrichtigung " +
                         "zum Eingeben des Kopplungscodes.\n\n" +
                         "4. In den Entwickleroptionen unter „Kabelloses Debugging“ → „Gerät über Kopplungscode koppeln“ tippen und " +
                         "den Code in die Shizuku-Benachrichtigung eintippen.\n\n" +
-                        "5. In Shizuku auf „Starten“ tippen. Fertig – zurück zu N-Connect.")!
-            .SetPositiveButton("Shizuku öffnen", (_, _) => HelpPage.OpenShizuku(this))!
-            .SetNeutralButton("Entwickleroptionen", (_, _) => SystemPages.DeveloperOptions(this))!
-            .SetNegativeButton("Schließen", (_, _) => { })!
+                        "5. In Shizuku auf „Starten“ tippen. Fertig – zurück zu N-Connect."))!
+            .SetPositiveButton(L.T("Shizuku öffnen"), (_, _) => HelpPage.OpenShizuku(this))!
+            .SetNeutralButton(L.T("Entwickleroptionen"), (_, _) => SystemPages.DeveloperOptions(this))!
+            .SetNegativeButton(L.T("Schließen"), (_, _) => { })!
             .Show();
     }
 
@@ -487,11 +490,11 @@ public sealed class SetupWizardActivity : AppCompatActivity
                 return;
             case StepSetup when !IsOutputReady():
                 new MaterialAlertDialogBuilder(this)
-                    .SetTitle("Noch nicht fertig eingerichtet")!
-                    .SetMessage("Ohne diesen Schritt sehen Spiele deine Controller noch nicht. Du kannst die Einrichtung später " +
-                                "auf der Startseite über „Beheben“ fortsetzen.")!
-                    .SetPositiveButton("Trotzdem weiter", (_, _) => Go(_step + 1))!
-                    .SetNegativeButton("Zurück zur Einrichtung", (_, _) => { })!
+                    .SetTitle(L.T("Noch nicht fertig eingerichtet"))!
+                    .SetMessage(L.T("Ohne diesen Schritt sehen Spiele deine Controller noch nicht. Du kannst die Einrichtung später " +
+                                "auf der Startseite über „Beheben“ fortsetzen."))!
+                    .SetPositiveButton(L.T("Trotzdem weiter"), (_, _) => Go(_step + 1))!
+                    .SetNegativeButton(L.T("Zurück zur Einrichtung"), (_, _) => { })!
                     .Show();
                 return;
             case StepDone:

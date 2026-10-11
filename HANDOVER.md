@@ -262,21 +262,20 @@ kleben; ggf. Aufschrift weglassen statt verschieben.
   (Xbox-Platz → Spieler-LED, DS4-Lichtleiste → HOME-LED/Karte): FUNKTIONEN 7.1/7.2. Mit echter Hardware und Spielen
   **nicht** geprüft (Flick-Stick braucht ein Spiel mit Maussteuerung; Werte der Testdrehung je Spiel).
 
-## Android-Version (Stand 11.10.2026, in Entwicklung)
+## Android-Version (Stand 11.10.2026, Beta 0.9.0 veröffentlicht)
 
 Projekt `android/NConnect.Android` (.NET 10 für Android, nutzt `Switch2Pro.Protocol` unverändert). Ausführlich:
 **[docs/ANDROID.md](docs/ANDROID.md)**.
 
-- **Geht:** virtueller **Xbox-One-S-Controller ohne Root** über den Shell-Befehl `hid` (UHID) mit **Shizuku**
-  (Android meldet Gamepad + Vibration + Akku; DS4/DualSense scheitern am Kernel-Treiber). Einrichtungs-Assistent mit
-  Direktsprüngen in die Systemseiten, Hauptfenster Controller/Einstellungen/Hilfe, Farbschemata wie Windows
-  (gemeinsam in `ColorSchemes.cs`, `Theme.cs` liest daraus), App-Symbol aus dem Website-Logo.
-- **Offen:** Switch-2-Controller verbinden, **brechen aber nach Sekunden ab** (Status 147); Verdacht LE-Privacy
-  (Android verbindet mit Zufallsadresse, Kopplung 0x15 nutzt die feste Adresse). Wiederverbinden ohne SYNC, Touch,
-  Root, Samsung-Test, Übersetzungen, Release.
-- **Testgeräte** per Wireless-adb: Pixel 10a (Android 17) und Galaxy A52s. Shizuku vom PC starten, Protokoll per
-  `run-as … cat files/nconnect.log` (Befehle in docs/ANDROID.md). Screenshots nur, wenn N-Connect im Vordergrund ist.
-- Neue gemeinsame Dateien: `XboxBtReport.cs`, `ColorSchemes.cs` (+ Tests, jetzt 275). Noch **nicht committet**.
+- **Veröffentlicht:** 0.9.0 (Beta) als signierte APK `N-Connect-Android-0.9.0.apk` am GitHub-Release **v1.0.20**;
+  README/Webseite verlinken sie. Signatur-Schlüssel nur lokal unter `%USERPROFILE%\.nconnect` (nie committen).
+- **Geht:** Switch-2-Controller verbinden und spielen (Pixel 10a), virtueller **Xbox-One-S-Controller ohne Root** über
+  den Shell-Befehl `hid` (UHID) mit **Shizuku**, gemerkte Controller, Kodi-Repository aus der App, Farbschemata wie
+  Windows, **12 Sprachen** (Tabellen aus `android/i18n/*.json` per `generate.py`, im Emulator geprüft).
+- **Offen:** Root- und Touch-Weg vollständig testen, Samsung-Test, Wiederverbinden ohne SYNC über längere Zeit.
+- **Testgeräte** per Wireless-adb: Pixel 10a (Android 17) und Galaxy A52s; Emulator „Medium_Phone“ ohne Fenster.
+  Release-Builds sind nicht debuggable – Protokoll über logcat bzw. Hilfe › Diagnose › Teilen. Bedienung per adb nur,
+  wenn N-Connect im Vordergrund ist.
 
 ## Linux/LibreELEC-Version (Stand 11.10.2026, in Entwicklung)
 

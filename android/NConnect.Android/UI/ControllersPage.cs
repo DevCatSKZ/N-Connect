@@ -18,7 +18,7 @@ public sealed class ControllersPage(MainActivity host) : IPage
     private string _signature = "";
     private readonly Dictionary<Player, (TextView Info, TextView Live)> _live = [];
 
-    public string Title => "Controller";
+    public string Title => L.T("Controller");
 
     public View Build()
     {
@@ -94,7 +94,7 @@ public sealed class ControllersPage(MainActivity host) : IPage
 
         if (players.Count > 0)
         {
-            col.AddView(Ui.Section(host, players.Count == 1 ? "VERBUNDEN" : $"VERBUNDEN ({players.Count})"));
+            col.AddView(Ui.Section(host, players.Count == 1 ? "VERBUNDEN" : L.F("VERBUNDEN ({0})", players.Count)));
             foreach (var p in players)
                 col.AddView(PlayerCard(service!, p));
         }
@@ -131,7 +131,7 @@ public sealed class ControllersPage(MainActivity host) : IPage
                 string status = elsewhere.Contains(k.Address)
                     ? "Mit einem anderen Gerät gekoppelt – SYNC drücken, um ihn hier zu nutzen"
                     : "Nicht verbunden – eine Taste am Controller drücken";
-                string details = (k.Serial is { Length: > 0 } s ? $"Seriennr. {s} · " : "") + $"zuletzt {k.LastConnected:dd.MM. HH:mm}";
+                string details = (k.Serial is { Length: > 0 } s ? L.F("Seriennr. {0} · ", s) : "") + L.F("zuletzt {0}", k.LastConnected.ToString("g"));
                 string address = k.Address;
                 col.AddView(Ui.Card(host,
                     Ui.Title(host, Texts.ShortName(k.Kind)),
@@ -162,7 +162,7 @@ public sealed class ControllersPage(MainActivity host) : IPage
         var live = Ui.Body(host, LiveText(p.LastGamepad));
         live.SetPadding(0, Ui.Dp(host, 8), 0, 0);
         var card = Ui.Card(host,
-            Ui.Title(host, $"Spieler {p.Index + 1} · {p.Name}"),
+            Ui.Title(host, L.F("Spieler {0} · {1}", p.Index + 1, p.Name)),
             info,
             live,
             Ui.Buttons(host,
@@ -177,8 +177,8 @@ public sealed class ControllersPage(MainActivity host) : IPage
         var parts = new List<string> { Texts.Battery(p.BatteryPercent, p.Charging) };
         double rate = p.Devices.Count > 0 ? p.Devices.Min(d => d.ReportRate) : 0;
         if (rate > 0)
-            parts.Add($"{rate:0} Berichte/s");
-        parts.Add(p.HasOutput ? "Ausgabe aktiv" : "keine Ausgabe – siehe oben");
+            parts.Add(L.F("{0} Berichte/s", rate.ToString("0")));
+        parts.Add(L.T(p.HasOutput ? "Ausgabe aktiv" : "keine Ausgabe – siehe oben"));
         return string.Join(" · ", parts);
     }
 
@@ -195,7 +195,7 @@ public sealed class ControllersPage(MainActivity host) : IPage
         };
         foreach (var (flag, name) in names)
             if (g.Buttons.HasFlag(flag))
-                parts.Add(name);
+                parts.Add(L.T(name));
         if (g.LeftTrigger > 10)
             parts.Add($"LT {g.LeftTrigger * 100 / 255} %");
         if (g.RightTrigger > 10)
@@ -212,7 +212,7 @@ public sealed class ControllersPage(MainActivity host) : IPage
         foreach (var s in new[] { Stick("L-Stick", g.LeftX, g.LeftY), Stick("R-Stick", g.RightX, g.RightY) })
             if (s.Length > 0)
                 parts.Add(s);
-        return parts.Count == 0 ? "Drück eine Taste – sie erscheint hier." : "Eingabe: " + string.Join("  ", parts);
+        return parts.Count == 0 ? L.T("Drück eine Taste – sie erscheint hier.") : L.T("Eingabe: ") + string.Join("  ", parts);
     }
 
     private static void TestRumble(Player p)
@@ -227,14 +227,20 @@ public sealed class ControllersPage(MainActivity host) : IPage
         });
     }
 
-    /// <summary>Status des Ausgabewegs in Alltagssprache.</summary>
+    /// <summary>Status des Ausgabewegs in Alltagssprache (übersetzt).</summary>
     public static (PathState State, string Title, string Subtitle) OutputStatus()
+    {
+        var (state, title, subtitle) = OutputStatusGerman();
+        return (state, L.T(title), L.T(subtitle));
+    }
+
+    private static (PathState State, string Title, string Subtitle) OutputStatusGerman()
     {
         var shell = OutputRouter.Shell;
         bool touch = AppPrefs.TouchEnabled || AppPrefs.Mode == OutputPath.Touch;
         if (shell is not null)
-            return (PathState.Ready, $"Bereit: virtueller Xbox-Controller ({shell.Name})",
-                "Spiele und Emulatoren erkennen deine Controller als Xbox-Controller." + (touch ? " Touch-Steuerung ist zusätzlich an." : ""));
+            return (PathState.Ready, L.F("Bereit: virtueller Xbox-Controller ({0})", shell.Name),
+                L.T("Spiele und Emulatoren erkennen deine Controller als Xbox-Controller.") + (touch ? L.T(" Touch-Steuerung ist zusätzlich an.") : ""));
         switch (AppPrefs.Mode)
         {
             case OutputPath.Touch when TouchService.Instance is not null:

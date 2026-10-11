@@ -42,7 +42,7 @@ public static class Ui
 
     private static TextView Text(Context ctx, string text, int style, int rgb)
     {
-        var tv = new TextView(ctx) { Text = text };
+        var tv = new TextView(ctx) { Text = L.T(text) };
         TextViewCompat.SetTextAppearance(tv, style);
         tv.SetTextColor(Look.C(rgb));
         return tv;
@@ -76,7 +76,7 @@ public static class Ui
     public static TextView Rich(Context ctx, string html)
     {
         var tv = Body(ctx, "");
-        tv.TextFormatted = Html.FromHtml(html, FromHtmlOptions.ModeCompact);
+        tv.TextFormatted = Html.FromHtml(L.T(html), FromHtmlOptions.ModeCompact);
         return tv;
     }
 
@@ -116,7 +116,7 @@ public static class Ui
             ButtonStyle.Text => Resource.Attribute.borderlessButtonStyle,
             _ => Resource.Attribute.materialButtonStyle,
         };
-        var b = new MaterialButton(ctx, null, attr) { Text = text };
+        var b = new MaterialButton(ctx, null, attr) { Text = L.T(text) };
         switch (style)
         {
             case ButtonStyle.Filled:
@@ -211,7 +211,7 @@ public static class Ui
         slider.TickInactiveTintList = Look.Solid(p.TextMuted).WithAlpha(120)!;
         slider.AddOnChangeListener(new SliderListener((v, fromUser) =>
         {
-            caption.Text = describe(v);
+            caption.Text = L.T(describe(v));
             if (fromUser)
                 onChanged(v);
         }));
@@ -302,5 +302,5 @@ public static class Ui
     }
 
     public static void Toast(Context ctx, string text) =>
-        global::Android.Widget.Toast.MakeText(ctx, text, ToastLength.Short)!.Show();
+        global::Android.Widget.Toast.MakeText(ctx, L.T(text), ToastLength.Short)!.Show();
 }
