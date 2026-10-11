@@ -18,12 +18,16 @@
   <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
   <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
   <uses-permission android:name="android.permission.WAKE_LOCK" />
+  <!-- Nur für „DevCatSKZ Repository für Kodi herunterladen“ -->
+  <uses-permission android:name="android.permission.INTERNET" />
   <!-- Direkter System-Dialog „Akku: nicht einschränken“ (verhindert Abbrüche beim Spielen). -->
   <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
   <!-- Ab Android 11 sieht eine App andere Apps nur, wenn sie das ankündigt: Shizuku erkennen und öffnen. -->
   <queries>
     <package android:name="moe.shizuku.privileged.api" />
+    <!-- Kodi erkennen (DevCatSKZ Repository einrichten) -->
+    <package android:name="org.xbmc.kodi" />
   </queries>
 
   <application android:allowBackup="true"

@@ -489,6 +489,71 @@ internal sealed class SettingsForm : UiForm
             Row("Farbschema", "Farben für Akzente, Knöpfe, Flächen und Ränder.", _scheme, Glyph.Palette),
             Row("Mica-Effekt", "Durchscheinende Titelleiste (ab Windows 11).", _transparency, Glyph.Palette),
             Row("Sprache / Language", null, _language, Glyph.Globe));
+        bool kodi = KodiIntegration.KodiFound;
+        var kodiSetup = new GlyphButton(kodi ? "In Kodi einrichten" : "Kodi herunterladen …", kodi ? Glyph.Layers : Glyph.Export);
+        kodiSetup.Click += async (_, _) =>
+        {
+            if (!KodiIntegration.KodiFound)
+            {
+                KodiIntegration.Open(KodiIntegration.KodiDownloadPage);
+                return;
+            }
+            kodiSetup.Enabled = false;
+            try
+            {
+                await KodiIntegration.InstallRepositoryAsync();
+                Tr.Show(this, "Das DevCatSKZ Repository liegt jetzt in Kodi. Starte Kodi (neu) und schalte es ein: " +
+                    "Add-ons → Meine Add-ons → Add-on-Repository → DevCatSKZ Repository → Aktivieren.", "N-Connect",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception e) when (e is HttpRequestException or TaskCanceledException or InvalidDataException)
+            {
+                Log.Warn($"Kodi-Repository einrichten: {Log.Reason(e)}");
+                Tr.Show(this, "Download fehlgeschlagen – bitte die Internetverbindung prüfen.", "N-Connect", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+            {
+                Log.Warn($"Kodi-Repository einrichten: {Log.Reason(e)}");
+                Tr.Show(this, "Einrichten fehlgeschlagen – der Kodi-Ordner ist nicht beschreibbar. Nutze „Repository herunterladen“.",
+                    "N-Connect", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            finally
+            {
+                kodiSetup.Enabled = true;
+            }
+        };
+        GlyphButton KodiDownload(bool plugin)
+        {
+            var button = new GlyphButton("Herunterladen …", Glyph.Export);
+            button.Click += async (_, _) =>
+            {
+                button.Enabled = false;
+                try
+                {
+                    KodiIntegration.ShowInExplorer(await KodiIntegration.SaveToDownloadsAsync(plugin));
+                }
+                catch (Exception e) when (e is HttpRequestException or TaskCanceledException or InvalidDataException or IOException or UnauthorizedAccessException)
+                {
+                    Log.Warn($"Kodi-Download: {Log.Reason(e)}");
+                    Tr.Show(this, "Download fehlgeschlagen – bitte die Internetverbindung prüfen.", "N-Connect", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                finally
+                {
+                    button.Enabled = true;
+                }
+            };
+            return button;
+        }
+        page.AddGroup("Kodi",
+            Row("DevCatSKZ Repository in Kodi einrichten", kodi
+                ? "Legt das Repository direkt in Kodi ab. Darüber kommen unsere Kodi-Plugins mit automatischen Updates. Danach in Kodi: " +
+                  "Add-ons → Meine Add-ons → Add-on-Repository → DevCatSKZ Repository → Aktivieren."
+                : "Kodi ist auf diesem PC nicht installiert. Mit Kodi für Windows funktionieren deine Controller auch ohne Plugin – " +
+                  "sie erscheinen dort als Xbox-Controller.", kodiSetup, Glyph.Layers),
+            Row("Repository herunterladen", "Speichert repository.devcatskz.zip im Download-Ordner – zum Installieren auf einem anderen " +
+                "Gerät über „Aus ZIP-Datei installieren“.", KodiDownload(plugin: false), Glyph.Export),
+            Row("Kodi-Plugin für LibreELEC", "Für Raspberry Pi und andere Geräte mit LibreELEC: N-Connect als Kodi-Plugin (alle Geräte). " +
+                "Am einfachsten über das DevCatSKZ Repository.", KodiDownload(plugin: true), Glyph.Export));
         var reset = new GlyphButton("Zurücksetzen", Glyph.Refresh);
         reset.Click += (_, _) => ResetAll();
         var diagnose = new GlyphButton("Exportieren …", Glyph.Export);

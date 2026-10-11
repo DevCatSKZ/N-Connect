@@ -3,6 +3,7 @@ using Android.Graphics;
 using Android.Views;
 using Android.Widget;
 using Google.Android.Material.Dialog;
+using NConnect.Android.Kodi;
 using NConnect.Android.Output;
 using NConnect.Android.Touch;
 using View = Android.Views.View;
@@ -76,6 +77,8 @@ public sealed class HelpPage(MainActivity host) : IPage
             "nach Beschriftung (Switch) zugeordnet wird.<br>" +
             "• <b>Bewegungssteuerung:</b> Unter „Gyro-Zielen“ steuert das Neigen des Controllers den rechten Stick."));
 
+        col.AddView(KodiTopic());
+
         col.AddView(Topic("Probleme lösen",
             "<b>Controller wird nicht gefunden:</b> Bluetooth an? SYNC-Taste lange genug gedrückt, bis die Lichter laufen? " +
             "Ist er gerade mit der Switch oder einem PC verbunden, schalte dort zuerst Bluetooth aus.<br><br>" +
@@ -123,6 +126,84 @@ public sealed class HelpPage(MainActivity host) : IPage
             arrow.Text = open ? "▴" : "▾";
         };
         return Ui.Card(host, header, body);
+    }
+
+    // ---------- Kodi: DevCatSKZ Repository ----------
+
+    private View KodiTopic()
+    {
+        bool kodi = KodiRepository.IsKodiInstalled(host);
+        bool direct = OutputRouter.Shell is { } s && s.HasPermission();
+        string html =
+            "Über das <b>DevCatSKZ Repository</b> bekommst du unsere Kodi-Plugins – mit automatischen Updates.<br><br>" +
+            (kodi
+                ? (direct
+                    ? "<b>Direkt einrichten</b> legt das Repository in Kodi ab (über " + OutputRouter.Shell!.Name + "). " +
+                      "Danach in Kodi: <b>Add-ons → Meine Add-ons → Add-on-Repository → DevCatSKZ Repository → Aktivieren</b>.<br><br>"
+                    : "") +
+                  "<b>Herunterladen</b> speichert die Datei im Download-Ordner. Danach in Kodi:<br>" +
+                  "<b>1.</b> Einstellungen → System → Add-ons → <b>Unbekannte Quellen</b> einschalten.<br>" +
+                  "<b>2.</b> Add-ons → Paket-Symbol → <b>Aus ZIP-Datei installieren</b> → Download → " +
+                  "<i>" + KodiRepository.ZipName + "</i>.<br>" +
+                  "<b>3.</b> „Aus Repository installieren“ → <b>DevCatSKZ Repository</b>."
+                : "Kodi ist auf diesem Gerät nicht installiert.");
+        View buttons = kodi
+            ? Ui.Buttons(host,
+                direct ? Ui.Button(host, "Direkt einrichten", () => _ = InstallDirectAsync()) : Ui.Button(host, "Herunterladen", () => _ = DownloadAsync()),
+                direct ? Ui.Button(host, "Herunterladen", () => _ = DownloadAsync(), Ui.ButtonStyle.Outlined) : Ui.Button(host, "Kodi öffnen", () => KodiRepository.OpenKodi(host), Ui.ButtonStyle.Outlined),
+                Ui.Button(host, direct ? "Kodi öffnen" : "Mehr Infos", direct ? () => KodiRepository.OpenKodi(host) : OpenRepoPage, Ui.ButtonStyle.Text))
+            : Ui.Buttons(host,
+                Ui.Button(host, "Kodi installieren", () => KodiRepository.OpenKodiInStore(host), Ui.ButtonStyle.Outlined),
+                Ui.Button(host, "Mehr Infos", OpenRepoPage, Ui.ButtonStyle.Text));
+        return Topic("Kodi: DevCatSKZ Repository", html, buttons);
+    }
+
+    private void OpenRepoPage() =>
+        host.StartActivity(new Intent(Intent.ActionView, global::Android.Net.Uri.Parse("https://github.com/DevCatSKZ/kodi-repo")));
+
+    private async Task DownloadAsync()
+    {
+        Ui.Toast(host, "Lade DevCatSKZ Repository …");
+        try
+        {
+            string where = await KodiRepository.SaveToDownloadsAsync(host);
+            host.RunOnUiThread(() => new MaterialAlertDialogBuilder(host)
+                .SetTitle("Heruntergeladen")!
+                .SetMessage($"Gespeichert unter: {where}\n\nIn Kodi: Add-ons → Paket-Symbol → „Aus ZIP-Datei installieren“ → " +
+                            "Download → " + KodiRepository.ZipName + ".\n(Vorher in Kodi „Unbekannte Quellen“ erlauben.)")!
+                .SetPositiveButton("Kodi öffnen", (_, _) => KodiRepository.OpenKodi(host))!
+                .SetNegativeButton("Schließen", (_, _) => { })!
+                .Show());
+        }
+        catch (Exception e)
+        {
+            Log.Error("DevCatSKZ Repository herunterladen", e);
+            host.RunOnUiThread(() => Ui.Toast(host, "Download fehlgeschlagen – Internetverbindung prüfen."));
+        }
+    }
+
+    private async Task InstallDirectAsync()
+    {
+        if (OutputRouter.Shell is not { } shell)
+            return;
+        Ui.Toast(host, "Richte DevCatSKZ Repository in Kodi ein …");
+        try
+        {
+            await KodiRepository.InstallDirectAsync(host, shell);
+            host.RunOnUiThread(() => new MaterialAlertDialogBuilder(host)
+                .SetTitle("Fast fertig")!
+                .SetMessage("Das Repository liegt jetzt in Kodi. Öffne Kodi und schalte es ein:\n" +
+                            "Add-ons → Meine Add-ons → Add-on-Repository → DevCatSKZ Repository → Aktivieren.\n\n" +
+                            "Läuft Kodi gerade, beende es vorher einmal ganz.")!
+                .SetPositiveButton("Kodi öffnen", (_, _) => KodiRepository.OpenKodi(host))!
+                .SetNegativeButton("Schließen", (_, _) => { })!
+                .Show());
+        }
+        catch (Exception e)
+        {
+            Log.Error("DevCatSKZ Repository direkt einrichten", e);
+            host.RunOnUiThread(() => Ui.Toast(host, "Direkt einrichten ging nicht – nutze „Herunterladen“."));
+        }
     }
 
     private void OpenWizard() => host.StartActivity(new Intent(host, typeof(SetupWizardActivity))

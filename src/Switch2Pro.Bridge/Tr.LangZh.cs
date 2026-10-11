@@ -7,6 +7,21 @@ internal static partial class Tr
 {
     private static readonly Dictionary<string, string> TextsZh = new(StringComparer.Ordinal)
     {
+        // ---------- Kodi (DevCatSKZ Repository) ----------
+        ["Kodi"] = "Kodi",
+        ["In Kodi einrichten"] = "在 Kodi 中设置",
+        ["Kodi herunterladen …"] = "下载 Kodi …",
+        ["Das DevCatSKZ Repository liegt jetzt in Kodi. Starte Kodi (neu) und schalte es ein: Add-ons → Meine Add-ons → Add-on-Repository → DevCatSKZ Repository → Aktivieren."] = "DevCatSKZ Repository 已放入 Kodi。启动（或重启）Kodi 并启用：附加组件 → 我的附加组件 → 附加组件库 → DevCatSKZ Repository → 启用。",
+        ["Download fehlgeschlagen – bitte die Internetverbindung prüfen."] = "下载失败 – 请检查网络连接。",
+        ["Einrichten fehlgeschlagen – der Kodi-Ordner ist nicht beschreibbar. Nutze „Repository herunterladen“."] = "设置失败 – Kodi 文件夹不可写。请使用“下载存储库”。",
+        ["Herunterladen …"] = "下载 …",
+        ["DevCatSKZ Repository in Kodi einrichten"] = "在 Kodi 中设置 DevCatSKZ Repository",
+        ["Legt das Repository direkt in Kodi ab. Darüber kommen unsere Kodi-Plugins mit automatischen Updates. Danach in Kodi: Add-ons → Meine Add-ons → Add-on-Repository → DevCatSKZ Repository → Aktivieren."] = "将存储库直接放入 Kodi。我们的 Kodi 插件将通过它自动更新。然后在 Kodi 中：附加组件 → 我的附加组件 → 附加组件库 → DevCatSKZ Repository → 启用。",
+        ["Kodi ist auf diesem PC nicht installiert. Mit Kodi für Windows funktionieren deine Controller auch ohne Plugin – sie erscheinen dort als Xbox-Controller."] = "此电脑未安装 Kodi。在 Windows 版 Kodi 中，即使没有插件，你的手柄也能作为 Xbox 手柄使用。",
+        ["Repository herunterladen"] = "下载存储库",
+        ["Speichert repository.devcatskz.zip im Download-Ordner – zum Installieren auf einem anderen Gerät über „Aus ZIP-Datei installieren“."] = "将 repository.devcatskz.zip 保存到下载文件夹 – 以便在其他设备上通过“从 zip 文件安装”进行安装。",
+        ["Kodi-Plugin für LibreELEC"] = "LibreELEC 的 Kodi 插件",
+        ["Für Raspberry Pi und andere Geräte mit LibreELEC: N-Connect als Kodi-Plugin (alle Geräte). Am einfachsten über das DevCatSKZ Repository."] = "适用于运行 LibreELEC 的 Raspberry Pi 及其他设备：N-Connect Kodi 插件（所有设备）。最简单的方式是通过 DevCatSKZ Repository。",
         // ---------- Fenster, Reiter, Abschnitte ----------
         ["Controller"] = "控制器",
         // ---------- Desktop-Modus, Testseite, Vorlagen, Diagnose ----------

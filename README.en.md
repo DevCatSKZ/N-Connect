@@ -51,6 +51,8 @@ On your TV with **LibreELEC**: the plugin runs invisibly in the background and c
 3. "Install from repository" > **DevCatSKZ Repository** > **N-Connect (LibreELEC/Linux)**.
 4. Press SYNC on the controller – done.
 
+Even quicker from N-Connect itself: **Windows** › Settings › General › Kodi or **Android** › Help › Kodi sets up the repository with one click or downloads it.
+
 Single downloads per device and all details: [DevCatSKZ Repository](https://github.com/DevCatSKZ/kodi-repo) ·
 technical docs: [docs/LINUX-KODI.md](docs/LINUX-KODI.md).
 

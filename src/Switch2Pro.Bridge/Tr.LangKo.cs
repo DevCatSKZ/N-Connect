@@ -7,6 +7,21 @@ internal static partial class Tr
 {
     private static readonly Dictionary<string, string> TextsKo = new(StringComparer.Ordinal)
     {
+        // ---------- Kodi (DevCatSKZ Repository) ----------
+        ["Kodi"] = "Kodi",
+        ["In Kodi einrichten"] = "Kodi에 설정",
+        ["Kodi herunterladen …"] = "Kodi 다운로드 …",
+        ["Das DevCatSKZ Repository liegt jetzt in Kodi. Starte Kodi (neu) und schalte es ein: Add-ons → Meine Add-ons → Add-on-Repository → DevCatSKZ Repository → Aktivieren."] = "DevCatSKZ Repository가 Kodi에 추가되었습니다. Kodi를 시작(재시작)하고 켜세요: 애드온 → 내 애드온 → 애드온 저장소 → DevCatSKZ Repository → 사용.",
+        ["Download fehlgeschlagen – bitte die Internetverbindung prüfen."] = "다운로드 실패 – 인터넷 연결을 확인하세요.",
+        ["Einrichten fehlgeschlagen – der Kodi-Ordner ist nicht beschreibbar. Nutze „Repository herunterladen“."] = "설정 실패 – Kodi 폴더에 쓸 수 없습니다. \"저장소 다운로드\"를 사용하세요.",
+        ["Herunterladen …"] = "다운로드 …",
+        ["DevCatSKZ Repository in Kodi einrichten"] = "Kodi에 DevCatSKZ Repository 설정",
+        ["Legt das Repository direkt in Kodi ab. Darüber kommen unsere Kodi-Plugins mit automatischen Updates. Danach in Kodi: Add-ons → Meine Add-ons → Add-on-Repository → DevCatSKZ Repository → Aktivieren."] = "저장소를 Kodi에 바로 넣습니다. 이를 통해 Kodi 플러그인이 자동 업데이트와 함께 제공됩니다. 그런 다음 Kodi에서: 애드온 → 내 애드온 → 애드온 저장소 → DevCatSKZ Repository → 사용.",
+        ["Kodi ist auf diesem PC nicht installiert. Mit Kodi für Windows funktionieren deine Controller auch ohne Plugin – sie erscheinen dort als Xbox-Controller."] = "이 PC에는 Kodi가 설치되어 있지 않습니다. Windows용 Kodi에서는 플러그인 없이도 컨트롤러가 Xbox 컨트롤러로 표시됩니다.",
+        ["Repository herunterladen"] = "저장소 다운로드",
+        ["Speichert repository.devcatskz.zip im Download-Ordner – zum Installieren auf einem anderen Gerät über „Aus ZIP-Datei installieren“."] = "repository.devcatskz.zip을 다운로드 폴더에 저장합니다 – 다른 기기에서 \"zip 파일에서 설치\"로 설치할 수 있습니다.",
+        ["Kodi-Plugin für LibreELEC"] = "LibreELEC용 Kodi 플러그인",
+        ["Für Raspberry Pi und andere Geräte mit LibreELEC: N-Connect als Kodi-Plugin (alle Geräte). Am einfachsten über das DevCatSKZ Repository."] = "LibreELEC를 쓰는 Raspberry Pi 등 기기용: Kodi 플러그인 N-Connect(모든 기기). DevCatSKZ Repository를 쓰는 것이 가장 쉽습니다.",
         // ---------- Fenster, Reiter, Abschnitte ----------
         ["Controller"] = "컨트롤러",
         // ---------- Desktop-Modus, Testseite, Vorlagen, Diagnose ----------

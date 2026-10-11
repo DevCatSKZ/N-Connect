@@ -38,7 +38,9 @@ public sealed class ControllersPage(MainActivity host) : IPage
         string signature = string.Join("|", players.Select(p => $"{p.Index}:{string.Join(",", p.Devices.Select(d => d.Address))}"))
                            + $"#{service is null}{service?.BluetoothOn}{Permissions.HasBluetooth(host)}"
                            + $"#{OutputRouter.Describe()}#{OutputStatus().State}#{service?.Elsewhere.Count}"
-                           + $"#{AppPrefs.TouchEnabled}{TouchService.Instance is null}";
+                           + $"#{AppPrefs.TouchEnabled}{TouchService.Instance is null}"
+                           + "#" + string.Join(",", KnownControllers.All.Select(k => k.Address))
+                           + "#" + string.Join(",", service?.Elsewhere.Select(f => f.Address) ?? []);
         if (signature != _signature)
         {
             _signature = signature;
@@ -106,13 +108,37 @@ public sealed class ControllersPage(MainActivity host) : IPage
                 Ui.Caption(host, Texts.ReconnectHowTo)));
         }
 
-        if (service is not null && service.Elsewhere.Count > 0)
+        // Fremd gekoppelte Controller, die hier noch nie verbunden waren (die bekannten stehen unten in der Liste).
+        var knownAddresses = KnownControllers.All.Select(k => k.Address).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        if (service is not null && service.Elsewhere.Any(f => !knownAddresses.Contains(f.Address)))
         {
             var card = Ui.Card(host, Ui.Title(host, "In der Nähe, aber woanders gekoppelt"), Ui.Space(host, 4),
                 Ui.Caption(host, Texts.OtherHostHint));
-            foreach (var f in service.Elsewhere)
+            foreach (var f in service.Elsewhere.Where(f => !knownAddresses.Contains(f.Address)))
                 Ui.Inner(card).AddView(Ui.Body(host, $"• {Texts.ShortName(f.Kind)}  ({f.Address})"));
             col.AddView(card);
+        }
+
+        // Gekoppelte, gerade nicht verbundene Controller – mit Namen und was zu tun ist.
+        var connected = players.SelectMany(p => p.Devices.Select(d => d.Address)).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var elsewhere = (service?.Elsewhere ?? []).Select(f => f.Address).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var known = KnownControllers.All.Where(k => !connected.Contains(k.Address)).ToList();
+        if (known.Count > 0)
+        {
+            col.AddView(Ui.Section(host, "GEKOPPELTE CONTROLLER"));
+            foreach (var k in known)
+            {
+                string status = elsewhere.Contains(k.Address)
+                    ? "Mit einem anderen Gerät gekoppelt – SYNC drücken, um ihn hier zu nutzen"
+                    : "Nicht verbunden – eine Taste am Controller drücken";
+                string details = (k.Serial is { Length: > 0 } s ? $"Seriennr. {s} · " : "") + $"zuletzt {k.LastConnected:dd.MM. HH:mm}";
+                string address = k.Address;
+                col.AddView(Ui.Card(host,
+                    Ui.Title(host, Texts.ShortName(k.Kind)),
+                    Ui.Caption(host, status),
+                    Ui.Caption(host, details),
+                    Ui.Button(host, "Vergessen", () => KnownControllers.Forget(address), Ui.ButtonStyle.Text)));
+            }
         }
 
         bool touch = AppPrefs.TouchEnabled || AppPrefs.Mode == OutputPath.Touch;

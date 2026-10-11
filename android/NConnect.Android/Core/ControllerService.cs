@@ -68,6 +68,7 @@ public sealed class ControllerService : Service
     public override void OnCreate()
     {
         base.OnCreate();
+        HangWatchdog.Start();
         Instance = this;
         CreateChannel();
         _scanner.Found += OnFound;
@@ -183,7 +184,9 @@ public sealed class ControllerService : Service
             return;
         // Nur im SYNC-Modus koppeln – und nur, wenn die eigene Adresse bekannt ist (sonst wäre die Kopplung wertlos).
         ulong pairHost = f.SyncMode ? me : 0;
-        _ = ConnectAsync(f, pairHost);
+        // Suchergebnisse kommen auf dem Haupt-Thread an – Verbindung, Einrichtung und virtueller Controller (Shizuku/Root-
+        // Prozess) laufen im Hintergrund, sonst friert die Oberfläche ein („App reagiert nicht“).
+        _ = Task.Run(() => ConnectAsync(f, pairHost));
     }
 
     private bool IsConnected(string address)
@@ -198,7 +201,7 @@ public sealed class ControllerService : Service
         RaiseChanged();
         try
         {
-            var device = await Switch2Device.ConnectAsync(this, f.Device, f.Kind, pairHost, _cts.Token);
+            var device = await Switch2Device.ConnectAsync(this, f.Device, f.Kind, pairHost, _cts.Token).ConfigureAwait(false);
             if (device.IsLost)
             {
                 Log.Warn($"{f.Address}: während der Einrichtung getrennt – nicht übernommen");
@@ -244,6 +247,7 @@ public sealed class ControllerService : Service
         }
         device.StateReceived += player.OnState;
         device.Lost += OnLost;
+        KnownControllers.Remember(device.Address, device.Kind, device.SerialNumber);
         if (!pairing)
             player.AttachOutput(OutputRouter.CreatePad(player.Index, $"N-Connect Spieler {player.Index + 1}"));
         _ = device.SetPlayerAsync(player.Index);

@@ -46,6 +46,7 @@ public sealed class MainActivity : AppCompatActivity
     {
         Look.ApplyNightMode();
         base.OnCreate(savedInstanceState);
+        Core.HangWatchdog.Start();
         if (!AppPrefs.SetupDone)
         {
             StartActivity(new Intent(this, typeof(SetupWizardActivity)));
@@ -121,6 +122,7 @@ public sealed class MainActivity : AppCompatActivity
         ControllerService.Changed += QueueRefresh;
         OutputRouter.Changed += QueueRefresh;
         TouchService.StateChanged += QueueRefresh;
+        Core.KnownControllers.Changed += QueueRefresh;
         _ticker = new Handler(Looper.MainLooper!);
         Tick();
         Rebuild();
@@ -131,6 +133,7 @@ public sealed class MainActivity : AppCompatActivity
         ControllerService.Changed -= QueueRefresh;
         OutputRouter.Changed -= QueueRefresh;
         TouchService.StateChanged -= QueueRefresh;
+        Core.KnownControllers.Changed -= QueueRefresh;
         _ticker?.RemoveCallbacksAndMessages(null);
         _ticker = null;
         base.OnPause();

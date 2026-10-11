@@ -5,6 +5,21 @@ internal static partial class Tr
 {
     private static readonly Dictionary<string, string> Texts = new(StringComparer.Ordinal)
     {
+        // ---------- Kodi (DevCatSKZ Repository) ----------
+        ["Kodi"] = "Kodi",
+        ["In Kodi einrichten"] = "Set up in Kodi",
+        ["Kodi herunterladen …"] = "Download Kodi …",
+        ["Das DevCatSKZ Repository liegt jetzt in Kodi. Starte Kodi (neu) und schalte es ein: Add-ons → Meine Add-ons → Add-on-Repository → DevCatSKZ Repository → Aktivieren."] = "The DevCatSKZ Repository is now in Kodi. Start (or restart) Kodi and enable it: Add-ons → My add-ons → Add-on repository → DevCatSKZ Repository → Enable.",
+        ["Download fehlgeschlagen – bitte die Internetverbindung prüfen."] = "Download failed – please check your internet connection.",
+        ["Einrichten fehlgeschlagen – der Kodi-Ordner ist nicht beschreibbar. Nutze „Repository herunterladen“."] = "Setup failed – the Kodi folder is not writable. Use “Download repository”.",
+        ["Herunterladen …"] = "Download …",
+        ["DevCatSKZ Repository in Kodi einrichten"] = "Set up the DevCatSKZ Repository in Kodi",
+        ["Legt das Repository direkt in Kodi ab. Darüber kommen unsere Kodi-Plugins mit automatischen Updates. Danach in Kodi: Add-ons → Meine Add-ons → Add-on-Repository → DevCatSKZ Repository → Aktivieren."] = "Puts the repository straight into Kodi. It brings our Kodi plugins with automatic updates. Then in Kodi: Add-ons → My add-ons → Add-on repository → DevCatSKZ Repository → Enable.",
+        ["Kodi ist auf diesem PC nicht installiert. Mit Kodi für Windows funktionieren deine Controller auch ohne Plugin – sie erscheinen dort als Xbox-Controller."] = "Kodi is not installed on this PC. With Kodi for Windows your controllers work even without a plugin – they show up there as Xbox controllers.",
+        ["Repository herunterladen"] = "Download repository",
+        ["Speichert repository.devcatskz.zip im Download-Ordner – zum Installieren auf einem anderen Gerät über „Aus ZIP-Datei installieren“."] = "Saves repository.devcatskz.zip to your Downloads folder – to install it on another device via “Install from zip file”.",
+        ["Kodi-Plugin für LibreELEC"] = "Kodi plugin for LibreELEC",
+        ["Für Raspberry Pi und andere Geräte mit LibreELEC: N-Connect als Kodi-Plugin (alle Geräte). Am einfachsten über das DevCatSKZ Repository."] = "For Raspberry Pi and other devices running LibreELEC: N-Connect as a Kodi plugin (all devices). Easiest via the DevCatSKZ Repository.",
         // ---------- Fenster, Reiter, Abschnitte ----------
         ["Controller"] = "Controllers",
         // ---------- Desktop-Modus, Testseite, Vorlagen, Diagnose ----------
