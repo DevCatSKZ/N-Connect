@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="service.nconnect" name="N-Connect (LibreELEC/Linux)" version="0.3.0" provider-name="devcatskz">
+<addon id="service.nconnect" name="N-Connect (LibreELEC/Linux)" version="0.3.1" provider-name="devcatskz">
   <requires>
     <import addon="xbmc.python" version="3.0.1"/>
   </requires>
@@ -31,7 +31,7 @@
     <license>MIT</license>
     <source>https://github.com/DevCatSKZ/N-Connect</source>
     <website>https://github.com/DevCatSKZ/N-Connect</website>
-    <news>0.3.0: Wii-Fernbedienung und Wii U Pro Controller koppeln, Gyro für Emulatoren (DSU/Cemuhook), feste Spielerplätze[CR]0.2.1:Name zeigt das System (LibreELEC/Linux), Downloads je Gerät[CR]0.2.0:Xbox-, PlayStation- und Switch-1-Controller automatisch koppeln, Hintergrundsuche abschaltbar, Akku-Warnung, Controller-Tasten für Kodi-Aktionen, 12 Sprachen, Update-Repository[CR]0.1.0: Erste Version für LibreELEC/Kodi</news>
+    <news>0.3.1: Joy-Con-Verbindung korrigiert – mit diesem Gerät gekoppelte Controller wurden fälschlich als „mit anderem Gerät verbunden“ gemeldet und konnten sich nicht verbinden[CR]0.3.0: Wii-Fernbedienung und Wii U Pro Controller koppeln, Gyro für Emulatoren (DSU/Cemuhook), feste Spielerplätze[CR]0.2.1:Name zeigt das System (LibreELEC/Linux), Downloads je Gerät[CR]0.2.0:Xbox-, PlayStation- und Switch-1-Controller automatisch koppeln, Hintergrundsuche abschaltbar, Akku-Warnung, Controller-Tasten für Kodi-Aktionen, 12 Sprachen, Update-Repository[CR]0.1.0: Erste Version für LibreELEC/Kodi</news>
     <assets>
       <icon>resources/icon.png</icon>
     </assets>

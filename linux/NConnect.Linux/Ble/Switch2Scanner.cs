@@ -6,8 +6,12 @@ using Advertisement = Switch2Pro.Protocol.Advertisement;
 
 namespace NConnect.Linux.Ble;
 
-/// <summary>Ein werbender Switch-2-Controller. <paramref name="Host"/> = Gerät, für das er wirbt (0 = SYNC-Modus).</summary>
-public sealed record FoundController(Device Device, string Address, byte AddressType, ControllerKind Kind, ulong Host, short Rssi)
+/// <summary>
+/// Ein werbender Switch-2-Controller. <paramref name="Host"/> = Gerät, für das er wirbt (0 = SYNC-Modus);
+/// <paramref name="Paired"/> = mit diesem Adapter gekoppelt (BlueZ-Bond), unabhängig davon, was die Werbung meldet.
+/// </summary>
+public sealed record FoundController(Device Device, string Address, byte AddressType, ControllerKind Kind, ulong Host,
+    short Rssi, bool Paired)
 {
     public bool SyncMode => Host == 0;
 }
@@ -145,7 +149,7 @@ public sealed class Switch2Scanner : IAsyncDisposable
                 return;
             ulong host = Advertisement.IsSyncMode(data) ? 0 : Advertisement.HostAddress(data);
             byte type = all.AddressType == "random" ? AttClient.AddressRandom : AttClient.AddressPublic;
-            Found?.Invoke(new FoundController(device, all.Address, type, kind, host, all.RSSI));
+            Found?.Invoke(new FoundController(device, all.Address, type, kind, host, all.RSSI, all.Paired));
         }
         catch (Exception)
         {
