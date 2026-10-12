@@ -5,6 +5,7 @@ Einstellungen, zeigt Meldungen beim Verbinden/Trennen und startet das Programm n
 """
 
 import json
+import os
 import subprocess
 import threading
 import time
@@ -32,6 +33,7 @@ class Service(xbmc.Monitor):
         self.last_bluetooth = None
         self.stopping = False
         self._last_widget_refresh = 0.0
+        self._status_mtime = None
 
     def refresh_widget(self):
         """Widget-Anzeige aktualisieren (Container.Refresh lädt plugin://-Listen neu). Gedrosselt, damit
@@ -40,7 +42,21 @@ class Service(xbmc.Monitor):
         if now - self._last_widget_refresh < 1.5:
             return
         self._last_widget_refresh = now
-        xbmc.executebuiltin('Container.Refresh')
+        # Nur Container mit einer N-Connect-Liste neu laden (eigene Quelle und das Status-Plugin),
+        # damit kein anderes Menü springt. Container.Refresh(pfad) wirkt nur auf passende Container.
+        for source in ('plugin://service.nconnect/', 'plugin://plugin.nconnect.status/'):
+            xbmc.executebuiltin('Container.Refresh({0})'.format(source))
+
+    def watch_status(self):
+        """status.json geändert → Widget neu laden. Deckt jede Status-Änderung ab (Akku, Rate, Verbindungen),
+        auch wenn dazu kein Ereignis kam oder der Ereignis-Refresh nicht am Home-Widget ankam."""
+        try:
+            mtime = os.path.getmtime(common.STATUS_JSON)
+        except OSError:
+            mtime = None
+        if mtime != self._status_mtime:
+            self._status_mtime = mtime
+            self.refresh_widget()
 
     # ---------- Programm starten/stoppen ----------
 
@@ -214,6 +230,7 @@ class Service(xbmc.Monitor):
                     process = self.process
                 if process is None or process.poll() is not None:
                     break
+                self.watch_status()
                 if self.waitForAbort(1):
                     break
             if self.abortRequested():

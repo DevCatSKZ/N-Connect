@@ -51,6 +51,16 @@ def listing():
         else:
             for p in status.get('players', []):
                 add(text(30600, p.get('player'), p.get('name')), subtitle_battery(p), common.player_icon(p))
+                # Bei Paaren (Joy-Con L+R) jedes Gerät einzeln mit eigenem Icon einrücken.
+                if len(p.get('devices', [])) > 1:
+                    for d in p['devices']:
+                        sub = []
+                        if d.get('battery', -1) >= 0:
+                            sub.append(text(30601, d['battery']))
+                        if d.get('rate'):
+                            sub.append(text(30603, d['rate']))
+                        add('  ' + d.get('name', '?'), ' · '.join(sub),
+                            common.kind_icon(d.get('kind'), d.get('name')))
             for g in status.get('gamepads', []):
                 details = [text(30651) if g.get('connected') else text(30652)]
                 if g.get('battery', -1) >= 0:
