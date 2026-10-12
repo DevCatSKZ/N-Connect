@@ -1,26 +1,32 @@
 # -*- coding: utf-8 -*-
 """Erzeugt die Controller-Icons für das Add-on-Menü und das Kodi-Widget (service.nconnect/resources/icons/).
-Einmalig bzw. bei Design-Änderungen ausführen: python linux/kodi/make_icons.py – die PNGs werden eingecheckt."""
+Einmalig bzw. bei Design-Änderungen ausführen: python linux/kodi/make_icons.py – die PNGs werden eingecheckt.
+
+Die Zeichnung läuft auf 512 px mit weichen Kanten und wird am Ende auf 128 px herunterskaliert
+(4×-Supersampling → saubere, runde Formen ohne Pixelkanten)."""
 import math
 import pathlib
 import struct
 import zlib
 
-S = 128  # Kantenlänge in Pixeln
+S = 512          # Render-Auflösung
+OUT_S = 128      # Ausgabe-Größe
 OUT = pathlib.Path(__file__).parent / 'service.nconnect' / 'resources' / 'icons'
 
 # Controller-Farben (an die echten Gehäuse angelehnt)
-BLUE = (86, 180, 233)     # Joy-Con 2 links
-CORAL = (255, 102, 96)    # Joy-Con 2 rechts
-SLATE = (86, 88, 100)     # Pro Controller 2
-PURPLE = (110, 90, 210)   # GameCube (Switch 2)
-GRAY = (125, 128, 140)    # generisch
-WHITE = (235, 235, 240)   # Xbox
-PSBLUE = (70, 100, 220)   # PlayStation
+BLUE = (86, 180, 233)      # Joy-Con links (Neon-Blau)
+CORAL = (255, 102, 96)     # Joy-Con rechts (Neon-Rot)
+SLATE = (70, 72, 82)       # Pro Controller
+PURPLE = (110, 90, 210)    # GameCube
+GRAY = (130, 133, 145)     # generisch
+WHITE = (238, 238, 243)    # Xbox
+PSBLUE = (72, 100, 224)    # PlayStation
+DARK = (30, 32, 38)
+LIGHT = (245, 245, 250)
 
 
 def new_image():
-    return bytearray(S * S * 4)  # RGBA, transparent
+    return bytearray(S * S * 4)
 
 
 def blend(img, x, y, c, alpha=255):
@@ -33,8 +39,12 @@ def blend(img, x, y, c, alpha=255):
         img[i + 3] = min(255, img[i + 3] + alpha)
 
 
+def shade(c, f):
+    """Farbe aufhellen (f > 1) oder abdunkeln (f < 1)."""
+    return tuple(max(0, min(255, int(v * f))) for v in c)
+
+
 def disc(img, cx, cy, r, c, alpha=255):
-    """Gefüllter Kreis mit 1,5 px weicher Kante."""
     for y in range(int(cy - r - 2), int(cy + r + 2)):
         for x in range(int(cx - r - 2), int(cx + r + 2)):
             d = math.hypot(x - cx, y - cy)
@@ -45,7 +55,6 @@ def disc(img, cx, cy, r, c, alpha=255):
 
 
 def rrect(img, x0, y0, x1, y1, r, c, alpha=255):
-    """Abgerundetes Rechteck mit 1,5 px weicher Kante."""
     for y in range(y0, y1):
         for x in range(x0, x1):
             dx = max(x0 + r - x, 0, x - (x1 - r - 1))
@@ -57,51 +66,124 @@ def rrect(img, x0, y0, x1, y1, r, c, alpha=255):
                 blend(img, x, y, c, int(alpha * (r - d) / 1.5))
 
 
+def ellipse(img, cx, cy, rx, ry, c, alpha=255, rot=0.0):
+    """Gefüllte, optional rotierte Ellipse (rot in Grad)."""
+    co, si = math.cos(math.radians(rot)), math.sin(math.radians(rot))
+    for y in range(int(cy - max(rx, ry) - 2), int(cy + max(rx, ry) + 2)):
+        for x in range(int(cx - max(rx, ry) - 2), int(cx + max(rx, ry) + 2)):
+            lx = (x - cx) * co + (y - cy) * si
+            ly = -(x - cx) * si + (y - cy) * co
+            d = math.hypot(lx / rx, ly / ry) * max(rx, ry) / max(rx, ry)
+            v = (lx / rx) ** 2 + (ly / ry) ** 2
+            edge = (1.0 - math.sqrt(v)) * min(rx, ry)
+            if edge >= 1.5:
+                blend(img, x, y, c, alpha)
+            elif edge >= 0:
+                blend(img, x, y, c, int(alpha * edge / 1.5))
+
+
 def stick(img, cx, cy, r):
-    """Analog-Stick: heller Ring mit dunklem Kern."""
-    disc(img, cx, cy, r, (245, 245, 250))
-    disc(img, cx, cy, r * 0.6, (40, 40, 48))
+    """Analog-Stick: dunkler Ring, heller Kappenrand, dunkle Mitte mit Mini-Highlight."""
+    disc(img, cx, cy, r, shade(DARK, 0.9))
+    disc(img, cx, cy, r * 0.78, (60, 62, 72))
+    disc(img, cx, cy, r * 0.62, DARK)
+    disc(img, cx - r * 0.18, cy - r * 0.22, r * 0.16, (80, 84, 96))
 
 
-def buttons(img, cx, cy, r, gap):
-    """Vier Aktionstasten als helle Punkte."""
-    disc(img, cx, cy - gap, r, (245, 245, 250))
-    disc(img, cx, cy + gap, r, (245, 245, 250))
-    disc(img, cx - gap, cy, r, (245, 245, 250))
-    disc(img, cx + gap, cy, r, (245, 245, 250))
+def face_buttons(img, cx, cy, r, gap, color=LIGHT):
+    """Vier Aktionstasten im Kreuz (A/B/X/Y bzw. Steuerkreuz)."""
+    for dx, dy in ((0, -gap), (0, gap), (-gap, 0), (gap, 0)):
+        disc(img, cx + dx, cy + dy, r, color)
 
 
-def draw_joycon(img, cx, color, mirror=False):
-    """Aufrechter Joy-Con: Gehäuse, Stick oben, Tasten darunter (gespiegelt für L/R)."""
-    rrect(img, cx - 20, 20, cx + 20, 108, 20, color)
-    stick(img, cx + (8 if mirror else -8), 46, 10)
-    buttons(img, cx - (8 if mirror else -8), 76, 3.2, 8)
+def joycon(img, cx, color, left):
+    """Ein aufrechter Joy-Con: farbige Kapsel, innere Führungsschiene, Stick oben (außen),
+    Tasten-Kreuz, kleine +/- und seitliche SL/SR-Andeutung."""
+    w, top, bottom = 96, 60, 460
+    rail_x = cx + (w // 2 - 12) * (-1 if left else 1)   # Schiene auf der Innenseite
+    outer = 1 if left else -1
+
+    # Gehäuse
+    rrect(img, cx - w // 2, top, cx + w // 2, bottom, 46, color)
+    # leichte Vertiefung unten (Volumen)
+    rrect(img, cx - w // 2 + 6, bottom - 90, cx + w // 2 - 6, bottom - 6, 34, shade(color, 0.82), 90)
+    # Schiene
+    rrect(img, rail_x - 4, top + 20, rail_x + 4, bottom - 20, 4, shade(color, 0.72))
+    # SL/SR-Andeutung an der Schiene
+    rrect(img, rail_x - 7, top + 60, rail_x + 7, top + 90, 6, shade(color, 0.6))
+    rrect(img, rail_x - 7, top + 98, rail_x + 7, top + 128, 6, shade(color, 0.6))
+
+    bx = cx + 10 * outer   # Bedienfeld leicht zur Außenseite versetzt
+    if left:
+        stick(img, bx + 6, top + 128, 34)
+        face_buttons(img, bx - 2, top + 258, 11, 26)          # Steuerkreuz-Tasten
+        disc(img, cx + w // 2 - 18, top + 44, 9, shade(color, 0.55))   # Minus
+        ellipse(img, bx - 2, bottom - 78, 26, 14, shade(color, 0.7))   # Screenshot-Taste
+    else:
+        face_buttons(img, bx - 2, top + 128, 11, 26)          # A B X Y
+        stick(img, bx + 6, top + 258, 34)
+        # Plus
+        rrect(img, cx - w // 2 + 9, top + 40, cx - w // 2 + 27, top + 48, 3, shade(color, 0.55))
+        rrect(img, cx - w // 2 + 15, top + 34, cx - w // 2 + 21, top + 54, 3, shade(color, 0.55))
+        disc(img, bx - 2, bottom - 78, 16, shade(color, 0.7))          # Home
 
 
-def draw_pad(img, color):
-    """Gamepad-Silhouette: Korpus + zwei Griffe, Sticks und Tasten."""
-    rrect(img, 16, 34, 112, 80, 22, color)
-    disc(img, 38, 80, 21, color)
-    disc(img, 90, 80, 21, color)
-    stick(img, 44, 56, 9)
-    buttons(img, 84, 56, 3.2, 9)
-    disc(img, 64, 48, 4, (245, 245, 250))  # Home-Taste
+def pad(img, color, xbox=False):
+    """Gamepad-Silhouette: Mittelstück + zwei angewinkelte Griffe, Sticks, Tasten, D-Pad."""
+    # Griffe zuerst (liegen unter dem Korpus)
+    ellipse(img, 128, 330, 74, 118, shade(color, 0.92), rot=-32)
+    ellipse(img, 384, 330, 74, 118, shade(color, 0.92), rot=32)
+    # Mittelstück
+    rrect(img, 60, 118, 452, 322, 78, color)
+    # Schulter-Andeutung
+    rrect(img, 96, 92, 196, 132, 18, shade(color, 0.8))
+    rrect(img, 316, 92, 416, 132, 18, shade(color, 0.8))
+    if xbox:
+        stick(img, 150, 190, 40)                    # linker Stick oben
+        face_buttons(img, 372, 190, 12, 30)         # ABXY
+        stick(img, 226, 268, 36)                    # rechter Stick unten-links
+        # D-Pad unten-links als Kreuz
+        rrect(img, 340, 244, 384, 288, 10, shade(color, 0.55))
+        rrect(img, 352, 232, 372, 300, 10, shade(color, 0.55))
+    else:
+        stick(img, 168, 230, 40)
+        stick(img, 344, 230, 40)
+        face_buttons(img, 416, 170, 12, 30)
+        rrect(img, 96, 158, 140, 202, 10, shade(color, 0.55))   # D-Pad
+        rrect(img, 108, 146, 128, 214, 10, shade(color, 0.55))
+    disc(img, 256, 158, 12, shade(color, 0.55))     # Home-LED/Taste
 
 
-def draw_pair(img):
-    """Joy-Con-Paar: links blau, rechts koralle."""
-    draw_joycon(img, 36, BLUE, mirror=False)
-    draw_joycon(img, 92, CORAL, mirror=True)
+def pair(img):
+    """Joy-Con-Paar nebeneinander – leicht ausgerichtet wie in einer Halterung."""
+    joycon(img, 152, BLUE, left=True)
+    joycon(img, 360, CORAL, left=False)
+    rrect(img, 236, 120, 276, 400, 12, (52, 54, 62))   # Mittelsteg (Grip)
 
 
 def save(name, img):
-    raw = b''.join(b'\x00' + bytes(img[y * S * 4:(y + 1) * S * 4]) for y in range(S))
+    """4×-Supersampling: je 4×4 Pixel mitteln (vorvermultipliziert)."""
+    small = bytearray(OUT_S * OUT_S * 4)
+    f = S // OUT_S
+    for y in range(OUT_S):
+        for x in range(OUT_S):
+            acc = [0, 0, 0, 0]
+            for sy in range(y * f, y * f + f):
+                for sx in range(x * f, x * f + f):
+                    i = (sy * S + sx) * 4
+                    for k in range(4):
+                        acc[k] += img[i + k]
+            j = (y * OUT_S + x) * 4
+            for k in range(4):
+                small[j + k] = acc[k] // (f * f)
+
+    raw = b''.join(b'\x00' + bytes(small[y * OUT_S * 4:(y + 1) * OUT_S * 4]) for y in range(OUT_S))
 
     def chunk(tag, data):
         return struct.pack('>I', len(data)) + tag + data + struct.pack('>I', zlib.crc32(tag + data))
 
     png = (b'\x89PNG\r\n\x1a\n'
-           + chunk(b'IHDR', struct.pack('>IIBBBBB', S, S, 8, 6, 0, 0, 0))
+           + chunk(b'IHDR', struct.pack('>IIBBBBB', OUT_S, OUT_S, 8, 6, 0, 0, 0))
            + chunk(b'IDAT', zlib.compress(raw, 9))
            + chunk(b'IEND', b''))
     OUT.mkdir(parents=True, exist_ok=True)
@@ -110,12 +192,13 @@ def save(name, img):
 
 
 def main():
-    img = new_image(); draw_joycon(img, 64, BLUE); save('joycon_l.png', img)
-    img = new_image(); draw_joycon(img, 64, CORAL, mirror=True); save('joycon_r.png', img)
-    img = new_image(); draw_pair(img); save('joycon_pair.png', img)
-    for name, color in (('pro.png', SLATE), ('gamecube.png', PURPLE), ('xbox.png', WHITE),
-                        ('playstation.png', PSBLUE), ('gamepad.png', GRAY)):
-        img = new_image(); draw_pad(img, color); save(name, img)
+    img = new_image(); joycon(img, 256, BLUE, left=True); save('joycon_l.png', img)
+    img = new_image(); joycon(img, 256, CORAL, left=False); save('joycon_r.png', img)
+    img = new_image(); pair(img); save('joycon_pair.png', img)
+    for name, color, xbox in (('pro.png', SLATE, False), ('gamecube.png', PURPLE, False),
+                              ('xbox.png', WHITE, True), ('playstation.png', PSBLUE, False),
+                              ('gamepad.png', GRAY, True)):
+        img = new_image(); pad(img, color, xbox); save(name, img)
 
 
 if __name__ == '__main__':

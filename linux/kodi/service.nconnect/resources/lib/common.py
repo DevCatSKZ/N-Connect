@@ -218,9 +218,12 @@ def read_log_tail(lines=300):
 ICONS_DIR = os.path.join(ADDON_PATH, 'resources', 'icons')
 _KIND_ICONS = {
     'JoyCon2Left': 'joycon_l.png', 'JoyCon2Right': 'joycon_r.png',
-    'JoyConLeft': 'joycon_l.png', 'JoyConRight': 'joycon_r.png',
-    'ProController2': 'pro.png', 'ProController': 'pro.png',
-    'GameCube2': 'gamecube.png', 'GameCube': 'gamecube.png',
+    'JoyCon1Left': 'joycon_l.png', 'JoyCon1Right': 'joycon_r.png',
+    'JoyConPair': 'joycon_pair.png',
+    'Pro2': 'pro.png', 'Pro1': 'pro.png', 'WiiUPro': 'pro.png',
+    'GameCube2': 'gamecube.png',
+    'DualShock4': 'playstation.png', 'DualSense': 'playstation.png',
+    'XboxController': 'xbox.png',
 }
 
 
