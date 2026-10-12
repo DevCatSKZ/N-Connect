@@ -213,6 +213,42 @@ def read_log_tail(lines=300):
         return ''
 
 
+# ---------- Icons je Controller-Art ----------
+
+ICONS_DIR = os.path.join(ADDON_PATH, 'resources', 'icons')
+_KIND_ICONS = {
+    'JoyCon2Left': 'joycon_l.png', 'JoyCon2Right': 'joycon_r.png',
+    'JoyConLeft': 'joycon_l.png', 'JoyConRight': 'joycon_r.png',
+    'ProController2': 'pro.png', 'ProController': 'pro.png',
+    'GameCube2': 'gamecube.png', 'GameCube': 'gamecube.png',
+}
+
+
+def kind_icon(kind, name=''):
+    """Icon-Datei zur Controller-Art; Fremd-Gamepads (Xbox, PlayStation …) anhand des Namens."""
+    if kind in _KIND_ICONS:
+        return os.path.join(ICONS_DIR, _KIND_ICONS[kind])
+    lower = (name or '').lower()
+    if 'joy-con' in lower:
+        return os.path.join(ICONS_DIR, 'joycon_l.png' if '(l' in lower else 'joycon_r.png')
+    for key, icon in (('xbox', 'xbox.png'), ('playstation', 'playstation.png'), ('dualshock', 'playstation.png'),
+                      ('dualsense', 'playstation.png'), ('gamecube', 'gamecube.png')):
+        if key in lower:
+            return os.path.join(ICONS_DIR, icon)
+    return os.path.join(ICONS_DIR, 'gamepad.png')
+
+
+def player_icon(player):
+    """Icon für einen Spieler-Eintrag aus status.json (Joy-Con-Paar hat ein eigenes)."""
+    devices = player.get('devices', [])
+    if len(devices) > 1:
+        return os.path.join(ICONS_DIR, 'joycon_pair.png')
+    for d in devices:
+        if d.get('kind') in _KIND_ICONS:
+            return os.path.join(ICONS_DIR, _KIND_ICONS[d['kind']])
+    return kind_icon('', player.get('name'))
+
+
 def help_text():
     """Anleitung in Kodis Sprache (help_<ISO 639-1>.txt), sonst Englisch."""
     lang = (xbmc.getLanguage(xbmc.ISO_639_1) or 'en')[:2].lower()

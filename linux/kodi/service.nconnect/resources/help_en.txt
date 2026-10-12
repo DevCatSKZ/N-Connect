@@ -45,4 +45,5 @@ The controller shows up as an "Xbox 360 Controller" everywhere and needs no mapp
 • Nothing happens on SYNC: run the diagnostics (shows whether Bluetooth and the virtual controller are ready).
 • Message "paired with another device": press SYNC to pair it here again.
 • Input lag: move closer to the Bluetooth adapter; a USB extension cable for the stick helps against USB 3 interference.
+• Connection is refused right away (errno 38): WiFi is interfering with Bluetooth – turn it off if unused (LibreELEC settings > Connections).
 • Show the log and attach it when reporting a problem: github.com/DevCatSKZ/N-Connect/issues

@@ -45,4 +45,5 @@ O comando aparece em todo o lado como «Xbox 360 Controller» e não precisa de 
 • Não acontece nada ao premir SYNC: execute o diagnóstico (mostra se o Bluetooth e o comando virtual estão prontos).
 • Mensagem «emparelhado com outro dispositivo»: prima SYNC para o emparelhar aqui novamente.
 • Atraso nos comandos: aproxime-se do adaptador Bluetooth; uma extensão USB para a pen ajuda contra interferências de USB 3.
+• A ligação é recusada de imediato (errno 38): o Wi-Fi interfere no Bluetooth – desliga-o se não for usado (Definições do LibreELEC > Ligações).
 • Mostre o registo e anexe-o ao comunicar um problema: github.com/DevCatSKZ/N-Connect/issues

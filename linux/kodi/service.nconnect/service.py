@@ -17,6 +17,10 @@ from resources.lib.common import text
 
 RESTART_DELAYS = [3, 5, 10, 30, 60]
 
+# Ereignisse, die den sichtbaren Controller-Stand ändern → Home-Widget (plugin://service.nconnect/) neu laden.
+WIDGET_EVENTS = {'connected', 'disconnected', 'paired', 'failed', 'elsewhere', 'battery-low', 'bluetooth',
+                 'wifi-hint', 'gamepad-paired', 'gamepad-connected', 'gamepad-disconnected', 'gamepad-pair-failed'}
+
 
 class Service(xbmc.Monitor):
     def __init__(self):
@@ -27,6 +31,16 @@ class Service(xbmc.Monitor):
         self.failures = 0
         self.last_bluetooth = None
         self.stopping = False
+        self._last_widget_refresh = 0.0
+
+    def refresh_widget(self):
+        """Widget-Anzeige aktualisieren (Container.Refresh lädt plugin://-Listen neu). Gedrosselt, damit
+        Ereignissalven nur eine Aktualisierung auslösen."""
+        now = time.time()
+        if now - self._last_widget_refresh < 1.5:
+            return
+        self._last_widget_refresh = now
+        xbmc.executebuiltin('Container.Refresh')
 
     # ---------- Programm starten/stoppen ----------
 
@@ -127,6 +141,9 @@ class Service(xbmc.Monitor):
             action = common.button_action(ev.get('button'))
             if action:
                 xbmc.executebuiltin(action)
+        elif name == 'wifi-hint':
+            # Funkkoexistenz: WLAN frisst die Verbindung – wichtig genug, um immer zu melden.
+            xbmcgui.Dialog().notification('N-Connect', text(30029), xbmcgui.NOTIFICATION_WARNING, 10000)
         elif name == 'error':
             self.notify(text(30017), error=True)
         elif name == 'bluetooth':
@@ -137,6 +154,8 @@ class Service(xbmc.Monitor):
                     self.notify(text(30015), duration=8000, error=True)
                 elif state == 'missing':
                     self.notify(text(30016), duration=8000, error=True)
+        if name in WIDGET_EVENTS:
+            self.refresh_widget()
 
     def notify(self, message, duration=4000, error=False):
         if not error and not common.notifications_enabled():

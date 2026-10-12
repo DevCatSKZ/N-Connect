@@ -426,6 +426,11 @@ public sealed class Daemon : IAsyncDisposable
         Log.Info($"{f.Address}: {f.Kind.DisplayName()} gefunden{(f.SyncMode ? " (SYNC)" : "")}, verbinde …");
         Emit("connecting", new JsonObject { ["address"] = f.Address, ["name"] = f.Kind.DisplayName() });
         RequestStatus();
+        // Suche anhalten, bevor verbunden wird: Bei Chips mit geteilter WLAN/BT-Antenne (Raspberry Pi)
+        // frisst die aktive Suche samt BR/EDR-Inquiry das gesamte Sendefenster – der frische Link bekommt
+        // keine Pakete vom Controller und stirbt sofort wieder (HCI-Status 0x3e → errno 38).
+        if (_scanner is { Scanning: true } scanner)
+            await scanner.StopAsync().ConfigureAwait(false);
         try
         {
             var device = await Switch2Device.ConnectAsync(_adapterAddress!, _adapterIndex, f.Address, f.AddressType, f.Kind,
@@ -442,6 +447,8 @@ public sealed class Daemon : IAsyncDisposable
         {
             Log.Error($"{f.Address}: Verbindung fehlgeschlagen", e);
             Emit("failed", new JsonObject { ["address"] = f.Address, ["name"] = f.Kind.DisplayName(), ["reason"] = e.Message });
+            if (e.Message.Contains("errno 38"))
+                WarnWifiCoexistence();
         }
         catch (Exception)
         {
@@ -456,11 +463,44 @@ public sealed class Daemon : IAsyncDisposable
     }
 
     private int _kickPending;
+    private bool _wifiHintShown;
+
+    /// <summary>
+    /// errno 38 = ENOSYS = nicht zugeordneter HCI-Status, bei uns in der Praxis 0x3e „Connection Failed to be
+    /// Established“: Der Chip meldet die Verbindung, bekommt dann aber kein Paket vom Controller – klassisch, wenn
+    /// auf Chips mit geteilter WLAN/BT-Antenne (Raspberry Pi, Mini-PCs) ein aktives WLAN-Radio die Funkzeit frisst.
+    /// Einmal pro Sitzung warnen, wenn gerade ein WLAN-Interface oben ist.
+    /// </summary>
+    private void WarnWifiCoexistence()
+    {
+        if (_wifiHintShown)
+            return;
+        try
+        {
+            foreach (var iface in Directory.EnumerateDirectories("/sys/class/net"))
+            {
+                string name = Path.GetFileName(iface);
+                if (!File.Exists(Path.Combine(iface, "phy80211")) && !Directory.Exists(Path.Combine(iface, "wireless")))
+                    continue;
+                if (File.ReadAllText(Path.Combine(iface, "operstate")).Trim() is not ("up" or "unknown"))
+                    continue;
+                _wifiHintShown = true;
+                Log.Warn($"WLAN ({name}) ist aktiv und teilt sich die Antenne mit Bluetooth – falls Verbindungen " +
+                         "weiter abgelehnt werden: WLAN ausschalten, wenn es nicht gebraucht wird (LibreELEC: Einstellungen > Verbindungen)");
+                Emit("wifi-hint", new JsonObject { ["interface"] = name });
+                return;
+            }
+        }
+        catch (Exception)
+        {
+            // /sys nicht lesbar – Hinweis entfällt
+        }
+    }
 
     /// <summary>Suche nach einem Verbindungsaufbau/-abbau neu starten (siehe <see cref="Switch2Scanner.RestartAsync"/>).</summary>
     private void KickScan()
     {
-        if (Interlocked.Exchange(ref _kickPending, 1) == 1)
+        if (!ShouldScan || Interlocked.Exchange(ref _kickPending, 1) == 1)
             return;
         _ = Task.Run(async () =>
         {
