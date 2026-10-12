@@ -31,12 +31,47 @@ public sealed class Player : IDisposable
     {
         get
         {
-            var values = Devices.Select(d => d.LastState?.BatteryPercent ?? -1).Where(v => v >= 0).ToList();
-            return values.Count == 0 ? -1 : values.Min();
+            int best = -1;
+            foreach (var d in Devices)
+            {
+                int v = d.LastState?.BatteryPercent ?? -1;
+                if (v >= 0 && (best < 0 || v < best))
+                    best = v;
+            }
+            return best;
         }
     }
 
     public bool Charging => Devices.Any(d => d.LastState?.Charging == true);
+
+    /// <summary>Bluetooth-Adresse des ersten Geräts (für den DSU-Server).</summary>
+    public ulong Mac => Devices.Count > 0 ? AppPrefs.ParseAddress(Devices[0].Address) : 0;
+
+    private bool _warn15, _warn5;
+
+    /// <summary>Akku-Warnungstext bei ≤15 % bzw. ≤5 % – je Verbindung höchstens einmal (wie unter Windows).</summary>
+    public string? CheckBattery()
+    {
+        int percent = BatteryPercent;
+        if (percent < 0)
+            return null;
+        if (Charging || percent > 20)
+        {
+            _warn15 = _warn5 = false;
+            return null;
+        }
+        if (percent <= 5 && !_warn5)
+        {
+            _warn5 = true;
+            return L.F("{0}: Akku fast leer ({1} %) – bitte laden", Name, percent);
+        }
+        if (percent <= 15 && !_warn15)
+        {
+            _warn15 = true;
+            return L.F("{0}: Akku fast leer ({1} %)", Name, percent);
+        }
+        return null;
+    }
 
     /// <summary>Kann <paramref name="device"/> mit dem einzelnen Joy-Con dieses Spielers ein Paar bilden?</summary>
     public bool CanPairWith(Switch2Device device) =>
@@ -80,10 +115,19 @@ public sealed class Player : IDisposable
             _states[source] = state;
             if (Devices.Count == 2)
             {
-                if (Devices.Any(d => !_states.ContainsKey(d)))
+                Switch2Device? left = null, right = null;
+                bool missing = false;
+                foreach (var d in Devices)
+                {
+                    if (!_states.ContainsKey(d))
+                        missing = true;
+                    if (d.Kind.IsLeftJoyCon())
+                        left = d;
+                    else
+                        right = d;
+                }
+                if (missing || left is null || right is null)
                     return;
-                var left = Devices.First(d => d.Kind.IsLeftJoyCon());
-                var right = Devices.First(d => !d.Kind.IsLeftJoyCon());
                 input = Mapping.Merge(_states[left], left.Calibration, _states[right], right.Calibration, settings.PairGyroSource);
             }
             else if (source.Kind.IsJoyCon() && settings.IsUprightJoyCon(source.Address))
@@ -98,7 +142,7 @@ public sealed class Player : IDisposable
         }
 
         var output = Mapping.Evaluate(input, settings);
-        var gamepad = output.Gamepad;
+        var gamepad = ApplyMacros(output.Gamepad, output.Macros);
         bool gyroStick = settings.GyroStick == GyroStickMode.Always
                          || settings.GyroStick == GyroStickMode.WhileAiming && gamepad.LeftTrigger > 40
                          || output.Specials.HasFlag(SpecialAction.GyroStick);
@@ -110,6 +154,7 @@ public sealed class Player : IDisposable
         }
         LastInput = input;
         LastGamepad = gamepad;
+        Dsu.DsuServer.Instance?.Publish(Index, Mac, gamepad, input);
         try
         {
             _pad?.Update(gamepad);
@@ -118,6 +163,50 @@ public sealed class Player : IDisposable
         {
             Log.Error($"Spieler {Index + 1}: Ausgabe", e);
         }
+    }
+
+    // ---------- Makros ----------
+
+    /// <summary>Laufende Makros (Skript, Startzeit) und die Makros, deren Taste gerade gehalten wird.</summary>
+    private readonly List<(string Text, MacroScript Script, long Start)> _macros = [];
+    private HashSet<string> _macroButtons = [];
+
+    /// <summary>
+    /// Startet Makros beim Drücken ihrer Taste (nicht erneut, solange sie läuft) und fügt den aktuellen Schritt
+    /// aller laufenden Makros zum Gamepad hinzu. Tastatur-Schritte (Key:) entfallen – unter Android gibt es
+    /// keine Tastatur-Ausgabe. Portierung von Player.ApplyMacros (Windows).
+    /// </summary>
+    private GamepadState ApplyMacros(GamepadState g, IReadOnlyList<string> pressed)
+    {
+        long now = System.Environment.TickCount64;
+        foreach (var text in pressed)
+        {
+            bool known = _macroButtons.Contains(text);
+            if (!known)
+                foreach (var m in _macros)
+                    if (m.Text == text)
+                    {
+                        known = true;
+                        break;
+                    }
+            if (known || !MacroScript.TryParse(text, out var script))
+                continue;
+            _macros.Add((text, script, now));
+        }
+        _macroButtons = new HashSet<string>(pressed);
+        for (int i = _macros.Count - 1; i >= 0; i--)
+        {
+            var (_, script, start) = _macros[i];
+            if (script.StepAt(now - start) is not { } step)
+            {
+                _macros.RemoveAt(i);
+                continue;
+            }
+            // step.Keys (Tastatur) gibt es unter Android nicht – nur die Gamepad-Tasten werden gesetzt.
+            foreach (var target in step.Buttons)
+                g = Mapping.Press(g, target);
+        }
+        return g;
     }
 
     private void OnRumble(byte large, byte small)
@@ -132,6 +221,7 @@ public sealed class Player : IDisposable
     public void Dispose()
     {
         AttachOutput(null);
+        _macros.Clear();
         foreach (var d in Devices.ToList())
             d.Dispose();
         Devices.Clear();

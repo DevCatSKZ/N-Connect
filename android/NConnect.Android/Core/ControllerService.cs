@@ -24,6 +24,7 @@ public sealed class ControllerService : Service
     public const string ActionStop = "com.devcatskz.nconnect.STOP";
     public const string ActionEditTouch = "com.devcatskz.nconnect.EDIT_TOUCH";
     private const string Channel = "controller";
+    private const string ChannelAlerts = "hinweise";
     private const int NotificationId = 1;
 
     public static ControllerService? Instance { get; private set; }
@@ -35,6 +36,8 @@ public sealed class ControllerService : Service
     private readonly ConcurrentDictionary<string, FoundController> _elsewhere = new();
     /// <summary>Von Hand getrennte Controller kurz ignorieren, sonst verbänden sie sich sofort wieder.</summary>
     private readonly ConcurrentDictionary<string, long> _quietUntil = new();
+    /// <summary>Nach Fehlschlägen zunehmend lange Pause vor dem nächsten Versuch (Fehlversuche, Pause bis).</summary>
+    private readonly ConcurrentDictionary<string, (int Failures, long Until)> _retry = new();
     private readonly CancellationTokenSource _cts = new();
     private BluetoothStateReceiver? _btReceiver;
 
@@ -70,7 +73,7 @@ public sealed class ControllerService : Service
         base.OnCreate();
         HangWatchdog.Start();
         Instance = this;
-        CreateChannel();
+        CreateChannel(this);
         _scanner.Found += OnFound;
         _btReceiver = new BluetoothStateReceiver(this);
         RegisterReceiver(_btReceiver, new IntentFilter(BluetoothAdapter.ActionStateChanged));
@@ -103,7 +106,10 @@ public sealed class ControllerService : Service
         {
             _outputWatch = true;
             _ = Task.Run(() => WatchOutputAsync(_cts.Token));
+            _ = Task.Run(() => MaintenanceLoopAsync(_cts.Token));
         }
+        if (AppPrefs.DsuEnabled)
+            Dsu.DsuServer.Start();
         return StartCommandResult.Sticky;
     }
 
@@ -112,6 +118,7 @@ public sealed class ControllerService : Service
     /// <summary>
     /// Hält den Ausgabeweg aktuell: ist (noch) keiner aktiv – etwa weil Shizuku erst nach N-Connect gestartet wurde –,
     /// wird alle 2 s nachgeprüft und sofort übernommen; fällt Shizuku weg (Neustart), merkt die App das ebenso.
+    /// Bei gesundem Weg genügt eine Prüfung alle 15 s (Akku).
     /// </summary>
     private async Task WatchOutputAsync(CancellationToken ct)
     {
@@ -135,7 +142,28 @@ public sealed class ControllerService : Service
                         RaiseChanged();
                     }
                 }
-                await Task.Delay(2000, ct);
+                await Task.Delay(before is null || lost ? 2000 : 15000, ct);
+            }
+        }
+        catch (System.OperationCanceledException)
+        {
+        }
+    }
+
+    /// <summary>Langsame Nebenaufgaben: Akku-Warnung und Profil des gerade laufenden Spiels.</summary>
+    private async Task MaintenanceLoopAsync(CancellationToken ct)
+    {
+        try
+        {
+            while (!ct.IsCancellationRequested)
+            {
+                await Task.Delay(5000, ct);
+                foreach (var player in Players)
+                {
+                    if (player.CheckBattery() is { } warning)
+                        NotifyBattery(player, warning);
+                }
+                Profiles.GameProfileWatcher.Poll(this, RaiseChanged);
             }
         }
         catch (System.OperationCanceledException)
@@ -154,12 +182,28 @@ public sealed class ControllerService : Service
 
     public void StartScan()
     {
-        bool anyConnected;
-        lock (_players)
-            anyConnected = _players.Count > 0;
-        if (!_scanner.Start(this, lowPower: anyConnected))
+        UpdateScanning();
+        if (!_scanner.Scanning && !BluetoothOn)
             Log.Warn("Bluetooth ist aus – Suche startet, sobald es eingeschaltet wird");
         RaiseChanged();
+    }
+
+    /// <summary>
+    /// Suche dem Zustand anpassen: ohne Controller flott suchen, mit Verbindung stromsparend – und gar nicht mehr,
+    /// wenn alle acht Spielerplätze belegt sind und auch kein Joy-Con mehr auf seinen Partner wartet.
+    /// </summary>
+    private void UpdateScanning()
+    {
+        lock (_players)
+        {
+            bool pairPossible = _players.Any(p => p.Devices.Count == 1 && p.Devices[0].Kind.IsJoyCon());
+            if (_players.Count >= 8 && !pairPossible)
+            {
+                _scanner.Stop();
+                return;
+            }
+            _scanner.Start(this, lowPower: _players.Count > 0);
+        }
     }
 
     // ---------- Controller finden und verbinden ----------
@@ -167,18 +211,24 @@ public sealed class ControllerService : Service
     private void OnFound(FoundController f)
     {
         ulong me = AppPrefs.ParseAddress(AppPrefs.HostAddress);
-        bool forUs = f.SyncMode || (me != 0 && f.Host == me);
+        // Mit diesem Gerät gekoppelt (Android-Bond)? Dann ist die Einordnung „anderes Gerät“ sicher falsch –
+        // z. B. wenn die Host-Adresse in der Werbung älter oder anders angeordnet ist.
+        bool bonded = Switch2Scanner.Adapter(this)?.GetRemoteDevice(f.Address)?.BondState == Bond.Bonded;
+        bool forUs = f.SyncMode || bonded || (me != 0 && f.Host == me);
         if (!forUs)
         {
             if (_elsewhere.TryAdd(f.Address, f))
             {
-                Log.Info($"{f.Address}: {Texts.ShortName(f.Kind)} ist mit einem anderen Gerät gekoppelt");
+                Log.Info($"{f.Address}: {Texts.ShortName(f.Kind)} wirbt für {BtAddress.Format(f.Host)} – mit einem anderen Gerät gekoppelt");
                 RaiseChanged();
             }
             return;
         }
         _elsewhere.TryRemove(f.Address, out _);
         if (_quietUntil.TryGetValue(f.Address, out long until) && System.Environment.TickCount64 < until)
+            return;
+        // Nach einem Fehlschlag nicht sofort wieder – sonst kreiselt die Verbindung im Sekundentakt.
+        if (_retry.TryGetValue(f.Address, out var retry) && System.Environment.TickCount64 < retry.Until)
             return;
         if (IsConnected(f.Address) || !_connecting.TryAdd(f.Address, 0))
             return;
@@ -208,19 +258,31 @@ public sealed class ControllerService : Service
             {
                 Log.Warn($"{f.Address}: während der Einrichtung getrennt – nicht übernommen");
                 device.Dispose();
+                NoteFailure(f.Address);
                 return;
             }
+            _retry.TryRemove(f.Address, out _); // Fehlerzähler bei Erfolg zurücksetzen
             AddToPlayer(device);
         }
         catch (Exception e) when (!_cts.IsCancellationRequested)
         {
             Log.Error($"{f.Address}: Verbindung fehlgeschlagen", e);
+            NoteFailure(f.Address);
         }
         finally
         {
             _connecting.TryRemove(f.Address, out _);
             RaiseChanged();
         }
+    }
+
+    /// <summary>Fehlversuch merken und die nächste Pause verdoppeln (5 s → höchstens 60 s).</summary>
+    private void NoteFailure(string address)
+    {
+        var entry = _retry.AddOrUpdate(address, (0, 0L), (_, old) => old);
+        int failures = entry.Failures + 1;
+        long delay = Math.Min(60000, 5000L << Math.Min(failures - 1, 4));
+        _retry[address] = (failures, System.Environment.TickCount64 + delay);
     }
 
     private void AddToPlayer(Switch2Device device)
@@ -256,7 +318,7 @@ public sealed class ControllerService : Service
         _ = device.PlayConnectFeedbackAsync();
         Log.Info(pairing ? $"Joy-Con zusammengefasst (Spieler {player.Index + 1})"
             : $"{Texts.ShortName(device.Kind)} verbunden (Spieler {player.Index + 1})");
-        _scanner.Start(this, lowPower: true);
+        UpdateScanning();
         RaiseChanged();
     }
 
@@ -277,12 +339,9 @@ public sealed class ControllerService : Service
         }
         device.Dispose();
         emptied?.Dispose();
+        Dsu.DsuServer.Instance?.Clear(emptied?.Index ?? -1);
         Log.Info($"{Texts.ShortName(device.Kind)} getrennt");
-        bool none;
-        lock (_players)
-            none = _players.Count == 0;
-        if (none)
-            _scanner.Start(this, lowPower: false);
+        UpdateScanning();
         RaiseChanged();
     }
 
@@ -314,7 +373,10 @@ public sealed class ControllerService : Service
             _players.Clear();
         }
         foreach (var p in all)
+        {
             Quiet(p);
+            Dsu.DsuServer.Instance?.Clear(p.Index);
+        }
         _ = Task.Run(() => { foreach (var p in all) p.Dispose(); });
         _scanner.Start(this, lowPower: false);
         RaiseChanged();
@@ -351,6 +413,7 @@ public sealed class ControllerService : Service
     private void StopEverything()
     {
         _scanner.Stop();
+        Dsu.DsuServer.Instance?.Dispose();
         DisconnectAll();
         StopForeground(StopForegroundFlags.Remove);
         StopSelf();
@@ -383,16 +446,23 @@ public sealed class ControllerService : Service
 
     // ---------- Benachrichtigung ----------
 
-    private void CreateChannel()
+    /// <summary>Benachrichtigungs-Kanäle anlegen – auch aus dem BootReceiver heraus nutzbar.</summary>
+    internal static void CreateChannel(Context context)
     {
         if (!OperatingSystem.IsAndroidVersionAtLeast(26))
             return;
+        var manager = context.GetSystemService(NotificationService)!.JavaCast<NotificationManager>()!;
         var channel = new NotificationChannel(Channel, L.T("Controller-Verbindung"), NotificationImportance.Low)
         {
             Description = L.T("Zeigt, welche Controller verbunden sind, solange N-Connect im Hintergrund läuft."),
         };
         channel.SetShowBadge(false);
-        GetSystemService(NotificationService)!.JavaCast<NotificationManager>()!.CreateNotificationChannel(channel);
+        manager.CreateNotificationChannel(channel);
+        var alerts = new NotificationChannel(ChannelAlerts, L.T("Hinweise"), NotificationImportance.Default)
+        {
+            Description = L.T("Akku-Warnungen und Hinweise auf neue Versionen."),
+        };
+        manager.CreateNotificationChannel(alerts);
     }
 
     private Notification BuildNotification()
@@ -429,6 +499,28 @@ public sealed class ControllerService : Service
     private PendingIntent ServiceIntent(string action, int requestCode) =>
         PendingIntent.GetService(this, requestCode, new Intent(this, typeof(ControllerService)).SetAction(action),
             PendingIntentFlags.Immutable | PendingIntentFlags.UpdateCurrent)!;
+
+    /// <summary>Akku-Warnung als eigene Benachrichtigung (je Spieler einmal, solange nicht geladen wird).</summary>
+    private void NotifyBattery(Player player, string text)
+    {
+        var open = PendingIntent.GetActivity(this, 0, new Intent(this, typeof(MainActivity)).SetFlags(ActivityFlags.SingleTop),
+            PendingIntentFlags.Immutable | PendingIntentFlags.UpdateCurrent);
+        var n = new NotificationCompat.Builder(this, ChannelAlerts)
+            .SetSmallIcon(Resource.Drawable.ic_battery)!
+            .SetContentTitle(L.T("Akku fast leer"))!
+            .SetContentText(text)!
+            .SetContentIntent(open)!
+            .SetAutoCancel(true)!
+            .SetColor(UI.Look.C(UI.Look.P(this).Accent).ToArgb())!
+            .Build()!;
+        try
+        {
+            NotificationManagerCompat.From(this)!.Notify(NotificationId + 10 + player.Index, n);
+        }
+        catch (Java.Lang.SecurityException)
+        {
+        }
+    }
 
     private void UpdateNotification()
     {

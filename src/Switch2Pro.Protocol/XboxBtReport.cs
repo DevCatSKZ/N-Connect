@@ -50,6 +50,16 @@ public static class XboxBtReport
     public static byte[] Build(GamepadState g)
     {
         var r = new byte[Length];
+        Build(g, r);
+        return r;
+    }
+
+    /// <summary>
+    /// Wie <see cref="Build(GamepadState)"/>, schreibt aber in einen vorhandenen Puffer (mindestens
+    /// <see cref="Length"/> Byte) – für den heißen Pfad ohne Speicherreservierung pro Bericht.
+    /// </summary>
+    public static void Build(GamepadState g, Span<byte> r)
+    {
         r[0] = 0x01;
         Put(r, 1, AxisX(g.LeftX));
         Put(r, 3, AxisY(g.LeftY));
@@ -65,13 +75,12 @@ public static class XboxBtReport
         r[15] = (byte)((b.HasFlag(XButtons.Start) ? 0x08 : 0) | (b.HasFlag(XButtons.Guide) ? 0x10 : 0)
                        | (b.HasFlag(XButtons.LS) ? 0x20 : 0) | (b.HasFlag(XButtons.RS) ? 0x40 : 0));
         r[16] = (byte)(b.HasFlag(XButtons.Back) ? 0x01 : 0);
-        return r;
     }
 
     /// <summary>Bericht ohne Eingabe (Sticks mittig, nichts gedrückt).</summary>
     public static byte[] Neutral() => Build(default);
 
-    private static void Put(byte[] r, int offset, ushort value)
+    private static void Put(Span<byte> r, int offset, ushort value)
     {
         r[offset] = (byte)value;
         r[offset + 1] = (byte)(value >> 8);
@@ -131,6 +140,53 @@ public static class UhidCommand
         sb.Append("{\"id\":").Append(id).Append(",\"command\":\"report\",\"report\":");
         AppendBytes(sb, report);
         return sb.Append('}').ToString();
+    }
+
+    /// <summary>
+    /// Die „Bericht senden“-Zeile (wie <see cref="Report"/>, plus Zeilenumbruch) direkt als ASCII in einen
+    /// Byte-Puffer schreiben. Rückgabe: geschriebene Länge. Im Dauerbetrieb ohne Speicherreservierung –
+    /// bei ~90 Eingaben/s je Controller würden sonst laufend Zeichenketten im Speicher landen.
+    /// </summary>
+    public static int WriteReportLine(int id, ReadOnlySpan<byte> report, Span<byte> buffer)
+    {
+        ReadOnlySpan<byte> head = "{\"id\":"u8;
+        ReadOnlySpan<byte> mid = ",\"command\":\"report\",\"report\":["u8;
+        int pos = 0;
+        head.CopyTo(buffer);
+        pos += head.Length;
+        pos += WriteInt(buffer[pos..], id);
+        mid.CopyTo(buffer[pos..]);
+        pos += mid.Length;
+        for (int i = 0; i < report.Length; i++)
+        {
+            if (i > 0)
+                buffer[pos++] = (byte)',';
+            pos += WriteInt(buffer[pos..], report[i]);
+        }
+        buffer[pos++] = (byte)']';
+        buffer[pos++] = (byte)'}';
+        buffer[pos++] = (byte)'\n';
+        return pos;
+    }
+
+    /// <summary>Schätzgröße, die <see cref="WriteReportLine"/> für einen Bericht braucht (gerundet nach oben).</summary>
+    public static int ReportLineCapacity(int reportLength) => reportLength * 4 + 48;
+
+    /// <summary>Nicht-negative ganze Zahl als ASCII-Ziffern schreiben. Rückgabe: geschriebene Länge.</summary>
+    private static int WriteInt(Span<byte> buffer, int value)
+    {
+        if (value == 0)
+        {
+            buffer[0] = (byte)'0';
+            return 1;
+        }
+        int digits = value < 10 ? 1 : value < 100 ? 2 : 3;
+        for (int i = digits - 1; i >= 0; i--)
+        {
+            buffer[i] = (byte)('0' + value % 10);
+            value /= 10;
+        }
+        return digits;
     }
 
     /// <summary>Virtuellen Xbox-Controller anmelden.</summary>
