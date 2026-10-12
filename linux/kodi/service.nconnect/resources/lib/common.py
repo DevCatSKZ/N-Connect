@@ -216,6 +216,26 @@ def read_log_tail(lines=300):
 # ---------- Icons je Controller-Art ----------
 
 ICONS_DIR = os.path.join(ADDON_PATH, 'resources', 'icons')
+# Kurze Namen für Widget-Kacheln – der volle Anzeigename („Nintendo Switch 2 Joy-Con (L)“)
+# wird auf dem Home-Bildschirm abgeschnitten.
+_KIND_SHORT = {
+    'JoyCon2Left': 'Joy-Con 2 (L)', 'JoyCon2Right': 'Joy-Con 2 (R)',
+    'JoyCon1Left': 'Joy-Con (L)', 'JoyCon1Right': 'Joy-Con (R)',
+    'JoyConPair': 'Joy-Con (L+R)',
+    'Pro2': 'Pro Controller 2', 'Pro1': 'Pro Controller', 'WiiUPro': 'Wii U Pro',
+    'GameCube2': 'GameCube',
+    'NesController': 'NES', 'SnesController': 'SNES',
+    'N64Controller': 'N64', 'MegaDrive': 'Mega Drive',
+    'WiiRemote': 'Wii Remote',
+    'DualShock4': 'DualShock 4', 'DualSense': 'DualSense',
+    'XboxController': 'Xbox',
+}
+
+
+def short_name(kind, name=''):
+    return _KIND_SHORT.get(kind) or (name or 'Controller')
+
+
 _KIND_ICONS = {
     'JoyCon2Left': 'joycon_l.png', 'JoyCon2Right': 'joycon_r.png',
     'JoyCon1Left': 'joycon_l.png', 'JoyCon1Right': 'joycon_r.png',
