@@ -69,6 +69,20 @@ public static class AppPrefs
         set => P.Edit()!.PutBoolean("auto_start", value)!.Apply();
     }
 
+    /// <summary>Controller-Dienst nach dem Einschalten des Geräts wieder starten (BootReceiver).</summary>
+    public static bool StartOnBoot
+    {
+        get => P.GetBoolean("start_on_boot", false);
+        set => P.Edit()!.PutBoolean("start_on_boot", value)!.Apply();
+    }
+
+    /// <summary>DSU-Server (Cemuhook, 127.0.0.1:26760): Gyro/Tasten an Emulatoren auf diesem Gerät liefern.</summary>
+    public static bool DsuEnabled
+    {
+        get => P.GetBoolean("dsu_enabled", false);
+        set => P.Edit()!.PutBoolean("dsu_enabled", value)!.Apply();
+    }
+
     public static string SettingsPath =>
         Path.Combine(global::Android.App.Application.Context.FilesDir!.AbsolutePath, "settings.json");
 

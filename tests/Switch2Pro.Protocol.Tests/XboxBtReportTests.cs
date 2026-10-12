@@ -85,4 +85,32 @@ public class XboxBtReportTests
         Assert.Equal("{\"id\":1,\"command\":\"report\",\"report\":[1,255,127,255,127,255,127,255,127,0,0,0,0,0,0,0,0]}",
             UhidCommand.Report(1, XboxBtReport.Neutral()));
     }
+
+    [Fact]
+    public void Build_InPuffer_GleicheBytesWieNeuesArray()
+    {
+        Span<byte> buffer = stackalloc byte[XboxBtReport.Length + 8];
+        foreach (var g in new[]
+                 {
+                     new GamepadState(XButtons.A | XButtons.Left, 255, 128, -1000, 2000, 30000, -31000, true),
+                     new GamepadState(XButtons.None, 0, 0, 0, 0, 0, 0, false),
+                     new GamepadState(XButtons.Guide | XButtons.RS, 1, 1, short.MaxValue, short.MinValue, short.MinValue, short.MaxValue, false),
+                 })
+        {
+            byte[] expected = XboxBtReport.Build(g);
+            XboxBtReport.Build(g, buffer);
+            Assert.Equal(expected, buffer[..XboxBtReport.Length].ToArray());
+        }
+    }
+
+    [Fact]
+    public void WriteReportLine_EntsperichtReportPlusZeilenumbruch()
+    {
+        byte[] report = XboxBtReport.Build(new GamepadState(XButtons.Y | XButtons.RB, 0, 0, 1234, -5678, 0, 0, false));
+        Span<byte> buffer = stackalloc byte[UhidCommand.ReportLineCapacity(report.Length)];
+        int n = UhidCommand.WriteReportLine(3, report, buffer);
+        Assert.Equal(UhidCommand.Report(3, report) + "\n", System.Text.Encoding.ASCII.GetString(buffer[..n]));
+        // Puffer mit Lückenfüller muss sauber enden (nichts wird hinter das Zeilenende geschrieben)
+        Assert.True(n <= buffer.Length);
+    }
 }

@@ -9,7 +9,7 @@ namespace NConnect.Android.Core;
 /// </summary>
 public static class HangWatchdog
 {
-    private const int CheckMs = 500;
+    private const int CheckMs = 1000;
     private const int StallMs = 2000;
     private static int _started;
 

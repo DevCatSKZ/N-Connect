@@ -108,6 +108,13 @@ public sealed class Switch2Scanner
                 if (_lastSeen.TryGetValue(address, out var last) && last.Host == host && now - last.Ticks < 1000)
                     return;
                 _lastSeen[address] = (now, host);
+                // Damit die Liste nicht über Stunden wächst: alte Einträge gelegentlich ausmisten.
+                if (_lastSeen.Count > 32)
+                {
+                    var stale = _lastSeen.Where(kv => now - kv.Value.Ticks > 60000).Select(kv => kv.Key).ToList();
+                    foreach (var key in stale)
+                        _lastSeen.Remove(key);
+                }
             }
             Found?.Invoke(new FoundController(address, kind, host, result.Rssi));
         }

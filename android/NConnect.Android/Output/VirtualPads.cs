@@ -25,7 +25,9 @@ public sealed partial class UhidPad : IVirtualPad
     private readonly Stream _stdin;
     private readonly object _writeLock = new();
     private readonly int _id;
-    private byte[]? _last;
+    private readonly byte[] _report = new byte[XboxBtReport.Length];
+    private readonly byte[] _line;
+    private bool _sent;
     private int _disposed;
 
     public event Action<byte, byte>? Rumble;
@@ -36,6 +38,7 @@ public sealed partial class UhidPad : IVirtualPad
         _process = process;
         _stdin = process.OutputStream!;
         _id = id;
+        _line = new byte[UhidCommand.ReportLineCapacity(XboxBtReport.Length)];
         Name = name;
         StartReader(process.InputStream!, ReadOutputLine);
         StartReader(process.ErrorStream!, line => Log.Warn($"hid ({Name}): {line}"));
@@ -54,29 +57,44 @@ public sealed partial class UhidPad : IVirtualPad
 
     public void Update(GamepadState state)
     {
-        byte[] report = XboxBtReport.Build(state);
-        if (_last is not null && report.AsSpan().SequenceEqual(_last))
-            return; // Android meldet nur Änderungen – gleiche Berichte sparen Akku
-        _last = report;
-        Write(UhidCommand.Report(_id, report));
+        lock (_writeLock)
+        {
+            // Bericht und JSON-Zeile laufen über feste Puffer – ~90 Berichte/s je Controller ohne neue Objekte.
+            var previous = _report.AsSpan();
+            Span<byte> current = stackalloc byte[XboxBtReport.Length];
+            XboxBtReport.Build(state, current);
+            if (_sent && current.SequenceEqual(previous))
+                return; // Android meldet nur Änderungen – gleiche Berichte sparen Akku
+            current.CopyTo(_report);
+            _sent = true;
+            Write(UhidCommand.WriteReportLine(_id, _report, _line));
+        }
     }
 
     private void Write(string line)
     {
-        if (Volatile.Read(ref _disposed) != 0)
-            return;
         byte[] bytes = Encoding.UTF8.GetBytes(line + "\n");
         lock (_writeLock)
+            WriteCore(bytes, bytes.Length);
+    }
+
+    private void Write(int length)
+    {
+        WriteCore(_line, length);
+    }
+
+    private void WriteCore(byte[] bytes, int length)
+    {
+        if (Volatile.Read(ref _disposed) != 0)
+            return;
+        try
         {
-            try
-            {
-                _stdin.Write(bytes, 0, bytes.Length);
-                _stdin.Flush();
-            }
-            catch (Exception e)
-            {
-                Log.Error($"Virtueller Controller „{Name}“", e);
-            }
+            _stdin.Write(bytes, 0, length);
+            _stdin.Flush();
+        }
+        catch (Exception e)
+        {
+            Log.Error($"Virtueller Controller „{Name}“", e);
         }
     }
 
