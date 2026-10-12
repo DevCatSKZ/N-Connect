@@ -50,28 +50,30 @@ def listing():
             add(text(30631))
         else:
             for p in status.get('players', []):
-                add(text(30600, p.get('player'), p.get('name')), subtitle_battery(p), common.player_icon(p))
+                devices = p.get('devices', [])
+                name = common.short_name(devices[0].get('kind'), p.get('name')) if len(devices) == 1 else p.get('name')
+                add(text(30600, p.get('player'), name), subtitle_battery(p), common.player_icon(p))
                 # Bei Paaren (Joy-Con L+R) jedes Gerät einzeln mit eigenem Icon einrücken.
-                if len(p.get('devices', [])) > 1:
-                    for d in p['devices']:
+                if len(devices) > 1:
+                    for d in devices:
                         sub = []
                         if d.get('battery', -1) >= 0:
                             sub.append(text(30601, d['battery']))
                         if d.get('rate'):
                             sub.append(text(30603, d['rate']))
-                        add('  ' + d.get('name', '?'), ' · '.join(sub),
+                        add('  ' + common.short_name(d.get('kind'), d.get('name')), ' · '.join(sub),
                             common.kind_icon(d.get('kind'), d.get('name')))
             for g in status.get('gamepads', []):
                 details = [text(30651) if g.get('connected') else text(30652)]
                 if g.get('battery', -1) >= 0:
                     details.append(text(30601, g['battery']))
                 add(g.get('name'), ' · '.join(details), common.kind_icon('', g.get('name')))
-            for address in status.get('connecting', []):
-                add(text(30621), address, 'DefaultIconInfo.png')
+            if status.get('connecting'):
+                add(text(30621), '', 'DefaultIconInfo.png')
             for f in status.get('elsewhere', []):
                 add(text(30606, f.get('name')), text(30607), 'DefaultIconInfo.png')
             if not status.get('players') and not status.get('gamepads') and bluetooth == 'on':
-                add(text(30604), text(30605), 'DefaultIconInfo.png')
+                add(text(30604), text(30605), common.ICON)
     xbmcplugin.setContent(int(sys.argv[1]), 'files')
     xbmcplugin.endOfDirectory(int(sys.argv[1]), cacheToDisc=False)
 

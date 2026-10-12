@@ -42,10 +42,7 @@ class Service(xbmc.Monitor):
         if now - self._last_widget_refresh < 1.5:
             return
         self._last_widget_refresh = now
-        # Nur Container mit einer N-Connect-Liste neu laden (eigene Quelle und das Status-Plugin),
-        # damit kein anderes Menü springt. Container.Refresh(pfad) wirkt nur auf passende Container.
-        for source in ('plugin://service.nconnect/', 'plugin://plugin.nconnect.status/'):
-            xbmc.executebuiltin('Container.Refresh({0})'.format(source))
+        xbmc.executebuiltin('Container.Refresh')
 
     def watch_status(self):
         """status.json geändert → Widget neu laden. Deckt jede Status-Änderung ab (Akku, Rate, Verbindungen),
