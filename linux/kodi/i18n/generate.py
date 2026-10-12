@@ -16,6 +16,20 @@ LANG_DIR = pathlib.Path(__file__).parent.parent / 'service.nconnect' / 'resource
 
 # Neue Texte, die in allen Sprachen ergänzt werden: ID -> {Sprache: Text}; "en" ist die Quelle (msgid).
 EXTRA = {
+    30029: {
+        'en': 'WiFi is active and shares the antenna with Bluetooth – turn it off if unused (LibreELEC settings > Connections)',
+        'de': 'WLAN ist aktiv und teilt sich die Antenne mit Bluetooth – ausschalten, wenn es nicht gebraucht wird (LibreELEC-Einstellungen > Verbindungen)',
+        'es': 'El WiFi está activo y comparte la antena con el Bluetooth; desactívalo si no lo usas (Ajustes de LibreELEC > Conexiones)',
+        'fr': "Le Wi-Fi est actif et partage l'antenne avec le Bluetooth ; désactivez-le s'il est inutile (Paramètres LibreELEC > Connexions)",
+        'it': "Il Wi-Fi è attivo e condivide l'antenna con il Bluetooth; spegnilo se non lo usi (Impostazioni LibreELEC > Connessioni)",
+        'pt': 'O Wi-Fi está ativo e partilha a antena com o Bluetooth; desliga-o se não for usado (Definições do LibreELEC > Ligações)',
+        'nl': 'Wifi is actief en deelt de antenne met Bluetooth; schakel het uit als je het niet gebruikt (LibreELEC-instellingen > Verbindingen)',
+        'pl': 'Wi-Fi jest aktywne i dzieli antenę z Bluetoothem – wyłącz je, jeśli nie jest potrzebne (Ustawienia LibreELEC > Połączenia)',
+        'ru': 'Wi-Fi активен и делит антенну с Bluetooth – выключите его, если он не нужен (Настройки LibreELEC > Соединения)',
+        'ja': 'Wi-Fi が有効で Bluetooth とアンテナを共用しています – 使わない場合はオフにしてください（LibreELEC 設定 > 接続）',
+        'zh': 'Wi-Fi 已启用并与蓝牙共用天线 – 如不使用请关闭（LibreELEC 设置 > 连接）',
+        'ko': 'Wi-Fi가 켜져 있어 Bluetooth와 안테나를 공유합니다 – 사용하지 않으면 끄세요 (LibreELEC 설정 > 연결)',
+    },
     30027: {
         'en': 'Searching for controllers for 2 minutes …', 'de': 'Suche 2 Minuten nach Controllern …',
         'es': 'Buscando mandos durante 2 minutos …', 'fr': 'Recherche de manettes pendant 2 minutes …',

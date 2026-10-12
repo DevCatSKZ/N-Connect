@@ -113,12 +113,14 @@ def menu():
         if status is not None:
             players = status.get('players', [])
             for p in players:
-                entries.append((item(text(30600, p.get('player'), p.get('name')), battery_line(p)), ('player', p)))
+                entries.append((item(text(30600, p.get('player'), p.get('name')), battery_line(p),
+                                     common.player_icon(p)), ('player', p)))
             for g in status.get('gamepads', []):
                 details = [text(30651) if g.get('connected') else text(30652)]
                 if g.get('battery', -1) >= 0:
                     details.append(text(30601, g['battery']))
-                entries.append((item(g.get('name'), ' · '.join(details)), ('gamepad', g)))
+                entries.append((item(g.get('name'), ' · '.join(details),
+                                     common.kind_icon('', g.get('name'))), ('gamepad', g)))
             for address in status.get('connecting', []):
                 entries.append((item(text(30621), address), ('refresh', None)))
             for f in status.get('elsewhere', []):

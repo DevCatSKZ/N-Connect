@@ -45,4 +45,5 @@ De controller verschijnt overal als „Xbox 360 Controller” en hoeft niet te w
 • Er gebeurt niets bij SYNC: voer de diagnose uit (toont of Bluetooth en de virtuele controller klaar zijn).
 • Melding „gekoppeld aan een ander apparaat”: druk op SYNC om hem hier opnieuw te koppelen.
 • Vertraging: ga dichter bij de Bluetooth-adapter zitten; een USB-verlengkabel voor de stick helpt tegen USB 3-storing.
+• Verbinding wordt meteen geweigerd (errno 38): wifi stoort Bluetooth – schakel het uit als je het niet gebruikt (LibreELEC-instellingen > Verbindingen).
 • Toon het logboek en voeg het toe bij het melden van een probleem: github.com/DevCatSKZ/N-Connect/issues

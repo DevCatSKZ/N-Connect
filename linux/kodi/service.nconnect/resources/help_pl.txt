@@ -45,4 +45,5 @@ Kontroler jest wszędzie widoczny jako „Xbox 360 Controller” i nie wymaga ko
 • Nic się nie dzieje po SYNC: uruchom diagnostykę (pokazuje, czy Bluetooth i wirtualny kontroler są gotowe).
 • Komunikat „sparowany z innym urządzeniem”: naciśnij SYNC, aby sparować go tutaj ponownie.
 • Opóźnienia: zbliż się do adaptera Bluetooth; przedłużacz USB dla klucza pomaga przy zakłóceniach USB 3.
+• Połączenie jest od razu odrzucane (errno 38): Wi-Fi zakłóca Bluetooth – wyłącz je, jeśli nie jest używane (Ustawienia LibreELEC > Połączenia).
 • Pokaż dziennik i dołącz go przy zgłaszaniu problemu: github.com/DevCatSKZ/N-Connect/issues

@@ -89,11 +89,10 @@ public sealed class Switch2Scanner : IAsyncDisposable
     /// <summary>
     /// Suche neu anstoßen. Nötig nach jedem eigenen Verbindungsaufbau: Der Kernel pausiert dafür die Suche und nimmt
     /// sie danach nicht wieder auf, während BlueZ weiter „Discovering = true“ meldet – neue Controller blieben unsichtbar.
+    /// Läuft auch, wenn die Suche vorher absichtlich angehalten wurde (Verbindungsaufbau).
     /// </summary>
     public async Task RestartAsync()
     {
-        if (!Scanning)
-            return;
         await StopAsync().ConfigureAwait(false);
         await Task.Delay(300).ConfigureAwait(false);
         await StartAsync().ConfigureAwait(false);

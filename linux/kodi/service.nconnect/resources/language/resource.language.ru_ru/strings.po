@@ -607,3 +607,7 @@ msgstr "Также для других устройств в домашней с
 msgctxt "#30144"
 msgid "Lets an emulator on another device (e.g. Cemu on a PC) use the motion data of controllers connected here. Only enable on a trusted home network."
 msgstr "Позволяет эмулятору на другом устройстве (например, Cemu на ПК) использовать данные движения подключённых здесь контроллеров. Включайте только в доверенной домашней сети."
+
+msgctxt "#30029"
+msgid "WiFi is active and shares the antenna with Bluetooth – turn it off if unused (LibreELEC settings > Connections)"
+msgstr "Wi-Fi активен и делит антенну с Bluetooth – выключите его, если он не нужен (Настройки LibreELEC > Соединения)"

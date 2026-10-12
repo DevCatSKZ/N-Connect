@@ -45,4 +45,5 @@ La manette apparaît partout comme « Xbox 360 Controller » et ne nécessite au
 • Rien ne se passe avec SYNC : lancez le diagnostic (il indique si le Bluetooth et la manette virtuelle sont prêts).
 • Message « associée à un autre appareil » : appuyez sur SYNC pour l'associer à nouveau ici.
 • Latence : rapprochez-vous de l'adaptateur Bluetooth ; une rallonge USB pour la clé aide contre les interférences USB 3.
+• La connexion est refusée aussitôt (errno 38) : le Wi-Fi perturbe le Bluetooth – désactivez-le s'il est inutile (Paramètres LibreELEC > Connexions).
 • Affichez le journal et joignez-le pour signaler un problème : github.com/DevCatSKZ/N-Connect/issues

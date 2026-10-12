@@ -45,4 +45,5 @@ El mando aparece en todas partes como «Xbox 360 Controller» y no necesita conf
 • No pasa nada al pulsar SYNC: ejecuta el diagnóstico (muestra si el Bluetooth y el mando virtual están listos).
 • Mensaje «emparejado con otro dispositivo»: pulsa SYNC para emparejarlo de nuevo aquí.
 • Retraso en la respuesta: acércate al adaptador Bluetooth; un alargador USB para la llave ayuda contra interferencias de USB 3.
+• La conexión se rechaza al instante (errno 38): el WiFi interfiere con el Bluetooth – desactívalo si no lo usas (Ajustes de LibreELEC > Conexiones).
 • Muestra el registro y adjúntalo al informar de un problema: github.com/DevCatSKZ/N-Connect/issues
