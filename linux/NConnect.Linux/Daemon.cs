@@ -391,12 +391,15 @@ public sealed class Daemon : IAsyncDisposable
 
     private void OnFound(FoundController f)
     {
-        bool forUs = f.SyncMode || (_hostAddress != 0 && f.Host == _hostAddress);
+        // „Für uns“: SYNC-Werbung, Werbung mit der Adresse dieses Adapters – oder mit ihm gekoppelt.
+        // Letzteres ist der verlässlichere Nachweis: Steht in der Werbung eine ältere/stimmt die Reihenfolge
+        // nicht überein, liegt der Controller sonst dauerhaft fälschlich in „anderes Gerät“.
+        bool forUs = f.SyncMode || f.Paired || (_hostAddress != 0 && f.Host == _hostAddress);
         if (!forUs)
         {
             if (_elsewhere.TryAdd(f.Address, f))
             {
-                Log.Info($"{f.Address}: {f.Kind.DisplayName()} ist mit einem anderen Gerät gekoppelt (SYNC drücken)");
+                Log.Info($"{f.Address}: {f.Kind.DisplayName()} wirbt für {BtAddress.Format(f.Host)} – mit einem anderen Gerät gekoppelt (SYNC drücken)");
                 Emit("elsewhere", new JsonObject { ["address"] = f.Address, ["kind"] = f.Kind.ToString(), ["name"] = f.Kind.DisplayName() });
                 RequestStatus();
             }
