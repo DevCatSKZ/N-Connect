@@ -26,9 +26,12 @@ public static class HangWatchdog
     {
         long lastBeat = System.Environment.TickCount64;
         bool reported = false;
+        // Ein einziges Runnable wiederverwenden: pro Sekunde ein neues Java-Objekt (samt Brücke) ergab im
+        // Dauerbetrieb laufend Speicherbereinigungen, auch wenn sonst nichts passiert.
+        using var beat = new Java.Lang.Runnable(() => Volatile.Write(ref lastBeat, System.Environment.TickCount64));
         while (true)
         {
-            main.Post(() => Volatile.Write(ref lastBeat, System.Environment.TickCount64));
+            main.Post(beat);
             Thread.Sleep(CheckMs);
             long stalled = System.Environment.TickCount64 - Volatile.Read(ref lastBeat);
             if (stalled < StallMs)

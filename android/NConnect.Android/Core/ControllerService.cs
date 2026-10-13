@@ -158,6 +158,8 @@ public sealed class ControllerService : Service
             while (!ct.IsCancellationRequested)
             {
                 await Task.Delay(5000, ct);
+                if (_scanner is { Scanning: true, LowPower: false } && System.Environment.TickCount64 >= _fastScanUntil)
+                    UpdateScanning(); // schnelles Suchfenster abgelaufen → stromsparend weitersuchen
                 foreach (var player in Players)
                 {
                     if (player.CheckBattery() is { } warning)
@@ -180,8 +182,13 @@ public sealed class ControllerService : Service
             StartForeground(NotificationId, n);
     }
 
+    /// <summary>Bis dahin (TickCount64) wird schnell gesucht – danach stromsparend, auch ganz ohne Controller.</summary>
+    private long _fastScanUntil;
+    private const long FastScanMs = 120_000;
+
     public void StartScan()
     {
+        _fastScanUntil = System.Environment.TickCount64 + FastScanMs;
         UpdateScanning();
         if (!_scanner.Scanning && !BluetoothOn)
             Log.Warn("Bluetooth ist aus – Suche startet, sobald es eingeschaltet wird");
@@ -189,8 +196,9 @@ public sealed class ControllerService : Service
     }
 
     /// <summary>
-    /// Suche dem Zustand anpassen: ohne Controller flott suchen, mit Verbindung stromsparend – und gar nicht mehr,
-    /// wenn alle acht Spielerplätze belegt sind und auch kein Joy-Con mehr auf seinen Partner wartet.
+    /// Suche dem Zustand anpassen: nur in den ersten zwei Minuten nach App-Start/Bluetooth-an/Trennen und ohne
+    /// Controller schnell suchen (Dauer-LowLatency belastet Akku und das ganze Telefon), sonst stromsparend – und gar
+    /// nicht mehr, wenn alle acht Spielerplätze belegt sind und auch kein Joy-Con mehr auf seinen Partner wartet.
     /// </summary>
     private void UpdateScanning()
     {
@@ -202,7 +210,8 @@ public sealed class ControllerService : Service
                 _scanner.Stop();
                 return;
             }
-            _scanner.Start(this, lowPower: _players.Count > 0);
+            bool fast = _players.Count == 0 && System.Environment.TickCount64 < _fastScanUntil;
+            _scanner.Start(this, lowPower: !fast);
         }
     }
 
@@ -212,9 +221,9 @@ public sealed class ControllerService : Service
     {
         ulong me = AppPrefs.ParseAddress(AppPrefs.HostAddress);
         // Mit diesem Gerät gekoppelt (Android-Bond)? Dann ist die Einordnung „anderes Gerät“ sicher falsch –
-        // z. B. wenn die Host-Adresse in der Werbung älter oder anders angeordnet ist.
-        bool bonded = Switch2Scanner.Adapter(this)?.GetRemoteDevice(f.Address)?.BondState == Bond.Bonded;
-        bool forUs = f.SyncMode || bonded || (me != 0 && f.Host == me);
+        // z. B. wenn die Host-Adresse in der Werbung älter oder anders angeordnet ist. Die Prüfung kostet einen
+        // Binder-Aufruf plus Java-Objekte, daher nur wenn nötig und zwischengespeichert (siehe IsBonded).
+        bool forUs = f.SyncMode || (me != 0 && f.Host == me) || IsBonded(f.Address);
         if (!forUs)
         {
             if (_elsewhere.TryAdd(f.Address, f))
@@ -237,6 +246,32 @@ public sealed class ControllerService : Service
         // Suchergebnisse kommen auf dem Haupt-Thread an – Verbindung, Einrichtung und virtueller Controller (Shizuku/Root-
         // Prozess) laufen im Hintergrund, sonst friert die Oberfläche ein („App reagiert nicht“).
         _ = Task.Run(() => ConnectAsync(f, pairHost));
+    }
+
+    private readonly ConcurrentDictionary<string, (bool Bonded, long Ticks)> _bondCache = new();
+
+    /// <summary>
+    /// Bond-Status eines Controllers, höchstens alle 15 s neu abgefragt. Werbende Controller melden sich mehrmals pro
+    /// Sekunde – jede Abfrage erzeugt Java-Objekte und einen Binder-Aufruf auf dem Haupt-Thread, ohne Zwischenspeicher
+    /// führt das zu Speicherbereinigungs-Stürmen und hängender Oberfläche.
+    /// </summary>
+    private bool IsBonded(string address)
+    {
+        long now = System.Environment.TickCount64;
+        if (_bondCache.TryGetValue(address, out var cached) && now - cached.Ticks < 15000)
+            return cached.Bonded;
+        bool bonded = false;
+        try
+        {
+            using var device = Switch2Scanner.Adapter(this)?.GetRemoteDevice(address);
+            bonded = device?.BondState == Bond.Bonded;
+        }
+        catch (Exception)
+        {
+            // Bluetooth gerade aus oder Adresse ungültig – als „nicht gekoppelt“ werten
+        }
+        _bondCache[address] = (bonded, now);
+        return bonded;
     }
 
     private bool IsConnected(string address)
@@ -262,6 +297,7 @@ public sealed class ControllerService : Service
                 return;
             }
             _retry.TryRemove(f.Address, out _); // Fehlerzähler bei Erfolg zurücksetzen
+            _bondCache.TryRemove(f.Address, out _); // evtl. gerade neu gekoppelt
             AddToPlayer(device);
         }
         catch (Exception e) when (!_cts.IsCancellationRequested)
@@ -341,6 +377,8 @@ public sealed class ControllerService : Service
         emptied?.Dispose();
         Dsu.DsuServer.Instance?.Clear(emptied?.Index ?? -1);
         Log.Info($"{Texts.ShortName(device.Kind)} getrennt");
+        if (emptied is not null)
+            _fastScanUntil = System.Environment.TickCount64 + FastScanMs;
         UpdateScanning();
         RaiseChanged();
     }
@@ -359,8 +397,9 @@ public sealed class ControllerService : Service
         _ = Task.Run(player.Dispose); // Prozess-/Bluetooth-Abbau nicht auf dem Hauptthread
         Log.Info($"Spieler {player.Index + 1} getrennt");
         if (none)
-            _scanner.Start(this, lowPower: false);
-        RaiseChanged();
+            StartScan();
+        else
+            RaiseChanged();
     }
 
     /// <summary>Alle Controller trennen (bleiben gekoppelt und verbinden sich per Tastendruck neu).</summary>
@@ -378,8 +417,7 @@ public sealed class ControllerService : Service
             Dsu.DsuServer.Instance?.Clear(p.Index);
         }
         _ = Task.Run(() => { foreach (var p in all) p.Dispose(); });
-        _scanner.Start(this, lowPower: false);
-        RaiseChanged();
+        StartScan();
     }
 
     private void Quiet(Player player)
