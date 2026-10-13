@@ -42,6 +42,12 @@ def machine():
     return platform.machine().lower()
 
 
+def is_windows():
+    """Kodi läuft unter Windows: Dort verbindet die N-Connect-App die Controller selbst und schreibt
+    status.json in diesen Datenordner – das Add-on startet keinen Dienst, sondern zeigt den Stand nur an."""
+    return os.name == 'nt'
+
+
 def binary_path():
     """Pfad zum N-Connect-Programm für diesen Prozessor (oder None) – setzt das Ausführungsrecht, das beim
     Entpacken des Add-on-Archivs verloren geht."""

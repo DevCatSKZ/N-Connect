@@ -100,7 +100,10 @@ def menu():
             entries.append((item(text(30631)), ('refresh', None)))
             status = None
         elif status is None:
-            entries.append((item(text(30612), text(30613), 'DefaultIconWarning.png'), ('restart', None)))
+            if common.is_windows():
+                entries.append((item(text(30660), text(30661), 'DefaultIconWarning.png'), ('help', None)))
+            else:
+                entries.append((item(text(30612), text(30613), 'DefaultIconWarning.png'), ('restart', None)))
         elif status.get('bluetooth') == 'off':
             entries.append((item(text(30608), text(30609), 'DefaultIconWarning.png'), ('libreelec', None)))
         elif status.get('bluetooth') == 'missing':
@@ -130,29 +133,34 @@ def menu():
                 entries.append((item(text(30606, f.get('name')), text(30607), 'DefaultIconInfo.png'), ('help', None)))
             if not players and not status.get('gamepads') and not status.get('known') and status.get('bluetooth') == 'on':
                 entries.append((item(text(30604), text(30605), 'DefaultIconInfo.png'), ('help', None)))
-            if status.get('bluetooth') == 'on' and not status.get('backgroundScan', True):
+            if status.get('bluetooth') == 'on' and not status.get('backgroundScan', True) and not common.is_windows():
                 entries.append((item(text(30632), text(30633)), ('scan', None)))
-            if players:
+            if players and not common.is_windows():
                 entries.append((item(text(30614)), ('disconnect-all', None)))
         entries.append((item(text(30615)), ('help', None)))
-        entries.append((item(text(30616)), ('selftest', None)))
-        entries.append((item(text(30617)), ('log', None)))
-        entries.append((item(text(30618)), ('settings', None)))
+        if not common.is_windows():
+            # Selbsttest, Dienst-Protokoll und Dienst-Einstellungen gibt es nur mit dem Linux-Dienst.
+            entries.append((item(text(30616)), ('selftest', None)))
+            entries.append((item(text(30617)), ('log', None)))
+            entries.append((item(text(30618)), ('settings', None)))
 
         choice = dialog.select('N-Connect', [e[0] for e in entries], useDetails=True)
         if choice < 0:
             return
         action, data = entries[choice][1]
         if action == 'player':
-            sub = dialog.contextmenu([text(30619), text(30620)])
-            if sub == 0:
+            # Trennen geht nur über den Linux-Dienst; unter Windows verwaltet die App die Verbindungen.
+            options = ([text(30619)] if not common.is_windows() else []) + [text(30620)]
+            sub = dialog.contextmenu(options)
+            if sub >= 0 and options[sub] == text(30619):
                 common.send_command('disconnect-{0}'.format(data.get('player')))
                 xbmc.sleep(800)
-            elif sub == 1:
+            elif sub >= 0:
                 player_details(data)
         elif action == 'gamepad':
-            options = ([text(30619)] if data.get('connected') else []) + [text(30653)]
-            sub = dialog.contextmenu(options)
+            options = ([text(30619)] if data.get('connected') and not common.is_windows() else [])
+            options += [text(30653)] if not common.is_windows() else []
+            sub = dialog.contextmenu(options) if options else -1
             if sub >= 0 and options[sub] == text(30619):
                 common.send_command('gamepad-disconnect-{0}'.format(data.get('address')))
                 xbmc.sleep(1500)
@@ -169,7 +177,9 @@ def menu():
             common.send_command('restart')
             xbmc.sleep(2000)
         elif action == 'libreelec':
-            xbmc.executebuiltin('RunAddon(service.libreelec.settings)')
+            # Gibt es nur auf LibreELEC (auf Batocera & Co. Bluetooth im Systemmenü einschalten).
+            if xbmc.getCondVisibility('System.HasAddon(service.libreelec.settings)'):
+                xbmc.executebuiltin('RunAddon(service.libreelec.settings)')
             return
         elif action == 'help':
             show_help()

@@ -619,3 +619,11 @@ msgstr "연결됨"
 msgctxt "#30656"
 msgid "Not connected"
 msgstr "연결 안 됨"
+
+msgctxt "#30660"
+msgid "N-Connect app is not running"
+msgstr "N-Connect 앱이 실행 중이 아닙니다"
+
+msgctxt "#30661"
+msgid "Start the N-Connect app on this PC – it reports the status here"
+msgstr "이 PC에서 N-Connect 앱을 실행하세요 – 여기로 상태를 보냅니다"

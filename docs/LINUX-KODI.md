@@ -108,6 +108,23 @@ Switch-2-Controller ──BLE──► BlueZ (bluetoothd) ──D-Bus──► n
 | Kodi-Add-on `service.nconnect` | [linux/kodi/service.nconnect/](../linux/kodi/service.nconnect/) | Startet/überwacht `nconnect`, Einstellungen, Meldungen, Menü, Diagnose |
 | Build-Skript | [linux/build-kodi-addon.ps1](../linux/build-kodi-addon.ps1) | Veröffentlicht linux-x64/arm64/arm und packt die Add-on-ZIPs nach `out/kodi/` |
 
+## Andere Kodi-Plattformen (ab 0.4.0)
+
+Das Add-on ist nicht mehr LibreELEC-only (`<platform>all</platform>`):
+
+- **Batocera / sonstiges Linux:** Dasselbe wie LibreELEC – das Add-on enthält das Programm für x86_64 und
+  aarch64 und läuft dort, weil alles als root läuft und BlueZ/uinput vorhanden sind. Auf Batocera selbst koppelt
+  bereits das System Bluetooth-Controller; N-Connect ist für Switch-2-Controller gedacht, die das Standard-BlueZ
+  nicht schafft. Hinweis: die Bluetooth-Einstellungen liegen dort im Batocera-/Systemmenü, nicht bei
+  `service.libreelec.settings` (das Menü prüft, ob das Add-on existiert). **Noch nicht auf echter Hardware geprüft.**
+- **Kodi auf Windows:** Es gibt keinen Linux-Dienst – die installierte N-Connect-App verbindet die Controller
+  (als XInput) und [KodiStatusWriter.cs](../src/Switch2Pro.Bridge/KodiStatusWriter.cs) schreibt dieselbe
+  `status.json` in Kodis `userdata/addon_data/service.nconnect/`. Das Add-on läuft im „Begleitmodus": es zeigt
+  Menü und Widget (verbunden farbig, bekannte/getrennte ausgegraut) und lädt die Anzeige bei Änderungen neu.
+  Trennen/Koppeln/Selbsttest/Dienst-Protokoll bleiben der App vorbehalten und werden im Menü nicht angeboten.
+  Kodi-Ordner findet [KodiIntegration.cs](../src/Switch2Pro.Bridge/KodiIntegration.cs) (normale Installation
+  und Microsoft-Store-Variante).
+
 ## Programm `nconnect`
 
 - **Bluetooth:** [Linux.Bluetooth](https://github.com/SuessLabs/Linux.Bluetooth) 6.0.0-pre3 über D-Bus. Bewusst
