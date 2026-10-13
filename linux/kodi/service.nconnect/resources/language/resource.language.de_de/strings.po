@@ -633,5 +633,5 @@ msgid "N-Connect app is not running"
 msgstr "N-Connect-App läuft nicht"
 
 msgctxt "#30661"
-msgid "Start the N-Connect app on this PC – it reports the status here"
-msgstr "Die App N-Connect auf diesem PC starten – sie meldet den Status hierher"
+msgid "Start the N-Connect app on this device – it reports the status here"
+msgstr "Die App N-Connect auf diesem Gerät starten – sie meldet den Status hierher"

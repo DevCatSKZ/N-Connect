@@ -5,6 +5,7 @@ Einstellungen, zeigt Meldungen beim Verbinden/Trennen und startet das Programm n
 """
 
 import json
+import platform
 import subprocess
 import threading
 import time
@@ -232,16 +233,16 @@ class Service(xbmc.Monitor):
     # ---------- Hauptschleife ----------
 
     def run_companion(self):
-        """Windows: Die N-Connect-App verbindet die Controller und schreibt status.json selbst. Dieser Dienst
-        sorgt nur dafür, dass Widgets bei sichtbaren Änderungen neu laden."""
-        common.log('Windows: Begleitmodus – Status kommt von der N-Connect-App')
+        """Ohne Linux-Dienst (Windows, Android, macOS): Die N-Connect-App verbindet die Controller und schreibt
+        status.json selbst. Dieser Dienst sorgt nur dafür, dass Widgets bei sichtbaren Änderungen neu laden."""
+        common.log('Begleitmodus auf {0} – Status kommt von der N-Connect-App'.format(platform.system()))
         while not self.abortRequested():
             self.watch_status()
             if self.waitForAbort(1):
                 break
 
     def run(self):
-        if common.is_windows():
+        if not common.has_daemon():
             self.run_companion()
             return
         try:

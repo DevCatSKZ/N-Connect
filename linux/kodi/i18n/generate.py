@@ -84,8 +84,8 @@ EXTRA = {
         'ja': 'N-Connect アプリが起動していません', 'zh': 'N-Connect 应用未在运行', 'ko': 'N-Connect 앱이 실행 중이 아닙니다',
     },
     30661: {
-        'en': 'Start the N-Connect app on this PC – it reports the status here',
-        'de': 'Die App N-Connect auf diesem PC starten – sie meldet den Status hierher',
+        'en': 'Start the N-Connect app on this device – it reports the status here',
+        'de': 'Die App N-Connect auf diesem Gerät starten – sie meldet den Status hierher',
         'es': 'Inicia la app N-Connect en este PC; envía el estado aquí',
         'fr': 'Démarrez l’application N-Connect sur ce PC – elle transmet l’état ici',
         'it': 'Avvia l’app N-Connect su questo PC: riporta qui lo stato',

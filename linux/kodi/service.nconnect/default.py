@@ -100,10 +100,10 @@ def menu():
             entries.append((item(text(30631)), ('refresh', None)))
             status = None
         elif status is None:
-            if common.is_windows():
-                entries.append((item(text(30660), text(30661), 'DefaultIconWarning.png'), ('help', None)))
-            else:
+            if common.has_daemon():
                 entries.append((item(text(30612), text(30613), 'DefaultIconWarning.png'), ('restart', None)))
+            else:
+                entries.append((item(text(30660), text(30661), 'DefaultIconWarning.png'), ('help', None)))
         elif status.get('bluetooth') == 'off':
             entries.append((item(text(30608), text(30609), 'DefaultIconWarning.png'), ('libreelec', None)))
         elif status.get('bluetooth') == 'missing':
@@ -133,12 +133,12 @@ def menu():
                 entries.append((item(text(30606, f.get('name')), text(30607), 'DefaultIconInfo.png'), ('help', None)))
             if not players and not status.get('gamepads') and not status.get('known') and status.get('bluetooth') == 'on':
                 entries.append((item(text(30604), text(30605), 'DefaultIconInfo.png'), ('help', None)))
-            if status.get('bluetooth') == 'on' and not status.get('backgroundScan', True) and not common.is_windows():
+            if status.get('bluetooth') == 'on' and not status.get('backgroundScan', True) and common.has_daemon():
                 entries.append((item(text(30632), text(30633)), ('scan', None)))
-            if players and not common.is_windows():
+            if players and common.has_daemon():
                 entries.append((item(text(30614)), ('disconnect-all', None)))
         entries.append((item(text(30615)), ('help', None)))
-        if not common.is_windows():
+        if common.has_daemon():
             # Selbsttest, Dienst-Protokoll und Dienst-Einstellungen gibt es nur mit dem Linux-Dienst.
             entries.append((item(text(30616)), ('selftest', None)))
             entries.append((item(text(30617)), ('log', None)))
@@ -149,8 +149,8 @@ def menu():
             return
         action, data = entries[choice][1]
         if action == 'player':
-            # Trennen geht nur über den Linux-Dienst; unter Windows verwaltet die App die Verbindungen.
-            options = ([text(30619)] if not common.is_windows() else []) + [text(30620)]
+            # Trennen geht nur über den Linux-Dienst; wo die App verwaltet, bleibt nur „Details".
+            options = ([text(30619)] if common.has_daemon() else []) + [text(30620)]
             sub = dialog.contextmenu(options)
             if sub >= 0 and options[sub] == text(30619):
                 common.send_command('disconnect-{0}'.format(data.get('player')))
@@ -158,8 +158,8 @@ def menu():
             elif sub >= 0:
                 player_details(data)
         elif action == 'gamepad':
-            options = ([text(30619)] if data.get('connected') and not common.is_windows() else [])
-            options += [text(30653)] if not common.is_windows() else []
+            options = ([text(30619)] if data.get('connected') and common.has_daemon() else [])
+            options += [text(30653)] if common.has_daemon() else []
             sub = dialog.contextmenu(options) if options else -1
             if sub >= 0 and options[sub] == text(30619):
                 common.send_command('gamepad-disconnect-{0}'.format(data.get('address')))
