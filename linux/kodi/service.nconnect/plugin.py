@@ -30,9 +30,6 @@ def subtitle_battery(player):
         parts.append(text(30601, player['battery']))
     if player.get('charging'):
         parts.append(text(30602))
-    rate = sum(int(d.get('rate', 0)) for d in player.get('devices', []))
-    if rate:
-        parts.append(text(30603, rate))
     return ' · '.join(parts)
 
 
@@ -59,8 +56,6 @@ def listing():
                         sub = []
                         if d.get('battery', -1) >= 0:
                             sub.append(text(30601, d['battery']))
-                        if d.get('rate'):
-                            sub.append(text(30603, d['rate']))
                         add('  ' + common.short_name(d.get('kind'), d.get('name')), ' · '.join(sub),
                             common.kind_icon(d.get('kind'), d.get('name')))
             for g in status.get('gamepads', []):
