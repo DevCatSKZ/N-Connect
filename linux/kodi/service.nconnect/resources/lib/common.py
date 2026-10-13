@@ -48,6 +48,12 @@ def is_windows():
     return os.name == 'nt'
 
 
+def has_daemon():
+    """Der N-Connect-Dienst (BlueZ/uinput) gibt es nur unter Linux. Auf anderen Systemen (Windows, Android,
+    macOS) läuft das Add-on im Begleitmodus: Es zeigt eine status.json an, die eine N-Connect-App schreibt."""
+    return platform.system() == 'Linux'
+
+
 def binary_path():
     """Pfad zum N-Connect-Programm für diesen Prozessor (oder None) – setzt das Ausführungsrecht, das beim
     Entpacken des Add-on-Archivs verloren geht."""

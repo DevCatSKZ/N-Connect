@@ -625,5 +625,5 @@ msgid "N-Connect app is not running"
 msgstr "N-Connect アプリが起動していません"
 
 msgctxt "#30661"
-msgid "Start the N-Connect app on this PC – it reports the status here"
+msgid "Start the N-Connect app on this device – it reports the status here"
 msgstr "この PC で N-Connect アプリを起動してください – ここに状態を送ります"

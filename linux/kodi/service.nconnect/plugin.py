@@ -46,10 +46,10 @@ def battery_text(source):
 def listing():
     status = common.read_status()
     if status is None:
-        if common.is_windows():
-            add(text(30660), text(30661), 'DefaultIconWarning.png')
-        else:
+        if common.has_daemon():
             add(text(30612), text(30613), 'DefaultIconWarning.png')
+        else:
+            add(text(30660), text(30661), 'DefaultIconWarning.png')
     else:
         bluetooth = status.get('bluetooth')
         if bluetooth == 'off':
