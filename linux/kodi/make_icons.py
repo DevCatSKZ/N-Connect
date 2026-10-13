@@ -189,6 +189,26 @@ def save(name, img):
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / name).write_bytes(png)
     print(name)
+    save_off(name, small)
+
+
+def save_off(name, small):
+    """Ausgegraute Variante („nicht verbunden“): Graustufen, deutlich durchsichtig – <name>_off.png."""
+    off = bytearray(small)
+    for i in range(0, len(off), 4):
+        gray = int(off[i] * 0.30 + off[i + 1] * 0.59 + off[i + 2] * 0.11)
+        off[i] = off[i + 1] = off[i + 2] = gray
+        off[i + 3] = off[i + 3] * 40 // 100
+    raw = b''.join(b'\x00' + bytes(off[y * OUT_S * 4:(y + 1) * OUT_S * 4]) for y in range(OUT_S))
+
+    def chunk(tag, data):
+        return struct.pack('>I', len(data)) + tag + data + struct.pack('>I', zlib.crc32(tag + data))
+
+    png = (b'\x89PNG\r\n\x1a\n'
+           + chunk(b'IHDR', struct.pack('>IIBBBBB', OUT_S, OUT_S, 8, 6, 0, 0, 0))
+           + chunk(b'IDAT', zlib.compress(raw, 9))
+           + chunk(b'IEND', b''))
+    (OUT / name.replace('.png', '_off.png')).write_bytes(png)
 
 
 def main():

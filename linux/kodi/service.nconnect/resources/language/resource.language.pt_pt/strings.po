@@ -611,3 +611,11 @@ msgstr "Permite que um emulador noutro dispositivo (p. ex. Cemu num PC) use os d
 msgctxt "#30029"
 msgid "WiFi is active and shares the antenna with Bluetooth – turn it off if unused (LibreELEC settings > Connections)"
 msgstr "O Wi-Fi está ativo e partilha a antena com o Bluetooth; desliga-o se não for usado (Definições do LibreELEC > Ligações)"
+
+msgctxt "#30655"
+msgid "Connected"
+msgstr "Ligado"
+
+msgctxt "#30656"
+msgid "Not connected"
+msgstr "Não ligado"

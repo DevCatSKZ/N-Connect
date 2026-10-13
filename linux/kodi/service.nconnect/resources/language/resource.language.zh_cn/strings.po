@@ -611,3 +611,11 @@ msgstr "允许其他设备上的模拟器（例如电脑上的 Cemu）使用此�
 msgctxt "#30029"
 msgid "WiFi is active and shares the antenna with Bluetooth – turn it off if unused (LibreELEC settings > Connections)"
 msgstr "Wi-Fi 已启用并与蓝牙共用天线 – 如不使用请关闭（LibreELEC 设置 > 连接）"
+
+msgctxt "#30655"
+msgid "Connected"
+msgstr "已连接"
+
+msgctxt "#30656"
+msgid "Not connected"
+msgstr "未连接"

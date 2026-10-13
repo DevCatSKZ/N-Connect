@@ -118,11 +118,17 @@ def menu():
                     details.append(text(30601, g['battery']))
                 entries.append((item(g.get('name'), ' · '.join(details),
                                      common.kind_icon('', g.get('name'))), ('gamepad', g)))
+            connected = {d.get('address', '').lower() for p in players for d in p.get('devices', [])}
+            for k in status.get('known', []):
+                if k.get('address', '').lower() not in connected and not k.get('connected'):
+                    name = common.short_name(k.get('kind'), k.get('name'))
+                    entries.append((item('[COLOR gray]{0}[/COLOR]'.format(name), text(30656),
+                                         common.offline_icon(common.kind_icon(k.get('kind'), name))), ('help', None)))
             for address in status.get('connecting', []):
                 entries.append((item(text(30621), address), ('refresh', None)))
             for f in status.get('elsewhere', []):
                 entries.append((item(text(30606, f.get('name')), text(30607), 'DefaultIconInfo.png'), ('help', None)))
-            if not players and not status.get('gamepads') and status.get('bluetooth') == 'on':
+            if not players and not status.get('gamepads') and not status.get('known') and status.get('bluetooth') == 'on':
                 entries.append((item(text(30604), text(30605), 'DefaultIconInfo.png'), ('help', None)))
             if status.get('bluetooth') == 'on' and not status.get('backgroundScan', True):
                 entries.append((item(text(30632), text(30633)), ('scan', None)))
