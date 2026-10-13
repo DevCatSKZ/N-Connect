@@ -49,14 +49,19 @@ def is_windows():
 
 
 def has_daemon():
-    """Der N-Connect-Dienst (BlueZ/uinput) gibt es nur unter Linux. Auf anderen Systemen (Windows, Android,
-    macOS) läuft das Add-on im Begleitmodus: Es zeigt eine status.json an, die eine N-Connect-App schreibt."""
+    """Der N-Connect-Dienst (BlueZ/uinput) gibt es nur unter echtem Linux. Auf anderen Systemen läuft das Add-on
+    im Begleitmodus: Es zeigt eine status.json an, die eine N-Connect-App schreibt. Achtung: platform.system()
+    meldet auf Android 'Linux' – darum wird Kodi gezielt gefragt."""
+    if xbmc.getCondVisibility('System.Platform.Android'):
+        return False
     return platform.system() == 'Linux'
 
 
 def binary_path():
     """Pfad zum N-Connect-Programm für diesen Prozessor (oder None) – setzt das Ausführungsrecht, das beim
     Entpacken des Add-on-Archivs verloren geht."""
+    if not has_daemon():
+        return None  # anderes System (Windows, Android, macOS) – kein mitgeliefertes Programm dafür
     rid = _RIDS.get(machine())
     if rid is None:
         return None

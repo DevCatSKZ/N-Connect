@@ -117,6 +117,9 @@ Das Add-on ist nicht mehr LibreELEC-only (`<platform>all</platform>`):
   bereits das System Bluetooth-Controller; N-Connect ist für Switch-2-Controller gedacht, die das Standard-BlueZ
   nicht schafft. Hinweis: die Bluetooth-Einstellungen liegen dort im Batocera-/Systemmenü, nicht bei
   `service.libreelec.settings` (das Menü prüft, ob das Add-on existiert). **Noch nicht auf echter Hardware geprüft.**
+- **Desktop-Linux** (Ubuntu & Co., Kodi läuft als normaler Benutzer): Das Programm braucht root für HCI-Rohzugriff
+  und /dev/uinput – als Benutzer gestartet schlägt es fehl (der eingebaute Selbsttest zeigt das an). Für Kodi auf
+  Desktop-Linux müsste noch ein systemd-Dienst oder eine udev-Regel ergänzt werden; bis dahin ungetestet.
 - **Kodi auf Windows:** Es gibt keinen Linux-Dienst – die installierte N-Connect-App verbindet die Controller
   (als XInput) und [KodiStatusWriter.cs](../src/Switch2Pro.Bridge/KodiStatusWriter.cs) schreibt dieselbe
   `status.json` in Kodis `userdata/addon_data/service.nconnect/`. Das Add-on läuft im „Begleitmodus": es zeigt
