@@ -142,7 +142,9 @@ public sealed class Player : IDisposable
         }
 
         var output = Mapping.Evaluate(input, settings);
-        var gamepad = ApplyMacros(output.Gamepad, output.Macros);
+        GamepadState gamepad;
+        lock (_macros)
+            gamepad = ApplyMacros(output.Gamepad, output.Macros);
         bool gyroStick = settings.GyroStick == GyroStickMode.Always
                          || settings.GyroStick == GyroStickMode.WhileAiming && gamepad.LeftTrigger > 40
                          || output.Specials.HasFlag(SpecialAction.GyroStick);
@@ -169,7 +171,7 @@ public sealed class Player : IDisposable
 
     /// <summary>Laufende Makros (Skript, Startzeit) und die Makros, deren Taste gerade gehalten wird.</summary>
     private readonly List<(string Text, MacroScript Script, long Start)> _macros = [];
-    private HashSet<string> _macroButtons = [];
+    private readonly HashSet<string> _macroButtons = [];
 
     /// <summary>
     /// Startet Makros beim Drücken ihrer Taste (nicht erneut, solange sie läuft) und fügt den aktuellen Schritt
@@ -178,9 +180,17 @@ public sealed class Player : IDisposable
     /// </summary>
     private GamepadState ApplyMacros(GamepadState g, IReadOnlyList<string> pressed)
     {
-        long now = System.Environment.TickCount64;
-        foreach (var text in pressed)
+        // Schnellweg ohne Allokation: ~90 Berichte/s je Controller, fast immer ohne Makro.
+        if (pressed.Count == 0 && _macros.Count == 0)
         {
+            if (_macroButtons.Count > 0)
+                _macroButtons.Clear();
+            return g;
+        }
+        long now = System.Environment.TickCount64;
+        for (int k = 0; k < pressed.Count; k++)
+        {
+            string text = pressed[k];
             bool known = _macroButtons.Contains(text);
             if (!known)
                 foreach (var m in _macros)
@@ -193,7 +203,9 @@ public sealed class Player : IDisposable
                 continue;
             _macros.Add((text, script, now));
         }
-        _macroButtons = new HashSet<string>(pressed);
+        _macroButtons.Clear();
+        for (int k = 0; k < pressed.Count; k++)
+            _macroButtons.Add(pressed[k]);
         for (int i = _macros.Count - 1; i >= 0; i--)
         {
             var (_, script, start) = _macros[i];

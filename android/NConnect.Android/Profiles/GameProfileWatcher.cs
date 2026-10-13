@@ -61,10 +61,10 @@ public static class GameProfileWatcher
             return null;
         long now = System.Environment.TickCount64;
         long wallNow = Java.Lang.JavaSystem.CurrentTimeMillis();
-        var events = usage.QueryEvents(wallNow - 15000, wallNow);
+        using var events = usage.QueryEvents(wallNow - 15000, wallNow);
         if (events is null)
             return null;
-        var ev = new UsageEvents.Event();
+        using var ev = new UsageEvents.Event();
         string? foreground = null;
         long best = 0;
         while (events.HasNextEvent)
