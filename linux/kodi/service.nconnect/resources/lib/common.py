@@ -216,6 +216,22 @@ def read_log_tail(lines=300):
 # ---------- Icons je Controller-Art ----------
 
 ICONS_DIR = os.path.join(ADDON_PATH, 'resources', 'icons')
+def fingerprint(status):
+    """Nur das, was Menü und Widget sichtbar anzeigen (ohne die ständig schwankende Berichtsrate) – ändert sich der
+    Wert, lohnt sich ein Neuladen der Anzeige; alle 5 s neu geschriebene status.json allein nicht."""
+    if status is None:
+        return None
+    return (
+        status.get('state'), status.get('bluetooth'), bool(status.get('scanning')), bool(status.get('connecting')),
+        tuple(sorted(f.get('address', '') for f in status.get('elsewhere', []))),
+        tuple((p.get('player'), p.get('name'), p.get('battery'), bool(p.get('charging')),
+               tuple((d.get('address'), d.get('kind'), d.get('battery')) for d in p.get('devices', [])))
+              for p in status.get('players', [])),
+        tuple((g.get('address'), g.get('name'), bool(g.get('connected')), g.get('battery'))
+              for g in status.get('gamepads', [])),
+    )
+
+
 # Kurze Namen für Widget-Kacheln – der volle Anzeigename („Nintendo Switch 2 Joy-Con (L)“)
 # wird auf dem Home-Bildschirm abgeschnitten.
 _KIND_SHORT = {

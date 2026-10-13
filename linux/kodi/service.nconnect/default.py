@@ -82,9 +82,6 @@ def battery_line(player):
         parts.append(text(30601, player['battery']))
     if player.get('charging'):
         parts.append(text(30602))
-    rate = sum(int(d.get('rate', 0)) for d in player.get('devices', []))
-    if rate:
-        parts.append(text(30603, rate))
     return ' · '.join(parts)
 
 

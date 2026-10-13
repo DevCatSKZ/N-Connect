@@ -5,7 +5,6 @@ Einstellungen, zeigt Meldungen beim Verbinden/Trennen und startet das Programm n
 """
 
 import json
-import os
 import subprocess
 import threading
 import time
@@ -23,6 +22,9 @@ WIDGET_EVENTS = {'connected', 'disconnected', 'paired', 'failed', 'elsewhere', '
                  'wifi-hint', 'gamepad-paired', 'gamepad-connected', 'gamepad-disconnected', 'gamepad-pair-failed'}
 
 
+WIDGET_PATHS = ('plugin://service.nconnect', 'plugin://plugin.nconnect.status')
+
+
 class Service(xbmc.Monitor):
     def __init__(self):
         super().__init__()
@@ -33,26 +35,33 @@ class Service(xbmc.Monitor):
         self.last_bluetooth = None
         self.stopping = False
         self._last_widget_refresh = 0.0
-        self._status_mtime = None
+        self._fingerprint = None
+        self._pending_refresh = False
 
     def refresh_widget(self):
-        """Widget-Anzeige aktualisieren (Container.Refresh lädt plugin://-Listen neu). Gedrosselt, damit
-        Ereignissalven nur eine Aktualisierung auslösen."""
+        """Widget-Anzeige aktualisieren. Container.Refresh trifft immer den gerade fokussierten Container – ein
+        blindes Aufrufen lud alle paar Sekunden Hauptmenü, Filmlisten usw. neu (Home-Bildschirm blieb schwarz).
+        Daher nur, wenn dort gerade eine N-Connect-Liste fokussiert ist; sonst merken wir uns den Wunsch und holen
+        ihn nach, sobald der Nutzer auf eine N-Connect-Liste kommt."""
         now = time.time()
         if now - self._last_widget_refresh < 1.5:
             return
+        if not xbmc.getInfoLabel('Container.FolderPath').startswith(WIDGET_PATHS):
+            self._pending_refresh = True
+            return
         self._last_widget_refresh = now
+        self._pending_refresh = False
         xbmc.executebuiltin('Container.Refresh')
 
     def watch_status(self):
-        """status.json geändert → Widget neu laden. Deckt jede Status-Änderung ab (Akku, Rate, Verbindungen),
-        auch wenn dazu kein Ereignis kam oder der Ereignis-Refresh nicht am Home-Widget ankam."""
-        try:
-            mtime = os.path.getmtime(common.STATUS_JSON)
-        except OSError:
-            mtime = None
-        if mtime != self._status_mtime:
-            self._status_mtime = mtime
+        """Sichtbare Änderung im Status (Controller, Akku, Verbindung, Bluetooth) → Anzeige neu laden. Fängt auch
+        Änderungen ab, zu denen kein Ereignis kam; reine Raten-Schwankungen der alle 5 s geschriebenen status.json
+        lösen nichts aus."""
+        fingerprint = common.fingerprint(common.read_status())
+        if fingerprint != self._fingerprint:
+            self._fingerprint = fingerprint
+            self.refresh_widget()
+        elif self._pending_refresh:
             self.refresh_widget()
 
     # ---------- Programm starten/stoppen ----------
