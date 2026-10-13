@@ -16,6 +16,16 @@ LANG_DIR = pathlib.Path(__file__).parent.parent / 'service.nconnect' / 'resource
 
 # Neue Texte, die in allen Sprachen ergänzt werden: ID -> {Sprache: Text}; "en" ist die Quelle (msgid).
 EXTRA = {
+    30655: {
+        'en': 'Connected', 'de': 'Verbunden', 'es': 'Conectado', 'fr': 'Connecté', 'it': 'Connesso',
+        'pt': 'Ligado', 'nl': 'Verbonden', 'pl': 'Połączony', 'ru': 'Подключён', 'ja': '接続済み',
+        'zh': '已连接', 'ko': '연결됨',
+    },
+    30656: {
+        'en': 'Not connected', 'de': 'Nicht verbunden', 'es': 'No conectado', 'fr': 'Non connecté',
+        'it': 'Non connesso', 'pt': 'Não ligado', 'nl': 'Niet verbonden', 'pl': 'Niepołączony',
+        'ru': 'Не подключён', 'ja': '未接続', 'zh': '未连接', 'ko': '연결 안 됨',
+    },
     30029: {
         'en': 'WiFi is active and shares the antenna with Bluetooth – turn it off if unused (LibreELEC settings > Connections)',
         'de': 'WLAN ist aktiv und teilt sich die Antenne mit Bluetooth – ausschalten, wenn es nicht gebraucht wird (LibreELEC-Einstellungen > Verbindungen)',

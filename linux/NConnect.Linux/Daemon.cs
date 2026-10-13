@@ -213,6 +213,60 @@ public sealed class Daemon : IAsyncDisposable
         return new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
     }
 
+    // ---------- Bekannte Controller (known.json: Adresse → Art, Seriennummer) ----------
+
+    private sealed record KnownController(string Kind, string? Serial);
+
+    private Dictionary<string, KnownController>? _known;
+
+    private string KnownPath => Path.Combine(_dataDir, "known.json");
+
+    /// <summary>Verbundenen Controller merken – damit das Widget ihn auch zeigt, wenn er gerade nicht verbunden ist.</summary>
+    private void RememberKnown(Switch2Device device)
+    {
+        var entry = new KnownController(device.Kind.ToString(), device.SerialNumber);
+        lock (_stdoutLock)
+        {
+            _known ??= LoadKnown();
+            if (_known.TryGetValue(device.Address, out var old) && old == entry)
+                return;
+            _known[device.Address] = entry;
+            try
+            {
+                string temp = KnownPath + ".tmp";
+                File.WriteAllText(temp, JsonSerializer.Serialize(_known, StatusJson));
+                File.Move(temp, KnownPath, overwrite: true);
+            }
+            catch (Exception e)
+            {
+                Log.Warn($"known.json: {Log.Reason(e)}");
+            }
+        }
+    }
+
+    private List<KeyValuePair<string, KnownController>> KnownSnapshot()
+    {
+        lock (_stdoutLock)
+        {
+            _known ??= LoadKnown();
+            return [.. _known];
+        }
+    }
+
+    private Dictionary<string, KnownController> LoadKnown()
+    {
+        try
+        {
+            if (File.Exists(KnownPath) && JsonSerializer.Deserialize<Dictionary<string, KnownController>>(File.ReadAllText(KnownPath)) is { } d)
+                return new Dictionary<string, KnownController>(d, StringComparer.OrdinalIgnoreCase);
+        }
+        catch (Exception)
+        {
+            // kaputte Datei: neu beginnen
+        }
+        return new Dictionary<string, KnownController>(StringComparer.OrdinalIgnoreCase);
+    }
+
     // ---------- DSU-Server (Gyro für Emulatoren) ----------
 
     private void ApplyDsu()
@@ -548,6 +602,7 @@ public sealed class Daemon : IAsyncDisposable
             player.Add(device);
         }
         RememberSlot(device.Address, player.Index);
+        RememberKnown(device);
         device.StateReceived += player.OnState;
         device.Lost += OnLost;
         if (!pairing)
@@ -871,6 +926,14 @@ public sealed class Daemon : IAsyncDisposable
                     ["firmware"] = d.Firmware,
                     ["rate"] = Math.Round(d.ReportRate),
                 })]),
+            })]),
+            ["known"] = new JsonArray([.. KnownSnapshot().Select(k => (JsonNode)new JsonObject
+            {
+                ["address"] = k.Key,
+                ["kind"] = k.Value.Kind,
+                ["name"] = Enum.TryParse<ControllerKind>(k.Value.Kind, out var kind) ? kind.DisplayName() : "Nintendo Controller",
+                ["serial"] = k.Value.Serial,
+                ["connected"] = players.Any(p => p.Devices.ToList().Any(d => string.Equals(d.Address, k.Key, StringComparison.OrdinalIgnoreCase))),
             })]),
             ["elsewhere"] = new JsonArray([.. _elsewhere.Values.Select(f => (JsonNode)new JsonObject
             {

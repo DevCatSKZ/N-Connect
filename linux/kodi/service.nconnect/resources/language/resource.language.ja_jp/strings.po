@@ -611,3 +611,11 @@ msgstr "ほかの機器のエミュレーター（例: PC の Cemu）が、こ�
 msgctxt "#30029"
 msgid "WiFi is active and shares the antenna with Bluetooth – turn it off if unused (LibreELEC settings > Connections)"
 msgstr "Wi-Fi が有効で Bluetooth とアンテナを共用しています – 使わない場合はオフにしてください（LibreELEC 設定 > 接続）"
+
+msgctxt "#30655"
+msgid "Connected"
+msgstr "接続済み"
+
+msgctxt "#30656"
+msgid "Not connected"
+msgstr "未接続"

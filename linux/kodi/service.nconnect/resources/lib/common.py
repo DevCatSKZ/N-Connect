@@ -229,6 +229,7 @@ def fingerprint(status):
               for p in status.get('players', [])),
         tuple((g.get('address'), g.get('name'), bool(g.get('connected')), g.get('battery'))
               for g in status.get('gamepads', [])),
+        tuple((k.get('address'), k.get('kind'), bool(k.get('connected'))) for k in status.get('known', [])),
     )
 
 
@@ -275,6 +276,12 @@ def kind_icon(kind, name=''):
         if key in lower:
             return os.path.join(ICONS_DIR, icon)
     return os.path.join(ICONS_DIR, 'gamepad.png')
+
+
+def offline_icon(path):
+    """Ausgegraute Variante eines Icons (für Controller, die bekannt, aber gerade nicht verbunden sind)."""
+    off = path.replace('.png', '_off.png')
+    return off if os.path.isfile(off) else path
 
 
 def player_icon(player):

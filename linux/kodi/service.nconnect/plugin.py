@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
 """
 plugin://service.nconnect/ – zeigt den aktuellen Controller-Stand als Liste (für das Kodi-Widget im Home-Menü:
-Skin-Einstellungen > Home > Widgets > Add-ons > N-Connect). Liest status.json bei jedem Aufruf frisch; der Dienst
-stößt bei jeder Änderung Container.Refresh an, die Anzeige ist damit immer aktuell.
+Skin-Einstellungen > Home > Widgets > Add-ons > N-Connect). Liest status.json bei jedem Aufruf frisch.
+
+Aktualisierung: Der Dienst setzt bei jeder sichtbaren Änderung die Home-Eigenschaft NConnect.Reload. Skins, die
+den Widget-Pfad mit  ?reload=$INFO[Window(Home).Property(NConnect.Reload)]  anlegen, laden das Widget dann von
+selbst neu – auch wenn es nicht fokussiert ist. Bei anderen Skins lädt der Dienst die Liste neu, sobald sie fokussiert ist.
+
+Angezeigt werden verbundene Controller (farbig) und bekannte, aber gerade nicht verbundene (ausgegraut).
 Auswahl eines Eintrags öffnet das N-Connect-Menü.
 """
 
@@ -24,13 +29,18 @@ def add(label, label2='', icon=None, action='menu'):
     xbmcplugin.addDirectoryItem(int(sys.argv[1]), url, li, isFolder=False)
 
 
-def subtitle_battery(player):
+def add_offline(name, kind):
+    """Bekannter Controller ohne Verbindung: grauer Name, ausgegrautes Icon."""
+    add('[COLOR gray]{0}[/COLOR]'.format(name), text(30656), common.offline_icon(common.kind_icon(kind, name)))
+
+
+def battery_text(source):
     parts = []
-    if player.get('battery', -1) >= 0:
-        parts.append(text(30601, player['battery']))
-    if player.get('charging'):
+    if source.get('battery', -1) >= 0:
+        parts.append(text(30601, source['battery']))
+    if source.get('charging'):
         parts.append(text(30602))
-    return ' · '.join(parts)
+    return ' · '.join(parts) or text(30655)
 
 
 def listing():
@@ -46,29 +56,36 @@ def listing():
         elif status.get('state') == 'starting':
             add(text(30631))
         else:
-            for p in status.get('players', []):
+            players = status.get('players', [])
+            connected = {d.get('address', '').lower() for p in players for d in p.get('devices', [])}
+            for p in players:
                 devices = p.get('devices', [])
                 name = common.short_name(devices[0].get('kind'), p.get('name')) if len(devices) == 1 else p.get('name')
-                add(text(30600, p.get('player'), name), subtitle_battery(p), common.player_icon(p))
-                # Bei Paaren (Joy-Con L+R) jedes Gerät einzeln mit eigenem Icon einrücken.
+                # Kachel-Beschriftung kurz halten (lange Namen werden abgeschnitten); Spielernummer und Akku in Zeile 2
+                add(name, '{0} · {1}'.format(text(30600, p.get('player'), '').rstrip(': '), battery_text(p)),
+                    common.player_icon(p))
+                # Bei Paaren (Joy-Con L+R) jedes Gerät einzeln mit eigenem Icon.
                 if len(devices) > 1:
                     for d in devices:
-                        sub = []
-                        if d.get('battery', -1) >= 0:
-                            sub.append(text(30601, d['battery']))
-                        add('  ' + common.short_name(d.get('kind'), d.get('name')), ' · '.join(sub),
+                        add(common.short_name(d.get('kind'), d.get('name')), battery_text(d),
                             common.kind_icon(d.get('kind'), d.get('name')))
             for g in status.get('gamepads', []):
-                details = [text(30651) if g.get('connected') else text(30652)]
-                if g.get('battery', -1) >= 0:
-                    details.append(text(30601, g['battery']))
-                add(g.get('name'), ' · '.join(details), common.kind_icon('', g.get('name')))
+                if g.get('connected'):
+                    add(g.get('name'), battery_text(g), common.kind_icon('', g.get('name')))
             if status.get('connecting'):
                 add(text(30621), '', 'DefaultIconInfo.png')
+            # Bekannt, aber gerade nicht verbunden – ausgegraut
+            for k in status.get('known', []):
+                if k.get('address', '').lower() not in connected and not k.get('connected'):
+                    add_offline(common.short_name(k.get('kind'), k.get('name')), k.get('kind'))
+            for g in status.get('gamepads', []):
+                if not g.get('connected'):
+                    add_offline(g.get('name'), '')
             for f in status.get('elsewhere', []):
                 add(text(30606, f.get('name')), text(30607), 'DefaultIconInfo.png')
-            if not status.get('players') and not status.get('gamepads') and bluetooth == 'on':
+            if not players and not status.get('gamepads') and not status.get('known') and bluetooth == 'on':
                 add(text(30604), text(30605), common.ICON)
+    common.log('Widget-Liste geladen')
     xbmcplugin.setContent(int(sys.argv[1]), 'files')
     xbmcplugin.endOfDirectory(int(sys.argv[1]), cacheToDisc=False)
 

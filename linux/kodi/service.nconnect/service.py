@@ -23,6 +23,7 @@ WIDGET_EVENTS = {'connected', 'disconnected', 'paired', 'failed', 'elsewhere', '
 
 
 WIDGET_PATHS = ('plugin://service.nconnect', 'plugin://plugin.nconnect.status')
+RELOAD_PROPERTY = 'NConnect.Reload'
 
 
 class Service(xbmc.Monitor):
@@ -36,22 +37,34 @@ class Service(xbmc.Monitor):
         self.stopping = False
         self._last_widget_refresh = 0.0
         self._fingerprint = None
-        self._pending_refresh = False
+        self._dirty = False
+        self._focus_pending = False
+        self._reload_counter = int(time.time())
 
     def refresh_widget(self):
-        """Widget-Anzeige aktualisieren. Container.Refresh trifft immer den gerade fokussierten Container – ein
-        blindes Aufrufen lud alle paar Sekunden Hauptmenü, Filmlisten usw. neu (Home-Bildschirm blieb schwarz).
-        Daher nur, wenn dort gerade eine N-Connect-Liste fokussiert ist; sonst merken wir uns den Wunsch und holen
-        ihn nach, sobald der Nutzer auf eine N-Connect-Liste kommt."""
+        """Eine sichtbare Änderung ist eingetreten: Widget soll neu laden (siehe flush_widget)."""
+        self._dirty = True
+        self.flush_widget()
+
+    def flush_widget(self):
+        """Widget-Anzeige aktualisieren, höchstens alle 1,5 s; eine gedrosselte Änderung bleibt vorgemerkt.
+
+        1. Home-Eigenschaft NConnect.Reload ändern: Skins mit ?reload=$INFO[Window(Home).Property(NConnect.Reload)]
+           im Widget-Pfad laden die Liste damit selbst neu – auch ohne Fokus, ohne andere Listen anzufassen.
+        2. Container.Refresh trifft immer den gerade fokussierten Container – ein blindes Aufrufen lud früher alle
+           paar Sekunden Hauptmenü und andere Listen neu (Home-Bildschirm blieb schwarz). Daher nur, wenn dort
+           gerade eine N-Connect-Liste fokussiert ist (für Skins mit festem Pfad); sonst nachholen, sobald sie es ist.
+        """
         now = time.time()
-        if now - self._last_widget_refresh < 1.5:
-            return
-        if not xbmc.getInfoLabel('Container.FolderPath').startswith(WIDGET_PATHS):
-            self._pending_refresh = True
-            return
-        self._last_widget_refresh = now
-        self._pending_refresh = False
-        xbmc.executebuiltin('Container.Refresh')
+        if self._dirty and now - self._last_widget_refresh >= 1.5:
+            self._last_widget_refresh = now
+            self._dirty = False
+            self._reload_counter += 1
+            xbmcgui.Window(10000).setProperty(RELOAD_PROPERTY, str(self._reload_counter))
+            self._focus_pending = True
+        if self._focus_pending and xbmc.getInfoLabel('Container.FolderPath').startswith(WIDGET_PATHS):
+            self._focus_pending = False
+            xbmc.executebuiltin('Container.Refresh')
 
     def watch_status(self):
         """Sichtbare Änderung im Status (Controller, Akku, Verbindung, Bluetooth) → Anzeige neu laden. Fängt auch
@@ -61,8 +74,8 @@ class Service(xbmc.Monitor):
         if fingerprint != self._fingerprint:
             self._fingerprint = fingerprint
             self.refresh_widget()
-        elif self._pending_refresh:
-            self.refresh_widget()
+        else:
+            self.flush_widget()
 
     # ---------- Programm starten/stoppen ----------
 

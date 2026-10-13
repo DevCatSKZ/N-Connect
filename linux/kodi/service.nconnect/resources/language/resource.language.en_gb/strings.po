@@ -619,3 +619,11 @@ msgstr ""
 msgctxt "#30029"
 msgid "WiFi is active and shares the antenna with Bluetooth – turn it off if unused (LibreELEC settings > Connections)"
 msgstr ""
+
+msgctxt "#30655"
+msgid "Connected"
+msgstr ""
+
+msgctxt "#30656"
+msgid "Not connected"
+msgstr ""

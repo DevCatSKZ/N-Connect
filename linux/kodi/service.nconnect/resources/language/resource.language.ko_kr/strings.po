@@ -611,3 +611,11 @@ msgstr "다른 기기의 에뮬레이터(예: PC의 Cemu)가 여기 연결된 �
 msgctxt "#30029"
 msgid "WiFi is active and shares the antenna with Bluetooth – turn it off if unused (LibreELEC settings > Connections)"
 msgstr "Wi-Fi가 켜져 있어 Bluetooth와 안테나를 공유합니다 – 사용하지 않으면 끄세요 (LibreELEC 설정 > 연결)"
+
+msgctxt "#30655"
+msgid "Connected"
+msgstr "연결됨"
+
+msgctxt "#30656"
+msgid "Not connected"
+msgstr "연결 안 됨"
