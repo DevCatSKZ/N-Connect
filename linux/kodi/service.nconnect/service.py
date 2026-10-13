@@ -231,7 +231,19 @@ class Service(xbmc.Monitor):
 
     # ---------- Hauptschleife ----------
 
+    def run_companion(self):
+        """Windows: Die N-Connect-App verbindet die Controller und schreibt status.json selbst. Dieser Dienst
+        sorgt nur dafür, dass Widgets bei sichtbaren Änderungen neu laden."""
+        common.log('Windows: Begleitmodus – Status kommt von der N-Connect-App')
+        while not self.abortRequested():
+            self.watch_status()
+            if self.waitForAbort(1):
+                break
+
     def run(self):
+        if common.is_windows():
+            self.run_companion()
+            return
         try:
             common.write_settings_json()
         except OSError as e:

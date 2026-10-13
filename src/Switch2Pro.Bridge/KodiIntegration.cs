@@ -11,6 +11,8 @@ namespace Switch2Pro.Bridge;
 internal static class KodiIntegration
 {
     public const string AddonId = "repository.devcatskz";
+    /// <summary>Add-on, dessen status.json das Kodi-Menü und das Home-Widget anzeigen.</summary>
+    public const string ServiceAddonId = "service.nconnect";
     public const string RepositoryZipName = "repository.devcatskz.zip";
     public const string PluginZipName = "N-Connect-Kodi-LibreELEC-alle-Geraete.zip";
     private const string RepositoryUrl = "https://github.com/DevCatSKZ/kodi-repo/raw/main/repository.devcatskz.zip";
@@ -46,6 +48,17 @@ internal static class KodiIntegration
     }
 
     public static bool KodiFound => FindAddonFolders().Count > 0;
+
+    /// <summary>Datenordner des Add-ons (userdata/addon_data/service.nconnect) je gefundener Kodi-Installation.
+    /// Dorthin schreibt <see cref="KodiStatusWriter"/> die status.json – daraus lesen Menü und Widget.</summary>
+    public static List<string> FindDataDirs()
+    {
+        var result = new List<string>();
+        foreach (string addons in FindAddonFolders())
+            if (Directory.GetParent(addons) is { } kodi)
+                result.Add(Path.Combine(kodi.FullName, "userdata", "addon_data", ServiceAddonId));
+        return result;
+    }
 
     private static async Task<byte[]> DownloadAsync(string url, bool checkRepository)
     {

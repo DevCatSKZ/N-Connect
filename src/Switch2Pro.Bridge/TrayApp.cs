@@ -14,6 +14,7 @@ internal sealed class TrayApp : ApplicationContext
     private readonly SynchronizationContext _ui;
     private readonly PadFactory? _factory;
     private readonly ControllerManager? _manager;
+    private readonly KodiStatusWriter? _kodiStatus;
     private readonly FileSystemWatcher? _settingsWatcher;
     private readonly SwitchCardWatcher? _cardWatcher;
     private Settings _settings;
@@ -124,6 +125,12 @@ internal sealed class TrayApp : ApplicationContext
             _manager.StartDemo();
         else
             Task.Run(() => AutoPairLoopAsync(_autoPairCts.Token)).Forget("Controller automatisch koppeln");
+        // Kodi auf diesem PC: status.json für Add-on-Menü und Home-Widget schreiben (nur wenn Kodi gefunden).
+        if (_manager is not null)
+        {
+            _kodiStatus = new KodiStatusWriter(_manager, () => _settings);
+            _kodiStatus.Start();
+        }
 
         _settingsWatcher = new FileSystemWatcher(Paths.SettingsDir, Path.GetFileName(Paths.SettingsFile))
         {
@@ -951,6 +958,7 @@ internal sealed class TrayApp : ApplicationContext
         _pairingData?.Close();
         _reloadTimer.Dispose();
         _profileTimer.Dispose();
+        _kodiStatus?.Dispose();
         if (_manager is not null)
         {
             // Sitzungen sauber beenden (Vibration stoppen, virtuelle Controller entfernen).

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="service.nconnect" name="N-Connect (LibreELEC/Linux)" version="0.3.4" provider-name="devcatskz">
+<addon id="service.nconnect" name="N-Connect" version="0.4.0" provider-name="devcatskz">
   <requires>
     <import addon="xbmc.python" version="3.0.1"/>
   </requires>
@@ -14,9 +14,9 @@
     <provides>executable</provides>
   </extension>
   <extension point="xbmc.addon.metadata">
-    <platform>linux</platform>
-    <summary lang="de_DE">Switch-2-Controller (Joy-Con 2, Pro Controller 2, GameCube) für Kodi</summary>
-    <summary lang="en_GB">Switch 2 controllers (Joy-Con 2, Pro Controller 2, GameCube) for Kodi</summary>
+    <platform>all</platform>
+    <summary lang="de_DE">Switch-2-Controller (Joy-Con 2, Pro Controller 2, GameCube) für Kodi – LibreELEC, Batocera, Windows</summary>
+    <summary lang="en_GB">Switch 2 controllers (Joy-Con 2, Pro Controller 2, GameCube) for Kodi – LibreELEC, Batocera, Windows</summary>
     <summary lang="es_ES">Mandos de Switch 2 (Joy-Con 2, Pro Controller 2, GameCube) y otros mandos Bluetooth para Kodi</summary>
     <summary lang="fr_FR">Manettes Switch 2 (Joy-Con 2, Pro Controller 2, GameCube) et autres manettes Bluetooth pour Kodi</summary>
     <summary lang="it_IT">Controller Switch 2 (Joy-Con 2, Pro Controller 2, GameCube) e altri controller Bluetooth per Kodi</summary>
@@ -28,14 +28,14 @@
     <summary lang="ja_JP">Kodi 用 Switch 2 コントローラー（Joy-Con 2、Pro コントローラー 2、ゲームキューブ）とその他の Bluetooth コントローラー</summary>
     <summary lang="zh_CN">适用于 Kodi 的 Switch 2 手柄（Joy-Con 2、Pro 手柄 2、GameCube）及其他蓝牙手柄</summary>
     <summary lang="ko_KR">Kodi용 Switch 2 컨트롤러 (Joy-Con 2, Pro 컨트롤러 2, 게임큐브) 및 기타 블루투스 컨트롤러</summary>
-    <description lang="de_DE">N-Connect verbindet Nintendo-Switch-2-Controller per Bluetooth mit LibreELEC und Kodi. Jeder Controller erscheint als Xbox-360-Controller – Kodi, RetroArch und Spiele erkennen ihn ohne Einrichtung. Joy-Con werden automatisch zu einem Paar zusammengefasst, Vibration und Spieler-LEDs funktionieren, nach dem ersten Koppeln genügt ein Tastendruck zum Verbinden.[CR][CR]Zum Koppeln die kleine SYNC-Taste am Controller drücken.</description>
-    <description lang="en_GB">N-Connect connects Nintendo Switch 2 controllers to LibreELEC and Kodi over Bluetooth. Each controller shows up as an Xbox 360 controller, so Kodi, RetroArch and games recognise it without setup. Joy-Con are combined into a pair automatically, rumble and player LEDs work, and after the first pairing a single button press reconnects.[CR][CR]To pair, press the small SYNC button on the controller.</description>
-    <disclaimer lang="de_DE">Kein offizielles Produkt von Nintendo. Benötigt Bluetooth (LibreELEC-Einstellungen > Bluetooth aktivieren).</disclaimer>
-    <disclaimer lang="en_GB">Not an official Nintendo product. Requires Bluetooth (LibreELEC settings > enable Bluetooth).</disclaimer>
+    <description lang="de_DE">N-Connect verbindet Nintendo-Switch-2-Controller per Bluetooth mit Kodi. Jeder Controller erscheint als Xbox-360-Controller – Kodi, RetroArch und Spiele erkennen ihn ohne Einrichtung. Joy-Con werden automatisch zu einem Paar zusammengefasst, Vibration und Spieler-LEDs funktionieren, nach dem ersten Koppeln genügt ein Tastendruck zum Verbinden.[CR][CR]Auf LibreELEC und Batocera (Linux) arbeitet das Add-on selbstständig. Auf Windows übernimmt die installierte N-Connect-App die Verbindung – das Add-on zeigt Status und Widget an. Zum Koppeln die kleine SYNC-Taste am Controller drücken.</description>
+    <description lang="en_GB">N-Connect connects Nintendo Switch 2 controllers to Kodi over Bluetooth. Each controller shows up as an Xbox 360 controller, so Kodi, RetroArch and games recognise it without setup. Joy-Con are combined into a pair automatically, rumble and player LEDs work, and after the first pairing a single button press reconnects.[CR][CR]On LibreELEC and Batocera (Linux) the add-on works on its own. On Windows the installed N-Connect app does the connecting – the add-on shows status and widget. To pair, press the small SYNC button on the controller.</description>
+    <disclaimer lang="de_DE">Kein offizielles Produkt von Nintendo. Benötigt Bluetooth.</disclaimer>
+    <disclaimer lang="en_GB">Not an official Nintendo product. Requires Bluetooth.</disclaimer>
     <license>MIT</license>
     <source>https://github.com/DevCatSKZ/N-Connect</source>
     <website>https://github.com/DevCatSKZ/N-Connect</website>
-    <news>0.3.4: Widget zeigt auch bekannte, gerade nicht verbundene Controller (ausgegraut) und aktualisiert sich bei jedem Verbinden/Trennen von selbst (Skin-Pfad mit ?reload=$INFO[Window(Home).Property(NConnect.Reload)])[CR]0.3.3: Home-Widget lädt nur noch neu, wenn wirklich etwas Sichtbares ändert und eine N-Connect-Liste fokussiert ist – vorher konnte das ständige Neuladen Hauptmenü und andere Listen stören (schwarzer Bildschirm); Berichtsrate nicht mehr in den Listen[CR]0.3.2: Verbindung auf Raspberry Pi &amp; Co. zuverlässiger – die Suche pausiert während des Verbindungsaufbaus (geteilte WLAN/BT-Antenne); Hinweis, falls aktives WLAN das Koppeln stört; neue Icons je Controller im Menü; verbundene Controller jetzt als Kodi-Widget im Home-Menü[CR]0.3.1: Joy-Con-Verbindung korrigiert – mit diesem Gerät gekoppelte Controller wurden fälschlich als „mit anderem Gerät verbunden“ gemeldet und konnten sich nicht verbinden[CR]0.3.0: Wii-Fernbedienung und Wii U Pro Controller koppeln, Gyro für Emulatoren (DSU/Cemuhook), feste Spielerplätze[CR]0.2.1:Name zeigt das System (LibreELEC/Linux), Downloads je Gerät[CR]0.2.0:Xbox-, PlayStation- und Switch-1-Controller automatisch koppeln, Hintergrundsuche abschaltbar, Akku-Warnung, Controller-Tasten für Kodi-Aktionen, 12 Sprachen, Update-Repository[CR]0.1.0: Erste Version für LibreELEC/Kodi</news>
+    <news>0.4.0: Läuft jetzt auf jeder Kodi-Plattform – zusätzlich zu LibreELEC auch Batocera (Linux) und Kodi unter Windows (Status/Widget kommen dort von der installierten N-Connect-App)[CR]0.3.4: Widget zeigt auch bekannte, gerade nicht verbundene Controller (ausgegraut) und aktualisiert sich bei jedem Verbinden/Trennen von selbst (Skin-Pfad mit ?reload=$INFO[Window(Home).Property(NConnect.Reload)])[CR]0.3.3: Home-Widget lädt nur noch neu, wenn wirklich etwas Sichtbares ändert und eine N-Connect-Liste fokussiert ist – vorher konnte das ständige Neuladen Hauptmenü und andere Listen stören (schwarzer Bildschirm); Berichtsrate nicht mehr in den Listen[CR]0.3.2: Verbindung auf Raspberry Pi &amp; Co. zuverlässiger – die Suche pausiert während des Verbindungsaufbaus (geteilte WLAN/BT-Antenne); Hinweis, falls aktives WLAN das Koppeln stört; neue Icons je Controller im Menü; verbundene Controller jetzt als Kodi-Widget im Home-Menü[CR]0.3.1: Joy-Con-Verbindung korrigiert – mit diesem Gerät gekoppelte Controller wurden fälschlich als „mit anderem Gerät verbunden“ gemeldet und konnten sich nicht verbinden[CR]0.3.0: Wii-Fernbedienung und Wii U Pro Controller koppeln, Gyro für Emulatoren (DSU/Cemuhook), feste Spielerplätze[CR]0.2.1:Name zeigt das System (LibreELEC/Linux), Downloads je Gerät[CR]0.2.0:Xbox-, PlayStation- und Switch-1-Controller automatisch koppeln, Hintergrundsuche abschaltbar, Akku-Warnung, Controller-Tasten für Kodi-Aktionen, 12 Sprachen, Update-Repository[CR]0.1.0: Erste Version für LibreELEC/Kodi</news>
     <assets>
       <icon>resources/icon.png</icon>
     </assets>
