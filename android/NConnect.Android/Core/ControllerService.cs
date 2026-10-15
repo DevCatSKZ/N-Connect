@@ -40,6 +40,7 @@ public sealed class ControllerService : Service
     private readonly ConcurrentDictionary<string, (int Failures, long Until)> _retry = new();
     private readonly CancellationTokenSource _cts = new();
     private BluetoothStateReceiver? _btReceiver;
+    private Kodi.KodiStatusWriter? _kodiStatus;
 
     public bool BluetoothOn => Switch2Scanner.Adapter(this)?.IsEnabled == true;
     public bool Scanning => _scanner.Scanning;
@@ -55,6 +56,9 @@ public sealed class ControllerService : Service
 
     /// <summary>Gefundene Controller, die mit einem anderen Gerät gekoppelt sind (Hinweis „SYNC drücken“).</summary>
     public IReadOnlyCollection<FoundController> Elsewhere => [.. _elsewhere.Values];
+
+    /// <summary>Adressen, deren Verbindungsaufbau gerade läuft (für den Kodi-Status).</summary>
+    public IReadOnlyCollection<string> Connecting => [.. _connecting.Keys];
 
     /// <summary>Dienst starten (aus einer Activity heraus).</summary>
     public static void Start(Context context)
@@ -79,6 +83,8 @@ public sealed class ControllerService : Service
         RegisterReceiver(_btReceiver, new IntentFilter(BluetoothAdapter.ActionStateChanged));
         OutputRouter.Changed += UpdateNotification;
         TouchService.StateChanged += OnTouchStateChanged;
+        _kodiStatus = new Kodi.KodiStatusWriter(this);
+        _kodiStatus.Start();
     }
 
     public override StartCommandResult OnStartCommand(Intent? intent, StartCommandFlags flags, int startId)
@@ -469,6 +475,8 @@ public sealed class ControllerService : Service
         }
         if (_btReceiver is not null)
             UnregisterReceiver(_btReceiver);
+        _kodiStatus?.Dispose();
+        _kodiStatus = null;
         OutputRouter.Changed -= UpdateNotification;
         TouchService.StateChanged -= OnTouchStateChanged;
         Instance = null;
