@@ -193,14 +193,31 @@ def notifications_enabled():
 
 # ---------- Status ----------
 
+def _status_candidates():
+    """Alle Orte, an denen eine status.json liegen kann. Unter Android darf die N-Connect-App nicht in
+    Kodis Datenordner schreiben – sie legt die Datei im gemeinsamen Dokumente-Ordner ab (bis Android 10
+    alternativ in ihrem externen App-Ordner)."""
+    yield STATUS_JSON
+    if xbmc.getCondVisibility('System.Platform.Android'):
+        yield '/sdcard/Documents/N-Connect/status.json'
+        yield '/sdcard/Android/data/com.devcatskz.nconnect/files/status.json'
+
+
 def read_status():
-    """status.json des Dienstes; None, wenn er nicht läuft (Datei fehlt, veraltet oder „stopped“).
+    """Frischeste lesbare status.json; None, wenn nichts läuft (Datei fehlt, veraltet oder „stopped“).
     {"state": "starting"} heißt: das Programm wird gerade (neu) gestartet."""
-    try:
-        with open(STATUS_JSON, 'r', encoding='utf-8') as f:
-            status = json.load(f)
-        age = time.time() - os.path.getmtime(STATUS_JSON)
-    except (OSError, ValueError):
+    status = None
+    age = None
+    for path in _status_candidates():
+        try:
+            with open(path, 'r', encoding='utf-8') as f:
+                candidate = json.load(f)
+            candidate_age = time.time() - os.path.getmtime(path)
+        except (OSError, ValueError):
+            continue
+        if age is None or candidate_age < age:
+            status, age = candidate, candidate_age
+    if status is None:
         return None
     state = status.get('state')
     if state == 'running' and age <= 15 or state == 'starting' and age <= 60:
