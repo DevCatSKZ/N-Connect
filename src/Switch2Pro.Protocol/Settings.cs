@@ -536,7 +536,8 @@ public sealed class Settings
     }
 
     /// <summary>
-    /// Vor dem ersten Speichern nach einem Ladefehler die unlesbare Datei einmalig daneben kopieren:
+    /// Vor dem ersten Speichern nach einem Ladefehler (auch wenn stattdessen die Sicherung geladen wurde) die unlesbare
+    /// Datei einmalig daneben kopieren:
     /// „settings.json.unlesbar-JJJJMMTT-hhmmss“, eine ebenfalls unlesbare Sicherung als „settings.json.bak.unlesbar-…“.
     /// Ohne das schöbe Save sie nach .bak, und spätestens beim zweiten Speichern wären Profile, Belegungen, Namen und
     /// Kalibrierungen weg – etwa bei einem Tippfehler in einer von Hand bearbeiteten Datei. Danach wird ganz normal
@@ -647,6 +648,13 @@ public sealed class Settings
         ControllerKinds = new Dictionary<string, ControllerKind>(other.ControllerKinds, StringComparer.OrdinalIgnoreCase);
         PlayerSlots = new Dictionary<string, int>(other.PlayerSlots, StringComparer.OrdinalIgnoreCase);
         StickCalibrations = new Dictionary<string, StickCalibration>(other.StickCalibrations, StringComparer.OrdinalIgnoreCase);
+        // Unlesbare Datei vom Laden mitnehmen (z. B. neu geladen, aber nur die Sicherung war lesbar): wer die Werte
+        // übernimmt und dann speichert, sichert sie vorher – siehe KeepUnreadable.
+        foreach (string file in other._unreadable)
+        {
+            if (!_unreadable.Contains(file))
+                _unreadable.Add(file);
+        }
     }
 
     [JsonIgnore]
@@ -859,6 +867,8 @@ internal sealed class TolerantEnumConverter<T> : JsonConverter<T> where T : stru
     /// <summary>„Unbekannt“: alle Bits gesetzt (−1 bzw. 0xFFFFFFFF) – in keinem Enum der Einstellungen vergeben.</summary>
     internal static readonly T Unknown = (T)Enum.ToObject(typeof(T), -1L);
 
+    private static readonly bool IsFlags = typeof(T).IsDefined(typeof(FlagsAttribute), inherit: false);
+
     public override T Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         switch (reader.TokenType)
@@ -884,7 +894,10 @@ internal sealed class TolerantEnumConverter<T> : JsonConverter<T> where T : stru
     public override void WriteAsPropertyName(Utf8JsonWriter writer, T value, JsonSerializerOptions options) =>
         writer.WritePropertyName(value.ToString());
 
-    /// <summary>Name (Groß/Klein egal, bei Flags auch „A, B“) oder Zahl als Text; sonst <see cref="Unknown"/>.</summary>
+    /// <summary>
+    /// Name (Groß/Klein egal) oder Zahl als Text; sonst <see cref="Unknown"/>. Mehrere Namen („A, B“) nur bei
+    /// Flags – Enum.TryParse verknüpfte sie sonst stillschweigend zu einem anderen Wert (A | B = X).
+    /// </summary>
     private static T Parse(string? text) =>
-        text is not null && Enum.TryParse(text.Trim(), ignoreCase: true, out T value) ? value : Unknown;
+        text is not null && (IsFlags || !text.Contains(',')) && Enum.TryParse(text, ignoreCase: true, out T value) ? value : Unknown;
 }

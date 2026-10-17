@@ -166,6 +166,30 @@ public class SettingsFileTests
     }
 
     [Fact]
+    public void Uebernommene_Werte_sichern_die_unlesbare_Datei_beim_Speichern()
+    {
+        // Wie TrayApp.ReloadSettings: neu laden (nur die Sicherung lesbar) und in das laufende Objekt übernehmen.
+        string dir = NewFolder();
+        try
+        {
+            string path = Path.Combine(dir, "settings.json");
+            var running = new Settings { InactivityMinutes = 15 };
+            running.Save(path);
+            running.Save(path);
+            File.WriteAllText(path, "{ von Hand kaputt");
+
+            running.CopyFrom(Settings.Load(path));
+            running.Save(path);
+
+            Assert.Equal("{ von Hand kaputt", File.ReadAllText(Assert.Single(Unreadable(dir, "settings.json"))));
+        }
+        finally
+        {
+            Directory.Delete(dir, recursive: true);
+        }
+    }
+
+    [Fact]
     public void Speichern_an_anderer_Stelle_sichert_die_unlesbare_Datei_ebenfalls_vorher()
     {
         string dir = NewFolder();
@@ -250,7 +274,7 @@ public class SettingsHandEditTests
               "ConnectNotify": 42,
               "GyroStick": "Manchmal",
               "InactivityMinutes": 15,
-              "Remap": { "GL": "LS", "GX": "A", "GR": "Laser" },
+              "Remap": { "GL": "LS", "GX": "A", "GR": "Laser", "C": "A, B" },
               "Profiles": { "Pro2": { "C": "Guide", "GX": "A" }, "Pro3": { "A": "B" } },
               "ShiftProfiles": { "Pro3": { "A": "B" } },
               "Deadzones": { "Pro2": 0.2, "Pro3": 0.3 },
@@ -308,6 +332,7 @@ public class SettingsHandEditTests
     [InlineData("true", OutputMode.Xbox360)]
     [InlineData("{ \"x\": [1, 2] }", OutputMode.Xbox360)]
     [InlineData("\"\"", OutputMode.Xbox360)]
+    [InlineData("\"Xbox360, DualShock4\"", OutputMode.Xbox360)]  // nicht zu 0 | 1 = DualShock4 verknüpfen
     public void Enum_Wert_jeder_Art_macht_die_Datei_nicht_unlesbar(string value, OutputMode expected)
     {
         var s = LoadJson($$"""{ "OutputMode": {{value}}, "InactivityMinutes": 7 }""");
