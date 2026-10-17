@@ -568,6 +568,8 @@ internal static partial class Tr
             "未隐藏原始控制器（已取消询问）。后续操作：控制器 → 设置 → 其他 →“显示重复？”。",
         ["Original-Controller nicht versteckt (Fehler, Details im Protokoll). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."] =
             "未隐藏原始控制器（出错，详见日志）。后续操作：控制器 → 设置 → 其他 →“显示重复？”。",
+        ["Eine ältere N-Connect-Version hat das eigene virtuelle DualShock 4 vor Spielen versteckt. Freigeben hat nicht geklappt – bitte im HidHide Configuration Client den Haken beim virtuellen DualShock 4 entfernen."] =
+            "旧版 N-Connect 曾将自身的虚拟 DualShock 4 对游戏隐藏。未能恢复显示 – 请在 HidHide Configuration Client 中取消勾选该虚拟 DualShock 4。",
         ["Tastenanordnung A/B/X/Y"] = "按键布局 A/B/X/Y",
         ["Xbox: nach Position (untere Taste = A). Nintendo: nach Beschriftung (A bleibt A)."] = "Xbox：按位置（下方按键 = A）。Nintendo：按标识（A 仍是 A）。",
         ["Verbinden"] = "连接",

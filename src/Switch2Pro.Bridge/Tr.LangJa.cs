@@ -568,6 +568,8 @@ internal static partial class Tr
             "元のコントローラーは隠されていません（確認をキャンセル）。後で行う場合：コントローラー → 設定 → その他 →「二重表示？」。",
         ["Original-Controller nicht versteckt (Fehler, Details im Protokoll). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."] =
             "元のコントローラーは隠されていません（エラー、詳細はログを参照）。後で行う場合：コントローラー → 設定 → その他 →「二重表示？」。",
+        ["Eine ältere N-Connect-Version hat das eigene virtuelle DualShock 4 vor Spielen versteckt. Freigeben hat nicht geklappt – bitte im HidHide Configuration Client den Haken beim virtuellen DualShock 4 entfernen."] =
+            "以前のバージョンの N-Connect が自身の仮想 DualShock 4 をゲームから隠しました。再表示できませんでした – HidHide Configuration Client で仮想 DualShock 4 のチェックを外してください。",
         ["Tastenanordnung A/B/X/Y"] = "ボタン配置 A/B/X/Y",
         ["Xbox: nach Position (untere Taste = A). Nintendo: nach Beschriftung (A bleibt A)."] = "Xbox：位置で決定（下のボタン = A）。Nintendo：表示どおり（A は A のまま）。",
         ["Verbinden"] = "接続",
