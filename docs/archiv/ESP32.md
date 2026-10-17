@@ -1,5 +1,11 @@
 # ESP32 als zweiter „Bluetooth-Stick“ – Controller ohne neues SYNC
 
+> **Verworfen am 10.10.2026** – Grund: Der nRF52840 kann kein Bluetooth-Adapter für Windows sein (er beherrscht nur
+> Bluetooth LE), der Relais-Weg (Platine verbindet die Controller und reicht sie per USB an N-Connect weiter) blieb in
+> den Tests ohne Ergebnis, und jeder Test kostete ein erneutes Koppeln der Controller. Mit einem ESP32 wurde nie
+> getestet. Export und Funkadapter sind aus N-Connect entfernt (ausgeblendet seit 1.0.19, Code entfernt in 1.0.22).
+> Archiv: Der Text unten beschreibt den damaligen Plan und gilt nicht mehr.
+
 Ziel: Deine Switch-2-Controller funktionieren **am PC mit dem Bluetooth-Stick** und **an einem anderen PC mit einem
 ESP32-S3**, ohne jedes Mal neu zu koppeln. N-Connect exportiert dafür alles, was der ESP32 braucht
 (*Kopplungsdaten → Für ESP32 exportieren*). Diese Seite erklärt das Prinzip, den Export und wie eine
@@ -13,7 +19,7 @@ ESP32-Firmware die Controller annimmt.
 ## 1. Prinzip in drei Sätzen
 
 1. Drückst du an einem Switch-2-Controller **SYNC**, koppelt N-Connect ihn mit dem PC und schreibt dabei die
-   **Bluetooth-Adresse deines Sticks** in den Controller (Befehl `0x15`, [PROTOKOLLE 1.6](PROTOKOLLE.md)).
+   **Bluetooth-Adresse deines Sticks** in den Controller (Befehl `0x15`, [PROTOKOLLE 1.6](../PROTOKOLLE.md)).
 2. Danach wirbt der Controller nach jedem Tastendruck nur noch für diese Adresse und nimmt die Verbindung nur von
    ihr an. Ein fremder Host wird abgelehnt (in N-Connect gemessen). Die Verbindung selbst ist **unverschlüsselt**;
    es gibt keinen geheimen Schlüssel.
@@ -96,7 +102,7 @@ ZIP `N-Connect-ESP32-<PC>.zip`:
 - `kind` = Name aus `ControllerKind`; `Unknown`, wenn die Art weder bekannt (`Settings.ControllerKinds`, beim
   Verbinden gemerkt) noch aus dem Windows-Namen (`BtDeviceNames.KindFromName`) ableitbar ist.
 - `transport` = `BLE` oder `Classic`; `supportedBle` nur bei Switch-2-Controllern (BLE, unverschlüsselt).
-- Felder ohne Wert fehlen. Kalibrierwerte sind 12-Bit-Rohwerte wie in [PROTOKOLLE 0](PROTOKOLLE.md).
+- Felder ohne Wert fehlen. Kalibrierwerte sind 12-Bit-Rohwerte wie in [PROTOKOLLE 0](../PROTOKOLLE.md).
 
 ### 4.2 `nconnect_pairing.h`
 
@@ -154,7 +160,7 @@ Passiv scannen (`ble_gap_disc`, `passive = 1`, Duplikate nicht filtern). In den 
 ```
 Kennung 0x0553 (LE: 53 05) | 01 00 03 | 7E xx | PID (LE) | … | Byte 10–15: Host-Adresse (LE)
 ```
-(Byte-Zählung ohne die zwei Kennungs-Bytes, wie in [PROTOKOLLE 1.1](PROTOKOLLE.md).)
+(Byte-Zählung ohne die zwei Kennungs-Bytes, wie in [PROTOKOLLE 1.1](../PROTOKOLLE.md).)
 
 - PID bestimmt die Art (`0x2069` Pro 2, `0x2067`/`0x2066` Joy-Con 2 L/R, `0x2073` GameCube).
 - **Byte 10–15 == `NCONNECT_HOST_ADDR_LE`** → der Controller sucht „deinen PC“ → verbinden.
@@ -167,7 +173,7 @@ Kennung 0x0553 (LE: 53 05) | 01 00 03 | 7E xx | PID (LE) | … | Byte 10–15: H
 1. `ble_gap_connect` mit der Adresse aus der Werbung (Adresstyp übernehmen), kein Pairing/SMP.
 2. MTU tauschen (`ble_gattc_exchange_mtu`), kürzeres Verbindungsintervall anfragen (7,5–15 ms; der Controller
    wählt sonst 30 ms ≈ 33 Berichte/s).
-3. Dienst `ab7de9be-89fe-49ad-828f-118f09df7fd0` und die Merkmale aus [PROTOKOLLE 1.2](PROTOKOLLE.md) suchen.
+3. Dienst `ab7de9be-89fe-49ad-828f-118f09df7fd0` und die Merkmale aus [PROTOKOLLE 1.2](../PROTOKOLLE.md) suchen.
 4. Benachrichtigungen für **Antworten** (`c765a961-…`) einschalten (CCCD `0x2902` = `01 00`).
 5. Befehle an `649d4ac9-…` (Schreiben ohne Antwort), Kopf `Befehl | 91 | 01 | Unter | 00 | Länge | 00 00` + Daten:
    - `0C 91 01 02 00 04 00 00 | M 00 00 00` (Funktionen setzen), dann dasselbe mit Unterbefehl `04` (einschalten);
@@ -178,8 +184,8 @@ Kennung 0x0553 (LE: 53 05) | 01 00 03 | 7E xx | PID (LE) | … | Byte 10–15: H
    die Werte aus `stick_cal` nehmen, falls `has_stick_cal` gesetzt ist.
 
 ### 5.5 Eingaben auswerten
-Eingabebericht wie in [PROTOKOLLE 1.4](PROTOKOLLE.md): Tasten in Byte 4–7, Sticks als 12-Bit-Paare ab 0x0A/0x0D
-(`A = b0 | (b1 & 0x0F) << 8`, `B = b1 >> 4 | b2 << 4`), Bewegung ab 0x30, Akku ab 0x1F. Vibration: [PROTOKOLLE 1.5](PROTOKOLLE.md).
+Eingabebericht wie in [PROTOKOLLE 1.4](../PROTOKOLLE.md): Tasten in Byte 4–7, Sticks als 12-Bit-Paare ab 0x0A/0x0D
+(`A = b0 | (b1 & 0x0F) << 8`, `B = b1 >> 4 | b2 << 4`), Bewegung ab 0x30, Akku ab 0x1F. Vibration: [PROTOKOLLE 1.5](../PROTOKOLLE.md).
 
 ### 5.6 Wie bekommt der zweite PC die Controller?
 Der ESP32-S3 hat einen nativen USB-Anschluss (Buchse „USB“, nicht „UART“). Zwei Wege:

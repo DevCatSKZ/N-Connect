@@ -1,48 +1,46 @@
-# N-Connect-Firmware für den nRF52840-Dongle (Weg A)
+# nRF52840-Firmware (verworfen, nur Referenz)
 
-Diese Firmware macht aus einem **Nordic nRF52840-Dongle** (PCA10059) einen Funkadapter: Er gibt sich als dein
-PC-Bluetooth-Adapter aus, verbindet die Switch-2-Controller per Bluetooth LE und reicht sie über USB an N-Connect
-weiter. N-Connect zeigt sie dann wie an einem normalen Stick an (Einstellung *Erweitert → Funkadapter*).
+> **Verworfen am 10.10.2026** – Grund: Der nRF52840 kann kein Bluetooth-Adapter für Windows sein (er beherrscht nur
+> Bluetooth LE), der Relais-Weg (Dongle verbindet die Controller und reicht sie per USB an N-Connect weiter) blieb in
+> den Tests ohne Ergebnis, und jeder Test kostete ein erneutes Koppeln der Controller. N-Connect enthält seit 1.0.22
+> weder die Gegenstelle noch einen Export der Kopplungsdaten für diese Firmware. Der Code wird nicht weiterentwickelt.
 
-- Protokoll zu N-Connect: [../../docs/ADAPTER-PROTOKOLL.md](../../docs/ADAPTER-PROTOKOLL.md)
+Der Code bleibt als Referenz für den BLE-Ablauf eines Switch-2-Controllers aus Sicht eines eigenen Hosts: Werbung
+erkennen (Nintendo-Herstellerdaten, Host-Adresse in Byte 10–15), öffentliche Adresse vor `bt_enable()` setzen,
+GATT-Verbindung aufbauen, Bericht 0x05 abonnieren. Der GATT-Teil wurde nie mit einem echten Controller eingefahren
+(Stellen mit `PRÜFEN:` in `src/main.c`).
+
 - Controller-Protokoll (GATT, Befehle, Bericht 0x05): [../../docs/PROTOKOLLE.md](../../docs/PROTOKOLLE.md)
-- Prinzip und Grenzen: [../../docs/NRF52840.md](../../docs/NRF52840.md)
+- Damaliger Plan und Grenzen: [../../docs/archiv/NRF52840.md](../../docs/archiv/NRF52840.md)
+- USB-Protokoll zur früheren Gegenstelle in N-Connect: [../../docs/archiv/ADAPTER-PROTOKOLL.md](../../docs/archiv/ADAPTER-PROTOKOLL.md)
 
-> **Stand:** v0, **noch nicht auf Hardware getestet.** Rahmenformat, Adressübernahme und das Erkennen der Werbung
-> sind 1:1 aus dem getesteten N-Connect-Code übernommen; der GATT-Ablauf (Verbinden, Merkmale finden, abonnieren,
-> Befehle schreiben) ist nach der Doku gebaut und muss mit echtem Controller eingefahren werden. `// PRÜFEN:` markiert
-> die Stellen, die am ehesten Nacharbeit brauchen.
+## BLE-Referenz aus dem Mitschnitt
 
-## Voraussetzungen
-- **nRF Connect SDK** (Zephyr), v2.6 oder neuer – inkl. Toolchain (`west`, arm-none-eabi-gcc). Am einfachsten über
-  „nRF Connect for Desktop“ → Toolchain Manager.
-- **nrfutil** (Nordic) zum Flashen über den USB-Bootloader des Dongles, oder „nRF Connect for Desktop → Programmer“.
+Am 10.10.2026 wurde mit dem Dongle als nRF Sniffer for Bluetooth LE (4.1.1) die funktionierende Strecke
+Windows ↔ Switch-2-Controller mitgeschnitten. Die Mitschnitte liegen nicht im Repo (sie enthalten Geräteadressen).
+Festgehalten:
 
-## Bauen
-1. Deine Kopplungsdaten exportieren: N-Connect → *Kopplungsdaten → Für nRF52840 exportieren*. Die Datei
-   **`nconnect_pairing.h`** aus dem ZIP hierher neben `src/main.c` legen (sie liefert `NCONNECT_HOST_ADDR_LE`).
-2. Bauen:
-   ```sh
-   west build -b nrf52840dongle_nrf52840 .
-   ```
-   Ergebnis: `build/zephyr/zephyr.hex`.
+- Ablauf nach dem Verbinden: `LL_VERSION_IND` → `LL_LENGTH_REQ` (Data Length Extension, 251 Byte) →
+  `LL_FEATURE_REQ` → ATT-MTU-Austausch → Dienstsuche.
+- Verbindungsparameter beim Aufbau: Intervall 60 ms, Latenz 0, Supervision-Timeout 9,6 s.
+- Eigener Dienst `ab7de9be-89fe-49ad-828f-118f09df7fd0` (kein HID-over-GATT), Handle des Eingabeberichts etwa
+  `0x000A`.
 
-## Flashen (über den USB-Bootloader, ohne Programmer)
-Dongle anstecken und die seitliche **RESET**-Taste drücken, bis die rote LED pulsiert (DFU-Modus). Dann:
+## Bauen und Flashen
+
+Nur für Versuche mit der Referenz. `src/main.c` erwartet eine Datei `nconnect_pairing.h` neben sich, die
+`NCONNECT_HOST_ADDR_LE[6]` definiert (Adresse des PC-Adapters, niedrigstes Byte zuerst). N-Connect erzeugt diese
+Datei nicht mehr; sie muss von Hand angelegt werden.
+
+Voraussetzungen: nRF Connect SDK (Zephyr) ab v2.6 mit Toolchain (`west`, arm-none-eabi-gcc) und `nrfutil` oder
+„nRF Connect for Desktop → Programmer“.
+
 ```sh
+west build -b nrf52840dongle_nrf52840 .
 nrfutil pkg generate --hw-version 52 --sd-req 0x00 \
   --application build/zephyr/zephyr.hex --application-version 1 nconnect_dfu.zip
-nrfutil dfu usb-serial -pkg nconnect_dfu.zip -p COM15
+nrfutil dfu usb-serial -pkg nconnect_dfu.zip -p COM<n>
 ```
-(COM-Port anpassen; unter nRF Connect for Desktop → Programmer geht es auch grafisch.)
 
-Der **Open Bootloader bleibt erhalten** – mit RESET kommst du jederzeit zurück in den DFU-Modus und kannst neu
-flashen. Die zuvor installierte Firmware lässt sich ohne SWD-Programmer aber **nicht sichern**.
-
-## Benutzen
-Dongle an den PC mit N-Connect stecken, dort *Erweitert → Funkadapter* einschalten. Controller einschalten / eine
-Taste drücken – sie erscheinen in N-Connect. Der PC mit dem echten Stick sollte dabei nicht gleichzeitig in
-Reichweite aktiv sein (gleiche Adresse).
-
-## LED (Vorschlag)
-- langsames Pulsieren: sucht Controller · an: mindestens einer verbunden · schnelles Blinken: USB nicht verbunden.
+Zum Flashen den Dongle anstecken und die seitliche RESET-Taste drücken, bis die rote LED pulsiert (DFU-Modus). Der
+Open Bootloader bleibt erhalten; die zuvor installierte Firmware lässt sich ohne SWD-Programmer nicht sichern.
