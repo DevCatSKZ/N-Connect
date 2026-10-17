@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Drawing;
 using Switch2Pro.Protocol;
 
@@ -1203,6 +1204,7 @@ internal sealed class SettingsForm : UiForm
         });
 
     /// <summary>Prüfhilfe: Fenster zeigen, ohne den Fokus zu übernehmen (Tastatureingaben bleiben beim Benutzer).</summary>
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     internal bool ShowInactive { get; init; }
 
     protected override bool ShowWithoutActivation => ShowInactive || base.ShowWithoutActivation;

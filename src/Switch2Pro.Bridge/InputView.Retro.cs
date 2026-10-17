@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using Switch2Pro.Protocol;
@@ -12,6 +13,7 @@ namespace Switch2Pro.Bridge;
 internal sealed partial class InputView
 {
     /// <summary>Was an der Wii-Fernbedienung steckt (für die richtige Zeichnung).</summary>
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public WiiExtension WiiExtension { get; set; }
 
     private static bool IsRetro(ControllerKind k) =>
