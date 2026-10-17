@@ -10,6 +10,10 @@ Projektdokumentation und Arbeitsprotokoll. Gemeinsame Funktion von **N-Connect**
 
 ## 0. Aktueller Stand (04.10.2026, ca. 09:30)
 
+> **Vorhaben ruht** seit dem 06.10.2026 (Stand 17.10.2026). Seitdem kamen nur Tests für `SwitchBtSave` und eine
+> vorläufige Auswahl des aktuellen Eintrags je Adresse (`SwitchBtSave.Current`) hinzu; der Hardwaretest steht aus.
+> Die übrigen Angaben in diesem Abschnitt geben den Stand vom 04.10.2026 wieder.
+
 **Gewählter Weg:** §5d – *die Switch übernimmt die Identität des PCs.* Der Joy-Con wird ganz normal mit Windows
 gekoppelt; Bluepick_RCM überträgt diese Kopplung auf die Switch (Atmosphère-Datei `bluetooth_devices.db` +
 MissionControl `host_address`). Ergebnis: Joy-Con funktioniert an PC und Switch ohne neues Koppeln, ohne
@@ -36,9 +40,11 @@ einfügen – oder hekate-UMS), Datei per Rücklesen prüfen, dann Hardwaretest 
 Testdaten von der Switch des Nutzers (echte Schlüssel, nicht veröffentlichen):
 `C:\Coding\Bluepick_RCM\Bluepick_RCM Project\archive\testdaten_switch_2026-10-04\`.
 
-**Geänderte Dateien (noch nicht committet):**
-- N-Connect (Git, alles neu, untracked): `docs/SWITCH-IDENTITAET.md`, `src/Switch2Pro.Protocol/SwitchBtSave.cs`,
-  `tools/Switch2Pro.BtIdentityProbe/` (`Program.cs`, `BtRadio.cs`, `ChipCommands.cs`, `.csproj`).
+**Dateien:**
+- N-Connect: am 06.10.2026 als Arbeitsstand committet (`11515915`) und damit öffentlich auf `main`:
+  `docs/SWITCH-IDENTITAET.md`, `docs/UEBERGABE-SWITCH-IDENTITAET.md`, `src/Switch2Pro.Protocol/SwitchBtSave.cs`,
+  `tools/Switch2Pro.BtIdentityProbe/` (`Program.cs`, `BtRadio.cs`, `ChipCommands.cs`, `.csproj`); Tests seit
+  17.10.2026 in `tests/Switch2Pro.Protocol.Tests/SwitchBtSaveTests.cs`.
 - Bluepick_RCM (kein Git): `source/keys/keys.c`, `source/keys/keys.h`, `source/main.c`, `Versions.inc` (1.0.6),
   `AGENTS.md`; Build-Ausgabe `output/Bluepick_RCM.bin` (102 357 B).
 

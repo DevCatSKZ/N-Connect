@@ -2,6 +2,8 @@
 
 Stand: 04.10.2026, ca. 09:40. Für den nächsten Agenten, der an dieser Funktion weiterarbeitet.
 
+> **Vorhaben ruht** seit dem 06.10.2026 (Stand 17.10.2026). Weiterarbeit nur nach Rücksprache mit dem Nutzer.
+
 **Zuerst lesen:** [SWITCH-IDENTITAET.md](SWITCH-IDENTITAET.md) – §0 (aktueller Stand), §5d (gewählter Weg),
 §5 (Arbeitsprotokoll inkl. Vorfall), §6 (offene Punkte). Diese Übergabe fasst nur zusammen und sagt, was als
 Nächstes zu tun ist.
@@ -31,9 +33,8 @@ später erkennen, anzeigen und unterstützen.
 **Achtung, parallele Arbeit am N-Connect-Repo:** Während dieser Sitzung hat eine andere Sitzung weiter
 committet (04.10.2026 11:48–12:37, zuletzt `898100a`; u. a. `bb48a21` „Kopplungsdaten im Windows-11-Stil,
 Joy-Con-1-Kopplung über WinRT“ – betrifft `PairingDataForm.cs`). Laut `HANDOVER.md` wird N-Connect als
-**öffentliches** Repo `DevCatSKZ/N-Connect` veröffentlicht. Die Dateien dieser Funktion sind noch untracked;
-vor einem Commit mit dem Nutzer klären, ob sie veröffentlicht werden sollen, und `git status` prüfen. Die
-Entwicklerdoku-Übersicht `docs/README.md` (von der anderen Sitzung) verlinkt diese Dateien noch nicht.
+**öffentliches** Repo `DevCatSKZ/N-Connect` veröffentlicht. Die Dateien dieser Funktion sind seit dem 06.10.2026
+als Arbeitsstand committet (`11515915`) und damit öffentlich auf `main`.
 
 **Achtung Testdaten:** enthalten echte Bluetooth-Adressen und Kopplungsschlüssel des Nutzers. Nie ins
 N-Connect-Repo kopieren, nie in Doku oder Chat im Klartext ausgeben (Schlüssel maskieren, wie das Prüfwerkzeug
@@ -52,11 +53,12 @@ es tut). Die Doku verwendet Platzhalter.
 - Offline-Prüfung: Ein aus `joycon_mac.bin` erzeugter Datenbankeintrag ist Byte für Byte identisch mit dem
   Eintrag, den HOS selbst im Save speichert (Testdaten, Joy-Con damals mit der Switch gekoppelt).
 
-**N-Connect** (alles neu, noch nicht committet, untracked):
+**N-Connect** (committet am 06.10.2026, `11515915`, Arbeitsstand):
 - `src/Switch2Pro.Protocol/SwitchBtSave.cs` – liest Geräteeinträge aus `8000000000000050.bin`.
-  Achtung: nutzt noch die alten Offsets ab Tabellenanfang `0x58000`-Raster (0x70/0x99/0x146); richtig
-  verstanden ist die Struktur ab `0x58070` (Adresse +0x00, Schlüssel +0x29, Name +0xD6). Ergebnis ist
-  gleich, die Doku im Code sollte aber angeglichen werden.
+  Gerechnet wird im 0x200-Raster ab Dateianfang (0x70/0x99/0x146); der Kommentar im Code beschreibt seit
+  17.10.2026 die Struktur ab `0x58070` (Adresse +0x00, Schlüssel +0x29, Name +0xD6), das Ergebnis ist gleich.
+  `SwitchBtSave.Current` wählt vorläufig den ersten Eintrag je Adresse; Tests in
+  `tests/Switch2Pro.Protocol.Tests/SwitchBtSaveTests.cs` (synthetische Daten).
 - `tools/Switch2Pro.BtIdentityProbe/` – Prüfwerkzeug für Herstellerbefehle an den PC-Bluetooth-Chip
   (`info`, `sd`, `csr-lesen`, `csr-setzen`, `bcm-setzen`). Gehört zum **verworfenen** Weg (PC-Adapter
   umadressieren); behalten als Diagnose, aber siehe Regel 3 unten.
@@ -86,7 +88,7 @@ es tut). Die Doku verwendet Platzhalter.
 - Pro Controller: Schlüssel aus Windows lesen (`HKLM\SYSTEM\CurrentControlSet\Services\BTHPORT\Parameters\Keys`,
   nur SYSTEM, nur lesend) und an Bluepick übergeben (z. B. Datei auf der SD, die Bluepick in die Datenbank
   übernimmt). Byte-Reihenfolge des Windows-Schlüssels erst prüfen.
-- `SwitchBtSave.cs` auf die Struktur ab `0x58070` umstellen, Tests in `tests/Switch2Pro.Protocol.Tests`.
+- `SwitchBtSave.Current` im Hardwaretest bestätigen (welche Tabellenkopie gilt, wenn sich die beiden unterscheiden).
 - Commits (N-Connect) erst nach Rücksprache.
 
 ## 6. Bauen
