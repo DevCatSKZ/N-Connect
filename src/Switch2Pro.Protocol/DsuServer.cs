@@ -2,27 +2,39 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
-using Switch2Pro.Protocol;
 
-namespace NConnect.Linux.Output;
+namespace Switch2Pro.Protocol;
 
 /// <summary>
-/// Cemuhook-/DSU-Server (Port 26760) wie unter Windows: Emulatoren (Dolphin, Cemu, Citra/Lime3DS, Ryujinx-Nachfolger …)
-/// holen sich Gyro, Beschleunigung und Tasten der Spieler 1–4. Standard nur lokal; mit <c>network</c> auch für andere
-/// Geräte im Heimnetz (z. B. Cemu auf dem PC mit dem Controller am Pi).
+/// Cemuhook-/DSU-Server (UDP, Port 26760) für Windows, Android und Linux: Emulatoren (Cemu, Dolphin, Citra/Lime3DS,
+/// Yuzu-/Ryujinx-Nachfolger …) holen sich hier Gyro, Beschleunigung und Tasten der Spieler 1–4. Standard nur lokal
+/// (127.0.0.1); mit <c>network</c> auch für andere Geräte im Heimnetz (z. B. Cemu auf dem PC mit dem Controller am Pi).
+/// Die Pakete baut <see cref="Dsu"/>; protokolliert wird über die Rückrufe der App.
 /// </summary>
 public sealed class DsuServer : IDisposable
 {
+    /// <summary>Der Server der App (über <see cref="Start(bool, Action{string}, Action{string})"/>), sonst null.</summary>
     public static DsuServer? Instance { get; private set; }
 
+    private static readonly object Gate = new();
+    /// <summary>Clients melden sich regelmäßig neu an; wer so lange schweigt, ist weg.</summary>
+    private const long ClientTimeoutMs = 5000;
+
     private readonly UdpClient _udp;
+    private readonly Action<string> _info;
+    private readonly Action<string> _warn;
     private readonly uint _serverId = (uint)Random.Shared.Next();
     private readonly CancellationTokenSource _cts = new();
     private readonly ConcurrentDictionary<IPEndPoint, Client> _clients = new();
     private readonly Slot?[] _slots = new Slot?[Dsu.MaxSlots];
     private readonly long _start = Stopwatch.GetTimestamp();
+    private int _disposed;
 
+    /// <summary>true: lauscht im Heimnetz (alle Adressen), false: nur auf 127.0.0.1.</summary>
     public bool Network { get; }
+
+    /// <summary>Tatsächlich belegter Port (sonst <see cref="Dsu.Port"/>, in Tests ein freier).</summary>
+    public int Port { get; }
 
     private sealed class Client
     {
@@ -36,27 +48,60 @@ public sealed class DsuServer : IDisposable
         public uint PacketNumber;
     }
 
-    private DsuServer(UdpClient udp, bool network)
+    private DsuServer(UdpClient udp, bool network, Action<string> info, Action<string> warn)
     {
         _udp = udp;
+        _info = info;
+        _warn = warn;
         Network = network;
+        Port = ((IPEndPoint)udp.Client.LocalEndPoint!).Port;
         _ = Task.Run(ReceiveLoopAsync);
     }
 
-    /// <summary>Server starten; null, wenn der Port schon belegt ist.</summary>
-    public static DsuServer? Start(bool network)
+    /// <summary>
+    /// Server der App starten und als <see cref="Instance"/> merken; läuft er schon mit derselben Einstellung, bleibt
+    /// es bei ihm. null, wenn der Port belegt ist (z. B. DS4Windows oder ein N-Connect, das sich gerade beendet) –
+    /// ein späterer Aufruf versucht es erneut.
+    /// </summary>
+    public static DsuServer? Start(bool network, Action<string> info, Action<string> warn) =>
+        Start(Dsu.Port, network, info, warn);
+
+    internal static DsuServer? Start(int port, bool network, Action<string> info, Action<string> warn)
     {
+        lock (Gate)
+        {
+            if (Instance is { } running)
+            {
+                if (running.Network == network)
+                    return running;
+                running.Dispose();
+            }
+            return Instance = Open(port, network, info, warn);
+        }
+    }
+
+    /// <summary>Server öffnen, ohne ihn als <see cref="Instance"/> zu merken (Tests); null, wenn der Port belegt ist.</summary>
+    internal static DsuServer? Open(int port, bool network, Action<string> info, Action<string> warn)
+    {
+        var address = network ? IPAddress.Any : IPAddress.Loopback;
+        UdpClient? udp = null;
         try
         {
-            var address = network ? IPAddress.Any : IPAddress.Loopback;
-            var udp = new UdpClient(new IPEndPoint(address, Dsu.Port));
-            Instance = new DsuServer(udp, network);
-            Log.Info($"DSU-Server (Cemuhook) läuft auf {address}:{Dsu.Port}");
-            return Instance;
+            udp = new UdpClient(new IPEndPoint(address, port));
+            if (OperatingSystem.IsWindows())
+            {
+                // ICMP „Port nicht erreichbar“ von beendeten Clients nicht als Empfangsfehler melden.
+                const int SIO_UDP_CONNRESET = -1744830452;
+                udp.Client.IOControl(SIO_UDP_CONNRESET, [0, 0, 0, 0], null);
+            }
+            var server = new DsuServer(udp, network, info, warn);
+            info($"DSU-Server (Cemuhook) läuft auf {address}:{server.Port}");
+            return server;
         }
         catch (SocketException e)
         {
-            Log.Warn($"DSU-Server nicht gestartet – Port {Dsu.Port} belegt? ({Log.Reason(e)})");
+            udp?.Dispose();
+            warn($"DSU-Server nicht gestartet – Port {port} belegt? ({Reason(e)}, {e.SocketErrorCode})");
             return null;
         }
     }
@@ -86,7 +131,7 @@ public sealed class DsuServer : IDisposable
             }
             catch (Exception e)
             {
-                Log.Warn($"DSU: Anfrage nicht verarbeitet: {Log.Reason(e)}");
+                _warn($"DSU: Anfrage nicht verarbeitet: {Reason(e)}");
             }
         }
     }
@@ -109,8 +154,11 @@ public sealed class DsuServer : IDisposable
                 }
                 break;
             case Dsu.MsgPadData:
+                long now = Environment.TickCount64;
+                if (!_clients.ContainsKey(from))
+                    RemoveStale(now); // im Heimnetz nicht unbegrenzt Absender sammeln, auch ohne Controller
                 var client = _clients.GetOrAdd(from, _ => new Client());
-                client.LastSeen = Environment.TickCount64;
+                client.LastSeen = now;
                 // Anmeldung: 0 = alle Slots, 1 = ein bestimmter Slot, 2 = per MAC (wir liefern dann alle)
                 byte flags = body.Length > 0 ? body[0] : (byte)0;
                 if (flags == 1 && body.Length > 1)
@@ -126,6 +174,7 @@ public sealed class DsuServer : IDisposable
     {
         if (slot is < 0 or >= Dsu.MaxSlots)
             return;
+        // Auch ohne Clients merken: ein Emulator, der später fragt, sieht den Slot sofort als belegt.
         var s = _slots[slot] = Merge(_slots[slot], mac, p);
         if (_clients.IsEmpty)
             return;
@@ -135,9 +184,9 @@ public sealed class DsuServer : IDisposable
         long now = Environment.TickCount64;
         foreach (var (endpoint, client) in _clients)
         {
-            if (now - client.LastSeen > 5000)
+            if (now - client.LastSeen > ClientTimeoutMs)
             {
-                _clients.TryRemove(endpoint, out _); // Clients melden sich regelmäßig neu an
+                _clients.TryRemove(endpoint, out _);
                 continue;
             }
             bool wanted;
@@ -161,6 +210,13 @@ public sealed class DsuServer : IDisposable
             _slots[slot] = null;
     }
 
+    private void RemoveStale(long now)
+    {
+        foreach (var (endpoint, client) in _clients)
+            if (now - client.LastSeen > ClientTimeoutMs)
+                _clients.TryRemove(endpoint, out _);
+    }
+
     private void Send(byte[] packet, IPEndPoint to)
     {
         try
@@ -173,12 +229,20 @@ public sealed class DsuServer : IDisposable
         }
     }
 
+    private static string Reason(Exception e) =>
+        string.IsNullOrWhiteSpace(e.Message) ? $"{e.GetType().Name} 0x{e.HResult:X8}" : e.Message.Trim();
+
     public void Dispose()
     {
+        if (Interlocked.Exchange(ref _disposed, 1) != 0)
+            return;
         _cts.Cancel();
         _udp.Dispose();
-        if (ReferenceEquals(Instance, this))
-            Instance = null;
-        Log.Info("DSU-Server beendet");
+        lock (Gate)
+        {
+            if (ReferenceEquals(Instance, this))
+                Instance = null;
+        }
+        _info("DSU-Server beendet");
     }
 }

@@ -360,7 +360,7 @@ public sealed class Daemon : IAsyncDisposable
             if (current is not null && (!want || current.Network != network))
                 current.Dispose();
             if (want && DsuServer.Instance is null)
-                DsuServer.Start(network);
+                DsuServer.Start(network, Log.Info, Log.Warn);
         }
     }
 
