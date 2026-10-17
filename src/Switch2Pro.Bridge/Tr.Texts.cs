@@ -60,28 +60,11 @@ internal static partial class Tr
         ["Eine Zeile je Controller: Spieler, Name und Akku."] = "One line per controller: player, name and battery.",
         ["Deckkraft"] = "Opacity",
         ["nativ"] = "native",
+        ["Xbox · nativ"] = "Xbox · native",
         ["Controller einschalten oder SYNC drücken"] = "Turn on a controller or press SYNC",
         ["N-Connect öffnen"] = "Open N-Connect",
         ["Position zurücksetzen"] = "Reset position",
         ["Widget ausblenden"] = "Hide widget",
-        // ---------- ESP32-Export ----------
-        ["Für ESP32 exportieren"] = "Export for ESP32",
-        ["Adresse dieses Bluetooth-Adapters und die Switch-2-Controller für einen ESP32-S3, der sich als dieser PC ausgibt – Controller verbinden sich dann ohne neues SYNC (Anleitung im ZIP)"] = "Address of this Bluetooth adapter and the Switch 2 controllers for an ESP32-S3 that poses as this PC – controllers then connect without a new SYNC (instructions in the ZIP)",
-        ["ESP32-Export …"] = "ESP32 export …",
-        ["Die Adresse des Bluetooth-Adapters ist nicht bekannt. Bluetooth einschalten und das Fenster neu öffnen."] = "The Bluetooth adapter address is unknown. Turn on Bluetooth and reopen this window.",
-        ["ZIP-Datei"] = "ZIP file",
-        ["ESP32-Export speichern"] = "Save ESP32 export",
-        ["ESP32-Export gespeichert:"] = "ESP32 export saved:",
-        ["Adresse für den ESP32"] = "Address for the ESP32",
-        ["übernehmbar"] = "transferable",
-        ["nicht übernehmbar"] = "not transferable",
-        ["Noch kein Switch-2-Controller bekannt: einmal per SYNC mit N-Connect koppeln und neu exportieren."] = "No Switch 2 controller known yet: pair one with N-Connect via SYNC once and export again.",
-        ["Für nRF52840 exportieren"] = "Export for nRF52840",
-        ["Dieselben Daten für einen Nordic-nRF52840-Dongle (nRF Connect SDK/Zephyr oder Adafruit Bluefruit) – auch er gibt sich als dieser PC aus (Anleitung im ZIP)"] = "The same data for a Nordic nRF52840 dongle (nRF Connect SDK/Zephyr or Adafruit Bluefruit) – it, too, poses as this PC (instructions in the ZIP)",
-        ["nRF52840-Export …"] = "nRF52840 export …",
-        ["nRF52840-Export speichern"] = "Save nRF52840 export",
-        ["nRF52840-Export gespeichert:"] = "nRF52840 export saved:",
-        ["Adresse für den nRF52840"] = "Address for the nRF52840",
         // ---------- Status-Kopfzeile, Ansicht ----------
         ["Farbschema"] = "Colour scheme",
         ["Farben für Akzente, Knöpfe, Flächen und Ränder."] = "Colours for accents, buttons, surfaces and borders.",
@@ -319,7 +302,6 @@ internal static partial class Tr
         ["Mitte = linear. Rechts = feiner um die Mitte (präzises Zielen), links = schneller."] = "Middle = linear. Right = finer around the center (precise aiming), left = faster.",
         ["So weit lässt sich ein analoger Trigger drücken, bevor er wirkt."] = "How far an analog trigger can be pressed before it takes effect.",
         ["Ab hier gilt der Trigger als ganz gedrückt (100 = erst am Anschlag)."] = "From here the trigger counts as fully pressed (100 = only at the end).",
-        ["Wie oft pro Sekunde Tasten mit „Turbo“ auslösen."] = "How often per second buttons with “turbo” fire.",
 
         // ---------- Infobereich ----------
         ["ViGEmBus-Treiber fehlt"] = "ViGEmBus driver missing",
@@ -391,6 +373,27 @@ internal static partial class Tr
         ["Spiel oder Programm wählen"] = "Choose game or program",
         ["Profil exportieren"] = "Export profile",
         ["Profil importieren"] = "Import profile",
+        // ---------- Kurzanleitung (WelcomeForm, je Absatz ein Schlüssel) ----------
+        ["N-Connect – Willkommen"] = "N-Connect – Welcome",
+        ["So verbindest du deine Controller:"] = "How to connect your controllers:",
+        ["Switch 2 (Pro Controller, Joy-Con 2, GameCube):\n" +
+         "   Kurz die kleine SYNC-Taste drücken – nach ein paar Sekunden vibriert der Controller.\n" +
+         "   Danach reicht ein Tastendruck zum Verbinden. Pro Controller und GameCube gehen auch per USB-Kabel.\n" +
+         "   Wichtig: NICHT über „Bluetooth → Gerät hinzufügen“ koppeln – das stört die Verbindung."] =
+            "Switch 2 (Pro Controller, Joy-Con 2, GameCube):\n" +
+            "   Briefly press the small SYNC button – after a few seconds the controller vibrates.\n" +
+            "   Afterwards a button press is enough to connect. Pro Controller and GameCube also work via USB cable.\n" +
+            "   Important: do NOT pair via “Bluetooth → Add device” – that disturbs the connection.",
+        ["Switch 1 (Pro Controller, Joy-Con, NES/SNES/N64/Mega Drive), Wii-Fernbedienung, Wii U Pro Controller:\n" +
+         "   SYNC-Taste drücken – N-Connect koppelt den Controller selbst (kein Umweg über die Windows-Einstellungen).\n" +
+         "   Danach verbindet er sich per Tastendruck. Gezielt suchen: Rechtsklick auf das Symbol → „Controller koppeln …“."] =
+            "Switch 1 (Pro Controller, Joy-Con, NES/SNES/N64/Mega Drive), Wii Remote, Wii U Pro Controller:\n" +
+            "   Press the SYNC button – N-Connect pairs the controller itself (no detour via the Windows settings).\n" +
+            "   Afterwards it connects with a button press. To search on purpose: right-click the icon → “Pair controller …”.",
+        ["Windows, Steam und Spiele sehen jeden Controller als Xbox-Controller.\n" +
+         "Das Programm läuft unten rechts im Infobereich – ein Klick öffnet die Übersicht."] =
+            "Windows, Steam and games see every controller as an Xbox controller.\n" +
+            "The program runs in the tray at the bottom right – a click opens the overview.",
         ["Verstanden"] = "Got it",
         ["Einstellungen öffnen"] = "Open settings",
         ["Willkommen"] = "Welcome",
@@ -559,7 +562,6 @@ internal static partial class Tr
             "Original controllers hidden from games – Steam and games now only see the virtual controller.",
         ["Original-Controller nicht versteckt (Abfrage abgebrochen). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."] =
             "Original controllers not hidden (prompt cancelled). To do it later: controller → Settings → Extras → “Shown twice?”.",
-        ["Xbox-360-Controller (empfohlen)"] = "Xbox 360 controller (recommended)",
         ["Tastenanordnung A/B/X/Y"] = "A/B/X/Y layout",
         ["Xbox: nach Position (untere Taste = A). Nintendo: nach Beschriftung (A bleibt A)."] = "Xbox: by position (bottom button = A). Nintendo: by label (A stays A).",
         ["Verbinden"] = "Connecting",
@@ -567,7 +569,6 @@ internal static partial class Tr
         ["Gekoppelte Controller verbinden sich ohne SYNC-Taste."] = "Paired controllers connect without the SYNC button.",
         ["Ohne Eingabe trennen nach"] = "Disconnect when idle after",
         ["Spart Akku, wenn ein Controller liegen bleibt."] = "Saves battery when a controller is left lying around.",
-        ["Mit Windows starten"] = "Start with Windows",
         ["N-Connect startet unsichtbar im Infobereich."] = "N-Connect starts hidden in the notification area.",
         ["Darstellung und Sprache"] = "Appearance and language",
         ["Farbmodus"] = "Color mode",
@@ -578,12 +579,10 @@ internal static partial class Tr
         ["Cemuhook-Server auf Port 26760 – wirkt nach einem Neustart von N-Connect."] = "Cemuhook server on port 26760 – takes effect after restarting N-Connect.",
         ["Nach Updates suchen"] = "Check for updates",
         ["Beim Start auf GitHub nach einer neuen Version suchen."] = "Look for a new version on GitHub at startup.",
-        ["Alles auf Standard"] = "Reset everything",
         ["Tastenbelegungen und Werte zurücksetzen. Gekoppelte Controller bleiben erhalten."] = "Reset button mappings and values. Paired controllers are kept.",
         ["Zurücksetzen"] = "Reset",
 
         // ---------- Controller-Karte ----------
-        ["Vibrieren"] = "Vibrate",
         ["Einstellungen"] = "Settings",
         ["Tastenbelegung und Einstellungen nur für diesen Controller"] = "Button mapping and settings for this controller only",
         ["Feineinstellung"] = "Fine-tuning",
@@ -633,7 +632,6 @@ internal static partial class Tr
         ["Versteckt den Original-Controller vor Steam und Spielen (HidHide) – sie sehen dann nur den virtuellen Controller."] =
             "Hides the original controller from Steam and games (HidHide) – they then only see the virtual controller.",
         ["bereit (auf den Tisch legen)"] = "ready (put it on the table)",
-        ["amiibo speichern"] = "Save amiibo",
         ["amiibo-Abbild (*.bin)|*.bin"] = "amiibo image (*.bin)|*.bin",
         ["Controller-Profil (*.ncprofile.json)|*.ncprofile.json|JSON (*.json)|*.json"] = "Controller profile (*.ncprofile.json)|*.ncprofile.json|JSON (*.json)|*.json",
         ["Programme (*.exe)|*.exe"] = "Programs (*.exe)|*.exe",
@@ -658,7 +656,6 @@ internal static partial class Tr
         ["Sucht eine Minute lang nach Controllern im Kopplungsmodus."] = "Searches for controllers in pairing mode for one minute.",
         ["Controller koppeln …"] = "Pair controller …",
         ["Controller koppeln"] = "Pair controller",
-        ["Umbenennen …"] = "Rename …",
         ["Linken Joy-Con umbenennen …"] = "Rename left Joy-Con …",
         ["Rechten Joy-Con umbenennen …"] = "Rename right Joy-Con …",
         ["Controller umbenennen"] = "Rename controller",
@@ -680,10 +677,11 @@ internal static partial class Tr
         ["Linker Stick"] = "Left stick",
         ["Rechter Stick"] = "Right stick",
         ["Stick"] = "Stick",
+        ["L-Stick"] = "L Stick",
+        ["R-Stick"] = "R Stick",
         ["Stick (linker Joy-Con)"] = "Stick (left Joy-Con)",
         ["Stick (rechter Joy-Con)"] = "Stick (right Joy-Con)",
         ["Neu messen"] = "Measure again",
-        ["Übernehmen"] = "Apply",
         ["Werkswerte"] = "Factory values",
         ["Der Punkt zeigt, wo der Stick gerade steht. Steht er losgelassen nicht in der Mitte oder erreicht er den Kreis nicht, auf „Neu messen“ klicken."] =
             "The dot shows where the stick is. If it is not centred when released or does not reach the circle, click “Measure again”.",
@@ -707,19 +705,15 @@ internal static partial class Tr
         ["Controller flach auf den Tisch legen, nicht berühren – verhindert, dass das Ziel von selbst wandert."] =
             "Lay the controller flat on the table, do not touch it – keeps the aim from drifting by itself.",
         ["Nullpunkt messen"] = "Measure zero point",
-        ["Ruhig liegen lassen …"] = "Keep it still …",
         ["Der Controller hat sich bewegt – bitte flach hinlegen und erneut versuchen."] = "The controller moved – please lay it flat and try again.",
         ["Nullpunkt gemessen ✓"] = "Zero point measured ✓",
         ["2  Wann zielt der Gyro?"] = "2  When does the gyro aim?",
         ["Nur per Taste"] = "Button only",
-        ["Immer"] = "Always",
         ["Beim Zielen (ZL/LT)"] = "While aiming (ZL/LT)",
         ["„Beim Zielen“: nur solange ZL (linker Trigger) gehalten wird – wie in vielen Shootern."] =
             "“While aiming”: only while ZL (left trigger) is held – as in many shooters.",
         ["3  Empfindlichkeit"] = "3  Sensitivity",
         ["Voller Ausschlag ab"] = "Full deflection from",
-        ["Mindestausschlag"] = "Minimum deflection",
-        ["Hoch/runter umkehren"] = "Invert up/down",
         ["Kleinerer Wert bei „Voller Ausschlag ab“ = empfindlicher. „Mindestausschlag“ überwindet die Totzone des Spiels."] =
             "Smaller “Full deflection from” = more sensitive. “Minimum deflection” overcomes the game's dead zone.",
         ["Mitte"] = "Centre",
@@ -738,7 +732,6 @@ internal static partial class Tr
             "Searching … press the SYNC button (Xbox: hold the pairing button on top, PlayStation: hold PS + Share/Create).",
         ["Kein Controller im Kopplungsmodus gefunden. SYNC-Taste drücken und erneut versuchen."] =
             "No controller in pairing mode found. Press SYNC and try again.",
-        ["Einstellungen"] = "Settings",
         ["Darstellung:"] = "Appearance:",
         ["Dunkel"] = "Dark",
         ["Hell"] = "Light",
@@ -746,7 +739,6 @@ internal static partial class Tr
         ["Mica-Effekt in der Titelleiste (ab Windows 11)"] = "Mica effect in the title bar (Windows 11 and later)",
 
         // ---------- Fehlerfälle und Hinweise ----------
-        ["Kein Bluetooth-Adapter gefunden."] = "No Bluetooth adapter found.",
         ["Bluetooth ist ausgeschaltet."] = "Bluetooth is turned off.",
         ["Dieser Bluetooth-Adapter unterstützt kein Bluetooth LE."] = "This Bluetooth adapter does not support Bluetooth LE.",
         ["Bluetooth-Suche konnte nicht starten."] = "Bluetooth search could not start.",
