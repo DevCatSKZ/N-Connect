@@ -324,7 +324,11 @@ internal static partial class Tr
         ["N-Connect: ViGEmBus fehlt"] = "N-Connect: ViGEmBus missing",
         ["Neue Version verfügbar"] = "New version available",
         ["Einstellungen fehlerhaft"] = "Settings damaged",
-        ["settings.json konnte nicht gelesen werden – es gelten die Standardwerte."] = "settings.json could not be read – defaults apply.",
+        ["settings.json konnte nicht gelesen werden – es gelten die Standardwerte. Die beschädigte Datei wird als „settings.json.unlesbar-…“ aufbewahrt (Klicken öffnet den Ordner)."] =
+            "settings.json could not be read – defaults apply. The damaged file is kept as “settings.json.unlesbar-…” (click to open the folder).",
+        ["Einstellungen wiederhergestellt"] = "Settings restored",
+        ["Die Einstellungen waren beschädigt und wurden aus der letzten Sicherung wiederhergestellt. Die zuletzt geänderten Werte fehlen womöglich (Klicken öffnet den Ordner)."] =
+            "The settings were damaged and have been restored from the last backup. The most recent changes may be missing (click to open the folder).",
         ["Ohne ViGEmBus kann kein virtueller Controller erzeugt werden. Bitte das Setup erneut ausführen oder ViGEmBus installieren (Rechtsklick auf das Symbol → ViGEmBus herunterladen)."] =
             "Without ViGEmBus no virtual controller can be created. Please run setup again or install ViGEmBus (right-click the icon → Download ViGEmBus).",
 
@@ -668,6 +672,9 @@ internal static partial class Tr
         ["HidHide aktuell halten"] = "Keep HidHide up to date",
         ["Beim Start nach einer neuen HidHide-Version suchen. Installiert wird nur nach Rückfrage (geprüfter Download vom Hersteller, Neustart nötig)."] =
             "Check for a new HidHide version at startup. It is only installed after you confirm (verified download from the vendor, restart required).",
+        ["Lizenzen Dritter"] = "Third-party licences",
+        ["Open-Source-Software und übernommener Code in N-Connect – mit Lizenzen und Copyright-Vermerken."] =
+            "Open-source software and adapted code in N-Connect – with licences and copyright notices.",
         ["Der Download hat nicht geklappt oder die Datei war fehlerhaft. Die Release-Seite im Browser öffnen?"] =
             "The download failed or the file was damaged. Open the release page in the browser?",
         ["Alle Controller trennen"] = "Disconnect all controllers",

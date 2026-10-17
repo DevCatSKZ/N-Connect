@@ -259,6 +259,14 @@ public sealed partial class TranslationTests : IDisposable
         "die Nintendo-Unterstützung abschalten.",
         "L-Stick",
         "R-Stick",
+        // Lizenzen Dritter (Allgemein → Erweitert) und Hinweise beim Start auf unlesbare bzw. wiederhergestellte Einstellungen.
+        "Lizenzen Dritter",
+        "Open-Source-Software und übernommener Code in N-Connect – mit Lizenzen und Copyright-Vermerken.",
+        "Einstellungen wiederhergestellt",
+        "settings.json konnte nicht gelesen werden – es gelten die Standardwerte. Die beschädigte Datei wird als " +
+        "„settings.json.unlesbar-…“ aufbewahrt (Klicken öffnet den Ordner).",
+        "Die Einstellungen waren beschädigt und wurden aus der letzten Sicherung wiederhergestellt. Die zuletzt " +
+        "geänderten Werte fehlen womöglich (Klicken öffnet den Ordner).",
     ];
 
     [Theory]
@@ -333,6 +341,25 @@ public sealed partial class TranslationTests : IDisposable
         }
         Tr.SetLanguage("de");
         Assert.Equal(string.Join("\n\n", WelcomeForm.Paragraphs), WelcomeForm.Guide);
+    }
+
+    /// <summary>Einblendungen im Infobereich fassen höchstens 255 Zeichen (NOTIFYICONDATA.szInfo) – Windows schneidet den Rest ab.</summary>
+    [Fact]
+    public void HinweiseZuDenEinstellungenPassenInDieEinblendung()
+    {
+        string[] texts =
+        [
+            "settings.json konnte nicht gelesen werden – es gelten die Standardwerte. Die beschädigte Datei wird als " +
+            "„settings.json.unlesbar-…“ aufbewahrt (Klicken öffnet den Ordner).",
+            "Die Einstellungen waren beschädigt und wurden aus der letzten Sicherung wiederhergestellt. Die zuletzt " +
+            "geänderten Werte fehlen womöglich (Klicken öffnet den Ordner).",
+        ];
+        foreach (var lang in Tr.Supported)
+        {
+            Tr.SetLanguage(lang);
+            foreach (var text in texts)
+                Assert.True(Tr.T(text).Length <= 255, $"{lang}: {Tr.T(text).Length} Zeichen: {Tr.T(text)}");
+        }
     }
 
     [Fact]
