@@ -119,7 +119,7 @@ public sealed class ControllerService : Service
             _ = Task.Run(() => MaintenanceLoopAsync(_cts.Token));
         }
         if (AppPrefs.DsuEnabled)
-            Dsu.DsuServer.Start();
+            DsuServer.Start(network: false, Log.Info, Log.Warn);
         return StartCommandResult.Sticky;
     }
 
@@ -430,7 +430,7 @@ public sealed class ControllerService : Service
         }
         device.Dispose();
         emptied?.Dispose();
-        Dsu.DsuServer.Instance?.Clear(emptied?.Index ?? -1);
+        DsuServer.Instance?.Clear(emptied?.Index ?? -1);
         Log.Info($"{Texts.ShortName(device.Kind)} getrennt");
         if (emptied is not null)
             _fastScanUntil = System.Environment.TickCount64 + FastScanMs;
@@ -469,7 +469,7 @@ public sealed class ControllerService : Service
         foreach (var p in all)
         {
             Quiet(p);
-            Dsu.DsuServer.Instance?.Clear(p.Index);
+            DsuServer.Instance?.Clear(p.Index);
         }
         _ = Task.Run(() => { foreach (var p in all) p.Dispose(); });
         StartScan();
@@ -506,7 +506,7 @@ public sealed class ControllerService : Service
     private void StopEverything()
     {
         _scanner.Stop();
-        Dsu.DsuServer.Instance?.Dispose();
+        DsuServer.Instance?.Dispose();
         DisconnectAll();
         StopForeground(StopForegroundFlags.Remove);
         StopSelf();
