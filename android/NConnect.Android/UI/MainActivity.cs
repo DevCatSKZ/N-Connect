@@ -82,6 +82,8 @@ public sealed class MainActivity : AppCompatActivity
         OnBackPressedDispatcher.AddCallback(this, new BackToControllers(this));
         if (AppPrefs.AutoStart)
             EnsureServiceRunning();
+        // Nach einem Update: die eingespielte (oder überholte) APK aus dem Download-Ordner entfernen.
+        _ = Task.Run(() => UpdateCheck.CleanUp(ApplicationContext!));
     }
 
     /// <summary>Startet den Hintergrunddienst, sobald Bluetooth erlaubt ist.</summary>

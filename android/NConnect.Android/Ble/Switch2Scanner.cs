@@ -56,7 +56,16 @@ public sealed class Switch2Scanner
         var settings = new ScanSettings.Builder()
             .SetScanMode(lowPower ? global::Android.Bluetooth.LE.ScanMode.Balanced : global::Android.Bluetooth.LE.ScanMode.LowLatency)!
             .Build()!;
-        _scanner.StartScan([filter], settings, _callback);
+        try
+        {
+            _scanner.StartScan([filter], settings, _callback);
+        }
+        catch (Exception e) when (e is Java.Lang.SecurityException or Java.Lang.IllegalStateException)
+        {
+            // „Geräte in der Nähe“ entzogen oder Bluetooth gerade im Umschalten – nicht abstürzen, später erneut.
+            Log.Warn($"Bluetooth-Suche nicht gestartet: {Log.Reason(e)}");
+            return false;
+        }
         Scanning = true;
         Log.Info($"Suche nach Switch-2-Controllern gestartet{(lowPower ? " (stromsparend)" : "")}");
         return true;
