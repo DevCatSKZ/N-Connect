@@ -20,7 +20,9 @@ ist, steht das dabei.
 | [release-notes/](release-notes/) | Release-Texte je Version (Deutsch und Englisch); die CI übernimmt `v<Version>.md` ins GitHub-Release |
 | [archiv/](archiv/) | Verworfene Wege: ESP32/nRF52840 als zweiter „Bluetooth-Stick“ und das USB-Protokoll dazu |
 
-Für Nutzer: [../README.md](../README.md). Arbeitsstand und Release-Ablauf: [../HANDOVER.md](../HANDOVER.md). Regeln
+Für Nutzer: [../README.md](../README.md) und die Anleitungen [Windows](anleitung/windows.md),
+[Android](anleitung/android.md), [Kodi](anleitung/kodi.md), [Hilfe bei Problemen](anleitung/hilfe.md) (englisch in
+[guide/](guide/)). Arbeitsstand und Release-Ablauf: [../HANDOVER.md](../HANDOVER.md). Regeln
 für Agenten: [../AGENTS.md](../AGENTS.md). Lizenzen: [../THIRD-PARTY-NOTICES.md](../THIRD-PARTY-NOTICES.md).
 
 ## In einem Satz
