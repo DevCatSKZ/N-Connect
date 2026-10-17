@@ -291,8 +291,8 @@ Kodi-Add-on `linux/kodi/service.nconnect`. Ausführlich: **[docs/LINUX-KODI.md](
 - **Auf echter Hardware geprüft:** Raspberry Pi 4 (LibreELEC 12.2.1) mit Pro Controller 2 und Joy-Con 2 – SYNC,
   Wiederverbinden, Joy-Con-Paar, ~89 Hz, DSU-Gyro, gemerkte Spielerplätze, Kodi-Menü/Anleitung (de).
 - **Veröffentlicht:** Plugin 0.3.0 im **DevCatSKZ Repository** (github.com/DevCatSKZ/kodi-repo), dazu Webseite und
-  README mit Plattform-Abschnitt. CI: `.github/workflows/kodi.yml`. Für Tags wird das Secret `KODI_REPO_TOKEN`
-  gebraucht (siehe docs/LINUX-KODI.md).
+  README mit Plattform-Abschnitt. CI: `.github/workflows/kodi.yml` (baut und testet nur; ins kodi-repo von Hand,
+  siehe docs/LINUX-KODI.md).
 - **Offen:**
   - Ungetestet: Xbox-, PlayStation-, Switch-1- und Wii-Kopplung, Vibration im Spiel, Pi 2/3 (arm).
   - Begleit-Plugin für Kodi unter Windows und Android.
