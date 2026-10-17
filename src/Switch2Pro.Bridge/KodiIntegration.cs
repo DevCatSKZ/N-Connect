@@ -49,13 +49,14 @@ internal static class KodiIntegration
 
     public static bool KodiFound => FindAddonFolders().Count > 0;
 
-    /// <summary>Datenordner des Add-ons (userdata/addon_data/service.nconnect) je gefundener Kodi-Installation.
-    /// Dorthin schreibt <see cref="KodiStatusWriter"/> die status.json – daraus lesen Menü und Widget.</summary>
+    /// <summary>Datenordner des Add-ons (userdata/addon_data/service.nconnect) je Kodi-Installation, in der das
+    /// Add-on service.nconnect installiert ist. Dorthin schreibt <see cref="KodiStatusWriter"/> die status.json – daraus
+    /// lesen Menü und Widget. Ohne Add-on liest sie niemand; dann wird auch kein leerer Datenordner angelegt.</summary>
     public static List<string> FindDataDirs()
     {
         var result = new List<string>();
         foreach (string addons in FindAddonFolders())
-            if (Directory.GetParent(addons) is { } kodi)
+            if (Directory.Exists(Path.Combine(addons, ServiceAddonId)) && Directory.GetParent(addons) is { } kodi)
                 result.Add(Path.Combine(kodi.FullName, "userdata", "addon_data", ServiceAddonId));
         return result;
     }

@@ -62,28 +62,11 @@ internal static partial class Tr
         ["Eine Zeile je Controller: Spieler, Name und Akku."] = "コントローラーごとに 1 行：プレイヤー、名前、バッテリー。",
         ["Deckkraft"] = "不透明度",
         ["nativ"] = "ネイティブ",
+        ["Xbox · nativ"] = "Xbox · ネイティブ",
         ["Controller einschalten oder SYNC drücken"] = "コントローラーの電源を入れるか SYNC を押してください",
         ["N-Connect öffnen"] = "N-Connect を開く",
         ["Position zurücksetzen"] = "位置をリセット",
         ["Widget ausblenden"] = "ウィジェットを非表示",
-        // ---------- ESP32-Export ----------
-        ["Für ESP32 exportieren"] = "ESP32 用にエクスポート",
-        ["Adresse dieses Bluetooth-Adapters und die Switch-2-Controller für einen ESP32-S3, der sich als dieser PC ausgibt – Controller verbinden sich dann ohne neues SYNC (Anleitung im ZIP)"] = "この Bluetooth アダプターのアドレスと Switch 2 コントローラーを、この PC になりすます ESP32-S3 用に書き出します。コントローラーは再 SYNC なしで接続します（手順は ZIP 内）",
-        ["ESP32-Export …"] = "ESP32 エクスポート …",
-        ["Die Adresse des Bluetooth-Adapters ist nicht bekannt. Bluetooth einschalten und das Fenster neu öffnen."] = "Bluetooth アダプターのアドレスが不明です。Bluetooth をオンにしてこのウィンドウを開き直してください。",
-        ["ZIP-Datei"] = "ZIP ファイル",
-        ["ESP32-Export speichern"] = "ESP32 エクスポートを保存",
-        ["ESP32-Export gespeichert:"] = "ESP32 エクスポートを保存しました:",
-        ["Adresse für den ESP32"] = "ESP32 用のアドレス",
-        ["übernehmbar"] = "引き継ぎ可",
-        ["nicht übernehmbar"] = "引き継ぎ不可",
-        ["Noch kein Switch-2-Controller bekannt: einmal per SYNC mit N-Connect koppeln und neu exportieren."] = "Switch 2 コントローラーがまだ登録されていません。一度 SYNC で N-Connect とペアリングしてから再度エクスポートしてください。",
-        ["Für nRF52840 exportieren"] = "nRF52840 用にエクスポート",
-        ["Dieselben Daten für einen Nordic-nRF52840-Dongle (nRF Connect SDK/Zephyr oder Adafruit Bluefruit) – auch er gibt sich als dieser PC aus (Anleitung im ZIP)"] = "Nordic nRF52840 ドングル用（nRF Connect SDK/Zephyr または Adafruit Bluefruit）に同じデータを書き出します。こちらもこの PC になりすまします（手順は ZIP 内）",
-        ["nRF52840-Export …"] = "nRF52840 エクスポート …",
-        ["nRF52840-Export speichern"] = "nRF52840 エクスポートを保存",
-        ["nRF52840-Export gespeichert:"] = "nRF52840 エクスポートを保存しました:",
-        ["Adresse für den nRF52840"] = "nRF52840 用のアドレス",
         // ---------- Status-Kopfzeile, Ansicht ----------
         ["Farbschema"] = "配色",
         ["Farben für Akzente, Knöpfe, Flächen und Ränder."] = "アクセント、ボタン、背景、枠線の色。",
@@ -107,6 +90,7 @@ internal static partial class Tr
         ["Wii-Fernbedienung: Zeiger (Sensorleiste) steuert die Maus"] = "Wiiリモコン：ポインター（センサーバー）でマウスを操作",
         ["Zeiger"] = "ポインター",
         ["kein Zeiger – Sensorleiste nicht im Blick"] = "ポインターなし – センサーバーが範囲外です",
+        ["MotionPlus"] = "MotionPlus",
         ["5. Zielen, Sticks, Trigger, Turbo"] = "5. エイム、スティック、トリガー、ターボ",
         ["6. Tastenbelegung und Profile  (Taste → Gamepad, Tastatur, Maus, Gyro-Maus, Shift-Ebene)"] =
             "6. ボタン割り当てとプロファイル（ボタン → ゲームパッド、キーボード、マウス、ジャイロマウス、Shiftレイヤー）",
@@ -239,6 +223,9 @@ internal static partial class Tr
         ["Kreis (rechts)"] = "○（右）",
         ["Viereck (links)"] = "□（左）",
         ["Dreieck (oben)"] = "△（上）",
+        ["Create"] = "Create",
+        ["Share"] = "Share",
+        ["Options"] = "Options",
         ["PS-Taste"] = "PS ボタン",
         ["Touchpad-Klick"] = "タッチパッド押し込み",
         ["Mikro stumm"] = "マイクミュート",
@@ -253,6 +240,8 @@ internal static partial class Tr
 
         // ---------- Controller-Namen ----------
         ["Wii-Fernbedienung"] = "Wiiリモコン",
+        ["Sony DualShock 4"] = "Sony DualShock 4",
+        ["Sony DualSense"] = "Sony DualSense",
         ["Xbox-Controller"] = "Xbox コントローラー",
         ["Xbox-Controller (Microsoft)"] = "Xbox コントローラー（Microsoft）",
         ["XInput (USB, Bluetooth oder Xbox-Adapter)"] = "XInput（USB、Bluetooth または Xbox アダプター）",
@@ -279,6 +268,7 @@ internal static partial class Tr
         ["Verbindung"] = "接続",
         ["Adresse"] = "アドレス",
         ["Seriennummer"] = "シリアル番号",
+        ["Firmware"] = "ファームウェア",
         ["Griff"] = "グリップ",
         ["Maus"] = "マウス",
         ["Gedrückt"] = "押下中",
@@ -286,6 +276,8 @@ internal static partial class Tr
         ["Charging Grip – GL/GR aktiv"] = "Charging Grip – GL/GR 有効",
         ["aktiv (liegt auf dem Tisch)"] = "有効（テーブルに置かれています）",
         ["bereit – zum Benutzen auf den Tisch legen"] = "準備完了 – テーブルに置いて使用",
+        ["Bluetooth LE"] = "Bluetooth LE",
+        ["Bluetooth"] = "Bluetooth",
         ["Bewegungssensor: keine Daten"] = "モーションセンサー：データなし",
         ["quer halten: Steuerkreuz links,\n1 und 2 rechts"] = "横向き：十字キーが左、\n1 と 2 が右",
 
@@ -310,7 +302,6 @@ internal static partial class Tr
         ["Mitte = linear. Rechts = feiner um die Mitte (präzises Zielen), links = schneller."] = "中央 = リニア。右 = 中央付近が繊細（精密エイム）、左 = 高速。",
         ["So weit lässt sich ein analoger Trigger drücken, bevor er wirkt."] = "アナログトリガーが反応するまでの押し込み量。",
         ["Ab hier gilt der Trigger als ganz gedrückt (100 = erst am Anschlag)."] = "ここからトリガーは完全に押し込まれたとみなされます（100 = 奥まで）。",
-        ["Wie oft pro Sekunde Tasten mit „Turbo“ auslösen."] = "「ターボ」ボタンが 1 秒間に発動する回数。",
 
         // ---------- Infobereich ----------
         ["ViGEmBus-Treiber fehlt"] = "ViGEmBus ドライバーがありません",
@@ -363,6 +354,7 @@ internal static partial class Tr
         ["Kamera startet …"] = "カメラ起動中 …",
         ["läuft – Joy-Con auf eine Lichtquelle oder die Hand richten"] = "動作中 – Joy-Con を光源または手に向けてください",
         ["Kamera startet nicht (Details im Protokoll)"] = "カメラが起動しません（詳細はログに）",
+        ["Ring-Con"] = "Ring-Con",
         ["Kein Ring-Con gefunden. Den rechten Joy-Con (Switch 1) fest in den Ring-Con schieben und erneut versuchen."] =
             "Ring-Con が見つかりません。右 Joy-Con（Switch 1）を Ring-Con にしっかり差し込んで再試行してください。",
         ["Kein amiibo erkannt. Bitte das amiibo flach an den NFC-Leser halten (Joy-Con: auf den rechten Stick, Pro Controller: auf das NFC-Logo) und erneut versuchen."] =
@@ -381,6 +373,27 @@ internal static partial class Tr
         ["Spiel oder Programm wählen"] = "ゲームまたはプログラムを選択",
         ["Profil exportieren"] = "プロファイルをエクスポート",
         ["Profil importieren"] = "プロファイルをインポート",
+        // ---------- Kurzanleitung (WelcomeForm, je Absatz ein Schlüssel) ----------
+        ["N-Connect – Willkommen"] = "N-Connect – ようこそ",
+        ["So verbindest du deine Controller:"] = "コントローラーの接続方法：",
+        ["Switch 2 (Pro Controller, Joy-Con 2, GameCube):\n" +
+         "   Kurz die kleine SYNC-Taste drücken – nach ein paar Sekunden vibriert der Controller.\n" +
+         "   Danach reicht ein Tastendruck zum Verbinden. Pro Controller und GameCube gehen auch per USB-Kabel.\n" +
+         "   Wichtig: NICHT über „Bluetooth → Gerät hinzufügen“ koppeln – das stört die Verbindung."] =
+            "Switch 2（Pro Controller、Joy-Con 2、GameCube）：\n" +
+            "   小さな SYNC ボタンを短く押します – 数秒後にコントローラーが振動します。\n" +
+            "   以降はボタンを押すだけで接続できます。Pro Controller と GameCube は USB ケーブルでも使えます。\n" +
+            "   重要：「Bluetooth → デバイスの追加」からペアリングしないでください – 接続が不安定になります。",
+        ["Switch 1 (Pro Controller, Joy-Con, NES/SNES/N64/Mega Drive), Wii-Fernbedienung, Wii U Pro Controller:\n" +
+         "   SYNC-Taste drücken – N-Connect koppelt den Controller selbst (kein Umweg über die Windows-Einstellungen).\n" +
+         "   Danach verbindet er sich per Tastendruck. Gezielt suchen: Rechtsklick auf das Symbol → „Controller koppeln …“."] =
+            "Switch 1（Pro Controller、Joy-Con、NES/SNES/N64/Mega Drive）、Wiiリモコン、Wii U Pro Controller：\n" +
+            "   SYNC ボタンを押します – N-Connect が自動でペアリングします（Windows の設定は不要です）。\n" +
+            "   以降はボタンを押すだけで接続します。手動で検索：アイコンを右クリック → 「コントローラーをペアリング …」。",
+        ["Windows, Steam und Spiele sehen jeden Controller als Xbox-Controller.\n" +
+         "Das Programm läuft unten rechts im Infobereich – ein Klick öffnet die Übersicht."] =
+            "Windows、Steam、ゲームからは、どのコントローラーも Xbox コントローラーとして認識されます。\n" +
+            "プログラムは画面右下の通知領域で動作します – クリックすると概要が開きます。",
         ["Verstanden"] = "了解",
         ["Einstellungen öffnen"] = "設定を開く",
         ["Willkommen"] = "ようこそ",
@@ -482,12 +495,16 @@ internal static partial class Tr
         ["SYNC-Taste am Controller drücken – N-Connect findet und koppelt ihn selbst. Danach reicht künftig ein Tastendruck."] =
             "コントローラーの SYNC ボタンを押してください – N-Connect が自動で検出してペアリングします。以降はボタン一つで接続できます。",
         ["So kommt der Controller in den Kopplungsmodus"] = "コントローラーをペアリングモードにする方法",
+        ["Switch 2: Pro Controller, Joy-Con 2, GameCube"] = "Switch 2：Pro Controller、Joy-Con 2、GameCube",
         ["Kurz die kleine SYNC-Taste drücken."] = "小さな SYNC ボタンを短く押します。",
+        ["Switch 1: Joy-Con, Pro Controller, NES/SNES/N64/Mega Drive"] = "Switch 1：Joy-Con、Pro Controller、NES/SNES/N64/Mega Drive",
         ["SYNC-Taste drücken, bis die Lichter laufen."] = "ランプが流れるまで SYNC ボタンを押します。",
         ["Batteriefach öffnen und die rote SYNC-Taste drücken."] = "電池カバーを開けて赤い SYNC ボタンを押します。",
         ["Die SYNC-Taste auf der Unterseite drücken."] = "底面の SYNC ボタンを押します。",
+        ["PlayStation: DualShock 4, DualSense"] = "PlayStation：DualShock 4、DualSense",
         ["PS + Teilen bzw. Create halten, bis die Lichtleiste schnell blinkt."] =
             "ライトバーが高速点滅するまで PS + Share/Create を押し続けます。",
+        ["Xbox über Bluetooth: One S, Series X|S, Elite"] = "Bluetooth 接続の Xbox：One S、Series X|S、Elite",
         ["Kopplungstaste oben halten, bis die Xbox-Taste blinkt."] = "Xbox ボタンが点滅するまで上部のペアリングボタンを押し続けます。",
         ["Status"] = "ステータス",
         ["Suche läuft …"] = "検索中 …",
@@ -545,6 +562,8 @@ internal static partial class Tr
             "元のコントローラーをゲームから隠しました – Steam とゲームには仮想コントローラーのみが見えます。",
         ["Original-Controller nicht versteckt (Abfrage abgebrochen). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."] =
             "元のコントローラーは隠されていません（確認をキャンセル）。後で行う場合：コントローラー → 設定 → その他 →「二重表示？」。",
+        ["Original-Controller nicht versteckt (Fehler, Details im Protokoll). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."] =
+            "元のコントローラーは隠されていません（エラー、詳細はログを参照）。後で行う場合：コントローラー → 設定 → その他 →「二重表示？」。",
         ["Tastenanordnung A/B/X/Y"] = "ボタン配置 A/B/X/Y",
         ["Xbox: nach Position (untere Taste = A). Nintendo: nach Beschriftung (A bleibt A)."] = "Xbox：位置で決定（下のボタン = A）。Nintendo：表示どおり（A は A のまま）。",
         ["Verbinden"] = "接続",
@@ -659,6 +678,8 @@ internal static partial class Tr
         ["Linker Stick"] = "左スティック",
         ["Rechter Stick"] = "右スティック",
         ["Stick"] = "スティック",
+        ["L-Stick"] = "Lスティック",
+        ["R-Stick"] = "Rスティック",
         ["Stick (linker Joy-Con)"] = "スティック（左 Joy-Con）",
         ["Stick (rechter Joy-Con)"] = "スティック（右 Joy-Con）",
         ["Neu messen"] = "再測定",
@@ -890,6 +911,7 @@ internal static partial class Tr
         (Re(@"^Spieler (?<n>\d+) – frei$"), m => $"プレイヤー {m.Groups["n"]} – 空き"),
         (Re(@"^Spieler (?<n>\d+)$"), m => $"プレイヤー {m.Groups["n"]}"),
         (Re(@"^Xbox 360 · Platz (?<n>\d+)$"), m => $"Xbox 360 · スロット {m.Groups["n"]}"),
+        (Re(@"^Xbox · Platz (?<n>\d+) · nativ$"), m => $"Xbox · スロット {m.Groups["n"]} · ネイティブ"),
         (Re(@"^noch (?<n>\d+) s$"), m => $"残り {m.Groups["n"]} 秒"),
         (Re(@"^Fertig – (?<n>\d+) Controller verbunden$"), m => $"完了 – {m.Groups["n"]} 台のコントローラーが接続されました"),
         (Re(@"^✓ (?<k>.+) verbunden – Spieler (?<n>\d+)$"), m => $"✓ {N(m, "k")} が接続されました – プレイヤー {m.Groups["n"]}"),
@@ -900,6 +922,8 @@ internal static partial class Tr
         (Re(@"^Spieler (?<a>\d+) und (?<b>\d+) getauscht$"), m => $"プレイヤー {m.Groups["a"]} と {m.Groups["b"]} を入れ替えました"),
         (Re(@"^Name für (?<k>.+) \(leer = Standardname\):$"), m => $"{N(m, "k")} の名前（空欄 = デフォルト名）："),
         (Re(@"^(?<k>.+) \(Joy-Con-Paar\)$"), m => $"{m.Groups["k"]}（Joy-Con ペア）"),
+        (Re(@"^Mitte (?<x>\d+) / (?<y>\d+) · Abweichung vom Kreis: vorher (?<a>\d+) %, neu (?<b>\d+) %$"),
+            m => $"中央 {m.Groups["x"]} / {m.Groups["y"]} · 円からのずれ：前 {m.Groups["a"]} %、新 {m.Groups["b"]} %"),
         (Re(@"^Joy-Con zusammengefasst \(Spieler (?<n>\d+)\)$"), m => $"Joy-Con をまとめました（プレイヤー {m.Groups["n"]}）"),
         (Re(@"^Joy-Con getrennt – (?<k>.+) ist jetzt Spieler (?<n>\d+)$"), m => $"Joy-Con を分離 – {N(m, "k")} はプレイヤー {m.Groups["n"]} になりました"),
         (Re(@"^Spieler (?<n>\d+): Akku (?<k>.+) fast leer \((?<p>\d+) %\) – bitte aufladen$"),
@@ -920,20 +944,32 @@ internal static partial class Tr
         (Re(@"^HidHide (?<v>.+) ist erschienen \(installiert: (?<i>.+)\)\. Klicken zum Installieren\.$"),
             m => $"HidHide {m.Groups["v"]} が公開されました（インストール済み：{m.Groups["i"]}）。クリックでインストール。"),
         (Re(@"^Lade HidHide (?<v>.+) herunter …$"), m => $"HidHide {m.Groups["v"]} をダウンロード中 …"),
+        (Re(@"^HidHide (?<v>.+) herunterladen und installieren\? Das HidHide-Setup entfernt zuerst die alte Version und verlangt einen Neustart von Windows – bitte seinen Anweisungen folgen\. Windows fragt dabei nach Administratorrechten\. Danach versteckt N-Connect die Controller automatisch neu\.$"),
+            m => $"HidHide {m.Groups["v"]} をダウンロードしてインストールしますか？HidHide のセットアップは古いバージョンを先に削除し、Windows の再起動が必要です – 指示に従ってください。Windows から管理者権限を求められます。その後、N-Connect がコントローラーを自動で再び非表示にします。"),
+        (Re(@"^Version (?<v>.+) herunterladen und installieren\? N-Connect wird dafür kurz beendet und danach wieder gestartet\.(?<a> Windows fragt dabei nach Administratorrechten\.)?$"),
+            m => $"バージョン {m.Groups["v"]} をダウンロードしてインストールしますか？N-Connect はいったん終了し、その後再起動します。" +
+                 (m.Groups["a"].Success ? "Windows から管理者権限を求められます。" : "")),
         (Re(@"^(?<t>.+) · (?<r>\d+) Berichte/s$"), m => $"{T(m.Groups["t"].Value)} · {m.Groups["r"]} レポート/秒"),
         (Re(@"^(?<p>\d+ %)(?<v>  \(.*\))?  ⚡ lädt$"), m => $"{m.Groups["p"]}{m.Groups["v"]}  ⚡ 充電中"),
         (Re(@"^Speichern fehlgeschlagen: (?<e>.*)$"), m => $"保存に失敗しました：{m.Groups["e"]}"),
         (Re(@"^Lesen fehlgeschlagen: (?<e>.*)$"), m => $"読み取りに失敗しました：{m.Groups["e"]}"),
         (Re(@"^amiibo konnte nicht gelesen werden: (?<e>.*)$"), m => $"amiibo を読み取れませんでした：{T(m.Groups["e"].Value)}"),
+        (Re(@"^Gekoppelt: (?<k>.+)\nDer Controller erscheint gleich in der Übersicht\.$"),
+            m => $"ペアリング済み：{m.Groups["k"]}\nコントローラーはまもなく概要に表示されます。"),
         (Re(@"^Gekoppelt: (?<k>.+)$"), m => $"ペアリング済み：{m.Groups["k"]}"),
         (Re(@"^Gefunden: (?<k>.+) – kopple …$"), m => $"検出：{m.Groups["k"]} – ペアリング中 …"),
         (Re(@"^amiibo erkannt \((?<u>.+)\) – lese …$"), m => $"amiibo を検出（{m.Groups["u"]}）– 読み取り中 …"),
+        (Re(@"^(?<w>\d+) × (?<h>\d+) · (?<f>[\d.,]+) Bilder/s$"), m => $"{m.Groups["w"]} × {m.Groups["h"]} · {m.Groups["f"]} フレーム/秒"),
         (Re(@"^(?<n>\d+) Minuten$"), m => $"{m.Groups["n"]} 分"),
         (Re(@"^✓ (?<n>\d+) Schritte, Dauer (?<ms>\d+) ms$"), m => $"✓ {m.Groups["n"]} ステップ、合計 {m.Groups["ms"]} ms"),
         (Re(@"^Controller-Taste „(?<b>.+)“:\nJetzt die gewünschte Taste oder Tastenkombination drücken\.$"),
             m => $"コントローラーボタン「{T(m.Groups["b"].Value)}」：\n使用するキーまたはキーの組み合わせを押してください。"),
         (Re(@"^Solange „(?<b>.+)“ gehalten wird, wird diese Taste schnell wiederholt gedrückt\n\(Geschwindigkeit unter 5\. „Turbo“\):$"),
             m => $"「{T(m.Groups["b"].Value)}」を押している間、このボタンが高速で繰り返されます\n（速度は 5.「ターボ」で設定）："),
+        (Re(@"^Beim Drücken von „(?<b>.+?)“ wird diese Folge einmal abgespielt\.(?<r>.*)$", RegexOptions.Singleline),
+            m => $"「{T(m.Groups["b"].Value)}」を押すと、このシーケンスを 1 回再生します。手順はカンマで区切り、各手順で押し続けるものと長さ（ms）を指定します。" +
+                 "ゲームパッド：A B X Y LB RB LT RT Up Down Left Right LS RS Start Back Guide、同時押しは +。" +
+                 "キーボード：Key:Ctrl+C。待機：Pause。\n例：「A 80, Pause 60, A 80」（ダブルタップ）  ·  「Down+B 150」  ·  「Key:Ctrl+S 50」"),
         (Re(@"^Ring-Con: (?<e>.*)$"), m => $"Ring-Con：{T(m.Groups["e"].Value)}"),
         (Re(@"^⌨  Taste: (?<k>.+)$"), m => $"⌨  キー：{m.Groups["k"]}"),
         (Re(@"^🔁  Turbo: Taste (?<k>.+)$"), m => $"🔁  ターボ：キー {m.Groups["k"]}"),
@@ -942,7 +978,10 @@ internal static partial class Tr
         (Re(@"^Tastatur: (?<k>.+)$"), m => $"キーボード：{m.Groups["k"]}"),
         (Re(@"^Gamepad: (?<k>.+)$"), m => $"ゲームパッド：{m.Groups["k"]}"),
         (Re(@"^(?<k>.+)  \(verbunden\)$"), m => $"{N(m, "k")}（接続済み）"),
+        // Tooltip „P1 Pro 2 57 %“: Namen bleiben, wie sie sind.
+        (Re(@"^P(?<n>\d+) (?<k>.+)$"), m => m.Value),
         (Re(@"^Bluetooth nicht verfügbar: (?<e>.*)$"), m => $"Bluetooth を利用できません：{m.Groups["e"]}"),
+        (Re(@"^N-Connect: (?<p>.+)$"), m => $"N-Connect：{T(m.Groups["p"].Value)}"),
         (Re(@"^(?<k>.+) per USB ist von einem anderen Programm belegt \(z\. B\. Steam\)\.$"),
             m => $"{N(m, "k")} の USB は別のプログラム（例：Steam）が使用中です。"),
         (Re(@"^Schon (?<n>\d+) Controller verbunden – (?<k>.+) wird nicht verwendet\.$"),

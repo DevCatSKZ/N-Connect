@@ -62,28 +62,11 @@ internal static partial class Tr
         ["Eine Zeile je Controller: Spieler, Name und Akku."] = "每个控制器一行：玩家、名称和电量。",
         ["Deckkraft"] = "不透明度",
         ["nativ"] = "原生",
+        ["Xbox · nativ"] = "Xbox · 原生",
         ["Controller einschalten oder SYNC drücken"] = "打开控制器或按 SYNC 键",
         ["N-Connect öffnen"] = "打开 N-Connect",
         ["Position zurücksetzen"] = "重置位置",
         ["Widget ausblenden"] = "隐藏小组件",
-        // ---------- ESP32-Export ----------
-        ["Für ESP32 exportieren"] = "导出到 ESP32",
-        ["Adresse dieses Bluetooth-Adapters und die Switch-2-Controller für einen ESP32-S3, der sich als dieser PC ausgibt – Controller verbinden sich dann ohne neues SYNC (Anleitung im ZIP)"] = "导出此蓝牙适配器的地址和 Switch 2 控制器，供冒充此电脑的 ESP32-S3 使用——控制器无需重新 SYNC 即可连接（说明见 ZIP）",
-        ["ESP32-Export …"] = "ESP32 导出 …",
-        ["Die Adresse des Bluetooth-Adapters ist nicht bekannt. Bluetooth einschalten und das Fenster neu öffnen."] = "蓝牙适配器地址未知。请打开蓝牙并重新打开此窗口。",
-        ["ZIP-Datei"] = "ZIP 文件",
-        ["ESP32-Export speichern"] = "保存 ESP32 导出",
-        ["ESP32-Export gespeichert:"] = "ESP32 导出已保存：",
-        ["Adresse für den ESP32"] = "ESP32 使用的地址",
-        ["übernehmbar"] = "可迁移",
-        ["nicht übernehmbar"] = "不可迁移",
-        ["Noch kein Switch-2-Controller bekannt: einmal per SYNC mit N-Connect koppeln und neu exportieren."] = "尚无已知的 Switch 2 控制器：请先通过 SYNC 与 N-Connect 配对一次，然后重新导出。",
-        ["Für nRF52840 exportieren"] = "导出到 nRF52840",
-        ["Dieselben Daten für einen Nordic-nRF52840-Dongle (nRF Connect SDK/Zephyr oder Adafruit Bluefruit) – auch er gibt sich als dieser PC aus (Anleitung im ZIP)"] = "为 Nordic nRF52840 加密狗（nRF Connect SDK/Zephyr 或 Adafruit Bluefruit）导出相同数据——它同样冒充此电脑（说明见 ZIP）",
-        ["nRF52840-Export …"] = "nRF52840 导出 …",
-        ["nRF52840-Export speichern"] = "保存 nRF52840 导出",
-        ["nRF52840-Export gespeichert:"] = "nRF52840 导出已保存：",
-        ["Adresse für den nRF52840"] = "nRF52840 使用的地址",
         // ---------- Status-Kopfzeile, Ansicht ----------
         ["Farbschema"] = "配色方案",
         ["Farben für Akzente, Knöpfe, Flächen und Ränder."] = "强调色、按钮、背景和边框的颜色。",
@@ -107,6 +90,7 @@ internal static partial class Tr
         ["Wii-Fernbedienung: Zeiger (Sensorleiste) steuert die Maus"] = "Wii 遥控器：指针（感应条）控制鼠标",
         ["Zeiger"] = "指针",
         ["kein Zeiger – Sensorleiste nicht im Blick"] = "无指针 – 感应条不在视野内",
+        ["MotionPlus"] = "MotionPlus",
         ["5. Zielen, Sticks, Trigger, Turbo"] = "5. 瞄准、摇杆、扳机、连发",
         ["6. Tastenbelegung und Profile  (Taste → Gamepad, Tastatur, Maus, Gyro-Maus, Shift-Ebene)"] =
             "6. 按键映射和配置文件（按键 → 手柄、键盘、鼠标、陀螺仪鼠标、Shift 层）",
@@ -239,6 +223,9 @@ internal static partial class Tr
         ["Kreis (rechts)"] = "○（右）",
         ["Viereck (links)"] = "□（左）",
         ["Dreieck (oben)"] = "△（上）",
+        ["Create"] = "Create",
+        ["Share"] = "Share",
+        ["Options"] = "Options",
         ["PS-Taste"] = "PS 键",
         ["Touchpad-Klick"] = "触摸板按下",
         ["Mikro stumm"] = "麦克风静音",
@@ -253,6 +240,8 @@ internal static partial class Tr
 
         // ---------- Controller-Namen ----------
         ["Wii-Fernbedienung"] = "Wii 遥控器",
+        ["Sony DualShock 4"] = "Sony DualShock 4",
+        ["Sony DualSense"] = "Sony DualSense",
         ["Xbox-Controller"] = "Xbox 控制器",
         ["Xbox-Controller (Microsoft)"] = "Xbox 控制器（Microsoft）",
         ["XInput (USB, Bluetooth oder Xbox-Adapter)"] = "XInput（USB、蓝牙或 Xbox 适配器）",
@@ -279,6 +268,7 @@ internal static partial class Tr
         ["Verbindung"] = "连接",
         ["Adresse"] = "地址",
         ["Seriennummer"] = "序列号",
+        ["Firmware"] = "固件",
         ["Griff"] = "握把",
         ["Maus"] = "鼠标",
         ["Gedrückt"] = "已按下",
@@ -286,6 +276,8 @@ internal static partial class Tr
         ["Charging Grip – GL/GR aktiv"] = "充电握把 – GL/GR 已启用",
         ["aktiv (liegt auf dem Tisch)"] = "已激活（平放在桌面上）",
         ["bereit – zum Benutzen auf den Tisch legen"] = "就绪 – 放到桌面上即可使用",
+        ["Bluetooth LE"] = "低功耗蓝牙",
+        ["Bluetooth"] = "蓝牙",
         ["Bewegungssensor: keine Daten"] = "运动传感器：无数据",
         ["quer halten: Steuerkreuz links,\n1 und 2 rechts"] = "横握：十字键在左，\n1 和 2 在右",
 
@@ -310,7 +302,6 @@ internal static partial class Tr
         ["Mitte = linear. Rechts = feiner um die Mitte (präzises Zielen), links = schneller."] = "中间 = 线性。右 = 中心附近更细腻（精准瞄准），左 = 更快。",
         ["So weit lässt sich ein analoger Trigger drücken, bevor er wirkt."] = "模拟扳机生效前可以按下的行程。",
         ["Ab hier gilt der Trigger als ganz gedrückt (100 = erst am Anschlag)."] = "从此处起扳机视为完全按下（100 = 按到底才算）。",
-        ["Wie oft pro Sekunde Tasten mit „Turbo“ auslösen."] = "“连发”按键每秒触发次数。",
 
         // ---------- Infobereich ----------
         ["ViGEmBus-Treiber fehlt"] = "缺少 ViGEmBus 驱动",
@@ -363,6 +354,7 @@ internal static partial class Tr
         ["Kamera startet …"] = "摄像头启动中 …",
         ["läuft – Joy-Con auf eine Lichtquelle oder die Hand richten"] = "运行中 – 将 Joy-Con 对准光源或手部",
         ["Kamera startet nicht (Details im Protokoll)"] = "摄像头无法启动（详见日志）",
+        ["Ring-Con"] = "Ring-Con",
         ["Kein Ring-Con gefunden. Den rechten Joy-Con (Switch 1) fest in den Ring-Con schieben und erneut versuchen."] =
             "未找到 Ring-Con。请将右 Joy-Con（Switch 1）牢固插入 Ring-Con 后重试。",
         ["Kein amiibo erkannt. Bitte das amiibo flach an den NFC-Leser halten (Joy-Con: auf den rechten Stick, Pro Controller: auf das NFC-Logo) und erneut versuchen."] =
@@ -381,6 +373,27 @@ internal static partial class Tr
         ["Spiel oder Programm wählen"] = "选择游戏或程序",
         ["Profil exportieren"] = "导出配置文件",
         ["Profil importieren"] = "导入配置文件",
+        // ---------- Kurzanleitung (WelcomeForm, je Absatz ein Schlüssel) ----------
+        ["N-Connect – Willkommen"] = "N-Connect – 欢迎",
+        ["So verbindest du deine Controller:"] = "如何连接控制器：",
+        ["Switch 2 (Pro Controller, Joy-Con 2, GameCube):\n" +
+         "   Kurz die kleine SYNC-Taste drücken – nach ein paar Sekunden vibriert der Controller.\n" +
+         "   Danach reicht ein Tastendruck zum Verbinden. Pro Controller und GameCube gehen auch per USB-Kabel.\n" +
+         "   Wichtig: NICHT über „Bluetooth → Gerät hinzufügen“ koppeln – das stört die Verbindung."] =
+            "Switch 2（Pro Controller、Joy-Con 2、GameCube）：\n" +
+            "   短按小的 SYNC 键 – 几秒后控制器会振动。\n" +
+            "   之后按任意键即可连接。Pro Controller 和 GameCube 也可以用 USB 线连接。\n" +
+            "   重要：不要通过“蓝牙 → 添加设备”配对 – 这会干扰连接。",
+        ["Switch 1 (Pro Controller, Joy-Con, NES/SNES/N64/Mega Drive), Wii-Fernbedienung, Wii U Pro Controller:\n" +
+         "   SYNC-Taste drücken – N-Connect koppelt den Controller selbst (kein Umweg über die Windows-Einstellungen).\n" +
+         "   Danach verbindet er sich per Tastendruck. Gezielt suchen: Rechtsklick auf das Symbol → „Controller koppeln …“."] =
+            "Switch 1（Pro Controller、Joy-Con、NES/SNES/N64/Mega Drive）、Wii 遥控器、Wii U Pro Controller：\n" +
+            "   按 SYNC 键 – N-Connect 会自动配对控制器（无需经过 Windows 设置）。\n" +
+            "   之后按任意键即可连接。手动搜索：右键点击图标 → “配对控制器 …”。",
+        ["Windows, Steam und Spiele sehen jeden Controller als Xbox-Controller.\n" +
+         "Das Programm läuft unten rechts im Infobereich – ein Klick öffnet die Übersicht."] =
+            "Windows、Steam 和游戏会把每个控制器识别为 Xbox 控制器。\n" +
+            "程序在右下角的通知区域运行 – 单击即可打开概览。",
         ["Verstanden"] = "知道了",
         ["Einstellungen öffnen"] = "打开设置",
         ["Willkommen"] = "欢迎",
@@ -482,12 +495,16 @@ internal static partial class Tr
         ["SYNC-Taste am Controller drücken – N-Connect findet und koppelt ihn selbst. Danach reicht künftig ein Tastendruck."] =
             "按控制器上的 SYNC 键 – N-Connect 会自动找到并配对。以后只需按任意键即可连接。",
         ["So kommt der Controller in den Kopplungsmodus"] = "如何让控制器进入配对模式",
+        ["Switch 2: Pro Controller, Joy-Con 2, GameCube"] = "Switch 2：Pro Controller、Joy-Con 2、GameCube",
         ["Kurz die kleine SYNC-Taste drücken."] = "短按小的 SYNC 键。",
+        ["Switch 1: Joy-Con, Pro Controller, NES/SNES/N64/Mega Drive"] = "Switch 1：Joy-Con、Pro Controller、NES/SNES/N64/Mega Drive",
         ["SYNC-Taste drücken, bis die Lichter laufen."] = "按 SYNC 键直到指示灯滚动。",
         ["Batteriefach öffnen und die rote SYNC-Taste drücken."] = "打开电池仓并按红色 SYNC 键。",
         ["Die SYNC-Taste auf der Unterseite drücken."] = "按底部的 SYNC 键。",
+        ["PlayStation: DualShock 4, DualSense"] = "PlayStation：DualShock 4、DualSense",
         ["PS + Teilen bzw. Create halten, bis die Lichtleiste schnell blinkt."] =
             "按住 PS + Share/Create 直到灯条快速闪烁。",
+        ["Xbox über Bluetooth: One S, Series X|S, Elite"] = "蓝牙连接的 Xbox：One S、Series X|S、Elite",
         ["Kopplungstaste oben halten, bis die Xbox-Taste blinkt."] = "按住顶部配对键直到 Xbox 键闪烁。",
         ["Status"] = "状态",
         ["Suche läuft …"] = "搜索中 …",
@@ -545,6 +562,8 @@ internal static partial class Tr
             "已对游戏隐藏原始控制器 – Steam 和游戏只能看到虚拟控制器。",
         ["Original-Controller nicht versteckt (Abfrage abgebrochen). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."] =
             "未隐藏原始控制器（已取消询问）。后续操作：控制器 → 设置 → 其他 →“显示重复？”。",
+        ["Original-Controller nicht versteckt (Fehler, Details im Protokoll). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."] =
+            "未隐藏原始控制器（出错，详见日志）。后续操作：控制器 → 设置 → 其他 →“显示重复？”。",
         ["Tastenanordnung A/B/X/Y"] = "按键布局 A/B/X/Y",
         ["Xbox: nach Position (untere Taste = A). Nintendo: nach Beschriftung (A bleibt A)."] = "Xbox：按位置（下方按键 = A）。Nintendo：按标识（A 仍是 A）。",
         ["Verbinden"] = "连接",
@@ -659,6 +678,8 @@ internal static partial class Tr
         ["Linker Stick"] = "左摇杆",
         ["Rechter Stick"] = "右摇杆",
         ["Stick"] = "摇杆",
+        ["L-Stick"] = "L摇杆",
+        ["R-Stick"] = "R摇杆",
         ["Stick (linker Joy-Con)"] = "摇杆（左 Joy-Con）",
         ["Stick (rechter Joy-Con)"] = "摇杆（右 Joy-Con）",
         ["Neu messen"] = "重新测量",
@@ -890,6 +911,7 @@ internal static partial class Tr
         (Re(@"^Spieler (?<n>\d+) – frei$"), m => $"玩家 {m.Groups["n"]} – 空闲"),
         (Re(@"^Spieler (?<n>\d+)$"), m => $"玩家 {m.Groups["n"]}"),
         (Re(@"^Xbox 360 · Platz (?<n>\d+)$"), m => $"Xbox 360 · 位置 {m.Groups["n"]}"),
+        (Re(@"^Xbox · Platz (?<n>\d+) · nativ$"), m => $"Xbox · 位置 {m.Groups["n"]} · 原生"),
         (Re(@"^noch (?<n>\d+) s$"), m => $"剩余 {m.Groups["n"]} 秒"),
         (Re(@"^Fertig – (?<n>\d+) Controller verbunden$"), m => $"完成 – 已连接 {m.Groups["n"]} 个控制器"),
         (Re(@"^✓ (?<k>.+) verbunden – Spieler (?<n>\d+)$"), m => $"✓ {N(m, "k")} 已连接 – 玩家 {m.Groups["n"]}"),
@@ -900,6 +922,8 @@ internal static partial class Tr
         (Re(@"^Spieler (?<a>\d+) und (?<b>\d+) getauscht$"), m => $"玩家 {m.Groups["a"]} 和 {m.Groups["b"]} 已交换"),
         (Re(@"^Name für (?<k>.+) \(leer = Standardname\):$"), m => $"{N(m, "k")} 的名称（留空 = 默认名）："),
         (Re(@"^(?<k>.+) \(Joy-Con-Paar\)$"), m => $"{m.Groups["k"]}（Joy-Con 组合）"),
+        (Re(@"^Mitte (?<x>\d+) / (?<y>\d+) · Abweichung vom Kreis: vorher (?<a>\d+) %, neu (?<b>\d+) %$"),
+            m => $"中心 {m.Groups["x"]} / {m.Groups["y"]} · 与圆的偏差：之前 {m.Groups["a"]} %，现在 {m.Groups["b"]} %"),
         (Re(@"^Joy-Con zusammengefasst \(Spieler (?<n>\d+)\)$"), m => $"Joy-Con 已组合（玩家 {m.Groups["n"]}）"),
         (Re(@"^Joy-Con getrennt – (?<k>.+) ist jetzt Spieler (?<n>\d+)$"), m => $"Joy-Con 已分离 – {N(m, "k")} 现在是玩家 {m.Groups["n"]}"),
         (Re(@"^Spieler (?<n>\d+): Akku (?<k>.+) fast leer \((?<p>\d+) %\) – bitte aufladen$"),
@@ -920,20 +944,32 @@ internal static partial class Tr
         (Re(@"^HidHide (?<v>.+) ist erschienen \(installiert: (?<i>.+)\)\. Klicken zum Installieren\.$"),
             m => $"HidHide {m.Groups["v"]} 已发布（当前安装：{m.Groups["i"]}）。点击安装。"),
         (Re(@"^Lade HidHide (?<v>.+) herunter …$"), m => $"正在下载 HidHide {m.Groups["v"]} …"),
+        (Re(@"^HidHide (?<v>.+) herunterladen und installieren\? Das HidHide-Setup entfernt zuerst die alte Version und verlangt einen Neustart von Windows – bitte seinen Anweisungen folgen\. Windows fragt dabei nach Administratorrechten\. Danach versteckt N-Connect die Controller automatisch neu\.$"),
+            m => $"下载并安装 HidHide {m.Groups["v"]}？HidHide 安装程序会先卸载旧版本，并需要重启 Windows – 请按照其提示操作。Windows 会请求管理员权限。之后 N-Connect 会自动重新隐藏控制器。"),
+        (Re(@"^Version (?<v>.+) herunterladen und installieren\? N-Connect wird dafür kurz beendet und danach wieder gestartet\.(?<a> Windows fragt dabei nach Administratorrechten\.)?$"),
+            m => $"下载并安装版本 {m.Groups["v"]}？N-Connect 会短暂退出，然后重新启动。" +
+                 (m.Groups["a"].Success ? "Windows 会请求管理员权限。" : "")),
         (Re(@"^(?<t>.+) · (?<r>\d+) Berichte/s$"), m => $"{T(m.Groups["t"].Value)} · {m.Groups["r"]} 报告/秒"),
         (Re(@"^(?<p>\d+ %)(?<v>  \(.*\))?  ⚡ lädt$"), m => $"{m.Groups["p"]}{m.Groups["v"]}  ⚡ 充电中"),
         (Re(@"^Speichern fehlgeschlagen: (?<e>.*)$"), m => $"保存失败：{m.Groups["e"]}"),
         (Re(@"^Lesen fehlgeschlagen: (?<e>.*)$"), m => $"读取失败：{m.Groups["e"]}"),
         (Re(@"^amiibo konnte nicht gelesen werden: (?<e>.*)$"), m => $"无法读取 amiibo：{T(m.Groups["e"].Value)}"),
+        (Re(@"^Gekoppelt: (?<k>.+)\nDer Controller erscheint gleich in der Übersicht\.$"),
+            m => $"已配对：{m.Groups["k"]}\n控制器很快会出现在概览中。"),
         (Re(@"^Gekoppelt: (?<k>.+)$"), m => $"已配对：{m.Groups["k"]}"),
         (Re(@"^Gefunden: (?<k>.+) – kopple …$"), m => $"找到：{m.Groups["k"]} – 配对中 …"),
         (Re(@"^amiibo erkannt \((?<u>.+)\) – lese …$"), m => $"识别到 amiibo（{m.Groups["u"]}）– 读取中 …"),
+        (Re(@"^(?<w>\d+) × (?<h>\d+) · (?<f>[\d.,]+) Bilder/s$"), m => $"{m.Groups["w"]} × {m.Groups["h"]} · {m.Groups["f"]} 帧/秒"),
         (Re(@"^(?<n>\d+) Minuten$"), m => $"{m.Groups["n"]} 分钟"),
         (Re(@"^✓ (?<n>\d+) Schritte, Dauer (?<ms>\d+) ms$"), m => $"✓ {m.Groups["n"]} 步，共 {m.Groups["ms"]} 毫秒"),
         (Re(@"^Controller-Taste „(?<b>.+)“:\nJetzt die gewünschte Taste oder Tastenkombination drücken\.$"),
             m => $"控制器按键“{T(m.Groups["b"].Value)}”：\n现在请按下所需的按键或组合键。"),
         (Re(@"^Solange „(?<b>.+)“ gehalten wird, wird diese Taste schnell wiederholt gedrückt\n\(Geschwindigkeit unter 5\. „Turbo“\):$"),
             m => $"按住“{T(m.Groups["b"].Value)}”时，此按键将快速重复触发\n（速度见第 5 项“连发”）："),
+        (Re(@"^Beim Drücken von „(?<b>.+?)“ wird diese Folge einmal abgespielt\.(?<r>.*)$", RegexOptions.Singleline),
+            m => $"按下“{T(m.Groups["b"].Value)}”时，此序列播放一次。各步骤用逗号分隔；每一步写明按住什么以及持续多久（毫秒）。" +
+                 "手柄：A B X Y LB RB LT RT Up Down Left Right LS RS Start Back Guide，同时按多个键用 +。" +
+                 "键盘：Key:Ctrl+C。等待：Pause。\n示例：“A 80, Pause 60, A 80”（双击）  ·  “Down+B 150”  ·  “Key:Ctrl+S 50”"),
         (Re(@"^Ring-Con: (?<e>.*)$"), m => $"Ring-Con：{T(m.Groups["e"].Value)}"),
         (Re(@"^⌨  Taste: (?<k>.+)$"), m => $"⌨  按键：{m.Groups["k"]}"),
         (Re(@"^🔁  Turbo: Taste (?<k>.+)$"), m => $"🔁  连发：按键 {m.Groups["k"]}"),
@@ -942,7 +978,10 @@ internal static partial class Tr
         (Re(@"^Tastatur: (?<k>.+)$"), m => $"键盘：{m.Groups["k"]}"),
         (Re(@"^Gamepad: (?<k>.+)$"), m => $"手柄：{m.Groups["k"]}"),
         (Re(@"^(?<k>.+)  \(verbunden\)$"), m => $"{N(m, "k")}（已连接）"),
+        // Tooltip „P1 Pro 2 57 %“: Namen bleiben, wie sie sind.
+        (Re(@"^P(?<n>\d+) (?<k>.+)$"), m => m.Value),
         (Re(@"^Bluetooth nicht verfügbar: (?<e>.*)$"), m => $"蓝牙不可用：{m.Groups["e"]}"),
+        (Re(@"^N-Connect: (?<p>.+)$"), m => $"N-Connect：{T(m.Groups["p"].Value)}"),
         (Re(@"^(?<k>.+) per USB ist von einem anderen Programm belegt \(z\. B\. Steam\)\.$"),
             m => $"{N(m, "k")} 的 USB 被其他程序占用（例如 Steam）。"),
         (Re(@"^Schon (?<n>\d+) Controller verbunden – (?<k>.+) wird nicht verwendet\.$"),
