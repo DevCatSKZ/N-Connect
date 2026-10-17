@@ -8,14 +8,16 @@ namespace NConnect.Android.Core;
 /// wieder hochfahren, damit sich die Controller ohne App-Start verbinden. Läuft nur, wenn es in den Einstellungen
 /// eingeschaltet ist (<see cref="AppPrefs.StartOnBoot"/>) und „Geräte in der Nähe“ erlaubt ist – ohne die Berechtigung
 /// würde Android den Dienst beim Start beenden (SecurityException).
+/// Nicht exportiert: Die beiden System-Broadcasts kommen trotzdem an, andere Apps können den Dienst darüber aber nicht
+/// starten. Nicht DirectBootAware: vor dem ersten Entsperren wären die Einstellungen (AppPrefs) gar nicht lesbar.
 /// </summary>
-[BroadcastReceiver(Enabled = true, Exported = true, DirectBootAware = true)]
-[IntentFilter(["android.intent.action.BOOT_COMPLETED", "android.intent.action.MY_PACKAGE_REPLACED"])]
-public sealed class BootReceiver : BroadcastReceiver
+[BroadcastReceiver(Enabled = true, Exported = false)]
+[IntentFilter([BootCompleted, PackageReplaced])]
+public sealed partial class BootReceiver : BroadcastReceiver
 {
     public override void OnReceive(Context? context, Intent? intent)
     {
-        if (context is null || !AppPrefs.StartOnBoot || !AppPrefs.SetupDone)
+        if (context is null || !StartsService(intent?.Action) || !AppPrefs.StartOnBoot || !AppPrefs.SetupDone)
             return;
         if (!UI.Permissions.HasBluetooth(context))
         {
