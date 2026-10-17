@@ -1,5 +1,10 @@
 # USB-Protokoll: Funkadapter ⇄ N-Connect
 
+> **Verworfen am 10.10.2026** – Grund: Der nRF52840 kann kein Bluetooth-Adapter für Windows sein (er beherrscht nur
+> Bluetooth LE), der Relais-Weg, für den dieses Protokoll gedacht war, blieb in den Tests ohne Ergebnis, und jeder Test
+> kostete ein erneutes Koppeln der Controller. `AdapterProtocol.cs`, `AdapterProtocolTests` und die Anbindung in
+> N-Connect sind in 1.0.22 entfernt. Archiv: Der Text unten beschreibt den damaligen Stand und gilt nicht mehr.
+
 Für **Weg A** (siehe [ESP32.md §5.6](ESP32.md) / [NRF52840.md](NRF52840.md)): Ein ESP32-S3 oder nRF52840 verbindet
 sich per Bluetooth LE mit den Switch-2-Controllern (er gibt sich als der PC-Bluetooth-Adapter aus) und reicht sie über
 USB an N-Connect weiter. N-Connect zeigt sie dann wie an einem normalen Stick an – mit voller Belegung, Gyro,
@@ -61,7 +66,7 @@ PID: `0x2069` Pro Controller 2, `0x2067` Joy-Con 2 L, `0x2066` Joy-Con 2 R, `0x2
 1. N-Connect öffnet den Port, schickt `Ping`, erwartet `Hello` mit passender Version.
 2. N-Connect schickt `SetHost` mit der Adresse, als die der Adapter auftreten soll (aus dem ESP32-/nRF52840-Export).
 3. Der Adapter sucht nach Werbung `0x0553`, deren Byte 10–15 diese Adresse ist, verbindet sich (BLE, ohne Pairing),
-   startet den Controller (Feature-Maske setzen/einschalten, siehe [PROTOKOLLE §1.3](PROTOKOLLE.md)) und meldet
+   startet den Controller (Feature-Maske setzen/einschalten, siehe [PROTOKOLLE §1.3](../PROTOKOLLE.md)) und meldet
    `Connected`.
 4. Laufend: Adapter → `Input` je Bericht; N-Connect → `Rumble`/`PlayerLed` bei Bedarf.
 5. Beim Abbruch meldet der Adapter `Disconnected`; N-Connect entfernt den Spieler.
