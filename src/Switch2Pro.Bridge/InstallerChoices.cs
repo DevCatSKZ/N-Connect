@@ -5,8 +5,8 @@ namespace Switch2Pro.Bridge;
 
 /// <summary>
 /// Sprache und Darstellung aus dem Installer: Das Setup startet N-Connect nach der Installation im Kontext des
-/// angemeldeten Benutzers mit „--setup-theme=dark|light|system“ und, falls dort bewusst eine andere Sprache als die von
-/// Windows gewählt wurde, „--setup-lang=xx“ (beim stillen Update ohne Argumente). Übernommen
+/// angemeldeten Benutzers mit „--setup-theme=dark|light|system“ und, falls dort bewusst eine andere Sprache als der
+/// Vorschlag des Setups gewählt wurde (ChosenLangCode), „--setup-lang=xx“ (beim stillen Update ohne Argumente). Übernommen
 /// wird nur, was in settings.json noch nicht gewählt ist – danach entscheidet allein die App, spätere Setups
 /// überschreiben nichts. Beim allerersten Start ohne diese Argumente (im Setup „Jetzt starten“ abgewählt, weiteres
 /// Benutzerkonto) gilt die Wahl, die das Setup in seinem Deinstallationsschlüssel (HKLM) merkt. Ältere Installer

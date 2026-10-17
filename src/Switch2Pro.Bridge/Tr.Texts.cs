@@ -568,6 +568,8 @@ internal static partial class Tr
             "Original controllers not hidden (prompt cancelled). To do it later: controller → Settings → Extras → “Shown twice?”.",
         ["Original-Controller nicht versteckt (Fehler, Details im Protokoll). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."] =
             "Original controllers not hidden (error, details in the log). To do it later: controller → Settings → Extras → “Shown twice?”.",
+        ["Eine ältere N-Connect-Version hat das eigene virtuelle DualShock 4 vor Spielen versteckt. Freigeben hat nicht geklappt – bitte im HidHide Configuration Client den Haken beim virtuellen DualShock 4 entfernen."] =
+            "An older N-Connect version hid its own virtual DualShock 4 from games. Unhiding it failed – please untick the virtual DualShock 4 in the HidHide Configuration Client.",
         ["Tastenanordnung A/B/X/Y"] = "A/B/X/Y layout",
         ["Xbox: nach Position (untere Taste = A). Nintendo: nach Beschriftung (A bleibt A)."] = "Xbox: by position (bottom button = A). Nintendo: by label (A stays A).",
         ["Verbinden"] = "Connecting",

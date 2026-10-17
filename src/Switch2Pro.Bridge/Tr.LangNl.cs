@@ -568,6 +568,8 @@ internal static partial class Tr
             "Originele controllers niet verborgen (vraag afgebroken). Inhalen: controller → Instellingen → Extra's → „Dubbel weergegeven?“.",
         ["Original-Controller nicht versteckt (Fehler, Details im Protokoll). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."] =
             "Originele controllers niet verborgen (fout, details in het logboek). Inhalen: controller → Instellingen → Extra's → „Dubbel weergegeven?“.",
+        ["Eine ältere N-Connect-Version hat das eigene virtuelle DualShock 4 vor Spielen versteckt. Freigeben hat nicht geklappt – bitte im HidHide Configuration Client den Haken beim virtuellen DualShock 4 entfernen."] =
+            "Een oudere versie van N-Connect heeft de eigen virtuele DualShock 4 voor games verborgen. Weer zichtbaar maken is mislukt – haal in HidHide Configuration Client het vinkje bij de virtuele DualShock 4 weg.",
         ["Tastenanordnung A/B/X/Y"] = "Knopindeling A/B/X/Y",
         ["Xbox: nach Position (untere Taste = A). Nintendo: nach Beschriftung (A bleibt A)."] = "Xbox: op positie (onderste knop = A). Nintendo: op opschrift (A blijft A).",
         ["Verbinden"] = "Verbinden",

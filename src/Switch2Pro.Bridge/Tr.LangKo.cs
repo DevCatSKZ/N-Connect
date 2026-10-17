@@ -568,6 +568,8 @@ internal static partial class Tr
             "원본 컨트롤러가 숨겨지지 않았습니다(확인 취소됨). 나중에: 컨트롤러 → 설정 → 기타 → „중복 표시?“.",
         ["Original-Controller nicht versteckt (Fehler, Details im Protokoll). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."] =
             "원본 컨트롤러가 숨겨지지 않았습니다(오류, 자세한 내용은 로그 참조). 나중에: 컨트롤러 → 설정 → 기타 → „중복 표시?“.",
+        ["Eine ältere N-Connect-Version hat das eigene virtuelle DualShock 4 vor Spielen versteckt. Freigeben hat nicht geklappt – bitte im HidHide Configuration Client den Haken beim virtuellen DualShock 4 entfernen."] =
+            "이전 버전의 N-Connect가 자체 가상 DualShock 4를 게임에서 숨겼습니다. 다시 표시하지 못했습니다 – HidHide Configuration Client에서 가상 DualShock 4의 체크를 해제하세요.",
         ["Tastenanordnung A/B/X/Y"] = "버튼 배열 A/B/X/Y",
         ["Xbox: nach Position (untere Taste = A). Nintendo: nach Beschriftung (A bleibt A)."] = "Xbox: 위치 기준(아래 버튼 = A). Nintendo: 표기 기준(A는 그대로 A).",
         ["Verbinden"] = "연결",
