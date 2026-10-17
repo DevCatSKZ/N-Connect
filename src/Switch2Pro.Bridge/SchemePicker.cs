@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
@@ -29,6 +30,7 @@ internal sealed class SchemePicker : Control, ISelfTranslating
         _hoverAnim = Theme.Schemes.Select(_ => new Anim(this)).ToArray();
     }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public int SelectedIndex
     {
         get => _selected;

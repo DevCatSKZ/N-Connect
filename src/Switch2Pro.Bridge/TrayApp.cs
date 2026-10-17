@@ -476,17 +476,17 @@ internal sealed class TrayApp : ApplicationContext
             return;
         }
         _update = update;
-        Log.Info($"Neue Version {update.Version} verfügbar (installiert: {UpdateCheck.Current})");
+        Log.Info($"Neue Version {update.Version} verfügbar (installiert: {UpdateCheck.Label})");
         if (update.Setup is null)
         {
             _balloonUrl = update.Url; // kein Installer im Release: Seite öffnen
             Balloon(8000, "Neue Version verfügbar",
-                $"Version {update.Version} ist erschienen (installiert: {UpdateCheck.Current}). Klicken zum Herunterladen.", ToolTipIcon.Info);
+                $"Version {update.Version} ist erschienen (installiert: {UpdateCheck.Label}). Klicken zum Herunterladen.", ToolTipIcon.Info);
             return;
         }
         _balloonUrl = null;
         Balloon(8000, "Neue Version verfügbar",
-            $"Version {update.Version} ist erschienen (installiert: {UpdateCheck.Current}). Klicken zum Installieren.", ToolTipIcon.Info,
+            $"Version {update.Version} ist erschienen (installiert: {UpdateCheck.Label}). Klicken zum Installieren.", ToolTipIcon.Info,
             () => InstallUpdateAsync().Forget("Update installieren"));
     }
 

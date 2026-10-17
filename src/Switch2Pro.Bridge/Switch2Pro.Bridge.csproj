@@ -1,15 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Company>devcatskz</Company>
-    <Authors>devcatskz</Authors>
-    <Product>N-Connect</Product>
-    <Copyright>© devcatskz</Copyright>
-    <!-- Angezeigte Version (Einstellungsfenster, Renders). Vor jedem Release-Tag hochzählen;
-         der Build-Workflow setzt sie beim Veröffentlichen ohnehin per -p:Version=<Tag>. -->
-    <Version>1.0.21</Version>
+    <!-- Firma, Produkt und Copyright kommen aus Directory.Build.props.
+         Version des nächsten Releases (Einstellungsfenster, Renders): vor jedem Release-Tag hochzählen. Der Build-Workflow
+         setzt beim Release die Version des Tags; Builds ohne Tag werden zur Vorabversion „<Version>-ci.<Lauf>“. -->
+    <Version>1.0.22</Version>
     <OutputType>WinExe</OutputType>
     <!-- 22621 = Windows 11 22H2 SDK (für schnellere BLE-Verbindungsparameter); läuft ab Windows 10 2004. -->
-    <TargetFramework>net8.0-windows10.0.22621.0</TargetFramework>
+    <TargetFramework>net10.0-windows10.0.22621.0</TargetFramework>
     <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
     <UseWindowsForms>true</UseWindowsForms>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>

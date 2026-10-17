@@ -12,6 +12,8 @@
 #ifndef AppVersion
   #define AppVersion "1.0.0"
 #endif
+; Dateiversion des Setups nur aus Zahlen: „1.0.22-ci.7“ (CI-Build ohne Tag) → 1.0.22.
+#define FileVersion Copy(AppVersion, 1, Pos("-", AppVersion + "-") - 1)
 #define AppExe "N-Connect.exe"
 ; Geplante Aufgabe, über die N-Connect Controller ohne UAC-Abfrage per HidHide versteckt (Name wie HidHide.TaskName).
 #define HidHideTask "N-Connect HidHide"
@@ -32,6 +34,7 @@
 AppId={{6F3C2B9E-52A1-4C8B-9E44-2D5F1B7A9C31}
 AppName={#AppName}
 AppVersion={#AppVersion}
+VersionInfoVersion={#FileVersion}
 AppPublisher=devcatskz
 DefaultDirName={autopf}\N-Connect
 DefaultGroupName={#AppName}
