@@ -324,9 +324,9 @@ dotnet build -t:Install -c Debug "-p:AdbTarget=-s adb-R5CRA1GQW0Z-ECDAJk._adb-tl
 
 - Voraussetzungen: .NET 10 SDK + Workload `android`, JDK 21 (`C:\Program Files\Microsoft\jdk-21.0.10.7-hotspot`, in der
   csproj hinterlegt – JDK 25 ist zu neu), Android-SDK unter `%LOCALAPPDATA%\Android\Sdk`.
-- Die Windows-CI baut nur `Switch2Pro.Protocol.Tests` und `Switch2Pro.Bridge` – das Android-Projekt stört sie nicht.
-  Ohne Android-Workload lauffähig und für die CI vorgesehen: `dotnet test android/NConnect.Android.Tests` und
-  `python android/i18n/generate.py --check` (siehe „Tests ohne Gerät“).
+- Die CI (`.github/workflows/build.yml`) testet die ganze Projektmappe, darunter `android/NConnect.Android.Tests`
+  (ohne Android-Workload). Der Job „Android kompilieren“ prüft `python android/i18n/generate.py --check` und baut die
+  App als Debug-Build ohne Signatur; das signierte APK entsteht weiterhin nur lokal (siehe oben).
 - **Shizuku vom PC starten** (spart die Kopplung per kabellosem Debugging beim Testen):
   `adb shell <APK-Ordner>/lib/arm64/libshizuku.so` (Ordner über `adb shell pm path moe.shizuku.privileged.api`).
 - **Protokoll lesen:** `adb shell "run-as com.devcatskz.nconnect cat files/nconnect.log"` (Logcat ist auf dem Pixel

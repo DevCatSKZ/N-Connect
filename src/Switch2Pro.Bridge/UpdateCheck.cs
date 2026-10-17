@@ -116,17 +116,38 @@ internal static class UpdateCheck
         }
     }
 
-    /// <summary>Eigene Version (aus dem Build, z. B. 1.0.42).</summary>
-    public static Version Current
+    /// <summary>Eigene Version (aus dem Build, z. B. 1.0.42) – bei einer Vorabversion ohne den Zusatz „-ci.7“.</summary>
+    public static Version Current => Own.Version;
+
+    /// <summary>Angezeigte Version: „1.0.42“, bei einem CI-Build ohne Tag „1.0.42-ci.7“.</summary>
+    public static string Label => Own.Label;
+
+    private static readonly BuildVersion Own = ParseBuild(
+        Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion,
+        Assembly.GetExecutingAssembly().GetName().Version);
+
+    /// <summary>Version aus dem Build. <see cref="Prerelease"/>: CI-Build ohne Tag („1.0.42-ci.7“, Vorabversion des
+    /// nächsten Releases 1.0.42) – das Release mit derselben Nummer gilt dann als neuer.</summary>
+    internal readonly record struct BuildVersion(Version Version, bool Prerelease, string Label);
+
+    /// <summary>„1.0.42-ci.7+3f2a…“ (InformationalVersion) → 1.0.42, Vorabversion, „1.0.42-ci.7“. Unlesbar → <paramref name="fallback"/>.</summary>
+    internal static BuildVersion ParseBuild(string? informational, Version? fallback)
     {
-        get
-        {
-            var asm = Assembly.GetExecutingAssembly();
-            var info = asm.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
-            if (info is not null && Version.TryParse(info.Split('+', '-')[0], out var v))
-                return v;
-            return asm.GetName().Version ?? new Version(1, 0, 0);
-        }
+        string text = informational?.Split('+')[0].Trim() ?? "";
+        int dash = text.IndexOf('-');
+        if (Version.TryParse(dash < 0 ? text : text[..dash], out var v))
+            return new BuildVersion(v, dash >= 0, text);
+        var f = fallback ?? new Version(1, 0, 0);
+        return new BuildVersion(f, false, f.ToString(3));
+    }
+
+    /// <summary>Ist das Release neuer als die eigene Version? 1.2 und 1.2.0 gelten als gleich; eine Vorabversion
+    /// (1.2.3-ci.7) ist älter als das Release 1.2.3.</summary>
+    internal static bool IsNewer(Version release, Version current, bool currentIsPrerelease)
+    {
+        var r = Normalize(release);
+        var c = Normalize(current);
+        return r > c || currentIsPrerelease && r == c;
     }
 
     public static async Task<Update?> FindAsync(CancellationToken ct)
@@ -153,7 +174,7 @@ internal static class UpdateCheck
                 if (best is null || version > best.Version)
                     best = new Update(version, release.GetProperty("html_url").GetString() ?? "", FindInstaller(release));
             }
-            return best is not null && Normalize(best.Version) > Normalize(Current) ? best : null;
+            return best is not null && IsNewer(best.Version, Current, Own.Prerelease) ? best : null;
         }
         catch (Exception e) when (e is HttpRequestException or TaskCanceledException or JsonException or InvalidOperationException
                                       or KeyNotFoundException)
