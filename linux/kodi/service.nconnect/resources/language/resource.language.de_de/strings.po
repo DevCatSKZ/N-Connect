@@ -442,10 +442,6 @@ msgctxt "#30642"
 msgid "Bluetooth adapter"
 msgstr "Bluetooth-Adapter"
 
-msgctxt "#30643"
-msgid "Low latency"
-msgstr "Geringe Verzögerung"
-
 msgctxt "#30644"
 msgid "Settings file"
 msgstr "Einstellungsdatei"
@@ -633,5 +629,53 @@ msgid "N-Connect app is not running"
 msgstr "N-Connect-App läuft nicht"
 
 msgctxt "#30661"
-msgid "Start the N-Connect app on this device – it reports the status here"
-msgstr "Die App N-Connect auf diesem Gerät starten – sie meldet den Status hierher"
+msgid "Start N-Connect on this PC – it reports the status here"
+msgstr "N-Connect auf diesem PC starten – die App meldet den Status hierher"
+
+msgctxt "#30019"
+msgid "Bluetooth adapter without LE – Switch 2 controllers cannot connect, other controllers still work"
+msgstr "Bluetooth-Adapter ohne LE – Switch-2-Controller können sich nicht verbinden, andere Controller schon"
+
+msgctxt "#30520"
+msgid "These settings only apply on LibreELEC/Linux"
+msgstr "Diese Einstellungen gelten nur unter LibreELEC/Linux"
+
+msgctxt "#30521"
+msgid "On Windows and Android the N-Connect app connects the controllers – change these settings in the app. On macOS the add-on only displays the status. Select to open the guide."
+msgstr "Unter Windows und Android verbindet die N-Connect-App die Controller – diese Einstellungen dort in der App ändern. Unter macOS zeigt das Add-on nur den Status an. Auswählen öffnet die Anleitung."
+
+msgctxt "#30634"
+msgid "Bluetooth without LE"
+msgstr "Bluetooth ohne LE"
+
+msgctxt "#30635"
+msgid "Switch 2 controllers need a Bluetooth adapter with LE (4.0 or newer) – other controllers keep working"
+msgstr "Switch-2-Controller brauchen einen Bluetooth-Adapter mit LE (ab 4.0) – andere Controller laufen weiter"
+
+msgctxt "#30646"
+msgid "Bluetooth LE (Switch 2)"
+msgstr "Bluetooth LE (Switch 2)"
+
+msgctxt "#30662"
+msgid "Turn on Bluetooth in the Windows settings"
+msgstr "Bluetooth in den Windows-Einstellungen einschalten"
+
+msgctxt "#30663"
+msgid "Turn on Bluetooth in Android"
+msgstr "Bluetooth in Android einschalten"
+
+msgctxt "#30664"
+msgid "Plug in a Bluetooth adapter or turn on Bluetooth in the Windows settings"
+msgstr "Bluetooth-Adapter anschließen oder Bluetooth in den Windows-Einstellungen einschalten"
+
+msgctxt "#30666"
+msgid "No N-Connect app for this system"
+msgstr "Keine N-Connect-App für dieses System"
+
+msgctxt "#30667"
+msgid "Display only – N-Connect is not available for {0}"
+msgstr "Nur Anzeige – N-Connect gibt es für {0} nicht"
+
+msgctxt "#30668"
+msgid "Start N-Connect for Android (0.9.1 or newer) on this device – it reports the status here"
+msgstr "N-Connect für Android (ab 0.9.1) auf diesem Gerät starten – die App meldet den Status hierher"

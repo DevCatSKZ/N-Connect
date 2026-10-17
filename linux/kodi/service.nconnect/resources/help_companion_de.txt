@@ -1,0 +1,17 @@
+[B]Begleitmodus[/B]
+Auf diesem System verbindet nicht das Add-on die Controller, sondern die N-Connect-App. Das Add-on zeigt nur an, was die App meldet: das Menü (Programme > N-Connect) und das Home-Widget mit verbundenen und bekannten Controllern samt Akku.
+
+[B]Windows[/B]
+N-Connect für Windows installieren und starten (github.com/DevCatSKZ/N-Connect). Die App verbindet die Controller als Xbox-Controller – Kodi erkennt sie ohne Einrichtung. Sie schreibt ihren Stand in Kodis Datenordner; läuft sie nicht, steht hier „N-Connect-App läuft nicht“. Kodi erst nach N-Connect installiert: N-Connect einmal neu starten.
+
+[B]Android[/B]
+N-Connect für Android ab Version 0.9.1 installieren und starten. Die App legt ihren Stand im Ordner Dokumente/N-Connect ab, dort liest das Add-on mit. Zeigt Kodi trotzdem nichts an, verwehrt Android womöglich den Zugriff: in den Android-Einstellungen Kodi den Zugriff auf Dateien (Speicher) erlauben. Kodi erst nach N-Connect installiert: N-Connect einmal neu starten.
+
+[B]macOS[/B]
+N-Connect gibt es für macOS nicht – das Add-on kann hier nur anzeigen und bleibt leer.
+
+[B]Einstellungen[/B]
+Belegung, Gyro, Vibration, Koppeln usw. stellst du in der N-Connect-App ein. Die Einstellungen dieses Add-ons wirken nur unter LibreELEC/Linux.
+
+[B]Widget im Home-Menü[/B]
+Je nach Skin: Skin-Einstellungen > Home > Widgets > Add-ons > N-Connect.

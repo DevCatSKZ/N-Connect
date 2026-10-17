@@ -1,0 +1,17 @@
+[B]Begeleidingsmodus[/B]
+Op dit systeem verbindt niet de add-on de controllers, maar de N-Connect-app. De add-on toont alleen wat de app meldt: het menu (Programma's > N-Connect) en de homewidget met verbonden en bekende controllers en hun batterij.
+
+[B]Windows[/B]
+Installeer en start N-Connect voor Windows (github.com/DevCatSKZ/N-Connect). De app verbindt de controllers als Xbox-controllers – Kodi herkent ze zonder instellen. Hij schrijft zijn status in de gegevensmap van Kodi; draait hij niet, dan staat hier „De N-Connect-app draait niet”. Kodi na N-Connect geïnstalleerd: start N-Connect één keer opnieuw.
+
+[B]Android[/B]
+Installeer en start N-Connect voor Android 0.9.1 of nieuwer. De app bewaart zijn status in de map Documents/N-Connect, waar de add-on hem leest. Toont Kodi nog steeds niets, dan blokkeert Android misschien de toegang: geef Kodi in de Android-instellingen toegang tot bestanden (opslag). Kodi na N-Connect geïnstalleerd: start N-Connect één keer opnieuw.
+
+[B]macOS[/B]
+N-Connect is niet beschikbaar voor macOS – de add-on kan hier alleen weergeven en blijft leeg.
+
+[B]Instellingen[/B]
+Knopindeling, gyroscoop, trillen, koppelen enzovoort stel je in de N-Connect-app in. De instellingen van deze add-on gelden alleen op LibreELEC/Linux.
+
+[B]Widget op het startscherm[/B]
+Afhankelijk van de skin: Skin-instellingen > Home > Widgets > Add-ons > N-Connect.
