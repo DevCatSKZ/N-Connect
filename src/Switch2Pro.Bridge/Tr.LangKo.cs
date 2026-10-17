@@ -62,28 +62,11 @@ internal static partial class Tr
         ["Eine Zeile je Controller: Spieler, Name und Akku."] = "컨트롤러마다 한 줄: 플레이어, 이름, 배터리.",
         ["Deckkraft"] = "불투명도",
         ["nativ"] = "네이티브",
+        ["Xbox · nativ"] = "Xbox · 네이티브",
         ["Controller einschalten oder SYNC drücken"] = "컨트롤러를 켜거나 SYNC를 누르세요",
         ["N-Connect öffnen"] = "N-Connect 열기",
         ["Position zurücksetzen"] = "위치 초기화",
         ["Widget ausblenden"] = "위젯 숨기기",
-        // ---------- ESP32-Export ----------
-        ["Für ESP32 exportieren"] = "ESP32용으로 내보내기",
-        ["Adresse dieses Bluetooth-Adapters und die Switch-2-Controller für einen ESP32-S3, der sich als dieser PC ausgibt – Controller verbinden sich dann ohne neues SYNC (Anleitung im ZIP)"] = "이 Bluetooth 어댑터의 주소와 Switch 2 컨트롤러를 이 PC로 위장하는 ESP32-S3용으로 내보냅니다. 컨트롤러는 다시 SYNC하지 않아도 연결됩니다(안내는 ZIP 안에 있음)",
-        ["ESP32-Export …"] = "ESP32 내보내기 …",
-        ["Die Adresse des Bluetooth-Adapters ist nicht bekannt. Bluetooth einschalten und das Fenster neu öffnen."] = "Bluetooth 어댑터 주소를 알 수 없습니다. Bluetooth를 켜고 이 창을 다시 여세요.",
-        ["ZIP-Datei"] = "ZIP 파일",
-        ["ESP32-Export speichern"] = "ESP32 내보내기 저장",
-        ["ESP32-Export gespeichert:"] = "ESP32 내보내기를 저장했습니다:",
-        ["Adresse für den ESP32"] = "ESP32용 주소",
-        ["übernehmbar"] = "이전 가능",
-        ["nicht übernehmbar"] = "이전 불가",
-        ["Noch kein Switch-2-Controller bekannt: einmal per SYNC mit N-Connect koppeln und neu exportieren."] = "아직 알려진 Switch 2 컨트롤러가 없습니다. SYNC로 N-Connect와 한 번 페어링한 다음 다시 내보내세요.",
-        ["Für nRF52840 exportieren"] = "nRF52840용으로 내보내기",
-        ["Dieselben Daten für einen Nordic-nRF52840-Dongle (nRF Connect SDK/Zephyr oder Adafruit Bluefruit) – auch er gibt sich als dieser PC aus (Anleitung im ZIP)"] = "Nordic nRF52840 동글용(nRF Connect SDK/Zephyr 또는 Adafruit Bluefruit)으로 같은 데이터를 내보냅니다. 이것도 이 PC로 위장합니다(안내는 ZIP 안에 있음)",
-        ["nRF52840-Export …"] = "nRF52840 내보내기 …",
-        ["nRF52840-Export speichern"] = "nRF52840 내보내기 저장",
-        ["nRF52840-Export gespeichert:"] = "nRF52840 내보내기를 저장했습니다:",
-        ["Adresse für den nRF52840"] = "nRF52840용 주소",
         // ---------- Status-Kopfzeile, Ansicht ----------
         ["Farbschema"] = "색 구성표",
         ["Farben für Akzente, Knöpfe, Flächen und Ränder."] = "강조색, 버튼, 배경, 테두리 색상.",
@@ -107,6 +90,7 @@ internal static partial class Tr
         ["Wii-Fernbedienung: Zeiger (Sensorleiste) steuert die Maus"] = "Wii 리모컨: 포인터(센서 바)로 마우스 제어",
         ["Zeiger"] = "포인터",
         ["kein Zeiger – Sensorleiste nicht im Blick"] = "포인터 없음 – 센서 바가 시야 밖에 있습니다",
+        ["MotionPlus"] = "MotionPlus",
         ["5. Zielen, Sticks, Trigger, Turbo"] = "5. 조준, 스틱, 트리거, 터보",
         ["6. Tastenbelegung und Profile  (Taste → Gamepad, Tastatur, Maus, Gyro-Maus, Shift-Ebene)"] =
             "6. 버튼 매핑 및 프로필(버튼 → 게임패드, 키보드, 마우스, 자이로 마우스, Shift 레이어)",
@@ -239,6 +223,9 @@ internal static partial class Tr
         ["Kreis (rechts)"] = "○(오른쪽)",
         ["Viereck (links)"] = "□(왼쪽)",
         ["Dreieck (oben)"] = "△(위)",
+        ["Create"] = "Create",
+        ["Share"] = "Share",
+        ["Options"] = "Options",
         ["PS-Taste"] = "PS 버튼",
         ["Touchpad-Klick"] = "터치패드 클릭",
         ["Mikro stumm"] = "마이크 음소거",
@@ -253,6 +240,8 @@ internal static partial class Tr
 
         // ---------- Controller-Namen ----------
         ["Wii-Fernbedienung"] = "Wii 리모컨",
+        ["Sony DualShock 4"] = "Sony DualShock 4",
+        ["Sony DualSense"] = "Sony DualSense",
         ["Xbox-Controller"] = "Xbox 컨트롤러",
         ["Xbox-Controller (Microsoft)"] = "Xbox 컨트롤러(Microsoft)",
         ["XInput (USB, Bluetooth oder Xbox-Adapter)"] = "XInput(USB, Bluetooth 또는 Xbox 어댑터)",
@@ -279,6 +268,7 @@ internal static partial class Tr
         ["Verbindung"] = "연결",
         ["Adresse"] = "주소",
         ["Seriennummer"] = "일련 번호",
+        ["Firmware"] = "펌웨어",
         ["Griff"] = "그립",
         ["Maus"] = "마우스",
         ["Gedrückt"] = "눌림",
@@ -286,6 +276,8 @@ internal static partial class Tr
         ["Charging Grip – GL/GR aktiv"] = "Charging Grip – GL/GR 활성",
         ["aktiv (liegt auf dem Tisch)"] = "활성(책상 위에 놓여 있음)",
         ["bereit – zum Benutzen auf den Tisch legen"] = "준비됨 – 책상에 놓으면 사용 가능",
+        ["Bluetooth LE"] = "Bluetooth LE",
+        ["Bluetooth"] = "Bluetooth",
         ["Bewegungssensor: keine Daten"] = "모션 센서: 데이터 없음",
         ["quer halten: Steuerkreuz links,\n1 und 2 rechts"] = "가로로 들기: 십자키 왼쪽,\n1과 2 오른쪽",
 
@@ -310,7 +302,6 @@ internal static partial class Tr
         ["Mitte = linear. Rechts = feiner um die Mitte (präzises Zielen), links = schneller."] = "중앙 = 리니어. 오른쪽 = 중앙 근처에서 더 세밀(정밀 조준), 왼쪽 = 더 빠름.",
         ["So weit lässt sich ein analoger Trigger drücken, bevor er wirkt."] = "아날로그 트리거가 반응하기까지 누를 수 있는 범위입니다.",
         ["Ab hier gilt der Trigger als ganz gedrückt (100 = erst am Anschlag)."] = "여기부터 트리거가 완전히 눌린 것으로 간주됩니다(100 = 끝까지 눌러야 함).",
-        ["Wie oft pro Sekunde Tasten mit „Turbo“ auslösen."] = "„터보“ 버튼이 초당 발동되는 횟수입니다.",
 
         // ---------- Infobereich ----------
         ["ViGEmBus-Treiber fehlt"] = "ViGEmBus 드라이버가 없습니다",
@@ -363,6 +354,7 @@ internal static partial class Tr
         ["Kamera startet …"] = "카메라 시작 중 …",
         ["läuft – Joy-Con auf eine Lichtquelle oder die Hand richten"] = "작동 중 – Joy-Con을 광원이나 손에 향하세요",
         ["Kamera startet nicht (Details im Protokoll)"] = "카메라가 시작되지 않습니다(자세한 내용은 로그 참조)",
+        ["Ring-Con"] = "Ring-Con",
         ["Kein Ring-Con gefunden. Den rechten Joy-Con (Switch 1) fest in den Ring-Con schieben und erneut versuchen."] =
             "Ring-Con을 찾을 수 없습니다. 오른쪽 Joy-Con(Switch 1)을 Ring-Con에 단단히 끼우고 다시 시도하세요.",
         ["Kein amiibo erkannt. Bitte das amiibo flach an den NFC-Leser halten (Joy-Con: auf den rechten Stick, Pro Controller: auf das NFC-Logo) und erneut versuchen."] =
@@ -381,6 +373,27 @@ internal static partial class Tr
         ["Spiel oder Programm wählen"] = "게임 또는 프로그램 선택",
         ["Profil exportieren"] = "프로필보내기",
         ["Profil importieren"] = "프로필 가져오기",
+        // ---------- Kurzanleitung (WelcomeForm, je Absatz ein Schlüssel) ----------
+        ["N-Connect – Willkommen"] = "N-Connect – 환영합니다",
+        ["So verbindest du deine Controller:"] = "컨트롤러 연결 방법:",
+        ["Switch 2 (Pro Controller, Joy-Con 2, GameCube):\n" +
+         "   Kurz die kleine SYNC-Taste drücken – nach ein paar Sekunden vibriert der Controller.\n" +
+         "   Danach reicht ein Tastendruck zum Verbinden. Pro Controller und GameCube gehen auch per USB-Kabel.\n" +
+         "   Wichtig: NICHT über „Bluetooth → Gerät hinzufügen“ koppeln – das stört die Verbindung."] =
+            "Switch 2(Pro Controller, Joy-Con 2, GameCube):\n" +
+            "   작은 SYNC 버튼을 짧게 누르세요 – 몇 초 후 컨트롤러가 진동합니다.\n" +
+            "   이후에는 버튼 하나로 연결됩니다. Pro Controller와 GameCube는 USB 케이블로도 사용할 수 있습니다.\n" +
+            "   중요: „Bluetooth → 장치 추가“로 페어링하지 마세요 – 연결이 불안정해집니다.",
+        ["Switch 1 (Pro Controller, Joy-Con, NES/SNES/N64/Mega Drive), Wii-Fernbedienung, Wii U Pro Controller:\n" +
+         "   SYNC-Taste drücken – N-Connect koppelt den Controller selbst (kein Umweg über die Windows-Einstellungen).\n" +
+         "   Danach verbindet er sich per Tastendruck. Gezielt suchen: Rechtsklick auf das Symbol → „Controller koppeln …“."] =
+            "Switch 1(Pro Controller, Joy-Con, NES/SNES/N64/Mega Drive), Wii 리모컨, Wii U Pro Controller:\n" +
+            "   SYNC 버튼을 누르세요 – N-Connect가 컨트롤러를 직접 페어링합니다(Windows 설정을 거치지 않음).\n" +
+            "   이후에는 버튼 하나로 연결됩니다. 직접 검색: 아이콘 우클릭 → „컨트롤러 페어링 …“.",
+        ["Windows, Steam und Spiele sehen jeden Controller als Xbox-Controller.\n" +
+         "Das Programm läuft unten rechts im Infobereich – ein Klick öffnet die Übersicht."] =
+            "Windows, Steam과 게임은 모든 컨트롤러를 Xbox 컨트롤러로 인식합니다.\n" +
+            "프로그램은 오른쪽 아래 알림 영역에서 실행됩니다 – 클릭하면 개요가 열립니다.",
         ["Verstanden"] = "확인",
         ["Einstellungen öffnen"] = "설정 열기",
         ["Willkommen"] = "환영합니다",
@@ -482,12 +495,16 @@ internal static partial class Tr
         ["SYNC-Taste am Controller drücken – N-Connect findet und koppelt ihn selbst. Danach reicht künftig ein Tastendruck."] =
             "컨트롤러의 SYNC 버튼을 누르세요 – N-Connect가 자동으로 찾아 페어링합니다. 이후에는 버튼 하나로 연결됩니다.",
         ["So kommt der Controller in den Kopplungsmodus"] = "컨트롤러를 페어링 모드로 만드는 방법",
+        ["Switch 2: Pro Controller, Joy-Con 2, GameCube"] = "Switch 2: Pro Controller, Joy-Con 2, GameCube",
         ["Kurz die kleine SYNC-Taste drücken."] = "작은 SYNC 버튼을 짧게 누릅니다.",
+        ["Switch 1: Joy-Con, Pro Controller, NES/SNES/N64/Mega Drive"] = "Switch 1: Joy-Con, Pro Controller, NES/SNES/N64/Mega Drive",
         ["SYNC-Taste drücken, bis die Lichter laufen."] = "LED가 흐를 때까지 SYNC 버튼을 누릅니다.",
         ["Batteriefach öffnen und die rote SYNC-Taste drücken."] = "배터리 커버를 열고 빨간 SYNC 버튼을 누릅니다.",
         ["Die SYNC-Taste auf der Unterseite drücken."] = "하단의 SYNC 버튼을 누릅니다.",
+        ["PlayStation: DualShock 4, DualSense"] = "PlayStation: DualShock 4, DualSense",
         ["PS + Teilen bzw. Create halten, bis die Lichtleiste schnell blinkt."] =
             "라이트 바가 빠르게 깜박일 때까지 PS + Share/Create를 누르고 있습니다.",
+        ["Xbox über Bluetooth: One S, Series X|S, Elite"] = "Bluetooth 연결 Xbox: One S, Series X|S, Elite",
         ["Kopplungstaste oben halten, bis die Xbox-Taste blinkt."] = "Xbox 버튼이 깜박일 때까지 상단의 페어링 버튼을 누르고 있습니다.",
         ["Status"] = "상태",
         ["Suche läuft …"] = "검색 중 …",
@@ -659,6 +676,8 @@ internal static partial class Tr
         ["Linker Stick"] = "왼쪽 스틱",
         ["Rechter Stick"] = "오른쪽 스틱",
         ["Stick"] = "스틱",
+        ["L-Stick"] = "L 스틱",
+        ["R-Stick"] = "R 스틱",
         ["Stick (linker Joy-Con)"] = "스틱(왼쪽 Joy-Con)",
         ["Stick (rechter Joy-Con)"] = "스틱(오른쪽 Joy-Con)",
         ["Neu messen"] = "다시 측정",
@@ -890,6 +909,7 @@ internal static partial class Tr
         (Re(@"^Spieler (?<n>\d+) – frei$"), m => $"플레이어 {m.Groups["n"]} – 비어 있음"),
         (Re(@"^Spieler (?<n>\d+)$"), m => $"플레이어 {m.Groups["n"]}"),
         (Re(@"^Xbox 360 · Platz (?<n>\d+)$"), m => $"Xbox 360 · 슬롯 {m.Groups["n"]}"),
+        (Re(@"^Xbox · Platz (?<n>\d+) · nativ$"), m => $"Xbox · 슬롯 {m.Groups["n"]} · 네이티브"),
         (Re(@"^noch (?<n>\d+) s$"), m => $"남은 시간 {m.Groups["n"]}초"),
         (Re(@"^Fertig – (?<n>\d+) Controller verbunden$"), m => $"완료 – 컨트롤러 {m.Groups["n"]}대 연결됨"),
         (Re(@"^✓ (?<k>.+) verbunden – Spieler (?<n>\d+)$"), m => $"✓ {N(m, "k")} 연결됨 – 플레이어 {m.Groups["n"]}"),
@@ -900,6 +920,8 @@ internal static partial class Tr
         (Re(@"^Spieler (?<a>\d+) und (?<b>\d+) getauscht$"), m => $"플레이어 {m.Groups["a"]}과(와) {m.Groups["b"]}을(를) 교체했습니다"),
         (Re(@"^Name für (?<k>.+) \(leer = Standardname\):$"), m => $"{N(m, "k")}의 이름(비워두면 기본 이름):"),
         (Re(@"^(?<k>.+) \(Joy-Con-Paar\)$"), m => $"{m.Groups["k"]}(Joy-Con 페어)"),
+        (Re(@"^Mitte (?<x>\d+) / (?<y>\d+) · Abweichung vom Kreis: vorher (?<a>\d+) %, neu (?<b>\d+) %$"),
+            m => $"중앙 {m.Groups["x"]} / {m.Groups["y"]} · 원과의 편차: 이전 {m.Groups["a"]} %, 새 값 {m.Groups["b"]} %"),
         (Re(@"^Joy-Con zusammengefasst \(Spieler (?<n>\d+)\)$"), m => $"Joy-Con 결합됨(플레이어 {m.Groups["n"]})"),
         (Re(@"^Joy-Con getrennt – (?<k>.+) ist jetzt Spieler (?<n>\d+)$"), m => $"Joy-Con 분리됨 – {N(m, "k")}이(가) 플레이어 {m.Groups["n"]}이(가) 되었습니다"),
         (Re(@"^Spieler (?<n>\d+): Akku (?<k>.+) fast leer \((?<p>\d+) %\) – bitte aufladen$"),
@@ -920,20 +942,32 @@ internal static partial class Tr
         (Re(@"^HidHide (?<v>.+) ist erschienen \(installiert: (?<i>.+)\)\. Klicken zum Installieren\.$"),
             m => $"HidHide {m.Groups["v"]}이(가) 출시되었습니다(설치됨: {m.Groups["i"]}). 클릭하여 설치."),
         (Re(@"^Lade HidHide (?<v>.+) herunter …$"), m => $"HidHide {m.Groups["v"]} 다운로드 중 …"),
+        (Re(@"^HidHide (?<v>.+) herunterladen und installieren\? Das HidHide-Setup entfernt zuerst die alte Version und verlangt einen Neustart von Windows – bitte seinen Anweisungen folgen\. Windows fragt dabei nach Administratorrechten\. Danach versteckt N-Connect die Controller automatisch neu\.$"),
+            m => $"HidHide {m.Groups["v"]}을(를) 다운로드하여 설치할까요? HidHide 설치 프로그램은 먼저 이전 버전을 제거하고 Windows를 다시 시작해야 합니다 – 안내에 따라 주세요. Windows가 관리자 권한을 요청합니다. 그 후 N-Connect가 컨트롤러를 자동으로 다시 숨깁니다."),
+        (Re(@"^Version (?<v>.+) herunterladen und installieren\? N-Connect wird dafür kurz beendet und danach wieder gestartet\.(?<a> Windows fragt dabei nach Administratorrechten\.)?$"),
+            m => $"버전 {m.Groups["v"]}을(를) 다운로드하여 설치할까요? N-Connect가 잠시 종료된 후 다시 시작됩니다." +
+                 (m.Groups["a"].Success ? " Windows가 관리자 권한을 요청합니다." : "")),
         (Re(@"^(?<t>.+) · (?<r>\d+) Berichte/s$"), m => $"{T(m.Groups["t"].Value)} · {m.Groups["r"]} 리포트/초"),
         (Re(@"^(?<p>\d+ %)(?<v>  \(.*\))?  ⚡ lädt$"), m => $"{m.Groups["p"]}{m.Groups["v"]}  ⚡ 충전 중"),
         (Re(@"^Speichern fehlgeschlagen: (?<e>.*)$"), m => $"저장 실패: {m.Groups["e"]}"),
         (Re(@"^Lesen fehlgeschlagen: (?<e>.*)$"), m => $"읽기 실패: {m.Groups["e"]}"),
         (Re(@"^amiibo konnte nicht gelesen werden: (?<e>.*)$"), m => $"amiibo를 읽을 수 없습니다: {T(m.Groups["e"].Value)}"),
+        (Re(@"^Gekoppelt: (?<k>.+)\nDer Controller erscheint gleich in der Übersicht\.$"),
+            m => $"페어링됨: {m.Groups["k"]}\n컨트롤러가 곧 개요에 표시됩니다."),
         (Re(@"^Gekoppelt: (?<k>.+)$"), m => $"페어링됨: {m.Groups["k"]}"),
         (Re(@"^Gefunden: (?<k>.+) – kopple …$"), m => $"발견: {m.Groups["k"]} – 페어링 중 …"),
         (Re(@"^amiibo erkannt \((?<u>.+)\) – lese …$"), m => $"amiibo 감지됨({m.Groups["u"]}) – 읽는 중 …"),
+        (Re(@"^(?<w>\d+) × (?<h>\d+) · (?<f>[\d.,]+) Bilder/s$"), m => $"{m.Groups["w"]} × {m.Groups["h"]} · {m.Groups["f"]} 프레임/초"),
         (Re(@"^(?<n>\d+) Minuten$"), m => $"{m.Groups["n"]}분"),
         (Re(@"^✓ (?<n>\d+) Schritte, Dauer (?<ms>\d+) ms$"), m => $"✓ {m.Groups["n"]}단계, 총 {m.Groups["ms"]}ms"),
         (Re(@"^Controller-Taste „(?<b>.+)“:\nJetzt die gewünschte Taste oder Tastenkombination drücken\.$"),
             m => $"컨트롤러 버튼 „{T(m.Groups["b"].Value)}“:\n이제 원하는 키 또는 키 조합을 누르세요."),
         (Re(@"^Solange „(?<b>.+)“ gehalten wird, wird diese Taste schnell wiederholt gedrückt\n\(Geschwindigkeit unter 5\. „Turbo“\):$"),
             m => $"„{T(m.Groups["b"].Value)}“을(를) 누르는 동안 이 버튼이 빠르게 반복됩니다\n(속도는 5. „터보“에서 설정):"),
+        (Re(@"^Beim Drücken von „(?<b>.+?)“ wird diese Folge einmal abgespielt\.(?<r>.*)$", RegexOptions.Singleline),
+            m => $"„{T(m.Groups["b"].Value)}“을(를) 누르면 이 시퀀스가 한 번 재생됩니다. 단계는 쉼표로 구분하고, 단계마다 누르고 있을 것과 시간(ms)을 적습니다. " +
+                 "게임패드: A B X Y LB RB LT RT Up Down Left Right LS RS Start Back Guide, 여러 개를 동시에 누르려면 +. " +
+                 "키보드: Key:Ctrl+C. 대기: Pause.\n예:  „A 80, Pause 60, A 80“(더블 탭)  ·  „Down+B 150“  ·  „Key:Ctrl+S 50“"),
         (Re(@"^Ring-Con: (?<e>.*)$"), m => $"Ring-Con: {T(m.Groups["e"].Value)}"),
         (Re(@"^⌨  Taste: (?<k>.+)$"), m => $"⌨  키: {m.Groups["k"]}"),
         (Re(@"^🔁  Turbo: Taste (?<k>.+)$"), m => $"🔁  터보: 키 {m.Groups["k"]}"),
@@ -942,7 +976,10 @@ internal static partial class Tr
         (Re(@"^Tastatur: (?<k>.+)$"), m => $"키보드: {m.Groups["k"]}"),
         (Re(@"^Gamepad: (?<k>.+)$"), m => $"게임패드: {m.Groups["k"]}"),
         (Re(@"^(?<k>.+)  \(verbunden\)$"), m => $"{N(m, "k")}(연결됨)"),
+        // Tooltip „P1 Pro 2 57 %“: Namen bleiben, wie sie sind.
+        (Re(@"^P(?<n>\d+) (?<k>.+)$"), m => m.Value),
         (Re(@"^Bluetooth nicht verfügbar: (?<e>.*)$"), m => $"Bluetooth 사용 불가: {m.Groups["e"]}"),
+        (Re(@"^N-Connect: (?<p>.+)$"), m => $"N-Connect: {T(m.Groups["p"].Value)}"),
         (Re(@"^(?<k>.+) per USB ist von einem anderen Programm belegt \(z\. B\. Steam\)\.$"),
             m => $"{N(m, "k")}의 USB가 다른 프로그램(예: Steam)에서 사용 중입니다."),
         (Re(@"^Schon (?<n>\d+) Controller verbunden – (?<k>.+) wird nicht verwendet\.$"),

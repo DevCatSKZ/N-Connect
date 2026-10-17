@@ -235,6 +235,14 @@ internal static class MacroDialog
         form.CancelButton = cancel;
         Theme.Apply(form);
         Tr.Apply(form);
+        // Übersetzte Erklärung ist teils länger als die deutsche: Eingabefeld, Status und Knöpfe darunter nachrücken.
+        int shift = Math.Max(0, info.Bottom + UiScale.Px(10) - box.Top);
+        if (shift > 0)
+        {
+            foreach (var control in new Control[] { box, status, ok, cancel })
+                control.Top += shift;
+            form.ClientSize = new Size(form.ClientSize.Width, form.ClientSize.Height + shift);
+        }
         if (form.ShowDialog(owner) != DialogResult.OK)
             return null;
         return ButtonAction.Play((box.Text ?? "").Replace("\r", "").Replace('\n', ',').Trim()).ToString();

@@ -61,7 +61,7 @@ internal sealed class TrayApp : ApplicationContext
         _factory = PadFactory.TryCreate();
         if (_factory is null)
         {
-            _icon.Text = "N-Connect: ViGEmBus fehlt";
+            _icon.Text = Tr.T("N-Connect: ViGEmBus fehlt");
             Balloon(10000, "ViGEmBus-Treiber fehlt",
                 "Ohne ViGEmBus kann kein virtueller Controller erzeugt werden. Bitte das Setup erneut ausführen " +
                 "oder ViGEmBus installieren (Rechtsklick auf das Symbol → ViGEmBus herunterladen).", ToolTipIcon.Error);

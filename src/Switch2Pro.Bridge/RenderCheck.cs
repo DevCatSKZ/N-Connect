@@ -13,12 +13,16 @@ internal static class RenderCheck
     [System.Runtime.InteropServices.DllImport("user32.dll")]
     private static extern bool PrintWindow(IntPtr hwnd, IntPtr hdc, uint flags);
 
-    /// <summary>Alle sichtbaren Texte der Fenster (Steuerelemente, Listen) in eine Datei schreiben – je Zeile ein Text.</summary>
+    /// <summary>
+    /// Alle sichtbaren Texte der Fenster (Steuerelemente, Listen) in eine Datei schreiben – je Zeile ein Text. Mit
+    /// <c>--en</c> bzw. <c>--lang=xx</c> nur die Texte ohne eigene Übersetzung; dazu <c>&lt;Datei&gt;.rueckfall.txt</c>
+    /// mit allen Sprachen und den Texten, die dort nur über Englisch (oder gar nicht) übersetzt werden.
+    /// </summary>
     public static void DumpTexts(string file)
     {
         // Deutsche Originaltexte sammeln (Fenster auf Deutsch aufbauen) und danach einzeln prüfen.
-        bool english = Tr.English;
-        Tr.SetEnglish(false);
+        string language = Tr.Lang;
+        Tr.SetLanguage("de");
         var texts = new SortedSet<string>(StringComparer.Ordinal);
         void Walk(Control c)
         {
@@ -46,6 +50,9 @@ internal static class RenderCheck
         }
         using (var welcome = new WelcomeForm())
             Walk(welcome);
+        // Die Kurzanleitung wird absatzweise übersetzt – Absätze statt des ganzen Textes prüfen.
+        texts.Remove(WelcomeForm.Guide);
+        texts.UnionWith(WelcomeForm.Paragraphs);
         using (var capture = new KeyCaptureDialog("X"))
             Walk(capture);
         using (var wii = new PairForm(null))
@@ -68,19 +75,44 @@ internal static class RenderCheck
             $"{pro} verbunden (Spieler 1)", $"{jc} getrennt", "Joy-Con zusammengefasst (Spieler 2)",
             $"Joy-Con getrennt – {jc} ist jetzt Spieler 3", $"Spieler 1: Akku {jc} fast leer (14 %) – bitte aufladen",
             "Spieler 2: nach 15 min ohne Eingabe getrennt",
-            $"{pro} per USB verbunden. Sieht ein Spiel ihn doppelt? Im Fenster „Doppelt angezeigt? Verstecken“ klicken.",
             "Profil „Zelda“ aktiv", "Bluetooth LE · 33 Berichte/s", "60 %  (3,70 V)  ⚡ lädt",
             $"Spieler 1  ·  {pro}  ·  Gyro-Maus", "Erst den Ring-Con ausschalten (Ring-Con und IR-Kamera nutzen denselben Zusatzprozessor).",
+            "Xbox · Platz 1 · nativ", "Xbox · nativ", "N-Connect: Bluetooth ist ausgeschaltet.", "N-Connect: ViGEmBus fehlt",
+            $"Gekoppelt: {pro}\nDer Controller erscheint gleich in der Übersicht.",
+            "Mitte 2048 / 2048 · Abweichung vom Kreis: vorher 12 %, neu 3 %", "320 × 240 · 12,5 Bilder/s",
+            "Beim Drücken von „A“ wird diese Folge einmal abgespielt. Schritte durch Komma trennen …",
+            "Version 1.0.22 herunterladen und installieren? N-Connect wird dafür kurz beendet und danach wieder gestartet.",
+            "Version 1.0.22 herunterladen und installieren? N-Connect wird dafür kurz beendet und danach wieder gestartet. " +
+            "Windows fragt dabei nach Administratorrechten.",
+            "HidHide 1.5.230 herunterladen und installieren? Das HidHide-Setup entfernt zuerst die alte Version und verlangt einen " +
+            "Neustart von Windows – bitte seinen Anweisungen folgen. Windows fragt dabei nach Administratorrechten. Danach " +
+            "versteckt N-Connect die Controller automatisch neu.",
         ]);
 
-        // Bei englischer Oberfläche: nur Texte ausgeben, die keine Übersetzung haben (oder danach noch deutsch aussehen).
-        Tr.SetEnglish(english);
+        Tr.SetLanguage(language);
         File.WriteAllLines(file + ".alle.txt", texts.Select(t => Tr.T(t)).Distinct());
-        var lines = english
-            ? texts.Where(t => (Tr.T(t) == t && NeedsTranslation(t)) || LooksGerman(Tr.T(t)))
-            : texts;
-        File.WriteAllLines(file, lines.Select(t => t.Replace("\r", "").Replace("\n", "\\n")));
+        // Bei fremder Oberfläche: nur Texte ausgeben, die keine eigene Übersetzung haben (Englisch: oder danach noch
+        // deutsch aussehen); auf Deutsch alle.
+        IEnumerable<string> lines = language switch
+        {
+            "de" => texts,
+            "en" => texts.Where(t => (Tr.T(t) == t && NeedsTranslation(t)) || LooksGerman(Tr.T(t))),
+            _ => texts.Where(t => NeedsTranslation(t) && !Tr.HasOwnTranslation(t, language)),
+        };
+        File.WriteAllLines(file, lines.Select(OneLine));
+
+        // Für jede Sprache: Texte, die nur über den Rückfall (Englisch, sonst Deutsch) aufgelöst werden.
+        var fallback = new List<string>();
+        foreach (var lang in Tr.Supported.Where(l => l != "de"))
+        {
+            var missing = texts.Where(t => NeedsTranslation(t) && !Tr.HasOwnTranslation(t, lang)).ToList();
+            fallback.Add($"[{lang}] {missing.Count}");
+            fallback.AddRange(missing.Select(t => "  " + OneLine(t)));
+        }
+        File.WriteAllLines(file + ".rueckfall.txt", fallback);
     }
+
+    private static string OneLine(string t) => t.Replace("\r", "").Replace("\n", "\\n");
 
     /// <summary>Enthält der Text Wörter (nicht nur Namen, Zahlen, Tasten wie „ZL“ oder Marken)?</summary>
     private static bool NeedsTranslation(string t)

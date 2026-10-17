@@ -15,16 +15,10 @@ internal static partial class Tr
     /// <summary>Aktive Oberflächensprache (ISO-639-1, z. B. "de", "en", "es").</summary>
     public static string Lang { get; private set; } = "de";
 
-    /// <summary>Englische Oberfläche aktiv?</summary>
-    public static bool English => Lang == "en";
-
     /// <summary>Sprachen mit vorhandener Übersetzungstabelle.</summary>
     public static readonly string[] Supported = ["de", "en", "es", "fr", "it", "pt", "nl", "pl", "ru", "ja", "zh", "ko"];
 
-    /// <summary>Nur für die Prüfhilfe: Sprache direkt setzen.</summary>
-    internal static void SetEnglish(bool english) => Lang = english ? "en" : "de";
-
-    /// <summary>Nur für die Prüfhilfe/Render: Sprache direkt setzen.</summary>
+    /// <summary>Nur für Prüfhilfe, Render und Tests: Sprache direkt setzen (unbekannt/null = Englisch).</summary>
     internal static void SetLanguage(string? language) => Lang = Normalize(language) ?? "en";
 
     /// <summary>Kennzeichen (Tag) für Steuerelemente/Menüeinträge mit Benutzerdaten (z. B. Profilnamen): nicht übersetzen.</summary>
@@ -63,8 +57,8 @@ internal static partial class Tr
             ? CultureInfo.CurrentUICulture.TwoLetterISOLanguageName : "en");
     }
 
-    /// <summary>Übersetzungstabelle der aktiven Sprache (null = Deutsch).</summary>
-    private static Dictionary<string, string>? Table(string lang) => lang switch
+    /// <summary>Übersetzungstabelle einer Sprache (null = Deutsch). Intern auch für die Tests.</summary>
+    internal static Dictionary<string, string>? Table(string lang) => lang switch
     {
         "en" => Texts,
         "es" => TextsEs,
@@ -80,8 +74,8 @@ internal static partial class Tr
         _ => null,
     };
 
-    /// <summary>Muster-Tabelle der aktiven Sprache (Meldungen mit Platzhaltern); null = englische Muster.</summary>
-    private static (Regex Pattern, Func<Match, string> Replace)[]? PatternsFor(string lang) => lang switch
+    /// <summary>Muster-Tabelle einer Sprache (Meldungen mit Platzhaltern); null = Deutsch. Intern auch für die Tests.</summary>
+    internal static (Regex Pattern, Func<Match, string> Replace)[]? PatternsFor(string lang) => lang switch
     {
         "en" => Patterns,
         "es" => PatternsEs,
@@ -130,11 +124,7 @@ internal static partial class Tr
             }
         }
         // Aus mehreren Sätzen zusammengesetzt (z. B. Problem + Tipp): Satz für Satz übersetzen.
-        // Abkürzungen wie „z. B.“ sind kein Satzende.
-        string guarded = german;
-        foreach (var abbreviation in new[] { "z. B. ", "bzw. ", "d. h. ", "ca. ", "u. a. ", "usw. " })
-            guarded = guarded.Replace(abbreviation, abbreviation.Replace(' ', '\u0001'));
-        var sentences = SentenceBreak().Split(guarded).Select(s => s.Replace('\u0001', ' ')).ToArray();
+        var sentences = Sentences(german);
         if (sentences.Length > 1)
         {
             var translated = sentences.Select(T).ToArray();
@@ -144,8 +134,40 @@ internal static partial class Tr
         return german;
     }
 
+    /// <summary>Text in Sätze teilen; Abkürzungen wie „z. B.“ sind kein Satzende.</summary>
+    private static string[] Sentences(string german)
+    {
+        string guarded = german;
+        foreach (var abbreviation in new[] { "z. B. ", "bzw. ", "d. h. ", "ca. ", "u. a. ", "usw. " })
+            guarded = guarded.Replace(abbreviation, abbreviation.Replace(' ', '\u0001'));
+        return SentenceBreak().Split(guarded).Select(s => s.Replace('\u0001', ' ')).ToArray();
+    }
+
     [GeneratedRegex(@"(?<=[.!?…])\s+(?=[A-ZÄÖÜ„])")]
     private static partial Regex SentenceBreak();
+
+    /// <summary>
+    /// Prüfhilfe und Tests: Hat die Sprache für den Text einen eigenen Eintrag bzw. ein eigenes Muster? false, wenn
+    /// <see cref="T"/> ihn nur über Englisch auflöst oder deutsch lässt. Zusammengesetzte Sätze zählen, wenn jeder
+    /// Satz einen eigenen hat. Platzhalter in Mustern (z. B. Controllernamen) werden nicht mitgeprüft.
+    /// </summary>
+    internal static bool HasOwnTranslation(string german, string lang)
+    {
+        if (german.Length == 0 || lang == "de")
+            return true;
+        if (Table(lang) is { } table && table.ContainsKey(german))
+            return true;
+        if (lang != "en" && Texts.ContainsKey(german))
+            return false; // englische Tabelle kommt in T vor den Mustern der Sprache
+        if (german.StartsWith("Standard: ", StringComparison.Ordinal))
+            return HasOwnTranslation(german["Standard: ".Length..], lang);
+        if (PatternsFor(lang)?.Any(p => p.Pattern.IsMatch(german)) == true)
+            return true;
+        if (Patterns.Any(p => p.Pattern.IsMatch(german)))
+            return false;
+        var sentences = Sentences(german);
+        return sentences.Length > 1 && sentences.All(s => HasOwnTranslation(s, lang));
+    }
 
     /// <summary>Alle Texte eines Fensters bzw. Steuerelements (rekursiv) übersetzen, auch Listeneinträge.</summary>
     public static void Apply(Control root)
@@ -183,7 +205,10 @@ internal static partial class Tr
 
     private static string N(Match m, string group) => T(m.Groups[group].Value);
 
-    /// <summary>Meldungen mit Platzhaltern (Spielernummer, Controllername, Prozent …).</summary>
+    /// <summary>
+    /// Meldungen mit Platzhaltern (Spielernummer, Controllername, Prozent …). Jede Sprachtabelle hat dieselben Muster in
+    /// derselben Reihenfolge – das erste passende gewinnt (geprüft in Switch2Pro.Bridge.Tests).
+    /// </summary>
     private static readonly (Regex Pattern, Func<Match, string> Replace)[] Patterns =
     [
         (Re(@"^Allgemeiner Wert \((?<v>.+)\) – Regler verschieben für einen eigenen$"), m => $"General value ({m.Groups["v"]}) – move the slider to set your own"),
@@ -197,6 +222,7 @@ internal static partial class Tr
         (Re(@"^Spieler (?<n>\d+) – frei$"), m => $"Player {m.Groups["n"]} – free"),
         (Re(@"^Spieler (?<n>\d+)$"), m => $"Player {m.Groups["n"]}"),
         (Re(@"^Xbox 360 · Platz (?<n>\d+)$"), m => $"Xbox 360 · slot {m.Groups["n"]}"),
+        (Re(@"^Xbox · Platz (?<n>\d+) · nativ$"), m => $"Xbox · slot {m.Groups["n"]} · native"),
         (Re(@"^noch (?<n>\d+) s$"), m => $"{m.Groups["n"]} s left"),
         (Re(@"^Fertig – (?<n>\d+) Controller verbunden$"), m => $"Done – {m.Groups["n"]} controller(s) connected"),
         (Re(@"^✓ (?<k>.+) verbunden – Spieler (?<n>\d+)$"), m => $"✓ {N(m, "k")} connected – player {m.Groups["n"]}"),
@@ -215,8 +241,6 @@ internal static partial class Tr
             m => $"Player {m.Groups["n"]}: {N(m, "k")} battery low ({m.Groups["p"]} %) – please charge"),
         (Re(@"^Spieler (?<n>\d+): nach (?<m>\d+) min ohne Eingabe getrennt$"),
             m => $"Player {m.Groups["n"]}: disconnected after {m.Groups["m"]} min without input"),
-        (Re(@"^(?<k>.+) per USB verbunden\. Sieht ein Spiel ihn doppelt\? Im Fenster „Doppelt angezeigt\? Verstecken“ klicken\.$"),
-            m => $"{N(m, "k")} connected via USB. Does a game see it twice? Click “Shown twice? Hide” in the window."),
         (Re(@"^Profil „(?<p>.+)“ aktiv$"), m => $"Profile “{ProfileName(m.Groups["p"].Value)}” active"),
         (Re(@"^Profil: (?<p>.+)$"), m => $"Profile: {ProfileName(m.Groups["p"].Value)}"),
         (Re(@"^Profil „(?<p>.+)“ löschen\?$"), m => $"Delete profile “{m.Groups["p"]}”?"),
@@ -233,8 +257,10 @@ internal static partial class Tr
         (Re(@"^Lade HidHide (?<v>.+) herunter …$"), m => $"Downloading HidHide {m.Groups["v"]} …"),
         (Re(@"^HidHide (?<v>.+) herunterladen und installieren\? Das HidHide-Setup entfernt zuerst die alte Version und verlangt einen Neustart von Windows – bitte seinen Anweisungen folgen\. Windows fragt dabei nach Administratorrechten\. Danach versteckt N-Connect die Controller automatisch neu\.$"),
             m => $"Download and install HidHide {m.Groups["v"]}? The HidHide setup first removes the old version and requires a Windows restart – please follow its instructions. Windows will ask for administrator rights. Afterwards N-Connect hides the controllers again automatically."),
-        (Re(@"^Version (?<v>.+) herunterladen und installieren\? N-Connect wird dafür kurz beendet und danach wieder gestartet\. Windows fragt dabei nach Administratorrechten\.$"),
-            m => $"Download and install version {m.Groups["v"]}? N-Connect closes briefly and starts again afterwards. Windows will ask for administrator rights."),
+        // Ohne Admin-Satz: portable Variante (ZIP), die kein Setup startet.
+        (Re(@"^Version (?<v>.+) herunterladen und installieren\? N-Connect wird dafür kurz beendet und danach wieder gestartet\.(?<a> Windows fragt dabei nach Administratorrechten\.)?$"),
+            m => $"Download and install version {m.Groups["v"]}? N-Connect closes briefly and starts again afterwards." +
+                 (m.Groups["a"].Success ? " Windows will ask for administrator rights." : "")),
         (Re(@"^(?<t>.+) · (?<r>\d+) Berichte/s$"), m => $"{T(m.Groups["t"].Value)} · {m.Groups["r"]} reports/s"),
         (Re(@"^(?<p>\d+ %)(?<v>  \(.*\))?  ⚡ lädt$"), m => $"{m.Groups["p"]}{m.Groups["v"]}  ⚡ charging"),
         (Re(@"^Speichern fehlgeschlagen: (?<e>.*)$"), m => $"Saving failed: {m.Groups["e"]}"),
@@ -257,9 +283,6 @@ internal static partial class Tr
                  "for how long (ms). Gamepad: A B X Y LB RB LT RT Up Down Left Right LS RS Start Back Guide, several at once with +. " +
                  "Keyboard: Key:Ctrl+C. Wait: Pause.\nExamples:  “A 80, Pause 60, A 80” (double tap)  ·  “Down+B 150”  ·  “Key:Ctrl+S 50”"),
         (Re(@"^Ring-Con: (?<e>.*)$"), m => $"Ring-Con: {T(m.Groups["e"].Value)}"),
-        (Re(@"^Gyro-Stick: voller Ausschlag bei (?<s>\d+) °/s, mindestens (?<m>\d+) %   ·   Kennlinie (?<c>[\d.,]+)   ·   Trigger: ab (?<d>\d+) %, voll ab (?<f>\d+) %   ·   Turbo (?<t>\d+)× pro Sekunde$"),
-            m => $"Gyro stick: full deflection at {m.Groups["s"]} °/s, at least {m.Groups["m"]} %   ·   curve {m.Groups["c"]}   ·   " +
-                 $"triggers: from {m.Groups["d"]} %, full at {m.Groups["f"]} %   ·   turbo {m.Groups["t"]}× per second"),
         (Re(@"^⌨  Taste: (?<k>.+)$"), m => $"⌨  Key: {m.Groups["k"]}"),
         (Re(@"^🔁  Turbo: Taste (?<k>.+)$"), m => $"🔁  Turbo: key {m.Groups["k"]}"),
         (Re(@"^🔁  Turbo: (?<k>.+)$"), m => $"🔁  Turbo: {T(m.Groups["k"].Value)}"),
@@ -267,8 +290,11 @@ internal static partial class Tr
         (Re(@"^Tastatur: (?<k>.+)$"), m => $"Keyboard: {m.Groups["k"]}"),
         (Re(@"^Gamepad: (?<k>.+)$"), m => $"Gamepad: {m.Groups["k"]}"),
         (Re(@"^(?<k>.+)  \(verbunden\)$"), m => $"{N(m, "k")}  (connected)"),
+        // Tooltip „P1 Pro 2 57 %“: Namen bleiben, wie sie sind (nicht über spätere Muster zerlegen).
         (Re(@"^P(?<n>\d+) (?<k>.+)$"), m => m.Value),
         (Re(@"^Bluetooth nicht verfügbar: (?<e>.*)$"), m => $"Bluetooth not available: {m.Groups["e"]}"),
+        // Tooltip des Symbols „N-Connect: <Bluetooth-Problem>“.
+        (Re(@"^N-Connect: (?<p>.+)$"), m => $"N-Connect: {T(m.Groups["p"].Value)}"),
         (Re(@"^(?<k>.+) per USB ist von einem anderen Programm belegt \(z\. B\. Steam\)\.$"),
             m => $"{N(m, "k")} via USB is in use by another program (e.g. Steam)."),
         (Re(@"^Schon (?<n>\d+) Controller verbunden – (?<k>.+) wird nicht verwendet\.$"),

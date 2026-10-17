@@ -62,28 +62,11 @@ internal static partial class Tr
         ["Eine Zeile je Controller: Spieler, Name und Akku."] = "Eén regel per controller: speler, naam en accu.",
         ["Deckkraft"] = "Dekking",
         ["nativ"] = "native",
+        ["Xbox · nativ"] = "Xbox · native",
         ["Controller einschalten oder SYNC drücken"] = "Zet een controller aan of druk op SYNC",
         ["N-Connect öffnen"] = "N-Connect openen",
         ["Position zurücksetzen"] = "Positie herstellen",
         ["Widget ausblenden"] = "Widget verbergen",
-        // ---------- ESP32-Export ----------
-        ["Für ESP32 exportieren"] = "Exporteren voor ESP32",
-        ["Adresse dieses Bluetooth-Adapters und die Switch-2-Controller für einen ESP32-S3, der sich als dieser PC ausgibt – Controller verbinden sich dann ohne neues SYNC (Anleitung im ZIP)"] = "Adres van deze Bluetooth-adapter en de Switch 2-controllers voor een ESP32-S3 die zich voordoet als deze pc – controllers verbinden dan zonder nieuwe SYNC (uitleg in de ZIP)",
-        ["ESP32-Export …"] = "ESP32-export …",
-        ["Die Adresse des Bluetooth-Adapters ist nicht bekannt. Bluetooth einschalten und das Fenster neu öffnen."] = "Het adres van de Bluetooth-adapter is onbekend. Zet Bluetooth aan en open dit venster opnieuw.",
-        ["ZIP-Datei"] = "ZIP-bestand",
-        ["ESP32-Export speichern"] = "ESP32-export opslaan",
-        ["ESP32-Export gespeichert:"] = "ESP32-export opgeslagen:",
-        ["Adresse für den ESP32"] = "Adres voor de ESP32",
-        ["übernehmbar"] = "overdraagbaar",
-        ["nicht übernehmbar"] = "niet overdraagbaar",
-        ["Noch kein Switch-2-Controller bekannt: einmal per SYNC mit N-Connect koppeln und neu exportieren."] = "Nog geen Switch 2-controller bekend: koppel er één keer een met N-Connect via SYNC en exporteer opnieuw.",
-        ["Für nRF52840 exportieren"] = "Exporteren voor nRF52840",
-        ["Dieselben Daten für einen Nordic-nRF52840-Dongle (nRF Connect SDK/Zephyr oder Adafruit Bluefruit) – auch er gibt sich als dieser PC aus (Anleitung im ZIP)"] = "Dezelfde gegevens voor een Nordic nRF52840-dongle (nRF Connect SDK/Zephyr of Adafruit Bluefruit) – ook die doet zich voor als deze pc (uitleg in de ZIP)",
-        ["nRF52840-Export …"] = "nRF52840-export …",
-        ["nRF52840-Export speichern"] = "nRF52840-export opslaan",
-        ["nRF52840-Export gespeichert:"] = "nRF52840-export opgeslagen:",
-        ["Adresse für den nRF52840"] = "Adres voor de nRF52840",
         // ---------- Status-Kopfzeile, Ansicht ----------
         ["Farbschema"] = "Kleurenschema",
         ["Farben für Akzente, Knöpfe, Flächen und Ränder."] = "Kleuren voor accenten, knoppen, vlakken en randen.",
@@ -107,6 +90,7 @@ internal static partial class Tr
         ["Wii-Fernbedienung: Zeiger (Sensorleiste) steuert die Maus"] = "Wii-afstandsbediening: de pointer (sensorbalk) beweegt de muis",
         ["Zeiger"] = "Pointer",
         ["kein Zeiger – Sensorleiste nicht im Blick"] = "geen pointer – sensorbalk niet in beeld",
+        ["MotionPlus"] = "MotionPlus",
         ["5. Zielen, Sticks, Trigger, Turbo"] = "5. Richten, sticks, triggers, turbo",
         ["6. Tastenbelegung und Profile  (Taste → Gamepad, Tastatur, Maus, Gyro-Maus, Shift-Ebene)"] =
             "6. Knoptoewijzing en profielen  (knop → gamepad, toetsenbord, muis, gyro-muis, Shift-laag)",
@@ -239,6 +223,9 @@ internal static partial class Tr
         ["Kreis (rechts)"] = "Cirkel (rechts)",
         ["Viereck (links)"] = "Vierkant (links)",
         ["Dreieck (oben)"] = "Driehoek (boven)",
+        ["Create"] = "Create",
+        ["Share"] = "Share",
+        ["Options"] = "Options",
         ["PS-Taste"] = "PS-knop",
         ["Touchpad-Klick"] = "Touchpad-klik",
         ["Mikro stumm"] = "Microfoon dempen",
@@ -253,6 +240,8 @@ internal static partial class Tr
 
         // ---------- Controller-Namen ----------
         ["Wii-Fernbedienung"] = "Wii-afstandsbediening",
+        ["Sony DualShock 4"] = "Sony DualShock 4",
+        ["Sony DualSense"] = "Sony DualSense",
         ["Xbox-Controller"] = "Xbox-controller",
         ["Xbox-Controller (Microsoft)"] = "Xbox-controller (Microsoft)",
         ["XInput (USB, Bluetooth oder Xbox-Adapter)"] = "XInput (USB, Bluetooth of Xbox-adapter)",
@@ -279,6 +268,7 @@ internal static partial class Tr
         ["Verbindung"] = "Verbinding",
         ["Adresse"] = "Adres",
         ["Seriennummer"] = "Serienummer",
+        ["Firmware"] = "Firmware",
         ["Griff"] = "Grip",
         ["Maus"] = "Muis",
         ["Gedrückt"] = "Ingedrukt",
@@ -286,6 +276,8 @@ internal static partial class Tr
         ["Charging Grip – GL/GR aktiv"] = "Charging Grip – GL/GR actief",
         ["aktiv (liegt auf dem Tisch)"] = "actief (ligt op tafel)",
         ["bereit – zum Benutzen auf den Tisch legen"] = "klaar – leg op tafel om te gebruiken",
+        ["Bluetooth LE"] = "Bluetooth LE",
+        ["Bluetooth"] = "Bluetooth",
         ["Bewegungssensor: keine Daten"] = "Bewegingssensor: geen gegevens",
         ["quer halten: Steuerkreuz links,\n1 und 2 rechts"] = "horizontaal: d-pad links,\n1 en 2 rechts",
 
@@ -310,7 +302,6 @@ internal static partial class Tr
         ["Mitte = linear. Rechts = feiner um die Mitte (präzises Zielen), links = schneller."] = "Midden = lineair. Rechts = fijner rond het midden (precies richten), links = sneller.",
         ["So weit lässt sich ein analoger Trigger drücken, bevor er wirkt."] = "Hoe ver een analoge trigger kan worden ingedrukt voordat hij werkt.",
         ["Ab hier gilt der Trigger als ganz gedrückt (100 = erst am Anschlag)."] = "Vanaf hier geldt de trigger als volledig ingedrukt (100 = pas aan het einde).",
-        ["Wie oft pro Sekunde Tasten mit „Turbo“ auslösen."] = "Hoe vaak per seconde „turbo“-knoppen worden geactiveerd.",
 
         // ---------- Infobereich ----------
         ["ViGEmBus-Treiber fehlt"] = "ViGEmBus-stuurprogramma ontbreekt",
@@ -363,6 +354,7 @@ internal static partial class Tr
         ["Kamera startet …"] = "Camera start …",
         ["läuft – Joy-Con auf eine Lichtquelle oder die Hand richten"] = "actief – richt de Joy-Con op een lichtbron of je hand",
         ["Kamera startet nicht (Details im Protokoll)"] = "Camera start niet (details in het logboek)",
+        ["Ring-Con"] = "Ring-Con",
         ["Kein Ring-Con gefunden. Den rechten Joy-Con (Switch 1) fest in den Ring-Con schieben und erneut versuchen."] =
             "Geen Ring-Con gevonden. Schuif de rechter Joy-Con (Switch 1) stevig in de Ring-Con en probeer opnieuw.",
         ["Kein amiibo erkannt. Bitte das amiibo flach an den NFC-Leser halten (Joy-Con: auf den rechten Stick, Pro Controller: auf das NFC-Logo) und erneut versuchen."] =
@@ -381,6 +373,27 @@ internal static partial class Tr
         ["Spiel oder Programm wählen"] = "Spel of programma kiezen",
         ["Profil exportieren"] = "Profiel exporteren",
         ["Profil importieren"] = "Profiel importeren",
+        // ---------- Kurzanleitung (WelcomeForm, je Absatz ein Schlüssel) ----------
+        ["N-Connect – Willkommen"] = "N-Connect – Welkom",
+        ["So verbindest du deine Controller:"] = "Zo verbind je je controllers:",
+        ["Switch 2 (Pro Controller, Joy-Con 2, GameCube):\n" +
+         "   Kurz die kleine SYNC-Taste drücken – nach ein paar Sekunden vibriert der Controller.\n" +
+         "   Danach reicht ein Tastendruck zum Verbinden. Pro Controller und GameCube gehen auch per USB-Kabel.\n" +
+         "   Wichtig: NICHT über „Bluetooth → Gerät hinzufügen“ koppeln – das stört die Verbindung."] =
+            "Switch 2 (Pro Controller, Joy-Con 2, GameCube):\n" +
+            "   Druk kort op de kleine SYNC-knop – na een paar seconden trilt de controller.\n" +
+            "   Daarna volstaat een knopdruk om te verbinden. Pro Controller en GameCube werken ook via een USB-kabel.\n" +
+            "   Belangrijk: NIET koppelen via „Bluetooth → Apparaat toevoegen” – dat verstoort de verbinding.",
+        ["Switch 1 (Pro Controller, Joy-Con, NES/SNES/N64/Mega Drive), Wii-Fernbedienung, Wii U Pro Controller:\n" +
+         "   SYNC-Taste drücken – N-Connect koppelt den Controller selbst (kein Umweg über die Windows-Einstellungen).\n" +
+         "   Danach verbindet er sich per Tastendruck. Gezielt suchen: Rechtsklick auf das Symbol → „Controller koppeln …“."] =
+            "Switch 1 (Pro Controller, Joy-Con, NES/SNES/N64/Mega Drive), Wii-afstandsbediening, Wii U Pro Controller:\n" +
+            "   Druk op de SYNC-knop – N-Connect koppelt de controller zelf (geen omweg via de Windows-instellingen).\n" +
+            "   Daarna verbindt hij met een knopdruk. Gericht zoeken: rechtermuisklik op het pictogram → „Controller koppelen …”.",
+        ["Windows, Steam und Spiele sehen jeden Controller als Xbox-Controller.\n" +
+         "Das Programm läuft unten rechts im Infobereich – ein Klick öffnet die Übersicht."] =
+            "Windows, Steam en games zien elke controller als Xbox-controller.\n" +
+            "Het programma draait rechtsonder in het systeemvak – één klik opent het overzicht.",
         ["Verstanden"] = "Begrepen",
         ["Einstellungen öffnen"] = "Instellingen openen",
         ["Willkommen"] = "Welkom",
@@ -482,12 +495,16 @@ internal static partial class Tr
         ["SYNC-Taste am Controller drücken – N-Connect findet und koppelt ihn selbst. Danach reicht künftig ein Tastendruck."] =
             "Druk op de SYNC-knop van de controller – N-Connect vindt en koppelt hem zelf. Daarna volstaat een knopdruk.",
         ["So kommt der Controller in den Kopplungsmodus"] = "Zo komt de controller in koppelmodus",
+        ["Switch 2: Pro Controller, Joy-Con 2, GameCube"] = "Switch 2: Pro Controller, Joy-Con 2, GameCube",
         ["Kurz die kleine SYNC-Taste drücken."] = "Druk kort op de kleine SYNC-knop.",
+        ["Switch 1: Joy-Con, Pro Controller, NES/SNES/N64/Mega Drive"] = "Switch 1: Joy-Con, Pro Controller, NES/SNES/N64/Mega Drive",
         ["SYNC-Taste drücken, bis die Lichter laufen."] = "Druk op de SYNC-knop tot de lampjes lopen.",
         ["Batteriefach öffnen und die rote SYNC-Taste drücken."] = "Open het batterijvak en druk op de rode SYNC-knop.",
         ["Die SYNC-Taste auf der Unterseite drücken."] = "Druk op de SYNC-knop aan de onderkant.",
+        ["PlayStation: DualShock 4, DualSense"] = "PlayStation: DualShock 4, DualSense",
         ["PS + Teilen bzw. Create halten, bis die Lichtleiste schnell blinkt."] =
             "Houd PS + Share/Create ingedrukt tot de lichtbalk snel knippert.",
+        ["Xbox über Bluetooth: One S, Series X|S, Elite"] = "Xbox via Bluetooth: One S, Series X|S, Elite",
         ["Kopplungstaste oben halten, bis die Xbox-Taste blinkt."] = "Houd de koppelknop bovenop ingedrukt tot de Xbox-knop knippert.",
         ["Status"] = "Status",
         ["Suche läuft …"] = "Zoeken …",
@@ -659,6 +676,8 @@ internal static partial class Tr
         ["Linker Stick"] = "Linker stick",
         ["Rechter Stick"] = "Rechter stick",
         ["Stick"] = "Stick",
+        ["L-Stick"] = "L-stick",
+        ["R-Stick"] = "R-stick",
         ["Stick (linker Joy-Con)"] = "Stick (linker Joy-Con)",
         ["Stick (rechter Joy-Con)"] = "Stick (rechter Joy-Con)",
         ["Neu messen"] = "Opnieuw meten",
@@ -890,6 +909,7 @@ internal static partial class Tr
         (Re(@"^Spieler (?<n>\d+) – frei$"), m => $"Speler {m.Groups["n"]} – vrij"),
         (Re(@"^Spieler (?<n>\d+)$"), m => $"Speler {m.Groups["n"]}"),
         (Re(@"^Xbox 360 · Platz (?<n>\d+)$"), m => $"Xbox 360 · plek {m.Groups["n"]}"),
+        (Re(@"^Xbox · Platz (?<n>\d+) · nativ$"), m => $"Xbox · plek {m.Groups["n"]} · native"),
         (Re(@"^noch (?<n>\d+) s$"), m => $"nog {m.Groups["n"]} s"),
         (Re(@"^Fertig – (?<n>\d+) Controller verbunden$"), m => $"Klaar – {m.Groups["n"]} controller(s) verbonden"),
         (Re(@"^✓ (?<k>.+) verbunden – Spieler (?<n>\d+)$"), m => $"✓ {N(m, "k")} verbonden – speler {m.Groups["n"]}"),
@@ -900,6 +920,8 @@ internal static partial class Tr
         (Re(@"^Spieler (?<a>\d+) und (?<b>\d+) getauscht$"), m => $"Spelers {m.Groups["a"]} en {m.Groups["b"]} gewisseld"),
         (Re(@"^Name für (?<k>.+) \(leer = Standardname\):$"), m => $"Naam voor {N(m, "k")} (leeg = standaardnaam):"),
         (Re(@"^(?<k>.+) \(Joy-Con-Paar\)$"), m => $"{m.Groups["k"]} (Joy-Con-paar)"),
+        (Re(@"^Mitte (?<x>\d+) / (?<y>\d+) · Abweichung vom Kreis: vorher (?<a>\d+) %, neu (?<b>\d+) %$"),
+            m => $"Midden {m.Groups["x"]} / {m.Groups["y"]} · afwijking van de cirkel: eerst {m.Groups["a"]} %, nu {m.Groups["b"]} %"),
         (Re(@"^Joy-Con zusammengefasst \(Spieler (?<n>\d+)\)$"), m => $"Joy-Con gecombineerd (speler {m.Groups["n"]})"),
         (Re(@"^Joy-Con getrennt – (?<k>.+) ist jetzt Spieler (?<n>\d+)$"), m => $"Joy-Con gescheiden – {N(m, "k")} is nu speler {m.Groups["n"]}"),
         (Re(@"^Spieler (?<n>\d+): Akku (?<k>.+) fast leer \((?<p>\d+) %\) – bitte aufladen$"),
@@ -920,20 +942,32 @@ internal static partial class Tr
         (Re(@"^HidHide (?<v>.+) ist erschienen \(installiert: (?<i>.+)\)\. Klicken zum Installieren\.$"),
             m => $"HidHide {m.Groups["v"]} is verschenen (geïnstalleerd: {m.Groups["i"]}). Klik om te installeren."),
         (Re(@"^Lade HidHide (?<v>.+) herunter …$"), m => $"HidHide {m.Groups["v"]} downloaden …"),
+        (Re(@"^HidHide (?<v>.+) herunterladen und installieren\? Das HidHide-Setup entfernt zuerst die alte Version und verlangt einen Neustart von Windows – bitte seinen Anweisungen folgen\. Windows fragt dabei nach Administratorrechten\. Danach versteckt N-Connect die Controller automatisch neu\.$"),
+            m => $"HidHide {m.Groups["v"]} downloaden en installeren? De HidHide-installatie verwijdert eerst de oude versie en vraagt om Windows opnieuw op te starten – volg de aanwijzingen. Windows vraagt daarbij om beheerdersrechten. Daarna verbergt N-Connect de controllers automatisch opnieuw."),
+        (Re(@"^Version (?<v>.+) herunterladen und installieren\? N-Connect wird dafür kurz beendet und danach wieder gestartet\.(?<a> Windows fragt dabei nach Administratorrechten\.)?$"),
+            m => $"Versie {m.Groups["v"]} downloaden en installeren? N-Connect wordt daarvoor kort afgesloten en daarna opnieuw gestart." +
+                 (m.Groups["a"].Success ? " Windows vraagt daarbij om beheerdersrechten." : "")),
         (Re(@"^(?<t>.+) · (?<r>\d+) Berichte/s$"), m => $"{T(m.Groups["t"].Value)} · {m.Groups["r"]} rapporten/s"),
         (Re(@"^(?<p>\d+ %)(?<v>  \(.*\))?  ⚡ lädt$"), m => $"{m.Groups["p"]}{m.Groups["v"]}  ⚡ aan het laden"),
         (Re(@"^Speichern fehlgeschlagen: (?<e>.*)$"), m => $"Opslaan mislukt: {m.Groups["e"]}"),
         (Re(@"^Lesen fehlgeschlagen: (?<e>.*)$"), m => $"Lezen mislukt: {m.Groups["e"]}"),
         (Re(@"^amiibo konnte nicht gelesen werden: (?<e>.*)$"), m => $"amiibo kon niet worden gelezen: {T(m.Groups["e"].Value)}"),
+        (Re(@"^Gekoppelt: (?<k>.+)\nDer Controller erscheint gleich in der Übersicht\.$"),
+            m => $"Gekoppeld: {m.Groups["k"]}\nDe controller verschijnt zo in het overzicht."),
         (Re(@"^Gekoppelt: (?<k>.+)$"), m => $"Gekoppeld: {m.Groups["k"]}"),
         (Re(@"^Gefunden: (?<k>.+) – kopple …$"), m => $"Gevonden: {m.Groups["k"]} – koppelen …"),
         (Re(@"^amiibo erkannt \((?<u>.+)\) – lese …$"), m => $"amiibo herkend ({m.Groups["u"]}) – lezen …"),
+        (Re(@"^(?<w>\d+) × (?<h>\d+) · (?<f>[\d.,]+) Bilder/s$"), m => $"{m.Groups["w"]} × {m.Groups["h"]} · {m.Groups["f"]} beelden/s"),
         (Re(@"^(?<n>\d+) Minuten$"), m => $"{m.Groups["n"]} minuten"),
         (Re(@"^✓ (?<n>\d+) Schritte, Dauer (?<ms>\d+) ms$"), m => $"✓ {m.Groups["n"]} stappen, {m.Groups["ms"]} ms totaal"),
         (Re(@"^Controller-Taste „(?<b>.+)“:\nJetzt die gewünschte Taste oder Tastenkombination drücken\.$"),
             m => $"Controllerknop „{T(m.Groups["b"].Value)}“:\nDruk nu de gewenste toets of toetscombinatie in."),
         (Re(@"^Solange „(?<b>.+)“ gehalten wird, wird diese Taste schnell wiederholt gedrückt\n\(Geschwindigkeit unter 5\. „Turbo“\):$"),
             m => $"Zolang „{T(m.Groups["b"].Value)}“ is ingedrukt, wordt deze knop snel herhaald\n(snelheid onder 5. „Turbo“):"),
+        (Re(@"^Beim Drücken von „(?<b>.+?)“ wird diese Folge einmal abgespielt\.(?<r>.*)$", RegexOptions.Singleline),
+            m => $"Bij het indrukken van „{T(m.Groups["b"].Value)}“ wordt deze reeks één keer afgespeeld. Scheid de stappen met komma's; per stap wat ingedrukt " +
+                 "blijft en hoe lang (ms). Gamepad: A B X Y LB RB LT RT Up Down Left Right LS RS Start Back Guide, meerdere tegelijk met +. " +
+                 "Toetsenbord: Key:Ctrl+C. Wachten: Pause.\nVoorbeelden:  „A 80, Pause 60, A 80” (dubbeltik)  ·  „Down+B 150”  ·  „Key:Ctrl+S 50”"),
         (Re(@"^Ring-Con: (?<e>.*)$"), m => $"Ring-Con: {T(m.Groups["e"].Value)}"),
         (Re(@"^⌨  Taste: (?<k>.+)$"), m => $"⌨  Toets: {m.Groups["k"]}"),
         (Re(@"^🔁  Turbo: Taste (?<k>.+)$"), m => $"🔁  Turbo: toets {m.Groups["k"]}"),
@@ -942,7 +976,10 @@ internal static partial class Tr
         (Re(@"^Tastatur: (?<k>.+)$"), m => $"Toetsenbord: {m.Groups["k"]}"),
         (Re(@"^Gamepad: (?<k>.+)$"), m => $"Gamepad: {m.Groups["k"]}"),
         (Re(@"^(?<k>.+)  \(verbunden\)$"), m => $"{N(m, "k")}  (verbonden)"),
+        // Tooltip „P1 Pro 2 57 %“: Namen bleiben, wie sie sind.
+        (Re(@"^P(?<n>\d+) (?<k>.+)$"), m => m.Value),
         (Re(@"^Bluetooth nicht verfügbar: (?<e>.*)$"), m => $"Bluetooth niet beschikbaar: {m.Groups["e"]}"),
+        (Re(@"^N-Connect: (?<p>.+)$"), m => $"N-Connect: {T(m.Groups["p"].Value)}"),
         (Re(@"^(?<k>.+) per USB ist von einem anderen Programm belegt \(z\. B\. Steam\)\.$"),
             m => $"{N(m, "k")} via USB is in gebruik door een ander programma (bijv. Steam)."),
         (Re(@"^Schon (?<n>\d+) Controller verbunden – (?<k>.+) wird nicht verwendet\.$"),
