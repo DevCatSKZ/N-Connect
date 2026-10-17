@@ -1,6 +1,5 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
-using Microsoft.Win32;
 
 namespace Switch2Pro.Bridge;
 
@@ -32,29 +31,17 @@ internal static partial class Tr
         _ => "en",
     };
 
-    /// <summary>Sprache festlegen: ISO-Code, "de" oder null/"auto" = wie Windows (unterstützte Sprache, sonst Englisch).</summary>
-    public static void Init(string? language)
+    /// <summary>
+    /// Sprache festlegen: ISO-Code oder null/"auto" = wie Windows (Anzeigesprache von Windows, wenn es dafür eine
+    /// Tabelle gibt, sonst Englisch). Die Wahl im Installer steht schon in den Einstellungen (<see cref="InstallerChoices"/>).
+    /// </summary>
+    public static void Init(string? language) => Lang = Normalize(language) ?? WindowsLanguage();
+
+    /// <summary>Anzeigesprache von Windows, falls unterstützt (pt-BR und pt-PT teilen sich „pt“), sonst Englisch.</summary>
+    internal static string WindowsLanguage()
     {
-        string? code = language;
-        if (code is null or "auto")
-        {
-            // Sprachwahl des Installers übernehmen, wenn keine App-Einstellung existiert.
-            try
-            {
-                using var key = Registry.CurrentUser.OpenSubKey(@"Software\N-Connect");
-                code = key?.GetValue("Language") as string;
-            }
-            catch (Exception e) when (e is System.Security.SecurityException or UnauthorizedAccessException or IOException)
-            {
-            }
-            if (code is null)
-            {
-                var iso = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
-                code = iso == "pt" && CultureInfo.CurrentUICulture.Name.StartsWith("pt-BR", StringComparison.OrdinalIgnoreCase) ? "pt" : iso;
-            }
-        }
-        Lang = Normalize(code) ?? (Supported.Contains(CultureInfo.CurrentUICulture.TwoLetterISOLanguageName)
-            ? CultureInfo.CurrentUICulture.TwoLetterISOLanguageName : "en");
+        var iso = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+        return Supported.Contains(iso) ? iso : "en";
     }
 
     /// <summary>Übersetzungstabelle einer Sprache (null = Deutsch). Intern auch für die Tests.</summary>

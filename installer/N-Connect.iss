@@ -2,6 +2,11 @@
 ; Bauen: siehe .github/workflows/build.yml (Inno Setup 6).
 ; Erwartet:  ..\out\publish\win-x64\N-Connect.exe  (dotnet publish, self-contained)
 ;            redist\ViGEmBus_Setup.msi  ODER  redist\ViGEmBus_Setup.exe  (offizieller ViGEmBus-Installer)
+;            redist\HidHide_Setup.exe  (optional, offizieller HidHide-Installer)
+;            ..\README.md, ..\README.en.md, ..\THIRD-PARTY-NOTICES.md
+; Sprache und Darstellung schreibt das Setup nicht selbst in Benutzereinstellungen: Es übergibt sie beim Start nach der
+; Installation an die App (siehe SetupArgs) und merkt sie im eigenen Deinstallationsschlüssel (RegisterPreviousData);
+; die App übernimmt sie nur, solange in ihren Einstellungen noch nichts gewählt ist.
 
 #define AppName "N-Connect"
 #ifndef AppVersion
@@ -104,7 +109,7 @@ english.InstallingHidHide=Installing HidHide (prevents duplicate controllers in 
 german.ConfiguringHidHide=Gebe N-Connect in HidHide frei …
 english.ConfiguringHidHide=Allowing N-Connect in HidHide …
 
-; Seite „Darstellung“ (Programm-Theme): Standard ist Dunkel.
+; Seite „Darstellung“ (Programm-Theme): Standard ist Dunkel bzw. die Wahl der letzten Installation.
 german.ThemeCaption=Darstellung
 english.ThemeCaption=Appearance
 german.ThemeDescription=Wie soll N-Connect aussehen?
@@ -133,7 +138,9 @@ ThemeSystem=Same as Windows
 
 [Files]
 Source: "..\out\publish\win-x64\{#AppExe}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\README.md"; DestDir: "{app}"; DestName: "Anleitung.md"; Flags: ignoreversion
+; Anleitung in der Sprache des Setups: Deutsch, sonst Englisch (README.en.md).
+Source: "..\README.md"; DestDir: "{app}"; DestName: "Anleitung.md"; Languages: german; Flags: ignoreversion
+Source: "..\README.en.md"; DestDir: "{app}"; DestName: "README.md"; Languages: not german; Flags: ignoreversion
 Source: "..\THIRD-PARTY-NOTICES.md"; DestDir: "{app}"; Flags: ignoreversion
 Source: "redist\{#ViGEmFile}"; DestDir: "{tmp}"; Flags: deleteafterinstall; Check: not ViGEmInstalled
 #ifdef WithHidHide
@@ -144,12 +151,15 @@ Source: "redist\HidHide_Setup.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall;
 ; Reste der Vorversion („Nintendo Controller für Windows“, Switch2ProBridge.exe) beim Update entfernen.
 Type: files; Name: "{app}\Switch2ProBridge.exe"
 Type: files; Name: "{autoprograms}\Nintendo Controller für Windows.lnk"
+; Anleitung der anderen Sprache aus einer früheren Installation.
+Type: files; Name: "{app}\README.md"; Languages: german
+Type: files; Name: "{app}\Anleitung.md"; Languages: not german
 
 [Registry]
 Root: HKLM; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: none; ValueName: "Switch2ProBridge"; Flags: deletevalue
-; Autostart richtet N-Connect beim ersten Start selbst ein (für den Benutzer, in der App abschaltbar).
-; Einträge älterer Versionen für alle Benutzer entfernen – sie ließen sich in der App nicht abschalten.
-; Wird beim Deinstallieren entfernt.
+; Autostart richtet N-Connect beim ersten Start selbst ein (für den Benutzer, HKCU\…\Run, in der App abschaltbar;
+; beim Deinstallieren entfernt RemoveAutostartEntries ihn). Einträge älterer Versionen für alle Benutzer entfernen –
+; sie ließen sich in der App nicht abschalten.
 Root: HKLM; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: none; ValueName: "N-Connect"; Flags: deletevalue
 
 [Icons]
@@ -170,16 +180,20 @@ Filename: "{tmp}\HidHide_Setup.exe"; Parameters: "/exenoui /qn /norestart"; Stat
 ; N-Connect gleich als erlaubtes Programm eintragen und Verstecken einschalten (Fehlschlag, z. B. vor dem Neustart, ist
 ; unkritisch – die App holt das beim ersten Verstecken nach).
 Filename: "{code:HidHideCli}"; Parameters: "--app-reg ""{app}\{#AppExe}"" --cloak-on"; StatusMsg: "{cm:ConfiguringHidHide}"; Flags: runhidden waituntilterminated skipifdoesntexist; Check: HidHideInstalled
-; Programm im Kontext des angemeldeten Benutzers starten (zeigt beim ersten Start die Kurzanleitung).
-Filename: "{app}\{#AppExe}"; Description: "{cm:LaunchNow}"; Flags: nowait postinstall runasoriginaluser
+; Programm im Kontext des angemeldeten Benutzers starten (zeigt beim ersten Start die Kurzanleitung) und ihm dabei
+; Sprache und Darstellung des Setups mitgeben (beim stillen Update nicht, siehe SetupArgs). Läuft auch still, damit
+; N-Connect nach dem Ein-Klick-Update wieder startet.
+Filename: "{app}\{#AppExe}"; Parameters: "{code:SetupArgs}"; Description: "{cm:LaunchNow}"; Flags: nowait postinstall runasoriginaluser
 
 [UninstallRun]
 Filename: "{cmd}"; Parameters: "/C taskkill /IM {#AppExe} /F"; Flags: runhidden; RunOnceId: "KillBridge"
 Filename: "{sys}\schtasks.exe"; Parameters: "/Delete /TN ""{#HidHideTask}"" /F"; Flags: runhidden; RunOnceId: "HidHideTask"
 ; Freigabe in HidHide wieder austragen (HidHide selbst bleibt, andere Programme nutzen es evtl. auch).
 Filename: "{code:HidHideCli}"; Parameters: "--app-unreg ""{app}\{#AppExe}"""; Flags: runhidden skipifdoesntexist; RunOnceId: "HidHideUnreg"
-; Autostart, den die App selbst für den angemeldeten Benutzer gesetzt hat (Einstellungsfenster).
-Filename: "{cmd}"; Parameters: "/C reg delete HKCU\Software\Microsoft\Windows\CurrentVersion\Run /v N-Connect /f"; Flags: runhidden; RunOnceId: "RemoveAutostart"
+; Den Autostart der Benutzer entfernt nicht ein „reg delete HKCU …“ (das träfe im Admin-Kontext ggf. das falsche
+; Konto), sondern RemoveAutostartEntries beim Deinstallieren (CurUninstallStepChanged). Installationen bis 1.0.21
+; haben den alten Eintrag (RunOnceId „RemoveAutostart“) noch im Deinstallationsprotokoll – er läuft dann zusätzlich, ist
+; aber harmlos.
 
 [Code]
 // Vergleicht zwei Versionsangaben „a.b.c.d“ (−1, 0, 1).
@@ -230,9 +244,14 @@ begin
   Result := True;
 end;
 
-// Eigene Seite „Darstellung“: das gewählte Programm-Theme landet in der Registry (HKCU\Software\N-Connect\Theme)
-// und wird von der App beim ersten Start gelesen. Standard: Dunkel.
+// Eigene Seite „Darstellung“: Die Wahl bekommt die App beim Start nach der Installation als „--setup-theme=…“
+// (SetupArgs) und übernimmt sie nur, solange in ihren Einstellungen noch keine Darstellung steht. Vorausgewählt ist
+// die Wahl der letzten Installation (GetPreviousData, im Deinstallationsschlüssel), sonst Dunkel. Installationen bis
+// 1.0.21 hatten sie nur nach HKCU\Software\N-Connect geschrieben – dort nur lesen, damit ein Durchklicken beim Update
+// die damalige Wahl nicht durch „Dunkel“ ersetzt.
 procedure InitializeWizard;
+var
+  Previous: String;
 begin
   ThemePage := CreateInputOptionPage(wpSelectTasks,
     CustomMessage('ThemeCaption'), CustomMessage('ThemeDescription'),
@@ -240,10 +259,19 @@ begin
   ThemePage.Add(CustomMessage('ThemeDark'));
   ThemePage.Add(CustomMessage('ThemeLight'));
   ThemePage.Add(CustomMessage('ThemeSystem'));
-  ThemePage.SelectedValueIndex := 0;
+  Previous := GetPreviousData('Theme', '');
+  if Previous = '' then
+    if not RegQueryStringValue(HKCU, 'Software\N-Connect', 'Theme', Previous) then
+      Previous := 'dark';
+  if Previous = 'light' then
+    ThemePage.SelectedValueIndex := 1
+  else if Previous = 'system' then
+    ThemePage.SelectedValueIndex := 2
+  else
+    ThemePage.SelectedValueIndex := 0;
 end;
 
-function ThemeRegValue: String;
+function ThemeValue: String;
 begin
   case ThemePage.SelectedValueIndex of
     1: Result := 'light';
@@ -303,7 +331,7 @@ begin
   end;
 end;
 
-// Installersprache -> Sprachcode der App (HKCU\Software\N-Connect\Language, wird beim ersten Start gelesen).
+// Installersprache -> Sprachcode der App (für „--setup-lang=…“, siehe SetupArgs).
 function InstallerLangCode: String;
 var
   L: String;
@@ -323,14 +351,72 @@ begin
   else Result := 'en';
 end;
 
+// Argumente für den Start nach der Installation ([Run], runasoriginaluser): Sprache und Darstellung des Setups. Die App
+// übernimmt sie nur, solange in settings.json noch nichts gewählt ist (InstallerChoices; die Sprache nur, wenn sie von
+// der Windows-Sprache abweicht – sonst bleibt es bei „Automatisch“). Das Setup selbst schreibt
+// nichts nach HKCU – es läuft mit Adminrechten, bei UAC über ein anderes Konto wäre das das falsche Profil. Beim stillen
+// Update (Ein-Klick-Update der App, winget) keine Argumente: Dort gab es keine Wahl, die App behält ihre Einstellungen.
+function SetupArgs(Param: String): String;
+begin
+  if WizardSilent then
+    Result := ''
+  else
+    Result := '--setup-lang=' + InstallerLangCode + ' --setup-theme=' + ThemeValue;
+end;
+
+// Wahl für die nächste Installation merken (auch beim stillen Update, dann unverändert). Im Deinstallationsschlüssel
+// (HKLM, „Inno Setup CodeFile: Theme/Language“) liest sie auch die App beim allerersten Start ohne Argumente
+// (InstallerChoices) – etwa wenn „Jetzt starten“ abgewählt war oder ein weiteres Benutzerkonto N-Connect startet.
+procedure RegisterPreviousData(PreviousDataKey: Integer);
+begin
+  SetPreviousData(PreviousDataKey, 'Theme', ThemeValue);
+  SetPreviousData(PreviousDataKey, 'Language', InstallerLangCode);
+end;
+
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
   if CurStep = ssPostInstall then
-  begin
     RegisterHidHideTask;
-    RegWriteStringValue(HKCU, 'Software\N-Connect', 'Language', InstallerLangCode);
-    RegWriteStringValue(HKCU, 'Software\N-Connect', 'Theme', ThemeRegValue);
+end;
+
+// Autostart (HKCU\…\Run, Wert „N-Connect“) setzt die App selbst für den angemeldeten Benutzer. Die Deinstallation läuft
+// mit Adminrechten – ihr HKCU ist nach einer UAC-Abfrage mit anderem Konto nicht das des Benutzers. Deshalb in allen
+// geladenen Benutzerprofilen (HKEY_USERS = alle angemeldeten Benutzer) nur Einträge entfernen, die auf diese
+// Installation zeigen; dazu dort Reste älterer Installer (Software\N-Connect: Language, Theme). Profile nicht
+// angemeldeter Benutzer behalten einen toten Eintrag, den Windows beim Anmelden übergeht.
+procedure RemoveAutostartEntries;
+var
+  Users: TArrayOfString;
+  I: Integer;
+  Key, Command, Exe: String;
+begin
+  Exe := Lowercase(ExpandConstant('{app}\{#AppExe}'));
+  if not RegGetSubkeyNames(HKU, '', Users) then
+    Exit;
+  for I := 0 to GetArrayLength(Users) - 1 do
+  begin
+    Key := Users[I] + '\Software\Microsoft\Windows\CurrentVersion\Run';
+    if RegQueryStringValue(HKU, Key, 'N-Connect', Command) and (Pos(Exe, Lowercase(Command)) > 0) then
+    begin
+      if RegDeleteValue(HKU, Key, 'N-Connect') then
+        Log('Autostart entfernt: HKU\' + Key)
+      else
+        Log('Autostart nicht entfernt: HKU\' + Key);
+    end;
+    Key := Users[I] + '\Software\N-Connect';
+    if RegKeyExists(HKU, Key) then
+    begin
+      RegDeleteValue(HKU, Key, 'Language');
+      RegDeleteValue(HKU, Key, 'Theme');
+      RegDeleteKeyIfEmpty(HKU, Key);
+    end;
   end;
+end;
+
+procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
+begin
+  if CurUninstallStep = usUninstall then
+    RemoveAutostartEntries;
 end;
 
 procedure CheckViGEmResult;
