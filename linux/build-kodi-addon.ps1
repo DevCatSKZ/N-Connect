@@ -8,12 +8,19 @@
 #   script.nconnect.bundle-<Version>.zip                       Offline-Installer mit der aktuellen service.nconnect-
 #                                                              und Plugin-ZIP (resources/data)
 #   repository.devcatskz-<Version>.zip                         „DevCatSKZ Repository“ (automatische Updates)
+# Jede ZIP außer dem Repository-Add-on enthält LICENSE.txt und THIRD-PARTY-NOTICES.md (Hinweise zu .NET-Laufzeit,
+# Linux.Bluetooth, Tmds.DBus …) aus dem Repo-Wurzelordner.
 # Aufruf: powershell -File linux/build-kodi-addon.ps1 [-Rids linux-x64,linux-arm64] [-Out <Ordner>]
 #        powershell -File linux/build-kodi-addon.ps1 -Repo [-RepoDir <Ordner>]
-#            zusätzlich in eine Arbeitskopie von DevCatSKZ/kodi-repo legen und den Index neu bauen
-#            (Standard: kodi-repo neben dem N-Connect-Ordner); committen/pushen danach von Hand bzw. in der CI
-#        powershell -File linux/build-kodi-addon.ps1 -Repo -NoBuild -RepoDir <Ordner>
-#            nur ins Repository legen – mit den schon gebauten ZIPs aus -Out (CI: dieselben ZIPs wie am Release)
+#            zusätzlich in eine Arbeitskopie von DevCatSKZ/kodi-repo legen und dort den Index neu bauen
+#            (tools/build_repo.py; Standard-Ordner: kodi-repo neben dem N-Connect-Ordner)
+#        powershell -File linux/build-kodi-addon.ps1 -Repo -NoBuild [-Out <Ordner>] [-RepoDir <Ordner>]
+#            nur ins Repository legen – mit schon gebauten ZIPs in -Out (z. B. dem entpackten CI-Artefakt „Kodi-Plugin“,
+#            dann liegen dort dieselben ZIPs wie am GitHub-Release)
+# Release (von Hand – die CI legt nichts ins kodi-repo, Deploy-Keys sind in der Organisation abgeschaltet):
+#   1. kodi-repo aktuell holen (git -C <kodi-repo> pull)
+#   2. powershell -File linux/build-kodi-addon.ps1 -Repo -RepoDir <kodi-repo>
+#   3. in <kodi-repo> prüfen (git status), committen als devcatskz und pushen
 # Schutz: Eine Add-on-Version, die im Repository schon liegt, wird nie überschrieben (für ein Update die Version in
 # linux/kodi/<id>/addon.xml erhöhen). Ist service.nconnect oder das Plugin neu, muss auch das Bundle eine neue
 # Version haben – sonst bricht -Repo ab, bevor etwas kopiert wird.
@@ -33,6 +40,7 @@ $project = Join-Path $PSScriptRoot 'NConnect.Linux\NConnect.Linux.csproj'
 $kodiSrc = Join-Path $PSScriptRoot 'kodi'
 $icon = Join-Path $root 'installer\art\N-Connect.png'
 $license = Join-Path $root 'LICENSE'
+$notices = Join-Path $root 'THIRD-PARTY-NOTICES.md'
 $out = if ($Out) { $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Out) } else { Join-Path $root 'out\kodi' }
 $stage = Join-Path $out 'stage'
 
@@ -53,7 +61,8 @@ $bundleZip = Join-Path $out "script.nconnect.bundle-$bundleVersion.zip"
 $repoZip = Join-Path $out "repository.devcatskz-$repoVersion.zip"
 
 # Dateien eines Add-ons aus linux/kodi/<id> (ohne __pycache__/.pyc), dazu das Logo aus dem Installer an der Stelle,
-# die <assets><icon> der addon.xml nennt (damit alles gleich aussieht), und die Lizenz.
+# die <assets><icon> der addon.xml nennt (damit alles gleich aussieht), die Lizenz und die Drittanbieter-Hinweise.
+# -NoLicense: Repository-Add-on – enthält keinen fremden Code und bleibt so, wie es veröffentlicht ist.
 function Get-AddonFiles([string]$id, [switch]$NoLicense) {
     $src = Join-Path $kodiSrc $id
     $files = @()
@@ -66,7 +75,10 @@ function Get-AddonFiles([string]$id, [switch]$NoLicense) {
     $iconPath = (Get-AddonXml $id).addon.extension | Where-Object { $_.point -eq 'xbmc.addon.metadata' } |
         ForEach-Object { $_.assets.icon }
     if ($iconPath) { $files += [pscustomobject]@{ Source = $icon; Path = "$id/$iconPath"; Mode = 0 } }
-    if (-not $NoLicense) { $files += [pscustomobject]@{ Source = $license; Path = "$id/LICENSE.txt"; Mode = 0 } }
+    if (-not $NoLicense) {
+        $files += [pscustomobject]@{ Source = $license; Path = "$id/LICENSE.txt"; Mode = 0 }
+        $files += [pscustomobject]@{ Source = $notices; Path = "$id/THIRD-PARTY-NOTICES.md"; Mode = 0 }
+    }
     return $files
 }
 
@@ -95,10 +107,13 @@ function New-ServiceZip([string]$zipPath, [string[]]$ridsInZip) {
 }
 
 if (-not $NoBuild) {
-    # Nur eigene Ergebnisse entfernen (auch bei -Out auf einen vorhandenen Ordner)
+    # Nur eigene Ergebnisse entfernen (auch bei -Out auf einen vorhandenen Ordner mit anderen Dateien)
     New-Item -ItemType Directory -Force $out | Out-Null
     if (Test-Path $stage) { Remove-Item $stage -Recurse -Force }
-    Get-ChildItem $out -File -Filter '*.zip' | Remove-Item -Force
+    foreach ($pattern in @('N-Connect-Kodi-LibreELEC-*.zip', 'plugin.nconnect.status-*.zip', 'script.nconnect.bundle-*.zip',
+                           'repository.devcatskz-*.zip')) {
+        Get-ChildItem $out -File -Filter $pattern | Remove-Item -Force
+    }
     New-Item -ItemType Directory -Force $stage | Out-Null
 
     # 1. Programm je Prozessor veröffentlichen
