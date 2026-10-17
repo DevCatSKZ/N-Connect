@@ -4,6 +4,9 @@ using Microsoft.Win32.SafeHandles;
 
 namespace Switch2Pro.Bridge.Usb;
 
+/// <summary>Ein Knoten der Windows-Gerätehierarchie: Instanz-ID, Treiberdienst (oder null) und Hardware-IDs.</summary>
+internal sealed record DeviceNode(string InstanceId, string? Service, IReadOnlyList<string> HardwareIds);
+
 /// <summary>Win32-Aufrufe für Geräteliste (CfgMgr32), WinUSB und HID.</summary>
 internal static class UsbNative
 {
@@ -109,7 +112,7 @@ internal static class UsbNative
 
     /// <summary>
     /// Das Gerät und alle Vorfahren bis zur Wurzel (HTREE\ROOT\0), jeweils mit Treiberdienst und Hardware-IDs –
-    /// für <see cref="DeviceTree.IsPhysicalChain"/>. Leer, wenn das Gerät nicht (mehr) vorhanden ist.
+    /// für DeviceTree.IsPhysicalChain. Leer, wenn das Gerät nicht (mehr) vorhanden ist.
     /// </summary>
     public static List<DeviceNode> GetDeviceChain(string instanceId, int maxDepth)
     {
