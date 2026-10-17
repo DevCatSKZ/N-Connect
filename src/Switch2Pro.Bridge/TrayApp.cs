@@ -151,9 +151,15 @@ internal sealed class TrayApp : ApplicationContext
         _settingsWatcher.Created += Changed;
         _settingsWatcher.Renamed += (s, e) => Changed(s, e);
 
+        // Unlesbare settings.json: Settings.Save legt sie vor dem ersten Überschreiben als „settings.json.unlesbar-…“ daneben.
         if (_settings.LoadError is not null)
-            Balloon(5000, "Einstellungen fehlerhaft",
-                "settings.json konnte nicht gelesen werden – es gelten die Standardwerte.", ToolTipIcon.Warning);
+            Balloon(8000, "Einstellungen fehlerhaft",
+                "settings.json konnte nicht gelesen werden – es gelten die Standardwerte. Die beschädigte Datei wird als " +
+                "„settings.json.unlesbar-…“ aufbewahrt (Klicken öffnet den Ordner).", ToolTipIcon.Warning, ShowUnreadableSettings);
+        else if (_settings.RestoredFromBackup)
+            Balloon(8000, "Einstellungen wiederhergestellt",
+                "Die Einstellungen waren beschädigt und wurden aus der letzten Sicherung wiederhergestellt. Die zuletzt " +
+                "geänderten Werte fehlen womöglich (Klicken öffnet den Ordner).", ToolTipIcon.Warning, ShowUnreadableSettings);
         UpdateTooltip();
         BuildMenu();
         SyncWidget();
@@ -352,9 +358,12 @@ internal sealed class TrayApp : ApplicationContext
         if (!File.Exists(Paths.SettingsFile))
             return; // gelöscht: aktuelle Werte behalten statt alles auf Standard zu setzen
         var fresh = Settings.Load(Paths.SettingsFile);
-        if (fresh.LoadError is not null)
+        // Unlesbar (auch wenn nur die Sicherung lesbar war – sie ist älter als die laufenden Werte): Werte behalten,
+        // die kaputte Datei aber vor dem nächsten Speichern sichern, statt sie nach .bak zu schieben und zu verlieren.
+        if (fresh.LoadError is not null || fresh.RestoredFromBackup)
         {
-            Log.Warn($"settings.json fehlerhaft, Änderung ignoriert: {fresh.LoadError}");
+            _settings.KeepUnreadableOf(fresh);
+            Log.Warn($"settings.json fehlerhaft, Änderung ignoriert: {fresh.LoadError ?? "nur die Sicherung war lesbar"}");
             return;
         }
         // Werte übernehmen statt das Objekt zu ersetzen – das offene Einstellungsfenster arbeitet darauf.
@@ -869,6 +878,17 @@ internal sealed class TrayApp : ApplicationContext
         _settings.OutputMode = mode;
         SaveSettings();
         _manager?.ApplyOutputMode();
+    }
+
+    /// <summary>
+    /// Einstellungsordner im Explorer zeigen, mit der gesicherten unlesbaren Datei markiert – solange noch nicht
+    /// gespeichert wurde, ist das die unlesbare settings.json selbst.
+    /// </summary>
+    private void ShowUnreadableSettings()
+    {
+        string? file = _settings.UnreadableCopy is { } copy && File.Exists(copy) ? copy
+            : File.Exists(Paths.SettingsFile) ? Paths.SettingsFile : null;
+        Open("explorer.exe", file is not null ? $"/select,\"{file}\"" : $"\"{Paths.SettingsDir}\"");
     }
 
     private static void Open(string target, string? args = null)

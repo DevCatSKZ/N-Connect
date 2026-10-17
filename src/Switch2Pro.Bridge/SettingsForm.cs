@@ -559,6 +559,8 @@ internal sealed class SettingsForm : UiForm
         reset.Click += (_, _) => ResetAll();
         var diagnose = new GlyphButton("Exportieren …", Glyph.Export);
         diagnose.Click += (_, _) => ExportDiagnostics();
+        var notices = new GlyphButton("Öffnen", Glyph.Info);
+        notices.Click += (_, _) => OpenThirdPartyNotices();
         page.AddGroup("Erweitert",
             Row("Diagnose exportieren", "Protokoll, Einstellungen und Systeminfos als ZIP-Datei – zum Anhängen an eine Fehlermeldung. " +
                 "Enthält keine Kopplungsschlüssel.", diagnose, Glyph.Info),
@@ -566,6 +568,8 @@ internal sealed class SettingsForm : UiForm
             Row("Nach Updates suchen", "Beim Start auf GitHub nach einer neuen Version suchen.", _updates, Glyph.Sync),
             Row("HidHide aktuell halten", "Beim Start nach einer neuen HidHide-Version suchen. Installiert wird nur nach Rückfrage " +
                 "(geprüfter Download vom Hersteller, Neustart nötig).", _hidHideUpdates, Glyph.Sync),
+            Row("Lizenzen Dritter", "Open-Source-Software und übernommener Code in N-Connect – mit Lizenzen und " +
+                "Copyright-Vermerken.", notices, Glyph.Info),
             Row("Alles auf Standard", "Tastenbelegungen und Werte zurücksetzen. Gekoppelte Controller bleiben erhalten.", reset, Glyph.Refresh));
         return page;
     }
@@ -593,6 +597,39 @@ internal sealed class SettingsForm : UiForm
         {
             Log.Warn($"Diagnose exportieren: {Log.Reason(e)}");
             Tr.Show(this, $"Speichern fehlgeschlagen: {e.Message}", "N-Connect", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        }
+    }
+
+    /// <summary>Lizenzhinweise neben der EXE (Setup: Programmordner, portable: im ZIP).</summary>
+    internal const string NoticesFile = "THIRD-PARTY-NOTICES.md";
+    private const string NoticesUrl = "https://github.com/DevCatSKZ/N-Connect/blob/main/THIRD-PARTY-NOTICES.md";
+
+    /// <summary>
+    /// THIRD-PARTY-NOTICES.md öffnen: im Programm, das für .md eingestellt ist, sonst im Editor (Windows kennt .md
+    /// nicht von sich aus). Fehlt die Datei (z. B. nur die EXE kopiert), die Fassung auf GitHub.
+    /// </summary>
+    private static void OpenThirdPartyNotices()
+    {
+        string file = Path.Combine(AppContext.BaseDirectory, NoticesFile);
+        try
+        {
+            if (!File.Exists(file))
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(NoticesUrl) { UseShellExecute = true });
+                return;
+            }
+            try
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(file) { UseShellExecute = true });
+            }
+            catch (System.ComponentModel.Win32Exception)
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("notepad.exe", $"\"{file}\"") { UseShellExecute = true });
+            }
+        }
+        catch (Exception e) when (e is System.ComponentModel.Win32Exception or InvalidOperationException)
+        {
+            Log.Warn($"Lizenzhinweise öffnen: {Log.Reason(e)}");
         }
     }
 
