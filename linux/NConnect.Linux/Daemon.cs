@@ -86,35 +86,107 @@ public sealed class Daemon : IAsyncDisposable
         // gezogen), werden alle Controller getrennt und es wird erneut gewartet.
         while (!stop.IsCancellationRequested)
         {
+            Adapter? adapter = null;
             try
             {
-                await RunSessionAsync(stop).ConfigureAwait(false);
+                // Abbrechbar: Läuft bluetoothd nicht, hängt die Anfrage bis zu 25 s in der D-Bus-Aktivierung von org.bluez –
+                // Beenden (Kodi zu, Neustart über das Menü) soll darauf nicht warten.
+                adapter = await FindAdapterAsync().WaitAsync(stop).ConfigureAwait(false);
+                _adapter = adapter; // wird in EndSessionAsync freigegeben
+                if (adapter is null)
+                    OnNoAdapter();
+                else
+                    await RunSessionAsync(adapter, stop).ConfigureAwait(false);
             }
             catch (OperationCanceledException) when (stop.IsCancellationRequested)
             {
                 break;
             }
-            catch (Exception e) when (IsBluetoothServiceDown(e))
-            {
-                // bluetoothd läuft nicht – unter LibreELEC heißt das: Bluetooth ist in den Einstellungen ausgeschaltet.
-                if (_adapterState != "off")
-                    Log.Warn("Bluetooth-Dienst (bluetoothd) läuft nicht – Bluetooth ist aus");
-                SetAdapterState("off");
-            }
             catch (Exception e)
             {
-                Log.Warn($"Bluetooth nicht verfügbar: {Log.Reason(e)}");
-                if (_adapterState is null)
-                    SetAdapterState("missing"); // gar kein BlueZ/D-Bus – nicht ewig „startet …“ anzeigen
+                await OnRoundFailedAsync(e, adapterReached: adapter is not null).ConfigureAwait(false);
             }
             await EndSessionAsync().ConfigureAwait(false);
             await Task.Delay(5000, stop).ConfigureAwait(false);
         }
     }
 
-    /// <summary>bluetoothd läuft nicht (der D-Bus-Name org.bluez hat keinen Besitzer) – das ist „off“, nicht „missing“.</summary>
+    /// <summary>
+    /// bluetoothd läuft nicht bzw. lässt sich nicht starten – das ist „off“, nicht „missing“. Ohne Aktivierungsdatei
+    /// meldet der D-Bus ServiceUnknown/NameHasNoOwner. Mit ihr (LibreELEC: org.bluez.service → systemd) versucht er,
+    /// bluetoothd zu starten: Ist Bluetooth in den Einstellungen aus, startet die Unit wegen ihrer Bedingung nicht, und
+    /// nach 25 s kommt TimedOut („Failed to activate service 'org.bluez'“); scheitert der Start selbst, ein Spawn- bzw.
+    /// systemd-Fehler. Andere Fehlernamen klärt <see cref="OnRoundFailedAsync"/> über eine Nachfrage beim D-Bus.
+    /// </summary>
     internal static bool IsBluetoothServiceDown(Exception e) =>
-        e is DBusException { ErrorName: "org.freedesktop.DBus.Error.ServiceUnknown" or "org.freedesktop.DBus.Error.NameHasNoOwner" };
+        e is DBusException { ErrorName: { } name }
+        && (name is "org.freedesktop.DBus.Error.ServiceUnknown" or "org.freedesktop.DBus.Error.NameHasNoOwner"
+                or "org.freedesktop.DBus.Error.TimedOut"
+            || name.StartsWith("org.freedesktop.DBus.Error.Spawn.", StringComparison.Ordinal)
+            || name.StartsWith("org.freedesktop.systemd1.", StringComparison.Ordinal));
+
+    /// <summary>
+    /// Hat der D-Bus-Name org.bluez einen Besitzer (läuft bluetoothd)? Fragt nur den D-Bus selbst und startet nichts.
+    /// Tests ersetzen das – dort gibt es keinen System-D-Bus.
+    /// </summary>
+    internal Func<Task<bool>> BluetoothServiceRunningAsync { get; init; } =
+        () => Connection.System.IsServiceActiveAsync(BlueZ.Service);
+
+    /// <summary>
+    /// Eine Runde endete mit einem Fehler: den Bluetooth-Zustand nachführen, damit nach dem Ende der Sitzung kein
+    /// „on“ stehen bleibt, während bluetoothd weg ist (sonst erschiene der Hinweis „Bluetooth ist aus“ nie).
+    /// Läuft bluetoothd nicht – am Fehlernamen erkannt oder, bei jedem anderen Fehler, beim D-Bus nachgefragt –, ist
+    /// Bluetooth „off“. Sonst: Hat BlueZ in dieser Runde gar keinen Adapter geliefert, ist ein „on“/„no_le“ veraltet
+    /// → „missing“. Scheiterte erst das Einrichten bzw. Überwachen des gefundenen Adapters, bleibt der Zustand stehen:
+    /// Die nächste Runde stellt ihn neu fest (weg → „missing“, aus → „off“), und ein Fehler, der bei jedem Einrichten
+    /// wiederkehrt, ließe ihn sonst alle paar Sekunden springen – mit einer Kodi-Meldung bei jedem Wechsel.
+    /// </summary>
+    /// <param name="adapterReached">BlueZ hat in dieser Runde einen Adapter geliefert.</param>
+    internal async Task OnRoundFailedAsync(Exception e, bool adapterReached)
+    {
+        if (IsBluetoothServiceDown(e) || await IsBluetoothServiceRunningAsync().ConfigureAwait(false) == false)
+        {
+            // Unter LibreELEC heißt das: Bluetooth ist in den Einstellungen ausgeschaltet.
+            if (_adapterState != "off")
+                Log.Warn($"Bluetooth-Dienst (bluetoothd) läuft nicht – Bluetooth ist aus ({Log.Reason(e)})");
+            SetAdapterState("off");
+            return;
+        }
+        Log.Warn($"Bluetooth nicht verfügbar: {Log.Reason(e)}");
+        if (_adapterState is null || (!adapterReached && _adapterState is ("on" or "no_le")))
+            SetAdapterState("missing"); // kein (erreichbarer) Adapter – auch nicht ewig „startet …“ anzeigen
+    }
+
+    /// <summary>true/false laut D-Bus; null = unbekannt (D-Bus selbst nicht erreichbar oder keine Antwort).</summary>
+    private async Task<bool?> IsBluetoothServiceRunningAsync()
+    {
+        try
+        {
+            return await BluetoothServiceRunningAsync().WaitAsync(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
+    private bool _waitedForAdapter;
+
+    /// <summary>
+    /// BlueZ antwortet, meldet aber keinen Adapter. Kommt bluetoothd gerade erst (wieder) hoch – Bluetooth eben
+    /// eingeschaltet, Systemstart –, übernimmt er den D-Bus-Namen, bevor er seine Adapter anmeldet; eine Anfrage in
+    /// diesem Moment sieht noch keinen. Kommt man von „off“ oder ist noch nichts geprüft, daher eine Runde (5 s) abwarten,
+    /// statt kurz „Kein Bluetooth-Adapter“ zu melden; fehlt er dann noch, ist es „missing“.
+    /// </summary>
+    internal void OnNoAdapter()
+    {
+        if (_adapterState is (null or "off") && !_waitedForAdapter)
+        {
+            _waitedForAdapter = true;
+            return;
+        }
+        SetAdapterState("missing");
+    }
 
     /// <summary>Den Dienst von innen beenden (Kodi weg) – wie SIGTERM: Controller trennen, Pads entfernen.</summary>
     private void StopRunning(string reason)
@@ -155,15 +227,9 @@ public sealed class Daemon : IAsyncDisposable
         }
     }
 
-    private async Task RunSessionAsync(CancellationToken stop)
+    private async Task RunSessionAsync(Adapter adapter, CancellationToken stop)
     {
-        var adapter = await FindAdapterAsync().ConfigureAwait(false);
-        if (adapter is null)
-        {
-            SetAdapterState("missing");
-            return;
-        }
-        _adapter = adapter; // wird in EndSessionAsync freigegeben
+        _waitedForAdapter = false;
         if (!await adapter.GetPoweredAsync().ConfigureAwait(false))
         {
             SetAdapterState("off");
@@ -1001,6 +1067,7 @@ public sealed class Daemon : IAsyncDisposable
         if (_adapterState == state)
             return;
         _adapterState = state;
+        _waitedForAdapter = false; // neuer Zustand: beim nächsten „kein Adapter“ wieder eine Runde abwarten (OnNoAdapter)
         Emit("bluetooth", new JsonObject { ["state"] = state });
         RequestStatus();
     }
