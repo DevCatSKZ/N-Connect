@@ -113,4 +113,66 @@ public class XboxBtReportTests
         // Puffer mit Lückenfüller muss sauber enden (nichts wird hinter das Zeilenende geschrieben)
         Assert.True(n <= buffer.Length);
     }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(9)]
+    [InlineData(10)]
+    [InlineData(99)]
+    [InlineData(100)]
+    [InlineData(255)]
+    [InlineData(256)]
+    [InlineData(999)]
+    [InlineData(1000)]
+    [InlineData(1234)]                // früher als „234“ geschrieben
+    [InlineData(int.MaxValue)]
+    [InlineData(-1)]                  // früher ein falsches Zeichen
+    [InlineData(int.MinValue)]
+    public void WriteReportLine_schreibt_jede_ID_wie_Report(int id)
+    {
+        byte[] report = [0, 9, 10, 99, 100, 255, 1, 128];
+        Span<byte> buffer = stackalloc byte[UhidCommand.ReportLineCapacity(report.Length)];
+        int n = UhidCommand.WriteReportLine(id, report, buffer);
+        Assert.Equal(UhidCommand.Report(id, report) + "\n", System.Text.Encoding.ASCII.GetString(buffer[..n]));
+    }
+
+    [Fact]
+    public void ReportLineCapacity_reicht_fuer_den_laengsten_Fall()
+    {
+        // Längste ID, jedes Byte dreistellig, und der leere Bericht.
+        byte[] full = Enumerable.Repeat((byte)255, XboxBtReport.Length).ToArray();
+        foreach (var report in new byte[][] { full, [] })
+        {
+            var buffer = new byte[UhidCommand.ReportLineCapacity(report.Length)];
+            int n = UhidCommand.WriteReportLine(int.MinValue, report, buffer);
+            Assert.Equal(UhidCommand.Report(int.MinValue, report) + "\n", System.Text.Encoding.ASCII.GetString(buffer, 0, n));
+            Assert.InRange(buffer.Length - n, 0, 1); // höchstens ein Byte Reserve: die Schätzung ist knapp, aber sicher
+        }
+    }
+
+    [Fact]
+    public void WriteReportLine_meldet_zu_kleinen_Puffer()
+    {
+        byte[] report = XboxBtReport.Neutral();
+        var buffer = new byte[UhidCommand.ReportLineCapacity(report.Length) - 1];
+        Assert.Throws<ArgumentException>(() => UhidCommand.WriteReportLine(1, report, buffer));
+        Assert.Throws<ArgumentOutOfRangeException>(() => UhidCommand.ReportLineCapacity(-1));
+    }
+
+    [Fact]
+    public void HidJson_negative_ID_unabhaengig_von_der_Sprache()
+    {
+        var culture = System.Globalization.CultureInfo.CurrentCulture;
+        try
+        {
+            // Schwedisch schreibt negative Zahlen mit Unicode-Minus (U+2212) – im JSON wäre das ungültig.
+            System.Globalization.CultureInfo.CurrentCulture = new System.Globalization.CultureInfo("sv-SE");
+            Assert.StartsWith("{\"id\":-1,", UhidCommand.Report(-1, [1]));
+            Assert.StartsWith("{\"id\":-1,", UhidCommand.RegisterXbox(-1, "x"));
+        }
+        finally
+        {
+            System.Globalization.CultureInfo.CurrentCulture = culture;
+        }
+    }
 }

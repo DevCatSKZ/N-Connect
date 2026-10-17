@@ -1,3 +1,5 @@
+using System.Buffers.Text;
+using System.Globalization;
 using System.Text;
 
 namespace Switch2Pro.Protocol;
@@ -118,6 +120,7 @@ public static class XboxBtReport
 /// <summary>
 /// Befehle für den Android-Shell-Befehl <c>hid</c> (AOSP <c>frameworks/base/cmds/hid</c>): eine JSON-Zeile je
 /// Ereignis über stdin. Damit legt N-Connect unter Android ein virtuelles HID-Gerät an und füttert es.
+/// Zahlen immer kulturunabhängig (manche Sprachen schreiben negative Zahlen mit Unicode-Minus – ungültiges JSON).
 /// </summary>
 public static class UhidCommand
 {
@@ -126,7 +129,7 @@ public static class UhidCommand
         ReadOnlySpan<byte> descriptor)
     {
         var sb = new StringBuilder(descriptor.Length * 4 + 160);
-        sb.Append("{\"id\":").Append(id).Append(",\"command\":\"register\",\"name\":\"").Append(Escape(name))
+        sb.Append("{\"id\":").Append(id.ToString(CultureInfo.InvariantCulture)).Append(",\"command\":\"register\",\"name\":\"").Append(Escape(name))
           .Append("\",\"vid\":").Append(vendorId).Append(",\"pid\":").Append(productId)
           .Append(",\"bus\":\"").Append(bus).Append("\",\"descriptor\":");
         AppendBytes(sb, descriptor);
@@ -137,7 +140,7 @@ public static class UhidCommand
     public static string Report(int id, ReadOnlySpan<byte> report)
     {
         var sb = new StringBuilder(report.Length * 4 + 40);
-        sb.Append("{\"id\":").Append(id).Append(",\"command\":\"report\",\"report\":");
+        sb.Append("{\"id\":").Append(id.ToString(CultureInfo.InvariantCulture)).Append(",\"command\":\"report\",\"report\":");
         AppendBytes(sb, report);
         return sb.Append('}').ToString();
     }
@@ -146,9 +149,13 @@ public static class UhidCommand
     /// Die „Bericht senden“-Zeile (wie <see cref="Report"/>, plus Zeilenumbruch) direkt als ASCII in einen
     /// Byte-Puffer schreiben. Rückgabe: geschriebene Länge. Im Dauerbetrieb ohne Speicherreservierung –
     /// bei ~90 Eingaben/s je Controller würden sonst laufend Zeichenketten im Speicher landen.
+    /// Jede <paramref name="id"/> wird so geschrieben wie bei <see cref="Report"/> (auch mehrstellig oder negativ);
+    /// der Puffer muss mindestens <see cref="ReportLineCapacity"/> Byte groß sein, sonst ArgumentException.
     /// </summary>
     public static int WriteReportLine(int id, ReadOnlySpan<byte> report, Span<byte> buffer)
     {
+        if (buffer.Length < ReportLineCapacity(report.Length))
+            throw new ArgumentException($"Puffer zu klein: {buffer.Length} statt {ReportLineCapacity(report.Length)} Byte.", nameof(buffer));
         ReadOnlySpan<byte> head = "{\"id\":"u8;
         ReadOnlySpan<byte> mid = ",\"command\":\"report\",\"report\":["u8;
         int pos = 0;
@@ -169,24 +176,22 @@ public static class UhidCommand
         return pos;
     }
 
-    /// <summary>Schätzgröße, die <see cref="WriteReportLine"/> für einen Bericht braucht (gerundet nach oben).</summary>
-    public static int ReportLineCapacity(int reportLength) => reportLength * 4 + 48;
+    /// <summary>
+    /// Puffergröße, die <see cref="WriteReportLine"/> höchstens braucht: Kopf und Ende (39 Byte), die längste ID
+    /// („-2147483648“, 11 Byte) und je Berichtsbyte bis zu 3 Ziffern plus Komma.
+    /// </summary>
+    public static int ReportLineCapacity(int reportLength)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(reportLength);
+        return reportLength * 4 + 50;
+    }
 
-    /// <summary>Nicht-negative ganze Zahl als ASCII-Ziffern schreiben. Rückgabe: geschriebene Länge.</summary>
+    /// <summary>Ganze Zahl als ASCII-Ziffern schreiben (wie StringBuilder.Append, ohne Speicherreservierung). Rückgabe: geschriebene Länge.</summary>
     private static int WriteInt(Span<byte> buffer, int value)
     {
-        if (value == 0)
-        {
-            buffer[0] = (byte)'0';
-            return 1;
-        }
-        int digits = value < 10 ? 1 : value < 100 ? 2 : 3;
-        for (int i = digits - 1; i >= 0; i--)
-        {
-            buffer[i] = (byte)('0' + value % 10);
-            value /= 10;
-        }
-        return digits;
+        if (!Utf8Formatter.TryFormat(value, buffer, out int written))
+            throw new ArgumentException("Puffer zu klein.", nameof(buffer));
+        return written;
     }
 
     /// <summary>Virtuellen Xbox-Controller anmelden.</summary>
