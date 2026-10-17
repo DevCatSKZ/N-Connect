@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -101,7 +102,7 @@ public sealed record NamedProfile
     private static readonly JsonSerializerOptions FileOptions = new()
     {
         WriteIndented = true,
-        Converters = { new JsonStringEnumConverter() },
+        Converters = { new TolerantEnumConverterFactory() },
         ReadCommentHandling = JsonCommentHandling.Skip,
         AllowTrailingCommas = true,
     };
@@ -117,7 +118,8 @@ public sealed record NamedProfile
             var p = JsonSerializer.Deserialize<NamedProfile>(json, FileOptions);
             if (p is null || string.IsNullOrWhiteSpace(p.Name))
                 return null;
-            // Nur gültige Einträge übernehmen (fremde Dateien können alles enthalten).
+            // Nur gültige Einträge übernehmen (fremde Dateien können alles enthalten, unbekannte Namen kommen als
+            // ungültiger Wert an – siehe TolerantEnumConverter).
             static Dictionary<ControllerKind, Dictionary<ProButtons, string>> Clean(Dictionary<ControllerKind, Dictionary<ProButtons, string>>? maps) =>
                 maps?.Where(m => m.Value is not null && Enum.IsDefined(m.Key))
                     .ToDictionary(m => m.Key, m => m.Value.Where(e => e.Value is not null && Enum.IsDefined(e.Key)).ToDictionary(e => e.Key, e => e.Value)) ?? [];
@@ -429,13 +431,21 @@ public sealed class Settings
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         WriteIndented = true,
-        Converters = { new JsonStringEnumConverter() },
+        // Enum-Werte als Namen; unbekannte Namen (neuere Version, Tippfehler) verwirft Sanitized einzeln, statt dass
+        // die ganze Datei unlesbar wird.
+        Converters = { new TolerantEnumConverterFactory() },
         ReadCommentHandling = JsonCommentHandling.Skip,
         AllowTrailingCommas = true,
     };
 
     /// <summary>Sicherung der vorletzten gespeicherten Fassung (wird beim Speichern ersetzt).</summary>
     public static string BackupPath(string path) => path + ".bak";
+
+    /// <summary>
+    /// Unlesbare Dateien vom Laden (volle Pfade), die <see cref="Save"/> vor dem ersten Überschreiben wegsichert
+    /// (siehe <see cref="KeepUnreadable"/>).
+    /// </summary>
+    private readonly List<string> _unreadable = [];
 
     public static Settings Load(string path)
     {
@@ -444,19 +454,30 @@ public sealed class Settings
             if (File.Exists(path))
                 return Parse(File.ReadAllText(path));
         }
-        catch (Exception e) when (e is JsonException or IOException or UnauthorizedAccessException)
+        catch (Exception e) when (IsReadError(e))
         {
-            // Kaputte Datei (z. B. Stromausfall beim Speichern einer älteren Version): die Sicherung nehmen, sonst mit
-            // Standardwerten weiterlaufen und die Datei nicht überschreiben.
+            // Kaputte Datei (z. B. Stromausfall beim Speichern einer älteren Version oder von Hand bearbeitet): die
+            // Sicherung nehmen, sonst mit Standardwerten weiterlaufen. Überschrieben wird die unlesbare Datei erst beim
+            // nächsten Speichern – und erst, nachdem Save sie daneben gesichert hat.
+            string full = Path.GetFullPath(path), backup = BackupPath(full);
             try
             {
-                if (File.Exists(BackupPath(path)))
-                    return Parse(File.ReadAllText(BackupPath(path)));
+                if (File.Exists(backup))
+                {
+                    var restored = Parse(File.ReadAllText(backup));
+                    restored.RestoredFromBackup = true;
+                    restored._unreadable.Add(full);
+                    return restored;
+                }
             }
-            catch (Exception backupError) when (backupError is JsonException or IOException or UnauthorizedAccessException)
+            catch (Exception backupError) when (IsReadError(backupError))
             {
             }
-            return new Settings { LoadError = e.Message };
+            var defaults = new Settings { LoadError = e.Message };
+            defaults._unreadable.Add(full);
+            if (File.Exists(backup))
+                defaults._unreadable.Add(backup); // ebenfalls unlesbar – sonst wäre sie oben geladen worden
+            return defaults;
         }
         var fresh = new Settings();
         try
@@ -474,12 +495,21 @@ public sealed class Settings
         (JsonSerializer.Deserialize<Settings>(json, JsonOptions) ?? throw new JsonException("leere Einstellungen")).Sanitized();
 
     /// <summary>
+    /// Fehler, an denen eine Datei als unlesbar gilt (statt den Start abstürzen zu lassen): kaputtes JSON, kein Zugriff,
+    /// und Ausnahmen beim Aufräumen von Hand bearbeiteter Inhalte (Argument/InvalidOperation).
+    /// </summary>
+    private static bool IsReadError(Exception e) =>
+        e is JsonException or IOException or UnauthorizedAccessException or ArgumentException or InvalidOperationException;
+
+    /// <summary>
     /// Sicher speichern: erst in eine temporäre Datei schreiben, dann in einem Schritt austauschen (die bisherige Fassung
     /// wird zur Sicherung <see cref="BackupPath"/>). So bleibt bei Absturz oder Stromausfall immer eine vollständige
     /// Datei übrig – vorher konnte eine halb geschriebene settings.json alle Profile und Belegungen kosten.
+    /// War die Datei beim Laden unlesbar, wird sie vorher einmalig gesichert (<see cref="KeepUnreadable"/>).
     /// </summary>
     public void Save(string path)
     {
+        KeepUnreadable();
         Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path))!);
         string temp = path + ".tmp";
         using (var stream = new FileStream(temp, FileMode.Create, FileAccess.Write, FileShare.None))
@@ -503,6 +533,40 @@ public sealed class Settings
             }
         }
         File.Move(temp, path, overwrite: true);
+    }
+
+    /// <summary>
+    /// Vor dem ersten Speichern nach einem Ladefehler (auch wenn stattdessen die Sicherung geladen wurde) die unlesbare
+    /// Datei einmalig daneben kopieren:
+    /// „settings.json.unlesbar-JJJJMMTT-hhmmss“, eine ebenfalls unlesbare Sicherung als „settings.json.bak.unlesbar-…“.
+    /// Ohne das schöbe Save sie nach .bak, und spätestens beim zweiten Speichern wären Profile, Belegungen, Namen und
+    /// Kalibrierungen weg – etwa bei einem Tippfehler in einer von Hand bearbeiteten Datei. Danach wird ganz normal
+    /// gespeichert (sonst könnte die App nie mehr speichern). Klappt das Kopieren nicht, wirft Save, ohne etwas zu
+    /// überschreiben; der nächste Versuch sichert erneut.
+    /// </summary>
+    private void KeepUnreadable()
+    {
+        while (_unreadable.Count > 0)
+        {
+            string file = _unreadable[0];
+            if (File.Exists(file))
+            {
+                string copy = UnreadableName(file);
+                File.Copy(file, copy);
+                UnreadableCopy ??= copy;
+            }
+            _unreadable.RemoveAt(0);
+        }
+    }
+
+    /// <summary>Freier Name für die Kopie einer unlesbaren Datei: „Datei.unlesbar-JJJJMMTT-hhmmss“, notfalls mit „-2“ usw.</summary>
+    private static string UnreadableName(string file)
+    {
+        string stamp = DateTime.Now.ToString("yyyyMMdd-HHmmss", CultureInfo.InvariantCulture);
+        string name = $"{file}.unlesbar-{stamp}";
+        for (int i = 2; File.Exists(name); i++)
+            name = $"{file}.unlesbar-{stamp}-{i}";
+        return name;
     }
 
     /// <summary>Übernimmt alle Werte aus <paramref name="other"/>.</summary>
@@ -584,10 +648,41 @@ public sealed class Settings
         ControllerKinds = new Dictionary<string, ControllerKind>(other.ControllerKinds, StringComparer.OrdinalIgnoreCase);
         PlayerSlots = new Dictionary<string, int>(other.PlayerSlots, StringComparer.OrdinalIgnoreCase);
         StickCalibrations = new Dictionary<string, StickCalibration>(other.StickCalibrations, StringComparer.OrdinalIgnoreCase);
+        // Unlesbare Datei vom Laden mitnehmen (z. B. neu geladen, aber nur die Sicherung war lesbar): wer die Werte
+        // übernimmt und dann speichert, sichert sie vorher – siehe KeepUnreadable.
+        KeepUnreadableOf(other);
+    }
+
+    /// <summary>
+    /// Für ein verworfenes Neuladen (<paramref name="rejected"/> mit <see cref="LoadError"/> oder
+    /// <see cref="RestoredFromBackup"/>): Die laufenden Werte bleiben, aber die dabei unlesbare Datei sichert das nächste
+    /// <see cref="Save"/> vorher, statt sie nach .bak zu schieben und beim übernächsten Speichern zu verlieren (z. B. ein
+    /// Tippfehler beim Bearbeiten von Hand, während die App läuft). <see cref="CopyFrom"/> macht das von selbst.
+    /// </summary>
+    public void KeepUnreadableOf(Settings rejected)
+    {
+        foreach (string file in rejected._unreadable)
+        {
+            if (!_unreadable.Contains(file))
+                _unreadable.Add(file);
+        }
     }
 
     [JsonIgnore]
     public string? LoadError { get; private set; }
+
+    /// <summary>
+    /// settings.json war unlesbar, geladen wurde die Sicherung <see cref="BackupPath"/> – die Fassung vor dem letzten
+    /// Speichern; was zuletzt gespeichert wurde, fehlt also. Die Apps sollten beim Start darauf hinweisen. Beim Neuladen
+    /// im Betrieb ist der laufende Stand neuer als die Sicherung: dann besser wie bei <see cref="LoadError"/> verwerfen
+    /// (<see cref="KeepUnreadableOf"/>), statt per <see cref="CopyFrom"/> auf die Sicherung zurückzufallen.
+    /// </summary>
+    [JsonIgnore]
+    public bool RestoredFromBackup { get; private set; }
+
+    /// <summary>Kopie der beim Laden unlesbaren Datei, die <see cref="Save"/> vor dem ersten Überschreiben angelegt hat; sonst null.</summary>
+    [JsonIgnore]
+    public string? UnreadableCopy { get; private set; }
 
     public bool IsKnown(string address) =>
         KnownControllers.Any(a => string.Equals(a.Trim(), address, StringComparison.OrdinalIgnoreCase));
@@ -656,10 +751,29 @@ public sealed class Settings
     public GyroBias GyroBiasFor(string? address, GyroBias factory) =>
         address is not null && GyroCalibration.TryGetValue(address, out var bias) ? bias : factory;
 
-    /// <summary>Belegungen ohne null-Einträge (von Hand bearbeitete Dateien).</summary>
+    /// <summary>
+    /// Belegungen ohne null-Einträge (von Hand bearbeitete Dateien) und ohne unbekannte Controller-Arten oder Tasten
+    /// (z. B. aus einer neueren Version).
+    /// </summary>
     private static Dictionary<ControllerKind, Dictionary<ProButtons, string>> Clean(Dictionary<ControllerKind, Dictionary<ProButtons, string>>? maps) =>
-        maps?.Where(m => m.Value is not null)
-            .ToDictionary(m => m.Key, m => m.Value.Where(e => e.Value is not null).ToDictionary(e => e.Key, e => e.Value)) ?? [];
+        maps?.Where(m => m.Value is not null && Enum.IsDefined(m.Key))
+            .ToDictionary(m => m.Key, m => m.Value.Where(e => e.Value is not null && Enum.IsDefined(e.Key)).ToDictionary(e => e.Key, e => e.Value)) ?? [];
+
+    /// <summary>
+    /// Neues Wörterbuch mit Adressen als Schlüssel, ohne Rücksicht auf Groß-/Kleinschreibung. Beim Einlesen sind
+    /// „aa:bb:…“ und „AA:BB:…“ noch zwei Schlüssel (von Hand bearbeitete Datei): Dann gilt der spätere gültige Eintrag,
+    /// statt dass ToDictionary mit einer ArgumentException den Start verhindert.
+    /// </summary>
+    private static Dictionary<string, T> IgnoreCase<T>(IEnumerable<KeyValuePair<string, T>>? entries)
+    {
+        var result = new Dictionary<string, T>(StringComparer.OrdinalIgnoreCase);
+        foreach (var (key, value) in entries ?? [])
+        {
+            if (key is not null)
+                result[key] = value;
+        }
+        return result;
+    }
 
     private Settings Sanitized()
     {
@@ -674,13 +788,13 @@ public sealed class Settings
         UprightJoyCons ??= [];
         HiddenDevices ??= [];
         ImportedPairings = ImportedPairings?.Where(p => p?.Address is not null).ToList() ?? [];
-        Remap ??= [];
+        // Unbekannte Tasten oder Ziele (neuere Version, Tippfehler) kommen als ungültiger Wert an: nur sie weglassen.
+        Remap = Remap?.Where(r => Enum.IsDefined(r.Key) && Enum.IsDefined(r.Value)).ToDictionary(r => r.Key, r => r.Value) ?? [];
         Profiles ??= [];
         ShiftProfiles ??= [];
         NamedProfiles ??= [];
-        Deadzones ??= [];
-        GyroCalibration = GyroCalibration is null ? new(StringComparer.OrdinalIgnoreCase)
-            : new Dictionary<string, GyroBias>(GyroCalibration, StringComparer.OrdinalIgnoreCase);
+        Deadzones = Deadzones?.Where(d => Enum.IsDefined(d.Key)).ToDictionary(d => d.Key, d => d.Value) ?? [];
+        GyroCalibration = IgnoreCase(GyroCalibration);
         GyroMouseSpeed = float.IsFinite(GyroMouseSpeed) ? Math.Clamp(GyroMouseSpeed, 1f, 100f) : 20f;
         InactivityMinutes = Math.Clamp(InactivityMinutes, 0, 240);
         static float Fin(float v, float min, float max, float fallback) => float.IsFinite(v) ? Math.Clamp(v, min, max) : fallback;
@@ -699,8 +813,15 @@ public sealed class Settings
             Theme = null;
         if (Language is not (null or "de" or "en" or "es" or "fr" or "it" or "pt" or "nl" or "pl" or "ru" or "ja" or "zh" or "ko"))
             Language = null;
+        // Unbekannte Namen oder Zahlen (siehe TolerantEnumConverter) → Standardwert.
         if (!Enum.IsDefined(GyroStick))
             GyroStick = GyroStickMode.Off;
+        if (!Enum.IsDefined(Layout))
+            Layout = FaceButtonLayout.Xbox;
+        if (!Enum.IsDefined(PairGyroSource))
+            PairGyroSource = GyroSource.Right;
+        if (!Enum.IsDefined(ConnectNotify))
+            ConnectNotify = ConnectNotifications.NConnect;
         UprightJoyCons.RemoveAll(a => a is null);
         NamedProfiles.RemoveAll(p => p is null || string.IsNullOrWhiteSpace(p.Name));
         NamedProfiles = NamedProfiles.Select(p => p with
@@ -714,28 +835,82 @@ public sealed class Settings
             .ToDictionary(t => t.Key, t => t.Value.Sanitized()) ?? [];
         foreach (var kind in Deadzones.Keys.ToList())
             Deadzones[kind] = float.IsFinite(Deadzones[kind]) ? Math.Clamp(Deadzones[kind], 0f, 0.5f) : StickDeadzone;
-        // Von Hand bearbeitete Dateien können null-Einträge enthalten ("…": null).
+        // Von Hand bearbeitete Dateien können null-Einträge enthalten ("…": null) – IsHidden & Co. rufen Trim() auf.
         AllowedControllers.RemoveAll(a => a is null);
         KnownControllers.RemoveAll(a => a is null);
         SingleJoyCons.RemoveAll(a => a is null);
+        HiddenDevices.RemoveAll(a => a is null);
         Profiles = Clean(Profiles);
-        ControllerNames = ControllerNames?.Where(n => n.Key is not null && !string.IsNullOrWhiteSpace(n.Value))
-            .ToDictionary(n => n.Key, n => n.Value.Trim(), StringComparer.OrdinalIgnoreCase) ?? new(StringComparer.OrdinalIgnoreCase);
-        PlayerSlots = PlayerSlots?.Where(s => s.Key is not null && s.Value is >= 0 and < 8)
-            .ToDictionary(s => s.Key, s => s.Value, StringComparer.OrdinalIgnoreCase) ?? new(StringComparer.OrdinalIgnoreCase);
-        ControllerKinds = ControllerKinds?.Where(k => k.Key is not null && Enum.IsDefined(k.Value) && k.Value != ControllerKind.Unknown)
-            .ToDictionary(k => k.Key, k => k.Value, StringComparer.OrdinalIgnoreCase) ?? new(StringComparer.OrdinalIgnoreCase);
-        ControllerOutputs = ControllerOutputs?.Where(o => o.Key is not null && Enum.IsDefined(o.Value))
-            .ToDictionary(o => o.Key, o => o.Value, StringComparer.OrdinalIgnoreCase) ?? new(StringComparer.OrdinalIgnoreCase);
+        // Adress-Wörterbücher: Groß-/Kleinschreibungs-Dubletten zusammenführen (siehe IgnoreCase).
+        ControllerNames = IgnoreCase(ControllerNames?.Where(n => !string.IsNullOrWhiteSpace(n.Value))
+            .Select(n => KeyValuePair.Create(n.Key, n.Value.Trim())));
+        PlayerSlots = IgnoreCase(PlayerSlots?.Where(s => s.Value is >= 0 and < 8));
+        ControllerKinds = IgnoreCase(ControllerKinds?.Where(k => Enum.IsDefined(k.Value) && k.Value != ControllerKind.Unknown));
+        ControllerOutputs = IgnoreCase(ControllerOutputs?.Where(o => Enum.IsDefined(o.Value)));
         if (!Enum.IsDefined(OutputMode))
             OutputMode = OutputMode.Xbox360;
         // Nur plausible Kalibrierungen (Mitte im 12-Bit-Bereich, Ausschlag 200–2047) – sonst lieber die Werkswerte.
         static bool Plausible(AxisCalibration a) => a.Neutral is > 0 and < 4095 && a.Max is >= 200 and <= 2047 && a.Min is >= 200 and <= 2047;
-        StickCalibrations = StickCalibrations?.Where(c => c.Key is not null && Plausible(c.Value.X) && Plausible(c.Value.Y))
-            .ToDictionary(c => c.Key, c => c.Value, StringComparer.OrdinalIgnoreCase) ?? new(StringComparer.OrdinalIgnoreCase);
+        StickCalibrations = IgnoreCase(StickCalibrations?.Where(c => Plausible(c.Value.X) && Plausible(c.Value.Y)));
         return this;
     }
 }
 
 /// <summary>Ein übernommener Kopplungseintrag: Controller-Adresse, Name, Host-Adresse, Herkunft ("Switch"/"N-Connect").</summary>
 public sealed record PairingNote(string Address, string? Name, string? HostAddress, string? Source);
+
+/// <summary>Für jedes Enum einen <see cref="TolerantEnumConverter{T}"/> (Werte und Wörterbuch-Schlüssel).</summary>
+internal sealed class TolerantEnumConverterFactory : JsonConverterFactory
+{
+    public override bool CanConvert(Type typeToConvert) => typeToConvert.IsEnum;
+
+    public override JsonConverter CreateConverter(Type typeToConvert, JsonSerializerOptions options) =>
+        (JsonConverter)Activator.CreateInstance(typeof(TolerantEnumConverter<>).MakeGenericType(typeToConvert))!;
+}
+
+/// <summary>
+/// Enum-Werte als Namen speichern (wie <see cref="JsonStringEnumConverter"/>: "GL": "LS"), beim Lesen aber nachsichtig.
+/// Ein unbekannter Name – eine Datei aus einer neueren Version mit neuer Controller-Art oder ein Tippfehler – ergibt
+/// <see cref="Unknown"/> statt einer JsonException, die die ganze settings.json unlesbar machen würde. Zahlen werden wie
+/// bisher angenommen. <see cref="Settings"/> verwirft ungültige Werte danach beim Aufräumen einzeln
+/// (Wörterbucheintrag weg bzw. Standardwert).
+/// </summary>
+internal sealed class TolerantEnumConverter<T> : JsonConverter<T> where T : struct, Enum
+{
+    /// <summary>„Unbekannt“: alle Bits gesetzt (−1 bzw. 0xFFFFFFFF) – in keinem Enum der Einstellungen vergeben.</summary>
+    internal static readonly T Unknown = (T)Enum.ToObject(typeof(T), -1L);
+
+    private static readonly bool IsFlags = typeof(T).IsDefined(typeof(FlagsAttribute), inherit: false);
+
+    public override T Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        switch (reader.TokenType)
+        {
+            case JsonTokenType.String:
+                return Parse(reader.GetString());
+            case JsonTokenType.Number when reader.TryGetInt64(out long number):
+                // Nur Zahlen, die in den Enum passen (sonst würde z. B. 2^32 + 1 still zu 1).
+                var value = (T)Enum.ToObject(typeof(T), number);
+                return Convert.ToInt64(value, CultureInfo.InvariantCulture) == number ? value : Unknown;
+            default:
+                reader.Skip(); // null, true, Objekt … – ganz überspringen
+                return Unknown;
+        }
+    }
+
+    public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options) =>
+        writer.WriteStringValue(value.ToString());
+
+    public override T ReadAsPropertyName(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) =>
+        Parse(reader.GetString());
+
+    public override void WriteAsPropertyName(Utf8JsonWriter writer, T value, JsonSerializerOptions options) =>
+        writer.WritePropertyName(value.ToString());
+
+    /// <summary>
+    /// Name (Groß/Klein egal) oder Zahl als Text; sonst <see cref="Unknown"/>. Mehrere Namen („A, B“) nur bei
+    /// Flags – Enum.TryParse verknüpfte sie sonst stillschweigend zu einem anderen Wert (A | B = X).
+    /// </summary>
+    private static T Parse(string? text) =>
+        text is not null && (IsFlags || !text.Contains(',')) && Enum.TryParse(text, ignoreCase: true, out T value) ? value : Unknown;
+}

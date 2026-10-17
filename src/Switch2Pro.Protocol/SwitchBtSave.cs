@@ -19,17 +19,29 @@ public sealed record SwitchBtDevice(int Offset, string Address, string Name, byt
 /// <c>sd:/switch/Bluepick_RCM/8000000000000050.bin</c> exportiert. Das Save ist innerhalb der Datei nicht
 /// verschlüsselt (verschlüsselt ist nur die NAND-Ebene, die Bluepick beim Export bereits entschlüsselt).
 ///
-/// Layout (ermittelt am 04.10.2026 an einem Save von FW 22.x, gegengeprüft mit joycon_mac.ini):
-/// Einträge zu je 0x200 Byte, Adresse bei +0x70 (höchstes Byte zuerst), Schlüssel bei +0x99 (16 Byte,
-/// umgekehrt zu joycon_mac.ini), Name bei +0x146 (ASCII, nullterminiert). Der Speicher hält zwei Kopien der
-/// Tabelle (Save-Journal); deshalb wird die ganze Datei durchsucht und doppelte Einträge zusammengefasst.
+/// Layout (ermittelt am 04.10.2026 an einem Save von FW 22.x, gegengeprüft mit joycon_mac.ini; siehe
+/// docs/SWITCH-IDENTITAET.md): Die Einträge haben das Format <c>SetSysBluetoothDevicesSettings</c> (libnx, 0x200 Byte),
+/// der erste beginnt bei 0x58070, eine zweite Kopie der Tabelle (Save-Journal) bei 0x5C070. Relativ zum Eintrag:
+/// Adresse +0x00 (6 Byte, höchstes Byte zuerst), Klasse +0x26, Schlüssel +0x29 (16 Byte, umgekehrt zu joycon_mac.ini),
+/// VID/PID +0x40/+0x42, Name +0xD6 (ASCII, nullterminiert).
+///
+/// Der Parser rastert die ganze Datei in 0x200-Schritten ab Dateianfang. Weil 0x58000 auf diesem Raster liegt, sind
+/// <see cref="AddressOffset"/>, <see cref="KeyOffset"/> und <see cref="NameOffset"/> dieselben Felder, gemessen ab dem
+/// Rasterpunkt 0x70 Byte vor dem Eintrag (0x70 + 0x00, 0x70 + 0x29, 0x70 + 0xD6). So werden beide Kopien gefunden;
+/// doppelte Einträge (gleiche Adresse und gleicher Schlüssel) werden zusammengefasst. Ältere Kopplungen derselben
+/// Adresse mit anderem Schlüssel bleiben in <see cref="Parse"/> stehen; den aktuellen Eintrag je Adresse wählt
+/// <see cref="Current"/> (nach Testbefund, nicht gesichert). Arbeitsstand: nur das Diagnosewerkzeug BtIdentityProbe
+/// nutzt den Parser.
 /// </summary>
 public static class SwitchBtSave
 {
     public const string FileName = "8000000000000050.bin";
     public const int EntrySize = 0x200;
+    /// <summary>Adresse: 0x70 Byte ab Rasterpunkt = Eintrag +0x00.</summary>
     public const int AddressOffset = 0x70;
+    /// <summary>Kopplungsschlüssel: Eintrag +0x29.</summary>
     public const int KeyOffset = 0x99;
+    /// <summary>Gerätename: Eintrag +0xD6.</summary>
     public const int NameOffset = 0x146;
     private const int NameLength = 0x20;
 
@@ -44,6 +56,21 @@ public static class SwitchBtSave
                 result.Add(device);
         }
         return result;
+    }
+
+    /// <summary>
+    /// Je Adresse nur der aktuelle Eintrag: der erste in Dateireihenfolge (<paramref name="devices"/> so wie von
+    /// <see cref="Parse"/> geliefert), die Reihenfolge der Adressen bleibt.
+    /// Nach Testbefund, nicht gesichert: Im Save vom 04.10.2026 traf der erste Eintrag je Adresse für beide Joy-Con aus
+    /// joycon_mac.ini deren Schlüssel; die ältere Kopplung des einen stand weiter hinten (nachgeprüft am 17.10.2026). Für
+    /// die übrigen Adressen dort gibt es keinen Vergleich. Beide Kopien der Tabelle waren gleich – welche die
+    /// Save-Verwaltung gelten lässt, wenn sie sich unterscheiden, liest der Parser nicht aus. Für Joy-Con bleibt
+    /// joycon_mac.ini die sichere Quelle (Schlüssel aus dem Joy-Con selbst).
+    /// </summary>
+    public static List<SwitchBtDevice> Current(IEnumerable<SwitchBtDevice> devices)
+    {
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        return devices.Where(d => seen.Add(d.Address)).ToList();
     }
 
     private static bool TryParseEntry(ReadOnlySpan<byte> entry, int offset, out SwitchBtDevice device)
