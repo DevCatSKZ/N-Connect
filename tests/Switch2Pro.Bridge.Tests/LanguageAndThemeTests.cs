@@ -5,7 +5,8 @@ using Switch2Pro.Protocol;
 namespace Switch2Pro.Bridge.Tests;
 
 /// <summary>
-/// Sprache und Darstellung: „Automatisch“ folgt der Windows-Sprache, „Dunkel“ wird ausdrücklich gespeichert, und die
+/// Sprache und Darstellung: „Automatisch“ folgt der Windows-Sprache, „Automatisch“ und „Dunkel“ werden ausdrücklich
+/// gespeichert, das Setup übergibt eine Sprache nur bei bewusster Wahl, und die
 /// Wahl im Installer füllt nur Einstellungen, die noch leer sind (stille Updates und spätere Setups ändern nichts).
 /// Ohne Registry: <see cref="InstallerChoices.Apply"/> selbst wird hier nicht aufgerufen.
 /// </summary>
@@ -121,8 +122,8 @@ public sealed class LanguageAndThemeTests : IDisposable
     }
 
     /// <summary>
-    /// Installersprache = Windows-Sprache: nichts speichern – „Automatisch“ (null) ergibt dieselbe Sprache und folgt
-    /// Windows weiter, auch wenn es in der App ausdrücklich gewählt war und später ein Setup läuft.
+    /// Installersprache = Windows-Sprache: nichts speichern – null (nie gewählt) ergibt dieselbe Sprache und folgt
+    /// Windows weiter, auch wenn später ein Setup mit anderer Windows-Sprache läuft.
     /// </summary>
     [Fact]
     public void InstallerSpracheWieWindowsBleibtAutomatisch()
@@ -147,6 +148,56 @@ public sealed class LanguageAndThemeTests : IDisposable
         Assert.Null(settings.Theme);
     }
 
+    [Fact]
+    public void SprachlisteSpeichertAutomatischAusdruecklich()
+    {
+        Assert.Equal("auto", SettingsForm.LanguageCode(0));
+        Assert.Equal("auto", SettingsForm.LanguageCode(-1));
+        Assert.Equal("auto", SettingsForm.LanguageCode(99));
+        Assert.Equal(Tr.Supported, Enumerable.Range(1, Tr.Supported.Length).Select(SettingsForm.LanguageCode));
+    }
+
+    /// <summary>
+    /// Englisches Setup auf deutschem Windows, danach in der App „Automatisch“ gewählt: Ein späteres Setup, das wieder
+    /// Englisch übergibt, ändert daran nichts – die App folgt weiter Windows.
+    /// </summary>
+    [Fact]
+    public void InDerAppGewaehltesAutomatischBleibtTrotzAbweichenderInstallerSprache()
+    {
+        var settings = new Settings();
+        Assert.True(InstallerChoices.Adopt(settings, "en", "dark", "de"));
+        Assert.Equal("en", settings.Language);
+        settings.Language = SettingsForm.LanguageCode(0);
+        Assert.False(InstallerChoices.Adopt(settings, "en", "light", "de"));
+        Assert.Equal("auto", settings.Language);
+        Assert.Equal("dark", settings.Theme);
+        CultureInfo.CurrentUICulture = new CultureInfo("de-DE");
+        Tr.Init(settings.Language);
+        Assert.Equal("de", Tr.Lang);
+    }
+
+    [Fact]
+    public void AutomatischBleibtNachSpeichernUndLadenErhalten()
+    {
+        string dir = Path.Combine(Path.GetTempPath(), "nconnect-bridge-tests-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(dir);
+        try
+        {
+            string path = Path.Combine(dir, "settings.json");
+            new Settings { Language = "auto", Theme = "dark" }.Save(path);
+            var loaded = Settings.Load(path);
+            Assert.Null(loaded.LoadError);
+            Assert.Equal("auto", loaded.Language);
+            Assert.Equal("dark", loaded.Theme);
+            File.WriteAllText(path, """{ "Language": "xx" }""");
+            Assert.Null(Settings.Load(path).Language);
+        }
+        finally
+        {
+            try { Directory.Delete(dir, recursive: true); } catch (IOException) { /* bleibt im Temp-Ordner */ }
+        }
+    }
+
     /// <summary>
     /// Setup und App passen zusammen: dieselben Argumente, nur Sprachcodes mit Tabelle, genau die drei Darstellungen
     /// und der Deinstallationsschlüssel zur AppId (dort liest die App beim ersten Start die gemerkte Wahl).
@@ -155,9 +206,11 @@ public sealed class LanguageAndThemeTests : IDisposable
     public void InstallerSkriptPasstZurApp()
     {
         string iss = File.ReadAllText(Path.Combine(Repo.Root(), "installer", "N-Connect.iss"));
-        Assert.Contains("'--setup-lang=' + InstallerLangCode + ' --setup-theme=' + ThemeValue", iss);
+        Assert.Contains("Result := '--setup-theme=' + ThemeValue;", iss);
+        Assert.Contains("Result := '--setup-lang=' + ChosenLangCode + ' ' + Result;", iss);
+        Assert.DoesNotContain("'--setup-lang=' + InstallerLangCode", iss);
         Assert.Contains("SetPreviousData(PreviousDataKey, 'Theme', ThemeValue);", iss);
-        Assert.Contains("SetPreviousData(PreviousDataKey, 'Language', InstallerLangCode);", iss);
+        Assert.Contains("SetPreviousData(PreviousDataKey, 'Language', ChosenLangCode);", iss);
 
         var appId = Regex.Match(iss, @"^AppId=\{(\{[0-9A-F-]+\})", RegexOptions.Multiline);
         Assert.True(appId.Success, "AppId nicht gefunden");
@@ -169,6 +222,46 @@ public sealed class LanguageAndThemeTests : IDisposable
 
         string themes = Regex.Match(iss, @"function ThemeValue: String;.*?\nend;", RegexOptions.Singleline).Value;
         Assert.Equal(["dark", "light", "system"], Regex.Matches(themes, @"Result := '([a-z]+)'").Select(m => m.Groups[1].Value).Order());
+    }
+
+    /// <summary>
+    /// Das Setup erkennt eine bewusst gewählte Sprache (ChosenLangCode) nur richtig, wenn es die Windows-Sprache so
+    /// bestimmt wie die App (Tr.WindowsLanguage), Englisch sein Vorschlag ohne passende Sprache ist (erster Eintrag) und
+    /// SetupLangs genau die Sprachen sammelt, die es tatsächlich anbietet.
+    /// </summary>
+    [Fact]
+    public void InstallerKenntSeineSprachenWieDieApp()
+    {
+        // Zeilenenden vereinheitlichen (Checkout mit core.autocrlf, z. B. auf dem Windows-Runner der CI).
+        string iss = File.ReadAllText(Path.Combine(Repo.Root(), "installer", "N-Connect.iss")).Replace("\r\n", "\n");
+
+        string windows = Regex.Match(iss, @"function WindowsLangCode: String;.*?\nend;", RegexOptions.Singleline).Value;
+        var lcids = Regex.Matches(windows, @"\$([0-9A-F]{2}): Result := '([a-z]+)'").ToList();
+        Assert.Equal(Tr.Supported.Where(l => l != "en").Order(), lcids.Select(m => m.Groups[2].Value).Order());
+        foreach (var m in lcids)
+            Assert.Equal(m.Groups[2].Value, CultureInfo.GetCultureInfo(Convert.ToInt32(m.Groups[1].Value, 16)).TwoLetterISOLanguageName);
+        Assert.Matches(@"else\s+Result := 'en';", windows);
+
+        string languages = Regex.Match(iss, @"^\[Languages\]$.*?^\[", RegexOptions.Singleline | RegexOptions.Multiline).Value;
+        Assert.Matches(@"^Name: ""english""; MessagesFile: ""compiler:Default.isl""", languages.Split('\n').First(l => l.StartsWith("Name:")));
+
+        // Name der Sprache im Setup → Sprachcode der App (InstallerLangCode; „english“ ist der else-Zweig).
+        string mapping = Regex.Match(iss, @"function InstallerLangCode: String;.*?\nend;", RegexOptions.Singleline).Value;
+        var codeOf = new Dictionary<string, string> { ["english"] = "en" };
+        foreach (Match line in Regex.Matches(mapping, @"^.*L = '.*Result := '([a-z]+)'.*$", RegexOptions.Multiline))
+            foreach (Match name in Regex.Matches(line.Value, @"L = '(\w+)'"))
+                codeOf[name.Groups[1].Value] = line.Groups[1].Value;
+
+        var always = Regex.Matches(languages, @"^Name: ""(\w+)"";", RegexOptions.Multiline).Select(m => m.Groups[1].Value)
+            .Except(Regex.Matches(languages, @"#if [^\n]*\nName: ""(\w+)"";").Select(m => m.Groups[1].Value)).ToList();
+        Assert.Equal(["english", "german"], always);
+        Assert.Contains(@"#define SetupLangs ""en de""", languages);
+        var optional = Regex.Matches(languages,
+            @"#if FileExists\(InnoLangDir \+ ""\\\w+\.isl""\)\nName: ""(\w+)"";[^\n]*\n\s*#define SetupLangs SetupLangs \+ "" ([a-z]+)""\n#endif").ToList();
+        Assert.Equal(Regex.Matches(languages, "#if ").Count, optional.Count);
+        foreach (var m in optional)
+            Assert.Equal(codeOf[m.Groups[1].Value], m.Groups[2].Value);
+        Assert.Equal(Tr.Supported.Order(), always.Concat(optional.Select(m => m.Groups[1].Value)).Select(n => codeOf[n]).Distinct().Order());
     }
 
     [Fact]

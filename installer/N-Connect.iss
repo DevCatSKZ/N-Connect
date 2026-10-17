@@ -58,42 +58,57 @@ CloseApplications=yes
 RestartApplications=no
 
 [Languages]
-Name: "german"; MessagesFile: "compiler:Languages\German.isl"
+; Englisch zuerst: Ohne passende Sprache (z. B. Schwedisch, oder Chinesisch ohne ISL-Datei) schlägt das Setup den
+; ersten Eintrag vor – wie die App, die dann unter „Automatisch“ Englisch zeigt (siehe ChosenLangCode).
 Name: "english"; MessagesFile: "compiler:Default.isl"
-; Weitere Sprachen nur aufnehmen, wenn die ISL-Datei der installierten Inno-Version sie mitbringt.
-#define InnoLangDir GetEnv("ProgramFiles(x86)") + "\Inno Setup 6\Languages"
+Name: "german"; MessagesFile: "compiler:Languages\German.isl"
+; Weitere Sprachen nur aufnehmen, wenn die ISL-Datei der Inno-Version, die gerade baut, sie mitbringt. SetupLangs
+; sammelt dazu die Sprachcodes der App (siehe InstallerLangCode), damit das Setup weiß, was es angeboten hat.
+#define InnoLangDir AddBackslash(CompilerPath) + "Languages"
+#define SetupLangs "en de"
 #if FileExists(InnoLangDir + "\Spanish.isl")
 Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"
+  #define SetupLangs SetupLangs + " es"
 #endif
 #if FileExists(InnoLangDir + "\French.isl")
 Name: "french"; MessagesFile: "compiler:Languages\French.isl"
+  #define SetupLangs SetupLangs + " fr"
 #endif
 #if FileExists(InnoLangDir + "\Italian.isl")
 Name: "italian"; MessagesFile: "compiler:Languages\Italian.isl"
+  #define SetupLangs SetupLangs + " it"
 #endif
 #if FileExists(InnoLangDir + "\Portuguese.isl")
 Name: "portuguese"; MessagesFile: "compiler:Languages\Portuguese.isl"
+  #define SetupLangs SetupLangs + " pt"
 #endif
 #if FileExists(InnoLangDir + "\BrazilianPortuguese.isl")
 Name: "brazilianportuguese"; MessagesFile: "compiler:Languages\BrazilianPortuguese.isl"
+  #define SetupLangs SetupLangs + " pt"
 #endif
 #if FileExists(InnoLangDir + "\Dutch.isl")
 Name: "dutch"; MessagesFile: "compiler:Languages\Dutch.isl"
+  #define SetupLangs SetupLangs + " nl"
 #endif
 #if FileExists(InnoLangDir + "\Polish.isl")
 Name: "polish"; MessagesFile: "compiler:Languages\Polish.isl"
+  #define SetupLangs SetupLangs + " pl"
 #endif
 #if FileExists(InnoLangDir + "\Russian.isl")
 Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl"
+  #define SetupLangs SetupLangs + " ru"
 #endif
 #if FileExists(InnoLangDir + "\Japanese.isl")
 Name: "japanese"; MessagesFile: "compiler:Languages\Japanese.isl"
+  #define SetupLangs SetupLangs + " ja"
 #endif
 #if FileExists(InnoLangDir + "\ChineseSimplified.isl")
 Name: "chinesesimplified"; MessagesFile: "compiler:Languages\ChineseSimplified.isl"
+  #define SetupLangs SetupLangs + " zh"
 #endif
 #if FileExists(InnoLangDir + "\Korean.isl")
 Name: "korean"; MessagesFile: "compiler:Languages\Korean.isl"
+  #define SetupLangs SetupLangs + " ko"
 #endif
 
 [CustomMessages]
@@ -351,26 +366,70 @@ begin
   else Result := 'en';
 end;
 
-// Argumente für den Start nach der Installation ([Run], runasoriginaluser): Sprache und Darstellung des Setups. Die App
-// übernimmt sie nur, solange in settings.json noch nichts gewählt ist (InstallerChoices; die Sprache nur, wenn sie von
-// der Windows-Sprache abweicht – sonst bleibt es bei „Automatisch“). Das Setup selbst schreibt
-// nichts nach HKCU – es läuft mit Adminrechten, bei UAC über ein anderes Konto wäre das das falsche Profil. Beim stillen
-// Update (Ein-Klick-Update der App, winget) keine Argumente: Dort gab es keine Wahl, die App behält ihre Einstellungen.
+// Anzeigesprache von Windows als Sprachcode der App – dieselbe Wahl wie Tr.WindowsLanguage unter „Automatisch“
+// (Hauptsprache der LANGID; ohne eigene Tabelle Englisch).
+function WindowsLangCode: String;
+begin
+  case GetUILanguage and $3FF of
+    $07: Result := 'de';
+    $0A: Result := 'es';
+    $0C: Result := 'fr';
+    $10: Result := 'it';
+    $16: Result := 'pt';
+    $13: Result := 'nl';
+    $15: Result := 'pl';
+    $19: Result := 'ru';
+    $11: Result := 'ja';
+    $04: Result := 'zh';
+    $12: Result := 'ko';
+  else
+    Result := 'en';
+  end;
+end;
+
+// Sprachcode, wenn die Setup-Sprache bewusst gewählt wurde, sonst '' (die App bleibt „wie Windows“). Das Setup schlägt
+// die Windows-Sprache vor, wenn es sie anbietet (Traditionelles Chinesisch nie als Vereinfachtes), sonst Englisch
+// (erster Eintrag unter [Languages]). Nur wenn dieser Vorschlag die Sprache der App unter „Automatisch“ war, ist eine
+// andere Setup-Sprache eine bewusste Wahl. Bietet das Setup die Windows-Sprache nicht an (z. B. Chinesisch, ISL-Datei
+// fehlt beim Bauen), lief es zwangsläufig in einer anderen Sprache – dann nichts übergeben.
+function ChosenLangCode: String;
+var
+  WinLang: String;
+  Lang: Integer;
+begin
+  WinLang := WindowsLangCode;
+  Lang := GetUILanguage;
+  Result := InstallerLangCode;
+  if (Result = WinLang) or (Pos(' ' + WinLang + ' ', ' {#SetupLangs} ') = 0)
+     or ((WinLang = 'zh') and ((Lang = $0404) or (Lang = $0C04) or (Lang = $1404) or (Lang = $7C04))) then
+    Result := '';
+end;
+
+// Argumente für den Start nach der Installation ([Run], runasoriginaluser): Darstellung und – nur bei bewusster Wahl,
+// siehe ChosenLangCode – Sprache des Setups. Die App übernimmt sie nur, solange in settings.json noch nichts gewählt
+// ist (InstallerChoices; „Automatisch“ und „Dunkel“ speichert sie ausdrücklich). Das Setup selbst schreibt nichts nach
+// HKCU – es läuft mit Adminrechten, bei UAC über ein anderes Konto wäre das das falsche Profil. Beim stillen Update
+// (Ein-Klick-Update der App, winget) keine Argumente: Dort gab es keine Wahl, die App behält ihre Einstellungen.
 function SetupArgs(Param: String): String;
 begin
   if WizardSilent then
     Result := ''
   else
-    Result := '--setup-lang=' + InstallerLangCode + ' --setup-theme=' + ThemeValue;
+  begin
+    Result := '--setup-theme=' + ThemeValue;
+    if ChosenLangCode <> '' then
+      Result := '--setup-lang=' + ChosenLangCode + ' ' + Result;
+  end;
 end;
 
-// Wahl für die nächste Installation merken (auch beim stillen Update, dann unverändert). Im Deinstallationsschlüssel
-// (HKLM, „Inno Setup CodeFile: Theme/Language“) liest sie auch die App beim allerersten Start ohne Argumente
-// (InstallerChoices) – etwa wenn „Jetzt starten“ abgewählt war oder ein weiteres Benutzerkonto N-Connect startet.
+// Wahl für die nächste Installation merken (auch beim stillen Update, dann unverändert; Sprache leer, wenn nicht bewusst
+// gewählt). Im Deinstallationsschlüssel (HKLM, „Inno Setup CodeFile: Theme/Language“) liest sie auch die App beim
+// allerersten Start ohne Argumente (InstallerChoices) – etwa wenn „Jetzt starten“ abgewählt war oder ein weiteres
+// Benutzerkonto N-Connect startet.
 procedure RegisterPreviousData(PreviousDataKey: Integer);
 begin
   SetPreviousData(PreviousDataKey, 'Theme', ThemeValue);
-  SetPreviousData(PreviousDataKey, 'Language', InstallerLangCode);
+  SetPreviousData(PreviousDataKey, 'Language', ChosenLangCode);
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);

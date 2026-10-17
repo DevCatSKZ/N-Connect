@@ -496,8 +496,10 @@ erneut versucht – ebenso, wenn ViGEm keinen virtuellen Controller anlegen kann
   als PNG), PNG und Installer-Grafiken, ohne ein Fenster zu öffnen.
 - **Grafiken**: Pfeile (▲▼◀▶) zeichnet `InputView.Caption` als gleich große Dreiecke, die bei gedrehtem Controller
   (quer gehaltener Joy-Con) mitdrehen; alle anderen Beschriftungen bleiben waagerecht lesbar.
-- **Sprache**: 12 Sprachen (de, en, es, fr, it, pt, nl, pl, ru, ja, zh, ko). „Automatisch (wie Windows)“ (Standard,
-  gespeichert als null) = Anzeigesprache von Windows (`Tr.WindowsLanguage`; ohne eigene Tabelle Englisch). Übersetzt
+- **Sprache**: 12 Sprachen (de, en, es, fr, it, pt, nl, pl, ru, ja, zh, ko). „Automatisch (wie Windows)“ (Standard)
+  = Anzeigesprache von Windows (`Tr.WindowsLanguage`; ohne eigene Tabelle Englisch). In der App gewählt, wird es wie
+  „Dunkel“ ausdrücklich gespeichert (`Settings.Language` = `auto`); null heißt „nie gewählt“ und gilt ebenfalls als
+  „wie Windows“ – nur dann darf ein Setup die Sprache vorgeben. Übersetzt
   wird über Tabellen mit dem deutschen Text als Schlüssel (`Tr.Texts.cs` = Englisch, `Tr.Lang*.cs`) und Muster für
   Texte mit Platzhaltern (`Tr.cs` und je Sprache dieselben Muster in derselben Reihenfolge); aus mehreren Sätzen
   zusammengesetzte Meldungen Satz für Satz. Fehlt ein Text, gilt Englisch, dann Deutsch. Die Kurzanleitung
@@ -506,12 +508,17 @@ erneut versucht – ebenso, wenn ViGEm keinen virtuellen Controller anlegen kann
   denselben Schlüsseln, keine doppelten, gleiche Muster, Zahlen/Namen bleiben erhalten, Stichproben bisheriger Lücken.
 - **Installer → App** (`installer/N-Connect.iss`, `InstallerChoices`): Das Setup läuft mit Adminrechten und schreibt
   deshalb keine Benutzereinstellungen (kein HKCU). Es startet N-Connect nach der Installation als angemeldeter Benutzer
-  mit `--setup-lang=xx --setup-theme=dark|light|system`; die App übernimmt die Werte einmalig, solange in
-  settings.json noch nichts gewählt ist – die Sprache nur, wenn sie von der Windows-Sprache abweicht (sonst bleibt es
-  bei „Automatisch“). Fehlen die Argumente beim allerersten Start (im Setup „Jetzt starten“ abgewählt, weiteres
-  Benutzerkonto), gilt die Wahl, die das Setup im eigenen Deinstallationsschlüssel in HKLM merkt
-  (`Inno Setup CodeFile: Language`/`Theme`, nur gelesen). Stilles Update (Ein-Klick-Update, winget): keine
-  Argumente, es ändert sich nichts. Werte älterer Setups (bis 1.0.21: `HKCU\Software\N-Connect\Language`/`Theme`)
+  mit `--setup-theme=dark|light|system` und `--setup-lang=xx` – die Sprache nur, wenn sie im Setup bewusst gewählt
+  wurde (`ChosenLangCode`): Das Setup schlägt die Windows-Sprache vor, wenn es sie anbietet, sonst Englisch (erster
+  Eintrag unter `[Languages]`). Weicht die Setup-Sprache davon ab, obwohl der Vorschlag der Sprache der App unter
+  „Automatisch“ entsprach, war es eine Wahl; fehlt dem Setup die Windows-Sprache (ISL-Datei beim Bauen nicht
+  vorhanden, z. B. Chinesisch – Inno Setup bringt sie nicht mit), wird nichts übergeben. Welche Sprachen das Setup
+  anbietet, sammelt `SetupLangs` beim Bauen (Sprachdateien aus dem Ordner des Compilers, `CompilerPath`). Die App
+  übernimmt die Werte einmalig, solange in settings.json noch nichts gewählt ist – die Sprache zusätzlich nur, wenn
+  sie von der Windows-Sprache abweicht. Fehlen die Argumente beim allerersten Start (im Setup „Jetzt starten“
+  abgewählt, weiteres Benutzerkonto), gilt die Wahl, die das Setup im eigenen Deinstallationsschlüssel in HKLM merkt
+  (`Inno Setup CodeFile: Language`/`Theme`, nur gelesen; Sprache leer, wenn nicht bewusst gewählt). Stilles Update
+  (Ein-Klick-Update, winget): keine Argumente, es ändert sich nichts. Werte älterer Setups (bis 1.0.21: `HKCU\Software\N-Connect\Language`/`Theme`)
   übernimmt die installierte App beim nächsten Start einmalig und löscht sie. Die Setup-Seite „Darstellung“ wählt
   die Wahl der letzten Installation vor. Anleitung im Programmordner in der Setup-Sprache: Deutsch `Anleitung.md`,
   sonst `README.md` (englisch). Die Deinstallation entfernt den Autostart in allen angemeldeten Benutzerprofilen
