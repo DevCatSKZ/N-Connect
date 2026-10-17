@@ -33,6 +33,8 @@ internal sealed class ControllerManager : IAsyncDisposable
     private readonly System.Threading.Timer _inactivityTimer;
     /// <summary>Geräte, deren Verbindungsfehler schon gemeldet wurde (nicht bei jedem neuen Versuch wieder).</summary>
     private readonly ConcurrentDictionary<string, byte> _unreachable = new(StringComparer.OrdinalIgnoreCase);
+    /// <summary>Geräte, die wegen voller Spielerplätze abgewiesen und dafür schon gemeldet wurden.</summary>
+    private readonly ConcurrentDictionary<string, byte> _refusedFull = new(StringComparer.OrdinalIgnoreCase);
     /// <summary>Von Hand getrennte USB-Controller (bis das Kabel abgezogen wird).</summary>
     private readonly ConcurrentDictionary<string, byte> _usbSuppressed = new(StringComparer.OrdinalIgnoreCase);
     private readonly List<Player> _players = [];
@@ -56,13 +58,14 @@ internal sealed class ControllerManager : IAsyncDisposable
     /// <summary>Ein Switch-2-Controller wurde verbunden (Adresse, Art) – zum Merken für das Wiederverbinden per Tastendruck.</summary>
     public event Action<string, ControllerKind>? ControllerConnected;
 
+    /// <summary>Bluetooth-Problem als Text für die Anzeige (null = bereit); der Zustand selbst steht in <see cref="Bluetooth"/>.</summary>
     public string? AdapterProblem { get; private set; }
+
+    /// <summary>Zustand des Bluetooth-Adapters (für die Kodi-status.json und Entscheidungen – nicht aus dem Text ableiten).</summary>
+    public BluetoothAdapterState Bluetooth { get; private set; } = BluetoothAdapterState.On;
 
     /// <summary>Bluetooth-Adresse dieses PCs (für Kopplung und Wiederverbinden per Tastendruck).</summary>
     private ulong _hostAddress;
-
-    /// <summary>Funkadapter (ESP32/nRF52840) über USB, falls eingeschaltet.</summary>
-    private AdapterConnection? _adapter;
 
     public ControllerManager(Func<Settings> settings, PadFactory factory)
     {
@@ -157,46 +160,6 @@ internal sealed class ControllerManager : IAsyncDisposable
     {
         await StartBluetoothAsync();
         Track(Task.Run(() => HidScanLoopAsync(_cts.Token)));
-        ApplyAdapterSetting();
-    }
-
-    /// <summary>
-    /// Funkadapter (ESP32/nRF52840) nach der Einstellung starten oder stoppen. Jeder Controller am Adapter wird wie ein
-    /// normaler Controller eingehängt (<see cref="Attach"/>); die Eingaben kommen über USB statt über BLE.
-    /// </summary>
-    public void ApplyAdapterSetting()
-    {
-        if (_disposed)
-            return;
-        var s = _settings();
-        if (!s.UseAdapter)
-        {
-            _adapter?.Dispose();
-            _adapter = null;
-            return;
-        }
-        if (_adapter is not null)
-            return;
-        var adapter = new AdapterConnection();
-        adapter.ControllerArrived += link =>
-        {
-            if (!Attach(link))
-                link.MarkLost();
-        };
-        _adapter = adapter;
-        Track(Task.Run(async () =>
-        {
-            try
-            {
-                var port = await adapter.StartAsync(s.AdapterPort, _cts.Token);
-                if (port is null && !_disposed)
-                    Notify?.Invoke("Kein Funkadapter gefunden. Ist der ESP32/nRF52840 angeschlossen und die N-Connect-Firmware aufgespielt?");
-            }
-            catch (Exception e) when (e is not OperationCanceledException)
-            {
-                Log.Warn($"Funkadapter: {Log.Reason(e)}");
-            }
-        }));
     }
 
     private void Track(Task task)
@@ -214,7 +177,7 @@ internal sealed class ControllerManager : IAsyncDisposable
     {
         if (_disposed)
             return;
-        var problem = await CheckAdapterAsync();
+        var (state, problem) = await CheckAdapterAsync();
         if (_disposed)
             return; // während der Prüfung beendet
         // Nur bei Änderung melden und protokollieren (die Prüfung läuft alle 5 s, solange ein Problem besteht).
@@ -232,6 +195,7 @@ internal sealed class ControllerManager : IAsyncDisposable
             }
         }
         AdapterProblem = problem;
+        Bluetooth = state;
         Changed?.Invoke();
         if (AdapterProblem is not null)
         {
@@ -250,6 +214,7 @@ internal sealed class ControllerManager : IAsyncDisposable
         {
             Log.Error("Bluetooth-Suche konnte nicht starten", e);
             AdapterProblem = "Bluetooth-Suche konnte nicht starten.";
+            Bluetooth = BluetoothAdapterState.Off;
             Changed?.Invoke();
             _restartTimer.Change(5000, Timeout.Infinite);
         }
@@ -264,24 +229,25 @@ internal sealed class ControllerManager : IAsyncDisposable
         _ => "Bluetooth-Adapter (z. B. USB-Stick) einstecken bzw. Bluetooth in Windows aktivieren. Controller per USB funktionieren weiterhin.",
     };
 
-    private async Task<string?> CheckAdapterAsync()
+    private async Task<(BluetoothAdapterState State, string? Problem)> CheckAdapterAsync()
     {
         try
         {
             var adapter = await BluetoothAdapter.GetDefaultAsync();
             if (adapter is null)
-                return "Kein Bluetooth-Adapter gefunden.";
+                return (BluetoothAdapterState.Missing, "Kein Bluetooth-Adapter gefunden.");
             _hostAddress = adapter.BluetoothAddress;
             if (!adapter.IsLowEnergySupported || !adapter.IsCentralRoleSupported)
-                return "Dieser Bluetooth-Adapter unterstützt kein Bluetooth LE.";
+                return (BluetoothAdapterState.NoLe, "Dieser Bluetooth-Adapter unterstützt kein Bluetooth LE.");
             var radio = await adapter.GetRadioAsync();
             if (radio is not null && radio.State != RadioState.On)
-                return "Bluetooth ist ausgeschaltet.";
-            return null;
+                return (BluetoothAdapterState.Off, "Bluetooth ist ausgeschaltet.");
+            return (BluetoothAdapterState.On, null);
         }
         catch (Exception e)
         {
-            return $"Bluetooth nicht verfügbar: {e.Message}";
+            // Bluetooth-Dienst bzw. Treiber nicht erreichbar – für Kodi wie „kein Adapter“.
+            return (BluetoothAdapterState.Missing, $"Bluetooth nicht verfügbar: {e.Message}");
         }
     }
 
@@ -473,9 +439,9 @@ internal sealed class ControllerManager : IAsyncDisposable
             // Lizenzierte Kabel-Gamepads (HORI, PowerA, PDP): eigenes, einfaches Format.
             string? wiredPad = kind == ControllerKind.Unknown ? WiredSwitchPad.NameFromHidPath(path) : null;
             // Sony DualShock 4 / DualSense (USB und Bluetooth-Classic-HID). Unser eigener virtueller
-            // DualShock 4 (ViGEm) sieht genauso aus – an der Gerätehierarchie erkennbar (kein USB-/BT-Stamm).
+            // DualShock 4 (ViGEm) sieht genauso aus – an der Gerätehierarchie erkennbar (ViGEmBus statt USB-Host/Bluetooth).
             ControllerKind? sony = kind == ControllerKind.Unknown && wiredPad is null
-                && PlayStationPad.KindFromHidPath(path) is { } ps && IsPhysicalDevice(path) ? ps : null;
+                && PlayStationPad.KindFromHidPath(path) is { } ps && DeviceTree.IsPhysical(path) ? ps : null;
             if (kind == ControllerKind.Unknown && wiredPad is null && sony is null || _links.ContainsKey(path) || _connecting.ContainsKey(path))
                 continue;
             if (_retryAfter.TryGetValue(path, out long until) && Environment.TickCount64 < until)
@@ -491,23 +457,6 @@ internal sealed class ControllerManager : IAsyncDisposable
         }
     }
 
-    /// <summary>
-    /// Echtes Gerät (hängt an USB oder Bluetooth) oder virtuelles? Virtuelle Ausgabe-Controller wie unser
-    /// ViGEm-DualShock 4 hängen an einem Software-Knoten (SWD\…/ROOT\…) und dürfen nicht als Eingabe dienen.
-    /// </summary>
-    private static bool IsPhysicalDevice(string hidPath)
-    {
-        var id = UsbNative.GetInstanceId(hidPath);
-        for (int depth = 0; id is not null && depth < 6; depth++)
-        {
-            if (id.StartsWith("USB\\", StringComparison.OrdinalIgnoreCase)
-                || id.StartsWith("BTH", StringComparison.OrdinalIgnoreCase))
-                return true;
-            id = UsbNative.GetParentInstanceId(id);
-        }
-        return false;
-    }
-
     private async Task ConnectWiredPadAsync(string path, string name)
     {
         Changed?.Invoke();
@@ -515,7 +464,8 @@ internal sealed class ControllerManager : IAsyncDisposable
         {
             var link = await WiredPadLink.OpenAsync(path, name);
             _unreachable.TryRemove(path, out _);
-            Attach(link);
+            if (!Attach(link))
+                _retryAfter[path] = Environment.TickCount64 + 10000; // z. B. alle Spielerplätze belegt
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException or System.ComponentModel.Win32Exception)
         {
@@ -543,7 +493,9 @@ internal sealed class ControllerManager : IAsyncDisposable
                 ? await WiimoteHidLink.ConnectAsync(path, _settings, timeout.Token)
                 : await Switch1HidLink.ConnectAsync(path, kind, timeout.Token);
             _unreachable.TryRemove(path, out _);
-            Attach(link);
+            // Abgelehnt (alle Plätze belegt, ViGEm-Fehler): nicht alle 2 s neu öffnen und komplett initialisieren.
+            if (!Attach(link))
+                _retryAfter[path] = Environment.TickCount64 + 10000;
         }
         catch (OperationCanceledException) when (_disposed)
         {
@@ -763,12 +715,17 @@ internal sealed class ControllerManager : IAsyncDisposable
                 int index = FreeIndex(link.Address);
                 if (index < 0)
                 {
-                    Log.Warn($"{link.Id}: schon {MaxPlayers} Spieler – Controller wird nicht verwendet");
-                    ConnectionNotify?.Invoke($"Schon {MaxPlayers} Controller verbunden – {link.Kind.DisplayName()} wird nicht verwendet. Erst einen anderen trennen.");
+                    // Je Gerät nur einmal melden – der nächste Versuch folgt still nach der Wartezeit.
+                    if (_refusedFull.TryAdd(link.Id, 0))
+                    {
+                        Log.Warn($"{link.Id}: schon {MaxPlayers} Spieler – Controller wird nicht verwendet");
+                        ConnectionNotify?.Invoke($"Schon {MaxPlayers} Controller verbunden – {link.Kind.DisplayName()} wird nicht verwendet. Erst einen anderen trennen.");
+                    }
                     _links.TryRemove(link.Id, out _);
                     link.DisposeAsync().AsTask().Forget($"{link.Id}: Trennen");
                     return false;
                 }
+                _refusedFull.TryRemove(link.Id, out _);
                 try
                 {
                     _players.Add(NewPlayer(index, link));
@@ -840,6 +797,13 @@ internal sealed class ControllerManager : IAsyncDisposable
         var settings = _settings();
         if (!settings.HideFromGames || link.HidInstanceId is not { } id || settings.IsHidden(id) || _disposed)
             return;
+        // Doppelter Schutz: ein virtuelles Pad (eigenes ViGEm-Pad o. Ä.) nie verstecken – sonst sähen Spiele
+        // die eigene Ausgabe von N-Connect nicht mehr.
+        if (!DeviceTree.IsPhysicalInstance(id))
+        {
+            Log.Warn($"{link.Id}: virtuelles Gerät – wird nicht versteckt");
+            return;
+        }
         if (!HidHide.IsInstalled)
         {
             if (!_hidHideMissingNoted)
@@ -871,10 +835,10 @@ internal sealed class ControllerManager : IAsyncDisposable
 
     private async Task HideSoonAsync()
     {
+        List<string> ids = [];
         try
         {
             await Task.Delay(3000, _cts.Token); // zweiten Joy-Con des Paars abwarten – eine Abfrage für beide
-            List<string> ids;
             lock (_hidePending)
             {
                 ids = [.. _hidePending];
@@ -902,6 +866,16 @@ internal sealed class ControllerManager : IAsyncDisposable
         }
         catch (OperationCanceledException)
         {
+        }
+        catch (Exception e) when (e is not OutOfMemoryException)
+        {
+            // Unerwarteter Fehler (z. B. COM der Aufgabenplanung): nicht still im Hintergrund verschlucken und nicht
+            // bei jedem Controller erneut versuchen – der Benutzer kann es von Hand nachholen.
+            Log.Error("HidHide: Verstecken fehlgeschlagen", e);
+            lock (_hidePending)
+                _hideDeclined.UnionWith(ids);
+            if (!_disposed)
+                Notify?.Invoke("Original-Controller nicht versteckt (Abfrage abgebrochen). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“.");
         }
         finally
         {
@@ -1259,8 +1233,6 @@ internal sealed class ControllerManager : IAsyncDisposable
     public async ValueTask DisposeAsync()
     {
         _disposed = true;
-        _adapter?.Dispose();
-        _adapter = null;
         _restartTimer.Dispose();
         _inactivityTimer.Dispose();
         _cts.Cancel();
@@ -1287,6 +1259,22 @@ internal sealed class ControllerManager : IAsyncDisposable
         _links.Clear();
         _cts.Dispose();
     }
+}
+
+/// <summary>
+/// Zustand des Bluetooth-Adapters. In der Kodi-status.json als "on" | "off" | "missing" | "no_le"
+/// (<see cref="KodiStatusWriter.BluetoothValue"/>).
+/// </summary>
+internal enum BluetoothAdapterState
+{
+    /// <summary>Bereit – Switch-2-Controller werden gesucht.</summary>
+    On,
+    /// <summary>Ausgeschaltet (oder die Suche startet nicht) – USB und XInput laufen weiter.</summary>
+    Off,
+    /// <summary>Kein Adapter bzw. Bluetooth nicht erreichbar.</summary>
+    Missing,
+    /// <summary>Adapter ohne Bluetooth LE: keine Switch-2-Controller, klassische (Switch 1, Sony, Wii) gehen weiter.</summary>
+    NoLe,
 }
 
 /// <summary>Erkennung von Switch-1-Controllern an ihrem HID-Gerätepfad.</summary>

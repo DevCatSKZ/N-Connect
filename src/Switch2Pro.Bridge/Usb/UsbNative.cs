@@ -50,6 +50,13 @@ internal static class UsbNative
     [DllImport("cfgmgr32.dll", CharSet = CharSet.Unicode)]
     private static extern int CM_Get_Device_IDW(uint devInst, char[] buffer, uint length, uint flags);
 
+    [DllImport("cfgmgr32.dll", CharSet = CharSet.Unicode)]
+    private static extern int CM_Get_DevNode_Registry_PropertyW(uint devInst, uint property, out uint regType,
+        byte[]? buffer, ref uint length, uint flags);
+
+    private const uint CM_DRP_HARDWAREID = 0x02;
+    private const uint CM_DRP_SERVICE = 0x05;
+
     /// <summary>Pfade aller vorhandenen Geräteschnittstellen einer Klasse.</summary>
     public static List<string> GetInterfacePaths(Guid interfaceClass)
     {
@@ -89,10 +96,50 @@ internal static class UsbNative
             return null;
         if (CM_Get_Parent(out uint parent, node, 0) != CR_SUCCESS)
             return null;
+        return DeviceId(parent);
+    }
+
+    private static string? DeviceId(uint node)
+    {
         var buffer = new char[512];
-        if (CM_Get_Device_IDW(parent, buffer, (uint)buffer.Length, 0) != CR_SUCCESS)
+        if (CM_Get_Device_IDW(node, buffer, (uint)buffer.Length, 0) != CR_SUCCESS)
             return null;
         return new string(buffer).TrimEnd('\0');
+    }
+
+    /// <summary>
+    /// Das Gerät und alle Vorfahren bis zur Wurzel (HTREE\ROOT\0), jeweils mit Treiberdienst und Hardware-IDs –
+    /// für <see cref="DeviceTree.IsPhysicalChain"/>. Leer, wenn das Gerät nicht (mehr) vorhanden ist.
+    /// </summary>
+    public static List<DeviceNode> GetDeviceChain(string instanceId, int maxDepth)
+    {
+        var chain = new List<DeviceNode>();
+        if (CM_Locate_DevNodeW(out uint node, instanceId, 0) != CR_SUCCESS)
+            return chain;
+        for (int depth = 0; depth < maxDepth; depth++)
+        {
+            if (DeviceId(node) is not { } id)
+                break;
+            var service = RegistryStrings(node, CM_DRP_SERVICE);
+            chain.Add(new DeviceNode(id, service.Length > 0 ? service[0] : null, RegistryStrings(node, CM_DRP_HARDWAREID)));
+            if (CM_Get_Parent(out uint parent, node, 0) != CR_SUCCESS)
+                break;
+            node = parent;
+        }
+        return chain;
+    }
+
+    /// <summary>Text-Eigenschaft eines Geräteknotens (REG_SZ oder REG_MULTI_SZ); leer, wenn sie fehlt.</summary>
+    private static string[] RegistryStrings(uint node, uint property)
+    {
+        uint size = 0;
+        CM_Get_DevNode_Registry_PropertyW(node, property, out _, null, ref size, 0);
+        if (size == 0)
+            return [];
+        var buffer = new byte[size];
+        if (CM_Get_DevNode_Registry_PropertyW(node, property, out _, buffer, ref size, 0) != CR_SUCCESS)
+            return [];
+        return System.Text.Encoding.Unicode.GetString(buffer, 0, (int)size).Split('\0', StringSplitOptions.RemoveEmptyEntries);
     }
 
     // ---------- Dateien ----------

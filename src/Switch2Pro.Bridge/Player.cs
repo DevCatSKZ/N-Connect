@@ -27,6 +27,8 @@ internal sealed class Player : IDisposable
     private IVirtualPad? _pad;
     private bool _disposed;
     private bool _rumbling;
+    /// <summary>Schon protokolliert, dass ein Spiel vibrieren wollte, die Vibration aber ausgeschaltet ist (Fehlersuche).</summary>
+    private int _rumbleMutedLogged;
     private long _updates;
     private ulong? _mac;
 
@@ -830,7 +832,11 @@ internal sealed class Player : IDisposable
         var settings = _settings();
         float strength = settings.RumbleEnabled ? settings.RumbleStrengthFor(Kind) : 0f;
         if (strength <= 0f)
+        {
+            if ((large | small) != 0 && Interlocked.Exchange(ref _rumbleMutedLogged, 1) == 0)
+                Log.Info($"Spieler {Index + 1}: Vibrationswunsch vom Spiel, aber Vibration ist in den Einstellungen aus");
             large = small = 0;
+        }
         _rumbling = (large | small) != 0;
         foreach (var link in Links)
             link.SetRumble(large, small, strength);

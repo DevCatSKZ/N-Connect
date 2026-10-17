@@ -47,7 +47,16 @@ internal static class HidHide
     /// </summary>
     public static async Task<bool> HideAsync(IEnumerable<string> instanceIds)
     {
-        var ids = instanceIds.ToList();
+        // Virtuelle Geräte (eigene ViGEm-Pads) nie verstecken – Spiele sähen sonst die Ausgabe von N-Connect nicht.
+        var ids = instanceIds.Where(id =>
+        {
+            if (Usb.DeviceTree.IsPhysicalInstance(id))
+                return true;
+            Log.Warn($"HidHide: {id} ist virtuell oder nicht angeschlossen – wird nicht versteckt");
+            return false;
+        }).ToList();
+        if (ids.Count == 0)
+            return false;
         await Gate.WaitAsync();
         try
         {
@@ -61,7 +70,8 @@ internal static class HidHide
 
     /// <summary>
     /// Startet die geplante Aufgabe mit den IDs als Argument und wartet auf ihr Ergebnis. null, wenn die Aufgabe fehlt
-    /// oder für eine andere N-Connect.exe eingerichtet ist (z. B. Entwicklerversion) – dann der UAC-Weg.
+    /// (portable Variante, Registrierung im Setup gescheitert) oder für eine andere N-Connect.exe eingerichtet ist
+    /// (z. B. Entwicklerversion) – dann der UAC-Weg.
     /// </summary>
     private static async Task<bool?> HideViaTaskAsync(List<string> ids)
     {
@@ -83,26 +93,36 @@ internal static class HidHide
             before = task.LastRunTime;
             task.Run(string.Join('|', ids));
         }
-        catch (Exception e) when (e is System.Runtime.InteropServices.COMException or UnauthorizedAccessException
-                                      or Microsoft.CSharp.RuntimeBinder.RuntimeBinderException or ArgumentException)
+        catch (Exception e) when (e is not OutOfMemoryException)
         {
+            // Fehlende Aufgabe meldet die Aufgabenplanung als FileNotFoundException (0x80070002, Issue #1), dazu
+            // COMException, UnauthorizedAccessException, RuntimeBinderException … – in jedem Fall der UAC-Weg.
             Log.Info($"HidHide: Aufgabe nicht verfügbar ({Log.Reason(e)}) – frage per UAC");
             return null;
         }
         // Zustand: 2 = in Warteschlange, 4 = läuft; danach steht das Ergebnis (Rückgabewert des Helfers) bereit.
-        bool started = false;
-        for (var until = DateTime.UtcNow.AddSeconds(30); DateTime.UtcNow < until; )
+        try
         {
-            await Task.Delay(250);
-            int state = task.State;
-            if (state is 2 or 4)
-                started = true;
-            else if (started || (DateTime)task.LastRunTime > before)
+            bool started = false;
+            for (var until = DateTime.UtcNow.AddSeconds(30); DateTime.UtcNow < until; )
             {
-                int result = task.LastTaskResult;
-                Log.Info($"HidHide (Aufgabe): {string.Join(' ', ids)} → Ergebnis {result}");
-                return result == 0;
+                await Task.Delay(250);
+                int state = task.State;
+                if (state is 2 or 4)
+                    started = true;
+                else if (started || (DateTime)task.LastRunTime > before)
+                {
+                    int result = task.LastTaskResult;
+                    Log.Info($"HidHide (Aufgabe): {string.Join(' ', ids)} → Ergebnis {result}");
+                    return result == 0;
+                }
             }
+        }
+        catch (Exception e) when (e is not OutOfMemoryException)
+        {
+            // Die Aufgabe ist schon gestartet – nicht zusätzlich per UAC fragen.
+            Log.Warn($"HidHide (Aufgabe): Ergebnis nicht lesbar ({Log.Reason(e)})");
+            return false;
         }
         Log.Warn("HidHide (Aufgabe): keine Rückmeldung binnen 30 s");
         return false;
@@ -140,9 +160,10 @@ internal static class HidHide
 
     /// <summary>
     /// Helfer der geplanten Aufgabe (läuft als SYSTEM, Aufruf <c>--hidhide-helper "id1|id2"</c>). Die IDs kommen vom
-    /// angemeldeten Benutzer und werden deshalb streng geprüft: versteckt wird nur, was gerade als HID-Gerät angeschlossen
-    /// und ein Nintendo-/Sony-Controller bzw. bekanntes Kabel-Pad ist. Freigegeben wird nur diese EXE selbst. Schreibt keine
-    /// Dateien. Rückgabe: 0 = versteckt, 2 = nichts Gültiges angefragt, 3 = HidHide fehlt, sonst Code von HidHideCLI.
+    /// angemeldeten Benutzer und werden deshalb streng geprüft: versteckt wird nur, was gerade als HID-Gerät angeschlossen,
+    /// ein echtes Gerät (kein virtuelles Pad wie das eigene ViGEm-DualShock-4) und ein Nintendo-/Sony-Controller bzw.
+    /// bekanntes Kabel-Pad ist. Freigegeben wird nur diese EXE selbst. Schreibt keine Dateien.
+    /// Rückgabe: 0 = versteckt, 2 = nichts Gültiges angefragt, 3 = HidHide fehlt, sonst Code von HidHideCLI.
     /// </summary>
     public static int RunHelper(string[] args)
     {
@@ -154,7 +175,8 @@ internal static class HidHide
         var ids = new List<string>();
         foreach (var path in Usb.UsbNative.GetInterfacePaths(Usb.UsbNative.HidInterface))
         {
-            if (!IsKnownController(path) || Usb.UsbNative.GetInstanceId(path) is not { } id || !requested.Contains(id))
+            if (!IsKnownController(path) || Usb.UsbNative.GetInstanceId(path) is not { } id || !requested.Contains(id)
+                || !Usb.DeviceTree.IsPhysicalInstance(id))
                 continue;
             ids.Add(id);
         }
