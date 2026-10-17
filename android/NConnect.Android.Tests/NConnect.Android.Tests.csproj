@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Tests für die Teile der Android-App, die ohne Gerät prüfbar sind: Update-Prüfung (Release-Liste), Profile je Spiel,
+    Erkennung der App im Vordergrund, status.json-Vertrag und Übersetzungstabellen. Die Quelldateien haben keine
+    Android-Abhängigkeiten und werden direkt mitkompiliert (das Android-Projekt selbst lässt sich hier nicht laden).
+    Aufruf: dotnet test android/NConnect.Android.Tests
+  -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>NConnect.Android.Tests</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Switch2Pro.Protocol\Switch2Pro.Protocol.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\NConnect.Android\Core\UpdateCheck.Releases.cs" Link="App\UpdateCheck.Releases.cs" />
+    <Compile Include="..\NConnect.Android\Profiles\ProfileEdit.cs" Link="App\ProfileEdit.cs" />
+    <Compile Include="..\NConnect.Android\Profiles\GameProfileWatcher.Pick.cs" Link="App\GameProfileWatcher.Pick.cs" />
+    <Compile Include="..\NConnect.Android\Kodi\KodiStatusWriter.Contract.cs" Link="App\KodiStatusWriter.Contract.cs" />
+    <Compile Include="..\NConnect.Android\L.Texts.cs" Link="App\L.Texts.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+</Project>

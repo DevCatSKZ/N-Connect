@@ -34,6 +34,20 @@
     <package android:name="moe.shizuku.privileged.api" />
     <!-- Kodi erkennen (DevCatSKZ Repository einrichten) -->
     <package android:name="org.xbmc.kodi" />
+    <!-- „Profile je Spiel“: startbare Apps zur Auswahl anbieten (auch Fernseher-Apps) … -->
+    <intent>
+      <action android:name="android.intent.action.MAIN" />
+      <category android:name="android.intent.category.LAUNCHER" />
+    </intent>
+    <intent>
+      <action android:name="android.intent.action.MAIN" />
+      <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+    </intent>
+    <!-- … und Startbildschirme erkennen, damit ein Wechsel dorthin das Profil nicht umschaltet. -->
+    <intent>
+      <action android:name="android.intent.action.MAIN" />
+      <category android:name="android.intent.category.HOME" />
+    </intent>
   </queries>
 
   <application android:allowBackup="true"
