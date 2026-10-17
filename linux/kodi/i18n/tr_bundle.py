@@ -1,0 +1,40 @@
+# -*- coding: utf-8 -*-
+"""Texte des Bundle-Installers (script.nconnect.bundle) in allen 12 Sprachen – ID -> {Sprache: Text}, "en" ist die
+Quelle (msgid). generate.py schreibt daraus alle strings.po des Bundles (auch en_gb und de_de)."""
+
+BUNDLE = {
+    32000: {'en': 'Installed: {0}', 'de': 'Installiert: {0}', 'es': 'Instalado: {0}', 'fr': 'Installé : {0}',
+            'it': 'Installato: {0}', 'pt': 'Instalado: {0}', 'nl': 'Geïnstalleerd: {0}', 'pl': 'Zainstalowano: {0}',
+            'ru': 'Установлено: {0}', 'ja': 'インストール済み: {0}', 'zh': '已安装：{0}', 'ko': '설치됨: {0}'},
+    32001: {'en': 'Restart Kodi so that the add-ons are registered.',
+            'de': 'Kodi neu starten, damit die Add-ons registriert werden.',
+            'es': 'Reinicia Kodi para que se registren los add-ons.',
+            'fr': 'Redémarrez Kodi pour que les add-ons soient enregistrés.',
+            'it': 'Riavvia Kodi perché gli add-on vengano registrati.',
+            'pt': 'Reinicie o Kodi para que os add-ons sejam registados.',
+            'nl': 'Start Kodi opnieuw zodat de add-ons worden geregistreerd.',
+            'pl': 'Uruchom ponownie Kodi, aby dodatki zostały zarejestrowane.',
+            'ru': 'Перезапустите Kodi, чтобы дополнения были зарегистрированы.',
+            'ja': 'アドオンを登録するには Kodi を再起動してください。', 'zh': '请重启 Kodi 以注册这些插件。',
+            'ko': '애드온이 등록되도록 Kodi를 다시 시작하세요.'},
+    32002: {'en': 'All add-ons are already installed.', 'de': 'Alle Add-ons sind bereits installiert.',
+            'es': 'Todos los add-ons ya están instalados.', 'fr': 'Tous les add-ons sont déjà installés.',
+            'it': 'Tutti gli add-on sono già installati.', 'pt': 'Todos os add-ons já estão instalados.',
+            'nl': 'Alle add-ons zijn al geïnstalleerd.', 'pl': 'Wszystkie dodatki są już zainstalowane.',
+            'ru': 'Все дополнения уже установлены.', 'ja': 'すべてのアドオンはインストール済みです。', 'zh': '所有插件均已安装。',
+            'ko': '모든 애드온이 이미 설치되어 있습니다.'},
+    32003: {'en': 'Skin integration updated.', 'de': 'Skin-Einbindung aktualisiert.',
+            'es': 'Integración en el skin actualizada.', 'fr': 'Intégration au skin mise à jour.',
+            'it': 'Integrazione nella skin aggiornata.', 'pt': 'Integração no skin atualizada.',
+            'nl': 'Skin-integratie bijgewerkt.', 'pl': 'Integracja ze skórką zaktualizowana.',
+            'ru': 'Интеграция в скин обновлена.', 'ja': 'スキンへの組み込みを更新しました。', 'zh': '皮肤集成已更新。',
+            'ko': '스킨 통합을 업데이트했습니다.'},
+    32004: {'en': 'Restart Kodi now?', 'de': 'Kodi jetzt neu starten?', 'es': '¿Reiniciar Kodi ahora?',
+            'fr': 'Redémarrer Kodi maintenant ?', 'it': 'Riavviare Kodi adesso?', 'pt': 'Reiniciar o Kodi agora?',
+            'nl': 'Kodi nu opnieuw starten?', 'pl': 'Uruchomić ponownie Kodi teraz?', 'ru': 'Перезапустить Kodi сейчас?',
+            'ja': '今すぐ Kodi を再起動しますか？', 'zh': '现在重启 Kodi？', 'ko': '지금 Kodi를 다시 시작할까요?'},
+    # Untertitel des Menüpunkts und Name des Widgets in Aeon Nox Silvo („N-Connect – Controller“)
+    32005: {'en': 'Controllers', 'de': 'Controller', 'es': 'Mandos', 'fr': 'Manettes', 'it': 'Controller',
+            'pt': 'Comandos', 'nl': 'Controllers', 'pl': 'Kontrolery', 'ru': 'Контроллеры', 'ja': 'コントローラー',
+            'zh': '手柄', 'ko': '컨트롤러'},
+}

@@ -27,12 +27,17 @@ MENU_XML = os.path.join(SHORTCUTS_DIR, 'mainmenu.DATA.xml')
 PROPS_FILE = os.path.join(SHORTCUTS_DIR, SKIN_ID + '.properties')
 
 MENU_LABEL = 'N-Connect'
-MENU_LABEL2 = 'Controller'
 WIDGET_PATH = ('plugin://plugin.nconnect.status/?reload='
                '$INFO[Window(Home).Property(widgetreload)]'
                '$INFO[Window(Home).Property(widgetreload2)]'
                '$INFO[Window(Home).Property(NConnect.Reload)]')
 ICON_PATH = os.path.join(ADDONS_DIR, 'service.nconnect', 'resources', 'icon.png')
+
+
+def text(string_id, *args):
+    """Übersetzter Text aus resources/language (Kodis Sprache, sonst Englisch); {0} … werden ersetzt."""
+    value = ADDON.getLocalizedString(string_id)
+    return value.format(*args) if args else value
 
 
 def widget_props():
@@ -41,7 +46,7 @@ def widget_props():
         thumb.replace('/', '%2f').replace(':', '%3a'))
     return [
         ('widget', 'Addon'),
-        ('widgetName', 'N-Connect - Controller'),
+        ('widgetName', '{0} - {1}'.format(MENU_LABEL, text(32005))),
         ('widgetType', 'videos'),
         ('widgetTarget', 'videos'),
         ('widgetPath', WIDGET_PATH),
@@ -92,9 +97,19 @@ def install_addons():
     return installed
 
 
+def _read(path):
+    with open(path, encoding='utf-8') as f:
+        return f.read()
+
+
+def _write(path, content):
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write(content)
+
+
 def shortcut_exists():
     try:
-        return 'service.nconnect' in open(MENU_XML, encoding='utf-8').read()
+        return 'service.nconnect' in _read(MENU_XML)
     except OSError:
         return False
 
@@ -108,8 +123,8 @@ def integrate_silvo():
     # --- Menüpunkt in mainmenu.DATA.xml ---
     if not os.path.isfile(MENU_XML):
         root = '<shortcuts>\n</shortcuts>'
-        open(MENU_XML, 'w', encoding='utf-8').write(root)
-    xml = open(MENU_XML, encoding='utf-8').read()
+        _write(MENU_XML, root)
+    xml = _read(MENU_XML)
     if 'service.nconnect' not in xml:
         thumb = ICON_PATH.replace('\\', '/')
         thumb = 'image://{0}/'.format(
@@ -121,7 +136,7 @@ def integrate_silvo():
                 '\t\t<icon>DefaultShortcut.png</icon>\n'
                 '\t\t<thumb>{2}</thumb>\n'
                 '\t\t<action>RunScript(service.nconnect)</action>\n'
-                '\t\t</shortcut>\n').format(MENU_LABEL, MENU_LABEL2, thumb)
+                '\t\t</shortcut>\n').format(MENU_LABEL, text(32005), thumb)
         marker = '<defaultID>settings</defaultID>'
         pos = xml.find(marker)
         if pos > 0:
@@ -129,13 +144,13 @@ def integrate_silvo():
             xml = xml[:pos] + item + xml[pos:]
         else:
             xml = xml.replace('</shortcuts>', item + '</shortcuts>')
-        open(MENU_XML, 'w', encoding='utf-8').write(xml)
+        _write(MENU_XML, xml)
         changed = True
         log('Menueeintrag hinzugefuegt')
 
     # --- Widget-Eigenschaften ---
     try:
-        data = json.load(open(PROPS_FILE, encoding='utf-8'))
+        data = json.loads(_read(PROPS_FILE))
     except (OSError, ValueError):
         data = []
     have = {tuple(e[:3]) for e in data}
@@ -146,7 +161,7 @@ def integrate_silvo():
         data.append([key[0], key[1], prop, value])
         changed = True
     if changed:
-        json.dump(data, open(PROPS_FILE, 'w', encoding='utf-8'), indent=4)
+        _write(PROPS_FILE, json.dumps(data, indent=4))
         log('Widget-Properties geschrieben')
     return changed
 
@@ -161,15 +176,13 @@ def run(interactive=True):
     if interactive:
         dialog = xbmcgui.Dialog()
         if installed:
-            dialog.ok('N-Connect Bundle',
-                      'Installiert: {0}\n\nKodi neu starten, damit die '
-                      'Addons registriert werden.'.format(', '.join(installed)))
+            dialog.ok('N-Connect Bundle', text(32000, ', '.join(installed)) + '\n\n' + text(32001))
         else:
-            msg = 'Alle Addons bereits installiert.'
+            msg = text(32002)
             if skin_done:
-                msg += '\nSkin-Integration aktualisiert.'
+                msg += '\n' + text(32003)
             dialog.ok('N-Connect Bundle', msg)
         if installed or skin_done:
-            if dialog.yesno('N-Connect Bundle', 'Kodi jetzt neu starten?'):
+            if dialog.yesno('N-Connect Bundle', text(32004)):
                 xbmc.executebuiltin('RestartApp')
     return installed, skin_done
