@@ -118,12 +118,11 @@ internal static class Theme
     /// <summary>Schema zu einer Kennung ("neon", "aurora" …); unbekannt oder null = Neon.</summary>
     public static Scheme SchemeById(string? id) => Schemes.FirstOrDefault(s => s.Id == id) ?? Schemes[0];
 
-    /// <summary>Darstellung festlegen: "dark" (Standard), "light" oder "system"; Farbschema (null = Neon); Mica nur ab
-    /// Windows 11. Ohne App-Einstellung (null) gilt die Themawahl des Installers aus der Registry, sonst Dunkel.
-    /// Nicht die Windows-Akzentfarbe – die sieht je nach Nutzerwahl beliebig aus (z. B. pink).</summary>
+    /// <summary>Darstellung festlegen: "dark" (Standard, auch null = nie gewählt), "light" oder "system" (wie Windows);
+    /// Farbschema (null = Neon); Mica nur ab Windows 11. Die Wahl im Installer steht schon in den Einstellungen
+    /// (<see cref="InstallerChoices"/>). Nicht die Windows-Akzentfarbe – die sieht je nach Nutzerwahl beliebig aus (z. B. pink).</summary>
     public static void Init(string? mode, bool transparency, string? scheme = null)
     {
-        mode ??= InstallerTheme();
         bool dark = mode switch
         {
             "light" => false,
@@ -133,20 +132,6 @@ internal static class Theme
         ActiveScheme = SchemeById(scheme);
         Current = dark ? ActiveScheme.DarkPalette : ActiveScheme.LightPalette;
         Mica = transparency && OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22621);
-    }
-
-    /// <summary>Themawahl des Installers (HKCU\Software\N-Connect\Theme): "dark", "light" oder "system".</summary>
-    private static string? InstallerTheme()
-    {
-        try
-        {
-            using var key = Registry.CurrentUser.OpenSubKey(@"Software\N-Connect");
-            return key?.GetValue("Theme") is string v && v is "dark" or "light" or "system" ? v : null;
-        }
-        catch (Exception e) when (e is System.Security.SecurityException or UnauthorizedAccessException or IOException)
-        {
-            return null;
-        }
     }
 
     private static bool WindowsUsesLightApps()
@@ -498,6 +483,16 @@ internal static class Theme
     /// <summary>Meldung im Stil der Darstellung (statt der immer hellen MessageBox von Windows).</summary>
     public static DialogResult Message(IWin32Window? owner, string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon)
     {
+        Icon? symbol = icon switch
+        {
+            MessageBoxIcon.Error => SystemIcons.Error,
+            MessageBoxIcon.Warning => SystemIcons.Warning,
+            MessageBoxIcon.Question => SystemIcons.Question,
+            MessageBoxIcon.Information => SystemIcons.Information,
+            _ => null,
+        };
+        // Vor dem Fenster angelegt, damit es nach dem Fenster (und seiner PictureBox) freigegeben wird.
+        using var symbolImage = symbol?.ToBitmap();
         using var form = new UiForm
         {
             Text = caption, FormBorderStyle = FormBorderStyle.FixedDialog, MinimizeBox = false, MaximizeBox = false,
@@ -507,16 +502,8 @@ internal static class Theme
             Padding = new Padding(0),
         };
         var layout = new TableLayoutPanel { AutoSize = true, ColumnCount = 2, RowCount = 2, Padding = new Padding(UiScale.Px(20), UiScale.Px(20), UiScale.Px(20), UiScale.Px(12)) };
-        Icon? symbol = icon switch
-        {
-            MessageBoxIcon.Error => SystemIcons.Error,
-            MessageBoxIcon.Warning => SystemIcons.Warning,
-            MessageBoxIcon.Question => SystemIcons.Question,
-            MessageBoxIcon.Information => SystemIcons.Information,
-            _ => null,
-        };
-        if (symbol is not null)
-            layout.Controls.Add(new PictureBox { Image = symbol.ToBitmap(), Size = new Size(UiScale.Px(32), UiScale.Px(32)), Margin = new Padding(0, 0, UiScale.Px(14), 0) }, 0, 0);
+        if (symbolImage is not null)
+            layout.Controls.Add(new PictureBox { Image = symbolImage, Size = new Size(UiScale.Px(32), UiScale.Px(32)), Margin = new Padding(0, 0, UiScale.Px(14), 0) }, 0, 0);
         layout.Controls.Add(new Label { Text = text, AutoSize = true, MaximumSize = new Size(UiScale.Px(460), 0), Margin = new Padding(0, UiScale.Px(6), 0, UiScale.Px(16)) }, 1, 0);
 
         var bar = new FlowLayoutPanel { AutoSize = true, FlowDirection = FlowDirection.RightToLeft, Anchor = AnchorStyles.Right, Margin = new Padding(0) };
@@ -628,92 +615,5 @@ internal static class Theme
         public override Color CheckBackground => Blend(P.SurfaceHover, Accent, 0.3f);
         public override Color CheckSelectedBackground => Blend(P.SurfaceHover, Accent, 0.4f);
         public override Color CheckPressedBackground => Blend(P.SurfaceHover, Accent, 0.4f);
-    }
-}
-
-/// <summary>Eintrag der Navigation oben (wie in Windows 11): Text, die aktive Seite mit Akzent-Unterstrich.</summary>
-internal sealed class NavButton : Control
-{
-    private bool _selected, _hover;
-
-    public NavButton(string text, Action click)
-    {
-        Text = Tr.T(text);
-        Font = new Font("Segoe UI Semibold", 10.5f);
-        Size = new Size(TextRenderer.MeasureText(Text, Font).Width + 36, 38);
-        Margin = new Padding(0, 0, UiScale.Px(6), 0);
-        Cursor = Cursors.Hand;
-        SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint, true);
-        BackColor = Theme.Backdrop;
-        Click += (_, _) => click();
-        MouseEnter += (_, _) => { _hover = true; Invalidate(); };
-        MouseLeave += (_, _) => { _hover = false; Invalidate(); };
-    }
-
-    public bool Selected
-    {
-        get => _selected;
-        set { _selected = value; Invalidate(); }
-    }
-
-    protected override void OnPaint(PaintEventArgs e)
-    {
-        var g = e.Graphics;
-        g.SmoothingMode = SmoothingMode.AntiAlias;
-        var p = Theme.Current;
-        if (_selected || _hover)
-        {
-            using var path = Theme.RoundedRect(new RectangleF(0.5f, 0.5f, Width - 1.5f, Height - 1.5f), 6);
-            using var fill = new SolidBrush(_selected ? p.Surface : Theme.Blend(p.Window, p.Surface, 0.6f));
-            g.FillPath(fill, path);
-        }
-        TextRenderer.DrawText(g, Text, Font, new Rectangle(0, 0, Width, Height - 4), _selected ? p.Text : p.TextMuted,
-            TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
-        if (_selected)
-        {
-            using var accent = new SolidBrush(Theme.Accent);
-            using var bar = Theme.RoundedRect(new RectangleF(Width / 2f - 12, Height - 5, 24, 3), 1.5f);
-            g.FillPath(accent, bar);
-        }
-    }
-}
-
-/// <summary>
-/// Abschnitt im Stil von Windows 11 (wie die Kacheln in den Windows-Einstellungen): abgerundete Fläche mit dünnem
-/// Rand und Überschrift. Ersetzt die altmodische GroupBox.
-/// </summary>
-internal sealed class Section : Panel
-{
-    private readonly Label _title;
-
-    public Section(string title, Control content)
-    {
-        AutoSize = true;
-        AutoSizeMode = AutoSizeMode.GrowAndShrink;
-        Padding = new Padding(UiScale.Px(16), UiScale.Px(40), UiScale.Px(16), UiScale.Px(14));
-        Margin = new Padding(0, 0, 0, UiScale.Px(10));
-        BackColor = Theme.Backdrop;
-        DoubleBuffered = true;
-        _title = new Label
-        {
-            Text = title, AutoSize = true, Location = new Point(UiScale.Px(16), UiScale.Px(12)), Font = UiFonts.Strong,
-            BackColor = Theme.Current.Surface, ForeColor = Theme.Current.Text,
-        };
-        content.BackColor = Theme.Current.Surface;
-        content.Location = new Point(Padding.Left, Padding.Top);
-        Controls.Add(content);
-        Controls.Add(_title);
-    }
-
-    protected override void OnPaint(PaintEventArgs e)
-    {
-        var g = e.Graphics;
-        g.SmoothingMode = SmoothingMode.AntiAlias;
-        var r = new RectangleF(0.5f, 0.5f, Width - 1.5f, Height - 1.5f);
-        using var path = Theme.RoundedRect(r, 8);
-        using (var fill = new SolidBrush(Theme.Current.Surface))
-            g.FillPath(fill, path);
-        using var pen = new Pen(Theme.Current.Border, 1f);
-        g.DrawPath(pen, path);
     }
 }

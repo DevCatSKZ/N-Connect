@@ -25,6 +25,23 @@ internal sealed class PadFactory : IDisposable
 
     private PadFactory(ViGEmClient client) => _client = client;
 
+    /// <summary>Installierte ViGEmBus-Treiberversion (aus ViGEmBus.sys), null = Treiber fehlt.</summary>
+    public static string? DriverVersion
+    {
+        get
+        {
+            try
+            {
+                string sys = Path.Combine(Environment.SystemDirectory, "drivers", "ViGEmBus.sys");
+                return File.Exists(sys) ? System.Diagnostics.FileVersionInfo.GetVersionInfo(sys).FileVersion ?? "?" : null;
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException)
+            {
+                return null;
+            }
+        }
+    }
+
     /// <summary>Liefert null, wenn der ViGEmBus-Treiber fehlt.</summary>
     public static PadFactory? TryCreate()
     {

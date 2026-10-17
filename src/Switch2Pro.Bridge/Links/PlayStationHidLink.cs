@@ -16,7 +16,12 @@ internal sealed class PlayStationHidLink : IControllerLink
     private readonly CancellationTokenSource _cts = new();
     private readonly RateMeter _rate = new();
     private readonly bool _bluetooth;
+    /// <summary>Virtuelles Gerät (z. B. ViGEm-Pad): nie Vibration/Lichtleiste hineinschreiben.</summary>
+    private readonly bool _virtual;
     private readonly object _effectGate = new();
+    /// <summary>Weckt die Sende-Schleife; sie schickt jeweils den neuesten Stand (Vibration, Lichtleiste, LEDs).</summary>
+    private readonly SemaphoreSlim _effectSignal = new(0, int.MaxValue);
+    private int _effectPending, _effectFailures, _rumbleSent;
     private int _closed, _lostRaised;
 
     private byte _rumbleSmall, _rumbleLarge;
@@ -54,6 +59,11 @@ internal sealed class PlayStationHidLink : IControllerLink
         HidInstanceId = UsbNative.GetInstanceId(path);
         Address = bluetooth ? BluetoothAddress(path) : $"USB:{HidInstanceId ?? path}";
         _playerIndex = -1;
+        // Die HID-Suche nimmt virtuelle Pads gar nicht erst an; falls doch einmal eins durchrutscht, darf es keine
+        // Vibration und Lichtleiste in ein fremdes (oder das eigene vorige) virtuelle Pad zurückschreiben.
+        _virtual = !DeviceTree.IsPhysical(path);
+        if (_virtual)
+            Log.Warn($"{path}: virtuelles Gerät – Vibration und Lichtleiste werden nicht gesendet");
     }
 
     /// <summary>Bluetooth-Adresse des Controllers aus der Gerätehierarchie (BTH\DEV_AABBCCDDEEFF).</summary>
@@ -90,13 +100,14 @@ internal sealed class PlayStationHidLink : IControllerLink
 
             // DualSense über Bluetooth: ein erster Ausgabebericht schaltet die vollen Berichte ein
             // und setzt gleich Lichtleiste + Spieler-LEDs (SDL: LED-Reset beim Verbinden).
-            if (bluetooth && kind == ControllerKind.DualSense)
+            if (bluetooth && kind == ControllerKind.DualSense && !link._virtual)
             {
                 var report = link.BuildEffect(0, 0);
                 await hid.WriteAsync(report, ct);
             }
 
             link._readTask = Task.Run(() => link.ReadLoopAsync(link._cts.Token));
+            Task.Run(() => link.EffectLoopAsync(link._cts.Token)).Forget($"{path}: Ausgabeberichte");
             Log.Info($"{link.ProductName ?? kind.DisplayName()} bereit ({(bluetooth ? "Bluetooth" : "USB")}, {path})");
             return link;
         }
@@ -202,22 +213,78 @@ internal sealed class PlayStationHidLink : IControllerLink
         }
     }
 
+    /// <summary>
+    /// Neuen Stand zum Senden vormerken. Kehrt sofort zurück: Aufgerufen wird das aus dem ViGEm-Rückkanal
+    /// (Vibration vom Spiel) – ein hängender Bluetooth-Schreibvorgang darf ihn nicht blockieren.
+    /// </summary>
     private void SendEffect()
     {
-        if (_closed != 0)
+        if (_closed != 0 || _virtual)
             return;
+        if (Interlocked.Exchange(ref _effectPending, 1) == 0)
+            _effectSignal.Release();
+    }
+
+    /// <summary>Sende-Schleife: schickt jeweils den zuletzt gewünschten Stand (Zwischenstände entfallen).</summary>
+    private async Task EffectLoopAsync(CancellationToken ct)
+    {
         try
         {
-            var report = BuildEffect(_rumbleSmall, _rumbleLarge);
-            // Bluetooth-Stacks lehnen WriteFile für Ausgabeberichte teils ab → über den Steuerkanal.
-            if (!_hid.WriteAsync(report, _cts.Token).Wait(500) && !_hid.SetOutputReport(report))
-                Log.Warn($"{Id}: Ausgabebericht nicht gesendet");
+            while (!ct.IsCancellationRequested)
+            {
+                await _effectSignal.WaitAsync(ct);
+                if (Interlocked.Exchange(ref _effectPending, 0) == 0)
+                    continue;
+                byte small, large;
+                lock (_effectGate)
+                    (small, large) = (_rumbleSmall, _rumbleLarge);
+                var report = BuildEffect(small, large);
+                try
+                {
+                    if (await WriteEffectAsync(report, ct))
+                    {
+                        Volatile.Write(ref _rumbleSent, (small | large) != 0 ? 1 : 0);
+                        _effectFailures = 0;
+                    }
+                    else if (_effectFailures++ == 0)
+                    {
+                        Log.Warn($"{Id}: Ausgabebericht nicht gesendet");
+                    }
+                }
+                catch (Exception e) when (e is not (OperationCanceledException or ObjectDisposedException or OutOfMemoryException))
+                {
+                    // Nur den ersten Fehler einer Folge melden; die nächsten Wünsche werden weiter versucht.
+                    if (_closed == 0 && _effectFailures++ == 0)
+                        Log.Warn($"{Id}: Ausgabebericht fehlgeschlagen ({Log.Reason(e)})");
+                }
+            }
         }
-        catch (Exception e) when (e is IOException or ObjectDisposedException or OperationCanceledException or AggregateException)
+        catch (Exception e) when (e is OperationCanceledException or ObjectDisposedException)
         {
-            if (_closed == 0)
-                Log.Warn($"{Id}: Ausgabebericht fehlgeschlagen ({Log.Reason(e)})");
+            // Verbindung beendet
         }
+    }
+
+    /// <summary>Ausgabebericht schreiben; true, wenn er raus ist.</summary>
+    private async Task<bool> WriteEffectAsync(byte[] report, CancellationToken ct)
+    {
+        var write = _hid.WriteAsync(report, ct);
+        try
+        {
+            await write.WaitAsync(TimeSpan.FromMilliseconds(500), ct);
+            return true;
+        }
+        catch (TimeoutException)
+        {
+            write.Forget($"{Id}: Ausgabebericht"); // läuft noch – einen späteren Fehler trotzdem beobachten
+        }
+        catch (OperationCanceledException) when (!write.IsCompleted)
+        {
+            write.Forget($"{Id}: Ausgabebericht");
+            throw;
+        }
+        // Bluetooth-Stacks lehnen WriteFile für Ausgabeberichte teils ab (hängt) → über den Steuerkanal.
+        return _hid.SetOutputReport(report);
     }
 
     public void SetRumble(byte large, byte small, float strength)
@@ -257,12 +324,29 @@ internal sealed class PlayStationHidLink : IControllerLink
             Lost?.Invoke(this);
     }
 
-    public ValueTask DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         if (Interlocked.Exchange(ref _closed, 1) == 1)
-            return ValueTask.CompletedTask;
+            return;
         _cts.Cancel();
+        // Lief zuletzt Vibration (z. B. von Hand getrennt, Controller hängt noch am Kabel): einmal „aus“ schicken –
+        // die Sende-Schleife ist schon beendet und hätte den Stopp aus Player.StopRumble evtl. nicht mehr gesendet.
+        if (Volatile.Read(ref _rumbleSent) == 1)
+        {
+            var stop = _hid.WriteAsync(BuildEffect(0, 0), CancellationToken.None);
+            try
+            {
+                await stop.WaitAsync(TimeSpan.FromMilliseconds(200));
+            }
+            catch (TimeoutException)
+            {
+                stop.Forget($"{Id}: Vibration aus"); // hängt – einen späteren Fehler trotzdem beobachten
+            }
+            catch (Exception)
+            {
+                // Controller schon weg.
+            }
+        }
         _hid.Dispose();
-        return ValueTask.CompletedTask;
     }
 }

@@ -23,7 +23,9 @@ Fundstellen in Klammern (`Datei`/`Klasse`), damit sich Details schnell nachschla
 | DualSense / DualSense Edge (Sony) | USB und Bluetooth Classic HID (VID 054C, PID 0CE6/0DF2) | wie DualShock 4 + Mikro-Taste, Edge-Backtasten | Vibration, Lichtleiste, Spieler-LEDs, Mikro-LED |
 | Xbox-Controller (360, One, Series, Elite, XInput-kompatible) | beliebig (USB, Bluetooth, Xbox-Wireless-Adapter) – über **XInput** | Tasten, Sticks, analoge Trigger, Guide-Taste, Akku | Vibration direkt über XInput; **nativ**, kein virtueller Controller |
 
-Bis zu **8 Spieler** gleichzeitig (`ControllerManager.MaxPlayers`). Der 9. Controller wird abgewiesen (Einblendung).
+Bis zu **8 Spieler** gleichzeitig (`ControllerManager.MaxPlayers`). Der 9. Controller wird abgewiesen (Einblendung
+je Gerät nur einmal) und auf jedem Weg (Bluetooth LE, Switch 1/NSO/Wii, Kabel-Pads, Sony, XInput, USB) erst nach 10 s
+erneut versucht – ebenso, wenn ViGEm keinen virtuellen Controller anlegen kann.
 
 ---
 
@@ -109,10 +111,19 @@ Bis zu **8 Spieler** gleichzeitig (`ControllerManager.MaxPlayers`). Der 9. Contr
   `HidHideCLI --app-reg <N-Connect> --dev-hide … --cloak-on` – **ohne Rückfrage** über die geplante Aufgabe
   „N-Connect HidHide“ (vom Installer angelegt, läuft als SYSTEM, Benutzer dürfen sie nur starten; `HidHide.HideViaTaskAsync`
   startet sie mit den IDs als `$(Arg0)`, der Helfer `N-Connect.exe --hidhide-helper` versteckt nur gerade angeschlossene
-  Nintendo-Controller/Kabel-Pads und gibt nur sich selbst frei, schreibt keine Dateien). Fehlt die Aufgabe oder gehört
-  sie zu einer anderen EXE (Entwicklerversion): **eine** UAC-Abfrage wie bisher. Erfolg → `HiddenDevices`, Meldung
-  (läuft Steam: „Steam einmal neu starten“ – Steam hält sein schon geöffnetes Handle). Abgebrochen → in dieser
-  Sitzung nicht erneut fragen; Nachholen per Karte → Extras → „Doppelt angezeigt?“ oder Einstellung aus/ein.
+  Nintendo-/Sony-Controller und Kabel-Pads und gibt nur sich selbst frei, schreibt keine Dateien). Fehlt die Aufgabe
+  (portable Variante, Registrierung im Setup gescheitert – die Aufgabenplanung meldet das als `FileNotFoundException`
+  0x80070002), ist sie nicht lesbar oder gehört sie zu einer anderen EXE (Entwicklerversion): **eine** UAC-Abfrage.
+  Jeder andere Fehler der Aufgabenplanung führt ebenfalls zur UAC-Abfrage statt still abzubrechen (bis 1.0.21 blieb das
+  Verstecken dann ohne Meldung aus, Issue #1). Erfolg → `HiddenDevices`, Meldung
+  (läuft Steam: „Steam einmal neu starten“ – Steam hält sein schon geöffnetes Handle). Abgebrochen oder fehlgeschlagen →
+  protokolliert, Meldung, in dieser Sitzung nicht erneut fragen; die Meldung sagt „Abfrage abgebrochen“ nur, wenn die
+  UAC-Abfrage abgelehnt wurde (Win32-Fehler 1223, `HidHide.HideResult.Declined`), sonst „Fehler, Details im Protokoll“
+  (Fehlercode der Aufgabe oder von HidHideCLI, keine Rückmeldung, Ausnahme). Nachholen per Karte → Extras → „Doppelt
+  angezeigt?“ (Fehler dort: Meldung „HidHide konnte nicht eingerichtet werden …“) oder Einstellung aus/ein.
+- **Nie versteckt werden virtuelle Geräte** (eigene ViGEm-Pads und die anderer Programme): `QueueHide`,
+  `HidHide.HideAsync` und der Aufgaben-Helfer prüfen jede ID mit `DeviceTree.IsPhysicalInstance` (siehe 2.5) –
+  sonst sähen Spiele die Ausgabe von N-Connect nicht mehr.
 - Bluetooth-Instanz-IDs ändern sich nach jedem Neukoppeln → dann wird erneut versteckt (mit Aufgabe ohne Abfrage).
 - HidHide fehlt → einmalige Meldung, auf „Allgemein“ Knopf „HidHide installieren …“. Der Installer installiert
   HidHide **immer** still mit, wenn es fehlt (keine Auswahl; danach fragt das Setup nach einem Neustart), trägt
@@ -153,7 +164,16 @@ Bis zu **8 Spieler** gleichzeitig (`ControllerManager.MaxPlayers`). Der 9. Contr
   angezeigt.
 - **Sony über HID** (`PlayStationHidLink`, Protokoll `PlayStationPad`): Sony-HID-Pfade (054C:05C4/09CC/0BA0/0CE6/
   0DF2) werden im selben 2-s-Suchlauf gefunden; USB- und Bluetooth-Pfade sind unterscheidbar (`vid_054c` vs.
-  `vid&0002054c`). Der eigene virtuelle DualShock 4 (ViGEm) wird an der Gerätehierarchie erkannt und übersprungen.
+  `vid&0002054c`).
+- **Eigener virtueller DualShock 4 (ViGEm) nie als Eingabe** (`DeviceTree.IsPhysical`, Unit-Tests in
+  `tests/Switch2Pro.Bridge.Tests`): ViGEm-Pads melden sich als USB-Geräte (`USB\VID_054C&PID_05C4\…`) unter dem
+  Root-Knoten des ViGEm-Busses (`ROOT\SYSTEM\000n`, Dienst `ViGEmBus`, Hardware-ID `Nefarius\ViGEmBus\Gen1`). Geprüft wird
+  die ganze Vorfahrenkette bis zur Wurzel: virtuell, wenn ein Knoten zum ViGEmBus gehört (Dienst oder Hardware-ID) oder
+  über der USB-Kette zuerst ein Software-Knoten (`ROOT\`, `SWD\`) bzw. die Wurzel kommt; echt nur, wenn vorher ein
+  USB-Host/Hub (`USB\ROOT_HUB…`, `PCI\…`) oder der Bluetooth-Stack (`BTH…`) erreicht wird. Ein `ROOT\`-Vorfahre allein
+  sagt nichts (echte Geräte haben oben `ROOT\ACPI_HAL\0000`). Bis 1.0.21 genügte ein `USB\`-Vorfahre – mit Ausgabeart
+  DualShock 4 entstanden so bis zu 8 Geister-Spieler (Issue #1). Zusätzlich schreibt `PlayStationHidLink` in ein als
+  virtuell erkanntes Gerät keine Vibration und Lichtleiste.
 - **Berichte:** DualShock 4 USB (0x01) und Bluetooth (0x11, CRC32), DualSense USB voll (0x01), einfach (0x01 BT)
   und Bluetooth erweitert (0x31, CRC32) – jeweils Tasten, D-Pad, analoge Trigger, Sticks, Touchpad-Klick, PS-Taste,
   DS5-Mikro und Edge-Tasten (Byte 10), Gyro/Beschl. (auf die internen Switch-2-Achsen gedreht), Akku.
@@ -162,10 +182,13 @@ Bis zu **8 Spieler** gleichzeitig (`ControllerManager.MaxPlayers`). Der 9. Contr
   CRC), womit der Controller in den erweiterten Modus wechselt (Gyro, Akku, Touchpad).
 - **Ausgaben an den Sony-Controller:** Vibration (DS4 0x05/0x11, DS5 0x02/0x31 inkl. Trigger-Effekte-Felder),
   Lichtleiste (vom virtuellen DS4-Ausgang des Spiels durchgereicht, `IControllerLink.SetLightbarAsync`),
-  DS5-Spieler-LEDs und Mikro-LED; Bluetooth-Berichte mit Seed 0xA2 + CRC32.
+  DS5-Spieler-LEDs und Mikro-LED; Bluetooth-Berichte mit Seed 0xA2 + CRC32. Gesendet wird über eine eigene
+  Sende-Schleife, die jeweils den neuesten Wunsch nimmt (der ViGEm-Rückkanal wartet nie auf Bluetooth); hängt WriteFile
+  länger als 500 ms, geht der Bericht über den Steuerkanal (`HidD_SetOutputReport`). Lief beim Trennen noch Vibration,
+  wird einmal „aus“ gesendet.
 - **Metadaten:** Seriennummer/Adresse und Firmware über Feature-Berichte (DS4 0x12, DS5 0x09/0x20); die USB-Instanz-
   ID wird **nicht** als Seriennummer ausgegeben. Adressschlüssel: Bluetooth = MAC, USB = `USB:<Instanz>`.
-- **Verstecken:** Sony-HID-Controller stehen wie Nintendo-Geräte auf der HidHide-Whitelist (`HidHide.IsKnownDevice`
+- **Verstecken:** Sony-HID-Controller stehen wie Nintendo-Geräte auf der HidHide-Whitelist (`HidHide.IsKnownController`
   und die Aufgaben-Helfer-Prüfung) und werden mit aktivem virtuellen Ausgang versteckt. **Native Xbox-Controller
   werden nie versteckt** – das native Gerät ist dort der Spiele-Eingang.
 
@@ -274,6 +297,10 @@ Bis zu **8 Spieler** gleichzeitig (`ControllerManager.MaxPlayers`). Der 9. Contr
 - **Analoge Trigger** (GameCube): Totzone 0–0,5 (Standard 0,05), „voll ab“ 0,5–1.
 - **Vibration**: an/aus, Stärke 0–1 (Standard 0,8), je Controller-Art. Switch 2: großer Motor → tiefes Band
   (0x112), kleiner → hohes Band (0x187), Amplitude max. 453/1023 (wie SDL, schont die Motoren).
+- **Switch 1/NSO** (`Switch1HidLink.RumbleLoopAsync`, Bericht 0x10 alle 30 ms, wie SDL): Für die Fehlersuche steht je
+  Verbindung einmal im Protokoll, wann der erste Vibrationswunsch ankommt (Werte, Stärke) und wann der erste Bericht
+  0x10 gesendet wurde; wünscht ein Spiel Vibration, obwohl sie in den Einstellungen aus ist, ebenfalls einmal je
+  Spieler. Einzelne Schreibfehler (kurzer Funkaussetzer) beenden die Vibration nicht mehr – erst 50 in Folge (~1,5 s).
 - **Stick-Kalibrierung** (geführt, je Controller und Stick): 1. Stick loslassen, bis 1,5 s ruhig (Streuung ≤ 60
   Rohschritte); 2. am Rand kreisen, bis 24 Richtungen (≥ 700 Rohschritte von der Mitte) erfasst sind. Ergebnis:
   Mitte und Ausschlag je Richtung × 0,95 (Rand sicher erreichbar), mindestens 400 je Richtung. Anzeige der
@@ -394,12 +421,15 @@ Bis zu **8 Spieler** gleichzeitig (`ControllerManager.MaxPlayers`). Der 9. Contr
 - **Einblendung beim Verbinden** (`ConnectOverlay`, `Settings.ConnectOverlay`, Standard an; Ereignis
   `ControllerManager.LinkConnected`): Kärtchen oben rechts, ohne Fokus, klickdurchlässig, 3 s, stapelt sich.
 - **Diagnose exportieren** (`Diagnostics`, *Allgemein → Erweitert*): ZIP mit bridge.log(+.1), settings.json und
-  system.txt (Version, Windows, Sprache, Skalierung, Treiber, Controller). Einstellungen enthalten keine Schlüssel.
+  system.txt (Version, Windows, Sprache, Skalierung, Treiber mit ViGEmBus- und HidHide-Version, Controller).
+  Einstellungen enthalten keine Schlüssel. Beide Treiberversionen stehen außerdem beim Start im Protokoll
+  (ViGEmBus ist seit 2023 archiviert – so lassen sich Probleme nach Windows-Updates schnell zuordnen).
 - **Tastenvorlagen** für Zusatztasten: Mikrofon stumm (Win+Alt+K), Discord Strg+Umschalt+M/D, Win+D, Win+Tab,
   Alt+Tab, Ton aus, Titel vor/zurück (`NextTrack`/`PrevTrack`).
 - **Desktop-Widget** (`ControllerWidget`, `Settings.DesktopWidget`, Standard **aus**; *Allgemein → Desktop-Widget*):
   rahmenloses Kärtchen im aktiven Farbschema (Neon: Akzentlinie oben) mit Spieler, Name, Verbindung · Ausgabe und
-  Akku (leerster Akku des Spielers, Blitz beim Laden); Kopf zeigt Anzahl bzw. aktives Profil. Ohne Fokus, nicht in
+  Akku (leerster Akku des Spielers, Blitz beim Laden); Kopf zeigt Anzahl bzw. aktives Profil (im Infobereich fest
+  „Standard“ gewählt: „Profil: Standard“, `ControllerWidget.ProfileStatus`). Ohne Fokus, nicht in
   der Taskleiste; mit der Maus verschiebbar (`WidgetX`/`WidgetY`, ungültige Position → oben rechts), Rechtsklick:
   N-Connect öffnen, Immer im Vordergrund (`WidgetOnTop`), Kompakte Ansicht (`WidgetCompact`), Deckkraft
   (`WidgetOpacity` 40–100 %), Position zurücksetzen, ausblenden. Doppelklick öffnet N-Connect. Aktualisiert sich
@@ -409,8 +439,12 @@ Bis zu **8 Spieler** gleichzeitig (`ControllerManager.MaxPlayers`). Der 9. Contr
 
 - Linksklick: Fenster. Rechtsklick: Menü mit je Spieler einem Untermenü (Vibrieren, Spielerplatz, Trennen),
   „Alle Controller trennen“, Ausgabe (Xbox 360 / DualShock 4), Tastenanordnung, Profil, Vibration, Mit Windows
-  starten, Einstellungen, Controller koppeln, Kurzanleitung, Protokoll öffnen, Update, Beenden.
-- Symbol zeigt den niedrigsten Akkustand; Tooltip je Spieler „P1 Name 57 %“ (max. 127 Zeichen).
+  starten, Einstellungen, Controller koppeln, Kurzanleitung, Protokoll öffnen, Update, Beenden. Bei einem
+  Bluetooth-Problem steht es als erste Zeile darüber; die Spieler bleiben trotzdem aufgeführt (USB, XInput und ohne
+  Bluetooth LE auch die klassischen Controller laufen weiter).
+- Symbol zeigt den niedrigsten Akkustand; Tooltip je Spieler „P1 Name 57 %“ (max. 127 Zeichen), ohne Controller
+  „N-Connect: warte auf Controller (SYNC drücken)“, bei einem Bluetooth-Problem bzw. fehlendem ViGEmBus
+  „N-Connect: <Problem>“ – alles in der Sprache der Oberfläche.
 - Einblendungen: Verbunden/Getrennt, Kopplung, Akku, schwache Verbindung, Bluetooth-Probleme, Update.
 
 ## 13. Kopplungsdaten (Switch 1)
@@ -424,23 +458,20 @@ Bis zu **8 Spieler** gleichzeitig (`ControllerManager.MaxPlayers`). Der 9. Contr
 - Fenster `PairingDataForm` im Windows-11-Stil (Gruppen „Übernehmen“, „Inhalt“, „Weitergeben und sichern“, Fußleiste
   mit Akzent-Knopf „Übernehmen“); Inhalt wird selbst gezeichnet (`Report`: Zeilen mit „:“ am Ende = Zwischenüberschrift,
   „  •  “ = Aufzählung). Passwort-Dialog (`PasswordDialog`) ebenso, Eingabefelder als `TextField`.
-- **Für ESP32 / nRF52840 exportieren** (`Esp32Export`, `PairingDataForm.ExportBoard`): ZIP mit
-  `nconnect-esp32.json`, `nconnect_pairing.h` und `LIESMICH.txt` (gleicher Inhalt, nur die Kurzanleitung je Platine).
-  Inhalt: Adresse des Bluetooth-Adapters (die Platine übernimmt sie – ESP32 `esp_iface_mac_addr_set(…, ESP_MAC_BT)`,
-  nRF52840 öffentliche Adresse/`NCONNECT_HOST_ADDR_LE`) und alle bekannten Controller mit Art, Name, Spielerplatz,
-  Ausgabe, Stick-/Gyro-Kalibrierung. Übernehmbar ohne neues SYNC sind nur Switch-2-Controller (BLE, unverschlüsselt,
-  Host-Adresse in der Werbung); klassische/verschlüsselte stehen mit Hinweis dabei. **Keine Schlüssel, kein
-  Adminrecht.** Aufgenommen werden Controller aus `Settings.ControllerKinds` (Art beim Verbinden gemerkt,
-  `RememberKind`) **und** in Windows gekoppelte Controller, erkannt am Namen (`WindowsBtDevices` liest nur
-  Adresse + Name aus `BTHPORT\Parameters\Devices`, `BtDeviceNames.KindFromName`). Ausführlich:
-  [ESP32.md](ESP32.md), [NRF52840.md](NRF52840.md).
+- **Entfernt: Export für ESP32 / nRF52840 und Funkadapter.** Der Weg über eine eigene Funkplatine ist verworfen
+  (10.10.2026). Der Export war seit 1.0.19 ausgeblendet; nach 1.0.21 sind auch der Code (`Esp32Export`,
+  `AdapterProtocol`, `AdapterConnection`/`AdapterLink`, `WindowsBtDevices`), das Paket System.IO.Ports und die
+  Einstellungen `UseAdapter`/`AdapterPort` entfernt – alte settings.json mit diesen Feldern laden weiter (unbekannte
+  Felder werden überlesen). Die gemerkte Art je Controller (`Settings.ControllerKinds`, `RememberKind`) bleibt: Sie
+  dient der Kodi-Anzeige getrennter Controller (Abschnitt 14).
 
 ## 14. Programm
 
 - **Autostart** (Standard an beim ersten Start, danach Nutzerentscheidung): HKCU\…\Run mit `--autostart`
   (unsichtbar starten). Zweiter Start zeigt das Fenster der laufenden Instanz.
-- **Darstellung**: Farbmodus Dunkel (Standard), Hell, Wie Windows; dazu **Farbschema** (`Theme.Schemes`,
-  `Settings.ColorScheme`, Auswahl als Vorschau-Kacheln `SchemePicker` unter *Allgemein → Darstellung*):
+- **Darstellung**: Farbmodus Dunkel (Standard), Hell, Wie Windows (`Settings.Theme` = `dark`/`light`/`system`; auch
+  „Dunkel“ wird ausdrücklich gespeichert, null heißt „nie gewählt“ und gilt als Dunkel); dazu **Farbschema**
+  (`Theme.Schemes`, `Settings.ColorScheme`, Auswahl als Vorschau-Kacheln `SchemePicker` unter *Allgemein → Darstellung*):
   - **Windows** (Standard): Farben von Windows 11/Fluent – Hintergrund #202020, Karten #2B2B2B, Steuerelemente
     #373737, Akzent Windows-Blau (dunkel #4CC2FF mit schwarzer Schrift wie in Windows, hell #005FB8 mit weißer);
     keine Verläufe, kein Leuchten (`Theme.Neon` = false), Schriftzug schlicht in Textfarbe.
@@ -467,12 +498,51 @@ Bis zu **8 Spieler** gleichzeitig (`ControllerManager.MaxPlayers`). Der 9. Contr
   als PNG), PNG und Installer-Grafiken, ohne ein Fenster zu öffnen.
 - **Grafiken**: Pfeile (▲▼◀▶) zeichnet `InputView.Caption` als gleich große Dreiecke, die bei gedrehtem Controller
   (quer gehaltener Joy-Con) mitdrehen; alle anderen Beschriftungen bleiben waagerecht lesbar.
-- **Sprache**: Deutsch/Englisch, Standard wie Windows (Übersetzungstabelle + Muster für Texte mit Platzhaltern).
+- **Sprache**: 12 Sprachen (de, en, es, fr, it, pt, nl, pl, ru, ja, zh, ko). „Automatisch (wie Windows)“ (Standard)
+  = Anzeigesprache von Windows (`Tr.WindowsLanguage`; ohne eigene Tabelle Englisch). In der App gewählt, wird es wie
+  „Dunkel“ ausdrücklich gespeichert (`Settings.Language` = `auto`); null heißt „nie gewählt“ und gilt ebenfalls als
+  „wie Windows“ – nur dann darf ein Setup die Sprache vorgeben. Übersetzt
+  wird über Tabellen mit dem deutschen Text als Schlüssel (`Tr.Texts.cs` = Englisch, `Tr.Lang*.cs`) und Muster für
+  Texte mit Platzhaltern (`Tr.cs` und je Sprache dieselben Muster in derselben Reihenfolge); aus mehreren Sätzen
+  zusammengesetzte Meldungen Satz für Satz. Fehlt ein Text, gilt Englisch, dann Deutsch. Die Kurzanleitung
+  (`WelcomeForm`, beim ersten Start und im Infobereich) wird absatzweise übersetzt, das Fenster wächst mit dem Text.
+  Vollständigkeit sichern die Unit-Tests `TranslationTests` (`tests/Switch2Pro.Bridge.Tests`): alle Tabellen mit
+  denselben Schlüsseln, keine doppelten, gleiche Muster, Zahlen/Namen bleiben erhalten, Stichproben bisheriger Lücken.
+- **Installer → App** (`installer/N-Connect.iss`, `InstallerChoices`): Das Setup läuft mit Adminrechten und schreibt
+  deshalb keine Benutzereinstellungen (kein HKCU). Es startet N-Connect nach der Installation als angemeldeter Benutzer
+  mit `--setup-theme=dark|light|system` und `--setup-lang=xx` – die Sprache nur, wenn sie im Setup bewusst gewählt
+  wurde (`ChosenLangCode`): Das Setup schlägt die Windows-Sprache vor, wenn es sie anbietet, sonst Englisch (erster
+  Eintrag unter `[Languages]`). Weicht die Setup-Sprache davon ab, obwohl der Vorschlag der Sprache der App unter
+  „Automatisch“ entsprach, war es eine Wahl; fehlt dem Setup die Windows-Sprache (ISL-Datei beim Bauen nicht
+  vorhanden, z. B. Chinesisch – Inno Setup bringt sie nicht mit), wird nichts übergeben. Welche Sprachen das Setup
+  anbietet, sammelt `SetupLangs` beim Bauen (Sprachdateien aus dem Ordner des Compilers, `CompilerPath`). Die App
+  übernimmt die Werte einmalig, solange in settings.json noch nichts gewählt ist – die Sprache zusätzlich nur, wenn
+  sie von der Windows-Sprache abweicht. Fehlen die Argumente beim allerersten Start (im Setup „Jetzt starten“
+  abgewählt, weiteres Benutzerkonto), gilt die Wahl, die das Setup im eigenen Deinstallationsschlüssel in HKLM merkt
+  (`Inno Setup CodeFile: Language`/`Theme`, nur gelesen; Sprache leer, wenn nicht bewusst gewählt). Stilles Update
+  (Ein-Klick-Update, winget): keine Argumente, es ändert sich nichts. Werte älterer Setups (bis 1.0.21: `HKCU\Software\N-Connect\Language`/`Theme`)
+  übernimmt die installierte App beim nächsten Start einmalig und löscht sie. Die Setup-Seite „Darstellung“ wählt
+  die Wahl der letzten Installation vor. Anleitung im Programmordner in der Setup-Sprache: Deutsch `Anleitung.md`,
+  sonst `README.md` (englisch). Die Deinstallation entfernt den Autostart in allen angemeldeten Benutzerprofilen
+  (nur Einträge, die auf diese Installation zeigen).
+- **Kodi auf diesem PC** (`KodiStatusWriter`): Ist in einer Kodi-Installation (normal oder Microsoft Store) das
+  Add-on `service.nconnect` installiert, schreibt N-Connect alle 3 s bei Änderung, sonst alle 10 s als Herzschlag
+  `userdata/addon_data/service.nconnect/status.json` (gleiches Format wie der Linux-Dienst; die Berichtsrate zählt
+  nicht als Änderung). Ohne Add-on wird nichts geschrieben und kein Ordner angelegt; ob Kodi/Add-on da sind, wird alle
+  30 s neu geprüft (kein Neustart nötig). Felder u. a. `"platform": "windows"` und `"bluetooth"` aus dem
+  Bluetooth-Zustand (`ControllerManager.Bluetooth`, nicht aus dem Meldungstext): `on`, `off` (aus oder Suche startet
+  nicht), `missing` (kein Adapter / Bluetooth nicht erreichbar), `no_le` (Adapter ohne Bluetooth LE – Switch-2-Controller
+  gehen nicht, klassische schon). Beim Beenden einmal `{"state": "stopped", "platform": "windows"}`, damit Kodi nicht
+  noch bis zu 15 s verbundene Controller zeigt.
 - **Update**: Prüft beim Start (nach 10 s) GitHub-Releases (`v1.2.3`). Mit Installer im Release: Ein-Klick-Update –
-  Nachfrage, Download nur von GitHub, Größe und SHA-256 (falls angegeben) geprüft, stiller Installer, Neustart.
+  Nachfrage, Download nur von GitHub, Größe und SHA-256 (falls angegeben) geprüft, stiller Installer, Neustart. Die
+  portable Variante lädt das ZIP und tauscht die EXE nach dem Beenden aus; ihre Nachfrage nennt deshalb keine
+  Administratorrechte.
 - **Protokoll**: `%LOCALAPPDATA%\N-Connect\bridge.log` (ab 1 MB einmal rotiert). Einstellungen:
   `%APPDATA%\N-Connect\settings.json` (bei Änderung von außen neu geladen, 300 ms entprellt).
 - **Prüfhilfen**: `--demo`, `--demo-all`, `--demo-retro` (simulierte Controller), `--render <Ordner>`
   (Controller-Grafiken, auch Joy-Con 1/2 quer, hochkant, Paar, Grip: `jc1_links_quer.png` …),
-  `--render-ui <Ordner> [--wide] [--en] [--light]` (alle Seiten/Karten/Dialoge, auch `ui_kopplungsdaten_*.png`),
-  `--render-brand`, `--dump-ui <Datei> --en` (Texte ohne Übersetzung).
+  `--render-ui <Ordner> [--wide] [--en | --lang=xx] [--light]` (alle Seiten/Karten/Dialoge, auch
+  `ui_kopplungsdaten_*.png`), `--render-brand`, `--dump-ui <Datei> [--en | --lang=xx]` (Texte ohne eigene Übersetzung
+  in dieser Sprache; dazu `<Datei>.rueckfall.txt` mit allen Sprachen und den Texten, die dort nur über Englisch oder
+  gar nicht übersetzt werden).

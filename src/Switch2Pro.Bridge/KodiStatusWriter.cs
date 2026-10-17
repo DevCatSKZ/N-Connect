@@ -7,19 +7,28 @@ namespace Switch2Pro.Bridge;
 /// Schreibt den aktuellen Stand als status.json in Kodis Add-on-Datenordner (userdata/addon_data/service.nconnect)
 /// – gleiches Format wie der Linux-Dienst, damit das Kodi-Add-on (Menü und Home-Widget) auf jeder Plattform
 /// dieselbe Anzeige hat. Auf Windows verbindet die App die Controller selbst; das Add-on zeigt nur an.
+/// Geschrieben wird nur in Kodi-Installationen, in denen das Add-on service.nconnect installiert ist; das wird alle
+/// 30 s neu geprüft, damit ein später installiertes Kodi bzw. Add-on ohne Neustart von N-Connect erkannt wird.
 /// </summary>
 internal sealed class KodiStatusWriter : IDisposable
 {
     /// <summary>Menü/Widget lesen den Stand nur, wenn die Datei höchstens ~15 s alt ist – Herzschlag kürzer.</summary>
     private static readonly TimeSpan Heartbeat = TimeSpan.FromSeconds(10);
     private static readonly TimeSpan Interval = TimeSpan.FromSeconds(3);
+    /// <summary>So oft nachsehen, ob Kodi bzw. das Add-on (noch) da ist.</summary>
+    private static readonly TimeSpan DirsInterval = TimeSpan.FromSeconds(30);
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
 
     private readonly ControllerManager _manager;
     private readonly Func<Settings> _settings;
     private readonly System.Threading.Timer _timer;
-    private string _lastJson = string.Empty;
+    private readonly object _gate = new();
+    private List<string> _dirs = [];
+    private DateTime _dirsChecked = DateTime.MinValue;
+    /// <summary>Zuletzt geschriebener Stand ohne die ständig schwankende Berichtsrate (für den Änderungsvergleich).</summary>
+    private string _lastCompare = string.Empty;
     private DateTime _lastWrite = DateTime.MinValue;
+    private bool _disposed;
 
     public KodiStatusWriter(ControllerManager manager, Func<Settings> settings)
     {
@@ -28,15 +37,19 @@ internal sealed class KodiStatusWriter : IDisposable
         _timer = new System.Threading.Timer(_ => Tick(), null, Timeout.Infinite, Timeout.Infinite);
     }
 
-    public void Start()
-    {
-        if (KodiIntegration.FindDataDirs().Count == 0)
-            return; // kein Kodi installiert – nichts zu tun (bei späterer Installation nach App-Neustart aktiv)
-        Log.Info("Kodi gefunden – status.json wird für das Kodi-Add-on geschrieben");
-        _timer.Change(TimeSpan.Zero, Interval);
-    }
+    public void Start() => _timer.Change(TimeSpan.Zero, Interval);
 
-    private object BuildStatus()
+    /// <summary>Wert für "bluetooth" in der status.json (Vertrag mit dem Kodi-Add-on: on | off | missing | no_le).</summary>
+    internal static string BluetoothValue(BluetoothAdapterState state) => state switch
+    {
+        BluetoothAdapterState.Off => "off",
+        BluetoothAdapterState.Missing => "missing",
+        BluetoothAdapterState.NoLe => "no_le",
+        _ => "on",
+    };
+
+    /// <param name="withRate">Berichtsrate aufnehmen – nicht für den Änderungsvergleich, sonst wäre jeder Takt eine „Änderung“.</param>
+    private object BuildStatus(bool withRate)
     {
         var settings = _settings();
         var players = _manager.Players.Select(p =>
@@ -50,7 +63,7 @@ internal sealed class KodiStatusWriter : IDisposable
                 firmware = l.Info.Firmware,
                 battery = l.LastState?.BatteryPercent ?? -1,
                 charging = l.LastState?.Charging ?? false,
-                rate = (int)Math.Round(l.ReportRate),
+                rate = withRate ? (int)Math.Round(l.ReportRate) : 0,
             }).ToList();
             return (object)new
             {
@@ -80,13 +93,14 @@ internal sealed class KodiStatusWriter : IDisposable
                     connected = connectedAddresses.Contains(address),
                 };
             }).ToList();
-        string? problem = _manager.AdapterProblem;
+        var bluetooth = _manager.Bluetooth;
         return new
         {
             state = "running",
+            platform = "windows",
             version = Application.ProductVersion,
-            bluetooth = problem is null ? "on" : problem.Contains("kein", StringComparison.OrdinalIgnoreCase) ? "missing" : "off",
-            scanning = problem is null,
+            bluetooth = BluetoothValue(bluetooth),
+            scanning = bluetooth == BluetoothAdapterState.On,
             connecting = Array.Empty<string>(),
             players,
             elsewhere = Array.Empty<object>(),
@@ -101,17 +115,28 @@ internal sealed class KodiStatusWriter : IDisposable
     {
         try
         {
-            string json = JsonSerializer.Serialize(BuildStatus(), JsonOptions);
-            if (json != _lastJson || DateTime.UtcNow - _lastWrite >= Heartbeat)
+            lock (_gate)
             {
-                var dirs = KodiIntegration.FindDataDirs();
-                foreach (string dir in dirs)
-                    WriteAtomic(dir, json);
-                if (dirs.Count > 0)
+                if (_disposed)
+                    return;
+                if (DateTime.UtcNow - _dirsChecked >= DirsInterval)
                 {
-                    _lastJson = json;
-                    _lastWrite = DateTime.UtcNow;
+                    _dirsChecked = DateTime.UtcNow;
+                    var dirs = KodiIntegration.FindDataDirs();
+                    if (dirs.Count > 0 && _dirs.Count == 0)
+                        Log.Info("Kodi-Add-on gefunden – status.json wird für das Kodi-Add-on geschrieben");
+                    _dirs = dirs;
                 }
+                if (_dirs.Count == 0)
+                    return; // kein Kodi mit N-Connect-Add-on – nichts zu tun
+                string compare = JsonSerializer.Serialize(BuildStatus(withRate: false), JsonOptions);
+                if (compare == _lastCompare && DateTime.UtcNow - _lastWrite < Heartbeat)
+                    return;
+                string json = JsonSerializer.Serialize(BuildStatus(withRate: true), JsonOptions);
+                foreach (string dir in _dirs)
+                    WriteAtomic(dir, json);
+                _lastCompare = compare;
+                _lastWrite = DateTime.UtcNow;
             }
         }
         catch (Exception e) // Timer-Thread: nie unbehandelt enden lassen
@@ -136,5 +161,20 @@ internal sealed class KodiStatusWriter : IDisposable
         }
     }
 
-    public void Dispose() => _timer.Dispose();
+    /// <summary>Beim Beenden einmal „stopped“ schreiben – sonst zeigte Kodi bis zu 15 s weiter verbundene Controller.</summary>
+    public void Dispose()
+    {
+        _timer.Dispose();
+        lock (_gate)
+        {
+            if (_disposed)
+                return;
+            _disposed = true;
+            if (_lastWrite == DateTime.MinValue)
+                return; // nie geschrieben (kein Add-on) – nichts zurückzusetzen
+            string json = JsonSerializer.Serialize(new { state = "stopped", platform = "windows" }, JsonOptions);
+            foreach (string dir in _dirs)
+                WriteAtomic(dir, json);
+        }
+    }
 }

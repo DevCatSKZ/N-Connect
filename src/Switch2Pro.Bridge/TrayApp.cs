@@ -31,6 +31,10 @@ internal sealed class TrayApp : ApplicationContext
         _ui = SynchronizationContext.Current ?? new WindowsFormsSynchronizationContext();
         bool firstRun = !File.Exists(Paths.SettingsFile);
         _settings = Settings.Load(Paths.SettingsFile);
+        // Sprache/Darstellung aus dem Installer (Befehlszeile, beim ersten Start die gemerkte Wahl des Setups, ältere
+        // Setups: HKCU) – nur, solange nichts gewählt ist.
+        if (_settings.LoadError is null)
+            InstallerChoices.Apply(_settings, Environment.GetCommandLineArgs(), firstRun, SaveSettings);
         Tr.Init(_settings.Language);
         Theme.Init(_settings.Theme, _settings.Transparency, _settings.ColorScheme);
         EnableAutostartOnce();
@@ -56,10 +60,12 @@ internal sealed class TrayApp : ApplicationContext
                 ShowSettings();
         };
 
+        // Treiberstände ins Protokoll: ViGEmBus ist seit 2023 archiviert – Probleme nach Windows-Updates so schnell zuordnen.
+        Log.Info($"ViGEmBus {PadFactory.DriverVersion ?? "fehlt"} · HidHide {HidHideUpdate.Installed?.ToString() ?? "fehlt"}");
         _factory = PadFactory.TryCreate();
         if (_factory is null)
         {
-            _icon.Text = "N-Connect: ViGEmBus fehlt";
+            _icon.Text = Tr.T("N-Connect: ViGEmBus fehlt");
             Balloon(10000, "ViGEmBus-Treiber fehlt",
                 "Ohne ViGEmBus kann kein virtueller Controller erzeugt werden. Bitte das Setup erneut ausführen " +
                 "oder ViGEmBus installieren (Rechtsklick auf das Symbol → ViGEmBus herunterladen).", ToolTipIcon.Error);
@@ -105,7 +111,7 @@ internal sealed class TrayApp : ApplicationContext
             catch (Exception e) { Log.Warn($"Einblendung: {Log.Reason(e)}"); }
         }, null);
         _manager.ControllerConnected += (address, _) => _ui.Post(_ => RememberController(address), null);
-        // Art je Adresse merken (für den ESP32-Export auch, wenn der Controller gerade nicht verbunden ist).
+        // Art je Adresse merken (die Kodi-Anzeige zeigt sie auch, wenn der Controller gerade nicht verbunden ist).
         _manager.LinkConnected += link => _ui.Post(_ =>
         {
             if (link.Address is { } address && _settings.RememberKind(address, link.Kind))
@@ -125,7 +131,7 @@ internal sealed class TrayApp : ApplicationContext
             _manager.StartDemo();
         else
             Task.Run(() => AutoPairLoopAsync(_autoPairCts.Token)).Forget("Controller automatisch koppeln");
-        // Kodi auf diesem PC: status.json für Add-on-Menü und Home-Widget schreiben (nur wenn Kodi gefunden).
+        // Kodi auf diesem PC: status.json für Add-on-Menü und Home-Widget schreiben (nur, wo das Add-on installiert ist).
         if (_manager is not null)
         {
             _kodiStatus = new KodiStatusWriter(_manager, () => _settings);
@@ -357,7 +363,6 @@ internal sealed class TrayApp : ApplicationContext
         _icon.ContextMenuStrip!.Renderer = Theme.MenuRenderer();
         _icon.ContextMenuStrip.ForeColor = Theme.Current.Text;
         _manager?.ApplyOutputMode(); // allgemein oder je Controller geändert – nur Abweichende werden neu angelegt
-        _manager?.ApplyAdapterSetting();
         ApplyConnectNotify();
         if (_settingsForm is { IsDisposed: false } form)
             form.ReloadValues(); // sonst arbeitet das Fenster mit veralteten Profilen weiter
@@ -706,14 +711,14 @@ internal sealed class TrayApp : ApplicationContext
             menu.Items.Add(new ToolStripMenuItem("ViGEmBus-Treiber fehlt") { Enabled = false });
             menu.Items.Add("ViGEmBus herunterladen …", null, (_, _) => Open(ViGEmDownload));
         }
-        else if (_manager.AdapterProblem is { } problem)
-        {
-            menu.Items.Add(new ToolStripMenuItem(problem) { Enabled = false });
-        }
         else
         {
+            // Bluetooth-Problem zuerst nennen – die Spieler trotzdem zeigen: USB-, XInput- und (ohne LE) klassische
+            // Controller laufen weiter.
+            if (_manager.AdapterProblem is { } problem)
+                menu.Items.Add(new ToolStripMenuItem(problem) { Enabled = false });
             var players = _manager.Players;
-            if (players.Count == 0)
+            if (players.Count == 0 && _manager.AdapterProblem is null)
                 menu.Items.Add(new ToolStripMenuItem(_manager.IsConnecting
                     ? "Verbinde …"
                     : "Kein Controller – SYNC-Taste am Controller kurz drücken") { Enabled = false });

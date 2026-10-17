@@ -7,44 +7,45 @@ internal sealed class WelcomeForm : UiForm
 {
     public bool OpenSettings { get; private set; }
 
-    private const string German =
-        "So verbindest du deine Controller:\n\n" +
+    /// <summary>Anleitung in Absätzen – jeder Absatz ist ein Schlüssel der Übersetzungstabellen.</summary>
+    internal static readonly string[] Paragraphs =
+    [
+        "So verbindest du deine Controller:",
         "Switch 2 (Pro Controller, Joy-Con 2, GameCube):\n" +
         "   Kurz die kleine SYNC-Taste drücken – nach ein paar Sekunden vibriert der Controller.\n" +
         "   Danach reicht ein Tastendruck zum Verbinden. Pro Controller und GameCube gehen auch per USB-Kabel.\n" +
-        "   Wichtig: NICHT über „Bluetooth → Gerät hinzufügen“ koppeln – das stört die Verbindung.\n\n" +
+        "   Wichtig: NICHT über „Bluetooth → Gerät hinzufügen“ koppeln – das stört die Verbindung.",
         "Switch 1 (Pro Controller, Joy-Con, NES/SNES/N64/Mega Drive), Wii-Fernbedienung, Wii U Pro Controller:\n" +
         "   SYNC-Taste drücken – N-Connect koppelt den Controller selbst (kein Umweg über die Windows-Einstellungen).\n" +
-        "   Danach verbindet er sich per Tastendruck. Gezielt suchen: Rechtsklick auf das Symbol → „Controller koppeln …“.\n\n" +
+        "   Danach verbindet er sich per Tastendruck. Gezielt suchen: Rechtsklick auf das Symbol → „Controller koppeln …“.",
         "Windows, Steam und Spiele sehen jeden Controller als Xbox-Controller.\n" +
-        "Das Programm läuft unten rechts im Infobereich – ein Klick öffnet die Übersicht.";
+        "Das Programm läuft unten rechts im Infobereich – ein Klick öffnet die Übersicht.",
+    ];
 
-    private const string English =
-        "How to connect your controllers:\n\n" +
-        "Switch 2 (Pro Controller, Joy-Con 2, GameCube):\n" +
-        "   Briefly press the small SYNC button – after a few seconds the controller vibrates.\n" +
-        "   Afterwards a button press is enough to connect. Pro Controller and GameCube also work via USB cable.\n" +
-        "   Important: do NOT pair via “Bluetooth → Add device” – that disturbs the connection.\n\n" +
-        "Switch 1 (Pro Controller, Joy-Con, NES/SNES/N64/Mega Drive), Wii Remote, Wii U Pro Controller:\n" +
-        "   Press the SYNC button – N-Connect pairs the controller itself (no detour via the Windows settings).\n" +
-        "   Afterwards it connects with a button press. To search on purpose: right-click the icon → “Pair controller …”.\n\n" +
-        "Windows, Steam and games see every controller as an Xbox controller.\n" +
-        "The program runs in the tray at the bottom right – a click opens the overview.";
+    /// <summary>Ganze Anleitung in der Sprache der Oberfläche.</summary>
+    internal static string Guide => string.Join("\n\n", Paragraphs.Select(Tr.T));
 
     public WelcomeForm()
     {
-        Text = Tr.English ? "N-Connect – Welcome" : "N-Connect – Willkommen";
+        Text = Tr.T("N-Connect – Willkommen");
         StartPosition = FormStartPosition.CenterScreen;
         FormBorderStyle = FormBorderStyle.FixedDialog;
         MaximizeBox = MinimizeBox = false;
         Font = UiFonts.Body;
         AutoScaleDimensions = UiScale.Dimensions;
         AutoScaleMode = AutoScaleMode.None;
-        ClientSize = new Size(UiScale.Px(700), UiScale.Px(440));
 
-        var text = new Label { Dock = DockStyle.Fill, Padding = new Padding(UiScale.Px(20)), Text = Tr.English ? English : German };
+        string guide = Guide;
+        int padding = UiScale.Px(20), buttonsHeight = UiScale.Px(52), width = UiScale.Px(700);
+        // Übersetzungen sind teils länger als das Deutsche: Höhe nach dem umbrochenen Text, höchstens Bildschirmhöhe.
+        int textHeight = TextRenderer.MeasureText(guide, Font, new Size(width - 2 * padding, int.MaxValue),
+            TextFormatFlags.WordBreak | TextFormatFlags.NoPrefix).Height;
+        int maxHeight = (Screen.PrimaryScreen?.WorkingArea.Height ?? 720) - UiScale.Px(80);
+        ClientSize = new Size(width, Math.Min(maxHeight, Math.Max(UiScale.Px(440), textHeight + 2 * padding + buttonsHeight + UiScale.Px(12))));
 
-        var buttons = new FlowLayoutPanel { Dock = DockStyle.Bottom, Height = UiScale.Px(52), FlowDirection = FlowDirection.RightToLeft, Padding = new Padding(UiScale.Px(10)) };
+        var text = new Label { Dock = DockStyle.Fill, Padding = new Padding(padding), Text = guide, UseMnemonic = false };
+
+        var buttons = new FlowLayoutPanel { Dock = DockStyle.Bottom, Height = buttonsHeight, FlowDirection = FlowDirection.RightToLeft, Padding = new Padding(UiScale.Px(10)) };
         var ok = new Button { Text = Tr.T("Verstanden"), AutoSize = true, DialogResult = DialogResult.OK };
         var settings = new Button { Text = Tr.T("Einstellungen öffnen"), AutoSize = true, DialogResult = DialogResult.OK };
         settings.Click += (_, _) => OpenSettings = true;
