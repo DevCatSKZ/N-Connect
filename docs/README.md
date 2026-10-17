@@ -3,7 +3,7 @@
 Vollständige Beschreibung aller Funktionen, des Aufbaus und der Controller-Protokolle von N-Connect – als
 Grundlage für Weiterentwicklung und für Portierungen auf andere Plattformen (Linux, macOS, Android, Steam Deck …).
 
-Stand: 04.10.2026 (Version 1.0.x, Windows, .NET 8). Alle Angaben sind aus dem Code abgeleitet; wo etwas nur
+Stand: 17.10.2026 (Version 1.0.x, Windows, .NET 10). Alle Angaben sind aus dem Code abgeleitet; wo etwas nur
 geschätzt oder nicht mit echter Hardware geprüft ist, steht das ausdrücklich dabei.
 
 | Dokument | Inhalt |
