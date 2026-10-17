@@ -17,7 +17,7 @@ public class ParserRobustnessTests
         r[2] = 0x90;            // Akku voll, lädt
         r[3] = 0x08;            // A
         for (int i = 13; i < Math.Min(length, 49); i++)
-            r[i] = (byte)(i * 7); // Sticks und IMU-Proben mit Inhalt
+            r[i] = (byte)(i * 7); // Byte 13–48 (u. a. die IMU-Proben) mit Inhalt
         return r;
     }
 
@@ -60,7 +60,7 @@ public class ParserRobustnessTests
             r => Switch1.TryParseReply(r, Switch1.SubDeviceInfo, out _)),
         ["Switch1.SPI_Antwort"] = new(15 + 5 + 24, () => Switch1Reply(Switch1.SubSpiRead, [.. Switch1.SpiReadArgs(Switch1.SpiFactoryImu, 24), .. Imu]),
             r => Switch1.TryParseReply(r, Switch1.SubSpiRead, out _, Switch1.SpiFactoryImu)),
-        ["Switch1.IMU_Kalibrierung"] = new(24, () => Imu, r => Switch1.TryParseImu(r, out _)),
+        ["Switch1.IMU_Kalibrierung"] = new(24, () => [.. Imu], r => Switch1.TryParseImu(r, out _)),
         ["Switch1.Stick_Kalibrierung"] = new(9, () => [0xDC, 0x55, 0x57, 0x00, 0x08, 0x80, 0x14, 0x45, 0x4B],
             r => Switch1.TryParseStick(r, left: true, out _)),
         ["Wii.Status"] = new(7, () => [Wii.InputStatus, 0, 0, 0x02, 0, 0, 200], r => Wii.TryParseStatus(r, out _, out _)),
