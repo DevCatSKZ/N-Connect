@@ -480,6 +480,19 @@
   "zh": "N-Connect已是最新版本",
   "ko": "N-Connect가 최신 상태입니다"
  },
+ "Update-Prüfung fehlgeschlagen – bitte später erneut versuchen": {
+  "en": "Update check failed – please try again later",
+  "es": "Comprobación de actualizaciones fallida – inténtalo de nuevo más tarde",
+  "fr": "Vérification des mises à jour échouée – réessayez plus tard",
+  "it": "Controllo aggiornamenti non riuscito – riprova più tardi",
+  "pt": "Falha na verificação de atualizações – tenta de novo mais tarde",
+  "nl": "Controleren op updates mislukt – probeer het later opnieuw",
+  "pl": "Sprawdzanie aktualizacji nie powiodło się – spróbuj ponownie później",
+  "ru": "Не удалось проверить обновления – повторите позже",
+  "ja": "アップデートの確認に失敗しました – 後でもう一度お試しください",
+  "zh": "检查更新失败 – 请稍后重试",
+  "ko": "업데이트 확인 실패 – 나중에 다시 시도하세요"
+ },
  "Version {0} verfügbar": {
   "en": "Version {0} available",
   "es": "Versión {0} disponible",

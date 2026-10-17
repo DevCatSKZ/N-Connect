@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <!--
-    Tests für die Teile der Android-App, die ohne Gerät prüfbar sind: Update-Prüfung (Release-Liste), Profile je Spiel,
-    Erkennung der App im Vordergrund, status.json-Vertrag und Übersetzungstabellen. Die Quelldateien haben keine
+    Tests für die Teile der Android-App, die ohne Gerät prüfbar sind: Update-Prüfung (Release-Liste, Netzfehler, Download),
+    Profile je Spiel, Erkennung der App im Vordergrund, status.json-Vertrag und Übersetzungstabellen. Die Quelldateien haben keine
     Android-Abhängigkeiten und werden direkt mitkompiliert (das Android-Projekt selbst lässt sich hier nicht laden).
     Aufruf: dotnet test android/NConnect.Android.Tests
   -->
@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\NConnect.Android\Core\UpdateCheck.Releases.cs" Link="App\UpdateCheck.Releases.cs" />
+    <Compile Include="..\NConnect.Android\Core\UpdateCheck.Http.cs" Link="App\UpdateCheck.Http.cs" />
     <Compile Include="..\NConnect.Android\Profiles\ProfileEdit.cs" Link="App\ProfileEdit.cs" />
     <Compile Include="..\NConnect.Android\Profiles\GameProfileWatcher.Pick.cs" Link="App\GameProfileWatcher.Pick.cs" />
     <Compile Include="..\NConnect.Android\Kodi\KodiStatusWriter.Contract.cs" Link="App\KodiStatusWriter.Contract.cs" />
