@@ -1,3 +1,5 @@
+// Teile nach SDL (zlib-Lizenz), angepasst – siehe THIRD-PARTY-NOTICES.md, Abschnitt B.1.
+
 namespace Switch2Pro.Protocol;
 
 /// <summary>
