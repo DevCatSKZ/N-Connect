@@ -52,7 +52,6 @@ public static class Wii
         return [ReportLeds, (byte)(leds | (rumble ? 1 : 0))];
     }
 
-    /// <summary>Daten dauernd senden (Bit 2), im gewünschten Format.</summary>
     /// <summary>
     /// Datenformat einstellen. <paramref name="continuous"/>: 100 Berichte/s auch ohne Änderung (Bit 0x04); sonst nur
     /// bei Änderung – spart Funkzeit für andere Controller, ohne Verzögerung (Änderungen werden sofort gesendet).
