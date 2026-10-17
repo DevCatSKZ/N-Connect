@@ -32,9 +32,10 @@ Xbox/PlayStation/Switch 1/Wii ──► BlueZ (bluetoothd, D-Bus) ◄───�
 | `script.nconnect.bundle` | [linux/kodi/script.nconnect.bundle/](../linux/kodi/script.nconnect.bundle/) | Offline-Installer: bringt die aktuelle `service.nconnect`- und Plugin-ZIP mit, richtet in Aeon Nox Silvo Menüpunkt und Widget ein |
 | `repository.devcatskz` | [linux/kodi/repository.devcatskz/](../linux/kodi/repository.devcatskz/) | „DevCatSKZ Repository“ für automatische Updates (Inhalt: github.com/DevCatSKZ/kodi-repo) |
 | Index-Werkzeug | [linux/kodi/repo-tools/build_repo.py](../linux/kodi/repo-tools/build_repo.py) | addons.xml, .md5, .sha256, index.html im kodi-repo (wird dorthin kopiert) |
-| Sprachen | [linux/kodi/i18n/](../linux/kodi/i18n/) | erzeugt die `strings.po` aller Sprachen |
+| Sprachen | [linux/kodi/i18n/](../linux/kodi/i18n/) | erzeugt die `strings.po` aller Sprachen (`service.nconnect`, `script.nconnect.bundle`) |
+| Tests | [tests/NConnect.Linux.Tests/](../tests/NConnect.Linux.Tests/), [linux/kodi/tests/](../linux/kodi/tests/) | Dienst- und Add-on-Logik ohne Gerät (siehe [Tests](#tests)) |
 | Build-Skript | [linux/build-kodi-addon.ps1](../linux/build-kodi-addon.ps1) | Veröffentlicht linux-x64/arm64/arm und packt alle Add-on-ZIPs |
-| CI | [.github/workflows/kodi.yml](../.github/workflows/kodi.yml) | Artefakt bei jedem Lauf; bei Tags Release-Anhang und kodi-repo |
+| CI | [.github/workflows/kodi.yml](../.github/workflows/kodi.yml) | Tests und Artefakt bei jedem Lauf; bei Tags Release-Anhang (das kodi-repo pflegt sie nicht) |
 
 ## Erkenntnisse vom echten Gerät (wichtig)
 
@@ -89,7 +90,11 @@ Xbox/PlayStation/Switch 1/Wii ──► BlueZ (bluetoothd, D-Bus) ◄───�
   - Spieler werden über `phys` unterschieden (`nconnect/playerN`), weil Kodi die Belegung über den Namen findet.
   - Vibration über `FF_RUMBLE`: Upload/Erase per `UI_BEGIN/END_FF_*`, abgespielt mit `EV_FF`; ioctl-Größen für 64 und
     32 Bit. Der Leser wartet mit `poll` und liest wie die Schreiber unter einer Sperre mit Prüfung auf Dispose – nie
-    in einen geschlossenen (und womöglich neu vergebenen) fd. Gleiches gilt für den ATT-Socket.
+    in einen geschlossenen (und womöglich neu vergebenen) fd.
+- **ATT-Socket** ([AttClient.cs](../linux/NConnect.Linux/Ble/AttClient.cs)): Gesendet wird unter einer Sperre mit
+  Prüfung auf „getrennt“; geschlossen wird der fd erst, wenn Besitzer und Leser fertig sind (Nutzungszähler), und zwar
+  unter derselben Sperre. Beim Trennen läuft `shutdown` bewusst ohne die Sperre: Ein Sender, der bei vollem
+  Sendepuffer in `write` hängt, kehrt sofort zurück, statt das Trennen bis zum Supervision-Timeout aufzuhalten.
 - **DSU/Cemuhook-Server** ([Output/DsuServer.cs](../linux/NConnect.Linux/Output/DsuServer.cs)): Port 26760,
   standardmäßig nur lokal; `DsuNetwork` öffnet ihn fürs Heimnetz. Ist der Port beim Start belegt (meist ein gerade
   endendes N-Connect), versucht der Daemon es nach 2, 5, 10, 20 und 30 s erneut.
@@ -169,7 +174,9 @@ Xbox/PlayStation/Switch 1/Wii ──► BlueZ (bluetoothd, D-Bus) ◄───�
   pt-Texten). Englisch (`en_gb`, Pflicht als Rückfall) und Deutsch werden von Hand gepflegt, die übrigen erzeugt
   [generate.py](../linux/kodi/i18n/generate.py) aus `tr_a.py`/`tr_b.py`; neue Texte kommen in `EXTRA` (und werden
   dann auch in en/de ergänzt). Die Anleitung gibt es in allen 12 Sprachen: `resources/help_<sprache>.txt` (LibreELEC)
-  und `resources/help_companion_<sprache>.txt` (Begleitmodus).
+  und `resources/help_companion_<sprache>.txt` (Begleitmodus). Die Dialoge des Bundles stehen in
+  [tr_bundle.py](../linux/kodi/i18n/tr_bundle.py) (IDs 32000 ff., alle 13 `strings.po` werden daraus erzeugt);
+  Zusammenfassung und Beschreibung aller drei Add-ons stehen in ihrer `addon.xml` in allen 12 Sprachen.
 
 ## Andere Kodi-Plattformen
 
@@ -219,6 +226,9 @@ powershell -File linux/build-kodi-addon.ps1 -Repo                     # zusätzl
 powershell -File linux/build-kodi-addon.ps1 -Repo -NoBuild -RepoDir … # nur ablegen, vorhandene ZIPs aus -Out
 ```
 
+Vor einem neuen Lauf entfernt das Skript im Ausgabeordner nur seine eigenen ZIPs (`N-Connect-Kodi-LibreELEC-*`,
+`plugin.nconnect.status-*`, `script.nconnect.bundle-*`, `repository.devcatskz-*`) – andere Dateien in `-Out` bleiben.
+
 Ergebnis (Größen mit allen drei Prozessoren):
 
 | Datei | Größe | Inhalt |
@@ -232,8 +242,10 @@ Ergebnis (Größen mit allen drei Prozessoren):
 | `repository.devcatskz-<V>.zip` | < 0,1 MB | Repository-Add-on |
 
 Die Versionen stehen in `linux/kodi/<id>/addon.xml` (unabhängig von der Windows-Version); die Programmversion wird beim
-Bauen aus der `service.nconnect`-Version gesetzt (`-p:Version`, im csproj gleich gehalten). Logo (Installer-Grafik)
-und Lizenz kommen beim Packen dazu, `__pycache__`/`.pyc` nie.
+Bauen aus der `service.nconnect`-Version gesetzt (`-p:Version`, im csproj gleich gehalten). Logo (Installer-Grafik),
+Lizenz (`LICENSE.txt`) und die Drittanbieter-Hinweise (`THIRD-PARTY-NOTICES.md` aus dem Repo-Wurzelordner: .NET-Laufzeit,
+Linux.Bluetooth, Tmds.DBus …) kommen beim Packen in jede ZIP außer dem Repository-Add-on (das enthält keinen fremden
+Code); `__pycache__`/`.pyc` nie.
 
 Installation von Hand: Kodi → Add-ons → Aus ZIP-Datei installieren (vorher „Unbekannte Quellen“ erlauben).
 Kodi aktualisiert nur Installationen aus dem Repository und nur, wenn die Version steigt.
@@ -253,14 +265,46 @@ Kodi aktualisiert nur Installationen aus dem Repository und nur, wenn die Versio
   Version erhöhen) und bricht ab, wenn `service.nconnect` oder das Plugin neu sind, das Bundle aber nicht. Die
   Download-ZIPs werden nur zusammen mit einer neuen `service.nconnect`-Version ersetzt.
 - **CI** ([kodi.yml](../.github/workflows/kodi.yml)):
-  - Jeder Push auf `linux/**`, `src/Switch2Pro.Protocol/**` oder die Workflow-Datei erzeugt das Artefakt „Kodi-Plugin“
-    (alle ZIPs).
-  - Ein Tag `v…` hängt die `N-Connect-Kodi-*.zip` ans Release, checkt `DevCatSKZ/kodi-repo` mit dem Secret
-    **`KODI_REPO_DEPLOY_KEY`** aus (privater SSH-Schlüssel; der öffentliche Teil ist als Deploy-Key mit Schreibrecht nur
-    in kodi-repo hinterlegt), legt mit `-Repo -NoBuild` dieselben ZIPs wie am Release ab, baut den Index und pusht als
-    `devcatskz <devcatskz@gmail.com>` – nur, wenn sich etwas geändert hat. Fehlt das Secret, meldet der Lauf eine
-    Warnung (`::warning::`) und überspringt den Schritt; dann von Hand: `linux/build-kodi-addon.ps1 -Repo`, in kodi-repo
-    committen und pushen.
+  - Jeder Push auf `linux/**`, `src/Switch2Pro.Protocol/**`, `tests/NConnect.Linux.Tests/**`,
+    `THIRD-PARTY-NOTICES.md` oder die Workflow-Datei führt die [Tests](#tests) aus, prüft, dass `generate.py` keine
+    Sprachdatei ändert, und erzeugt das Artefakt „Kodi-Plugin“ (alle ZIPs).
+  - Ein Tag `v…` hängt zusätzlich die `N-Connect-Kodi-*.zip` ans GitHub-Release.
+  - Ins kodi-repo schreibt die CI bewusst **nicht** (kein automatischer Zugang; Deploy-Keys sind in der Organisation
+    DevCatSKZ ohnehin abgeschaltet).
+- **Release von Hand** (nach dem Tag, aus einer Arbeitskopie von N-Connect auf dem Release-Stand):
+  1. kodi-repo aktuell holen: `git -C <kodi-repo> pull`.
+  2. `powershell -File linux/build-kodi-addon.ps1 -Repo -RepoDir <kodi-repo>` – baut alle ZIPs, legt neue Versionen
+     samt `downloads/` und `repository.devcatskz.zip` ab und ruft dort das Index-Werkzeug `tools/build_repo.py` auf
+     (addons.xml, .md5, .sha256, index.html; von Hand: `python tools/build_repo.py` im kodi-repo). Sollen dort
+     byteweise dieselben ZIPs wie am GitHub-Release liegen: das CI-Artefakt „Kodi-Plugin“ in einen Ordner entpacken
+     und `-Repo -NoBuild -Out <Ordner> -RepoDir <kodi-repo>` nehmen.
+  3. In `<kodi-repo>` mit `git status` prüfen (nur neue Versionen, `addons.xml*`, `index.html`, `downloads/`),
+     committen als `devcatskz <devcatskz@gmail.com>` und pushen. Kodi holt die neuen Versionen dann selbst.
+  - Liegt eine Version schon im kodi-repo, bleibt sie unverändert („schon veröffentlicht“) – für ein Update die
+    Version in der `addon.xml` erhöhen.
+
+## Tests
+
+Alles, was ohne Gerät prüfbar ist; die CI führt beides vor dem Bauen aus (unter Windows – nichts davon braucht
+Bluetooth, uinput oder libc).
+
+- **Dienst** ([tests/NConnect.Linux.Tests/](../tests/NConnect.Linux.Tests/), xUnit):
+  `dotnet test tests/NConnect.Linux.Tests -c Release`
+  - Befehlskanal: Ein fehlgeschlagener Befehl (auch eine D-Bus-Zeitüberschreitung) beendet ihn nicht; echte Befehle
+    ohne Adapter und unsinnige Zeilen laufen ins Leere, das Ende von stdin wird erkannt.
+  - status.json: `starting` ohne `bluetooth` vor der ersten Prüfung, `platform: linux`, jeder der vier
+    Bluetooth-Werte, `stopped` beim Ende; „bluetoothd läuft nicht“ gilt als `off`.
+  - Verbindungsabbruch: Lost vor dem Zuordnen zum Spieler (kein Geist-Controller), Lost danach, ohne Abbruch bleibt
+    der Controller. Virtuelle Controller legt der Dienst in den Tests nie an (`CreatePad`).
+- **Add-ons** ([linux/kodi/tests/](../linux/kodi/tests/), unittest mit nachgebauten Kodi-Modulen in `kodi_stubs.py`):
+  `py -3 -m unittest discover -s linux/kodi/tests`
+  - Programmwahl nach Bitbreite, Rückfall beim Start, Meldung 30022, Warten beim Beenden, PID-Datei samt
+    `/proc/<pid>/cmdline`-Prüfung.
+  - Hinweise je Plattform und Bluetooth-Zustand, Widget-Liste, Lesen der status.json (Alter, `starting`, Android-Pfade).
+  - Bundle: neueste mitgelieferte ZIP, Installation, Dialoge und Skin-Einträge in Kodis Sprache.
+  - Dateien: `addon.xml`/`settings.xml` wohlgeformt, Beschreibungen in allen 12 Sprachen, alle `strings.po` vollständig
+    (samt Platzhaltern), jede benutzte String-ID definiert, `generate.py` aktuell, Versionen (csproj =
+    `service.nconnect`), Index-Werkzeug `build_repo.py` (KEEP, Prüfsummen, `index.html`).
 
 ## Hintergrundsuche
 
@@ -303,10 +347,11 @@ Damals (0.1/0.2) geprüft und bestanden:
 
 ## Offen
 
-- **Hardwaretest der Änderungen von 0.4.4** auf dem Pi 4 (ohne Gerät nur gebaut und mit Kodi-Nachbau geprüft):
+- **Hardwaretest der Änderungen von 0.4.4** auf dem Pi 4 (ohne Gerät nur gebaut und mit den [Tests](#tests) geprüft):
   `--kodi` (Ende mit Kodi, auch nach `kill -9` von Kodi), PID-Datei und Beenden eines Rests, Neustart über das Menü
   (DSU-Port danach wieder offen), `no_le`-Erkennung über `Roles` (ältere BlueZ ohne `Roles` gelten als LE-fähig),
-  poll-Leser des virtuellen Controllers samt Vibration, Speicherverlauf bei langer Laufzeit (vorher/nachher).
+  poll-Leser des virtuellen Controllers samt Vibration, Trennen während laufender Vibration (ATT-`shutdown` ohne
+  Sperre), Speicherverlauf bei langer Laufzeit (vorher/nachher).
 - **Ungetestete Geräte und Controller:** Pi 2/3 (`linux-arm`), Pi 5, 64-Bit-Boxen, PCs; Kopplung von Xbox-, PlayStation-,
   Switch-1- und Wii-Controllern, Vibration im Spiel; Klone wie der ShanWan-Pro-Controller (Issue #1, nur klassisches
   Bluetooth) laufen unter Linux vermutlich über `hid-nintendo` – ungeprüft.
