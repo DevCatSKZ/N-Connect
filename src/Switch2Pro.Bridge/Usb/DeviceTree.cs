@@ -1,8 +1,5 @@
 namespace Switch2Pro.Bridge.Usb;
 
-/// <summary>Ein Knoten der Windows-Gerätehierarchie: Instanz-ID, Treiberdienst (oder null) und Hardware-IDs.</summary>
-internal sealed record DeviceNode(string InstanceId, string? Service, IReadOnlyList<string> HardwareIds);
-
 /// <summary>
 /// Echtes Gerät (hängt an einem USB-Host bzw. am Bluetooth-Stack) oder virtuelles? Virtuelle Ausgabe-Controller wie
 /// unser ViGEm-DualShock-4 dürfen nie als Eingabe dienen und nie versteckt werden: N-Connect sähe sonst sein eigenes
