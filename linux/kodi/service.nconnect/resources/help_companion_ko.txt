@@ -1,0 +1,17 @@
+[B]동반 모드[/B]
+이 시스템에서는 애드온이 아니라 N-Connect 앱이 컨트롤러를 연결합니다. 애드온은 앱이 알려 주는 내용만 표시합니다: 메뉴(프로그램 > N-Connect)와 연결된 컨트롤러 및 알려진 컨트롤러와 배터리를 보여 주는 홈 위젯.
+
+[B]Windows[/B]
+N-Connect for Windows를 설치하고 실행하세요 (github.com/DevCatSKZ/N-Connect). 앱이 컨트롤러를 Xbox 컨트롤러로 연결합니다 – Kodi는 설정 없이 인식합니다. 앱은 상태를 Kodi 데이터 폴더에 기록합니다. 앱이 실행 중이 아니면 여기에 "N-Connect 앱이 실행 중이 아닙니다"가 표시됩니다. N-Connect보다 Kodi를 나중에 설치했다면 N-Connect를 한 번 다시 시작하세요.
+
+[B]Android[/B]
+N-Connect for Android 0.9.1 이상을 설치하고 실행하세요. 앱은 상태를 Documents/N-Connect 폴더에 저장하고, 애드온은 거기서 읽습니다. 그래도 Kodi에 아무것도 표시되지 않으면 Android가 접근을 막고 있을 수 있습니다: Android 설정에서 Kodi에 파일(저장공간) 접근을 허용하세요. N-Connect보다 Kodi를 나중에 설치했다면 N-Connect를 한 번 다시 시작하세요.
+
+[B]macOS[/B]
+N-Connect는 macOS용이 없습니다 – 여기서는 애드온이 표시만 할 수 있으며 비어 있습니다.
+
+[B]설정[/B]
+버튼 배치, 자이로, 진동, 페어링 등은 N-Connect 앱에서 설정합니다. 이 애드온의 설정은 LibreELEC/Linux에서만 적용됩니다.
+
+[B]홈 화면 위젯[/B]
+스킨에 따라 다릅니다: 스킨 설정 > 홈 > 위젯 > 애드온 > N-Connect.

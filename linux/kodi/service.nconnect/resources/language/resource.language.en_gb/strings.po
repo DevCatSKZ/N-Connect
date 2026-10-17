@@ -442,10 +442,6 @@ msgctxt "#30642"
 msgid "Bluetooth adapter"
 msgstr ""
 
-msgctxt "#30643"
-msgid "Low latency"
-msgstr ""
-
 msgctxt "#30644"
 msgid "Settings file"
 msgstr ""
@@ -633,5 +629,53 @@ msgid "N-Connect app is not running"
 msgstr ""
 
 msgctxt "#30661"
-msgid "Start the N-Connect app on this device – it reports the status here"
+msgid "Start N-Connect on this PC – it reports the status here"
+msgstr ""
+
+msgctxt "#30019"
+msgid "Bluetooth adapter without LE – Switch 2 controllers cannot connect, other controllers still work"
+msgstr ""
+
+msgctxt "#30520"
+msgid "These settings only apply on LibreELEC/Linux"
+msgstr ""
+
+msgctxt "#30521"
+msgid "On Windows and Android the N-Connect app connects the controllers – change these settings in the app. On macOS the add-on only displays the status. Select to open the guide."
+msgstr ""
+
+msgctxt "#30634"
+msgid "Bluetooth without LE"
+msgstr ""
+
+msgctxt "#30635"
+msgid "Switch 2 controllers need a Bluetooth adapter with LE (4.0 or newer) – other controllers keep working"
+msgstr ""
+
+msgctxt "#30646"
+msgid "Bluetooth LE (Switch 2)"
+msgstr ""
+
+msgctxt "#30662"
+msgid "Turn on Bluetooth in the Windows settings"
+msgstr ""
+
+msgctxt "#30663"
+msgid "Turn on Bluetooth in Android"
+msgstr ""
+
+msgctxt "#30664"
+msgid "Plug in a Bluetooth adapter or turn on Bluetooth in the Windows settings"
+msgstr ""
+
+msgctxt "#30666"
+msgid "No N-Connect app for this system"
+msgstr ""
+
+msgctxt "#30667"
+msgid "Display only – N-Connect is not available for {0}"
+msgstr ""
+
+msgctxt "#30668"
+msgid "Start N-Connect for Android (0.9.1 or newer) on this device – it reports the status here"
 msgstr ""

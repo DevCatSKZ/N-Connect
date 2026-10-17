@@ -4,7 +4,9 @@
 import json
 import os
 import platform
+import signal
 import stat
+import struct
 import time
 
 import xbmc
@@ -19,13 +21,15 @@ ICON = os.path.join(ADDON_PATH, 'resources', 'icon.png')
 SETTINGS_JSON = os.path.join(DATA_DIR, 'settings.json')
 STATUS_JSON = os.path.join(DATA_DIR, 'status.json')
 LOG_FILE = os.path.join(DATA_DIR, 'nconnect.log')
+PID_FILE = os.path.join(DATA_DIR, 'nconnect.pid')
 
-# Prozessor → .NET-Laufzeitkennung des mitgelieferten Programms.
-_RIDS = {
-    'x86_64': 'linux-x64', 'amd64': 'linux-x64',
-    'aarch64': 'linux-arm64', 'arm64': 'linux-arm64',
-    'armv7l': 'linux-arm', 'armv8l': 'linux-arm', 'armv7': 'linux-arm',
-}
+# Werte von "bluetooth" in status.json (gleich bei Linux-Dienst, Windows- und Android-App). "no_le": Adapter ohne
+# Bluetooth LE – Switch-2-Controller gehen nicht, klassische Controller schon.
+BLUETOOTH_STATES = ('on', 'off', 'missing', 'no_le')
+
+# Prozessorfamilie (Kernel, platform.machine()) → .NET-Laufzeitkennungen des mitgelieferten Programms.
+_X64 = ('x86_64', 'amd64')
+_ARM = ('aarch64', 'arm64', 'armv7l', 'armv8l', 'armv7', 'armv8')
 
 
 def text(string_id, *args):
@@ -57,21 +61,140 @@ def has_daemon():
     return platform.system() == 'Linux'
 
 
-def binary_path():
-    """Pfad zum N-Connect-Programm für diesen Prozessor (oder None) – setzt das Ausführungsrecht, das beim
-    Entpacken des Add-on-Archivs verloren geht."""
-    if not has_daemon():
-        return None  # anderes System (Windows, Android, macOS) – kein mitgeliefertes Programm dafür
-    rid = _RIDS.get(machine())
-    if rid is None:
+def kodi_platform():
+    """System, auf dem Kodi läuft: 'windows' | 'android' | 'linux' | 'osx' | 'ios' | 'tvos' | 'other'."""
+    if xbmc.getCondVisibility('System.Platform.Android'):
+        return 'android'
+    if os.name == 'nt':
+        return 'windows'
+    for name, condition in (('tvos', 'System.Platform.TVOS'), ('ios', 'System.Platform.IOS'),
+                            ('osx', 'System.Platform.OSX')):
+        if xbmc.getCondVisibility(condition):
+            return name
+    return 'linux' if platform.system() == 'Linux' else 'other'
+
+
+def status_platform(status):
+    """Wer die status.json schreibt: Feld "platform" ('windows' | 'android' | 'linux'); ältere Schreiber ohne das
+    Feld → Kodis eigene Plattform."""
+    value = (status or {}).get('platform')
+    return value if value in ('windows', 'android', 'linux') else kodi_platform()
+
+
+def system_name():
+    """Anzeigename eines Systems ohne N-Connect (für „nur Anzeige“)."""
+    return {'osx': 'macOS', 'ios': 'iOS', 'tvos': 'tvOS'}.get(kodi_platform()) or platform.system() or '?'
+
+
+def bluetooth_hint(status):
+    """Hinweis (Titel, Text) zum Bluetooth-Zustand oder None. Der Text passt zum System, das die status.json
+    schreibt: LibreELEC/Linux, Windows oder Android. Die Controllerliste wird trotzdem immer angezeigt."""
+    state = status.get('bluetooth')
+    if state == 'no_le':
+        return text(30634), text(30635)
+    if state not in ('off', 'missing'):
         return None
-    for candidate in (os.path.join(ADDON_PATH, 'bin', rid, 'nconnect'), os.path.join(ADDON_PATH, 'bin', 'nconnect')):
-        if os.path.isfile(candidate):
+    system = status_platform(status)
+    if system == 'windows':
+        detail = text(30662 if state == 'off' else 30664)
+    elif system == 'android':
+        detail = text(30663)
+    else:
+        detail = text(30609 if state == 'off' else 30611)
+    return text(30608 if state == 'off' else 30610), detail
+
+
+def companion_hint():
+    """(Titel, Text), wenn im Begleitmodus kein Status da ist – je nach System, auf dem Kodi läuft."""
+    system = kodi_platform()
+    if system == 'windows':
+        return text(30660), text(30661)
+    if system == 'android':
+        return text(30660), text(30668)
+    return text(30666), text(30667, system_name())  # macOS & Co.: N-Connect gibt es dort nicht – nur Anzeige
+
+
+def runtime_ids():
+    """.NET-Laufzeitkennungen in Prüf-Reihenfolge. Entscheidend ist die Bitbreite des Userlands – die von Kodis
+    Python-Prozess (struct.calcsize('P')) –, nicht die des Kernels: Ein 64-Bit-Kernel mit 32-Bit-System (z. B.
+    Raspberry Pi OS 32 Bit auf Pi 4/5) braucht linux-arm. Die andere ARM-Variante bleibt als Rückfall."""
+    m = machine()
+    if m in _X64:
+        return ['linux-x64']
+    if m in _ARM:
+        return ['linux-arm64', 'linux-arm'] if struct.calcsize('P') == 8 else ['linux-arm', 'linux-arm64']
+    return []
+
+
+def binary_candidates():
+    """Mitgelieferte N-Connect-Programme für diesen Prozessor in Prüf-Reihenfolge (leer = keins). Setzt das
+    Ausführungsrecht, das beim Entpacken des Add-on-Archivs verloren geht."""
+    if not has_daemon():
+        return []  # anderes System (Windows, Android, macOS) – kein mitgeliefertes Programm dafür
+    paths = [os.path.join(ADDON_PATH, 'bin', rid, 'nconnect') for rid in runtime_ids()]
+    paths.append(os.path.join(ADDON_PATH, 'bin', 'nconnect'))
+    result = []
+    for candidate in paths:
+        if not os.path.isfile(candidate):
+            continue
+        try:
             mode = os.stat(candidate).st_mode
             if not mode & stat.S_IXUSR:
                 os.chmod(candidate, mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
-            return candidate
-    return None
+        except OSError as e:
+            log('Ausführungsrecht für {0}: {1}'.format(candidate, e), xbmc.LOGWARNING)
+        result.append(candidate)
+    return result
+
+
+# ---------- Programm aus einer früheren Kodi-Sitzung ----------
+
+def write_pid(pid):
+    try:
+        with open(PID_FILE, 'w') as f:
+            f.write(str(pid))
+    except OSError as e:
+        log('nconnect.pid: {0}'.format(e), xbmc.LOGWARNING)
+
+
+def clear_pid():
+    try:
+        os.remove(PID_FILE)
+    except OSError:
+        pass
+
+
+def _is_nconnect(pid):
+    """Gehört die PID wirklich zu N-Connect mit diesem Datenordner? (PIDs werden wiederverwendet.)"""
+    try:
+        with open('/proc/{0}/cmdline'.format(pid), 'rb') as f:
+            args = f.read().decode('utf-8', 'replace').split('\0')
+    except OSError:
+        return False
+    return os.path.basename(args[0]) == 'nconnect' and DATA_DIR in args
+
+
+def stop_leftover():
+    """Läuft noch ein N-Connect-Programm aus einer früheren Kodi-Sitzung (Kodi abgestürzt), es vor dem Start
+    beenden – sonst halten zwei Programme dieselben Controller und den DSU-Port, und beide schreiben status.json."""
+    try:
+        with open(PID_FILE, 'r') as f:
+            pid = int(f.read().strip())
+    except (OSError, ValueError):
+        return
+    if pid > 1 and _is_nconnect(pid):
+        log('altes N-Connect-Programm (PID {0}) läuft noch – wird beendet'.format(pid), xbmc.LOGWARNING)
+        try:
+            os.kill(pid, signal.SIGTERM)  # trennt die Controller sauber und entfernt die virtuellen Controller
+            for _ in range(40):
+                time.sleep(0.2)
+                if not _is_nconnect(pid):
+                    break
+            else:
+                os.kill(pid, signal.SIGKILL)
+        except OSError as e:
+            log('altes N-Connect-Programm: {0}'.format(e), xbmc.LOGWARNING)
+    clear_pid()
 
 
 def environment():
@@ -330,9 +453,11 @@ def player_icon(player):
 
 
 def help_text():
-    """Anleitung in Kodis Sprache (help_<ISO 639-1>.txt), sonst Englisch."""
+    """Anleitung in Kodis Sprache (help_<ISO 639-1>.txt), sonst Englisch. Im Begleitmodus (Windows, Android, macOS)
+    die kurze Anleitung help_companion_<Sprache>.txt – die LibreELEC-Schritte gibt es dort nicht."""
     lang = (xbmc.getLanguage(xbmc.ISO_639_1) or 'en')[:2].lower()
-    for name in ('help_{0}.txt'.format(lang), 'help_en.txt'):
+    prefix = 'help' if has_daemon() else 'help_companion'
+    for name in ('{0}_{1}.txt'.format(prefix, lang), '{0}_en.txt'.format(prefix)):
         try:
             with open(os.path.join(ADDON_PATH, 'resources', name), 'r', encoding='utf-8') as f:
                 return f.read()

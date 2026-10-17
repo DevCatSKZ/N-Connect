@@ -1,0 +1,17 @@
+[B]Modo de acompanhamento[/B]
+Neste sistema não é o add-on que liga os comandos, mas sim a aplicação N-Connect. O add-on mostra apenas o que a aplicação comunica: o menu (Programas > N-Connect) e o widget do ecrã inicial com os comandos ligados e conhecidos e a respetiva bateria.
+
+[B]Windows[/B]
+Instale e inicie o N-Connect para Windows (github.com/DevCatSKZ/N-Connect). A aplicação liga os comandos como comandos Xbox – o Kodi reconhece-os sem configuração. Escreve o seu estado na pasta de dados do Kodi; se não estiver em execução, aparece aqui «A aplicação N-Connect não está em execução». Kodi instalado depois do N-Connect: reinicie o N-Connect uma vez.
+
+[B]Android[/B]
+Instale e inicie o N-Connect para Android 0.9.1 ou mais recente. A aplicação guarda o seu estado na pasta Documents/N-Connect, onde o add-on o lê. Se o Kodi continuar sem mostrar nada, o Android pode estar a bloquear o acesso: permita ao Kodi o acesso a ficheiros (armazenamento) nas definições do Android. Kodi instalado depois do N-Connect: reinicie o N-Connect uma vez.
+
+[B]macOS[/B]
+O N-Connect não está disponível para macOS – aqui o add-on só pode mostrar e fica vazio.
+
+[B]Definições[/B]
+A disposição dos botões, o giroscópio, a vibração, o emparelhamento, etc. definem-se na aplicação N-Connect. As definições deste add-on só se aplicam no LibreELEC/Linux.
+
+[B]Widget no ecrã inicial[/B]
+Conforme o skin: Definições do skin > Início > Widgets > Add-ons > N-Connect.

@@ -3,6 +3,18 @@
   <section id="service.nconnect">
     <category id="controller" label="30100">
       <group id="buttons" label="30101">
+        <setting id="companion_note_controller" type="action" label="30520" help="30521">
+          <level>0</level>
+          <data>RunScript(service.nconnect,help)</data>
+          <dependencies>
+            <dependency type="visible">
+              <condition on="property" name="InfoBool">!System.Platform.Linux | System.Platform.Android</condition>
+            </dependency>
+          </dependencies>
+          <control type="button" format="action">
+            <close>false</close>
+          </control>
+        </setting>
         <setting id="layout" type="integer" label="30110" help="30111">
           <level>0</level>
           <default>0</default>
@@ -12,6 +24,11 @@
               <option label="30113">1</option>
             </options>
           </constraints>
+          <dependencies>
+            <dependency type="enable">
+              <condition on="property" name="InfoBool">System.Platform.Linux + !System.Platform.Android</condition>
+            </dependency>
+          </dependencies>
           <control type="spinner" format="string"/>
         </setting>
         <setting id="stick_deadzone" type="integer" label="30114" help="30115">
@@ -22,6 +39,11 @@
             <step>1</step>
             <maximum>30</maximum>
           </constraints>
+          <dependencies>
+            <dependency type="enable">
+              <condition on="property" name="InfoBool">System.Platform.Linux + !System.Platform.Android</condition>
+            </dependency>
+          </dependencies>
           <control type="slider" format="percentage">
             <popup>false</popup>
           </control>
@@ -31,6 +53,11 @@
         <setting id="combine_joycons" type="boolean" label="30120" help="30121">
           <level>0</level>
           <default>true</default>
+          <dependencies>
+            <dependency type="enable">
+              <condition on="property" name="InfoBool">System.Platform.Linux + !System.Platform.Android</condition>
+            </dependency>
+          </dependencies>
           <control type="toggle"/>
         </setting>
       </group>
@@ -45,6 +72,11 @@
               <option label="30134">2</option>
             </options>
           </constraints>
+          <dependencies>
+            <dependency type="enable">
+              <condition on="property" name="InfoBool">System.Platform.Linux + !System.Platform.Android</condition>
+            </dependency>
+          </dependencies>
           <control type="spinner" format="string"/>
         </setting>
         <setting id="gyro_speed" type="integer" label="30135" help="30136">
@@ -55,6 +87,11 @@
             <step>10</step>
             <maximum>400</maximum>
           </constraints>
+          <dependencies>
+            <dependency type="enable">
+              <condition on="property" name="InfoBool">System.Platform.Linux + !System.Platform.Android</condition>
+            </dependency>
+          </dependencies>
           <control type="slider" format="integer">
             <popup>false</popup>
           </control>
@@ -62,6 +99,11 @@
         <setting id="gyro_invert_y" type="boolean" label="30137" help="30138">
           <level>1</level>
           <default>false</default>
+          <dependencies>
+            <dependency type="enable">
+              <condition on="property" name="InfoBool">System.Platform.Linux + !System.Platform.Android</condition>
+            </dependency>
+          </dependencies>
           <control type="toggle"/>
         </setting>
       </group>
@@ -69,9 +111,26 @@
 
     <category id="emulators" label="30140">
       <group id="dsu" label="30140">
+        <setting id="companion_note_emulators" type="action" label="30520" help="30521">
+          <level>0</level>
+          <data>RunScript(service.nconnect,help)</data>
+          <dependencies>
+            <dependency type="visible">
+              <condition on="property" name="InfoBool">!System.Platform.Linux | System.Platform.Android</condition>
+            </dependency>
+          </dependencies>
+          <control type="button" format="action">
+            <close>false</close>
+          </control>
+        </setting>
         <setting id="dsu_server" type="boolean" label="30141" help="30142">
           <level>0</level>
           <default>true</default>
+          <dependencies>
+            <dependency type="enable">
+              <condition on="property" name="InfoBool">System.Platform.Linux + !System.Platform.Android</condition>
+            </dependency>
+          </dependencies>
           <control type="toggle"/>
         </setting>
         <setting id="dsu_network" type="boolean" label="30143" help="30144">
@@ -79,6 +138,9 @@
           <default>false</default>
           <dependencies>
             <dependency type="enable" setting="dsu_server">true</dependency>
+            <dependency type="enable">
+              <condition on="property" name="InfoBool">System.Platform.Linux + !System.Platform.Android</condition>
+            </dependency>
           </dependencies>
           <control type="toggle"/>
         </setting>
@@ -87,9 +149,26 @@
 
     <category id="rumble" label="30200">
       <group id="rumble" label="30201">
+        <setting id="companion_note_rumble" type="action" label="30520" help="30521">
+          <level>0</level>
+          <data>RunScript(service.nconnect,help)</data>
+          <dependencies>
+            <dependency type="visible">
+              <condition on="property" name="InfoBool">!System.Platform.Linux | System.Platform.Android</condition>
+            </dependency>
+          </dependencies>
+          <control type="button" format="action">
+            <close>false</close>
+          </control>
+        </setting>
         <setting id="rumble" type="boolean" label="30210" help="30211">
           <level>0</level>
           <default>true</default>
+          <dependencies>
+            <dependency type="enable">
+              <condition on="property" name="InfoBool">System.Platform.Linux + !System.Platform.Android</condition>
+            </dependency>
+          </dependencies>
           <control type="toggle"/>
         </setting>
         <setting id="rumble_strength" type="integer" label="30212" help="30213">
@@ -102,6 +181,9 @@
           </constraints>
           <dependencies>
             <dependency type="enable" setting="rumble">true</dependency>
+            <dependency type="enable">
+              <condition on="property" name="InfoBool">System.Platform.Linux + !System.Platform.Android</condition>
+            </dependency>
           </dependencies>
           <control type="slider" format="percentage">
             <popup>false</popup>
@@ -112,29 +194,66 @@
 
     <category id="connection" label="30300">
       <group id="pairing" label="30301">
+        <setting id="companion_note_connection" type="action" label="30520" help="30521">
+          <level>0</level>
+          <data>RunScript(service.nconnect,help)</data>
+          <dependencies>
+            <dependency type="visible">
+              <condition on="property" name="InfoBool">!System.Platform.Linux | System.Platform.Android</condition>
+            </dependency>
+          </dependencies>
+          <control type="button" format="action">
+            <close>false</close>
+          </control>
+        </setting>
         <setting id="auto_pair" type="boolean" label="30310" help="30311">
           <level>0</level>
           <default>true</default>
+          <dependencies>
+            <dependency type="enable">
+              <condition on="property" name="InfoBool">System.Platform.Linux + !System.Platform.Android</condition>
+            </dependency>
+          </dependencies>
           <control type="toggle"/>
         </setting>
         <setting id="background_scan" type="boolean" label="30334" help="30335">
           <level>0</level>
           <default>true</default>
+          <dependencies>
+            <dependency type="enable">
+              <condition on="property" name="InfoBool">System.Platform.Linux + !System.Platform.Android</condition>
+            </dependency>
+          </dependencies>
           <control type="toggle"/>
         </setting>
         <setting id="auto_pair_gamepads" type="boolean" label="30332" help="30333">
           <level>0</level>
           <default>true</default>
+          <dependencies>
+            <dependency type="enable">
+              <condition on="property" name="InfoBool">System.Platform.Linux + !System.Platform.Android</condition>
+            </dependency>
+          </dependencies>
           <control type="toggle"/>
         </setting>
         <setting id="player_leds" type="boolean" label="30312" help="30313">
           <level>1</level>
           <default>true</default>
+          <dependencies>
+            <dependency type="enable">
+              <condition on="property" name="InfoBool">System.Platform.Linux + !System.Platform.Android</condition>
+            </dependency>
+          </dependencies>
           <control type="toggle"/>
         </setting>
         <setting id="connect_feedback" type="boolean" label="30314" help="30315">
           <level>1</level>
           <default>true</default>
+          <dependencies>
+            <dependency type="enable">
+              <condition on="property" name="InfoBool">System.Platform.Linux + !System.Platform.Android</condition>
+            </dependency>
+          </dependencies>
           <control type="toggle"/>
         </setting>
       </group>
@@ -152,6 +271,11 @@
               <option label="30325">5</option>
             </options>
           </constraints>
+          <dependencies>
+            <dependency type="enable">
+              <condition on="property" name="InfoBool">System.Platform.Linux + !System.Platform.Android</condition>
+            </dependency>
+          </dependencies>
           <control type="spinner" format="string"/>
         </setting>
       </group>
@@ -162,6 +286,11 @@
           <constraints>
             <allowempty>true</allowempty>
           </constraints>
+          <dependencies>
+            <dependency type="enable">
+              <condition on="property" name="InfoBool">System.Platform.Linux + !System.Platform.Android</condition>
+            </dependency>
+          </dependencies>
           <control type="edit" format="string">
             <heading>30330</heading>
           </control>
@@ -171,14 +300,36 @@
 
     <category id="kodi" label="30400">
       <group id="notifications" label="30401">
+        <setting id="companion_note_kodi" type="action" label="30520" help="30521">
+          <level>0</level>
+          <data>RunScript(service.nconnect,help)</data>
+          <dependencies>
+            <dependency type="visible">
+              <condition on="property" name="InfoBool">!System.Platform.Linux | System.Platform.Android</condition>
+            </dependency>
+          </dependencies>
+          <control type="button" format="action">
+            <close>false</close>
+          </control>
+        </setting>
         <setting id="notifications" type="boolean" label="30410" help="30411">
           <level>0</level>
           <default>true</default>
+          <dependencies>
+            <dependency type="enable">
+              <condition on="property" name="InfoBool">System.Platform.Linux + !System.Platform.Android</condition>
+            </dependency>
+          </dependencies>
           <control type="toggle"/>
         </setting>
         <setting id="battery_warning" type="boolean" label="30412" help="30413">
           <level>0</level>
           <default>true</default>
+          <dependencies>
+            <dependency type="enable">
+              <condition on="property" name="InfoBool">System.Platform.Linux + !System.Platform.Android</condition>
+            </dependency>
+          </dependencies>
           <control type="toggle"/>
         </setting>
       </group>
@@ -194,6 +345,11 @@
               <option label="30439">9</option><option label="30440">10</option>
             </options>
           </constraints>
+          <dependencies>
+            <dependency type="enable">
+              <condition on="property" name="InfoBool">System.Platform.Linux + !System.Platform.Android</condition>
+            </dependency>
+          </dependencies>
           <control type="spinner" format="string"/>
         </setting>
         <setting id="c_action" type="integer" label="30422" help="30425">
@@ -207,6 +363,11 @@
               <option label="30439">9</option><option label="30440">10</option>
             </options>
           </constraints>
+          <dependencies>
+            <dependency type="enable">
+              <condition on="property" name="InfoBool">System.Platform.Linux + !System.Platform.Android</condition>
+            </dependency>
+          </dependencies>
           <control type="spinner" format="string"/>
         </setting>
         <setting id="gl_action" type="integer" label="30423" help="30425">
@@ -220,6 +381,11 @@
               <option label="30439">9</option><option label="30440">10</option>
             </options>
           </constraints>
+          <dependencies>
+            <dependency type="enable">
+              <condition on="property" name="InfoBool">System.Platform.Linux + !System.Platform.Android</condition>
+            </dependency>
+          </dependencies>
           <control type="spinner" format="string"/>
         </setting>
         <setting id="gr_action" type="integer" label="30424" help="30425">
@@ -233,6 +399,11 @@
               <option label="30439">9</option><option label="30440">10</option>
             </options>
           </constraints>
+          <dependencies>
+            <dependency type="enable">
+              <condition on="property" name="InfoBool">System.Platform.Linux + !System.Platform.Android</condition>
+            </dependency>
+          </dependencies>
           <control type="spinner" format="string"/>
         </setting>
       </group>
@@ -257,6 +428,11 @@
         <setting id="run_selftest" type="action" label="30514" help="30515">
           <level>0</level>
           <data>RunScript(service.nconnect,selftest)</data>
+          <dependencies>
+            <dependency type="visible">
+              <condition on="property" name="InfoBool">System.Platform.Linux + !System.Platform.Android</condition>
+            </dependency>
+          </dependencies>
           <control type="button" format="action">
             <close>false</close>
           </control>
@@ -264,6 +440,11 @@
         <setting id="open_log" type="action" label="30516" help="30517">
           <level>1</level>
           <data>RunScript(service.nconnect,log)</data>
+          <dependencies>
+            <dependency type="visible">
+              <condition on="property" name="InfoBool">System.Platform.Linux + !System.Platform.Android</condition>
+            </dependency>
+          </dependencies>
           <control type="button" format="action">
             <close>false</close>
           </control>
