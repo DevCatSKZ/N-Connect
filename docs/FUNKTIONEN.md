@@ -426,7 +426,8 @@ erneut versucht – ebenso, wenn ViGEm keinen virtuellen Controller anlegen kann
   Alt+Tab, Ton aus, Titel vor/zurück (`NextTrack`/`PrevTrack`).
 - **Desktop-Widget** (`ControllerWidget`, `Settings.DesktopWidget`, Standard **aus**; *Allgemein → Desktop-Widget*):
   rahmenloses Kärtchen im aktiven Farbschema (Neon: Akzentlinie oben) mit Spieler, Name, Verbindung · Ausgabe und
-  Akku (leerster Akku des Spielers, Blitz beim Laden); Kopf zeigt Anzahl bzw. aktives Profil. Ohne Fokus, nicht in
+  Akku (leerster Akku des Spielers, Blitz beim Laden); Kopf zeigt Anzahl bzw. aktives Profil (im Infobereich fest
+  „Standard“ gewählt: „Profil: Standard“, `ControllerWidget.ProfileStatus`). Ohne Fokus, nicht in
   der Taskleiste; mit der Maus verschiebbar (`WidgetX`/`WidgetY`, ungültige Position → oben rechts), Rechtsklick:
   N-Connect öffnen, Immer im Vordergrund (`WidgetOnTop`), Kompakte Ansicht (`WidgetCompact`), Deckkraft
   (`WidgetOpacity` 40–100 %), Position zurücksetzen, ausblenden. Doppelklick öffnet N-Connect. Aktualisiert sich
@@ -439,7 +440,9 @@ erneut versucht – ebenso, wenn ViGEm keinen virtuellen Controller anlegen kann
   starten, Einstellungen, Controller koppeln, Kurzanleitung, Protokoll öffnen, Update, Beenden. Bei einem
   Bluetooth-Problem steht es als erste Zeile darüber; die Spieler bleiben trotzdem aufgeführt (USB, XInput und ohne
   Bluetooth LE auch die klassischen Controller laufen weiter).
-- Symbol zeigt den niedrigsten Akkustand; Tooltip je Spieler „P1 Name 57 %“ (max. 127 Zeichen).
+- Symbol zeigt den niedrigsten Akkustand; Tooltip je Spieler „P1 Name 57 %“ (max. 127 Zeichen), ohne Controller
+  „N-Connect: warte auf Controller (SYNC drücken)“, bei einem Bluetooth-Problem bzw. fehlendem ViGEmBus
+  „N-Connect: <Problem>“ – alles in der Sprache der Oberfläche.
 - Einblendungen: Verbunden/Getrennt, Kopplung, Akku, schwache Verbindung, Bluetooth-Probleme, Update.
 
 ## 13. Kopplungsdaten (Switch 1)
@@ -464,8 +467,9 @@ erneut versucht – ebenso, wenn ViGEm keinen virtuellen Controller anlegen kann
 
 - **Autostart** (Standard an beim ersten Start, danach Nutzerentscheidung): HKCU\…\Run mit `--autostart`
   (unsichtbar starten). Zweiter Start zeigt das Fenster der laufenden Instanz.
-- **Darstellung**: Farbmodus Dunkel (Standard), Hell, Wie Windows; dazu **Farbschema** (`Theme.Schemes`,
-  `Settings.ColorScheme`, Auswahl als Vorschau-Kacheln `SchemePicker` unter *Allgemein → Darstellung*):
+- **Darstellung**: Farbmodus Dunkel (Standard), Hell, Wie Windows (`Settings.Theme` = `dark`/`light`/`system`; auch
+  „Dunkel“ wird ausdrücklich gespeichert, null heißt „nie gewählt“ und gilt als Dunkel); dazu **Farbschema**
+  (`Theme.Schemes`, `Settings.ColorScheme`, Auswahl als Vorschau-Kacheln `SchemePicker` unter *Allgemein → Darstellung*):
   - **Windows** (Standard): Farben von Windows 11/Fluent – Hintergrund #202020, Karten #2B2B2B, Steuerelemente
     #373737, Akzent Windows-Blau (dunkel #4CC2FF mit schwarzer Schrift wie in Windows, hell #005FB8 mit weißer);
     keine Verläufe, kein Leuchten (`Theme.Neon` = false), Schriftzug schlicht in Textfarbe.
@@ -492,8 +496,26 @@ erneut versucht – ebenso, wenn ViGEm keinen virtuellen Controller anlegen kann
   als PNG), PNG und Installer-Grafiken, ohne ein Fenster zu öffnen.
 - **Grafiken**: Pfeile (▲▼◀▶) zeichnet `InputView.Caption` als gleich große Dreiecke, die bei gedrehtem Controller
   (quer gehaltener Joy-Con) mitdrehen; alle anderen Beschriftungen bleiben waagerecht lesbar.
-- **Sprache**: 12 Sprachen (de, en, es, fr, it, pt, nl, pl, ru, ja, zh, ko), Standard wie Windows
-  (Übersetzungstabelle + Muster für Texte mit Platzhaltern).
+- **Sprache**: 12 Sprachen (de, en, es, fr, it, pt, nl, pl, ru, ja, zh, ko). „Automatisch (wie Windows)“ (Standard,
+  gespeichert als null) = Anzeigesprache von Windows (`Tr.WindowsLanguage`; ohne eigene Tabelle Englisch). Übersetzt
+  wird über Tabellen mit dem deutschen Text als Schlüssel (`Tr.Texts.cs` = Englisch, `Tr.Lang*.cs`) und Muster für
+  Texte mit Platzhaltern (`Tr.cs` und je Sprache dieselben Muster in derselben Reihenfolge); aus mehreren Sätzen
+  zusammengesetzte Meldungen Satz für Satz. Fehlt ein Text, gilt Englisch, dann Deutsch. Die Kurzanleitung
+  (`WelcomeForm`, beim ersten Start und im Infobereich) wird absatzweise übersetzt, das Fenster wächst mit dem Text.
+  Vollständigkeit sichern die Unit-Tests `TranslationTests` (`tests/Switch2Pro.Bridge.Tests`): alle Tabellen mit
+  denselben Schlüsseln, keine doppelten, gleiche Muster, Zahlen/Namen bleiben erhalten, Stichproben bisheriger Lücken.
+- **Installer → App** (`installer/N-Connect.iss`, `InstallerChoices`): Das Setup läuft mit Adminrechten und schreibt
+  deshalb keine Benutzereinstellungen (kein HKCU). Es startet N-Connect nach der Installation als angemeldeter Benutzer
+  mit `--setup-lang=xx --setup-theme=dark|light|system`; die App übernimmt die Werte einmalig, solange in
+  settings.json noch nichts gewählt ist – die Sprache nur, wenn sie von der Windows-Sprache abweicht (sonst bleibt es
+  bei „Automatisch“). Fehlen die Argumente beim allerersten Start (im Setup „Jetzt starten“ abgewählt, weiteres
+  Benutzerkonto), gilt die Wahl, die das Setup im eigenen Deinstallationsschlüssel in HKLM merkt
+  (`Inno Setup CodeFile: Language`/`Theme`, nur gelesen). Stilles Update (Ein-Klick-Update, winget): keine
+  Argumente, es ändert sich nichts. Werte älterer Setups (bis 1.0.21: `HKCU\Software\N-Connect\Language`/`Theme`)
+  übernimmt die installierte App beim nächsten Start einmalig und löscht sie. Die Setup-Seite „Darstellung“ wählt
+  die Wahl der letzten Installation vor. Anleitung im Programmordner in der Setup-Sprache: Deutsch `Anleitung.md`,
+  sonst `README.md` (englisch). Die Deinstallation entfernt den Autostart in allen angemeldeten Benutzerprofilen
+  (nur Einträge, die auf diese Installation zeigen).
 - **Kodi auf diesem PC** (`KodiStatusWriter`): Ist in einer Kodi-Installation (normal oder Microsoft Store) das
   Add-on `service.nconnect` installiert, schreibt N-Connect alle 3 s bei Änderung, sonst alle 10 s als Herzschlag
   `userdata/addon_data/service.nconnect/status.json` (gleiches Format wie der Linux-Dienst; die Berichtsrate zählt
@@ -504,10 +526,14 @@ erneut versucht – ebenso, wenn ViGEm keinen virtuellen Controller anlegen kann
   gehen nicht, klassische schon). Beim Beenden einmal `{"state": "stopped", "platform": "windows"}`, damit Kodi nicht
   noch bis zu 15 s verbundene Controller zeigt.
 - **Update**: Prüft beim Start (nach 10 s) GitHub-Releases (`v1.2.3`). Mit Installer im Release: Ein-Klick-Update –
-  Nachfrage, Download nur von GitHub, Größe und SHA-256 (falls angegeben) geprüft, stiller Installer, Neustart.
+  Nachfrage, Download nur von GitHub, Größe und SHA-256 (falls angegeben) geprüft, stiller Installer, Neustart. Die
+  portable Variante lädt das ZIP und tauscht die EXE nach dem Beenden aus; ihre Nachfrage nennt deshalb keine
+  Administratorrechte.
 - **Protokoll**: `%LOCALAPPDATA%\N-Connect\bridge.log` (ab 1 MB einmal rotiert). Einstellungen:
   `%APPDATA%\N-Connect\settings.json` (bei Änderung von außen neu geladen, 300 ms entprellt).
 - **Prüfhilfen**: `--demo`, `--demo-all`, `--demo-retro` (simulierte Controller), `--render <Ordner>`
   (Controller-Grafiken, auch Joy-Con 1/2 quer, hochkant, Paar, Grip: `jc1_links_quer.png` …),
-  `--render-ui <Ordner> [--wide] [--en] [--light]` (alle Seiten/Karten/Dialoge, auch `ui_kopplungsdaten_*.png`),
-  `--render-brand`, `--dump-ui <Datei> --en` (Texte ohne Übersetzung).
+  `--render-ui <Ordner> [--wide] [--en | --lang=xx] [--light]` (alle Seiten/Karten/Dialoge, auch
+  `ui_kopplungsdaten_*.png`), `--render-brand`, `--dump-ui <Datei> [--en | --lang=xx]` (Texte ohne eigene Übersetzung
+  in dieser Sprache; dazu `<Datei>.rueckfall.txt` mit allen Sprachen und den Texten, die dort nur über Englisch oder
+  gar nicht übersetzt werden).
