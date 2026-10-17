@@ -264,6 +264,33 @@ public sealed class LanguageAndThemeTests : IDisposable
         Assert.Equal(Tr.Supported.Order(), always.Concat(optional.Select(m => m.Groups[1].Value)).Select(n => codeOf[n]).Distinct().Order());
     }
 
+    /// <summary>
+    /// Bewusst gewählt ist jede Setup-Sprache, die vom Vorschlag des Setups abweicht – auch wenn es die Windows-Sprache gar
+    /// nicht anbot (traditionelles Chinesisch, Chinesisch ohne ISL-Datei): Wer dort Deutsch wählt, bekommt Deutsch statt
+    /// der vereinfacht-chinesischen Tabelle. Verworfen wird nur der Vorschlag selbst (Windows-Sprache bzw. Englisch).
+    /// </summary>
+    [Fact]
+    public void InstallerVerwirftNurDenEigenenVorschlag()
+    {
+        string iss = File.ReadAllText(Path.Combine(Repo.Root(), "installer", "N-Connect.iss")).Replace("\r\n", "\n");
+        string chosen = Regex.Match(iss, @"function ChosenLangCode: String;.*?\nend;", RegexOptions.Singleline).Value;
+        Assert.NotEqual("", chosen);
+        var proposal = Regex.Match(chosen,
+            @"if \(Pos\(' ' \+ WinLang \+ ' ', ' \{#SetupLangs\} '\) > 0\)\s*and not \(\(WinLang = 'zh'\) and \((?<hant>[^\n]*)\)\) then\s*" +
+            @"Proposal := WinLang\s*else\s*Proposal := 'en';\s*Result := InstallerLangCode;\s*if Result = Proposal then\s*Result := '';\s*end;$");
+        Assert.True(proposal.Success, chosen);
+        // Alle Kennungen für traditionelles Chinesisch (Taiwan, Hongkong, Macau, neutral) – Vorschlag dort Englisch.
+        var hant = Regex.Matches(proposal.Groups["hant"].Value, @"Lang = \$([0-9A-F]{4})").Select(m => Convert.ToInt32(m.Groups[1].Value, 16)).ToList();
+        Assert.Equal([0x0404, 0x0C04, 0x1404, 0x7C04], hant);
+        foreach (int lcid in hant)
+        {
+            var culture = CultureInfo.GetCultureInfo(lcid);
+            Assert.True(culture.Name == "zh-Hant" || culture.Parent.Name == "zh-Hant", $"{lcid:X4}: {culture.Name}");
+        }
+        // Nur eine Stelle setzt die Sprache auf „nichts übergeben“.
+        Assert.Single(Regex.Matches(chosen, @"Result := '';"));
+    }
+
     [Fact]
     public void GrossschreibungIstEgal()
     {

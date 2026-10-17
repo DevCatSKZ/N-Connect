@@ -561,8 +561,16 @@ internal sealed class TrayApp : ApplicationContext
     }
 
     /// <summary>
-    /// Portable-Update: ZIP entpacken, ein Hilfsskript schreiben, das nach unserem Prozess-Ende die neue EXE
-    /// neben die alte kopiert und N-Connect wieder startet. Liefert false, wenn das ZIP kein N-Connect.exe enthielt.
+    /// Begleitdateien im Portable-ZIP (build.yml packt sie neben die EXE), die das Update mit austauscht, wenn das ZIP sie
+    /// enthält: Lizenz und Drittanbieter-Hinweise – „Lizenzen Dritter“ öffnet die Datei neben der EXE, sie muss zur
+    /// laufenden Version passen. portable.txt und den Ordner „data“ (Einstellungen, Protokoll) fasst das Update nicht an.
+    /// </summary>
+    internal static readonly string[] PortableCompanionFiles = ["LICENSE", SettingsForm.NoticesFile];
+
+    /// <summary>
+    /// Portable-Update: ZIP entpacken, ein Hilfsskript schreiben, das nach unserem Prozess-Ende die neue EXE (und ihre
+    /// Begleitdateien) neben die alte kopiert und N-Connect wieder startet. Liefert false, wenn das ZIP kein N-Connect.exe
+    /// enthielt.
     /// </summary>
     private bool PreparePortableUpdate(string zipPath)
     {
@@ -574,29 +582,17 @@ internal sealed class TrayApp : ApplicationContext
             System.IO.Compression.ZipFile.ExtractToDirectory(zipPath, dir);
             string? exe = Directory.GetFiles(dir, "N-Connect.exe", SearchOption.AllDirectories).FirstOrDefault();
             string? target = Environment.ProcessPath;
-            if (exe is null || target is null)
+            if (exe is null || target is null || Path.GetDirectoryName(exe) is not { } source
+                || Path.GetDirectoryName(target) is not { } targetDir)
                 return false;
+            var companions = PortableCompanionFiles
+                .Select(name => (From: Path.Combine(source, name), To: Path.Combine(targetDir, name)))
+                .Where(file => File.Exists(file.From))
+                .ToList();
             string script = Path.Combine(Path.GetTempPath(), "N-Connect-Update", "update.cmd");
-            int pid = Environment.ProcessId;
-            // „%“ in Pfaden würde cmd als Variable lesen.
-            static string Batch(string path) => path.Replace("%", "%%");
             // UTF-8 ohne BOM + chcp 65001: sonst liest cmd Umlaute im Pfad (z. B. Benutzername „Jürgen“) in der
-            // OEM-Codepage falsch und findet weder die neue noch die alte EXE. Kopieren mehrmals versuchen, weil die
-            // EXE kurz nach Prozess-Ende noch gesperrt sein kann.
-            File.WriteAllText(script,
-                "@echo off\r\n" +
-                "chcp 65001 >nul\r\n" +
-                ":wait\r\n" +
-                $"tasklist /FI \"PID eq {pid}\" | findstr /C:\" {pid} \" >nul\r\n" +
-                "if not errorlevel 1 (timeout /t 1 /nobreak >nul & goto wait)\r\n" +
-                "set tries=0\r\n" +
-                ":copy\r\n" +
-                $"copy /y \"{Batch(exe)}\" \"{Batch(target)}\" >nul && goto run\r\n" +
-                "set /a tries+=1\r\n" +
-                "if %tries% lss 10 (timeout /t 1 /nobreak >nul & goto copy)\r\n" +
-                ":run\r\n" +
-                $"start \"\" \"{Batch(target)}\"\r\n" +
-                "(goto) 2>nul & del \"%~f0\"\r\n",
+            // OEM-Codepage falsch und findet weder die neue noch die alte EXE.
+            File.WriteAllText(script, PortableUpdateScript(Environment.ProcessId, exe, target, companions),
                 new System.Text.UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("cmd.exe", $"/c \"{script}\"")
                 { CreateNoWindow = true, UseShellExecute = false, WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden });
@@ -608,6 +604,39 @@ internal sealed class TrayApp : ApplicationContext
             Log.Warn($"Update: portable EXE nicht vorbereitet: {Log.Reason(e)}");
             return false;
         }
+    }
+
+    /// <summary>
+    /// Hilfsskript fürs Portable-Update: wartet auf das Ende von Prozess <paramref name="pid"/>, ersetzt die EXE (mehrere
+    /// Versuche, sie kann kurz nach Prozess-Ende noch gesperrt sein), kopiert danach die Begleitdateien
+    /// (<see cref="PortableCompanionFiles"/>) und startet N-Connect wieder. Klappt das Ersetzen der EXE nicht, bleiben auch
+    /// die Begleitdateien alt – sie gehören zur EXE, die weiterläuft. Ein Fehler beim Kopieren einer Begleitdatei hält den
+    /// Neustart nicht auf.
+    /// </summary>
+    internal static string PortableUpdateScript(int pid, string newExe, string target, IEnumerable<(string From, string To)> companions)
+    {
+        // „%“ in Pfaden würde cmd als Variable lesen.
+        static string Batch(string path) => path.Replace("%", "%%");
+        var script = new System.Text.StringBuilder()
+            .Append("@echo off\r\n")
+            .Append("chcp 65001 >nul\r\n")
+            .Append(":wait\r\n")
+            .Append($"tasklist /FI \"PID eq {pid}\" | findstr /C:\" {pid} \" >nul\r\n")
+            .Append("if not errorlevel 1 (timeout /t 1 /nobreak >nul & goto wait)\r\n")
+            .Append("set tries=0\r\n")
+            .Append(":copy\r\n")
+            .Append($"copy /y \"{Batch(newExe)}\" \"{Batch(target)}\" >nul && goto copied\r\n")
+            .Append("set /a tries+=1\r\n")
+            .Append("if %tries% lss 10 (timeout /t 1 /nobreak >nul & goto copy)\r\n")
+            .Append("goto run\r\n")
+            .Append(":copied\r\n");
+        foreach (var (from, to) in companions)
+            script.Append($"copy /y \"{Batch(from)}\" \"{Batch(to)}\" >nul 2>nul\r\n");
+        return script
+            .Append(":run\r\n")
+            .Append($"start \"\" \"{Batch(target)}\"\r\n")
+            .Append("(goto) 2>nul & del \"%~f0\"\r\n")
+            .ToString();
     }
 
     private async Task CheckForHidHideUpdateAsync()
