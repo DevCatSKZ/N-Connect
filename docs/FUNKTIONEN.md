@@ -317,7 +317,9 @@ erneut versucht – ebenso, wenn ViGEm keinen virtuellen Controller anlegen kann
 - **Gyro-Maus**: Bildpunkte je Grad (Standard 20), per Taste gehalten oder umgeschaltet.
 - **Joy-Con-Paar**: Gyro vom rechten (Standard) oder linken Joy-Con.
 - **DualShock 4**: Bewegungsdaten gehen an Spiele/Steam.
-- **Cemuhook/DSU** (Standard an): UDP 127.0.0.1:26760 für Emulatoren (Cemu, Dolphin, Yuzu-Nachfolger …).
+- **Cemuhook/DSU** (Standard an): UDP 127.0.0.1:26760 für Emulatoren (Cemu, Dolphin, Yuzu-Nachfolger …), Spieler 1–4.
+  Derselbe Server wie unter Android und Linux (`Switch2Pro.Protocol.DsuServer`); ist der Port belegt (etwa durch
+  DS4Windows), läuft N-Connect ohne DSU weiter und vermerkt das im Protokoll.
 
 ### 7.1 Extras nach JoyShockMapper (Referenz: JSM-Dokumentation, gleiche Begriffe)
 - **Gyro-Beschleunigung** (`GyroAcceleration` 1–4, 1 = aus; `GyroAccelSlow` 20 °/s, `GyroAccelFast` 120 °/s – wie
@@ -459,7 +461,7 @@ erneut versucht – ebenso, wenn ViGEm keinen virtuellen Controller anlegen kann
   mit Akzent-Knopf „Übernehmen“); Inhalt wird selbst gezeichnet (`Report`: Zeilen mit „:“ am Ende = Zwischenüberschrift,
   „  •  “ = Aufzählung). Passwort-Dialog (`PasswordDialog`) ebenso, Eingabefelder als `TextField`.
 - **Entfernt: Export für ESP32 / nRF52840 und Funkadapter.** Der Weg über eine eigene Funkplatine ist verworfen
-  (10.10.2026). Der Export war seit 1.0.19 ausgeblendet; nach 1.0.21 sind auch der Code (`Esp32Export`,
+  (10.10.2026). Der Export war seit 1.0.19 ausgeblendet; in 1.0.22 sind auch der Code (`Esp32Export`,
   `AdapterProtocol`, `AdapterConnection`/`AdapterLink`, `WindowsBtDevices`), das Paket System.IO.Ports und die
   Einstellungen `UseAdapter`/`AdapterPort` entfernt – alte settings.json mit diesen Feldern laden weiter (unbekannte
   Felder werden überlesen). Die gemerkte Art je Controller (`Settings.ControllerKinds`, `RememberKind`) bleibt: Sie
@@ -537,9 +539,23 @@ erneut versucht – ebenso, wenn ViGEm keinen virtuellen Controller anlegen kann
 - **Update**: Prüft beim Start (nach 10 s) GitHub-Releases (`v1.2.3`). Mit Installer im Release: Ein-Klick-Update –
   Nachfrage, Download nur von GitHub, Größe und SHA-256 (falls angegeben) geprüft, stiller Installer, Neustart. Die
   portable Variante lädt das ZIP und tauscht die EXE nach dem Beenden aus; ihre Nachfrage nennt deshalb keine
-  Administratorrechte.
+  Administratorrechte. Builds der CI ohne Tag tragen die Vorabversion `<Version>-ci.<Lauf>` (`UpdateCheck.Label`,
+  angezeigt in den Einstellungen, der Diagnose und im Startprotokoll); für sie gilt das Release mit derselben Nummer
+  als neuer (`UpdateCheck.IsNewer`). Datei- und Setup-Version bleiben numerisch.
 - **Protokoll**: `%LOCALAPPDATA%\N-Connect\bridge.log` (ab 1 MB einmal rotiert). Einstellungen:
   `%APPDATA%\N-Connect\settings.json` (bei Änderung von außen neu geladen, 300 ms entprellt).
+- **Einstellungsdatei unlesbar** (`Settings.Load`/`Save`): Gespeichert wird über eine Zwischendatei, die vorige Fassung
+  bleibt als `settings.json.bak`. Ist `settings.json` beim Start unlesbar, lädt N-Connect die `.bak`
+  (`RestoredFromBackup`, Meldung „Einstellungen wiederhergestellt“) oder die Standardwerte (`LoadError`, Meldung
+  „Einstellungen fehlerhaft“); ein Klick auf die Meldung zeigt die Datei im Explorer. Vor dem ersten Überschreiben
+  wird die unlesbare Datei einmalig als `settings.json.unlesbar-<yyyyMMdd-HHmmss>` aufbewahrt (`UnreadableCopy`), eine
+  ebenfalls unlesbare `.bak` als `settings.json.bak.unlesbar-…`; scheitert das Kopieren, wird nichts überschrieben.
+  Unlesbar beim Neuladen im Betrieb (auch wenn nur die ältere `.bak` lesbar wäre): Die Änderung wird verworfen, die
+  laufenden Werte bleiben (`KeepUnreadableOf`). Unbekannte Enum-Namen (neuere Version, Tippfehler) verwerfen nur den
+  einzelnen Wert, Groß/Klein-Dubletten in den Adress-Wörterbüchern werden zusammengeführt (letzter Wert gewinnt).
+- **Lizenzen Dritter** (*Allgemein → Erweitert*, Knopf „Öffnen“): öffnet `THIRD-PARTY-NOTICES.md` neben der EXE (Setup:
+  Programmordner, portable: im ZIP) im Programm, das für `.md` eingestellt ist, sonst im Editor; fehlt die Datei, die
+  Fassung auf GitHub. Das Portable-ZIP enthält zusätzlich `LICENSE`.
 - **Prüfhilfen**: `--demo`, `--demo-all`, `--demo-retro` (simulierte Controller), `--render <Ordner>`
   (Controller-Grafiken, auch Joy-Con 1/2 quer, hochkant, Paar, Grip: `jc1_links_quer.png` …),
   `--render-ui <Ordner> [--wide] [--en | --lang=xx] [--light]` (alle Seiten/Karten/Dialoge, auch
