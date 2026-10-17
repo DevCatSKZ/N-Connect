@@ -107,7 +107,7 @@ internal sealed class TrayApp : ApplicationContext
             catch (Exception e) { Log.Warn($"Einblendung: {Log.Reason(e)}"); }
         }, null);
         _manager.ControllerConnected += (address, _) => _ui.Post(_ => RememberController(address), null);
-        // Art je Adresse merken (Kodi-Anzeige und Übersicht zeigen sie auch, wenn der Controller gerade nicht verbunden ist).
+        // Art je Adresse merken (die Kodi-Anzeige zeigt sie auch, wenn der Controller gerade nicht verbunden ist).
         _manager.LinkConnected += link => _ui.Post(_ =>
         {
             if (link.Address is { } address && _settings.RememberKind(address, link.Kind))
