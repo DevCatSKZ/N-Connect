@@ -53,9 +53,9 @@ internal sealed class SettingsForm : UiForm
     private readonly ComboBox _language = Combo(220, "Automatisch (wie Windows)", "Deutsch", "English", "Español",
         "Français", "Italiano", "Português", "Nederlands", "Polski", "Русский", "日本語", "中文 (简体)", "한국어");
 
-    /// <summary>Sprachcodes passend zu den Einträgen der Sprachliste (null = automatisch).</summary>
-    private static readonly string?[] LanguageCodes =
-        [null, "de", "en", "es", "fr", "it", "pt", "nl", "pl", "ru", "ja", "zh", "ko"];
+    /// <summary>Sprachcodes passend zu den Einträgen der Sprachliste („auto“ = Automatisch, siehe <see cref="LanguageCode"/>).</summary>
+    private static readonly string[] LanguageCodes =
+        ["auto", "de", "en", "es", "fr", "it", "pt", "nl", "pl", "ru", "ja", "zh", "ko"];
     private readonly ToggleSwitch _dsu = new();
     private readonly ToggleSwitch _updates = new();
     private readonly ToggleSwitch _hidHideUpdates = new();
@@ -803,7 +803,7 @@ internal sealed class SettingsForm : UiForm
         _dsu.Checked = _settings.DsuServer;
         _updates.Checked = _settings.CheckForUpdates;
         _hidHideUpdates.Checked = _settings.CheckHidHideUpdates;
-        _language.SelectedIndex = Math.Max(0, Array.IndexOf(LanguageCodes, _settings.Language));
+        _language.SelectedIndex = Math.Max(0, Array.IndexOf(LanguageCodes, _settings.Language)); // null (nie gewählt) = Automatisch
         _themeMode.SelectedIndex = _settings.Theme switch { "light" => 1, "system" => 2, _ => 0 };
         _transparency.Checked = _settings.Transparency;
         _scheme.SelectedIndex = Math.Max(0, Array.IndexOf(Theme.Schemes, Theme.SchemeById(_settings.ColorScheme)));
@@ -1172,12 +1172,19 @@ internal sealed class SettingsForm : UiForm
         Reopen();
     }
 
+    /// <summary>
+    /// Wert für <see cref="Settings.Language"/> zum Eintrag der Sprachliste. „Automatisch“ wird wie „Dunkel“
+    /// ausdrücklich gespeichert („auto“): null heißt „nie gewählt“ – nur dann darf der Installer vorgeben.
+    /// </summary>
+    internal static string LanguageCode(int selectedIndex) =>
+        selectedIndex >= 0 && selectedIndex < LanguageCodes.Length ? LanguageCodes[selectedIndex] : LanguageCodes[0];
+
     /// <summary>Sprache wechseln: speichern und das Fenster in der neuen Sprache neu öffnen.</summary>
     private void ChangeLanguage()
     {
         if (_loading)
             return;
-        string? language = _language.SelectedIndex is >= 0 and var i && i < LanguageCodes.Length ? LanguageCodes[i] : null;
+        string language = LanguageCode(_language.SelectedIndex);
         if (language == _settings.Language)
             return;
         _settings.Language = language;

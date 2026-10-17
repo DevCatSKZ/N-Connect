@@ -5,7 +5,8 @@ namespace Switch2Pro.Bridge;
 
 /// <summary>
 /// Sprache und Darstellung aus dem Installer: Das Setup startet N-Connect nach der Installation im Kontext des
-/// angemeldeten Benutzers mit „--setup-lang=xx --setup-theme=dark|light|system“ (beim stillen Update ohne). Übernommen
+/// angemeldeten Benutzers mit „--setup-theme=dark|light|system“ und, falls dort bewusst eine andere Sprache als die von
+/// Windows gewählt wurde, „--setup-lang=xx“ (beim stillen Update ohne Argumente). Übernommen
 /// wird nur, was in settings.json noch nicht gewählt ist – danach entscheidet allein die App, spätere Setups
 /// überschreiben nichts. Beim allerersten Start ohne diese Argumente (im Setup „Jetzt starten“ abgewählt, weiteres
 /// Benutzerkonto) gilt die Wahl, die das Setup in seinem Deinstallationsschlüssel (HKLM) merkt. Ältere Installer
@@ -52,10 +53,11 @@ internal static class InstallerChoices
         args.FirstOrDefault(a => a.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)) is { } a ? a[prefix.Length..].Trim() : null;
 
     /// <summary>
-    /// Gültige Werte übernehmen, wo die Einstellung noch leer ist (null = nie gewählt). Unbekannte Codes werden
-    /// ignoriert. Die Sprache nur, wenn sie von der Windows-Sprache <paramref name="windowsLanguage"/> abweicht: Sonst
-    /// ergibt „Automatisch“ (ebenfalls null) dieselbe Sprache – so bleibt „Automatisch“ auch nach einem späteren Setup
-    /// erhalten und folgt weiter Windows. Liefert true, wenn sich etwas geändert hat.
+    /// Gültige Werte übernehmen, wo die Einstellung noch leer ist (null = nie gewählt; „Automatisch“ und „Dunkel“
+    /// speichert die App ausdrücklich als "auto" bzw. "dark"). Unbekannte Codes werden ignoriert. Die Sprache nur, wenn
+    /// sie von der Windows-Sprache <paramref name="windowsLanguage"/> abweicht: Sonst ergibt null dieselbe Sprache und
+    /// folgt weiter Windows. Das Setup übergibt die Sprache ohnehin nur, wenn sie dort bewusst gewählt wurde
+    /// (ChosenLangCode in installer/N-Connect.iss). Liefert true, wenn sich etwas geändert hat.
     /// </summary>
     internal static bool Adopt(Settings settings, string? language, string? theme, string windowsLanguage)
     {
