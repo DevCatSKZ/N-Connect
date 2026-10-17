@@ -25,6 +25,13 @@ internal static class DeviceTree
         IsPhysicalChain(UsbNative.GetDeviceChain(instanceId, MaxDepth));
 
     /// <summary>
+    /// Angeschlossenes Gerät am ViGEm-Bus (eigene und fremde virtuelle Pads, siehe <see cref="IsViGEmChain"/>)? false,
+    /// wenn es gerade nicht angeschlossen ist.
+    /// </summary>
+    public static bool IsViGEmInstance(string instanceId) =>
+        IsViGEmChain(UsbNative.GetDeviceChain(instanceId, MaxDepth));
+
+    /// <summary>
     /// Entscheidung allein aus der Kette (Index 0 = das Gerät selbst, dann die Eltern bis zur Wurzel):
     /// virtuell, sobald irgendein Knoten zum ViGEmBus gehört (Dienst oder Hardware-ID, eigene und fremde Pads,
     /// z. B. DS4Windows). Sonst von unten nach oben: echt, wenn zuerst ein USB-Host/Hub (USB\ROOT_HUB…, PCI\…) oder
@@ -33,7 +40,7 @@ internal static class DeviceTree
     /// </summary>
     public static bool IsPhysicalChain(IReadOnlyList<DeviceNode> chain)
     {
-        if (chain.Any(IsViGEmBus))
+        if (IsViGEmChain(chain))
             return false;
         foreach (var node in chain)
         {
@@ -48,6 +55,13 @@ internal static class DeviceTree
         }
         return false;
     }
+
+    /// <summary>
+    /// Gehört ein Knoten der Kette zum ViGEmBus? Der Beweis für ein virtuelles Pad, das N-Connect in HidHide wieder
+    /// freigeben darf. Andere Software-Busse zählen hier bewusst nicht: Über USB-über-Netzwerk o. Ä. hängt dort womöglich
+    /// ein echter Controller, den jemand mit Absicht versteckt hat.
+    /// </summary>
+    public static bool IsViGEmChain(IReadOnlyList<DeviceNode> chain) => chain.Any(IsViGEmBus);
 
     private static bool IsViGEmBus(DeviceNode node) =>
         string.Equals(node.Service, "ViGEmBus", StringComparison.OrdinalIgnoreCase)

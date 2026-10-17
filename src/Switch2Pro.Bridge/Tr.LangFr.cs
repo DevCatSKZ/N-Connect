@@ -568,6 +568,8 @@ internal static partial class Tr
             "Manettes d'origine non masquées (demande annulée). Pour plus tard : manette → Paramètres → Extras → « Affiché en double ? ».",
         ["Original-Controller nicht versteckt (Fehler, Details im Protokoll). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."] =
             "Manettes d'origine non masquées (erreur, détails dans le journal). Pour plus tard : manette → Paramètres → Extras → « Affiché en double ? ».",
+        ["Eine ältere N-Connect-Version hat das eigene virtuelle DualShock 4 vor Spielen versteckt. Freigeben hat nicht geklappt – bitte im HidHide Configuration Client den Haken beim virtuellen DualShock 4 entfernen."] =
+            "Une ancienne version de N-Connect a masqué aux jeux sa propre DualShock 4 virtuelle. Impossible de la rendre de nouveau visible – décochez la DualShock 4 virtuelle dans HidHide Configuration Client.",
         ["Tastenanordnung A/B/X/Y"] = "Disposition des boutons A/B/X/Y",
         ["Xbox: nach Position (untere Taste = A). Nintendo: nach Beschriftung (A bleibt A)."] = "Xbox : par position (bouton du bas = A). Nintendo : par libellé (A reste A).",
         ["Verbinden"] = "Connexion",
