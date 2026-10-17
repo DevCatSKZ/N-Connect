@@ -1,311 +1,91 @@
 <div align="center">
 
-<img src="installer/art/N-Connect.png" width="112" alt="N-Connect Logo">
+<img src="installer/art/N-Connect.png" width="112" alt="N-Connect-Logo">
 
 # N-Connect
 
-**Nintendo-, PlayStation- und Xbox-Controller am PC, am Handy und am Fernseher – einfach verbinden und spielen.**
+**Switch-2-Controller und weitere Controller unter Windows als Xbox- oder DualShock-4-Controller –
+für Spiele, Steam und Emulatoren.**
 
-[![Download](https://img.shields.io/github/v/release/DevCatSKZ/N-Connect?label=Download&style=for-the-badge&color=0078D4)](https://github.com/DevCatSKZ/N-Connect/releases/latest)
-
-![Windows 10 | 11](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?style=flat-square)
-![Android 8+ | Beta](https://img.shields.io/badge/Android-8%2B%20%C2%B7%20Beta-0078D4?style=flat-square)
-![Kodi | LibreELEC](https://img.shields.io/badge/Kodi-LibreELEC-0078D4?style=flat-square)
-![12 Sprachen](https://img.shields.io/badge/Sprachen-12-0078D4?style=flat-square)
-[![Lizenz: MIT](https://img.shields.io/badge/Lizenz-MIT-0078D4?style=flat-square)](LICENSE)
-![Kostenlos](https://img.shields.io/badge/kostenlos-ohne%20Werbung-0078D4?style=flat-square)
+Dazu N-Connect für Android (Beta) und ein Add-on für Kodi/LibreELEC.
 
 **Deutsch** · [English](README.en.md) · [Webseite](https://devcatskz.github.io/N-Connect/)
 
-<img src="https://devcatskz.github.io/N-Connect/screenshots/uebersicht.png" width="820" alt="N-Connect: Übersicht mit verbundenen Controllern, Akkustand und Live-Anzeige der Tasten">
+<img src="https://devcatskz.github.io/N-Connect/screenshots/uebersicht.png" width="820" alt="N-Connect unter Windows: Übersicht mit verbundenen Controllern, Akkustand und Live-Anzeige der Tasten">
 
 </div>
 
-## Was ist N-Connect?
-
-Viele Spiele unter Windows verstehen nur Xbox-Controller. **N-Connect übersetzt deinen Controller so, dass jedes
-Spiel ihn erkennt** – egal ob Switch 2, Switch, Wii, PlayStation oder Xbox. Das funktioniert in Steam, im Xbox-/Game
-Pass, bei Epic, in Emulatoren und in allen anderen Spielen mit Controller-Unterstützung.
-
-Einmal installieren, Controller verbinden, spielen. N-Connect läuft unauffällig im Hintergrund.
-
 ## Download
 
-| Plattform | Stand | Download | Anleitung |
+| Plattform | Version | Download | Anleitung |
 |---|---|---|---|
-| 🪟 **Windows 10 / 11** (64 Bit) | ✅ stabil | [**N-Connect-Setup**](https://github.com/DevCatSKZ/N-Connect/releases/latest) (empfohlen) · [Portable-ZIP](https://github.com/DevCatSKZ/N-Connect/releases/latest) | [In 3 Schritten loslegen](#windows-in-3-schritten-loslegen) |
-| 🤖 **Android 8 oder neuer** | 🧪 Beta 0.9.0 | [**N-Connect-Android-0.9.0.apk**](https://github.com/DevCatSKZ/N-Connect/releases/download/v1.0.20/N-Connect-Android-0.9.0.apk) | [N-Connect für Android](#n-connect-für-android-beta) |
-| 📺 **Kodi / LibreELEC** – Raspberry Pi 2–5, 64-Bit-Boxen, PC | ✅ stabil | über das [**DevCatSKZ Repository**](https://github.com/DevCatSKZ/kodi-repo) (automatische Updates) · einzelne ZIPs je Gerät auf der [Release-Seite](https://github.com/DevCatSKZ/N-Connect/releases/latest) | [N-Connect für Kodi](#n-connect-für-kodi--libreelec) |
+| Windows 10 (ab 2004) und 11, 64 Bit | 1.0.22 | [Setup oder Portable-ZIP](https://github.com/DevCatSKZ/N-Connect/releases/latest) | [Windows](docs/anleitung/windows.md) |
+| Android 8 oder neuer | 0.9.1 Beta | [N-Connect-Android-0.9.1.apk](https://github.com/DevCatSKZ/N-Connect/releases/download/v1.0.22/N-Connect-Android-0.9.1.apk) | [Android](docs/anleitung/android.md) |
+| Kodi unter LibreELEC | 0.4.4 | [DevCatSKZ Repository](https://github.com/DevCatSKZ/kodi-repo) | [Kodi](docs/anleitung/kodi.md) |
 
-Alle Versionen sind kostenlos, ohne Werbung und in 12 Sprachen – die Sprache richtet sich automatisch nach dem System.
-
-## N-Connect für Android (Beta)
-
-Spiele mit deinen **Switch-2-Controllern** (Pro Controller 2, Joy-Con 2 einzeln oder als Paar, GameCube-Controller)
-auf Handy oder Tablet. N-Connect macht daraus einen **echten Xbox-Controller**, den Android-Spiele, Emulatoren
-(Dolphin, PPSSPP, RetroArch, Eden …) und Cloud-Gaming (Xbox Cloud, GeForce NOW, Steam Link) direkt verstehen –
-mit Vibration, Gyro-Zielen, Akkuanzeige und gemerkten Controllern. Für Spiele ohne Controller-Unterstützung gibt es
-zusätzlich eine **Touch-Steuerung**, die Bildschirmknöpfe antippt.
-
-1. **[APK herunterladen](https://github.com/DevCatSKZ/N-Connect/releases/download/v1.0.20/N-Connect-Android-0.9.0.apk)**
-   und öffnen. Android fragt einmal, ob der Browser Apps installieren darf → **Zulassen**. Warnt Play Protect vor
-   einer unbekannten App: **Weitere Details → Trotzdem installieren** (die App ist Open Source und signiert).
-2. **N-Connect öffnen** – der Einrichtungsassistent führt durch Bluetooth-Berechtigung, Benachrichtigungen und Akku.
-3. **Ausgabeweg wählen:**
-   - **Shizuku (empfohlen, ohne Root):** [Shizuku](https://play.google.com/store/apps/details?id=moe.shizuku.privileged.api)
-     aus dem Play Store installieren · Einstellungen › Über das Telefon › 7× auf *Build-Nummer* tippen ·
-     in den Entwickleroptionen **Kabelloses Debugging** einschalten (WLAN nötig) · in Shizuku „Über kabelloses
-     Debugging starten“ › **Kopplung** und danach **Starten** · zurück in N-Connect **Zugriff erlauben**.
-     Nach jedem Neustart des Handys einmal in Shizuku auf „Starten“ tippen.
-   - **Root** (Magisk, KernelSU, APatch): im Assistenten wählen und im Root-Dialog erlauben – funktioniert dauerhaft.
-   - **Touch-Steuerung:** nur eine Bedienungshilfe einschalten; kein echter Controller, aber für jedes Spiel.
-4. **SYNC-Taste** am Controller gedrückt halten, bis die Lichter laufen – fertig. Danach verbindet ein Tastendruck.
-
-> [!NOTE]
-> Xbox-, PlayStation- und ältere Switch-Controller funktionieren unter Android meist schon direkt über die
-> Bluetooth-Einstellungen; N-Connect für Android ist für die Switch-2-Controller gedacht. Es ist eine **Beta** –
-> Rückmeldungen und Fehler bitte als [Issue](https://github.com/DevCatSKZ/N-Connect/issues) (Protokoll: Hilfe ›
-> Diagnose › Teilen).
-
-## N-Connect für Kodi / LibreELEC
-
-Am Fernseher mit **LibreELEC**: Das Plugin läuft unsichtbar im Hintergrund und verbindet jederzeit neue Controller.
-- **Switch-2-Controller** werden Xbox-Controller für Kodi, RetroArch und Spiele, inklusive Joy-Con-Paar, Vibration und
-  Spieler-LEDs.
-- **Xbox-, PlayStation-, Switch-1-, Wii- und 8BitDo-Controller** koppelt es automatisch, sobald sie im Kopplungsmodus
-  sind. Ein Umweg über die Bluetooth-Einstellungen ist nicht nötig.
-- Dazu kommen Akku-Warnung, Controller-Tasten für Kodi-Aktionen (z. B. Capture = Bildschirmfoto), feste Spielerplätze,
-  Gyro für Emulatoren (DSU) und 12 Sprachen.
-
-1. Kodi > Einstellungen > System > Add-ons: „Unbekannte Quellen“ einschalten.
-2. **[repository.devcatskz.zip](https://github.com/DevCatSKZ/kodi-repo/raw/main/repository.devcatskz.zip)** über „Aus ZIP-Datei installieren“ installieren.
-3. „Aus Repository installieren“ > **DevCatSKZ Repository** > **N-Connect (LibreELEC/Linux)**.
-4. SYNC am Controller drücken – fertig.
-
-Schneller geht es aus N-Connect selbst: **Windows** › Einstellungen › Allgemein › Kodi bzw. **Android** › Hilfe › Kodi richtet das Repository mit einem Klick ein oder lädt es herunter.
-
-Einzelne Downloads je Gerät und alle Details: [DevCatSKZ Repository](https://github.com/DevCatSKZ/kodi-repo) ·
-technische Doku: [docs/LINUX-KODI.md](docs/LINUX-KODI.md).
-
-## Windows: in 3 Schritten loslegen
-
-| | |
-|:---:|---|
-| **1** | **Herunterladen und installieren** – [`N-Connect-Setup` von der Release-Seite](https://github.com/DevCatSKZ/N-Connect/releases/latest) laden und starten. Alles Nötige wird mitinstalliert. |
-| **2** | **Controller verbinden** – meist reicht ein Druck auf die **SYNC-Taste** (siehe unten). |
-| **3** | **Spielen** – der Controller funktioniert sofort in deinen Spielen. |
-
-> [!TIP]
-> **Windows zeigt eine Warnung „Der Computer wurde durch Windows geschützt“?** Das passiert bei neuen Programmen
-> ohne teures Zertifikat. Klicke auf **Weitere Informationen → Trotzdem ausführen**. N-Connect ist Open Source –
-> der komplette Quellcode liegt hier im Repository.
-
-**Voraussetzungen:** Windows 10 oder 11 (64 Bit) und Bluetooth – oder ein USB-Kabel.
-
-## Controller verbinden
-
-| Controller | So geht's |
-|---|---|
-| **Switch 2** – Pro Controller, Joy-Con 2, GameCube | **SYNC-Taste** kurz drücken. Der Controller vibriert, wenn er verbunden ist. Pro Controller und GameCube gehen auch per **USB-Kabel**. |
-| **Switch** – Pro Controller, Joy-Con, NES, SNES, N64, Mega Drive | **SYNC-Taste** drücken, bis die Lichter laufen. N-Connect koppelt den Controller selbst. |
-| **Wii-Fernbedienung, Wii U Pro Controller** | **Rote SYNC-Taste** drücken (Wii-Fernbedienung: im Batteriefach, Wii U Pro: auf der Unterseite). |
-| **PlayStation** – DualShock 4, DualSense | Einmal in den **Windows-Bluetooth-Einstellungen** koppeln oder per **USB-Kabel** anschließen. |
-| **Xbox** | Einfach anschließen – per USB, Bluetooth oder Xbox-Wireless-Adapter. |
-
-Danach reicht beim nächsten Mal **ein beliebiger Tastendruck** zum Verbinden.
-
-> [!IMPORTANT]
-> **Switch-2-Controller nicht in den Windows-Bluetooth-Einstellungen hinzufügen** – das stört die Verbindung.
-> Einfach nur die SYNC-Taste drücken. Möchtest du den Controller danach wieder an der Switch 2 benutzen, dort
-> einmal neu koppeln.
-
-## Das kann N-Connect
-
-- 🎮 **Funktioniert in jedem Spiel** – dein Controller erscheint als Xbox-Controller (oder als PlayStation-Controller
-  mit Bewegungssteuerung).
-- 👥 **Bis zu 8 Controller gleichzeitig** – du legst fest, wer Spieler 1, 2, 3 … ist.
-- 🔋 **Akkustand immer im Blick** – mit Warnung, bevor der Akku leer ist.
-- ⌨️ **Tasten frei belegen** – auch mit Tastatur, Maus, Turbo oder ganzen Tastenfolgen. Eigene Profile je Spiel.
-- 🎯 **Zielen durch Bewegen** – die Bewegungssensoren steuern Kamera oder Maus, ideal für Shooter.
-- 🕹️ **Joy-Con wie an der Switch** – als Paar oder einzeln, quer oder hochkant.
-- 🩹 **Stick-Drift beheben** – Sticks einfach neu ausmessen.
-- 🧪 **Controller testen** – Sticks, Trigger, Bewegungssensoren und Tasten live prüfen, z. B. beim Gebrauchtkauf.
-- 🖱️ **Desktop-Modus** (zum Einschalten) – läuft kein Spiel, steuert der Controller Maus und Tastatur. Ideal für den
-  PC am Fernseher.
-- 🪟 **Desktop-Widget** (zum Einschalten) – kleines Kärtchen auf dem Desktop mit allen Controllern, Akku und
-  Verbindung, im gewählten Farbschema.
-- 🔄 **Updates mit einem Klick** – N-Connect meldet sich, wenn es eine neue Version gibt.
-- 🌍 **12 Sprachen** und ein **Design wie Windows 11** – hell, dunkel und vier weitere Farbschemata.
-
-<details>
-<summary><b>Alle Funktionen im Detail</b></summary>
-
-### Übersicht
-- Live-Grafik jedes Controllers – gedrückte Tasten leuchten, Sticks bewegen sich mit.
-- Statusleiste: verbundene Controller, Bluetooth, niedrigster Akku, wie Spiele die Controller sehen.
-- Ansicht **Groß** oder **Kompakt** (bis zu vier Controller nebeneinander).
-- Knöpfe je Controller: **Vibrieren** (welcher ist welcher?), **Trennen**, **Einstellungen** nur für diesen Controller.
-- Controller umbenennen, z. B. „Lenas Joy-Con“.
-
-### Tasten und Profile
-- Jede Taste auf Controller-Tasten, **Tastatur-Kürzel**, **Maustasten**, **Turbo** oder **Makros** legen –
-  oder auf fertige Vorlagen wie Bildschirmfoto, Aufnahme, Xbox Game Bar oder Lautstärke.
-- Taste per Tastendruck belegen: Tastatur-Symbol neben der Taste anklicken und die gewünschte Taste drücken.
-- **Shift-Ebene:** Solange eine Taste gehalten wird, haben die anderen Tasten eine zweite Belegung.
-- **Profile je Spiel** werden automatisch aktiv, sobald das Spiel im Vordergrund ist – auch als Datei teilbar.
-
-### Bewegung und Sticks
-- **Gyro als rechter Stick** – immer, nur beim Zielen oder per Taste. Geführter Gyro-Assistent mit Vorschau.
-- **Gyro als Maus**, Flick-Stick und weitere Extras für Shooter.
-- **Sticks kalibrieren** gegen Drift (nur in N-Connect gespeichert, der Controller bleibt unverändert).
-- Totzone, Empfindlichkeitskurve, Trigger-Schwellen und Vibrationsstärke – allgemein oder je Controller.
-- Bewegungsdaten für Emulatoren wie Cemu und Dolphin (Cemuhook/DSU).
-
-### Joy-Con und Wii
-- Zwei Joy-Con werden automatisch ein Controller; quer halten und SL oder SR drücken macht einen Joy-Con zum eigenen
-  Spieler, L + R gleichzeitig verbindet wieder.
-- **Joy-Con 2 als Maus:** auf die Schienenkante stellen.
-- amiibo lesen, Ring-Con und IR-Kamera (Switch-Joy-Con), Nunchuk und Classic Controller (Wii).
-
-### Desktop-Modus (unter *Allgemein*, standardmäßig aus)
-- Läuft kein Spiel, steuert der Controller Windows: linker Stick = Maus, rechter Stick = Scrollen, A = Klick,
-  B = Rechtsklick, X = Taskansicht, Y = Bildschirmtastatur, Steuerkreuz = Pfeiltasten, LB/RB = zurück/vor,
-  Start = Enter, Back = Esc, HOME = Startmenü, RT halten = präziser Zeiger.
-- In Vollbildspielen und Programmen mit eigenem Profil automatisch aus. **Back + Start** 1 Sekunde halten pausiert ihn.
-
-### Komfort
-- Startet mit Windows unsichtbar im Infobereich; Menü dort mit Vibrieren, Spielerplatz und Trennen je Controller.
-- Einblendung beim Verbinden (Spieler, Controller, Akku – abschaltbar), Meldung beim Trennen, automatisches Trennen
-  nach Inaktivität (spart Akku).
-- **Controller testen** (Reiter „Test“ an jeder Karte): Sticks mit Rundheitsanzeige, Trigger, Bewegungssensoren,
-  Tasten, Berichtsrate, Vibration.
-- Fertige Tastenvorlagen, z. B. für die C-Taste: Mikrofon stumm, Discord stumm/taub, Desktop anzeigen, Titel vor/zurück.
-- **Diagnose exportieren** (*Allgemein → Erweitert*): Protokoll und Systeminfos als ZIP für Fehlermeldungen.
-- Original-Controller werden vor Steam und Spielen versteckt, damit kein Controller doppelt erscheint.
-- Kopplungsdaten von der Switch übernehmen oder auf einen anderen PC übertragen.
-- **Für ESP32 / nRF52840 exportieren:** Switch-2-Controller auch an einem ESP32-S3 oder Nordic-nRF52840-Dongle nutzen
-  (z. B. an einem zweiten PC), ohne neu zu koppeln – Anleitung: [docs/ESP32.md](docs/ESP32.md),
-  [docs/NRF52840.md](docs/NRF52840.md).
-- Gut lesbar bei jeder Bildschirmskalierung (100 % bis 200 %).
-
-</details>
+Das Windows-Setup installiert die benötigten Treiber ViGEmBus und HidHide mit. Setup und Programm sind nicht
+code-signiert, daher zeigt Windows SmartScreen beim ersten Start eine Warnung.
 
 ## Unterstützte Controller
 
-| Controller | USB-Kabel | Bluetooth | Besonderheiten |
-|---|:---:|:---:|---|
-| Switch 2 Pro Controller | ✅ | ✅ | Gyro, HD-Vibration, Zusatztasten GL/GR/C |
-| Joy-Con 2 | – | ✅ | als Paar oder einzeln, Mausmodus |
-| GameCube-Controller (Switch 2) | ✅ | ✅ | analoge Trigger |
-| Switch Pro Controller | ✅ | ✅ | Gyro, Vibration, amiibo |
-| Joy-Con (Switch) | Ladegriff | ✅ | amiibo, Ring-Con, IR-Kamera |
-| NES · SNES · N64 · Mega Drive (Nintendo Switch Online) | – | ✅ | originale Tastenanordnung |
-| Wii-Fernbedienung (auch Plus) | – | ✅ | mit Nunchuk oder Classic Controller |
-| Wii U Pro Controller | – | ✅ | |
-| DualShock 4 · DualSense · DualSense Edge | ✅ | ✅ | Touchpad, Gyro, Lichtleiste |
-| Xbox 360 · One · Series · Elite | ✅ | ✅ | läuft direkt, N-Connect zeigt Akku und Belegung |
-| Kabel-Controller von HORI, PowerA, PDP; Nachbauten (z. B. 8BitDo) im Switch-Modus | ✅ | je nach Modell | |
+| Controller | Windows | Android | Kodi |
+|---|---|---|---|
+| Pro Controller 2, Joy-Con 2 | ✓ | ✓ | ✓ |
+| GameCube-Controller (Switch 2) | ✓ | ✓¹ | ✓¹ |
+| Switch Pro Controller, Joy-Con (Switch), NSO-Controller | ✓ | – | Kopplung¹ |
+| Wii-Fernbedienung, Wii U Pro Controller | ✓ | – | Kopplung¹ |
+| DualShock 4, DualSense | ✓¹ | – | Kopplung¹ |
+| Xbox-Controller | nativ² | – | Kopplung¹ |
+| Kabel-Controller von HORI, PowerA, PDP | ✓¹ | – | – |
 
-> [!NOTE]
-> **Hast du einen Kabel-Controller von HORI, PowerA oder PDP?** Diese Modelle sind noch nicht mit echter Hardware
-> getestet. Bitte [kurz melden](https://github.com/DevCatSKZ/N-Connect/issues), ob deiner funktioniert – am besten mit
-> *Allgemein → Erweitert → Diagnose exportieren*.
+¹ Noch nicht mit echter Hardware geprüft – [Rückmeldungen](https://github.com/DevCatSKZ/N-Connect/issues) helfen.
+² Windows erkennt Xbox-Controller selbst; N-Connect ergänzt Akkuanzeige und Belegungen.
+**Kopplung:** N-Connect koppelt den Controller, die Eingaben übernimmt Linux. Unter Android verbinden sich andere
+Controller direkt mit dem System.
 
-> [!NOTE]
-> **Viele Controller gleichzeitig?** Einfache Bluetooth-Sticks schaffen oft nur 2–3 Controller. Für mehr empfiehlt
-> sich ein guter Adapter (z. B. Intel AX200/AX210 oder ein Bluetooth-5.3-Stick).
+## Funktionen
 
-## Hilfe bei Problemen
+**Windows**
+- Ausgabe als Xbox 360 oder DualShock 4 (mit Bewegungsdaten für Steam), allgemein oder je Controller
+- Bis zu 8 Controller, Joy-Con einzeln oder als Paar
+- Tastenbelegung mit Tastatur, Maus, Turbo und Makros; Profile wechseln automatisch je Spiel
+- Gyro als Stick oder Maus, Flick-Stick, DSU-Server für Emulatoren
+- amiibo, Ring-Con, IR-Kamera, Stick-Kalibrierung, Akkuwarnung
+- Originale werden per HidHide vor Spielen versteckt – keine doppelten Controller
 
-<details>
-<summary><b>Der Switch-2-Controller verbindet sich nicht</b></summary>
+**Android (Beta):** Switch-2-Controller als virtueller Xbox-Controller über Shizuku oder Root, mit Vibration,
+Gyro, Profilen je Spiel und DSU; für Spiele ohne Controller-Unterstützung eine Touch-Steuerung.
 
-SYNC-Taste nur **kurz** drücken, nicht halten. Steht der Controller in den Windows-Bluetooth-Einstellungen, dort
-**entfernen**. Eine Switch 2 in der Nähe am besten in den Ruhemodus versetzen, damit sie den Controller nicht übernimmt.
-</details>
+**Kodi/LibreELEC:** Switch-2-Controller als Xbox-Controller für Kodi und RetroArch, mit Joy-Con-Paar, Vibration,
+festen Spielerplätzen, DSU und Home-Widget.
 
-<details>
-<summary><b>Ein Switch-, Wii- oder NSO-Controller wird nicht gefunden</b></summary>
+## Stand
 
-In N-Connect auf **„Controller suchen …“** klicken und dann die SYNC-Taste drücken, solange gesucht wird. Die
-automatische Suche pausiert, während jemand spielt.
-</details>
+Windows ist die Hauptplattform. Android ist eine Beta. Das Kodi-Add-on ist auf einem Raspberry Pi 4 mit
+LibreELEC 12.2 geprüft, andere Geräte noch nicht. Der Treiber ViGEmBus wird seit 2023 nicht mehr weiterentwickelt;
+N-Connect nutzt die letzte Version 1.22.0.
 
-<details>
-<summary><b>Steam oder ein Spiel zeigt einen Controller doppelt</b></summary>
+## Datenschutz
 
-Unter **Allgemein → Original-Controller verstecken** einschalten, die Windows-Abfrage bestätigen und Steam einmal neu
-starten.
-</details>
+Kein Konto, keine Telemetrie, keine Werbung. Die Controller funktionieren ohne Internet; die Windows-App sucht beim
+Start auf GitHub nach Updates (abschaltbar).
 
-<details>
-<summary><b>Ein Joy-Con ist plötzlich ein eigener Spieler</b></summary>
+## Dokumentation
 
-Er wurde vom Paar gelöst (quer gehalten und SL/SR gedrückt). **L** am linken und **R** am rechten Joy-Con
-gleichzeitig drücken – schon sind sie wieder ein Paar.
-</details>
+- Anleitungen: [Windows](docs/anleitung/windows.md) · [Android](docs/anleitung/android.md) ·
+  [Kodi](docs/anleitung/kodi.md) · [Hilfe bei Problemen](docs/anleitung/hilfe.md)
+- [Technische Dokumentation](docs/README.md)
+- Fehler bitte als [Issue](https://github.com/DevCatSKZ/N-Connect/issues) melden, möglichst mit Diagnose
+  (Windows: *Allgemein › Erweitert › Diagnose exportieren*).
 
-<details>
-<summary><b>Meldung „ViGEmBus-Treiber fehlt“</b></summary>
+## Selbst bauen
 
-Das Setup einfach noch einmal ausführen. Der Treiber sorgt dafür, dass Spiele den Controller sehen.
-</details>
-
-<details>
-<summary><b>Etwas anderes funktioniert nicht</b></summary>
-
-Unter **Allgemein → Erweitert → Diagnose exportieren** eine ZIP-Datei erstellen und bei einer
-[Fehlermeldung](https://github.com/DevCatSKZ/N-Connect/issues) anhängen. Sie enthält Protokoll, Einstellungen und
-Systeminfos, aber keine Kopplungsschlüssel.
-</details>
-
-## Portable Version
-
-Lieber ohne Installation? Auf der [Release-Seite](https://github.com/DevCatSKZ/N-Connect/releases/latest) gibt es
-**`N-Connect-Portable-….zip`**: entpacken und `N-Connect.exe` starten. Einstellungen bleiben im Ordner neben dem
-Programm. Die beiden Treiber [ViGEmBus](https://github.com/nefarius/ViGEmBus/releases) und
-[HidHide](https://github.com/nefarius/HidHide/releases) müssen auf dem PC trotzdem einmal installiert sein.
-
-<details>
-<summary><b>Für Entwickler: Technik und selbst bauen</b></summary>
-
-N-Connect spricht die Controller direkt an (Bluetooth LE über WinRT, HID, WinUSB) und gibt die Eingaben an
-[ViGEmBus](https://github.com/nefarius/ViGEmBus) weiter, einen signierten Treiber für virtuelle Xbox-360- bzw.
-DualShock-4-Controller. [HidHide](https://github.com/nefarius/HidHide) versteckt die Original-Controller vor Spielen.
-Ausführliche Dokumentation (Funktionen, Architektur, Protokolle): **[docs/](docs/README.md)**.
-
-```
-src/Switch2Pro.Protocol   Protokolle (plattformunabhängig, mit Tests)
-src/Switch2Pro.Bridge     Windows-App: Verbindungen, virtuelle Controller, Oberfläche, Übersetzung
-tests/                    xUnit-Tests
-installer/                Inno-Setup-Skript
-linux/                    N-Connect für Linux/LibreELEC (Dienst) und das Kodi-Plugin service.nconnect
-android/                  N-Connect für Android (Beta; Übersetzungen in android/i18n)
-```
-
-**Bauen** (.NET 10 SDK):
-`dotnet test` und
-`dotnet publish src/Switch2Pro.Bridge -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o out/publish/win-x64`.
-Setup lokal: Inno Setup 6, dann `ISCC.exe installer\N-Connect.iss`. Releases baut der Workflow
-`.github/workflows/build.yml` automatisch beim Setzen eines Tags `v…`.
-
-**Prüfhilfen:** `N-Connect.exe --render-ui <Ordner>` erzeugt Bilder aller Seiten (läuft auf einem unsichtbaren
-Desktop; Schalter `--demo`, `--demo-all`, `--light`, `--lang=xx`, `--scheme=xx`, `--scale=1.5`, `--compact`,
-`--wide`). `--render <Ordner>` zeichnet alle Controller-Grafiken, `--render-brand <Ordner>` Icon und
-Installer-Bilder.
-
-Dateien: Protokoll `%LOCALAPPDATA%\N-Connect\bridge.log`, Einstellungen `%APPDATA%\N-Connect\settings.json`.
-
-**Quellen und Dank** (Protokollinformationen, eigene Umsetzung):
-[ndeadly/switch2_controller_research](https://github.com/ndeadly/switch2_controller_research), SDL (zlib),
-dekuNukem/Nintendo_Switch_Reverse_Engineering, Linux `hid-nintendo` und `hid-wiimote`, WiiBrew, yuzu/Citron,
-Dolphin, Switch2Connect, NS2Pro-Bridge-Windows (MIT). Virtuelle Controller: ViGEmBus und HidHide von Nefarius.
-</details>
+.NET 10 SDK unter Windows: `dotnet test Switch2Pro.sln -c Release`. Details zu Setup, Android-App und Kodi-Add-ons
+in [HANDOVER.md](HANDOVER.md#bauen-und-testen).
 
 ## Lizenz
 
-[MIT](LICENSE) © **devcatskz** – kostenlos, Open Source.
+[MIT](LICENSE), © 2026 devcatskz. Komponenten Dritter: [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
 
-Inoffizielles Projekt, nicht mit Nintendo, Sony oder Microsoft verbunden. „Nintendo“, „Switch“, „Wii“, „amiibo“ sind
-Marken von Nintendo; „PlayStation“, „DualShock“, „DualSense“ von Sony; „Xbox“ von Microsoft; „SEGA“ und „Mega Drive“
-von SEGA.
+Inoffizielles Projekt ohne Verbindung zu Nintendo, Sony oder Microsoft. Alle genannten Marken gehören ihren
+jeweiligen Inhabern.
