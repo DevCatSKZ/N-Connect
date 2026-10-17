@@ -8,6 +8,7 @@ using AndroidX.AppCompat.App;
 using AndroidX.Core.View;
 using Google.Android.Material.AppBar;
 using Google.Android.Material.BottomNavigation;
+using Google.Android.Material.Dialog;
 using NConnect.Android.Core;
 using NConnect.Android.Output;
 using NConnect.Android.Touch;
@@ -84,6 +85,25 @@ public sealed class MainActivity : AppCompatActivity
             EnsureServiceRunning();
         // Nach einem Update: die eingespielte (oder überholte) APK aus dem Download-Ordner entfernen.
         _ = Task.Run(() => UpdateCheck.CleanUp(ApplicationContext!));
+        ShowSettingsNotice();
+    }
+
+    /// <summary>Einmaliger Hinweis, wenn settings.json beim Laden unlesbar war (siehe <see cref="AppPrefs.TakeSettingsNotice"/>).</summary>
+    private void ShowSettingsNotice()
+    {
+        string? notice = AppPrefs.TakeSettingsNotice();
+        if (notice is null)
+            return;
+        bool restored = notice == AppPrefs.NoticeRestored;
+        new MaterialAlertDialogBuilder(this)
+            .SetTitle(L.T(restored ? "Einstellungen wiederhergestellt" : "Einstellungen fehlerhaft"))!
+            .SetMessage(L.T(restored
+                ? "Die Einstellungen waren beschädigt und wurden aus der letzten Sicherung wiederhergestellt. Die zuletzt " +
+                  "geänderten Werte fehlen womöglich – bitte kurz prüfen."
+                : "Die Einstellungen konnten nicht gelesen werden – es gelten die Standardwerte. Die beschädigte Datei " +
+                  "bleibt als „settings.json.unlesbar-…“ im Speicher der App erhalten."))!
+            .SetPositiveButton(L.T("OK"), (_, _) => { })!
+            .Show();
     }
 
     /// <summary>Startet den Hintergrunddienst, sobald Bluetooth erlaubt ist.</summary>
