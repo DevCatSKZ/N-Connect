@@ -650,7 +650,18 @@ public sealed class Settings
         StickCalibrations = new Dictionary<string, StickCalibration>(other.StickCalibrations, StringComparer.OrdinalIgnoreCase);
         // Unlesbare Datei vom Laden mitnehmen (z. B. neu geladen, aber nur die Sicherung war lesbar): wer die Werte
         // übernimmt und dann speichert, sichert sie vorher – siehe KeepUnreadable.
-        foreach (string file in other._unreadable)
+        KeepUnreadableOf(other);
+    }
+
+    /// <summary>
+    /// Für ein verworfenes Neuladen (<paramref name="rejected"/> mit <see cref="LoadError"/> oder
+    /// <see cref="RestoredFromBackup"/>): Die laufenden Werte bleiben, aber die dabei unlesbare Datei sichert das nächste
+    /// <see cref="Save"/> vorher, statt sie nach .bak zu schieben und beim übernächsten Speichern zu verlieren (z. B. ein
+    /// Tippfehler beim Bearbeiten von Hand, während die App läuft). <see cref="CopyFrom"/> macht das von selbst.
+    /// </summary>
+    public void KeepUnreadableOf(Settings rejected)
+    {
+        foreach (string file in rejected._unreadable)
         {
             if (!_unreadable.Contains(file))
                 _unreadable.Add(file);
@@ -662,7 +673,9 @@ public sealed class Settings
 
     /// <summary>
     /// settings.json war unlesbar, geladen wurde die Sicherung <see cref="BackupPath"/> – die Fassung vor dem letzten
-    /// Speichern; was zuletzt gespeichert wurde, fehlt also. Die Apps sollten darauf hinweisen.
+    /// Speichern; was zuletzt gespeichert wurde, fehlt also. Die Apps sollten beim Start darauf hinweisen. Beim Neuladen
+    /// im Betrieb ist der laufende Stand neuer als die Sicherung: dann besser wie bei <see cref="LoadError"/> verwerfen
+    /// (<see cref="KeepUnreadableOf"/>), statt per <see cref="CopyFrom"/> auf die Sicherung zurückzufallen.
     /// </summary>
     [JsonIgnore]
     public bool RestoredFromBackup { get; private set; }

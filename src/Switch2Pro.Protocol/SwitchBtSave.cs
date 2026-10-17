@@ -29,8 +29,9 @@ public sealed record SwitchBtDevice(int Offset, string Address, string Name, byt
 /// <see cref="AddressOffset"/>, <see cref="KeyOffset"/> und <see cref="NameOffset"/> dieselben Felder, gemessen ab dem
 /// Rasterpunkt 0x70 Byte vor dem Eintrag (0x70 + 0x00, 0x70 + 0x29, 0x70 + 0xD6). So werden beide Kopien gefunden;
 /// doppelte Einträge (gleiche Adresse und gleicher Schlüssel) werden zusammengefasst. Ältere Kopplungen derselben
-/// Adresse mit anderem Schlüssel bleiben stehen – welcher Eintrag der aktuelle ist, ist noch offen
-/// (SWITCH-IDENTITAET.md §6). Arbeitsstand: nur das Diagnosewerkzeug BtIdentityProbe nutzt ihn.
+/// Adresse mit anderem Schlüssel bleiben in <see cref="Parse"/> stehen; den aktuellen Eintrag je Adresse wählt
+/// <see cref="Current"/> (nach Testbefund, nicht gesichert). Arbeitsstand: nur das Diagnosewerkzeug BtIdentityProbe
+/// nutzt den Parser.
 /// </summary>
 public static class SwitchBtSave
 {
@@ -55,6 +56,21 @@ public static class SwitchBtSave
                 result.Add(device);
         }
         return result;
+    }
+
+    /// <summary>
+    /// Je Adresse nur der aktuelle Eintrag: der erste in Dateireihenfolge (<paramref name="devices"/> so wie von
+    /// <see cref="Parse"/> geliefert), die Reihenfolge der Adressen bleibt.
+    /// Nach Testbefund, nicht gesichert: Im Save vom 04.10.2026 traf der erste Eintrag je Adresse für beide Joy-Con aus
+    /// joycon_mac.ini deren Schlüssel; die ältere Kopplung des einen stand weiter hinten (nachgeprüft am 17.10.2026). Für
+    /// die übrigen Adressen dort gibt es keinen Vergleich. Beide Kopien der Tabelle waren gleich – welche die
+    /// Save-Verwaltung gelten lässt, wenn sie sich unterscheiden, liest der Parser nicht aus. Für Joy-Con bleibt
+    /// joycon_mac.ini die sichere Quelle (Schlüssel aus dem Joy-Con selbst).
+    /// </summary>
+    public static List<SwitchBtDevice> Current(IEnumerable<SwitchBtDevice> devices)
+    {
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        return devices.Where(d => seen.Add(d.Address)).ToList();
     }
 
     private static bool TryParseEntry(ReadOnlySpan<byte> entry, int offset, out SwitchBtDevice device)

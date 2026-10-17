@@ -189,6 +189,45 @@ public class SettingsFileTests
         }
     }
 
+    [Theory]
+    [InlineData(true)]  // nur die Sicherung lesbar (RestoredFromBackup)
+    [InlineData(false)] // beide unlesbar (LoadError)
+    public void Verworfenes_Neuladen_behaelt_die_Werte_und_sichert_die_unlesbare_Datei(bool backupReadable)
+    {
+        // Wie ein Neuladen im Betrieb, das die App verwirft: Der laufende Stand (30) ist neuer als die Sicherung (15).
+        string dir = NewFolder();
+        try
+        {
+            string path = Path.Combine(dir, "settings.json");
+            var running = new Settings { InactivityMinutes = 15 };
+            running.Save(path);
+            running.InactivityMinutes = 30;
+            running.Save(path);
+            File.WriteAllText(path, "{ von Hand kaputt");
+            if (!backupReadable)
+                File.WriteAllText(Settings.BackupPath(path), "{ auch kaputt");
+
+            var fresh = Settings.Load(path);
+            Assert.Equal(backupReadable, fresh.RestoredFromBackup);
+            Assert.Equal(!backupReadable, fresh.LoadError is not null);
+            running.KeepUnreadableOf(fresh);
+            Assert.Empty(Unreadable(dir, "settings.json")); // erst beim Speichern
+            running.Save(path);
+            running.Save(path);
+
+            Assert.Equal("{ von Hand kaputt", File.ReadAllText(Assert.Single(Unreadable(dir, "settings.json"))));
+            Assert.Equal(backupReadable ? 0 : 1, Unreadable(dir, "settings.json.bak").Length);
+            Assert.Equal(running.UnreadableCopy, Assert.Single(Unreadable(dir, "settings.json")));
+            var again = Settings.Load(path);
+            Assert.False(again.RestoredFromBackup);
+            Assert.Equal(30, again.InactivityMinutes); // nicht auf die Sicherung zurückgefallen
+        }
+        finally
+        {
+            Directory.Delete(dir, recursive: true);
+        }
+    }
+
     [Fact]
     public void Speichern_an_anderer_Stelle_sichert_die_unlesbare_Datei_ebenfalls_vorher()
     {
