@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using Switch2Pro.Bridge.Links;
@@ -321,6 +322,7 @@ internal sealed class ControllerOverview : Panel
         public int NaturalBodyHeight { get; private set; }
 
         /// <summary>Vorgabe der Übersicht: alle zusammengeklappten Karten gleich hoch.</summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public int BodyHeight { get; set; }
         private InfoPanel? _details;
         private string? _title;
@@ -331,6 +333,7 @@ internal sealed class ControllerOverview : Panel
         private Settings CurrentSettings => _owner._settings();
 
         /// <summary>Kompakte Übersicht: kleine Grafik, nur Akku/Verbindung/Im Spiel; aufgeklappt wieder groß.</summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool Compact
         {
             get => _compact;
@@ -1296,9 +1299,11 @@ internal sealed class ControllerOverview : Panel
         private static int RowHeight => UiScale.Px(26);
 
         /// <summary>Kompakt (Karte): nur Akku, Verbindung, Griff/Maus und gedrückte Tasten; sonst alle Eigenschaften.</summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool Compact { get; init; } = true;
 
         /// <summary>Wie Spiele den Controller sehen (Art, Xbox-Platz) und ggf. die vom Spiel gesetzte Lichtleiste.</summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public (string Text, Color? Lightbar)? Game
         {
             get => _game;
@@ -1406,6 +1411,7 @@ internal sealed class ControllerOverview : Panel
         }
 
         /// <summary>Kompakte Übersicht: ohne Zeile „Gedrückt“.</summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool Minimal { get; set; }
 
         /// <summary>Angezeigter Füllstand je Controller – gleitet zum echten Wert (beim Verbinden füllt sich der Balken).</summary>

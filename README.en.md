@@ -280,7 +280,7 @@ linux/                    N-Connect for Linux/LibreELEC (service) and the Kodi p
 android/                  N-Connect for Android (beta; translations in android/i18n)
 ```
 
-**Build** (.NET 8 SDK):
+**Build** (.NET 10 SDK):
 `dotnet test` and
 `dotnet publish src/Switch2Pro.Bridge -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o out/publish/win-x64`.
 Local setup: Inno Setup 6, then `ISCC.exe installer\N-Connect.iss`. Releases are built automatically by

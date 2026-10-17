@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Drawing;
 using Switch2Pro.Bridge.Links;
 using Switch2Pro.Protocol;
@@ -107,6 +108,7 @@ internal sealed class PairForm : UiForm
     }
 
     /// <summary>Prüfhilfe: statt zu suchen einen verbundenen Controller zeigen (kein Bluetooth-Zugriff).</summary>
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string? Preview { get; init; }
 
     private void ShowPreview(string name)

@@ -80,7 +80,7 @@ android/NConnect.Android/
   Touch/                    Bedienungshilfe, Touch-Ausgabe (Gesten), Layout, Overlay-Editor
   UI/                       Assistent, Hauptfenster (Controller · Einstellungen · Hilfe), Baukasten, Design,
                             ProfileDialogs.cs (Profile und Belegungs-Editor), AppPicker.cs (App-Auswahl mit Symbol)
-android/NConnect.Android.Tests/  xUnit-Tests (net8.0) für die Android-freien Teile, siehe „Tests ohne Gerät“
+android/NConnect.Android.Tests/  xUnit-Tests (net10.0) für die Android-freien Teile, siehe „Tests ohne Gerät“
 android/i18n/               Übersetzungstabellen (*.json) und generate.py
 ```
 
@@ -337,7 +337,7 @@ dotnet build -t:Install -c Debug "-p:AdbTarget=-s adb-R5CRA1GQW0Z-ECDAJk._adb-tl
 
 ### Tests ohne Gerät
 
-`dotnet test android/NConnect.Android.Tests` (xUnit, net8.0, braucht kein Android-Workload) kompiliert die
+`dotnet test android/NConnect.Android.Tests` (xUnit, net10.0, braucht kein Android-Workload) kompiliert die
 Android-freien Quelldateien direkt mit (`UpdateCheck.Releases.cs`, `ProfileEdit.cs`, `GameProfileWatcher.Pick.cs`,
 `KodiStatusWriter.Contract.cs`, `L.Texts.cs`) und prüft:
 

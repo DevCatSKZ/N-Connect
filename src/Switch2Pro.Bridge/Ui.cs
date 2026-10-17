@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
@@ -280,6 +281,7 @@ internal class StackPanel : Panel, IHeightForWidth
 {
     private readonly HashSet<Control> _hidden = [];
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public int Spacing { get; set; }
 
     public StackPanel()
@@ -469,6 +471,7 @@ internal sealed class SettingRow : Control, IHeightForWidth, IExtraTexts, ISelfT
     private bool _hover;
 
     /// <summary>Zeile, die wie ein Link zu einer anderen Seite führt (mit Pfeil rechts).</summary>
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool Navigates { get; init; }
 
     public SettingRow(string title, string? description = null, Control? content = null, string? glyph = null)
@@ -497,6 +500,7 @@ internal sealed class SettingRow : Control, IHeightForWidth, IExtraTexts, ISelfT
 
     public Control? Content => _content;
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string? Description
     {
         get => _description;
@@ -623,6 +627,7 @@ internal sealed class ToggleSwitch : Control, ISelfTranslating
     protected override void ScaleControl(SizeF factor, BoundsSpecified specified) =>
         base.ScaleControl(factor, specified & ~BoundsSpecified.Size);
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool Checked
     {
         get => _checked;
@@ -705,7 +710,9 @@ internal sealed class Slider : Control, ISelfTranslating
     private int _value, _min, _max = 100;
     private bool _drag, _hover;
     public event EventHandler? ValueChanged;
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public Func<int, string> Format { get; set; } = v => v.ToString();
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public int SmallChange { get; set; } = 1;
     private static int ValueWidth => UiScale.Px(76);
 
@@ -721,9 +728,12 @@ internal sealed class Slider : Control, ISelfTranslating
     protected override void ScaleControl(SizeF factor, BoundsSpecified specified) =>
         base.ScaleControl(factor, specified & ~BoundsSpecified.Height);
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public int Minimum { get => _min; set { _min = value; Value = _value; Invalidate(); } }
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public int Maximum { get => _max; set { _max = value; Value = _value; Invalidate(); } }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public int Value
     {
         get => _value;
@@ -863,6 +873,7 @@ internal sealed class Segmented : Control, IExtraTexts, ISelfTranslating
 
     public IEnumerable<string> ExtraTexts => _options.Select(Tr.T);
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public int SelectedIndex
     {
         get => _selected;
@@ -971,9 +982,12 @@ internal sealed class GlyphButton : Control, ISelfTranslating
 {
     private bool _down, _checked;
     private readonly string? _glyph;
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool Accent { get; set; }
     /// <summary>Umschaltknopf (z. B. „Einstellungen“ auf- und zuklappen): gedrückt in Akzentfarbe.</summary>
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool Toggle { get; set; }
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string? TrailingGlyph { get; set; }
 
     public GlyphButton(string text, string? glyph = null, bool accent = false)
@@ -994,6 +1008,7 @@ internal sealed class GlyphButton : Control, ISelfTranslating
     /// <summary>Hover-Hervorhebung 0–1 (blendet weich ein und aus).</summary>
     private readonly Anim _hoverAnim;
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool Checked
     {
         get => _checked;
@@ -1141,6 +1156,7 @@ internal sealed class PivotTabs : Control, IExtraTexts, ISelfTranslating
         Invalidate();
     }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public int SelectedIndex
     {
         get => _selected;
@@ -1261,6 +1277,7 @@ internal sealed class NavItem : Control, ISelfTranslating
         KeyDown += (_, e) => { if (e.KeyCode is Keys.Enter or Keys.Space) select(); };
     }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool Selected
     {
         get => _selected;
@@ -1268,8 +1285,10 @@ internal sealed class NavItem : Control, ISelfTranslating
     }
 
     /// <summary>Hat Unterpunkte: Pfeil rechts, Klick darauf meldet <see cref="ExpandToggled"/>.</summary>
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool Expandable { get; set; }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool Expanded
     {
         get => _expanded;
@@ -1367,6 +1386,7 @@ internal sealed class NavSubItem : Control, ISelfTranslating
     }
 
     /// <summary>Gewählter Unterpunkt: Akzentmarke links, gleiche Füllung wie <see cref="NavItem.Selected"/>.</summary>
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool Selected
     {
         get => _selected;
@@ -1465,6 +1485,7 @@ internal sealed class TextField : Panel
 internal sealed class ScrollPage : Panel
 {
     public StackPanel Content { get; } = new() { Spacing = 0, Padding = new Padding(0, 0, 0, UiScale.Px(24)) };
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public int MaxContentWidth { get; set; } = 1240;
 
     public ScrollPage()
