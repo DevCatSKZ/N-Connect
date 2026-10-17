@@ -848,8 +848,8 @@ internal sealed class ControllerManager : IAsyncDisposable
             ids.RemoveAll(id => !_links.Values.Any(l => string.Equals(l.HidInstanceId, id, StringComparison.OrdinalIgnoreCase)));
             if (ids.Count == 0)
                 return;
-            bool ok = await HidHide.HideAsync(ids);
-            if (ok)
+            var result = await HidHide.HideAsync(ids);
+            if (result == HidHide.HideResult.Hidden)
             {
                 var settings = _settings();
                 settings.HiddenDevices = [.. settings.HiddenDevices, .. ids.Where(id => !settings.IsHidden(id))];
@@ -861,9 +861,13 @@ internal sealed class ControllerManager : IAsyncDisposable
             }
             else
             {
+                // Abgelehnt oder fehlgeschlagen: nicht bei jedem Controller erneut versuchen. „Abgebrochen“ nur, wenn der
+                // Benutzer die UAC-Abfrage wirklich abgelehnt hat – sonst sucht er die Ursache an der falschen Stelle.
                 lock (_hidePending)
                     _hideDeclined.UnionWith(ids);
-                Notify?.Invoke("Original-Controller nicht versteckt (Abfrage abgebrochen). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“.");
+                Notify?.Invoke(result == HidHide.HideResult.Declined
+                    ? "Original-Controller nicht versteckt (Abfrage abgebrochen). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."
+                    : "Original-Controller nicht versteckt (Fehler, Details im Protokoll). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“.");
             }
         }
         catch (OperationCanceledException)
@@ -877,7 +881,7 @@ internal sealed class ControllerManager : IAsyncDisposable
             lock (_hidePending)
                 _hideDeclined.UnionWith(ids);
             if (!_disposed)
-                Notify?.Invoke("Original-Controller nicht versteckt (Abfrage abgebrochen). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“.");
+                Notify?.Invoke("Original-Controller nicht versteckt (Fehler, Details im Protokoll). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“.");
         }
         finally
         {

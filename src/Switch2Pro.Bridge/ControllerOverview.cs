@@ -1210,7 +1210,7 @@ internal sealed class ControllerOverview : Panel
             bool ok;
             try
             {
-                ok = await HidHide.HideAsync(ids);
+                ok = await HidHide.HideAsync(ids) == HidHide.HideResult.Hidden;
             }
             catch (Exception e) when (e is not OutOfMemoryException)
             {

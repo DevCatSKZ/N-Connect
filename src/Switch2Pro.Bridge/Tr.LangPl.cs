@@ -562,6 +562,8 @@ internal static partial class Tr
             "Oryginalne kontrolery ukryte przed grami – Steam i gry widzą już tylko wirtualny kontroler.",
         ["Original-Controller nicht versteckt (Abfrage abgebrochen). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."] =
             "Oryginalne kontrolery nie ukryte (przerwano zapytanie). Później: kontroler → Ustawienia → Dodatki → „Wyświetlany podwójnie?”.",
+        ["Original-Controller nicht versteckt (Fehler, Details im Protokoll). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."] =
+            "Oryginalne kontrolery nie ukryte (błąd, szczegóły w dzienniku). Później: kontroler → Ustawienia → Dodatki → „Wyświetlany podwójnie?”.",
         ["Tastenanordnung A/B/X/Y"] = "Układ przycisków A/B/X/Y",
         ["Xbox: nach Position (untere Taste = A). Nintendo: nach Beschriftung (A bleibt A)."] = "Xbox: wg pozycji (dolny przycisk = A). Nintendo: wg oznaczenia (A pozostaje A).",
         ["Verbinden"] = "Połączenie",

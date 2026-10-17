@@ -562,6 +562,8 @@ internal static partial class Tr
             "Originele controllers verborgen voor games – Steam en games zien voortaan alleen de virtuele controller.",
         ["Original-Controller nicht versteckt (Abfrage abgebrochen). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."] =
             "Originele controllers niet verborgen (vraag afgebroken). Inhalen: controller → Instellingen → Extra's → „Dubbel weergegeven?“.",
+        ["Original-Controller nicht versteckt (Fehler, Details im Protokoll). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."] =
+            "Originele controllers niet verborgen (fout, details in het logboek). Inhalen: controller → Instellingen → Extra's → „Dubbel weergegeven?“.",
         ["Tastenanordnung A/B/X/Y"] = "Knopindeling A/B/X/Y",
         ["Xbox: nach Position (untere Taste = A). Nintendo: nach Beschriftung (A bleibt A)."] = "Xbox: op positie (onderste knop = A). Nintendo: op opschrift (A blijft A).",
         ["Verbinden"] = "Verbinden",

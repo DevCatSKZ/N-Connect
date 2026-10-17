@@ -562,6 +562,8 @@ internal static partial class Tr
             "元のコントローラーをゲームから隠しました – Steam とゲームには仮想コントローラーのみが見えます。",
         ["Original-Controller nicht versteckt (Abfrage abgebrochen). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."] =
             "元のコントローラーは隠されていません（確認をキャンセル）。後で行う場合：コントローラー → 設定 → その他 →「二重表示？」。",
+        ["Original-Controller nicht versteckt (Fehler, Details im Protokoll). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."] =
+            "元のコントローラーは隠されていません（エラー、詳細はログを参照）。後で行う場合：コントローラー → 設定 → その他 →「二重表示？」。",
         ["Tastenanordnung A/B/X/Y"] = "ボタン配置 A/B/X/Y",
         ["Xbox: nach Position (untere Taste = A). Nintendo: nach Beschriftung (A bleibt A)."] = "Xbox：位置で決定（下のボタン = A）。Nintendo：表示どおり（A は A のまま）。",
         ["Verbinden"] = "接続",

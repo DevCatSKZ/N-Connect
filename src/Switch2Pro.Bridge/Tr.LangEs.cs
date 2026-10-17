@@ -562,6 +562,8 @@ internal static partial class Tr
             "Mandos originales ocultos a los juegos: Steam y los juegos ahora solo ven el mando virtual.",
         ["Original-Controller nicht versteckt (Abfrage abgebrochen). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."] =
             "Mandos originales no ocultados (pregunta cancelada). Para hacerlo luego: mando → Ajustes → Extras → «¿Se muestra dos veces?».",
+        ["Original-Controller nicht versteckt (Fehler, Details im Protokoll). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."] =
+            "Mandos originales no ocultados (error, detalles en el registro). Para hacerlo luego: mando → Ajustes → Extras → «¿Se muestra dos veces?».",
         ["Tastenanordnung A/B/X/Y"] = "Disposición de botones A/B/X/Y",
         ["Xbox: nach Position (untere Taste = A). Nintendo: nach Beschriftung (A bleibt A)."] = "Xbox: por posición (botón inferior = A). Nintendo: por etiqueta (A sigue siendo A).",
         ["Verbinden"] = "Conectando",
