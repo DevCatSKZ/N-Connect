@@ -568,6 +568,8 @@ internal static partial class Tr
             "Оригинальные контроллеры не скрыты (запрос отменён). Позже: контроллер → Настройки → Дополнительно → «Отображается дважды?».",
         ["Original-Controller nicht versteckt (Fehler, Details im Protokoll). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."] =
             "Оригинальные контроллеры не скрыты (ошибка, подробности в журнале). Позже: контроллер → Настройки → Дополнительно → «Отображается дважды?».",
+        ["Eine ältere N-Connect-Version hat das eigene virtuelle DualShock 4 vor Spielen versteckt. Freigeben hat nicht geklappt – bitte im HidHide Configuration Client den Haken beim virtuellen DualShock 4 entfernen."] =
+            "Старая версия N-Connect скрыла от игр собственный виртуальный DualShock 4. Снова открыть его не удалось – снимите отметку с виртуального DualShock 4 в HidHide Configuration Client.",
         ["Tastenanordnung A/B/X/Y"] = "Раскладка кнопок A/B/X/Y",
         ["Xbox: nach Position (untere Taste = A). Nintendo: nach Beschriftung (A bleibt A)."] = "Xbox: по положению (нижняя кнопка = A). Nintendo: по надписи (A остаётся A).",
         ["Verbinden"] = "Подключение",

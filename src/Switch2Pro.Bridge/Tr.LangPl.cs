@@ -568,6 +568,8 @@ internal static partial class Tr
             "Oryginalne kontrolery nie ukryte (przerwano zapytanie). Później: kontroler → Ustawienia → Dodatki → „Wyświetlany podwójnie?”.",
         ["Original-Controller nicht versteckt (Fehler, Details im Protokoll). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."] =
             "Oryginalne kontrolery nie ukryte (błąd, szczegóły w dzienniku). Później: kontroler → Ustawienia → Dodatki → „Wyświetlany podwójnie?”.",
+        ["Eine ältere N-Connect-Version hat das eigene virtuelle DualShock 4 vor Spielen versteckt. Freigeben hat nicht geklappt – bitte im HidHide Configuration Client den Haken beim virtuellen DualShock 4 entfernen."] =
+            "Starsza wersja N-Connect ukryła przed grami własnego wirtualnego DualShock 4. Nie udało się go ponownie udostępnić – odznacz wirtualnego DualShock 4 w HidHide Configuration Client.",
         ["Tastenanordnung A/B/X/Y"] = "Układ przycisków A/B/X/Y",
         ["Xbox: nach Position (untere Taste = A). Nintendo: nach Beschriftung (A bleibt A)."] = "Xbox: wg pozycji (dolny przycisk = A). Nintendo: wg oznaczenia (A pozostaje A).",
         ["Verbinden"] = "Połączenie",

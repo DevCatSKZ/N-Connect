@@ -158,6 +158,7 @@ internal sealed class ControllerManager : IAsyncDisposable
 
     public async Task StartAsync()
     {
+        Track(Task.Run(ReleaseHiddenVirtualPadsAsync));
         await StartBluetoothAsync();
         Track(Task.Run(() => HidScanLoopAsync(_cts.Token)));
     }
@@ -849,7 +850,7 @@ internal sealed class ControllerManager : IAsyncDisposable
             if (ids.Count == 0)
                 return;
             var result = await HidHide.HideAsync(ids);
-            if (result == HidHide.HideResult.Hidden)
+            if (result == HidHide.Outcome.Done)
             {
                 var settings = _settings();
                 settings.HiddenDevices = [.. settings.HiddenDevices, .. ids.Where(id => !settings.IsHidden(id))];
@@ -865,7 +866,7 @@ internal sealed class ControllerManager : IAsyncDisposable
                 // Benutzer die UAC-Abfrage wirklich abgelehnt hat – sonst sucht er die Ursache an der falschen Stelle.
                 lock (_hidePending)
                     _hideDeclined.UnionWith(ids);
-                Notify?.Invoke(result == HidHide.HideResult.Declined
+                Notify?.Invoke(result == HidHide.Outcome.Declined
                     ? "Original-Controller nicht versteckt (Abfrage abgebrochen). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."
                     : "Original-Controller nicht versteckt (Fehler, Details im Protokoll). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“.");
             }
@@ -895,6 +896,37 @@ internal sealed class ControllerManager : IAsyncDisposable
             }
             if (again && !_disposed)
                 Track(HideSoonAsync());
+        }
+    }
+
+    /// <summary>
+    /// Bis 1.0.21 hielt N-Connect sein eigenes ViGEm-DualShock-4 für einen echten Controller und konnte es per HidHide
+    /// verstecken (Issue #1). Der Eintrag bleibt in HidHide auch nach dem Update stehen, und ViGEm vergibt dieselbe
+    /// Instanz-ID wieder – Steam und Spiele sähen die DS4-Ausgabe von N-Connect nie. Deshalb beim Start solche Einträge der
+    /// eigenen Liste versteckter Geräte freigeben (über die Aufgabe, sonst per UAC) und aus der Liste nehmen. Das geschieht
+    /// nur einmal, auch wenn es scheitert – dann erklärt eine Meldung, wie es von Hand geht.
+    /// </summary>
+    private async Task ReleaseHiddenVirtualPadsAsync()
+    {
+        try
+        {
+            var ids = _settings().HiddenDevices.Where(HidHide.IsVirtualPad).Take(HidHide.MaxIds).ToList();
+            if (ids.Count == 0 || _disposed || !HidHide.IsInstalled)
+                return;
+            Log.Info($"HidHide: eigenes virtuelles Pad von einer älteren Version versteckt ({string.Join(' ', ids)}) – wird freigegeben");
+            var result = await HidHide.UnhideAsync(ids);
+            var settings = _settings();
+            settings.HiddenDevices = [.. settings.HiddenDevices.Where(id => !ids.Contains(id, StringComparer.OrdinalIgnoreCase))];
+            RequestSave();
+            if (result == HidHide.Outcome.Done)
+                Log.Info("HidHide: virtuelles Pad wieder freigegeben");
+            else if (!_disposed)
+                Notify?.Invoke("Eine ältere N-Connect-Version hat das eigene virtuelle DualShock 4 vor Spielen versteckt. Freigeben " +
+                               "hat nicht geklappt – bitte im HidHide Configuration Client den Haken beim virtuellen DualShock 4 entfernen.");
+        }
+        catch (Exception e) when (e is not OutOfMemoryException)
+        {
+            Log.Error("HidHide: virtuelles Pad nicht freigegeben", e);
         }
     }
 

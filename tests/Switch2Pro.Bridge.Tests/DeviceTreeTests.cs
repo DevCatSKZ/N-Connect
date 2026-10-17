@@ -201,4 +201,37 @@ public class DeviceTreeTests
         Assert.False(DeviceTree.IsPhysicalChain(chain));
         Assert.True(DeviceTree.IsPhysicalChain([N(@"hid\x\1"), N(@"bthenum\{00001124}\2")]));
     }
+
+    /// <summary>
+    /// Freigeben in HidHide (Aufräumen nach Issue #1) nur mit Beweis: ein Knoten des ViGEm-Busses. Andere Software-Busse
+    /// (USB über Netzwerk o. Ä.) beweisen nichts – dort kann ein echter, absichtlich versteckter Controller hängen.
+    /// </summary>
+    [Fact]
+    public void FreigebenNurAmViGEmBus()
+    {
+        DeviceNode[] vigem =
+        [
+            N(@"HID\VID_054C&PID_05C4&REV_0100\2&be03103&0&0000", null, @"HID\VID_054C&PID_05C4&REV_0100"),
+            N(@"USB\VID_054C&PID_05C4\1&2d595ca7&1&01", "HidUsb"),
+            .. ViGEmTop,
+        ];
+        Assert.True(DeviceTree.IsViGEmChain(vigem));
+        Assert.True(DeviceTree.IsViGEmChain([N(@"HID\X\1"), N(@"USB\X\2", "HidUsb"), N(@"ROOT\SYSTEM\0001", null, @"Nefarius\ViGEmBus\Gen1")]));
+
+        // Software-Bus ohne ViGEm: nicht echt (wird nicht versteckt), aber auch nicht freigegeben.
+        DeviceNode[] swd = [N(@"HID\VID_057E&PID_2009\3&1"), N(@"USB\VID_057E&PID_2009\2&5"), N(@"SWD\VIRTUALUSB\1", "VirtualUsb")];
+        Assert.False(DeviceTree.IsPhysicalChain(swd));
+        Assert.False(DeviceTree.IsViGEmChain(swd));
+
+        DeviceNode[] real =
+        [
+            N(@"HID\VID_054C&PID_05C4&MI_03\8&2a1b3c4d&0&0000"),
+            N(@"USB\VID_054C&PID_05C4&MI_03\7&1f2e3d4c&0&0003", "HidUsb"),
+            N(@"USB\VID_054C&PID_05C4\5&2c3d4e5f&0&2", "usbccgp"),
+            .. PcTop,
+        ];
+        Assert.False(DeviceTree.IsViGEmChain(real));
+        // Nicht angeschlossen: CM_Locate_DevNode scheitert, die Kette ist leer.
+        Assert.False(DeviceTree.IsViGEmChain([]));
+    }
 }
