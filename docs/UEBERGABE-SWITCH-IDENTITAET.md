@@ -99,7 +99,7 @@ cd "C:\Coding\Bluepick_RCM\Bluepick_RCM Project"
 c:\devkitPro\msys2\usr\bin\make.exe -j4
 # Erwartet: Payload < 126 296 B, unkomprimiert < 140 288 B. Warnung „_derive_keys defined but not used“ ist alt.
 
-# N-Connect (.NET 8, SDK 9/10 installiert)
+# N-Connect (.NET 10, SDK 10 installiert)
 cd "C:\Coding\Switch 2 Pro Controler Bluetooth Treiber\N-Connect"
 dotnet build tools\Switch2Pro.BtIdentityProbe -c Release
 dotnet test tests\Switch2Pro.Protocol.Tests

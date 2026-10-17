@@ -324,7 +324,11 @@ internal static partial class Tr
         ["N-Connect: ViGEmBus fehlt"] = "N-Connect：ViGEmBus がありません",
         ["Neue Version verfügbar"] = "新しいバージョンがあります",
         ["Einstellungen fehlerhaft"] = "設定が壊れています",
-        ["settings.json konnte nicht gelesen werden – es gelten die Standardwerte."] = "settings.json を読み取れませんでした – デフォルト値が適用されます。",
+        ["settings.json konnte nicht gelesen werden – es gelten die Standardwerte. Die beschädigte Datei wird als „settings.json.unlesbar-…“ aufbewahrt (Klicken öffnet den Ordner)."] =
+            "settings.json を読み取れませんでした – デフォルト値が適用されます。破損したファイルは「settings.json.unlesbar-…」として保管されます（クリックでフォルダーを開きます）。",
+        ["Einstellungen wiederhergestellt"] = "設定を復元しました",
+        ["Die Einstellungen waren beschädigt und wurden aus der letzten Sicherung wiederhergestellt. Die zuletzt geänderten Werte fehlen womöglich (Klicken öffnet den Ordner)."] =
+            "設定が破損していたため、最後のバックアップから復元しました。直近の変更が失われている可能性があります（クリックでフォルダーを開きます）。",
         ["Ohne ViGEmBus kann kein virtueller Controller erzeugt werden. Bitte das Setup erneut ausführen oder ViGEmBus installieren (Rechtsklick auf das Symbol → ViGEmBus herunterladen)."] =
             "ViGEmBus がないと仮想コントローラーを作成できません。セットアップを再実行するか、ViGEmBus をインストールしてください（アイコンを右クリック → ViGEmBus をダウンロード）。",
 
@@ -668,6 +672,9 @@ internal static partial class Tr
         ["HidHide aktuell halten"] = "HidHide を最新に保つ",
         ["Beim Start nach einer neuen HidHide-Version suchen. Installiert wird nur nach Rückfrage (geprüfter Download vom Hersteller, Neustart nötig)."] =
             "起動時に HidHide の新しいバージョンを確認。確認後のみインストールします（メーカーからの検証済みダウンロード、再起動が必要）。",
+        ["Lizenzen Dritter"] = "サードパーティのライセンス",
+        ["Open-Source-Software und übernommener Code in N-Connect – mit Lizenzen und Copyright-Vermerken."] =
+            "N-Connect に含まれるオープンソースソフトウェアと流用したコード – ライセンスと著作権表示付き。",
         ["Der Download hat nicht geklappt oder die Datei war fehlerhaft. Die Release-Seite im Browser öffnen?"] =
             "ダウンロードに失敗したか、ファイルが破損していました。ブラウザでリリースページを開きますか？",
         ["Alle Controller trennen"] = "すべてのコントローラーを切断",

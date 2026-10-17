@@ -324,7 +324,11 @@ internal static partial class Tr
         ["N-Connect: ViGEmBus fehlt"] = "N-Connect: brak ViGEmBus",
         ["Neue Version verfügbar"] = "Dostępna nowa wersja",
         ["Einstellungen fehlerhaft"] = "Uszkodzone ustawienia",
-        ["settings.json konnte nicht gelesen werden – es gelten die Standardwerte."] = "Nie można odczytać settings.json – obowiązują wartości domyślne.",
+        ["settings.json konnte nicht gelesen werden – es gelten die Standardwerte. Die beschädigte Datei wird als „settings.json.unlesbar-…“ aufbewahrt (Klicken öffnet den Ordner)."] =
+            "Nie można odczytać settings.json – obowiązują wartości domyślne. Uszkodzony plik zostaje zachowany jako „settings.json.unlesbar-…” (kliknij, aby otworzyć folder).",
+        ["Einstellungen wiederhergestellt"] = "Przywrócono ustawienia",
+        ["Die Einstellungen waren beschädigt und wurden aus der letzten Sicherung wiederhergestellt. Die zuletzt geänderten Werte fehlen womöglich (Klicken öffnet den Ordner)."] =
+            "Ustawienia były uszkodzone i zostały przywrócone z ostatniej kopii zapasowej. Może brakować ostatnich zmian (kliknij, aby otworzyć folder).",
         ["Ohne ViGEmBus kann kein virtueller Controller erzeugt werden. Bitte das Setup erneut ausführen oder ViGEmBus installieren (Rechtsklick auf das Symbol → ViGEmBus herunterladen)."] =
             "Bez ViGEmBus nie można utworzyć wirtualnego kontrolera. Uruchom ponownie instalator lub zainstaluj ViGEmBus (kliknij ikonę prawym przyciskiem → Pobierz ViGEmBus).",
 
@@ -668,6 +672,9 @@ internal static partial class Tr
         ["HidHide aktuell halten"] = "Utrzymuj HidHide aktualny",
         ["Beim Start nach einer neuen HidHide-Version suchen. Installiert wird nur nach Rückfrage (geprüfter Download vom Hersteller, Neustart nötig)."] =
             "Szukaj nowej wersji HidHide przy starcie. Instalacja tylko po potwierdzeniu (zweryfikowane pobieranie od producenta, wymagany restart).",
+        ["Lizenzen Dritter"] = "Licencje stron trzecich",
+        ["Open-Source-Software und übernommener Code in N-Connect – mit Lizenzen und Copyright-Vermerken."] =
+            "Oprogramowanie open source i przejęty kod w N-Connect – z licencjami i informacjami o prawach autorskich.",
         ["Der Download hat nicht geklappt oder die Datei war fehlerhaft. Die Release-Seite im Browser öffnen?"] =
             "Pobieranie nie powiodło się lub plik był wadliwy. Otworzyć stronę wydania w przeglądarce?",
         ["Alle Controller trennen"] = "Rozłącz wszystkie kontrolery",

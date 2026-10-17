@@ -125,6 +125,8 @@ public sealed class HelpPage(MainActivity host) : IPage
             Ui.Buttons(host,
                 Ui.Button(host, "Protokoll anzeigen", ShowLog, Ui.ButtonStyle.Outlined),
                 Ui.Button(host, "Teilen", ShareLog, Ui.ButtonStyle.Text))));
+
+        col.AddView(LicensesTopic());
         return scroll;
     }
 
@@ -196,6 +198,98 @@ public sealed class HelpPage(MainActivity host) : IPage
 
     private void OpenRepoPage() =>
         host.StartActivity(new Intent(Intent.ActionView, global::Android.Net.Uri.Parse("https://github.com/DevCatSKZ/kodi-repo")));
+
+    // ---------- Lizenzen ----------
+
+    /// <summary>Asset aus THIRD-PARTY-NOTICES.md im Repository-Wurzelordner (siehe NConnect.Android.csproj).</summary>
+    private const string NoticesAsset = "THIRD-PARTY-NOTICES.md";
+    private const string NoticesUrl = "https://github.com/DevCatSKZ/N-Connect/blob/main/THIRD-PARTY-NOTICES.md";
+
+    /// <summary>
+    /// Kurzliste der Komponenten Dritter im APK mit Lizenz und Copyright-Vermerk (Namen und Vermerke bleiben wörtlich);
+    /// die vollständigen Lizenztexte und NOTICE-Dateien zeigt <see cref="ShowNotices"/>.
+    /// </summary>
+    private View LicensesTopic()
+    {
+        static string E(string text) => System.Net.WebUtility.HtmlEncode(text);
+        static string Group(string title) => $"<br><b>{E(title)}</b><br>";
+        static string Item(string name, string license, string copyright) =>
+            $"• {E(name)} – {E(license)}<br><small>{E(copyright)}</small><br>";
+        // Code Dritter in der Kotlin-Standardbibliothek (laut license/README.md des Kotlin-Projekts).
+        string kotlinParts = L.T("enthält:") + " GWT, (C) 2007-08 Google Inc. (Apache-2.0); Guava UnsignedLongs, (C) 2011 " +
+                             "The Guava Authors (Apache-2.0); ThreeTen-BP, Copyright (c) 2007-present, Stephen Colebourne & " +
+                             "Michael Nascimento Santos (BSD-3-Clause); Boost Math, Copyright Eric Ford & Hubert Holin 2001 (BSL-1.0)";
+        string html =
+            E(L.T("N-Connect enthält Software, Quellcode und Daten Dritter. Die Rechte daran verbleiben bei ihren Inhabern.")) + "<br>" +
+            Group(L.T("Laufzeit")) +
+            Item(L.T(".NET für Android 36.1 und .NET-Laufzeit 10 (Mono)"), "MIT", "Copyright (c) .NET Foundation and Contributors") +
+            Item(L.T(".NET-for-Android-Bindungen (Xamarin.*-Pakete)"), "MIT", "Copyright (c) .NET Foundation Contributors") +
+            Group(L.T("Bibliotheken")) +
+            Item("AndroidX (activity, annotation, appcompat, arch.core, cardview, collection, compose.runtime-annotation, " +
+                 "concurrent-futures, constraintlayout, coordinatorlayout, core, cursoradapter, customview, drawerlayout, " +
+                 "dynamicanimation, emoji2, fragment, graphics-shapes, interpolator, lifecycle, loader, navigationevent, " +
+                 "profileinstaller, recyclerview, resourceinspection, savedstate, startup, tracing, transition, vectordrawable, " +
+                 "versionedparcelable, viewpager, viewpager2)", "Apache-2.0", "Copyright (C) The Android Open Source Project") +
+            Item("Material Components for Android 1.14.0", "Apache-2.0", "Copyright (C) The Android Open Source Project (Google LLC)") +
+            Item(L.T("Kotlin-Standardbibliothek") + " 2.4.0", "Apache-2.0",
+                "Copyright 2010-2024 JetBrains s.r.o. and Kotlin Programming Language contributors") +
+            $"<small>{E(kotlinParts)}</small><br>" +
+            Item("kotlinx.coroutines 1.11.0", "Apache-2.0", "Copyright 2016-2025 JetBrains s.r.o and contributors") +
+            Item("kotlinx.serialization 1.11.0", "Apache-2.0", "Copyright 2017-2019 JetBrains s.r.o and respective authors and developers") +
+            Item("kotlinx-atomicfu 0.33.0", "Apache-2.0", "Copyright 2017 JetBrains s.r.o. and respective authors and developers") +
+            Item("Guava ListenableFuture 1.0", "Apache-2.0", "Copyright (C) 2007 The Guava Authors") +
+            Item("Error Prone Annotations 2.50.0", "Apache-2.0",
+                "Copyright The Error Prone Authors (Google Inc., Two Sigma Open Source, Picnic Technologies)") +
+            Item("JetBrains Java Annotations 26.1.0", "Apache-2.0", "Copyright 2000-2016 JetBrains s.r.o.") +
+            Item("JSpecify 1.0.0", "Apache-2.0", "Copyright The JSpecify Authors (Google LLC, Oracle America, Inc., SpotBugs Team)") +
+            Item("Shizuku API 13.1.5 (api, provider, shared, aidl)", "MIT", "Copyright (c) 2021 RikkaW") +
+            Group(L.T("Symbole")) +
+            Item("Material Icons (check, close, warning, bluetooth, battery_full, videogame_asset, help_outline, tune)",
+                "Apache-2.0", "Copyright Google LLC") +
+            Group(L.T("Übernommener oder angepasster Code und Daten")) +
+            Item("SDL – Simple DirectMedia Layer (" + L.T("HIDAPI-Treiber für Switch, Switch 2, PS4 und PS5; nach C# übertragen und angepasst") + ")",
+                "zlib", "Copyright (C) 1997-2026 Sam Lantinga; Code and logic contributed by Valve Corporation") +
+            Item("NS2Pro-Bridge-Windows (" + L.T("Bluetooth-Start-Sequenz und Vibrationspaket") + ")", "MIT",
+                "Copyright (c) 2026 NS2 Pro Compatibility contributors") +
+            Item("Switch2BTLink", "MIT", "Copyright (c) 2026 KumuIi") +
+            Item("joycon2cpp", "MIT", "Copyright (c) 2025 Frano") +
+            Item("Android Compatibility Test Suite (" + L.T("HID-Deskriptor des Xbox One S Controllers") + ")", "Apache-2.0",
+                "Copyright (C) The Android Open Source Project") +
+            Group(L.T("Protokoll-Dokumentation (kein übernommener Code)")) +
+            E("ndeadly/switch2_controller_research, dekuNukem/Nintendo_Switch_Reverse_Engineering, Linux (hid-nintendo, " +
+              "hid-wiimote, hid-playstation), WiiBrew, Dolphin, yuzu/Citron, Switch2Connect, Cemuhook/DSU, DS4Windows, " +
+              "AOSP frameworks/base/cmds/hid") + "<br><br>" +
+            E(L.T("Nintendo, Nintendo Switch, Joy-Con, Wii, Xbox, PlayStation, DualShock und DualSense sind Marken ihrer " +
+                  "jeweiligen Inhaber. N-Connect ist ein unabhängiges Projekt."));
+        return Topic("Lizenzen", html, Ui.Button(host, "Vollständige Lizenztexte anzeigen", ShowNotices, Ui.ButtonStyle.Outlined));
+    }
+
+    /// <summary>Vollständige THIRD-PARTY-NOTICES.md (Lizenztexte, NOTICE-Dateien, Versionen) zum Durchscrollen.</summary>
+    private void ShowNotices()
+    {
+        string text;
+        try
+        {
+            using var reader = new StreamReader(host.Assets!.Open(NoticesAsset));
+            text = reader.ReadToEnd();
+        }
+        catch (Java.IO.IOException e)
+        {
+            Log.Error("Lizenztexte lesen", e);
+            text = L.F("Die Lizenztexte fehlen in dieser Installation. Du findest sie unter {0}", NoticesUrl);
+        }
+        var view = new TextView(host) { Text = text, TextSize = 12 };
+        view.SetTextIsSelectable(true);
+        int pad = Ui.Dp(host, 20);
+        view.SetPadding(pad, Ui.Dp(host, 8), pad, 0);
+        var scroll = new ScrollView(host);
+        scroll.AddView(view);
+        new MaterialAlertDialogBuilder(host)
+            .SetTitle(L.T("Lizenztexte"))!
+            .SetView(scroll)!
+            .SetNegativeButton(L.T("Schließen"), (_, _) => { })!
+            .Show();
+    }
 
     private async Task DownloadAsync()
     {

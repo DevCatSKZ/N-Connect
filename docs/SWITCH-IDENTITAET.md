@@ -421,7 +421,7 @@ Erkennung muss über VID `057E` / Ordnerstruktur erfolgen, nicht über feste Nam
 
 ```powershell
 dotnet build tools\Switch2Pro.BtIdentityProbe -c Release
-$exe = "tools\Switch2Pro.BtIdentityProbe\bin\Release\net8.0-windows\Switch2Pro.BtIdentityProbe.exe"
+$exe = "tools\Switch2Pro.BtIdentityProbe\bin\Release\net10.0-windows\Switch2Pro.BtIdentityProbe.exe"
 & $exe info                          # Adapter anzeigen (ändert nichts)
 & $exe sd <SD-Stammordner>           # Kopplungsdaten auswerten (Schlüssel maskiert)
 # Ab hier: Terminal als Administrator, Herstellerbefehle

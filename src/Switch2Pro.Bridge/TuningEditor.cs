@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Drawing;
 using Switch2Pro.Protocol;
 
@@ -99,6 +100,7 @@ internal sealed class TuningEditor : SettingsGroup
         Reload();
     }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public ControllerKind Kind
     {
         get => _kind;

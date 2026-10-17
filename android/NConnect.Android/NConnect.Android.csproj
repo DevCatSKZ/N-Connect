@@ -34,6 +34,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Lizenzhinweise für Hilfe › Lizenzen: dieselbe Datei wie im Repository-Wurzelordner, keine zweite Kopie. -->
+    <AndroidAsset Include="..\..\THIRD-PARTY-NOTICES.md" Link="Assets\THIRD-PARTY-NOTICES.md" />
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- Shizuku: Shell-Rechte ohne Root (für den hid-Befehl). Nur paketiert, Aufruf per Reflection (ShizukuShell). -->
     <AndroidMavenLibrary Include="dev.rikka.shizuku:api" Version="13.1.5" Bind="false" VerifyDependencies="false" />
     <AndroidMavenLibrary Include="dev.rikka.shizuku:provider" Version="13.1.5" Bind="false" VerifyDependencies="false" />

@@ -17,6 +17,7 @@ on:
       - "src/Switch2Pro.Protocol/**"
       - "tests/NConnect.Linux.Tests/**"
       - "THIRD-PARTY-NOTICES.md"
+      - "Directory.Build.props"
       - ".github/workflows/kodi.yml"
 permissions:
   contents: write
@@ -26,16 +27,16 @@ concurrency:
 jobs:
   kodi:
     runs-on: windows-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     defaults:
       run:
         shell: pwsh
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 10.0.x
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
@@ -59,7 +60,7 @@ jobs:
       - name: "Add-ons bauen (LibreELEC: x86_64, arm64, arm)"
         run: powershell -NoProfile -ExecutionPolicy Bypass -File linux/build-kodi-addon.ps1
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: Kodi-Plugin
           path: out/kodi/*.zip
@@ -70,7 +71,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           $tag = "${{ github.ref_name }}"
-          # Das Windows-Release legt der andere Workflow an; falls er noch läuft, kurz warten.
-          for ($i = 0; $i -lt 30 -and -not (gh release view $tag 2>$null); $i++) { Start-Sleep 20 }
-          if (-not (gh release view $tag 2>$null)) { gh release create $tag --title "N-Connect $tag" --notes "Kodi-Plugin" }
+          # Das Windows-Release legt der andere Workflow an; falls er noch läuft, warten (bis 20 Minuten).
+          for ($i = 0; $i -lt 60 -and -not (gh release view $tag 2>$null); $i++) { Start-Sleep 20 }
+          if (-not (gh release view $tag 2>$null)) {
+            # Selbst anlegen – mit demselben Text, den der Windows-Workflow nähme.
+            $notes = "docs/release-notes/$tag.md"
+            if (Test-Path $notes) { gh release create $tag --title "N-Connect $tag" --notes-file $notes }
+            else { gh release create $tag --title "N-Connect $tag" --generate-notes }
+          }
           gh release upload $tag (Get-ChildItem out/kodi -Filter 'N-Connect-Kodi-*.zip').FullName --clobber
