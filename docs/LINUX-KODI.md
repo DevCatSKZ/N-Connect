@@ -95,7 +95,7 @@ Xbox/PlayStation/Switch 1/Wii ──► BlueZ (bluetoothd, D-Bus) ◄───�
   Prüfung auf „getrennt“; geschlossen wird der fd erst, wenn Besitzer und Leser fertig sind (Nutzungszähler), und zwar
   unter derselben Sperre. Beim Trennen läuft `shutdown` bewusst ohne die Sperre: Ein Sender, der bei vollem
   Sendepuffer in `write` hängt, kehrt sofort zurück, statt das Trennen bis zum Supervision-Timeout aufzuhalten.
-- **DSU/Cemuhook-Server** ([Output/DsuServer.cs](../linux/NConnect.Linux/Output/DsuServer.cs)): Port 26760,
+- **DSU/Cemuhook-Server** ([DsuServer.cs](../src/Switch2Pro.Protocol/DsuServer.cs), derselbe wie unter Windows und Android): Port 26760,
   standardmäßig nur lokal; `DsuNetwork` öffnet ihn fürs Heimnetz. Ist der Port beim Start belegt (meist ein gerade
   endendes N-Connect), versucht der Daemon es nach 2, 5, 10, 20 und 30 s erneut.
 - **Feste Spielerplätze** (`slots.json`), **bekannte Controller** (`known.json`, für das ausgegraute Widget),

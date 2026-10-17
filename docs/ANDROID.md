@@ -67,7 +67,6 @@ android/NConnect.Android/
   Core/UpdateCheck.Releases.cs  Auswertung der GitHub-Release-Liste (ohne Android-Abhängigkeit, getestet)
   Ble/Switch2Scanner.cs     BLE-Suche, Nintendo-Herstellerdaten 0x0553 (Kopf 01 00 03 7E)
   Ble/Switch2Device.cs      GATT-Verbindung – Portierung von Switch2BleLink (Windows)
-  Dsu/DsuServer.cs          Cemuhook-/DSU-Server auf 127.0.0.1:26760 (Gyro und Tasten für Emulatoren)
   Profiles/GameProfileWatcher.cs       App im Vordergrund (UsageStats) → Profil; Startbildschirme erkennen
   Profiles/GameProfileWatcher.Pick.cs  Auswahl der Vordergrund-App (ohne N-Connect/Startbildschirm, getestet)
   Profiles/ProfileEdit.cs   Profile anlegen (Kopie der Standardbelegung), Tasten/Makros ändern, umbenennen, löschen
@@ -90,7 +89,8 @@ Neu in der gemeinsamen Bibliothek (`src/Switch2Pro.Protocol`, auch unter Windows
   den Shell-Befehl `hid`). Tests: `XboxBtReportTests` (gegen die CTS-Referenzberichte).
 - `ColorSchemes.cs` – die fünf Farbschemata (Windows, Neon, Aurora, Sunset, Joy-Con) als gemeinsame Quelle; die
   Windows-App (`Theme.cs`) liest sie ebenfalls daraus. Tests: `ColorSchemesTests`.
-- `Dsu.cs` – Cemuhook-/DSU-Pakete (Port 26760), von Windows und Android genutzt.
+- `Dsu.cs`, `DsuServer.cs` – Cemuhook-/DSU-Pakete und der UDP-Server auf 127.0.0.1:26760 (Gyro und Tasten für
+  Emulatoren), derselbe Server wie unter Windows und Linux. Tests: `DsuServerTests` (echter UDP-Austausch).
 
 ### Datenfluss
 

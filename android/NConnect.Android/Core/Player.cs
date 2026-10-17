@@ -156,7 +156,7 @@ public sealed class Player : IDisposable
         }
         LastInput = input;
         LastGamepad = gamepad;
-        Dsu.DsuServer.Instance?.Publish(Index, Mac, gamepad, input);
+        DsuServer.Instance?.Publish(Index, Mac, gamepad, input);
         try
         {
             _pad?.Update(gamepad);
