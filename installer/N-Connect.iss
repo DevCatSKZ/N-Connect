@@ -62,7 +62,7 @@ RestartApplications=no
 
 [Languages]
 ; Englisch zuerst: Ohne passende Sprache (z. B. Schwedisch, oder Chinesisch ohne ISL-Datei) schlägt das Setup den
-; ersten Eintrag vor – wie die App, die dann unter „Automatisch“ Englisch zeigt (siehe ChosenLangCode).
+; ersten Eintrag vor – bei Schwedisch zeigt auch die App unter „Automatisch“ Englisch (siehe ChosenLangCode).
 Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "german"; MessagesFile: "compiler:Languages\German.isl"
 ; Weitere Sprachen nur aufnehmen, wenn die ISL-Datei der Inno-Version, die gerade baut, sie mitbringt. SetupLangs
@@ -320,10 +320,26 @@ begin
   Result := HidHideWasMissing and HidHideInstalled;
 end;
 
+// Die Aufgabe startet {app}\N-Connect.exe als SYSTEM, und jeder angemeldete Benutzer darf sie starten. Das ist nur
+// sicher, wenn Benutzer ohne Adminrechte die EXE und ihren Ordner nicht ändern können – unter „Programme“ ist das so.
+// Ein frei gewählter Ordner (z. B. C:\N-Connect, D:\Tools\N-Connect) erbt dagegen oft „Ändern“ für alle angemeldeten
+// Benutzer (so auf C:\): Dort könnte jeder die EXE oder eine DLL daneben austauschen und über die Aufgabe als SYSTEM
+// starten. Deshalb nur unter „Programme“ (Pfad ausgeschrieben, ohne „..“; im Zweifel keine Aufgabe).
+function AppDirIsProtected: Boolean;
+var
+  Dir: String;
+begin
+  Dir := Lowercase(AddBackslash(ExpandFileName(ExpandConstant('{app}'))));
+  Result := (Pos(Lowercase(AddBackslash(ExpandConstant('{commonpf64}'))), Dir) = 1)
+            or (Pos(Lowercase(AddBackslash(ExpandConstant('{commonpf32}'))), Dir) = 1);
+end;
+
 // Aufgabe „N-Connect HidHide“: startet „N-Connect.exe --hidhide-helper "<IDs>"“ als SYSTEM. Angemeldete Benutzer
 // dürfen sie nur lesen und starten (GRGX), nicht ändern – so versteckt die App neue Controller ohne UAC-Abfrage.
 // Der Helfer versteckt nur angeschlossene, echte Nintendo-/Sony-Controller und Kabel-Pads (keine virtuellen Pads)
-// und gibt nur sich selbst frei. Fehlt die Aufgabe (Registrierung gescheitert, portable Variante), fragt die App per UAC.
+// und gibt nur sich selbst frei; aus der Sperrliste nehmen („unhide|…“) darf er nur eigene virtuelle Pads. Nur für
+// Installationen unter „Programme“ (AppDirIsProtected) – sonst wird eine Aufgabe einer früheren Installation entfernt.
+// Fehlt die Aufgabe (Ordner außerhalb von „Programme“, Registrierung gescheitert, portable Variante), fragt die App per UAC.
 procedure RegisterHidHideTask;
 var
   Service, Folder: Variant;
@@ -342,8 +358,20 @@ begin
     Service := CreateOleObject('Schedule.Service');
     Service.Connect;
     Folder := Service.GetFolder('\');
-    // 6 = anlegen oder ersetzen, 5 = Dienstkonto (SYSTEM)
-    Folder.RegisterTask('{#HidHideTask}', Xml, 6, 'SYSTEM', Null, 5, 'D:(A;;FA;;;SY)(A;;FA;;;BA)(A;;GRGX;;;AU)');
+    if AppDirIsProtected then
+      // 6 = anlegen oder ersetzen, 5 = Dienstkonto (SYSTEM)
+      Folder.RegisterTask('{#HidHideTask}', Xml, 6, 'SYSTEM', Null, 5, 'D:(A;;FA;;;SY)(A;;FA;;;BA)(A;;GRGX;;;AU)')
+    else
+    begin
+      Log('Aufgabe {#HidHideTask} nicht angelegt: ' + ExpandConstant('{app}') + ' liegt nicht unter Programme');
+      // Aufgabe einer früheren Installation in diesem Ordner entfernen – sonst bliebe die Lücke nach dem Update offen.
+      try
+        Folder.DeleteTask('{#HidHideTask}', 0);
+        Log('Aufgabe {#HidHideTask} einer frueheren Installation entfernt');
+      except
+        // keine vorhanden
+      end;
+    end;
   except
     Log('Aufgabe {#HidHideTask} nicht angelegt: ' + GetExceptionMessage);
   end;
@@ -392,19 +420,25 @@ end;
 
 // Sprachcode, wenn die Setup-Sprache bewusst gewählt wurde, sonst '' (die App bleibt „wie Windows“). Das Setup schlägt
 // die Windows-Sprache vor, wenn es sie anbietet (Traditionelles Chinesisch nie als Vereinfachtes), sonst Englisch
-// (erster Eintrag unter [Languages]). Nur wenn dieser Vorschlag die Sprache der App unter „Automatisch“ war, ist eine
-// andere Setup-Sprache eine bewusste Wahl. Bietet das Setup die Windows-Sprache nicht an (z. B. Chinesisch, ISL-Datei
-// fehlt beim Bauen), lief es zwangsläufig in einer anderen Sprache – dann nichts übergeben.
+// (erster Eintrag unter [Languages]; z. B. bei Chinesisch, wenn die ISL-Datei beim Bauen fehlt). Bewusst gewählt ist
+// jede Sprache, die von diesem Vorschlag abweicht – auch wenn das Setup die Windows-Sprache gar nicht anbot (etwa
+// Deutsch auf traditionell-chinesischem Windows). Bleibt der Vorschlag stehen, nichts übergeben: Bei angebotener
+// Windows-Sprache ist er ohnehin die Sprache der App unter „Automatisch“; beim Vorschlag Englisch ist Durchklicken nicht
+// von einer Wahl zu unterscheiden – dann gilt wie in der App die Windows-Sprache (Chinesisch: die vereinfachte Tabelle).
 function ChosenLangCode: String;
 var
-  WinLang: String;
+  WinLang, Proposal: String;
   Lang: Integer;
 begin
   WinLang := WindowsLangCode;
   Lang := GetUILanguage;
+  if (Pos(' ' + WinLang + ' ', ' {#SetupLangs} ') > 0)
+     and not ((WinLang = 'zh') and ((Lang = $0404) or (Lang = $0C04) or (Lang = $1404) or (Lang = $7C04))) then
+    Proposal := WinLang
+  else
+    Proposal := 'en';
   Result := InstallerLangCode;
-  if (Result = WinLang) or (Pos(' ' + WinLang + ' ', ' {#SetupLangs} ') = 0)
-     or ((WinLang = 'zh') and ((Lang = $0404) or (Lang = $0C04) or (Lang = $1404) or (Lang = $7C04))) then
+  if Result = Proposal then
     Result := '';
 end;
 

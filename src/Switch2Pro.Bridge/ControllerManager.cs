@@ -33,8 +33,8 @@ internal sealed class ControllerManager : IAsyncDisposable
     private readonly System.Threading.Timer _inactivityTimer;
     /// <summary>Geräte, deren Verbindungsfehler schon gemeldet wurde (nicht bei jedem neuen Versuch wieder).</summary>
     private readonly ConcurrentDictionary<string, byte> _unreachable = new(StringComparer.OrdinalIgnoreCase);
-    /// <summary>Geräte, die wegen voller Spielerplätze abgewiesen und dafür schon gemeldet wurden.</summary>
-    private readonly ConcurrentDictionary<string, byte> _refusedFull = new(StringComparer.OrdinalIgnoreCase);
+    /// <summary>Geräte, die wegen voller Spielerplätze abgewiesen wurden – Meldung einmal je Versuch des Benutzers.</summary>
+    private readonly RefusalNotices _refusedFull = new();
     /// <summary>Von Hand getrennte USB-Controller (bis das Kabel abgezogen wird).</summary>
     private readonly ConcurrentDictionary<string, byte> _usbSuppressed = new(StringComparer.OrdinalIgnoreCase);
     private readonly List<Player> _players = [];
@@ -716,8 +716,9 @@ internal sealed class ControllerManager : IAsyncDisposable
                 int index = FreeIndex(link.Address);
                 if (index < 0)
                 {
-                    // Je Gerät nur einmal melden – der nächste Versuch folgt still nach der Wartezeit.
-                    if (_refusedFull.TryAdd(link.Id, 0))
+                    // Je Versuch nur einmal melden – die Wiederholungen nach der Wartezeit bleiben still, ein neuer
+                    // Versuch (Gerät war zwischendurch aus bzw. abgezogen) meldet wieder.
+                    if (_refusedFull.ShouldNotify(link.Id, Environment.TickCount64))
                     {
                         Log.Warn($"{link.Id}: schon {MaxPlayers} Spieler – Controller wird nicht verwendet");
                         ConnectionNotify?.Invoke($"Schon {MaxPlayers} Controller verbunden – {link.Kind.DisplayName()} wird nicht verwendet. Erst einen anderen trennen.");
@@ -726,7 +727,7 @@ internal sealed class ControllerManager : IAsyncDisposable
                     link.DisposeAsync().AsTask().Forget($"{link.Id}: Trennen");
                     return false;
                 }
-                _refusedFull.TryRemove(link.Id, out _);
+                _refusedFull.Forget(link.Id);
                 try
                 {
                     _players.Add(NewPlayer(index, link));
@@ -1297,6 +1298,37 @@ internal sealed class ControllerManager : IAsyncDisposable
         _links.Clear();
         _cts.Dispose();
     }
+}
+
+/// <summary>
+/// „Schon 8 Controller verbunden“ einmal je Versuch melden, nicht einmal je Sitzung: Ein abgewiesenes Gerät versucht es
+/// still weiter (Wartezeit 10 s, dann Suchtakt und Verbindungsaufbau). Liegt die letzte Abweisung länger als
+/// <see cref="PauseMs"/> zurück, war das Gerät zwischendurch aus, abgezogen bzw. ein anderes am selben XInput-Platz – ein
+/// neuer Versuch des Benutzers, der wieder eine Meldung bekommt.
+/// </summary>
+internal sealed class RefusalNotices
+{
+    /// <summary>Länger als Wartezeit (10 s) + Suchtakt (2 s) + längster Verbindungsaufbau (Bluetooth LE: 30 s).</summary>
+    internal const long PauseMs = 45_000;
+
+    private readonly ConcurrentDictionary<string, long> _lastRefusal = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>Abweisung vermerken; true, wenn sie gemeldet werden soll (erste Abweisung eines Versuchs).</summary>
+    public bool ShouldNotify(string id, long now)
+    {
+        // Alte Einträge entfernen – dabei fällt auch der eigene weg, wenn die Pause lang genug war.
+        foreach (var (key, at) in _lastRefusal)
+        {
+            if (now - at > PauseMs)
+                _lastRefusal.TryRemove(key, out _);
+        }
+        bool repeat = _lastRefusal.ContainsKey(id);
+        _lastRefusal[id] = now;
+        return !repeat;
+    }
+
+    /// <summary>Gerät wurde angenommen: eine spätere Abweisung ist ein neuer Versuch.</summary>
+    public void Forget(string id) => _lastRefusal.TryRemove(id, out _);
 }
 
 /// <summary>
