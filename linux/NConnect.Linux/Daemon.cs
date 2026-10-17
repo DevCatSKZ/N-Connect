@@ -62,6 +62,9 @@ public sealed class Daemon : IAsyncDisposable
             Log.Warn($"settings.json nicht lesbar ({error}) – Standardwerte");
     }
 
+    /// <summary>Legt den virtuellen Controller eines Spielers an (Tests ersetzen das – dort gibt es kein /dev/uinput).</summary>
+    internal Func<string, UInputPad?> CreatePad { get; init; } = phys => UInputPad.Create(phys);
+
     private Settings CurrentSettings() => _settings;
 
     public async Task RunAsync(CancellationToken stop)
@@ -91,8 +94,7 @@ public sealed class Daemon : IAsyncDisposable
             {
                 break;
             }
-            catch (DBusException e) when (e.ErrorName is "org.freedesktop.DBus.Error.ServiceUnknown"
-                                              or "org.freedesktop.DBus.Error.NameHasNoOwner")
+            catch (Exception e) when (IsBluetoothServiceDown(e))
             {
                 // bluetoothd läuft nicht – unter LibreELEC heißt das: Bluetooth ist in den Einstellungen ausgeschaltet.
                 if (_adapterState != "off")
@@ -109,6 +111,10 @@ public sealed class Daemon : IAsyncDisposable
             await Task.Delay(5000, stop).ConfigureAwait(false);
         }
     }
+
+    /// <summary>bluetoothd läuft nicht (der D-Bus-Name org.bluez hat keinen Besitzer) – das ist „off“, nicht „missing“.</summary>
+    internal static bool IsBluetoothServiceDown(Exception e) =>
+        e is DBusException { ErrorName: "org.freedesktop.DBus.Error.ServiceUnknown" or "org.freedesktop.DBus.Error.NameHasNoOwner" };
 
     /// <summary>Den Dienst von innen beenden (Kodi weg) – wie SIGTERM: Controller trennen, Pads entfernen.</summary>
     private void StopRunning(string reason)
@@ -679,7 +685,7 @@ public sealed class Daemon : IAsyncDisposable
         });
     }
 
-    private void AddToPlayer(Switch2Device device)
+    internal void AddToPlayer(Switch2Device device)
     {
         var settings = _settings;
         Player player;
@@ -715,7 +721,7 @@ public sealed class Daemon : IAsyncDisposable
         {
             try
             {
-                player.AttachOutput(UInputPad.Create($"nconnect/player{player.Index + 1}"));
+                player.AttachOutput(CreatePad($"nconnect/player{player.Index + 1}"));
             }
             catch (Exception e)
             {
@@ -912,28 +918,10 @@ public sealed class Daemon : IAsyncDisposable
         try
         {
             using var reader = new StreamReader(Console.OpenStandardInput());
-            while (!stop.IsCancellationRequested)
-            {
-                string? line = await reader.ReadLineAsync(stop).ConfigureAwait(false);
-                if (line is null)
-                {
-                    // Aus Kodi gestartet: stdin zu = Kodi beendet oder abgestürzt → mit beenden.
-                    if (_withKodi)
-                        StopRunning("Kodi hat die Verbindung geschlossen");
-                    return; // sonst (systemd, von Hand): kein stdin – nur Statusdatei und Signale
-                }
-                // Jeder Befehl einzeln abgesichert: Ein Fehler (z. B. D-Bus-Fehler beim Trennen eines Gamepads, das
-                // sich gerade selbst getrennt hat) darf den Befehlskanal nicht beenden – sonst gingen alle weiteren
-                // Menübefehle bis zum Neustart ins Leere.
-                try
-                {
-                    await HandleCommandAsync(line.Trim()).ConfigureAwait(false);
-                }
-                catch (Exception e) when (e is not OperationCanceledException || !stop.IsCancellationRequested)
-                {
-                    Log.Warn($"Befehl „{line.Trim()}“ fehlgeschlagen: {Log.Reason(e)}");
-                }
-            }
+            // Aus Kodi gestartet: stdin zu = Kodi beendet oder abgestürzt → mit beenden. Sonst (systemd, von Hand):
+            // kein stdin – nur Statusdatei und Signale.
+            if (await ReadCommandsAsync(reader, HandleCommandAsync, stop).ConfigureAwait(false) && _withKodi)
+                StopRunning("Kodi hat die Verbindung geschlossen");
         }
         catch (OperationCanceledException)
         {
@@ -944,7 +932,31 @@ public sealed class Daemon : IAsyncDisposable
         }
     }
 
-    private async Task HandleCommandAsync(string line)
+    /// <summary>
+    /// Liest Befehle zeilenweise und führt sie aus; true = Eingabe zu Ende (stdin geschlossen). Jeder Befehl ist
+    /// einzeln abgesichert: Ein Fehler (z. B. D-Bus-Fehler beim Trennen eines Gamepads, das sich gerade selbst getrennt
+    /// hat) darf den Befehlskanal nicht beenden – sonst gingen alle weiteren Menübefehle bis zum Neustart ins Leere.
+    /// </summary>
+    internal static async Task<bool> ReadCommandsAsync(TextReader reader, Func<string, Task> handle, CancellationToken stop)
+    {
+        while (!stop.IsCancellationRequested)
+        {
+            string? line = await reader.ReadLineAsync(stop).ConfigureAwait(false);
+            if (line is null)
+                return true;
+            try
+            {
+                await handle(line.Trim()).ConfigureAwait(false);
+            }
+            catch (Exception e) when (e is not OperationCanceledException || !stop.IsCancellationRequested)
+            {
+                Log.Warn($"Befehl „{line.Trim()}“ fehlgeschlagen: {Log.Reason(e)}");
+            }
+        }
+        return false;
+    }
+
+    internal async Task HandleCommandAsync(string line)
     {
         string[] parts = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         switch (parts.FirstOrDefault())
@@ -984,7 +996,7 @@ public sealed class Daemon : IAsyncDisposable
 
     // ---------- Status und Ereignisse ----------
 
-    private void SetAdapterState(string state)
+    internal void SetAdapterState(string state)
     {
         if (_adapterState == state)
             return;
@@ -1025,7 +1037,7 @@ public sealed class Daemon : IAsyncDisposable
         }
     }
 
-    private void WriteStatus(string state)
+    internal void WriteStatus(string state)
     {
         List<Player> players;
         lock (_players)
