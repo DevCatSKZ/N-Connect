@@ -1149,12 +1149,18 @@ internal sealed class SettingsForm : UiForm
         _changed(false);
     }
 
+    /// <summary>
+    /// Wert für <see cref="Settings.Theme"/> zum Eintrag der Auswahl (Dunkel, Hell, Wie Windows). „Dunkel“ wird
+    /// ausdrücklich gespeichert: null heißt „nie gewählt“ – nur dann darf der Installer einmalig vorgeben.
+    /// </summary>
+    internal static string ThemeMode(int selectedIndex) => selectedIndex switch { 1 => "light", 2 => "system", _ => "dark" };
+
     /// <summary>Darstellung wechseln: speichern und das Fenster in der neuen Darstellung neu öffnen.</summary>
     private void ChangeTheme()
     {
         if (_loading)
             return;
-        string? mode = _themeMode.SelectedIndex switch { 1 => "light", 2 => "system", _ => null };
+        string mode = ThemeMode(_themeMode.SelectedIndex);
         string? scheme = _scheme.SelectedIndex == 0 ? null : _scheme.SelectedId; // Neon = Standard, nicht speichern
         if (mode == _settings.Theme && _transparency.Checked == _settings.Transparency && scheme == _settings.ColorScheme)
             return;

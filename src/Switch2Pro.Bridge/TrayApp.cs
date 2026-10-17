@@ -31,6 +31,10 @@ internal sealed class TrayApp : ApplicationContext
         _ui = SynchronizationContext.Current ?? new WindowsFormsSynchronizationContext();
         bool firstRun = !File.Exists(Paths.SettingsFile);
         _settings = Settings.Load(Paths.SettingsFile);
+        // Sprache/Darstellung aus dem Installer (Befehlszeile, beim ersten Start die gemerkte Wahl des Setups, ältere
+        // Setups: HKCU) – nur, solange nichts gewählt ist.
+        if (_settings.LoadError is null)
+            InstallerChoices.Apply(_settings, Environment.GetCommandLineArgs(), firstRun, SaveSettings);
         Tr.Init(_settings.Language);
         Theme.Init(_settings.Theme, _settings.Transparency, _settings.ColorScheme);
         EnableAutostartOnce();

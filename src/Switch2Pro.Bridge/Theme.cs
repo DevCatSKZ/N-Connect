@@ -118,12 +118,11 @@ internal static class Theme
     /// <summary>Schema zu einer Kennung ("neon", "aurora" …); unbekannt oder null = Neon.</summary>
     public static Scheme SchemeById(string? id) => Schemes.FirstOrDefault(s => s.Id == id) ?? Schemes[0];
 
-    /// <summary>Darstellung festlegen: "dark" (Standard), "light" oder "system"; Farbschema (null = Neon); Mica nur ab
-    /// Windows 11. Ohne App-Einstellung (null) gilt die Themawahl des Installers aus der Registry, sonst Dunkel.
-    /// Nicht die Windows-Akzentfarbe – die sieht je nach Nutzerwahl beliebig aus (z. B. pink).</summary>
+    /// <summary>Darstellung festlegen: "dark" (Standard, auch null = nie gewählt), "light" oder "system" (wie Windows);
+    /// Farbschema (null = Neon); Mica nur ab Windows 11. Die Wahl im Installer steht schon in den Einstellungen
+    /// (<see cref="InstallerChoices"/>). Nicht die Windows-Akzentfarbe – die sieht je nach Nutzerwahl beliebig aus (z. B. pink).</summary>
     public static void Init(string? mode, bool transparency, string? scheme = null)
     {
-        mode ??= InstallerTheme();
         bool dark = mode switch
         {
             "light" => false,
@@ -133,20 +132,6 @@ internal static class Theme
         ActiveScheme = SchemeById(scheme);
         Current = dark ? ActiveScheme.DarkPalette : ActiveScheme.LightPalette;
         Mica = transparency && OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22621);
-    }
-
-    /// <summary>Themawahl des Installers (HKCU\Software\N-Connect\Theme): "dark", "light" oder "system".</summary>
-    private static string? InstallerTheme()
-    {
-        try
-        {
-            using var key = Registry.CurrentUser.OpenSubKey(@"Software\N-Connect");
-            return key?.GetValue("Theme") is string v && v is "dark" or "light" or "system" ? v : null;
-        }
-        catch (Exception e) when (e is System.Security.SecurityException or UnauthorizedAccessException or IOException)
-        {
-            return null;
-        }
     }
 
     private static bool WindowsUsesLightApps()
