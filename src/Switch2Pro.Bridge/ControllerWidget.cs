@@ -98,6 +98,10 @@ internal sealed class ControllerWidget : Form
 
     private static string? Profile(Settings settings) => settings.ForcedProfile ?? settings.DetectedProfile;
 
+    /// <summary>Kopfzeile rechts: aktives Profil ("" = im Infobereich fest „Standard“ gewählt), ohne Profil null.</summary>
+    internal static string? ProfileStatus(Settings settings) =>
+        Profile(settings) is { } profile ? $"{Tr.T("Profil")}: {(profile.Length == 0 ? Tr.T("Standard") : profile)}" : null;
+
     private static Row Describe(Player player, Settings settings)
     {
         var links = player.Links;
@@ -139,7 +143,8 @@ internal sealed class ControllerWidget : Form
     private void BuildMenu()
     {
         var settings = _settings();
-        _menu.Items.Clear();
+        foreach (var old in _menu.Items.Cast<ToolStripItem>().ToList())
+            old.Dispose(); // entfernt den Eintrag zugleich aus dem Menü (Clear allein gibt ihn nicht frei)
         _menu.Renderer = Theme.MenuRenderer();
         _menu.ForeColor = Theme.Current.Text;
         _menu.Font = UiFonts.Body;
@@ -224,9 +229,7 @@ internal sealed class ControllerWidget : Form
         TextRenderer.DrawText(g, Glyph.Gamepad, Glyph.Font(9.5f), Rectangle.Round(icon), glyphColor,
             TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
         int titleX = (int)icon.Right + S(10);
-        string status = Profile(settings) is { } profile
-            ? $"{Tr.T("Profil")}: {profile}"
-            : $"{_rows.Count} / {ControllerManager.MaxPlayers}";
+        string status = ProfileStatus(settings) ?? $"{_rows.Count} / {ControllerManager.MaxPlayers}";
         int statusW = Math.Min(Width / 2, TextRenderer.MeasureText(status, UiFonts.Small).Width + S(4));
         TextRenderer.DrawText(g, "N-Connect", UiFonts.Strong, new Rectangle(titleX, 0, Width - titleX - statusW - S(20), header), p.Text,
             TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis | TextFormatFlags.NoPrefix);

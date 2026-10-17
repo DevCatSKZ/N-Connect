@@ -6,10 +6,12 @@ namespace Switch2Pro.Bridge;
 /// <summary>Nimmt eine Taste oder Tastenkombination auf (z. B. Strg+Umschalt+S, F5, Alt+Tab).</summary>
 internal sealed class KeyCaptureDialog : UiForm
 {
+    /// <summary>Große Schrift der aufgenommenen Kombination – eigene Instanz, wird mit dem Fenster freigegeben.</summary>
+    private readonly Font _shownFont = new("Segoe UI Semibold", 16f);
+
     private readonly Label _shown = new()
     {
-        AutoSize = false, Dock = DockStyle.Top, Height = UiScale.Px(60), TextAlign = ContentAlignment.MiddleCenter,
-        Font = new Font("Segoe UI Semibold", 16f), Text = "…",
+        AutoSize = false, Dock = DockStyle.Top, Height = UiScale.Px(60), TextAlign = ContentAlignment.MiddleCenter, Text = "…",
     };
 
     /// <summary>Aufgenommene Kombination im Format von <see cref="WindowsInput.ParseCombo"/>, z. B. "Ctrl+Shift+S".</summary>
@@ -27,6 +29,7 @@ internal sealed class KeyCaptureDialog : UiForm
         Font = UiFonts.Body;
         AutoScaleDimensions = UiScale.Dimensions;
         AutoScaleMode = AutoScaleMode.None;
+        _shown.Font = _shownFont;
 
         var hint = new Label
         {
@@ -61,6 +64,13 @@ internal sealed class KeyCaptureDialog : UiForm
             _shown.Text = Combo;
             ok.Enabled = WindowsInput.ParseCombo(Combo) is not null;
         };
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+        if (disposing)
+            _shownFont.Dispose();
     }
 
     protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
