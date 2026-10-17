@@ -324,7 +324,11 @@ internal static partial class Tr
         ["N-Connect: ViGEmBus fehlt"] = "N-Connect：缺少 ViGEmBus",
         ["Neue Version verfügbar"] = "有新版本可用",
         ["Einstellungen fehlerhaft"] = "设置损坏",
-        ["settings.json konnte nicht gelesen werden – es gelten die Standardwerte."] = "无法读取 settings.json – 使用默认值。",
+        ["settings.json konnte nicht gelesen werden – es gelten die Standardwerte. Die beschädigte Datei wird als „settings.json.unlesbar-…“ aufbewahrt (Klicken öffnet den Ordner)."] =
+            "无法读取 settings.json – 使用默认值。损坏的文件会保留为“settings.json.unlesbar-…”（点击打开文件夹）。",
+        ["Einstellungen wiederhergestellt"] = "设置已恢复",
+        ["Die Einstellungen waren beschädigt und wurden aus der letzten Sicherung wiederhergestellt. Die zuletzt geänderten Werte fehlen womöglich (Klicken öffnet den Ordner)."] =
+            "设置已损坏，已从上一次备份中恢复。最近的更改可能丢失（点击打开文件夹）。",
         ["Ohne ViGEmBus kann kein virtueller Controller erzeugt werden. Bitte das Setup erneut ausführen oder ViGEmBus installieren (Rechtsklick auf das Symbol → ViGEmBus herunterladen)."] =
             "没有 ViGEmBus 就无法创建虚拟控制器。请重新运行安装程序或安装 ViGEmBus（右键点击图标 → 下载 ViGEmBus）。",
 
@@ -668,6 +672,8 @@ internal static partial class Tr
         ["HidHide aktuell halten"] = "保持 HidHide 最新",
         ["Beim Start nach einer neuen HidHide-Version suchen. Installiert wird nur nach Rückfrage (geprüfter Download vom Hersteller, Neustart nötig)."] =
             "启动时检查 HidHide 新版本。仅经确认后安装（厂商验证下载，需要重启）。",
+        ["Lizenzen Dritter"] = "第三方许可证",
+        ["Open-Source-Software und übernommener Code in N-Connect – mit Lizenzen und Copyright-Vermerken."] = "N-Connect 中的开源软件和改编代码 – 附带许可证和版权声明。",
         ["Der Download hat nicht geklappt oder die Datei war fehlerhaft. Die Release-Seite im Browser öffnen?"] =
             "下载失败或文件损坏。在浏览器中打开发布页面？",
         ["Alle Controller trennen"] = "断开所有控制器",

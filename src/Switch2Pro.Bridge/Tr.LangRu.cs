@@ -324,7 +324,11 @@ internal static partial class Tr
         ["N-Connect: ViGEmBus fehlt"] = "N-Connect: ViGEmBus отсутствует",
         ["Neue Version verfügbar"] = "Доступна новая версия",
         ["Einstellungen fehlerhaft"] = "Настройки повреждены",
-        ["settings.json konnte nicht gelesen werden – es gelten die Standardwerte."] = "Не удалось прочитать settings.json – действуют значения по умолчанию.",
+        ["settings.json konnte nicht gelesen werden – es gelten die Standardwerte. Die beschädigte Datei wird als „settings.json.unlesbar-…“ aufbewahrt (Klicken öffnet den Ordner)."] =
+            "Не удалось прочитать settings.json – действуют значения по умолчанию. Повреждённый файл сохранён как «settings.json.unlesbar-…» (нажмите, чтобы открыть папку).",
+        ["Einstellungen wiederhergestellt"] = "Настройки восстановлены",
+        ["Die Einstellungen waren beschädigt und wurden aus der letzten Sicherung wiederhergestellt. Die zuletzt geänderten Werte fehlen womöglich (Klicken öffnet den Ordner)."] =
+            "Настройки были повреждены и восстановлены из последней резервной копии. Последние изменения могут отсутствовать (нажмите, чтобы открыть папку).",
         ["Ohne ViGEmBus kann kein virtueller Controller erzeugt werden. Bitte das Setup erneut ausführen oder ViGEmBus installieren (Rechtsklick auf das Symbol → ViGEmBus herunterladen)."] =
             "Без ViGEmBus невозможно создать виртуальный контроллер. Запустите установку заново или установите ViGEmBus (правый клик по значку → Скачать ViGEmBus).",
 
@@ -668,6 +672,9 @@ internal static partial class Tr
         ["HidHide aktuell halten"] = "Поддерживать HidHide актуальным",
         ["Beim Start nach einer neuen HidHide-Version suchen. Installiert wird nur nach Rückfrage (geprüfter Download vom Hersteller, Neustart nötig)."] =
             "Искать новую версию HidHide при запуске. Установка только после подтверждения (проверенная загрузка от производителя, требуется перезагрузка).",
+        ["Lizenzen Dritter"] = "Сторонние лицензии",
+        ["Open-Source-Software und übernommener Code in N-Connect – mit Lizenzen und Copyright-Vermerken."] =
+            "Программы с открытым исходным кодом и заимствованный код в N-Connect – с лицензиями и уведомлениями об авторских правах.",
         ["Der Download hat nicht geklappt oder die Datei war fehlerhaft. Die Release-Seite im Browser öffnen?"] =
             "Загрузка не удалась или файл был повреждён. Открыть страницу выпуска в браузере?",
         ["Alle Controller trennen"] = "Отключить все контроллеры",

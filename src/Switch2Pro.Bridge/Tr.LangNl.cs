@@ -324,7 +324,11 @@ internal static partial class Tr
         ["N-Connect: ViGEmBus fehlt"] = "N-Connect: ViGEmBus ontbreekt",
         ["Neue Version verfügbar"] = "Nieuwe versie beschikbaar",
         ["Einstellungen fehlerhaft"] = "Instellingen beschadigd",
-        ["settings.json konnte nicht gelesen werden – es gelten die Standardwerte."] = "settings.json kon niet worden gelezen – de standaardwaarden gelden.",
+        ["settings.json konnte nicht gelesen werden – es gelten die Standardwerte. Die beschädigte Datei wird als „settings.json.unlesbar-…“ aufbewahrt (Klicken öffnet den Ordner)."] =
+            "settings.json kon niet worden gelezen – de standaardwaarden gelden. Het beschadigde bestand wordt bewaard als ‘settings.json.unlesbar-…’ (klik om de map te openen).",
+        ["Einstellungen wiederhergestellt"] = "Instellingen hersteld",
+        ["Die Einstellungen waren beschädigt und wurden aus der letzten Sicherung wiederhergestellt. Die zuletzt geänderten Werte fehlen womöglich (Klicken öffnet den Ordner)."] =
+            "De instellingen waren beschadigd en zijn hersteld uit de laatste back-up. De laatste wijzigingen ontbreken mogelijk (klik om de map te openen).",
         ["Ohne ViGEmBus kann kein virtueller Controller erzeugt werden. Bitte das Setup erneut ausführen oder ViGEmBus installieren (Rechtsklick auf das Symbol → ViGEmBus herunterladen)."] =
             "Zonder ViGEmBus kan geen virtuele controller worden gemaakt. Voer de installatie opnieuw uit of installeer ViGEmBus (rechtermuisklik op het pictogram → ViGEmBus downloaden).",
 
@@ -668,6 +672,9 @@ internal static partial class Tr
         ["HidHide aktuell halten"] = "HidHide actueel houden",
         ["Beim Start nach einer neuen HidHide-Version suchen. Installiert wird nur nach Rückfrage (geprüfter Download vom Hersteller, Neustart nötig)."] =
             "Bij het starten naar een nieuwe HidHide-versie zoeken. Geïnstalleerd wordt alleen na overleg (gecontroleerde download van de fabrikant, herstart nodig).",
+        ["Lizenzen Dritter"] = "Licenties van derden",
+        ["Open-Source-Software und übernommener Code in N-Connect – mit Lizenzen und Copyright-Vermerken."] =
+            "Opensourcesoftware en overgenomen code in N-Connect – met licenties en copyrightvermeldingen.",
         ["Der Download hat nicht geklappt oder die Datei war fehlerhaft. Die Release-Seite im Browser öffnen?"] =
             "De download is mislukt of het bestand was defect. De releasepagina in de browser openen?",
         ["Alle Controller trennen"] = "Alle controllers verbreken",
