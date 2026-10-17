@@ -1207,15 +1207,26 @@ internal sealed class ControllerOverview : Panel
                 return;
             }
             _hide.Enabled = false;
+            bool ok;
             try
             {
-                if (await HidHide.HideAsync(ids))
+                ok = await HidHide.HideAsync(ids);
+            }
+            catch (Exception e) when (e is not OutOfMemoryException)
+            {
+                // Sonst landete der Fehler nur als „Unbehandelter Fehler (UI)“ im Protokoll – ohne Meldung.
+                Log.Error("HidHide: Verstecken fehlgeschlagen", e);
+                ok = false;
+            }
+            try
+            {
+                if (ok)
                 {
                     var s = CurrentSettings;
                     s.HiddenDevices = [.. s.HiddenDevices, .. ids.Where(id => !s.IsHidden(id))];
                     Manager.RequestSave();
                 }
-                else
+                else if (!IsDisposed)
                 {
                     Tr.Show(FindForm(), "HidHide konnte nicht eingerichtet werden (abgebrochen oder fehlgeschlagen). Details im Protokoll.",
                         "Doppelte Controller verhindern", MessageBoxButtons.OK, MessageBoxIcon.Warning);

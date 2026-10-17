@@ -14,6 +14,8 @@ internal sealed class Switch1HidLink : IControllerLink
     private const int InputTimeoutMs = 3000;
     private const int RumbleIntervalMs = 30;   // SDL: höchstens alle 30 ms schreiben
     private const int RumbleRefreshMs = 50;    // und laufende Vibration alle 50 ms auffrischen
+    /// <summary>Erst nach so vielen Schreibfehlern in Folge (~1,5 s) aufgeben – ein kurzer Bluetooth-Aussetzer nicht.</summary>
+    private const int RumbleMaxFailures = 50;
 
     private readonly HidChannel _hid;
     private readonly CancellationTokenSource _cts = new();
@@ -26,6 +28,8 @@ internal sealed class Switch1HidLink : IControllerLink
     private long _lastInputTicks = Environment.TickCount64;
     private volatile int _rumbleLarge, _rumbleSmall;
     private float _rumbleStrength = 1f;
+    /// <summary>Fehlersuche (Issue #1): erster Vibrationswunsch bzw. erster gesendeter Bericht 0x10 schon protokolliert?</summary>
+    private int _rumbleWishLogged, _rumbleSentLogged;
     private int _closed, _lostRaised;
     private Task? _reader;
 
@@ -115,7 +119,7 @@ internal sealed class Switch1HidLink : IControllerLink
         await SubcommandAsync(Switch1.SubEnableVibration, [0x01], ct);
         _lastInputTicks = Environment.TickCount64;
         _ = Task.Run(() => WatchdogAsync(_cts.Token));
-        _ = Task.Run(() => RumbleLoopAsync(_cts.Token));
+        Task.Run(() => RumbleLoopAsync(_cts.Token)).Forget($"{Id}: Vibration");
         Log.Info($"{Id}: {Kind.DisplayName()} bereit ({Address ?? "?"})");
     }
 
@@ -611,6 +615,9 @@ internal sealed class Switch1HidLink : IControllerLink
         _rumbleLarge = large;
         _rumbleSmall = small;
         _rumbleStrength = strength;
+        // Einmal je Verbindung: Kommt vom Spiel (oder „Vibrieren“) überhaupt ein Wunsch an?
+        if ((large | small) != 0 && Interlocked.Exchange(ref _rumbleWishLogged, 1) == 0)
+            Log.Info($"{Id}: erster Vibrationswunsch (groß {large}, klein {small}, Stärke {strength:0.##})");
     }
 
     private byte[] CurrentRumble()
@@ -623,6 +630,7 @@ internal sealed class Switch1HidLink : IControllerLink
     {
         bool wasActive = false;
         long lastSent = 0;
+        int failures = 0;
         try
         {
             while (!ct.IsCancellationRequested)
@@ -633,20 +641,36 @@ internal sealed class Switch1HidLink : IControllerLink
                 {
                     if (active != wasActive || now - lastSent >= RumbleRefreshMs || active)
                     {
-                        await _hid.WriteAsync(Switch1.RumbleReport(Interlocked.Increment(ref _counter), CurrentRumble()), ct);
-                        lastSent = now;
+                        try
+                        {
+                            await _hid.WriteAsync(Switch1.RumbleReport(Interlocked.Increment(ref _counter), CurrentRumble()), ct);
+                            lastSent = now;
+                            if (failures > 0)
+                                Log.Info($"{Id}: Vibration wieder gesendet (nach {failures} Schreibfehlern)");
+                            failures = 0;
+                            if (active && Interlocked.Exchange(ref _rumbleSentLogged, 1) == 0)
+                                Log.Info($"{Id}: erster Vibrationsbericht (0x10) gesendet");
+                        }
+                        catch (Exception e) when (e is not (OperationCanceledException or ObjectDisposedException or OutOfMemoryException))
+                        {
+                            // Einzelne Schreibfehler (kurzer Funkaussetzer) übergehen; erst eine lange Fehlerfolge beendet die Vibration.
+                            if (++failures == 1)
+                                Log.Warn($"{Id}: Vibrationsbericht nicht gesendet ({Log.Reason(e)}) – wird weiter versucht");
+                            if (failures >= RumbleMaxFailures)
+                            {
+                                Log.Warn($"{Id}: Vibration abgeschaltet nach {failures} Schreibfehlern in Folge: {Log.Reason(e)}");
+                                return;
+                            }
+                        }
                     }
                 }
                 wasActive = active;
                 await Task.Delay(RumbleIntervalMs, ct);
             }
         }
-        catch (OperationCanceledException)
+        catch (Exception e) when (e is OperationCanceledException or ObjectDisposedException)
         {
-        }
-        catch (Exception e)
-        {
-            Log.Warn($"{Id}: Vibration abgeschaltet: {Log.Reason(e)}");
+            // Verbindung beendet
         }
     }
 

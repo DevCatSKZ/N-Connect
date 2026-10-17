@@ -275,11 +275,12 @@ public sealed class Settings
     /// <summary>Position des Widgets (linke obere Ecke, Bildschirmpixel); null = oben rechts.</summary>
     public int? WidgetX { get; set; }
     public int? WidgetY { get; set; }
-    /// <summary>Funkadapter (ESP32/nRF52840) über USB verwenden: Controller, die daran hängen, als Spieler anzeigen (Standard aus).</summary>
-    public bool UseAdapter { get; set; }
-    /// <summary>COM-Port des Funkadapters (z. B. "COM15"); null = automatisch suchen.</summary>
-    public string? AdapterPort { get; set; }
-    /// <summary>Sprache der Oberfläche: null = wie Windows, sonst "de" oder "en".</summary>
+    // Funkadapter (ESP32/nRF52840) entfernt: Weg verworfen. Alte Felder „UseAdapter“/„AdapterPort“ in settings.json
+    // überliest das Laden (unbekannte Felder werden ignoriert).
+    /// <summary>
+    /// Sprache der Oberfläche: null = wie Windows, sonst einer der 12 Sprachcodes
+    /// (de, en, es, fr, it, pt, nl, pl, ru, ja, zh, ko).
+    /// </summary>
     public string? Language { get; set; }
 
     /// <summary>Joy-Con 2 als Maus, sobald er auf einer Fläche liegt (wie an der Switch 2).</summary>
@@ -552,8 +553,6 @@ public sealed class Settings
         DesktopMode = other.DesktopMode;
         DesktopPointerSpeed = other.DesktopPointerSpeed;
         ConnectOverlay = other.ConnectOverlay;
-        UseAdapter = other.UseAdapter;
-        AdapterPort = other.AdapterPort;
         DesktopWidget = other.DesktopWidget;
         WidgetOnTop = other.WidgetOnTop;
         WidgetCompact = other.WidgetCompact;
