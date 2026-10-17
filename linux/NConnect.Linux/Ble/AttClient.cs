@@ -141,7 +141,7 @@ public sealed class AttClient : IDisposable
     {
         lock (_writeLock)
         {
-            // Prüfung unter der Sperre: Dispose schließt ebenfalls unter ihr – nie in einen schon geschlossenen
+            // Prüfung unter der Sperre: Release schließt den fd ebenfalls unter ihr – nie in einen schon geschlossenen
             // (und womöglich neu vergebenen) fd schreiben.
             if (Volatile.Read(ref _closed) != 0)
                 throw new IOException("Verbindung getrennt.");
@@ -410,12 +410,13 @@ public sealed class AttClient : IDisposable
 
     public void Dispose()
     {
-        lock (_writeLock)
-        {
-            if (Interlocked.Exchange(ref _closed, 1) != 0)
-                return;
-            shutdown(_fd, 2); // weckt den Leser (read liefert 0) und beendet die Verbindung
-        }
+        if (Interlocked.Exchange(ref _closed, 1) != 0)
+            return;
+        // Bewusst ohne Schreibsperre: Ein Sender, der in write() hängt (Sendepuffer voll, Controller quittiert nicht),
+        // hält sie – shutdown beendet sein write sofort (EPIPE), weckt den Leser (read liefert 0) und beendet die
+        // Verbindung. Der fd ist dabei sicher noch offen: Der Besitzer gibt seinen Anteil erst unten ab. close läuft in
+        // Release unter der Sperre, und Send prüft _closed unter ihr – nach dem close schreibt niemand mehr in den fd.
+        shutdown(_fd, 2);
         Release();
     }
 
