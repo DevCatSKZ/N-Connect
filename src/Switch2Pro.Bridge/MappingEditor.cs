@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Drawing;
 using Switch2Pro.Protocol;
 
@@ -242,6 +243,7 @@ internal sealed class MappingEditor : SettingsGroup
         Build();
     }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public ControllerKind Kind
     {
         get => _kind;
@@ -382,6 +384,7 @@ internal sealed class MappingEditor : SettingsGroup
 
         public IEnumerable<string> ExtraTexts => _items.Select(c => c.ToString());
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool Pressed
         {
             get => _pressed;

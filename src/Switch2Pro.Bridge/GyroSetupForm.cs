@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using Switch2Pro.Protocol;
@@ -194,6 +195,7 @@ internal sealed class GyroSetupForm : UiForm
     private sealed class Preview : Control
     {
         private float _x, _y, _stickX, _stickY;
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool NoData { get; set; }
 
         public Preview()

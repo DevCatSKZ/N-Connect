@@ -67,7 +67,6 @@ android/NConnect.Android/
   Core/UpdateCheck.Releases.cs  Auswertung der GitHub-Release-Liste (ohne Android-Abhängigkeit, getestet)
   Ble/Switch2Scanner.cs     BLE-Suche, Nintendo-Herstellerdaten 0x0553 (Kopf 01 00 03 7E)
   Ble/Switch2Device.cs      GATT-Verbindung – Portierung von Switch2BleLink (Windows)
-  Dsu/DsuServer.cs          Cemuhook-/DSU-Server auf 127.0.0.1:26760 (Gyro und Tasten für Emulatoren)
   Profiles/GameProfileWatcher.cs       App im Vordergrund (UsageStats) → Profil; Startbildschirme erkennen
   Profiles/GameProfileWatcher.Pick.cs  Auswahl der Vordergrund-App (ohne N-Connect/Startbildschirm, getestet)
   Profiles/ProfileEdit.cs   Profile anlegen (Kopie der Standardbelegung), Tasten/Makros ändern, umbenennen, löschen
@@ -80,7 +79,7 @@ android/NConnect.Android/
   Touch/                    Bedienungshilfe, Touch-Ausgabe (Gesten), Layout, Overlay-Editor
   UI/                       Assistent, Hauptfenster (Controller · Einstellungen · Hilfe), Baukasten, Design,
                             ProfileDialogs.cs (Profile und Belegungs-Editor), AppPicker.cs (App-Auswahl mit Symbol)
-android/NConnect.Android.Tests/  xUnit-Tests (net8.0) für die Android-freien Teile, siehe „Tests ohne Gerät“
+android/NConnect.Android.Tests/  xUnit-Tests (net10.0) für die Android-freien Teile, siehe „Tests ohne Gerät“
 android/i18n/               Übersetzungstabellen (*.json) und generate.py
 ```
 
@@ -90,7 +89,8 @@ Neu in der gemeinsamen Bibliothek (`src/Switch2Pro.Protocol`, auch unter Windows
   den Shell-Befehl `hid`). Tests: `XboxBtReportTests` (gegen die CTS-Referenzberichte).
 - `ColorSchemes.cs` – die fünf Farbschemata (Windows, Neon, Aurora, Sunset, Joy-Con) als gemeinsame Quelle; die
   Windows-App (`Theme.cs`) liest sie ebenfalls daraus. Tests: `ColorSchemesTests`.
-- `Dsu.cs` – Cemuhook-/DSU-Pakete (Port 26760), von Windows und Android genutzt.
+- `Dsu.cs`, `DsuServer.cs` – Cemuhook-/DSU-Pakete und der UDP-Server auf 127.0.0.1:26760 (Gyro und Tasten für
+  Emulatoren), derselbe Server wie unter Windows und Linux. Tests: `DsuServerTests` (echter UDP-Austausch).
 
 ### Datenfluss
 
@@ -324,9 +324,9 @@ dotnet build -t:Install -c Debug "-p:AdbTarget=-s adb-R5CRA1GQW0Z-ECDAJk._adb-tl
 
 - Voraussetzungen: .NET 10 SDK + Workload `android`, JDK 21 (`C:\Program Files\Microsoft\jdk-21.0.10.7-hotspot`, in der
   csproj hinterlegt – JDK 25 ist zu neu), Android-SDK unter `%LOCALAPPDATA%\Android\Sdk`.
-- Die Windows-CI baut nur `Switch2Pro.Protocol.Tests` und `Switch2Pro.Bridge` – das Android-Projekt stört sie nicht.
-  Ohne Android-Workload lauffähig und für die CI vorgesehen: `dotnet test android/NConnect.Android.Tests` und
-  `python android/i18n/generate.py --check` (siehe „Tests ohne Gerät“).
+- Die CI (`.github/workflows/build.yml`) testet die ganze Projektmappe, darunter `android/NConnect.Android.Tests`
+  (ohne Android-Workload). Der Job „Android kompilieren“ prüft `python android/i18n/generate.py --check` und baut die
+  App als Debug-Build ohne Signatur; das signierte APK entsteht weiterhin nur lokal (siehe oben).
 - **Shizuku vom PC starten** (spart die Kopplung per kabellosem Debugging beim Testen):
   `adb shell <APK-Ordner>/lib/arm64/libshizuku.so` (Ordner über `adb shell pm path moe.shizuku.privileged.api`).
 - **Protokoll lesen:** `adb shell "run-as com.devcatskz.nconnect cat files/nconnect.log"` (Logcat ist auf dem Pixel
@@ -337,7 +337,7 @@ dotnet build -t:Install -c Debug "-p:AdbTarget=-s adb-R5CRA1GQW0Z-ECDAJk._adb-tl
 
 ### Tests ohne Gerät
 
-`dotnet test android/NConnect.Android.Tests` (xUnit, net8.0, braucht kein Android-Workload) kompiliert die
+`dotnet test android/NConnect.Android.Tests` (xUnit, net10.0, braucht kein Android-Workload) kompiliert die
 Android-freien Quelldateien direkt mit (`UpdateCheck.Releases.cs`, `ProfileEdit.cs`, `GameProfileWatcher.Pick.cs`,
 `KodiStatusWriter.Contract.cs`, `L.Texts.cs`) und prüft:
 

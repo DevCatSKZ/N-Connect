@@ -98,9 +98,9 @@ public sealed class SettingsPage(MainActivity host) : IPage
             {
                 AppPrefs.DsuEnabled = on;
                 if (on)
-                    Dsu.DsuServer.Start();
+                    DsuServer.Start(network: false, Log.Info, Log.Warn);
                 else
-                    Dsu.DsuServer.Instance?.Dispose();
+                    DsuServer.Instance?.Dispose();
             }));
 
         // ---- Verbindung ----

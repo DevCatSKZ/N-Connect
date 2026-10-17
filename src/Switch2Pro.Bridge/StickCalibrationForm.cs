@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using Switch2Pro.Bridge.Links;
@@ -209,8 +210,11 @@ internal sealed class StickCalibrationForm : UiForm
     /// <summary>Kreis (voller Ausschlag), Achsen, aktuelle Stickstellung und beim Messen die erfassten Randpunkte.</summary>
     private sealed class Canvas : Control
     {
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public (float X, float Y) Point { get; set; }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public List<(float X, float Y)>? Edge { get; set; }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public float Progress { get; set; }
 
         public Canvas()

@@ -283,7 +283,7 @@ linux/                    N-Connect für Linux/LibreELEC (Dienst) und das Kodi-P
 android/                  N-Connect für Android (Beta; Übersetzungen in android/i18n)
 ```
 
-**Bauen** (.NET 8 SDK):
+**Bauen** (.NET 10 SDK):
 `dotnet test` und
 `dotnet publish src/Switch2Pro.Bridge -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o out/publish/win-x64`.
 Setup lokal: Inno Setup 6, dann `ISCC.exe installer\N-Connect.iss`. Releases baut der Workflow

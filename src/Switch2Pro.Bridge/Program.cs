@@ -101,7 +101,7 @@ internal static class Program
         ShowSignal = showSignal;
         Autostart.MigrateLegacy();
 
-        Log.Info($"Start, Version {typeof(Program).Assembly.GetName().Version}, Windows {Environment.OSVersion.Version}");
+        Log.Info($"Start, Version {UpdateCheck.Label}, Windows {Environment.OSVersion.Version}");
         Application.ThreadException += (_, e) => Log.Error("Unbehandelter Fehler (UI)", e.Exception);
         AppDomain.CurrentDomain.UnhandledException += (_, e) => Log.Error("Unbehandelter Fehler", e.ExceptionObject as Exception);
         TaskScheduler.UnobservedTaskException += (_, e) =>

@@ -324,7 +324,11 @@ internal static partial class Tr
         ["N-Connect: ViGEmBus fehlt"] = "N-Connect : ViGEmBus manquant",
         ["Neue Version verfügbar"] = "Nouvelle version disponible",
         ["Einstellungen fehlerhaft"] = "Paramètres endommagés",
-        ["settings.json konnte nicht gelesen werden – es gelten die Standardwerte."] = "settings.json n'a pas pu être lu – les valeurs par défaut s'appliquent.",
+        ["settings.json konnte nicht gelesen werden – es gelten die Standardwerte. Die beschädigte Datei wird als „settings.json.unlesbar-…“ aufbewahrt (Klicken öffnet den Ordner)."] =
+            "settings.json n'a pas pu être lu – les valeurs par défaut s'appliquent. Le fichier endommagé est conservé sous « settings.json.unlesbar-… » (cliquer pour ouvrir le dossier).",
+        ["Einstellungen wiederhergestellt"] = "Paramètres restaurés",
+        ["Die Einstellungen waren beschädigt und wurden aus der letzten Sicherung wiederhergestellt. Die zuletzt geänderten Werte fehlen womöglich (Klicken öffnet den Ordner)."] =
+            "Les paramètres étaient endommagés et ont été restaurés depuis la dernière sauvegarde. Les dernières modifications manquent peut-être (cliquer pour ouvrir le dossier).",
         ["Ohne ViGEmBus kann kein virtueller Controller erzeugt werden. Bitte das Setup erneut ausführen oder ViGEmBus installieren (Rechtsklick auf das Symbol → ViGEmBus herunterladen)."] =
             "Sans ViGEmBus, aucune manette virtuelle ne peut être créée. Relancez l'installation ou installez ViGEmBus (clic droit sur l'icône → Télécharger ViGEmBus).",
 
@@ -668,6 +672,9 @@ internal static partial class Tr
         ["HidHide aktuell halten"] = "Garder HidHide à jour",
         ["Beim Start nach einer neuen HidHide-Version suchen. Installiert wird nur nach Rückfrage (geprüfter Download vom Hersteller, Neustart nötig)."] =
             "Rechercher une nouvelle version de HidHide au démarrage. Installation seulement après confirmation (téléchargement vérifié de l'éditeur, redémarrage requis).",
+        ["Lizenzen Dritter"] = "Licences tierces",
+        ["Open-Source-Software und übernommener Code in N-Connect – mit Lizenzen und Copyright-Vermerken."] =
+            "Logiciels open source et code repris dans N-Connect – avec leurs licences et mentions de copyright.",
         ["Der Download hat nicht geklappt oder die Datei war fehlerhaft. Die Release-Seite im Browser öffnen?"] =
             "Le téléchargement a échoué ou le fichier était défectueux. Ouvrir la page de la version dans le navigateur ?",
         ["Alle Controller trennen"] = "Déconnecter toutes les manettes",

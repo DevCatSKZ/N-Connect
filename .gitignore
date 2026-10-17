@@ -4,3 +4,13 @@ out/
 installer/redist/
 *.user
 __pycache__/
+.vs/
+# Signaturschlüssel und Passwörter gehören nie ins Repository (Android: %USERPROFILE%\.nconnect).
+*.pfx
+*.p12
+*.jks
+*.keystore
+signing.props
+# Gebaute Android-Pakete (werden ans GitHub-Release gehängt, nicht eingecheckt).
+*.apk
+*.aab

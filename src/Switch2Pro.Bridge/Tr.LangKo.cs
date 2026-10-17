@@ -324,7 +324,11 @@ internal static partial class Tr
         ["N-Connect: ViGEmBus fehlt"] = "N-Connect: ViGEmBus 없음",
         ["Neue Version verfügbar"] = "새 버전 사용 가능",
         ["Einstellungen fehlerhaft"] = "설정이 손상됨",
-        ["settings.json konnte nicht gelesen werden – es gelten die Standardwerte."] = "settings.json을 읽을 수 없습니다 – 기본값이 적용됩니다.",
+        ["settings.json konnte nicht gelesen werden – es gelten die Standardwerte. Die beschädigte Datei wird als „settings.json.unlesbar-…“ aufbewahrt (Klicken öffnet den Ordner)."] =
+            "settings.json을 읽을 수 없습니다 – 기본값이 적용됩니다. 손상된 파일은 'settings.json.unlesbar-…' 이름으로 보관됩니다(클릭하면 폴더가 열립니다).",
+        ["Einstellungen wiederhergestellt"] = "설정 복원됨",
+        ["Die Einstellungen waren beschädigt und wurden aus der letzten Sicherung wiederhergestellt. Die zuletzt geänderten Werte fehlen womöglich (Klicken öffnet den Ordner)."] =
+            "설정이 손상되어 마지막 백업에서 복원했습니다. 최근 변경 내용이 없을 수 있습니다(클릭하면 폴더가 열립니다).",
         ["Ohne ViGEmBus kann kein virtueller Controller erzeugt werden. Bitte das Setup erneut ausführen oder ViGEmBus installieren (Rechtsklick auf das Symbol → ViGEmBus herunterladen)."] =
             "ViGEmBus가 없으면 가상 컨트롤러를 생성할 수 없습니다. 설치 프로그램을 다시 실행하거나 ViGEmBus를 설치하세요(아이콘 우클릭 → ViGEmBus 다운로드).",
 
@@ -668,6 +672,9 @@ internal static partial class Tr
         ["HidHide aktuell halten"] = "HidHide 최신 상태 유지",
         ["Beim Start nach einer neuen HidHide-Version suchen. Installiert wird nur nach Rückfrage (geprüfter Download vom Hersteller, Neustart nötig)."] =
             "시작 시 새 HidHide 버전을 확인합니다. 확인 후에만 설치됩니다(제조사의 검증된 다운로드, 재시작 필요).",
+        ["Lizenzen Dritter"] = "타사 라이선스",
+        ["Open-Source-Software und übernommener Code in N-Connect – mit Lizenzen und Copyright-Vermerken."] =
+            "N-Connect에 포함된 오픈 소스 소프트웨어와 가져온 코드 – 라이선스 및 저작권 고지 포함.",
         ["Der Download hat nicht geklappt oder die Datei war fehlerhaft. Die Release-Seite im Browser öffnen?"] =
             "다운로드에 실패했거나 파일이 손상되었습니다. 브라우저에서 릴리스 페이지를 여시겠습니까?",
         ["Alle Controller trennen"] = "모든 컨트롤러 연결 해제",
