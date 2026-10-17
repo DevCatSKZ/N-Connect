@@ -280,13 +280,19 @@ public sealed class SettingsPage(MainActivity host) : IPage
         Ui.Toast(host, L.T("Suche nach einer neuen Version …"));
         _ = Task.Run(async () =>
         {
-            var update = await UpdateCheck.FindAsync(host, CancellationToken.None);
+            // FindAsync wirft nicht: Netz- und API-Fehler (offline, Rate-Limit 403, 5xx) kommen als Failed zurück – die
+            // dürfen nicht als „auf dem neuesten Stand“ erscheinen.
+            var result = await UpdateCheck.FindAsync(host, CancellationToken.None);
             host.RunOnUiThread(() =>
             {
-                if (update is null)
+                if (host.IsFinishing || host.IsDestroyed)
+                    return; // App inzwischen verlassen – ein Dialog auf einer beendeten Activity würde abstürzen
+                if (result is { Status: UpdateCheck.CheckStatus.Available, Update: { } update })
+                    OfferUpdate(update);
+                else if (result.Status == UpdateCheck.CheckStatus.UpToDate)
                     Ui.Toast(host, L.T("N-Connect ist auf dem neuesten Stand"));
                 else
-                    OfferUpdate(update);
+                    Ui.Toast(host, L.T("Update-Prüfung fehlgeschlagen – bitte später erneut versuchen"));
             });
         });
     }
@@ -322,9 +328,25 @@ public sealed class SettingsPage(MainActivity host) : IPage
             .SetCancelable(false)!
             .Create()!;
         dialog.Show();
-        var reporter = new Progress<int>(p => bar.Progress = p);
-        var file = await UpdateCheck.DownloadAsync(host, apk, reporter, CancellationToken.None);
-        dialog.Dismiss();
+        Java.IO.File? file = null;
+        try
+        {
+            var reporter = new Progress<int>(p => bar.Progress = p);
+            file = await UpdateCheck.DownloadAsync(host, apk, reporter, CancellationToken.None);
+        }
+        catch (Exception e)
+        {
+            // DownloadAsync fängt Netz- und Dateifehler selbst – das hier nur, damit nie etwas still hängen bleibt.
+            Log.Error("Update herunterladen", e);
+        }
+        finally
+        {
+            // Der Dialog lässt sich nicht wegtippen: in jedem Fall schließen.
+            if (!host.IsDestroyed)
+                dialog.Dismiss();
+        }
+        if (host.IsFinishing || host.IsDestroyed)
+            return;
         if (file is null)
         {
             Ui.Toast(host, L.T("Download fehlgeschlagen – bitte später erneut versuchen"));
