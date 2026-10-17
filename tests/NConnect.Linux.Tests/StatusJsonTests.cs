@@ -68,6 +68,16 @@ public class StatusJsonTests
     [Theory]
     [InlineData("org.freedesktop.DBus.Error.ServiceUnknown", true)]
     [InlineData("org.freedesktop.DBus.Error.NameHasNoOwner", true)]
+    // D-Bus-Aktivierung von org.bluez gescheitert (LibreELEC bei ausgeschaltetem Bluetooth: Unit-Bedingung nicht erfüllt)
+    [InlineData("org.freedesktop.DBus.Error.TimedOut", true)]
+    [InlineData("org.freedesktop.DBus.Error.Spawn.ChildExited", true)]
+    [InlineData("org.freedesktop.DBus.Error.Spawn.ServiceNotFound", true)]
+    [InlineData("org.freedesktop.systemd1.NoSuchUnit", true)]
+    [InlineData("org.freedesktop.systemd1.UnitMasked", true)]
+    // keine Aussage über bluetoothd – das klärt die Nachfrage beim D-Bus (BluetoothStateTests)
+    [InlineData("org.freedesktop.DBus.Error.NoReply", false)]
+    [InlineData("org.freedesktop.DBus.Error.UnknownObject", false)]
+    [InlineData("org.freedesktop.DBus.Error.Spawn", false)]
     [InlineData("org.bluez.Error.NotReady", false)]
     [InlineData("org.freedesktop.DBus.Error.AccessDenied", false)]
     public void BluetoothdLaeuftNicht_GiltAlsAus(string errorName, bool off)
