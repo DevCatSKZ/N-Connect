@@ -1,8 +1,11 @@
-# Baut das Kodi-Plugin „N-Connect (LibreELEC/Linux)“ für alle Geräte und veröffentlicht es.
+# Baut die Kodi-Add-ons von N-Connect (service.nconnect für LibreELEC/Linux samt Begleitmodus, plugin.nconnect.status,
+# script.nconnect.bundle, repository.devcatskz) und veröffentlicht sie.
 # - Jeder Lauf: ZIPs als Artefakt „Kodi-Plugin“.
-# - Tag „v1.2.3“: ZIPs zusätzlich am GitHub-Release; neue Plugin-Version (addon.xml) ins DevCatSKZ Repository
-#   (github.com/DevCatSKZ/kodi-repo) – dort holt Kodi sie automatisch. Zugang über das Secret KODI_REPO_TOKEN
-#   (fein abgestufter Token, nur kodi-repo, „Contents: Read and write“; Deploy-Schlüssel sind in der Organisation aus).
+# - Tag „v1.2.3“: Die service.nconnect-ZIPs zusätzlich ans GitHub-Release; neue Add-on-Versionen (addon.xml) ins
+#   DevCatSKZ Repository (github.com/DevCatSKZ/kodi-repo) – dort holt Kodi sie automatisch. Abgelegt werden dieselben
+#   ZIPs wie am Release; eine Version, die dort schon liegt, wird nie überschrieben (dann vorher hochzählen).
+#   Zugang über das Secret KODI_REPO_DEPLOY_KEY: privater SSH-Schlüssel, dessen öffentlicher Teil als Deploy-Key mit
+#   Schreibrecht nur in DevCatSKZ/kodi-repo hinterlegt ist. Fehlt das Secret, wird der Schritt mit Warnung übersprungen.
 name: N-Connect – Kodi-Plugin
 on:
   workflow_dispatch:
@@ -19,6 +22,8 @@ jobs:
   kodi:
     runs-on: windows-latest
     timeout-minutes: 30
+    env:
+      HAS_KODI_REPO_KEY: ${{ secrets.KODI_REPO_DEPLOY_KEY != '' }}
     defaults:
       run:
         shell: pwsh
@@ -31,7 +36,7 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: "Plugin bauen (LibreELEC: x86_64, arm64, arm)"
+      - name: "Add-ons bauen (LibreELEC: x86_64, arm64, arm)"
         run: powershell -NoProfile -ExecutionPolicy Bypass -File linux/build-kodi-addon.ps1
 
       - uses: actions/upload-artifact@v4
@@ -50,22 +55,32 @@ jobs:
           if (-not (gh release view $tag 2>$null)) { gh release create $tag --title "N-Connect $tag" --notes "Kodi-Plugin" }
           gh release upload $tag (Get-ChildItem out/kodi -Filter 'N-Connect-Kodi-*.zip').FullName --clobber
 
+      - name: DevCatSKZ Repository – Deploy-Key fehlt
+        if: startsWith(github.ref, 'refs/tags/v') && env.HAS_KODI_REPO_KEY != 'true'
+        run: Write-Host "::warning title=Kodi-Repository nicht aktualisiert::Secret KODI_REPO_DEPLOY_KEY fehlt – DevCatSKZ/kodi-repo wurde nicht aktualisiert. ZIPs aus dem Artefakt 'Kodi-Plugin' von Hand ablegen (linux/build-kodi-addon.ps1 -Repo) oder den Deploy-Key einrichten."
+
+      - name: DevCatSKZ Repository auschecken
+        if: startsWith(github.ref, 'refs/tags/v') && env.HAS_KODI_REPO_KEY == 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: DevCatSKZ/kodi-repo
+          ref: main
+          path: kodi-repo
+          ssh-key: ${{ secrets.KODI_REPO_DEPLOY_KEY }}
+
       - name: Ins DevCatSKZ Repository legen
-        if: startsWith(github.ref, 'refs/tags/v')
-        env:
-          # Fein abgestufter Token: nur Repository DevCatSKZ/kodi-repo, Berechtigung „Contents: Read and write“.
-          KODI_REPO_TOKEN: ${{ secrets.KODI_REPO_TOKEN }}
+        if: startsWith(github.ref, 'refs/tags/v') && env.HAS_KODI_REPO_KEY == 'true'
         run: |
-          if (-not $env:KODI_REPO_TOKEN) { Write-Host "Kein KODI_REPO_TOKEN – Repository wird nicht aktualisiert."; exit 0 }
-          git clone --depth 1 "https://x-access-token:$($env:KODI_REPO_TOKEN)@github.com/DevCatSKZ/kodi-repo.git" $env:RUNNER_TEMP/kodi-repo
-          powershell -NoProfile -ExecutionPolicy Bypass -File linux/build-kodi-addon.ps1 -Repo -RepoDir $env:RUNNER_TEMP/kodi-repo
-          cd $env:RUNNER_TEMP/kodi-repo
+          # Dieselben ZIPs wie am Release (-NoBuild); danach Index (addons.xml, .md5, .sha256, index.html) neu bauen.
+          powershell -NoProfile -ExecutionPolicy Bypass -File linux/build-kodi-addon.ps1 -Repo -NoBuild -RepoDir kodi-repo
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cd kodi-repo
           git config user.name devcatskz
           git config user.email devcatskz@gmail.com
           git add -A
           if (git status --porcelain) {
-            git commit -m "N-Connect ${{ github.ref_name }}"
-            git push
+            git commit -m "N-Connect ${{ github.ref_name }}: Kodi-Add-ons aktualisiert"
+            git push origin HEAD:main
           } else {
-            Write-Host "Keine Änderung (gleiche Plugin-Version)."
+            Write-Host "Keine Änderung – alle Add-on-Versionen liegen schon im Repository."
           }

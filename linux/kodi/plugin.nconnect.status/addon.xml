@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.nconnect.status" name="N-Connect Status" version="1.1.1" provider-name="devcatskz">
+    <!-- Ältere Widget-Quelle für Skins (plugin://plugin.nconnect.status/). Die Anzeige liegt in service.nconnect
+         (plugin.py) – dieses Add-on leitet nur weiter, damit bestehende Widget-Einstellungen weiter funktionieren.
+         Das Symbol (resources/icon.png) legt linux/build-kodi-addon.ps1 beim Packen hinein. -->
+    <requires>
+        <import addon="xbmc.python" version="3.0.0"/>
+        <import addon="service.nconnect" version="0.3.4"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="default.py">
+        <provides>video</provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="de_DE">Verbundene Controller als Widget</summary>
+        <description lang="de_DE">Zeigt die über N-Connect verbundenen Controller (Name, Akku, Ladestatus) als Liste an. Für Skin-Widgets gedacht.</description>
+        <summary lang="en_GB">Connected controllers as widget</summary>
+        <description lang="en_GB">Lists controllers connected via N-Connect (name, battery, charging). Meant for skin widgets.</description>
+        <platform>all</platform>
+        <license>MIT</license>
+        <source>https://github.com/DevCatSKZ/N-Connect</source>
+        <website>https://github.com/DevCatSKZ/N-Connect</website>
+        <news>1.1.1: Quellcode im N-Connect-Repository, Anbieter devcatskz – Anzeige unverändert (kommt aus service.nconnect)[CR]1.1.0: Widget zeigt auch bekannte, gerade nicht verbundene Controller und lädt sich bei Änderungen selbst neu</news>
+        <assets>
+            <icon>resources/icon.png</icon>
+        </assets>
+    </extension>
+</addon>
