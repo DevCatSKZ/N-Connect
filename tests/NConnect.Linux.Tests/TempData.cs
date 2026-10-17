@@ -15,8 +15,16 @@ internal sealed class TempData : IDisposable
             """{ "GameLeds": false, "ConnectFeedback": false, "DsuServer": false }""");
     }
 
-    /// <summary>Dienst ohne virtuelle Controller – auch unter Linux wird nie ein uinput-Gerät angelegt.</summary>
-    public Daemon NewDaemon() => new(Dir, adapterName: null) { CreatePad = _ => null };
+    /// <summary>
+    /// Dienst ohne virtuelle Controller – auch unter Linux wird nie ein uinput-Gerät angelegt. Die Nachfrage beim D-Bus,
+    /// ob bluetoothd läuft, beantwortet <paramref name="bluetoothd"/>; ohne Angabe scheitert sie (wie ohne System-D-Bus),
+    /// nie wird der echte D-Bus gefragt.
+    /// </summary>
+    public Daemon NewDaemon(Func<Task<bool>>? bluetoothd = null) => new(Dir, adapterName: null)
+    {
+        CreatePad = _ => null,
+        BluetoothServiceRunningAsync = bluetoothd ?? (() => throw new InvalidOperationException("kein D-Bus im Test")),
+    };
 
     public JsonObject ReadStatus() => (JsonObject)JsonNode.Parse(File.ReadAllText(Path.Combine(Dir, "status.json")))!;
 
