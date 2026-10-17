@@ -160,8 +160,10 @@ public sealed class SetupWizardActivity : AppCompatActivity
             Ui.Space(this, 4),
             Ui.Body(this, "In wenigen Schritten erlaubst du Bluetooth, wählst aus, wie Spiele deine Controller sehen sollen, " +
                           "und verbindest deinen ersten Controller. Das dauert etwa zwei Minuten.")));
-        col.AddView(Ui.Caption(this, "Xbox-, PlayStation- und ältere Switch-Controller funktionieren unter Android meist schon " +
-                                     "direkt über die Bluetooth-Einstellungen."));
+        col.AddView(Ui.Caption(this, "N-Connect unterstützt nur Switch-2-Controller. Xbox- und PlayStation-Controller laufen " +
+                                     "direkt über die Bluetooth-Einstellungen von Android. Ältere Switch-Controller (Switch 1, " +
+                                     "Nachbauten) koppelst du ebenfalls dort – meist nur mit Tasten und Sticks, ohne " +
+                                     "Bewegungssteuerung und Vibration."));
     }
 
     private void PermissionsStep(LinearLayout col)

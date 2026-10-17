@@ -11,8 +11,8 @@
     <RootNamespace>NConnect.Android</RootNamespace>
     <ApplicationId>com.devcatskz.nconnect</ApplicationId>
     <ApplicationTitle>N-Connect</ApplicationTitle>
-    <ApplicationVersion>9</ApplicationVersion>
-    <ApplicationDisplayVersion>0.9.0</ApplicationDisplayVersion>
+    <ApplicationVersion>10</ApplicationVersion>
+    <ApplicationDisplayVersion>0.9.1</ApplicationDisplayVersion>
     <!-- Shizuku wird per Reflection angesprochen, Einstellungen per JSON: nicht voll trimmen. -->
     <TrimMode>partial</TrimMode>
   </PropertyGroup>

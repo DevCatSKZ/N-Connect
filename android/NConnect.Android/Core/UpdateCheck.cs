@@ -1,37 +1,32 @@
 using System.Net.Http.Headers;
 using System.Text.Json;
-using Android.App;
 using Android.Content;
 using AndroidX.Core.Content;
-using Switch2Pro.Protocol;
 
 namespace NConnect.Android.Core;
 
 /// <summary>
-/// Sucht auf GitHub nach einer neueren Android-Version (Release-Tag „v1.2.3“, Datei „N-Connect-Android-…apk“) –
-/// wie UpdateCheck in N-Connect für Windows, nur mit APK statt Setup-EXE. Heruntergeladen wird nur nach Zustimmung,
-/// nur von GitHub, und die Datei wird geprüft (Größe, SHA-256 falls GitHub sie angibt). Android fragt vor dem
-/// Installieren noch einmal nach.
+/// Sucht auf GitHub nach einer neueren Android-Version (Datei „N-Connect-Android-…apk“ an einem Release, siehe
+/// UpdateCheck.Releases.cs) – wie UpdateCheck in N-Connect für Windows, nur mit APK statt Setup-EXE. Heruntergeladen
+/// wird nur nach Zustimmung, nur von GitHub, und die Datei wird geprüft (Größe, SHA-256 falls GitHub sie angibt).
+/// Android fragt vor dem Installieren noch einmal nach.
 /// </summary>
-internal static class UpdateCheck
+internal static partial class UpdateCheck
 {
     private const string Releases = "https://api.github.com/repos/DevCatSKZ/N-Connect/releases?per_page=30";
-    private const string TagPrefix = "v";
     public const string ProviderAuthority = "com.devcatskz.nconnect.fileprovider";
 
-    /// <summary>Gefundene APK eines Releases (Name, Download-Adresse, Größe, SHA-256 als Hex – falls GitHub sie liefert).</summary>
-    public sealed record Apk(string Name, string Url, long Size, string? Sha256);
-
-    public sealed record Update(Version Version, string Url, Apk? File);
-
-    /// <summary>Installierte Version (VersionName aus dem Paket, z. B. „0.9.0“).</summary>
+    /// <summary>Installierte Version (VersionName aus dem Paket, z. B. „0.9.1“).</summary>
     public static Version Current(Context ctx)
     {
         string? name = ctx.PackageManager!.GetPackageInfo(ctx.PackageName!, 0)!.VersionName;
         return Version.TryParse(name?.Split('-', '+')[0], out var v) ? v : new Version(0, 0, 0);
     }
 
-    /// <summary>Neuestes Release mit Android-APK, wenn es neuer als die installierte Version ist; sonst null.</summary>
+    /// <summary>
+    /// Neueste Android-APK unter den Releases (nach der Version im Dateinamen, nicht nach dem Tag), wenn sie neuer als
+    /// die installierte Version ist; sonst null.
+    /// </summary>
     public static async Task<Update?> FindAsync(Context ctx, CancellationToken ct)
     {
         try
@@ -43,20 +38,10 @@ internal static class UpdateCheck
             if (!response.IsSuccessStatusCode)
                 return null;
             using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync(ct));
-            Update? best = null;
-            foreach (var release in doc.RootElement.EnumerateArray())
-            {
-                if (release.TryGetProperty("draft", out var draft) && draft.GetBoolean()
-                    || release.TryGetProperty("prerelease", out var pre) && pre.GetBoolean())
-                    continue;
-                var tag = release.GetProperty("tag_name").GetString();
-                if (tag is null || !tag.StartsWith(TagPrefix, StringComparison.OrdinalIgnoreCase)
-                    || !Version.TryParse(tag[TagPrefix.Length..], out var version))
-                    continue;
-                if (best is null || version > best.Version)
-                    best = new Update(version, release.GetProperty("html_url").GetString() ?? "", FindApk(release));
-            }
-            return best is not null && Normalize(best.Version) > Normalize(Current(ctx)) ? best : null;
+            var best = Newest(doc.RootElement);
+            Log.Info(best is null ? "Update-Prüfung: an keinem Release liegt eine Android-APK"
+                : $"Update-Prüfung: neueste APK {best.File.Name}, installiert {Current(ctx)}");
+            return best is not null && IsNewer(best.Version, Current(ctx)) ? best : null;
         }
         catch (Exception e) when (e is HttpRequestException or TaskCanceledException or JsonException or InvalidOperationException
                                       or KeyNotFoundException)
@@ -66,42 +51,26 @@ internal static class UpdateCheck
         }
     }
 
-    /// <summary>„N-Connect-Android-*.apk“ unter den Dateien eines Releases suchen.</summary>
-    private static Apk? FindApk(JsonElement release)
-    {
-        if (!release.TryGetProperty("assets", out var assets) || assets.ValueKind != JsonValueKind.Array)
-            return null;
-        foreach (var asset in assets.EnumerateArray())
-        {
-            string? name = asset.TryGetProperty("name", out var n) ? n.GetString() : null;
-            string? url = asset.TryGetProperty("browser_download_url", out var u) ? u.GetString() : null;
-            if (name is null || url is null || !name.StartsWith("N-Connect-Android", StringComparison.OrdinalIgnoreCase)
-                || !name.EndsWith(".apk", StringComparison.OrdinalIgnoreCase) || !IsGitHub(url))
-                continue;
-            long size = asset.TryGetProperty("size", out var s) && s.TryGetInt64(out long v) ? v : 0;
-            // GitHub liefert „digest“: "sha256:…" für neuere Uploads.
-            string? digest = asset.TryGetProperty("digest", out var d) ? d.GetString() : null;
-            string? sha = digest is not null && digest.StartsWith("sha256:", StringComparison.OrdinalIgnoreCase) ? digest[7..] : null;
-            return new Apk(name, url, size, sha);
-        }
-        return null;
-    }
-
-    /// <summary>Nur Downloads von GitHub (Release-Dateien liegen dort bzw. werden dorthin umgeleitet).</summary>
-    private static bool IsGitHub(string url) =>
-        Uri.TryCreate(url, UriKind.Absolute, out var uri) && uri.Scheme == Uri.UriSchemeHttps
-        && (uri.Host.Equals("github.com", StringComparison.OrdinalIgnoreCase)
-            || uri.Host.EndsWith(".githubusercontent.com", StringComparison.OrdinalIgnoreCase));
+    private static Java.IO.File DownloadDir(Context ctx) =>
+        ctx.GetExternalFilesDir(global::Android.OS.Environment.DirectoryDownloads) ?? ctx.FilesDir!;
 
     /// <summary>
-    /// APK in den App-eigenen Download-Ordner laden und prüfen. Liefert die Datei oder null (Grund im Protokoll).
+    /// APK in den App-eigenen Download-Ordner laden und prüfen. Liegt sie dort schon vollständig (z. B. weil vorher noch
+    /// „Unbekannte Apps installieren“ erlaubt werden musste), wird sie nicht erneut geladen. Andere APKs im Ordner
+    /// werden gelöscht. Liefert die Datei oder null (Grund im Protokoll).
     /// </summary>
     public static async Task<Java.IO.File?> DownloadAsync(Context ctx, Apk apk, IProgress<int>? progress, CancellationToken ct)
     {
-        var dir = ctx.GetExternalFilesDir(global::Android.OS.Environment.DirectoryDownloads) ?? ctx.FilesDir!;
-        var file = new Java.IO.File(dir, apk.Name);
+        var file = new Java.IO.File(DownloadDir(ctx), apk.Name);
+        CleanUp(ctx, keep: apk.Name);
         try
         {
+            if (await IsCompleteAsync(file, apk, ct))
+            {
+                Log.Info($"Update: {apk.Name} liegt schon vollständig vor");
+                progress?.Report(100);
+                return file;
+            }
             using var http = new HttpClient { Timeout = TimeSpan.FromMinutes(10) };
             http.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("N-Connect", Current(ctx).ToString()));
             using var response = await http.GetAsync(apk.Url, HttpCompletionOption.ResponseHeadersRead, ct);
@@ -153,6 +122,45 @@ internal static class UpdateCheck
         }
     }
 
+    /// <summary>Schon geladene Datei mit passender Größe und Prüfsumme? (Ohne Vergleichswert wird lieber frisch geladen.)</summary>
+    private static async Task<bool> IsCompleteAsync(Java.IO.File file, Apk apk, CancellationToken ct)
+    {
+        if (apk.Sha256 is null || apk.Size <= 0 || !file.Exists() || file.Length() != apk.Size)
+            return false;
+        await using var stream = new FileStream(file.AbsolutePath!, FileMode.Open, FileAccess.Read);
+        byte[] hash = await System.Security.Cryptography.SHA256.HashDataAsync(stream, ct);
+        return Convert.ToHexString(hash).Equals(apk.Sha256, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Alte Update-APKs im Download-Ordner löschen: beim App-Start alle, die nicht neuer als die installierte Version sind
+    /// (also schon eingespielt oder überholt), vor einem Download alle außer der neuen (<paramref name="keep"/>).
+    /// </summary>
+    public static void CleanUp(Context ctx, string? keep = null)
+    {
+        try
+        {
+            var current = Current(ctx);
+            foreach (var file in DownloadDir(ctx).ListFiles() ?? [])
+            {
+                using (file)
+                {
+                    string name = file.Name ?? "";
+                    if (!name.EndsWith(".apk", StringComparison.OrdinalIgnoreCase) || name == keep)
+                        continue;
+                    if (keep is null && VersionOf(name) is { } version && IsNewer(version, current))
+                        continue; // noch nicht installiert – bleibt für den nächsten Versuch
+                    if (file.Delete())
+                        Log.Info($"Update: alte Datei {name} gelöscht");
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Log.Warn($"Update: Aufräumen nicht möglich: {Log.Reason(e)}");
+        }
+    }
+
     /// <summary>System-Installationsdialog für eine geladene APK öffnen (über den FileProvider).</summary>
     public static void Install(Context ctx, Java.IO.File apk)
     {
@@ -172,7 +180,4 @@ internal static class UpdateCheck
         ctx.StartActivity(new Intent(global::Android.Provider.Settings.ActionManageUnknownAppSources,
                 global::Android.Net.Uri.Parse($"package:{ctx.PackageName}"))!
             .AddFlags(ActivityFlags.NewTask));
-
-    /// <summary>1.2 und 1.2.0 gelten als gleich.</summary>
-    private static Version Normalize(Version v) => new(v.Major, v.Minor, Math.Max(0, v.Build), Math.Max(0, v.Revision));
 }
