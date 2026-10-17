@@ -44,7 +44,7 @@ internal static class Diagnostics
     private static string SystemInfo(ControllerManager? manager)
     {
         var sb = new StringBuilder();
-        sb.AppendLine($"N-Connect {UpdateCheck.Current} ({(Paths.IsPortable ? "portabel" : "installiert")})");
+        sb.AppendLine($"N-Connect {UpdateCheck.Label} ({(Paths.IsPortable ? "portabel" : "installiert")})");
         sb.AppendLine($"Windows {Environment.OSVersion.Version} · {(Environment.Is64BitOperatingSystem ? "64 Bit" : "32 Bit")}");
         sb.AppendLine($"Sprache {Tr.Lang} · Windows-Sprache {System.Globalization.CultureInfo.CurrentUICulture.Name}");
         sb.AppendLine($"Skalierung {UiScale.Factor * 100:0} % · Darstellung {(Theme.Dark ? "dunkel" : "hell")}, Schema {Theme.ActiveScheme.Name}");
