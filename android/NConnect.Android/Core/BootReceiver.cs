@@ -6,7 +6,8 @@ namespace NConnect.Android.Core;
 /// <summary>
 /// „Mit Android starten“: nach dem Einschalten des Geräts (oder nach einem Update der App) den Controller-Dienst
 /// wieder hochfahren, damit sich die Controller ohne App-Start verbinden. Läuft nur, wenn es in den Einstellungen
-/// eingeschaltet ist (<see cref="AppPrefs.StartOnBoot"/>).
+/// eingeschaltet ist (<see cref="AppPrefs.StartOnBoot"/>) und „Geräte in der Nähe“ erlaubt ist – ohne die Berechtigung
+/// würde Android den Dienst beim Start beenden (SecurityException).
 /// </summary>
 [BroadcastReceiver(Enabled = true, Exported = true, DirectBootAware = true)]
 [IntentFilter(["android.intent.action.BOOT_COMPLETED", "android.intent.action.MY_PACKAGE_REPLACED"])]
@@ -16,6 +17,11 @@ public sealed class BootReceiver : BroadcastReceiver
     {
         if (context is null || !AppPrefs.StartOnBoot || !AppPrefs.SetupDone)
             return;
+        if (!UI.Permissions.HasBluetooth(context))
+        {
+            Log.Warn("Autostart übersprungen: Berechtigung „Geräte in der Nähe“ fehlt (in der App erneut erlauben)");
+            return;
+        }
         try
         {
             ControllerService.CreateChannel(context);

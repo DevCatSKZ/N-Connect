@@ -85,6 +85,7 @@ public sealed class ControllerService : Service
         TouchService.StateChanged += OnTouchStateChanged;
         _kodiStatus = new Kodi.KodiStatusWriter(this);
         _kodiStatus.Start();
+        NConnectTile.RequestUpdate(this);
     }
 
     public override StartCommandResult OnStartCommand(Intent? intent, StartCommandFlags flags, int startId)
@@ -106,8 +107,8 @@ public sealed class ControllerService : Service
                 }
                 return StartCommandResult.Sticky;
         }
-        StartAsForeground();
-        StartScan();
+        if (!TryStart())
+            return StartCommandResult.NotSticky;
         if (!_outputWatch)
         {
             _outputWatch = true;
@@ -120,6 +121,33 @@ public sealed class ControllerService : Service
     }
 
     private bool _outputWatch;
+
+    /// <summary>
+    /// Als Vordergrunddienst starten und suchen. Fehlt „Geräte in der Nähe“ (Kachel oder Autostart vor der Einrichtung,
+    /// Berechtigung entzogen) oder lehnt Android den Start ab, beendet sich der Dienst mit einem Protokolleintrag – ab
+    /// Android 12 würfe die Suche, ab Android 14 schon StartForeground eine SecurityException.
+    /// </summary>
+    private bool TryStart()
+    {
+        try
+        {
+            StartAsForeground();
+            if (UI.Permissions.HasBluetooth(this))
+            {
+                StartScan();
+                return true;
+            }
+            Log.Warn("Controller-Dienst beendet: Berechtigung „Geräte in der Nähe“ fehlt");
+        }
+        catch (Exception e)
+        {
+            Log.Error("Controller-Dienst konnte nicht starten", e);
+        }
+        _scanner.Stop();
+        StopForeground(StopForegroundFlags.Remove);
+        StopSelf();
+        return false;
+    }
 
     /// <summary>
     /// Hält den Ausgabeweg aktuell: ist (noch) keiner aktiv – etwa weil Shizuku erst nach N-Connect gestartet wurde –,
@@ -156,22 +184,37 @@ public sealed class ControllerService : Service
         }
     }
 
-    /// <summary>Langsame Nebenaufgaben: Akku-Warnung und Profil des gerade laufenden Spiels.</summary>
+    /// <summary>
+    /// Langsame Nebenaufgaben: Akku-Warnung und Profil des gerade laufenden Spiels. Jeder Durchlauf ist einzeln
+    /// abgesichert – eine Ausnahme (z. B. aus UsageStats/AppOps) darf die Schleife nicht still beenden, sonst gäbe es bis
+    /// zum Neustart des Dienstes weder Akku-Warnungen noch Profilwechsel.
+    /// </summary>
     private async Task MaintenanceLoopAsync(CancellationToken ct)
     {
+        string? lastError = null;
         try
         {
             while (!ct.IsCancellationRequested)
             {
                 await Task.Delay(5000, ct);
-                if (_scanner is { Scanning: true, LowPower: false } && System.Environment.TickCount64 >= _fastScanUntil)
-                    UpdateScanning(); // schnelles Suchfenster abgelaufen → stromsparend weitersuchen
-                foreach (var player in Players)
+                try
                 {
-                    if (player.CheckBattery() is { } warning)
-                        NotifyBattery(player, warning);
+                    if (_scanner is { Scanning: true, LowPower: false } && System.Environment.TickCount64 >= _fastScanUntil)
+                        UpdateScanning(); // schnelles Suchfenster abgelaufen → stromsparend weitersuchen
+                    foreach (var player in Players)
+                    {
+                        if (player.CheckBattery() is { } warning)
+                            NotifyBattery(player, warning);
+                    }
+                    Profiles.GameProfileWatcher.Poll(this, RaiseChanged);
+                    lastError = null;
                 }
-                Profiles.GameProfileWatcher.Poll(this, RaiseChanged);
+                catch (Exception e) when (e is not System.OperationCanceledException)
+                {
+                    if (e.Message != lastError) // nicht alle 5 s dieselbe Zeile
+                        Log.Error("Wartung (Akku/Profil)", e);
+                    lastError = e.Message;
+                }
             }
         }
         catch (System.OperationCanceledException)
@@ -481,6 +524,7 @@ public sealed class ControllerService : Service
         TouchService.StateChanged -= OnTouchStateChanged;
         Instance = null;
         Changed?.Invoke();
+        NConnectTile.RequestUpdate(this);
         base.OnDestroy();
     }
 

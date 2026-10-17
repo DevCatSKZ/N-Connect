@@ -25,8 +25,11 @@ public sealed class HelpPage(MainActivity host) : IPage
             "Android kann diese Controller nicht von selbst nutzen – N-Connect übersetzt sie in einen ganz normalen " +
             "<b>Xbox-Controller</b>, den praktisch jedes Spiel und jeder Emulator versteht. Für Spiele ohne " +
             "Controller-Unterstützung gibt es zusätzlich die <b>Touch-Steuerung</b>.<br><br>" +
-            "Xbox-, PlayStation- und ältere Switch-Controller funktionieren unter Android meist schon direkt – " +
-            "die verbindest du einfach in den Bluetooth-Einstellungen."));
+            "<b>Andere Controller:</b> N-Connect für Android unterstützt nur Switch-2-Controller (über Bluetooth LE). " +
+            "<b>Xbox- und PlayStation-Controller</b> laufen unter Android direkt – einfach in den Bluetooth-Einstellungen " +
+            "von Android koppeln. <b>Ältere Switch-Controller</b> (Pro Controller der Switch 1, Joy-Con der ersten Generation, " +
+            "Nachbauten) verbindest du dort ebenfalls direkt mit Android – N-Connect erkennt sie nicht. Dann gehen in der " +
+            "Regel nur Tasten und Sticks; Bewegungssteuerung und Vibration je nach Gerät nicht."));
 
         col.AddView(Topic("Controller verbinden",
             "<b>Beim ersten Mal:</b> Halte die kleine runde <b>SYNC-Taste</b> am Controller gedrückt, bis die Lichter " +
@@ -76,6 +79,31 @@ public sealed class HelpPage(MainActivity host) : IPage
             "• <b>Tastenlayout:</b> Unter Einstellungen → Tastenbelegung wählst du, ob A/B nach Position (Xbox) oder " +
             "nach Beschriftung (Switch) zugeordnet wird.<br>" +
             "• <b>Bewegungssteuerung:</b> Unter „Gyro-Zielen“ steuert das Neigen des Controllers den rechten Stick."));
+
+        col.AddView(Topic("Gyro für Emulatoren (DSU)",
+            "Emulatoren mit <b>DSU-/Cemuhook-Client</b> bekommen von N-Connect die Bewegungsdaten (und Tasten) direkt.<br><br>" +
+            "<b>1.</b> Einstellungen → Bewegungssteuerung → <b>Gyro an Emulatoren senden (DSU)</b> einschalten.<br>" +
+            "<b>2.</b> Im Emulator bei DSU, Cemuhook oder „UDP-Server“ als Adresse <b>127.0.0.1</b> und als Port " +
+            "<b>26760</b> eintragen.<br><br>" +
+            "Der Server ist nur auf diesem Gerät erreichbar. Spieler 1 bis 4 belegen dort der Reihe nach die vier " +
+            "Steckplätze (Slots)."));
+
+        col.AddView(Topic("Profile je Spiel",
+            "Unter Einstellungen → <b>Profile je Spiel verwalten</b> bekommt jedes Spiel seine eigene Tastenbelegung.<br><br>" +
+            "<b>1.</b> Einmal „Zugriff auf Nutzungsdaten“ erlauben – daran erkennt N-Connect, welche App im Vordergrund " +
+            "läuft (nur den Namen, keine Inhalte).<br>" +
+            "<b>2.</b> <b>Neues Profil</b> antippen und das Spiel aus der Liste wählen. Das Profil startet mit einer Kopie " +
+            "der Standardbelegung.<br>" +
+            "<b>3.</b> <b>Tastenbelegung bearbeiten</b>: Controller wählen und jeder Taste eine andere Funktion geben – eine " +
+            "Xbox-Taste, keine Funktion, Gyro als rechter Stick oder ein Makro (Tastenfolge).<br><br>" +
+            "Das Profil gilt automatisch, solange das Spiel läuft. Unter „Aktives Profil“ wählst du eins auch fest."));
+
+        col.AddView(Topic("Ohne App starten: Kachel und Autostart",
+            "<b>Schnelleinstellungen:</b> Benachrichtigungsleiste ganz herunterziehen, auf den Stift (Bearbeiten) tippen und " +
+            "die Kachel <b>N-Connect</b> in den aktiven Bereich ziehen. Ein Tippen startet oder beendet die " +
+            "Controller-Verbindung. Fehlt noch eine Berechtigung, öffnet die Kachel N-Connect.<br><br>" +
+            "<b>Mit Android starten:</b> Unter Einstellungen → Verbindung einschalten – nach dem Einschalten des Geräts " +
+            "verbinden sich deine Controller dann von selbst."));
 
         col.AddView(KodiTopic());
 

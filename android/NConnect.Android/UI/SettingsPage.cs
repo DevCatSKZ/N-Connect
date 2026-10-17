@@ -93,7 +93,7 @@ public sealed class SettingsPage(MainActivity host) : IPage
         col.AddView(Ui.SwitchRow(host, "Gyro hoch/runter umkehren", "Für Spiele mit umgekehrter Kamera.",
             S.GyroStickInvertY, on => { S.GyroStickInvertY = on; AppPrefs.SaveSettings(); }));
         col.AddView(Ui.SwitchRow(host, "Gyro an Emulatoren senden (DSU)",
-            "Cemuhook/DSU-Server auf diesem Gerät (nur lokal): Dolphin, Citra & Co. erhalten Bewegung und Tasten.",
+            "Für Emulatoren mit DSU-/Cemuhook-Client auf diesem Gerät: dort Server 127.0.0.1, Port 26760 eintragen (nur lokal erreichbar).",
             AppPrefs.DsuEnabled, on =>
             {
                 AppPrefs.DsuEnabled = on;
@@ -135,8 +135,17 @@ public sealed class SettingsPage(MainActivity host) : IPage
         return scroll;
     }
 
+    /// <summary>Geladene Update-APK, die auf die Freigabe „Unbekannte Apps installieren“ wartet.</summary>
+    private Java.IO.File? _pendingApk;
+
     public void Refresh()
     {
+        // Zurück aus der Systemseite „Unbekannte Apps installieren“: sobald erlaubt, die geladene APK einspielen.
+        if (_pendingApk is { } apk && UpdateCheck.CanInstall(host))
+        {
+            _pendingApk = null;
+            UpdateCheck.Install(host, apk);
+        }
     }
 
     private static string GyroText(GyroStickMode m) => m switch
@@ -263,90 +272,11 @@ public sealed class SettingsPage(MainActivity host) : IPage
                 .Show();
             return;
         }
-        var items = S.NamedProfiles.Select(p => $"{p.Name} – {string.Join(", ", p.Programs)}").ToList();
-        var list = new ListView(host);
-        var adapter = new ArrayAdapter<string>(host, global::Android.Resource.Layout.SimpleListItem1, items);
-        list.Adapter = adapter;
-        list.ItemClick += (_, e) =>
-        {
-            var profile = S.NamedProfiles[e.Position];
-            new MaterialAlertDialogBuilder(host)
-                .SetTitle(profile.Name)!
-                .SetMessage(L.F("Belegt die Spiele: {0}\n\nProfil löschen?", string.Join(", ", profile.Programs)))!
-                .SetPositiveButton(L.T("Löschen"), (_, _) =>
-                {
-                    S.NamedProfiles = [.. S.NamedProfiles.Where(p => p != profile)];
-                    AppPrefs.SaveSettings();
-                    host.Rebuild();
-                })!
-                .SetNegativeButton(L.T("Behalten"), (_, _) => { })!
-                .Show();
-        };
-        new MaterialAlertDialogBuilder(host)
-            .SetTitle(L.T("Profile je Spiel"))!
-            .SetView(list)!
-            .SetPositiveButton(L.T("Neu für laufendes Spiel"), (_, _) => CreateProfileForForeground())!
-            .SetNegativeButton(L.T("Fertig"), (_, _) => { })!
-            .Show();
-    }
-
-    private void CreateProfileForForeground()
-    {
-        string? package = Profiles.GameProfileWatcher.ForegroundPackage(host);
-        if (package is null)
-        {
-            Ui.Toast(host, L.T("Keine App im Vordergrund erkannt – starte das Spiel und versuche es erneut"));
-            return;
-        }
-        string label = package;
-        try
-        {
-            var info = host.PackageManager!.GetApplicationInfo(package, 0)!;
-            label = host.PackageManager.GetApplicationLabel(info) ?? package;
-        }
-        catch (Exception)
-        {
-        }
-        var layout = new TextInputLayout(host) { Hint = L.T("Profilname") };
-        var input = new TextInputEditText(layout.Context!) { Text = label };
-        layout.AddView(input);
-        var box = Ui.Column(host);
-        int pad = Ui.Dp(host, 24);
-        box.SetPadding(pad, Ui.Dp(host, 8), pad, 0);
-        box.AddView(Ui.Caption(host, L.F("Das Profil wird automatisch aktiv, solange „{0}“ läuft.", package)));
-        box.AddView(layout);
-        new MaterialAlertDialogBuilder(host)
-            .SetTitle(L.T("Neues Profil"))!
-            .SetView(box)!
-            .SetPositiveButton(L.T("Anlegen"), (_, _) =>
-            {
-                string name = input.Text?.Trim() ?? "";
-                if (name.Length == 0 || S.NamedProfiles.Any(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
-                {
-                    Ui.Toast(host, L.T("Name fehlt oder ist schon vergeben"));
-                    return;
-                }
-                S.NamedProfiles = [.. S.NamedProfiles, new NamedProfile { Name = name, Programs = [package] }];
-                AppPrefs.SaveSettings();
-                host.Rebuild();
-                Ui.Toast(host, L.F("Profil „{0}“ angelegt", name));
-            })!
-            .SetNegativeButton(L.T("Abbrechen"), (_, _) => { })!
-            .Show();
+        new ProfileDialogs(host).Manage();
     }
 
     private void CheckUpdate()
     {
-        if (!UpdateCheck.CanInstall(host))
-        {
-            new MaterialAlertDialogBuilder(host)
-                .SetTitle(L.T("Installieren erlauben?"))!
-                .SetMessage(L.T("Android fragt einmal, ob N-Connect Aktualisierungen einspielen darf."))!
-                .SetPositiveButton(L.T("Einstellungen öffnen"), (_, _) => UpdateCheck.OpenInstallPermission(host))!
-                .SetNegativeButton(L.T("Später"), (_, _) => { })!
-                .Show();
-            return;
-        }
         Ui.Toast(host, L.T("Suche nach einer neuen Version …"));
         _ = Task.Run(async () =>
         {
@@ -354,30 +284,16 @@ public sealed class SettingsPage(MainActivity host) : IPage
             host.RunOnUiThread(() =>
             {
                 if (update is null)
-                {
                     Ui.Toast(host, L.T("N-Connect ist auf dem neuesten Stand"));
-                    return;
-                }
-                if (update.File is null)
-                {
-                    // Kein APK am Release: auf die Release-Seite verweisen.
-                    new MaterialAlertDialogBuilder(host)
-                        .SetTitle(L.F("Version {0} verfügbar", update.Version))!
-                        .SetMessage(L.T("Am Release liegt keine Android-Datei – die neue Version findest du auf der Projektseite."))!
-                        .SetPositiveButton(L.T("Öffnen"), (_, _) => host.StartActivity(
-                            new Intent(Intent.ActionView, global::Android.Net.Uri.Parse(update.Url))))!
-                        .SetNegativeButton(L.T("Später"), (_, _) => { })!
-                        .Show();
-                    return;
-                }
-                OfferUpdate(update);
+                else
+                    OfferUpdate(update);
             });
         });
     }
 
     private void OfferUpdate(UpdateCheck.Update update)
     {
-        var apk = update.File!;
+        var apk = update.File;
         string size = apk.Size > 0 ? L.F(" · {0} MB", (apk.Size / 1048576.0).ToString("0.#")) : "";
         new MaterialAlertDialogBuilder(host)
             .SetTitle(L.F("Version {0} verfügbar", update.Version))!
@@ -414,7 +330,22 @@ public sealed class SettingsPage(MainActivity host) : IPage
             Ui.Toast(host, L.T("Download fehlgeschlagen – bitte später erneut versuchen"));
             return;
         }
-        UpdateCheck.Install(host, file);
+        if (UpdateCheck.CanInstall(host))
+        {
+            UpdateCheck.Install(host, file);
+            return;
+        }
+        // Erst jetzt, wo wirklich installiert wird, nach der Freigabe fragen. Danach spielt Refresh die Datei ein.
+        new MaterialAlertDialogBuilder(host)
+            .SetTitle(L.T("Installieren erlauben?"))!
+            .SetMessage(L.T("Android fragt einmal, ob N-Connect Aktualisierungen einspielen darf."))!
+            .SetPositiveButton(L.T("Einstellungen öffnen"), (_, _) =>
+            {
+                _pendingApk = file;
+                UpdateCheck.OpenInstallPermission(host);
+            })!
+            .SetNegativeButton(L.T("Später"), (_, _) => { })!
+            .Show();
     }
 
     private void EditAddress()
@@ -452,10 +383,13 @@ public sealed class SettingsPage(MainActivity host) : IPage
         new MaterialAlertDialogBuilder(host)
             .SetTitle(L.T("Belegung zurücksetzen?"))!
             .SetMessage(L.T("Alle Controller-Einstellungen (Tasten, Sticks, Gyro, Vibration) werden auf die Standardwerte gesetzt. " +
-                        "Kopplungen und Ausgabeweg bleiben erhalten."))!
+                        "Kopplungen, Ausgabeweg, Profile je Spiel und Farbschema bleiben erhalten."))!
             .SetPositiveButton(L.T("Zurücksetzen"), (_, _) =>
             {
+                // Profile je Spiel und Aussehen sind keine Controller-Einstellungen – sie bleiben.
+                var keep = (S.NamedProfiles, S.ColorScheme, S.Theme);
                 S.CopyFrom(new Settings());
+                (S.NamedProfiles, S.ColorScheme, S.Theme) = keep;
                 AppPrefs.SaveSettings();
                 host.Rebuild();
                 Ui.Toast(host, "Standardwerte wiederhergestellt");
