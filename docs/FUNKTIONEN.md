@@ -117,8 +117,10 @@ erneut versucht – ebenso, wenn ViGEm keinen virtuellen Controller anlegen kann
   Jeder andere Fehler der Aufgabenplanung führt ebenfalls zur UAC-Abfrage statt still abzubrechen (bis 1.0.21 blieb das
   Verstecken dann ohne Meldung aus, Issue #1). Erfolg → `HiddenDevices`, Meldung
   (läuft Steam: „Steam einmal neu starten“ – Steam hält sein schon geöffnetes Handle). Abgebrochen oder fehlgeschlagen →
-  protokolliert, Meldung, in dieser Sitzung nicht erneut fragen; Nachholen per Karte → Extras → „Doppelt angezeigt?“
-  (Fehler dort: Meldung „HidHide konnte nicht eingerichtet werden …“) oder Einstellung aus/ein.
+  protokolliert, Meldung, in dieser Sitzung nicht erneut fragen; die Meldung sagt „Abfrage abgebrochen“ nur, wenn die
+  UAC-Abfrage abgelehnt wurde (Win32-Fehler 1223, `HidHide.HideResult.Declined`), sonst „Fehler, Details im Protokoll“
+  (Fehlercode der Aufgabe oder von HidHideCLI, keine Rückmeldung, Ausnahme). Nachholen per Karte → Extras → „Doppelt
+  angezeigt?“ (Fehler dort: Meldung „HidHide konnte nicht eingerichtet werden …“) oder Einstellung aus/ein.
 - **Nie versteckt werden virtuelle Geräte** (eigene ViGEm-Pads und die anderer Programme): `QueueHide`,
   `HidHide.HideAsync` und der Aufgaben-Helfer prüfen jede ID mit `DeviceTree.IsPhysicalInstance` (siehe 2.5) –
   sonst sähen Spiele die Ausgabe von N-Connect nicht mehr.

@@ -562,6 +562,8 @@ internal static partial class Tr
             "已对游戏隐藏原始控制器 – Steam 和游戏只能看到虚拟控制器。",
         ["Original-Controller nicht versteckt (Abfrage abgebrochen). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."] =
             "未隐藏原始控制器（已取消询问）。后续操作：控制器 → 设置 → 其他 →“显示重复？”。",
+        ["Original-Controller nicht versteckt (Fehler, Details im Protokoll). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."] =
+            "未隐藏原始控制器（出错，详见日志）。后续操作：控制器 → 设置 → 其他 →“显示重复？”。",
         ["Tastenanordnung A/B/X/Y"] = "按键布局 A/B/X/Y",
         ["Xbox: nach Position (untere Taste = A). Nintendo: nach Beschriftung (A bleibt A)."] = "Xbox：按位置（下方按键 = A）。Nintendo：按标识（A 仍是 A）。",
         ["Verbinden"] = "连接",

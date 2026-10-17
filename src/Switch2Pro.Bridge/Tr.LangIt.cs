@@ -562,6 +562,8 @@ internal static partial class Tr
             "Controller originali nascosti ai giochi – Steam e i giochi ora vedono solo il controller virtuale.",
         ["Original-Controller nicht versteckt (Abfrage abgebrochen). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."] =
             "Controller originali non nascosti (richiesta annullata). Per dopo: controller → Impostazioni → Extra → « Visualizzato due volte? ».",
+        ["Original-Controller nicht versteckt (Fehler, Details im Protokoll). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."] =
+            "Controller originali non nascosti (errore, dettagli nel registro). Per dopo: controller → Impostazioni → Extra → « Visualizzato due volte? ».",
         ["Tastenanordnung A/B/X/Y"] = "Disposizione dei pulsanti A/B/X/Y",
         ["Xbox: nach Position (untere Taste = A). Nintendo: nach Beschriftung (A bleibt A)."] = "Xbox: per posizione (pulsante in basso = A). Nintendo: per etichetta (A resta A).",
         ["Verbinden"] = "Connessione",

@@ -41,11 +41,15 @@ internal static class HidHide
 
     private static readonly SemaphoreSlim Gate = new(1, 1);
 
+    /// <summary>Ergebnis von <see cref="HideAsync"/>: versteckt, UAC-Abfrage abgelehnt oder fehlgeschlagen (Grund im Protokoll).</summary>
+    public enum HideResult { Hidden, Declined, Failed }
+
     /// <summary>
     /// Versteckt die Geräte (HID-Instanz-IDs) und gibt diese App frei. Ohne Rückfrage über die geplante Aufgabe des
-    /// Installers, sonst per UAC-Abfrage. true, wenn HidHideCLI ohne Fehler durchlief.
+    /// Installers, sonst per UAC-Abfrage. <see cref="HideResult.Hidden"/>, wenn HidHideCLI ohne Fehler durchlief;
+    /// <see cref="HideResult.Declined"/> nur, wenn der Benutzer die UAC-Abfrage abgelehnt hat.
     /// </summary>
-    public static async Task<bool> HideAsync(IEnumerable<string> instanceIds)
+    public static async Task<HideResult> HideAsync(IEnumerable<string> instanceIds)
     {
         // Virtuelle Geräte (eigene ViGEm-Pads) nie verstecken – Spiele sähen sonst die Ausgabe von N-Connect nicht.
         var ids = instanceIds.Where(id =>
@@ -56,7 +60,7 @@ internal static class HidHide
             return false;
         }).ToList();
         if (ids.Count == 0)
-            return false;
+            return HideResult.Failed;
         await Gate.WaitAsync();
         try
         {
@@ -73,7 +77,7 @@ internal static class HidHide
     /// (portable Variante, Registrierung im Setup gescheitert) oder für eine andere N-Connect.exe eingerichtet ist
     /// (z. B. Entwicklerversion) – dann der UAC-Weg.
     /// </summary>
-    private static async Task<bool?> HideViaTaskAsync(List<string> ids)
+    private static async Task<HideResult?> HideViaTaskAsync(List<string> ids)
     {
         dynamic task;
         DateTime before;
@@ -114,7 +118,7 @@ internal static class HidHide
                 {
                     int result = task.LastTaskResult;
                     Log.Info($"HidHide (Aufgabe): {string.Join(' ', ids)} → Ergebnis {result}");
-                    return result == 0;
+                    return result == 0 ? HideResult.Hidden : HideResult.Failed;
                 }
             }
         }
@@ -122,16 +126,19 @@ internal static class HidHide
         {
             // Die Aufgabe ist schon gestartet – nicht zusätzlich per UAC fragen.
             Log.Warn($"HidHide (Aufgabe): Ergebnis nicht lesbar ({Log.Reason(e)})");
-            return false;
+            return HideResult.Failed;
         }
         Log.Warn("HidHide (Aufgabe): keine Rückmeldung binnen 30 s");
-        return false;
+        return HideResult.Failed;
     }
 
-    private static async Task<bool> HideElevatedAsync(List<string> instanceIds)
+    /// <summary>Windows-Fehlercode, wenn der Benutzer die UAC-Abfrage ablehnt (ERROR_CANCELLED).</summary>
+    private const int UacDeclined = 1223;
+
+    private static async Task<HideResult> HideElevatedAsync(List<string> instanceIds)
     {
         if (CliPath is not { } cli || Environment.ProcessPath is not { } self)
-            return false;
+            return HideResult.Failed;
         var args = CliArguments(self, instanceIds);
         try
         {
@@ -140,16 +147,20 @@ internal static class HidHide
                 UseShellExecute = true, Verb = "runas", WindowStyle = ProcessWindowStyle.Hidden,
             });
             if (process is null)
-                return false;
+                return HideResult.Failed;
             await process.WaitForExitAsync().WaitAsync(TimeSpan.FromSeconds(30));
             Log.Info($"HidHide: {args} → Ergebnis {process.ExitCode}");
-            return process.ExitCode == 0;
+            return process.ExitCode == 0 ? HideResult.Hidden : HideResult.Failed;
+        }
+        catch (System.ComponentModel.Win32Exception e) when (e.NativeErrorCode == UacDeclined)
+        {
+            Log.Info("HidHide: UAC-Abfrage abgelehnt – nicht eingerichtet");
+            return HideResult.Declined;
         }
         catch (Exception e) when (e is System.ComponentModel.Win32Exception or TimeoutException or InvalidOperationException)
         {
-            // Abbruch der UAC-Abfrage: Win32Exception 1223.
             Log.Warn($"HidHide: nicht eingerichtet ({Log.Reason(e)})");
-            return false;
+            return HideResult.Failed;
         }
     }
 

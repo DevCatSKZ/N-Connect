@@ -562,6 +562,8 @@ internal static partial class Tr
             "Оригинальные контроллеры скрыты от игр – Steam и игры теперь видят только виртуальный контроллер.",
         ["Original-Controller nicht versteckt (Abfrage abgebrochen). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."] =
             "Оригинальные контроллеры не скрыты (запрос отменён). Позже: контроллер → Настройки → Дополнительно → «Отображается дважды?».",
+        ["Original-Controller nicht versteckt (Fehler, Details im Protokoll). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."] =
+            "Оригинальные контроллеры не скрыты (ошибка, подробности в журнале). Позже: контроллер → Настройки → Дополнительно → «Отображается дважды?».",
         ["Tastenanordnung A/B/X/Y"] = "Раскладка кнопок A/B/X/Y",
         ["Xbox: nach Position (untere Taste = A). Nintendo: nach Beschriftung (A bleibt A)."] = "Xbox: по положению (нижняя кнопка = A). Nintendo: по надписи (A остаётся A).",
         ["Verbinden"] = "Подключение",

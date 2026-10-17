@@ -242,6 +242,7 @@ public sealed partial class TranslationTests : IDisposable
         "Beim Drücken von „A“ wird diese Folge einmal abgespielt. Schritte durch Komma trennen …",
         // Meldungen, die der Windows-Kern an neuen Stellen zeigt (HidHide-Fehler, Spielerlimit, Bluetooth-Zustand).
         "Original-Controller nicht versteckt (Abfrage abgebrochen). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“.",
+        "Original-Controller nicht versteckt (Fehler, Details im Protokoll). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“.",
         "HidHide konnte nicht eingerichtet werden (abgebrochen oder fehlgeschlagen). Details im Protokoll.",
         "Schon 8 Controller verbunden – Pro Controller wird nicht verwendet. Erst einen anderen trennen.",
         "Bluetooth ist ausgeschaltet.",

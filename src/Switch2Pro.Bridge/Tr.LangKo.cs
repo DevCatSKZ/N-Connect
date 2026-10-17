@@ -562,6 +562,8 @@ internal static partial class Tr
             "원본 컨트롤러가 게임에서 숨겨졌습니다 – Steam과 게임은 이제 가상 컨트롤러만 보게 됩니다.",
         ["Original-Controller nicht versteckt (Abfrage abgebrochen). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."] =
             "원본 컨트롤러가 숨겨지지 않았습니다(확인 취소됨). 나중에: 컨트롤러 → 설정 → 기타 → „중복 표시?“.",
+        ["Original-Controller nicht versteckt (Fehler, Details im Protokoll). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."] =
+            "원본 컨트롤러가 숨겨지지 않았습니다(오류, 자세한 내용은 로그 참조). 나중에: 컨트롤러 → 설정 → 기타 → „중복 표시?“.",
         ["Tastenanordnung A/B/X/Y"] = "버튼 배열 A/B/X/Y",
         ["Xbox: nach Position (untere Taste = A). Nintendo: nach Beschriftung (A bleibt A)."] = "Xbox: 위치 기준(아래 버튼 = A). Nintendo: 표기 기준(A는 그대로 A).",
         ["Verbinden"] = "연결",

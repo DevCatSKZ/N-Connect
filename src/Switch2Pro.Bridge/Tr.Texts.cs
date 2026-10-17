@@ -562,6 +562,8 @@ internal static partial class Tr
             "Original controllers hidden from games – Steam and games now only see the virtual controller.",
         ["Original-Controller nicht versteckt (Abfrage abgebrochen). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."] =
             "Original controllers not hidden (prompt cancelled). To do it later: controller → Settings → Extras → “Shown twice?”.",
+        ["Original-Controller nicht versteckt (Fehler, Details im Protokoll). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."] =
+            "Original controllers not hidden (error, details in the log). To do it later: controller → Settings → Extras → “Shown twice?”.",
         ["Tastenanordnung A/B/X/Y"] = "A/B/X/Y layout",
         ["Xbox: nach Position (untere Taste = A). Nintendo: nach Beschriftung (A bleibt A)."] = "Xbox: by position (bottom button = A). Nintendo: by label (A stays A).",
         ["Verbinden"] = "Connecting",

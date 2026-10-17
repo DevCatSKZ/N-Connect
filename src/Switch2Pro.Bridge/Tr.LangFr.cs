@@ -562,6 +562,8 @@ internal static partial class Tr
             "Manettes d'origine masquées aux jeux – Steam et les jeux ne voient désormais que la manette virtuelle.",
         ["Original-Controller nicht versteckt (Abfrage abgebrochen). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."] =
             "Manettes d'origine non masquées (demande annulée). Pour plus tard : manette → Paramètres → Extras → « Affiché en double ? ».",
+        ["Original-Controller nicht versteckt (Fehler, Details im Protokoll). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."] =
+            "Manettes d'origine non masquées (erreur, détails dans le journal). Pour plus tard : manette → Paramètres → Extras → « Affiché en double ? ».",
         ["Tastenanordnung A/B/X/Y"] = "Disposition des boutons A/B/X/Y",
         ["Xbox: nach Position (untere Taste = A). Nintendo: nach Beschriftung (A bleibt A)."] = "Xbox : par position (bouton du bas = A). Nintendo : par libellé (A reste A).",
         ["Verbinden"] = "Connexion",
