@@ -124,7 +124,7 @@ internal sealed class TrayApp : ApplicationContext
         }, null);
         _manager.SaveRequested += () => _ui.Post(_ => SaveSettings(), null);
         if (_settings.DsuServer)
-            _dsu = DsuServer.Start();
+            _dsu = DsuServer.Start(network: false, Log.Info, Log.Warn);
         _manager.StartAsync().Forget("Controller-Suche starten");
         bool demo = Environment.GetCommandLineArgs().Any(a => a.StartsWith("--demo", StringComparison.Ordinal));
         if (demo)

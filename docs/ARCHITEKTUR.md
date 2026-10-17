@@ -29,7 +29,7 @@ Protokoll-Projekt (plattformunabhängig, getestet). Die Bridge enthält nur Betr
 | `Profiles.cs`, `Macro.cs` | Tastenaktionen, Tastenlisten/-namen je Controller, Makros |
 | `Settings.cs` | Alle Einstellungen (JSON), Aufräumen beim Laden |
 | `BatteryEstimator.cs`, `StickCalibrator.cs` | Akku aus Spannung, geführte Stick-Kalibrierung |
-| `Dsu.cs` | Cemuhook/DSU-Pakete |
+| `Dsu.cs`, `DsuServer.cs` | Cemuhook/DSU-Pakete und der UDP-Server dazu (für Windows, Android und Linux; nur lokal oder im Heimnetz) |
 | `SwitchPairingData.cs`, `PairingTransfer.cs` | Kopplungsdaten von der SD-Karte, `.ncpair`-Datei |
 
 ### Bridge (Windows)
@@ -39,7 +39,7 @@ Protokoll-Projekt (plattformunabhängig, getestet). Die Bridge enthält nur Betr
 | Verbindungen (`Links/`) | `IControllerLink`, `Switch2BleLink`, `Switch2UsbLink`, `Switch1HidLink`, `WiimoteHidLink`, `WiredPadLink`, `PlayStationHidLink` (DS4/DS5 über USB/BT), `XInputLink` (nativer Xbox), `DemoLink` |
 | Geräte-Zugriff | `Usb/UsbNative` (SetupAPI), `Usb/UsbChannels` (`WinUsbChannel`, `HidChannel`), `XInput` (xinput1_4/9_1_0/1_3, dynamisch; Ordinale 100/108 für Guide/VID-PID, virtuelle Slot-Markierung), WinRT-Bluetooth |
 | Steuerung | `ControllerManager` (Suche, Verbinden, Spieler), `Player` (ein virtueller Controller), `ControllerPairing` (Classic-Kopplung) |
-| Ausgabe | `VirtualPads` (ViGEm Xbox 360 / DS4), `WindowsInput` (Tastatur/Maus per SendInput), `SmoothMouse`, `JoyConMouse`, `DsuServer`, `HidHide` |
+| Ausgabe | `VirtualPads` (ViGEm Xbox 360 / DS4), `WindowsInput` (Tastatur/Maus per SendInput), `SmoothMouse`, `JoyConMouse`, `HidHide` (der DSU-Server kommt aus dem Protokoll-Projekt) |
 | Zusatz | `BatteryTracker`, `UpdateCheck`, `SwitchCardWatcher`, `Log`, `Autostart` (in `Dialogs.cs`) |
 | Oberfläche | `TrayApp` (Infobereich, Lebenszyklus), `SettingsForm`, `ControllerOverview` (Karten), `PlayerOrderBar` (Spieler-Reihenfolge), `InputView*` (Grafiken), `MappingEditor`, `TuningEditor`, `PairingDataForm`, `PairForm`, `StickCalibrationForm`, `GyroSetupForm`, Dialoge, `Theme`, `Ui`, `Branding` (Logo, `LogoView`), `Tr` (Übersetzung) |
 
