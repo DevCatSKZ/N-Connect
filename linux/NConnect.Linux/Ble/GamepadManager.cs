@@ -57,7 +57,7 @@ public sealed partial class GamepadManager(Adapter adapter)
         && Advertisement.Kind(Gatt.NintendoCompanyId, data) != ControllerKind.Unknown;
 
     /// <summary>Von der Suche gemeldetes Gerät prüfen und ggf. koppeln.</summary>
-    public void OnSeen(Device device, Device1Properties p)
+    public void OnSeen(IDevice1 device, Device1Properties p)
     {
         if (!Enabled || p.Paired || p.Blocked || p.Connected || string.IsNullOrEmpty(p.Address))
             return;
@@ -70,7 +70,7 @@ public sealed partial class GamepadManager(Adapter adapter)
         _ = PairAsync(device, p.Address, p.Name ?? p.Alias ?? p.Address);
     }
 
-    private async Task PairAsync(Device device, string address, string name)
+    private async Task PairAsync(IDevice1 device, string address, string name)
     {
         Log.Info($"{address}: Gamepad „{name}“ im Kopplungsmodus – koppele …");
         try
@@ -111,15 +111,19 @@ public sealed partial class GamepadManager(Adapter adapter)
         }
     }
 
-    /// <summary>Liste der gekoppelten Gamepads auffrischen (alle paar Sekunden) und Verbinden/Trennen melden.</summary>
+    /// <summary>
+    /// Liste der gekoppelten Gamepads auffrischen (alle paar Sekunden) und Verbinden/Trennen melden. Nutzt schlichte
+    /// Proxys statt Device-Objekten (siehe <see cref="BlueZ"/>) – sonst bliebe bei jedem Durchlauf je Gerät ein
+    /// D-Bus-Beobachter zurück.
+    /// </summary>
     public async Task RefreshAsync()
     {
         var list = new List<GamepadInfo>();
-        foreach (var device in await adapter.GetDevicesAsync().ConfigureAwait(false))
+        foreach (var path in await BlueZ.DevicePathsAsync(adapter).ConfigureAwait(false))
         {
             try
             {
-                var p = await device.GetAllAsync().ConfigureAwait(false);
+                var p = await BlueZ.Device(path).GetAllAsync().ConfigureAwait(false);
                 if (!p.Paired || IsSwitch2(p) || !IsGamepad(p))
                     continue;
                 int battery = -1;
@@ -127,8 +131,7 @@ public sealed partial class GamepadManager(Adapter adapter)
                 {
                     try
                     {
-                        if (await device.GetBatteryAsync().ConfigureAwait(false) is { } b)
-                            battery = await b.GetPercentageAsync().ConfigureAwait(false);
+                        battery = await BlueZ.Battery(path).GetPercentageAsync().ConfigureAwait(false);
                     }
                     catch (Exception)
                     {
@@ -149,20 +152,41 @@ public sealed partial class GamepadManager(Adapter adapter)
         _known = list;
     }
 
+    /// <summary>
+    /// Trennen (Befehl aus dem Menü). D-Bus-Fehler werden hier abgefangen: Hat sich das Gamepad inzwischen selbst
+    /// getrennt, meldet BlueZ einen Fehler (z. B. NotConnected) – das ist kein Grund, den Befehlskanal zu stören.
+    /// </summary>
     public async Task DisconnectAsync(string address)
     {
-        if (await adapter.GetDeviceAsync(address).ConfigureAwait(false) is { } d)
-            await d.DisconnectAsync().ConfigureAwait(false);
+        try
+        {
+            using var d = await adapter.GetDeviceAsync(address).ConfigureAwait(false);
+            if (d is not null)
+                await d.DisconnectAsync().ConfigureAwait(false);
+        }
+        catch (Exception e)
+        {
+            Log.Warn($"{address}: Trennen fehlgeschlagen: {Log.Reason(e)}");
+        }
     }
 
     /// <summary>Kopplung löschen (für ein anderes Gerät freigeben); kurz ruhen, damit es nicht sofort neu koppelt.</summary>
-    public async Task ForgetAsync(string address)
+    public async Task<bool> ForgetAsync(string address)
     {
-        if (await adapter.GetDeviceAsync(address).ConfigureAwait(false) is { } d)
+        try
         {
+            using var d = await adapter.GetDeviceAsync(address).ConfigureAwait(false);
+            if (d is null)
+                return false;
             _quietUntil[address] = Environment.TickCount64 + RetryAfterFailureMs;
             await adapter.RemoveDeviceAsync(d.ObjectPath).ConfigureAwait(false);
             _lastConnected.TryRemove(address, out _);
+            return true;
+        }
+        catch (Exception e)
+        {
+            Log.Warn($"{address}: Kopplung löschen fehlgeschlagen: {Log.Reason(e)}");
+            return false;
         }
     }
 }

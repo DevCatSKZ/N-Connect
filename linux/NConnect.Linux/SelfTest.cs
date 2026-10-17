@@ -1,5 +1,6 @@
 using System.Text.Json.Nodes;
 using Linux.Bluetooth;
+using NConnect.Linux.Ble;
 using NConnect.Linux.Output;
 using Switch2Pro.Protocol;
 
@@ -59,6 +60,15 @@ public static class SelfTest
                     bool powered = await a.GetPoweredAsync().ConfigureAwait(false);
                     string address = await a.GetAddressAsync().ConfigureAwait(false);
                     Report("adapter", powered, $"{a.Name} {address} {(powered ? "an" : "aus")}");
+                    // Bluetooth LE: nötig für Switch-2-Controller; klassische Gamepads gehen auch ohne (daher nicht Pflicht).
+                    bool? le = await BlueZ.SupportsLeAsync(a).ConfigureAwait(false);
+                    Report("le", le != false, le switch
+                    {
+                        true => $"{a.Name}: Bluetooth LE vorhanden",
+                        false => $"{a.Name}: kein Bluetooth LE – Switch-2-Controller gehen nicht, andere Controller schon",
+                        null => $"{a.Name}: BlueZ meldet keine Rollen (ältere Version) – Bluetooth LE angenommen",
+                    }, required: false);
+                    a.Dispose();
                 }
             }
         }
