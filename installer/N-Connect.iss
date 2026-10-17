@@ -1,4 +1,4 @@
-; Installer „N-Connect“ – Nintendo-Controller unter Windows (Switch 1/2, NSO, Wii, Wii U).
+; Installer „N-Connect“ – Controller unter Windows (Switch 1/2, NSO, Wii, Wii U, PlayStation, Xbox).
 ; Bauen: siehe .github/workflows/build.yml (Inno Setup 6).
 ; Erwartet:  ..\out\publish\win-x64\N-Connect.exe  (dotnet publish, self-contained)
 ;            redist\ViGEmBus_Setup.msi  ODER  redist\ViGEmBus_Setup.exe  (offizieller ViGEmBus-Installer)
@@ -276,7 +276,8 @@ end;
 
 // Aufgabe „N-Connect HidHide“: startet „N-Connect.exe --hidhide-helper "<IDs>"“ als SYSTEM. Angemeldete Benutzer
 // dürfen sie nur lesen und starten (GRGX), nicht ändern – so versteckt die App neue Controller ohne UAC-Abfrage.
-// Der Helfer versteckt nur angeschlossene Nintendo-Controller/Kabel-Pads und gibt nur sich selbst frei.
+// Der Helfer versteckt nur angeschlossene, echte Nintendo-/Sony-Controller und Kabel-Pads (keine virtuellen Pads)
+// und gibt nur sich selbst frei. Fehlt die Aufgabe (Registrierung gescheitert, portable Variante), fragt die App per UAC.
 procedure RegisterHidHideTask;
 var
   Service, Folder: Variant;
