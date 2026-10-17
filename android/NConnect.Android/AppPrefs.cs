@@ -89,7 +89,42 @@ public static class AppPrefs
     private static Settings? _settings;
 
     /// <summary>Belegung und Feineinstellungen (geteilte Klasse mit der Windows-Version).</summary>
-    public static Settings Settings => _settings ??= Settings.Load(SettingsPath);
+    public static Settings Settings => _settings ??= LoadSettings();
+
+    /// <summary>
+    /// Laden. War settings.json unlesbar, merkt sich die App das für einen einmaligen Hinweis beim nächsten Öffnen
+    /// (<see cref="TakeSettingsNotice"/>) – geladen wird womöglich schon beim Gerätestart im Dienst, ohne Fenster.
+    /// </summary>
+    private static Settings LoadSettings()
+    {
+        var settings = Settings.Load(SettingsPath);
+        if (settings.LoadError is { } error)
+        {
+            Log.Warn($"settings.json nicht lesbar ({error}) – Standardwerte");
+            P.Edit()!.PutString("settings_notice", NoticeUnreadable)!.Apply();
+        }
+        else if (settings.RestoredFromBackup)
+        {
+            Log.Warn("settings.json nicht lesbar – Sicherung geladen");
+            P.Edit()!.PutString("settings_notice", NoticeRestored)!.Apply();
+        }
+        return settings;
+    }
+
+    public const string NoticeUnreadable = "unreadable", NoticeRestored = "restored";
+
+    /// <summary>
+    /// Offener Hinweis zu den Einstellungen (<see cref="NoticeUnreadable"/>: Standardwerte, <see cref="NoticeRestored"/>:
+    /// aus der Sicherung) oder null – nach dem Abholen gelöscht, damit er nur einmal erscheint.
+    /// </summary>
+    public static string? TakeSettingsNotice()
+    {
+        _ = Settings; // spätestens jetzt laden – das merkt sich auch den Hinweis
+        string? notice = P.GetString("settings_notice", null);
+        if (notice is not null)
+            P.Edit()!.Remove("settings_notice")!.Apply();
+        return notice;
+    }
 
     public static void SaveSettings()
     {
