@@ -50,9 +50,16 @@ jobs:
           # strings.po werden aus linux/kodi/i18n erzeugt – von Hand geänderte oder vergessene Dateien fallen hier auf
           python linux/kodi/i18n/generate.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          $changed = git status --porcelain -- linux/kodi
-          if ($changed) {
-            $changed | Write-Host
+          # Inhalt vergleichen, nicht „git status“: Der Windows-Runner checkt mit core.autocrlf=true aus (CRLF), generate.py
+          # schreibt LF. git status meldet dann jede neu geschriebene Datei als geändert (andere Größe), obwohl ihr Inhalt
+          # gleich ist – git diff vergleicht nach der Zeilenende-Umwandlung. Neue Dateien zeigt git diff nicht, daher ls-files.
+          git -c core.safecrlf=false diff --exit-code --stat -- linux/kodi
+          $diff = $LASTEXITCODE
+          if ($diff -gt 1) { exit $diff }
+          $new = git ls-files --others --exclude-standard -- linux/kodi
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if ($diff -eq 1 -or $new) {
+            $new | ForEach-Object { Write-Host "neu: $_" }
             Write-Host "::error::linux/kodi/i18n/generate.py ändert Sprachdateien – lokal ausführen und committen"
             exit 1
           }
