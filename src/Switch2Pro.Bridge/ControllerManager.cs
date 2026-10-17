@@ -844,6 +844,8 @@ internal sealed class ControllerManager : IAsyncDisposable
                 ids = [.. _hidePending];
                 _hidePending.Clear();
             }
+            // Inzwischen wieder getrennt: nichts zu verstecken (sonst käme eine irreführende Fehlermeldung).
+            ids.RemoveAll(id => !_links.Values.Any(l => string.Equals(l.HidInstanceId, id, StringComparison.OrdinalIgnoreCase)));
             if (ids.Count == 0)
                 return;
             bool ok = await HidHide.HideAsync(ids);
