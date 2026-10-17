@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
@@ -197,9 +198,11 @@ internal sealed partial class InputView : Control
     }
 
     /// <summary>Spielernummer für die LED-Anzeige (0–7), −1 = aus.</summary>
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public int PlayerIndex { get; set; } = -1;
 
     /// <summary>Farbe der Lichtleiste, die das Spiel dem Controller gegeben hat (Sony-Pads), null = Standard.</summary>
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public Color? LightbarTint { get; set; }
 
     // Tastenfarben des Xbox-Controllers (Buchstaben auf schwarzen Tasten).

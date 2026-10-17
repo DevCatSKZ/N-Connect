@@ -441,7 +441,7 @@ src/Switch2Pro.Protocol   plattformunabhängig, getestet
   PlayStationPad, XboxPad                        DS4/DualSense (USB+BT, CRC, Effekte), XInput-Zustand
   BatteryEstimator                              Akku aus Spannung (Glättung, Ladekorrektur, keine Sprünge)
   SwitchPairingData, PairingTransfer            Bluepick-/hekate-Kopplungsdaten, .ncpair-Datei
-src/Switch2Pro.Bridge     Windows-App (.NET 8 WinForms)
+src/Switch2Pro.Bridge     Windows-App (.NET 10 WinForms)
   Links/                  eine Verbindung je Controller (Switch2Ble/Usb, Switch1Hid, WiimoteHid, WiredPad,
                           PlayStationHid, XInput nativ, Demo)
   ControllerManager, Player, VirtualPads        Suche, Spielerplätze (lückenlos), ViGEm-Ausgabe

@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Drawing;
 using Switch2Pro.Protocol;
 
@@ -173,7 +174,7 @@ internal sealed class SettingsForm : UiForm
         var version = new Label
         {
             Dock = DockStyle.Bottom, Height = UiScale.Px(36), Padding = new Padding(UiScale.Px(22), 0, 0, UiScale.Px(10)), TextAlign = ContentAlignment.MiddleLeft,
-            Text = $"Version {UpdateCheck.Current.ToString(3)}", Tag = Theme.MutedTag, ForeColor = SystemColors.GrayText,
+            Text = $"Version {UpdateCheck.Label}", Tag = Theme.MutedTag, ForeColor = SystemColors.GrayText,
         };
         _navList.BackColor = Theme.Backdrop;
         rail.Controls.Add(_navList);
@@ -1203,6 +1204,7 @@ internal sealed class SettingsForm : UiForm
         });
 
     /// <summary>Prüfhilfe: Fenster zeigen, ohne den Fokus zu übernehmen (Tastatureingaben bleiben beim Benutzer).</summary>
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     internal bool ShowInactive { get; init; }
 
     protected override bool ShowWithoutActivation => ShowInactive || base.ShowWithoutActivation;
