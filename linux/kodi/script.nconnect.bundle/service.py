@@ -22,13 +22,12 @@ def main():
         return
     installed, skin_done = installer.run(interactive=False)
     xbmcvfs.mkdirs(os.path.dirname(FLAG))
-    open(FLAG, 'w').write('done')
+    with open(FLAG, 'w') as f:
+        f.write('done')
     if installed:
         dialog = xbmcgui.Dialog()
         if dialog.yesno('N-Connect Bundle',
-                        'Addons installiert: {0}\n'
-                        'Kodi jetzt neu starten?'.format(
-                            ', '.join(installed))):
+                        installer.text(32000, ', '.join(installed)) + '\n' + installer.text(32004)):
             import xbmc
             xbmc.executebuiltin('RestartApp')
 
