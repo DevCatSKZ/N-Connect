@@ -1,39 +1,43 @@
 # winget-Manifeste
 
-Diese Dateien beschreiben N-Connect für den Windows Package Manager (`winget install DevCatSKZ.N-Connect`).
-Sie gehören – einmal je Version – nach <https://github.com/microsoft/winget-pkgs> unter
-`manifests/d/DevCatSKZ/N-Connect/<Version>/`.
+Die vier YAML-Dateien beschreiben N-Connect für den Windows Package Manager (Paket `DevCatSKZ.N-Connect`, Setup und
+portable ZIP). `winget install DevCatSKZ.N-Connect` funktioniert erst, wenn die Manifeste bei
+[microsoft/winget-pkgs](https://github.com/microsoft/winget-pkgs) eingereicht und dort angenommen sind (Stand
+17.10.2026: noch nicht eingereicht). Eingereicht wird je Version unter
+`manifests/d/DevCatSKZ/N-Connect/<Version>/`, mit dem GitHub-Konto des Nutzers.
+
+## Bei jedem Release aktualisieren
+
+Erst nach dem Release, denn die Prüfsummen gehören zu den fertigen Dateien am GitHub-Release.
+
+- `PackageVersion` in allen vier Dateien, `ReleaseDate` und `ReleaseNotesUrl` auf den neuen Tag,
+- `InstallerUrl` auf `N-Connect-Setup-<Version>.exe` und `N-Connect-Portable-<Version>.zip` des Releases,
+- `InstallerSha256` aus den heruntergeladenen Release-Dateien neu rechnen:
+
+```powershell
+Get-FileHash .\N-Connect-Setup-<Version>.exe, .\N-Connect-Portable-<Version>.zip -Algorithm SHA256
+```
+
+Prüfen: `winget validate --manifest <Ordner>` mit einem Ordner, der nur die vier YAML-Dateien enthält – diese
+`README.md` im selben Ordner lässt die Prüfung scheitern.
 
 ## Einreichen
 
-Am einfachsten mit `wingetcreate` (https://github.com/microsoft/winget-create):
-
-```
-wingetcreate submit .\winget\   # forkt winget-pkgs, legt den Pull Request an
-```
-
-oder per Hand: Fork von `microsoft/winget-pkgs`, die vier Dateien nach
-`manifests/d/DevCatSKZ/N-Connect/1.0.18/` kopieren, PR öffnen. Die Moderation dort
-prüft die Manifeste automatisch (Validation-Pipeline) – dauert meist wenige Tage.
-
-## Vor jedem Release aktualisieren
-
-- `PackageVersion` (alle Dateien) und `ReleaseDate`/`ReleaseNotesUrl` an den Tag anpassen,
-- `InstallerUrl` auf die neuen Assets zeigen lassen,
-- `InstallerSha256` neu rechnen:
+Mit [wingetcreate](https://github.com/microsoft/winget-create), ebenfalls nur mit den vier YAML-Dateien:
 
 ```powershell
-Get-FileHash .\N-Connect-Setup-1.0.18.exe; Get-FileHash .\N-Connect-Portable-1.0.18.zip
+wingetcreate submit <Ordner mit den YAML-Dateien>
 ```
 
-Alternativ die Manifeste frisch erzeugen lassen:
-
-```
-wingetcreate update DevCatSKZ.N-Connect -v 1.0.18 -u <Setup-URL> <Zip-URL>
-```
+Alternativ von Hand: Fork von `microsoft/winget-pkgs`, die Dateien nach `manifests/d/DevCatSKZ/N-Connect/<Version>/`
+legen und einen Pull Request öffnen. Die Validierung dort läuft automatisch, die Moderation dauert meist einige Tage.
+Ist das Paket einmal aufgenommen, erzeugt `wingetcreate update DevCatSKZ.N-Connect -v <Version> -u <Setup-URL>
+<ZIP-URL>` die Manifeste für spätere Versionen.
 
 ## Hinweise
 
-- `License: MIT` – passt zur `LICENSE` im Repo (MIT seit Oktober 2026).
-- Der ZIP-Eintrag installiert die portable EXE (`winget install … --installer-type zip` bzw. als
-  Alternative zum Setup). ViGEmBus/HidHide kommen aus dem Inno-Setup – das ZIP enthält sie nicht.
+- `License: MIT` passt zur `LICENSE` im Repo.
+- Der ZIP-Eintrag installiert die portable EXE. ViGEmBus und HidHide bringt nur das Setup mit; ohne sie erzeugt die
+  portable Variante keine virtuellen Controller.
+- Setup und EXE sind nicht signiert (siehe [HANDOVER.md](../HANDOVER.md)); Windows zeigt beim Start die
+  SmartScreen-Warnung.
