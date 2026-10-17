@@ -48,7 +48,7 @@ ES = {
     30623: "[B]Todo listo.[/B] Pulsa SYNC en un mando para conectarlo.", 30624: "[B]Falta algo[/B] – mira las entradas en rojo.",
     30625: "El registro está vacío.", 30626: "Número de serie", 30627: "Firmware", 30628: "Dirección", 30629: "Registro de N-Connect",
     30630: "Esperando Bluetooth …", 30631: "N-Connect se está iniciando …", 30640: "Mando virtual", 30641: "Servicio Bluetooth",
-    30642: "Adaptador Bluetooth", 30643: "Baja latencia", 30644: "Archivo de ajustes", 30645: "Comprobando Bluetooth y el mando virtual …",
+    30642: "Adaptador Bluetooth", 30644: "Archivo de ajustes", 30645: "Comprobando Bluetooth y el mando virtual …",
     30651: "conectado", 30652: "no conectado – pulsa un botón del mando", 30653: "Olvidar mando",
     30654: "¿Eliminar el emparejamiento de {0}? Para volver a usarlo, ponlo en modo de emparejamiento.",
 }
@@ -100,7 +100,7 @@ FR = {
     30623: "[B]Tout est prêt.[/B] Appuyez sur SYNC sur une manette pour la connecter.", 30624: "[B]Il manque quelque chose[/B] – voir les entrées en rouge.",
     30625: "Le journal est vide.", 30626: "Numéro de série", 30627: "Micrologiciel", 30628: "Adresse", 30629: "Journal N-Connect",
     30630: "En attente du Bluetooth …", 30631: "Démarrage de N-Connect …", 30640: "Manette virtuelle", 30641: "Service Bluetooth",
-    30642: "Adaptateur Bluetooth", 30643: "Faible latence", 30644: "Fichier de paramètres", 30645: "Vérification du Bluetooth et de la manette virtuelle …",
+    30642: "Adaptateur Bluetooth", 30644: "Fichier de paramètres", 30645: "Vérification du Bluetooth et de la manette virtuelle …",
     30651: "connectée", 30652: "non connectée – appuyez sur un bouton de la manette", 30653: "Oublier la manette",
     30654: "Supprimer l'association de {0} ? Pour la réutiliser, mettez-la en mode association.",
 }
@@ -152,7 +152,7 @@ IT = {
     30623: "[B]Tutto pronto.[/B] Premi SYNC su un controller per collegarlo.", 30624: "[B]Manca qualcosa[/B] – vedi le voci in rosso.",
     30625: "Il registro è vuoto.", 30626: "Numero di serie", 30627: "Firmware", 30628: "Indirizzo", 30629: "Registro di N-Connect",
     30630: "In attesa del Bluetooth …", 30631: "Avvio di N-Connect …", 30640: "Controller virtuale", 30641: "Servizio Bluetooth",
-    30642: "Adattatore Bluetooth", 30643: "Bassa latenza", 30644: "File delle impostazioni", 30645: "Controllo del Bluetooth e del controller virtuale …",
+    30642: "Adattatore Bluetooth", 30644: "File delle impostazioni", 30645: "Controllo del Bluetooth e del controller virtuale …",
     30651: "connesso", 30652: "non connesso – premi un tasto sul controller", 30653: "Dimentica controller",
     30654: "Eliminare l'associazione di {0}? Per riutilizzarlo, mettilo in modalità di associazione.",
 }
@@ -204,7 +204,7 @@ PT = {
     30623: "[B]Tudo pronto.[/B] Prima SYNC num comando para o ligar.", 30624: "[B]Falta algo[/B] – veja as entradas a vermelho.",
     30625: "O registo está vazio.", 30626: "Número de série", 30627: "Firmware", 30628: "Endereço", 30629: "Registo do N-Connect",
     30630: "À espera do Bluetooth …", 30631: "O N-Connect está a iniciar …", 30640: "Comando virtual", 30641: "Serviço Bluetooth",
-    30642: "Adaptador Bluetooth", 30643: "Baixa latência", 30644: "Ficheiro de definições", 30645: "A verificar o Bluetooth e o comando virtual …",
+    30642: "Adaptador Bluetooth", 30644: "Ficheiro de definições", 30645: "A verificar o Bluetooth e o comando virtual …",
     30651: "ligado", 30652: "não ligado – prima um botão no comando", 30653: "Esquecer comando",
     30654: "Remover o emparelhamento de {0}? Para o voltar a usar, coloque-o em modo de emparelhamento.",
 }
@@ -256,7 +256,7 @@ NL = {
     30623: "[B]Alles is klaar.[/B] Druk op SYNC op een controller om hem te verbinden.", 30624: "[B]Er ontbreekt iets[/B] – zie de rode regels hieronder.",
     30625: "Het logboek is leeg.", 30626: "Serienummer", 30627: "Firmware", 30628: "Adres", 30629: "N-Connect-logboek",
     30630: "Wachten op Bluetooth …", 30631: "N-Connect start …", 30640: "Virtuele controller", 30641: "Bluetooth-dienst",
-    30642: "Bluetooth-adapter", 30643: "Lage vertraging", 30644: "Instellingenbestand", 30645: "Bluetooth en de virtuele controller controleren …",
+    30642: "Bluetooth-adapter", 30644: "Instellingenbestand", 30645: "Bluetooth en de virtuele controller controleren …",
     30651: "verbonden", 30652: "niet verbonden – druk op een knop van de controller", 30653: "Controller vergeten",
     30654: "Koppeling van {0} verwijderen? Zet hem in koppelmodus om hem opnieuw te gebruiken.",
 }

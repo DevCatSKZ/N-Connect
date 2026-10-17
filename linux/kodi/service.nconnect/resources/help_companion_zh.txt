@@ -1,0 +1,17 @@
+[B]伴随模式[/B]
+在此系统上，连接手柄的不是本插件，而是 N-Connect 应用。插件只显示应用报告的内容：菜单（程序 > N-Connect）以及显示已连接和已知手柄及其电量的主屏幕小部件。
+
+[B]Windows[/B]
+安装并启动 N-Connect for Windows（github.com/DevCatSKZ/N-Connect）。应用会把手柄连接为 Xbox 手柄 – Kodi 无需设置即可识别。它会把状态写入 Kodi 的数据文件夹；如果应用未运行，这里会显示“N-Connect 应用未在运行”。如果在 N-Connect 之后才安装 Kodi：请重新启动一次 N-Connect。
+
+[B]Android[/B]
+安装并启动 N-Connect for Android 0.9.1 或更高版本。应用会把状态保存在 Documents/N-Connect 文件夹中，插件从那里读取。如果 Kodi 仍然什么都不显示，可能是 Android 阻止了访问：请在 Android 设置中允许 Kodi 访问文件（存储）。如果在 N-Connect 之后才安装 Kodi：请重新启动一次 N-Connect。
+
+[B]macOS[/B]
+N-Connect 不支持 macOS – 插件在这里只能显示，内容为空。
+
+[B]设置[/B]
+按键布局、陀螺仪、振动、配对等都在 N-Connect 应用中设置。本插件的设置仅在 LibreELEC/Linux 上生效。
+
+[B]主屏幕小部件[/B]
+视皮肤而定：皮肤设置 > 主页 > 小部件 > 插件 > N-Connect。

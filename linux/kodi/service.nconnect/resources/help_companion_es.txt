@@ -1,0 +1,17 @@
+[B]Modo complementario[/B]
+En este sistema no es el add-on quien conecta los mandos, sino la app N-Connect. El add-on solo muestra lo que informa la app: el menú (Programas > N-Connect) y el widget de inicio con los mandos conectados y conocidos y su batería.
+
+[B]Windows[/B]
+Instala e inicia N-Connect para Windows (github.com/DevCatSKZ/N-Connect). La app conecta los mandos como mandos de Xbox: Kodi los reconoce sin configurar nada. Escribe su estado en la carpeta de datos de Kodi; si no está en marcha, aquí aparece «La app N-Connect no está en marcha». Si instalaste Kodi después de N-Connect, reinicia N-Connect una vez.
+
+[B]Android[/B]
+Instala e inicia N-Connect para Android 0.9.1 o posterior. La app guarda su estado en la carpeta Documents/N-Connect, donde lo lee el add-on. Si Kodi sigue sin mostrar nada, puede que Android bloquee el acceso: permite a Kodi el acceso a archivos (almacenamiento) en los ajustes de Android. Si instalaste Kodi después de N-Connect, reinicia N-Connect una vez.
+
+[B]macOS[/B]
+N-Connect no está disponible para macOS: aquí el add-on solo puede mostrar y se queda vacío.
+
+[B]Ajustes[/B]
+La distribución de botones, el giroscopio, la vibración, el emparejamiento, etc. se configuran en la app N-Connect. Los ajustes de este add-on solo se aplican en LibreELEC/Linux.
+
+[B]Widget en la pantalla de inicio[/B]
+Según el skin: Ajustes del skin > Inicio > Widgets > Add-ons > N-Connect.

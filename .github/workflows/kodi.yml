@@ -1,15 +1,23 @@
-# Baut das Kodi-Plugin „N-Connect (LibreELEC/Linux)“ für alle Geräte und veröffentlicht es.
-# - Jeder Lauf: ZIPs als Artefakt „Kodi-Plugin“.
-# - Tag „v1.2.3“: ZIPs zusätzlich am GitHub-Release; neue Plugin-Version (addon.xml) ins DevCatSKZ Repository
-#   (github.com/DevCatSKZ/kodi-repo) – dort holt Kodi sie automatisch. Zugang über das Secret KODI_REPO_TOKEN
-#   (fein abgestufter Token, nur kodi-repo, „Contents: Read and write“; Deploy-Schlüssel sind in der Organisation aus).
+# Prüft und baut die Kodi-Add-ons von N-Connect (service.nconnect für LibreELEC/Linux samt Begleitmodus,
+# plugin.nconnect.status, script.nconnect.bundle, repository.devcatskz).
+# - Jeder Lauf: Tests (Linux-Dienst und Add-on-Logik, Sprachdateien aktuell), dann alle ZIPs als Artefakt „Kodi-Plugin“.
+# - Tag „v1.2.3“: Die service.nconnect-ZIPs zusätzlich ans GitHub-Release.
+# Das DevCatSKZ Repository (github.com/DevCatSKZ/kodi-repo) pflegt die CI bewusst nicht – Deploy-Keys sind in der
+# Organisation abgeschaltet. Beim Release von Hand (siehe docs/LINUX-KODI.md):
+#   powershell -File linux/build-kodi-addon.ps1 -Repo -RepoDir <kodi-repo>, dort committen (devcatskz) und pushen.
+# Eine Version, die im kodi-repo schon liegt, überschreibt das Skript nie (dann vorher in der addon.xml hochzählen).
 name: N-Connect – Kodi-Plugin
 on:
   workflow_dispatch:
   push:
     branches: [main]
     tags: ["v*"]
-    paths: ["linux/**", "src/Switch2Pro.Protocol/**", ".github/workflows/kodi.yml"]
+    paths:
+      - "linux/**"
+      - "src/Switch2Pro.Protocol/**"
+      - "tests/NConnect.Linux.Tests/**"
+      - "THIRD-PARTY-NOTICES.md"
+      - ".github/workflows/kodi.yml"
 permissions:
   contents: write
 concurrency:
@@ -31,7 +39,24 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: "Plugin bauen (LibreELEC: x86_64, arm64, arm)"
+      - name: Linux-Dienst testen
+        run: dotnet test tests/NConnect.Linux.Tests -c Release
+
+      - name: Add-on-Logik testen, Sprachdateien aktuell
+        run: |
+          python -m unittest discover -s linux/kodi/tests -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          # strings.po werden aus linux/kodi/i18n erzeugt – von Hand geänderte oder vergessene Dateien fallen hier auf
+          python linux/kodi/i18n/generate.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $changed = git status --porcelain -- linux/kodi
+          if ($changed) {
+            $changed | Write-Host
+            Write-Host "::error::linux/kodi/i18n/generate.py ändert Sprachdateien – lokal ausführen und committen"
+            exit 1
+          }
+
+      - name: "Add-ons bauen (LibreELEC: x86_64, arm64, arm)"
         run: powershell -NoProfile -ExecutionPolicy Bypass -File linux/build-kodi-addon.ps1
 
       - uses: actions/upload-artifact@v4
@@ -49,23 +74,3 @@ jobs:
           for ($i = 0; $i -lt 30 -and -not (gh release view $tag 2>$null); $i++) { Start-Sleep 20 }
           if (-not (gh release view $tag 2>$null)) { gh release create $tag --title "N-Connect $tag" --notes "Kodi-Plugin" }
           gh release upload $tag (Get-ChildItem out/kodi -Filter 'N-Connect-Kodi-*.zip').FullName --clobber
-
-      - name: Ins DevCatSKZ Repository legen
-        if: startsWith(github.ref, 'refs/tags/v')
-        env:
-          # Fein abgestufter Token: nur Repository DevCatSKZ/kodi-repo, Berechtigung „Contents: Read and write“.
-          KODI_REPO_TOKEN: ${{ secrets.KODI_REPO_TOKEN }}
-        run: |
-          if (-not $env:KODI_REPO_TOKEN) { Write-Host "Kein KODI_REPO_TOKEN – Repository wird nicht aktualisiert."; exit 0 }
-          git clone --depth 1 "https://x-access-token:$($env:KODI_REPO_TOKEN)@github.com/DevCatSKZ/kodi-repo.git" $env:RUNNER_TEMP/kodi-repo
-          powershell -NoProfile -ExecutionPolicy Bypass -File linux/build-kodi-addon.ps1 -Repo -RepoDir $env:RUNNER_TEMP/kodi-repo
-          cd $env:RUNNER_TEMP/kodi-repo
-          git config user.name devcatskz
-          git config user.email devcatskz@gmail.com
-          git add -A
-          if (git status --porcelain) {
-            git commit -m "N-Connect ${{ github.ref_name }}"
-            git push
-          } else {
-            Write-Host "Keine Änderung (gleiche Plugin-Version)."
-          }

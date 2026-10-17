@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Erzeugt die Kodi-Sprachdateien (strings.po) des Add-ons aus resource.language.en_gb (Quelle) und den Übersetzungen
-in tr_a.py/tr_b.py. Gleiche Sprachen wie N-Connect für Windows. Aufruf: python linux/kodi/i18n/generate.py
-Englisch und Deutsch werden von Hand gepflegt; hier werden dort nur fehlende Einträge aus EXTRA ergänzt.
+Erzeugt die Kodi-Sprachdateien (strings.po) von service.nconnect aus resource.language.en_gb (Quelle) und den
+Übersetzungen in tr_a.py/tr_b.py, dazu die des Bundle-Installers aus tr_bundle.py. Gleiche Sprachen wie N-Connect für
+Windows. Aufruf: python linux/kodi/i18n/generate.py
+service.nconnect: Englisch und Deutsch werden von Hand gepflegt; hier werden dort nur fehlende Einträge aus EXTRA
+ergänzt. script.nconnect.bundle: alle Sprachdateien kommen aus tr_bundle.py.
 """
 import pathlib
 import re
@@ -11,8 +13,10 @@ import sys
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 from tr_a import ES, FR, IT, NL, PT  # noqa: E402
 from tr_b import JA, KO, PL, RU, ZH  # noqa: E402
+from tr_bundle import BUNDLE  # noqa: E402
 
 LANG_DIR = pathlib.Path(__file__).parent.parent / 'service.nconnect' / 'resources' / 'language'
+BUNDLE_LANG_DIR = pathlib.Path(__file__).parent.parent / 'script.nconnect.bundle' / 'resources' / 'language'
 
 # Neue Texte, die in allen Sprachen ergänzt werden: ID -> {Sprache: Text}; "en" ist die Quelle (msgid).
 EXTRA = {
@@ -84,8 +88,8 @@ EXTRA = {
         'ja': 'N-Connect アプリが起動していません', 'zh': 'N-Connect 应用未在运行', 'ko': 'N-Connect 앱이 실행 중이 아닙니다',
     },
     30661: {
-        'en': 'Start the N-Connect app on this device – it reports the status here',
-        'de': 'Die App N-Connect auf diesem Gerät starten – sie meldet den Status hierher',
+        'en': 'Start N-Connect on this PC – it reports the status here',
+        'de': 'N-Connect auf diesem PC starten – die App meldet den Status hierher',
         'es': 'Inicia la app N-Connect en este PC; envía el estado aquí',
         'fr': 'Démarrez l’application N-Connect sur ce PC – elle transmet l’état ici',
         'it': 'Avvia l’app N-Connect su questo PC: riporta qui lo stato',
@@ -235,6 +239,105 @@ EXTRA.update({
             'ko': '다른 기기의 에뮬레이터(예: PC의 Cemu)가 여기 연결된 컨트롤러의 모션 데이터를 사용할 수 있게 합니다. 신뢰할 수 있는 홈 네트워크에서만 켜세요.'},
 })
 
+# 0.4.4: Bluetooth-Hinweise je Plattform (Vertrag der status.json: on | off | missing | no_le), Begleitmodus,
+# Selbsttest „Bluetooth LE“.
+EXTRA.update({
+    30019: {'en': 'Bluetooth adapter without LE – Switch 2 controllers cannot connect, other controllers still work',
+            'de': 'Bluetooth-Adapter ohne LE – Switch-2-Controller können sich nicht verbinden, andere Controller schon',
+            'es': 'Adaptador Bluetooth sin LE – los mandos de Switch 2 no se pueden conectar, los demás mandos sí',
+            'fr': "Adaptateur Bluetooth sans LE – les manettes Switch 2 ne peuvent pas se connecter, les autres manettes oui",
+            'it': 'Adattatore Bluetooth senza LE – i controller Switch 2 non possono collegarsi, gli altri controller sì',
+            'pt': 'Adaptador Bluetooth sem LE – os comandos Switch 2 não se podem ligar, os outros comandos sim',
+            'nl': 'Bluetooth-adapter zonder LE – Switch 2-controllers kunnen niet verbinden, andere controllers wel',
+            'pl': 'Adapter Bluetooth bez LE – kontrolery Switch 2 nie mogą się połączyć, inne kontrolery tak',
+            'ru': 'Адаптер Bluetooth без LE – контроллеры Switch 2 не могут подключиться, остальные работают',
+            'ja': 'LE 非対応の Bluetooth アダプターです – Switch 2 コントローラーは接続できませんが、ほかのコントローラーは使えます',
+            'zh': '蓝牙适配器不支持 LE – Switch 2 手柄无法连接，其他手柄仍可使用',
+            'ko': 'LE를 지원하지 않는 블루투스 어댑터 – Switch 2 컨트롤러는 연결할 수 없지만 다른 컨트롤러는 됩니다'},
+    30520: {'en': 'These settings only apply on LibreELEC/Linux', 'de': 'Diese Einstellungen gelten nur unter LibreELEC/Linux',
+            'es': 'Estos ajustes solo se aplican en LibreELEC/Linux', 'fr': "Ces paramètres ne s'appliquent que sous LibreELEC/Linux",
+            'it': 'Queste impostazioni valgono solo su LibreELEC/Linux', 'pt': 'Estas definições só se aplicam no LibreELEC/Linux',
+            'nl': 'Deze instellingen gelden alleen op LibreELEC/Linux', 'pl': 'Te ustawienia działają tylko w LibreELEC/Linux',
+            'ru': 'Эти настройки действуют только в LibreELEC/Linux', 'ja': 'これらの設定は LibreELEC/Linux でのみ有効です',
+            'zh': '这些设置仅在 LibreELEC/Linux 上生效', 'ko': '이 설정은 LibreELEC/Linux에서만 적용됩니다'},
+    30521: {'en': 'On Windows and Android the N-Connect app connects the controllers – change these settings in the app. On macOS the add-on only displays the status. Select to open the guide.',
+            'de': 'Unter Windows und Android verbindet die N-Connect-App die Controller – diese Einstellungen dort in der App ändern. Unter macOS zeigt das Add-on nur den Status an. Auswählen öffnet die Anleitung.',
+            'es': 'En Windows y Android, la app N-Connect conecta los mandos: cambia estos ajustes en la app. En macOS el add-on solo muestra el estado. Selecciónalo para abrir la guía.',
+            'fr': "Sous Windows et Android, l'application N-Connect connecte les manettes : modifiez ces paramètres dans l'application. Sous macOS, l'add-on affiche seulement l'état. Sélectionnez pour ouvrir le guide.",
+            'it': "Su Windows e Android è l'app N-Connect a collegare i controller: modifica queste impostazioni nell'app. Su macOS l'add-on mostra solo lo stato. Seleziona per aprire la guida.",
+            'pt': 'No Windows e no Android é a aplicação N-Connect que liga os comandos – altere estas definições na aplicação. No macOS o add-on só mostra o estado. Selecione para abrir o guia.',
+            'nl': 'Op Windows en Android verbindt de N-Connect-app de controllers – wijzig deze instellingen in de app. Op macOS toont de add-on alleen de status. Selecteer om de handleiding te openen.',
+            'pl': 'W Windows i Androidzie kontrolery łączy aplikacja N-Connect – zmień te ustawienia w aplikacji. W macOS dodatek tylko pokazuje stan. Wybierz, aby otworzyć instrukcję.',
+            'ru': 'В Windows и Android контроллеры подключает приложение N-Connect – меняйте эти настройки в приложении. В macOS дополнение только показывает состояние. Выберите, чтобы открыть инструкцию.',
+            'ja': 'Windows と Android では N-Connect アプリがコントローラーを接続します – これらの設定はアプリで変更してください。macOS ではアドオンは状態を表示するだけです。選ぶとガイドを開きます。',
+            'zh': '在 Windows 和 Android 上由 N-Connect 应用连接手柄 – 请在应用中更改这些设置。在 macOS 上此插件仅显示状态。选择以打开指南。',
+            'ko': 'Windows와 Android에서는 N-Connect 앱이 컨트롤러를 연결합니다 – 이 설정은 앱에서 바꾸세요. macOS에서는 애드온이 상태만 표시합니다. 선택하면 안내를 엽니다.'},
+    30634: {'en': 'Bluetooth without LE', 'de': 'Bluetooth ohne LE', 'es': 'Bluetooth sin LE', 'fr': 'Bluetooth sans LE',
+            'it': 'Bluetooth senza LE', 'pt': 'Bluetooth sem LE', 'nl': 'Bluetooth zonder LE', 'pl': 'Bluetooth bez LE',
+            'ru': 'Bluetooth без LE', 'ja': 'Bluetooth LE 非対応', 'zh': '蓝牙不支持 LE', 'ko': '블루투스 LE 미지원'},
+    30635: {'en': 'Switch 2 controllers need a Bluetooth adapter with LE (4.0 or newer) – other controllers keep working',
+            'de': 'Switch-2-Controller brauchen einen Bluetooth-Adapter mit LE (ab 4.0) – andere Controller laufen weiter',
+            'es': 'Los mandos de Switch 2 necesitan un adaptador Bluetooth con LE (4.0 o superior) – los demás mandos siguen funcionando',
+            'fr': 'Les manettes Switch 2 nécessitent un adaptateur Bluetooth avec LE (4.0 ou plus récent) – les autres manettes continuent de fonctionner',
+            'it': 'I controller Switch 2 richiedono un adattatore Bluetooth con LE (4.0 o successivo) – gli altri controller continuano a funzionare',
+            'pt': 'Os comandos Switch 2 precisam de um adaptador Bluetooth com LE (4.0 ou mais recente) – os outros comandos continuam a funcionar',
+            'nl': 'Switch 2-controllers hebben een Bluetooth-adapter met LE nodig (4.0 of nieuwer) – andere controllers blijven werken',
+            'pl': 'Kontrolery Switch 2 wymagają adaptera Bluetooth z LE (4.0 lub nowszy) – inne kontrolery działają dalej',
+            'ru': 'Контроллерам Switch 2 нужен адаптер Bluetooth с LE (4.0 или новее) – остальные контроллеры работают дальше',
+            'ja': 'Switch 2 コントローラーには LE 対応（4.0 以降）の Bluetooth アダプターが必要です – ほかのコントローラーはそのまま使えます',
+            'zh': 'Switch 2 手柄需要支持 LE 的蓝牙适配器（4.0 或更高）– 其他手柄仍可正常使用',
+            'ko': 'Switch 2 컨트롤러에는 LE를 지원하는 블루투스 어댑터(4.0 이상)가 필요합니다 – 다른 컨트롤러는 계속 작동합니다'},
+    30646: {'en': 'Bluetooth LE (Switch 2)', 'de': 'Bluetooth LE (Switch 2)', 'es': 'Bluetooth LE (Switch 2)',
+            'fr': 'Bluetooth LE (Switch 2)', 'it': 'Bluetooth LE (Switch 2)', 'pt': 'Bluetooth LE (Switch 2)',
+            'nl': 'Bluetooth LE (Switch 2)', 'pl': 'Bluetooth LE (Switch 2)', 'ru': 'Bluetooth LE (Switch 2)',
+            'ja': 'Bluetooth LE（Switch 2）', 'zh': '蓝牙 LE（Switch 2）', 'ko': '블루투스 LE (Switch 2)'},
+    30662: {'en': 'Turn on Bluetooth in the Windows settings', 'de': 'Bluetooth in den Windows-Einstellungen einschalten',
+            'es': 'Activa el Bluetooth en la configuración de Windows', 'fr': 'Activez le Bluetooth dans les paramètres Windows',
+            'it': 'Attiva il Bluetooth nelle impostazioni di Windows', 'pt': 'Ative o Bluetooth nas definições do Windows',
+            'nl': 'Zet Bluetooth aan in de Windows-instellingen', 'pl': 'Włącz Bluetooth w ustawieniach systemu Windows',
+            'ru': 'Включите Bluetooth в параметрах Windows', 'ja': 'Windows の設定で Bluetooth をオンにしてください',
+            'zh': '请在 Windows 设置中开启蓝牙', 'ko': 'Windows 설정에서 블루투스를 켜세요'},
+    30663: {'en': 'Turn on Bluetooth in Android', 'de': 'Bluetooth in Android einschalten', 'es': 'Activa el Bluetooth en Android',
+            'fr': 'Activez le Bluetooth dans Android', 'it': 'Attiva il Bluetooth in Android', 'pt': 'Ative o Bluetooth no Android',
+            'nl': 'Zet Bluetooth aan in Android', 'pl': 'Włącz Bluetooth w Androidzie', 'ru': 'Включите Bluetooth в Android',
+            'ja': 'Android で Bluetooth をオンにしてください', 'zh': '请在 Android 中开启蓝牙', 'ko': 'Android에서 블루투스를 켜세요'},
+    30664: {'en': 'Plug in a Bluetooth adapter or turn on Bluetooth in the Windows settings',
+            'de': 'Bluetooth-Adapter anschließen oder Bluetooth in den Windows-Einstellungen einschalten',
+            'es': 'Conecta un adaptador Bluetooth o activa el Bluetooth en la configuración de Windows',
+            'fr': 'Branchez un adaptateur Bluetooth ou activez le Bluetooth dans les paramètres Windows',
+            'it': 'Collega un adattatore Bluetooth o attiva il Bluetooth nelle impostazioni di Windows',
+            'pt': 'Ligue um adaptador Bluetooth ou ative o Bluetooth nas definições do Windows',
+            'nl': 'Sluit een Bluetooth-adapter aan of zet Bluetooth aan in de Windows-instellingen',
+            'pl': 'Podłącz adapter Bluetooth lub włącz Bluetooth w ustawieniach systemu Windows',
+            'ru': 'Подключите адаптер Bluetooth или включите Bluetooth в параметрах Windows',
+            'ja': 'Bluetooth アダプターを接続するか、Windows の設定で Bluetooth をオンにしてください',
+            'zh': '插入蓝牙适配器，或在 Windows 设置中开启蓝牙', 'ko': '블루투스 어댑터를 연결하거나 Windows 설정에서 블루투스를 켜세요'},
+    30666: {'en': 'No N-Connect app for this system', 'de': 'Keine N-Connect-App für dieses System',
+            'es': 'No hay app N-Connect para este sistema', 'fr': "Pas d'application N-Connect pour ce système",
+            'it': 'Nessuna app N-Connect per questo sistema', 'pt': 'Não há aplicação N-Connect para este sistema',
+            'nl': 'Geen N-Connect-app voor dit systeem', 'pl': 'Brak aplikacji N-Connect dla tego systemu',
+            'ru': 'Нет приложения N-Connect для этой системы', 'ja': 'このシステム用の N-Connect アプリはありません',
+            'zh': '此系统没有 N-Connect 应用', 'ko': '이 시스템용 N-Connect 앱이 없습니다'},
+    30667: {'en': 'Display only – N-Connect is not available for {0}', 'de': 'Nur Anzeige – N-Connect gibt es für {0} nicht',
+            'es': 'Solo visualización – N-Connect no está disponible para {0}', 'fr': "Affichage seul – N-Connect n'existe pas pour {0}",
+            'it': 'Solo visualizzazione – N-Connect non è disponibile per {0}', 'pt': 'Só visualização – o N-Connect não está disponível para {0}',
+            'nl': 'Alleen weergave – N-Connect is niet beschikbaar voor {0}', 'pl': 'Tylko podgląd – N-Connect nie jest dostępny dla {0}',
+            'ru': 'Только просмотр – N-Connect для {0} нет', 'ja': '表示のみ – N-Connect は {0} に対応していません',
+            'zh': '仅显示 – N-Connect 不支持 {0}', 'ko': '표시 전용 – N-Connect는 {0}용이 없습니다'},
+    30668: {'en': 'Start N-Connect for Android (0.9.1 or newer) on this device – it reports the status here',
+            'de': 'N-Connect für Android (ab 0.9.1) auf diesem Gerät starten – die App meldet den Status hierher',
+            'es': 'Inicia N-Connect para Android (0.9.1 o posterior) en este dispositivo; envía el estado aquí',
+            'fr': 'Démarrez l’application N-Connect pour Android (0.9.1 ou plus récente) sur cet appareil – elle transmet l’état ici',
+            'it': 'Avvia l’app N-Connect per Android (0.9.1 o successiva) su questo dispositivo: riporta qui lo stato',
+            'pt': 'Inicia a aplicação N-Connect para Android (0.9.1 ou mais recente) neste dispositivo – ela envia o estado para aqui',
+            'nl': 'Start de N-Connect-app voor Android (0.9.1 of nieuwer) op dit apparaat – die meldt de status hier',
+            'pl': 'Uruchom aplikację N-Connect dla Androida (0.9.1 lub nowszą) na tym urządzeniu – ona przesyła tu stan',
+            'ru': 'Запустите приложение N-Connect для Android (0.9.1 или новее) на этом устройстве – оно передаёт сюда состояние',
+            'ja': 'この端末で N-Connect for Android（0.9.1 以降）を起動してください – ここに状態を送ります',
+            'zh': '请在此设备上启动 N-Connect for Android（0.9.1 或更高版本）——它会将状态发送到这里',
+            'ko': '이 기기에서 N-Connect for Android(0.9.1 이상)를 실행하세요 – 여기로 상태를 보냅니다'},
+})
+
 TARGETS = [
     ('es_es', 'es', ES), ('fr_fr', 'fr', FR), ('it_it', 'it', IT), ('pt_pt', 'pt', PT), ('pt_br', 'pt', PT),
     ('nl_nl', 'nl', NL), ('pl_pl', 'pl', PL), ('ru_ru', 'ru', RU), ('ja_jp', 'ja', JA), ('zh_cn', 'zh', ZH),
@@ -262,20 +365,35 @@ def append_missing(path, lang):
         path.write_text(text, encoding='utf-8', newline='\n')
 
 
+def header(name, addon_id, folder):
+    return [
+        '# Kodi Media Center language file', '# Addon Name: ' + name, '# Addon id: ' + addon_id,
+        '# Addon Provider: devcatskz', '# Generated by linux/kodi/i18n/generate.py – do not edit by hand.',
+        'msgid ""', 'msgstr ""', '"Project-Id-Version: {0}\\n"'.format(addon_id),
+        '"Report-Msgid-Bugs-To: https://github.com/DevCatSKZ/N-Connect/issues\\n"', '"MIME-Version: 1.0\\n"',
+        '"Content-Type: text/plain; charset=UTF-8\\n"', '"Content-Transfer-Encoding: 8bit\\n"',
+        '"Language: {0}\\n"'.format(folder), '',
+    ]
+
+
+def write_bundle():
+    """Alle Sprachdateien von script.nconnect.bundle (en_gb mit leerem msgstr = Quelle)."""
+    for folder, code in [('en_gb', 'en'), ('de_de', 'de')] + [(f, c) for f, c, _ in TARGETS]:
+        lines = header('N-Connect Bundle Installer', 'script.nconnect.bundle', folder)
+        lines += [entry(i, t['en'], '' if code == 'en' else t[code]) for i, t in sorted(BUNDLE.items())]
+        out = BUNDLE_LANG_DIR / ('resource.language.' + folder)
+        out.mkdir(parents=True, exist_ok=True)
+        (out / 'strings.po').write_text('\n'.join(lines), encoding='utf-8', newline='\n')
+    print('script.nconnect.bundle: {0} Texte in {1} Sprachdateien'.format(len(BUNDLE), len(TARGETS) + 2))
+
+
 def main():
     en_path = LANG_DIR / 'resource.language.en_gb' / 'strings.po'
     append_missing(en_path, 'en')
     append_missing(LANG_DIR / 'resource.language.de_de' / 'strings.po', 'de')
     source = [(int(m.group(1)), m.group(2)) for m in ENTRY.finditer(en_path.read_text(encoding='utf-8'))]
     for folder, code, table in TARGETS:
-        lines = [
-            '# Kodi Media Center language file', '# Addon Name: N-Connect', '# Addon id: service.nconnect',
-            '# Addon Provider: devcatskz', '# Generated by linux/kodi/i18n/generate.py – do not edit by hand.',
-            'msgid ""', 'msgstr ""', '"Project-Id-Version: service.nconnect\\n"',
-            '"Report-Msgid-Bugs-To: https://github.com/DevCatSKZ/N-Connect/issues\\n"', '"MIME-Version: 1.0\\n"',
-            '"Content-Type: text/plain; charset=UTF-8\\n"', '"Content-Transfer-Encoding: 8bit\\n"',
-            '"Language: {0}\\n"'.format(folder), '',
-        ]
+        lines = header('N-Connect', 'service.nconnect', folder)
         missing = []
         for i, msgid in source:
             msgid = msgid.replace('\\"', '"').replace('\\\\', '\\')
@@ -288,6 +406,7 @@ def main():
         out.mkdir(exist_ok=True)
         (out / 'strings.po').write_text('\n'.join(lines), encoding='utf-8', newline='\n')
         print('{0}: {1} Texte{2}'.format(folder, len(source), ', fehlend: {0}'.format(missing) if missing else ''))
+    write_bundle()
 
 
 if __name__ == '__main__':

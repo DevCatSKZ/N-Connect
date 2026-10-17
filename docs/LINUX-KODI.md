@@ -1,11 +1,41 @@
-# N-Connect für Linux / LibreELEC (Kodi-Add-on)
+# N-Connect für Linux / LibreELEC (Kodi-Add-ons)
 
-Stand: 11.10.2026, Version 0.1.0 (in Entwicklung).
+Stand: 17.10.2026 – `service.nconnect` 0.4.4 (Programm `nconnect` 0.4.4), `plugin.nconnect.status` 1.1.1,
+`script.nconnect.bundle` 1.0.2, `repository.devcatskz` 1.0.2.
 
 **Auf echter Hardware geprüft:** Raspberry Pi 4 mit LibreELEC 12.2.1 (Kodi 21.3, eingebautes Bluetooth).
 - Pro Controller 2: SYNC-Kopplung und Wiederverbinden per Tastendruck ohne SYNC funktionieren, ca. 89 Eingaben/s.
 - Joy-Con 2 (L) und (R): Kopplung funktioniert; die beiden werden automatisch zu einem Spieler zusammengefasst.
 - Kodi erkennt das virtuelle Pad als „Microsoft X-Box 360 pad“.
+
+**Nicht auf echter Hardware geprüft:** alle übrigen Geräte (Pi 2/3 mit `linux-arm`, Pi 5, 64-Bit-Boxen, PCs),
+Batocera, Desktop-Linux, die Kopplung von Xbox-, PlayStation-, Switch-1- und Wii-Controllern, Vibration im Spiel,
+Kodi unter Android (Begleitmodus) und die Änderungen von 0.4.4 (siehe [Offen](#offen)).
+
+## Überblick
+
+```
+Switch-2-Controller ──BLE──► Kernel (L2CAP/ATT, eigener Client) ──► nconnect (Dienst, .NET 10, root)
+Xbox/PlayStation/Switch 1/Wii ──► BlueZ (bluetoothd, D-Bus) ◄──────── Suche, Koppeln, Status
+                                                              │  Switch2Pro.Protocol (wie Windows/Android)
+                                                              ▼
+                                         /dev/uinput → „Microsoft X-Box 360 pad“ (045E:028E) je Spieler
+                                                              ▼
+                                         Kodi (peripheral.joystick) · RetroArch · SDL-Spiele · DSU (Port 26760)
+```
+
+| Teil | Ort | Aufgabe |
+|---|---|---|
+| `nconnect` | [linux/NConnect.Linux/](../linux/NConnect.Linux/) | Programm ohne Oberfläche: Suche, Verbindung, Belegung, virtuelle Controller, DSU, status.json |
+| `service.nconnect` | [linux/kodi/service.nconnect/](../linux/kodi/service.nconnect/) | Startet/überwacht `nconnect`, Einstellungen, Meldungen, Menü, Widget, Diagnose; auf Windows/Android/macOS Begleitmodus |
+| `plugin.nconnect.status` | [linux/kodi/plugin.nconnect.status/](../linux/kodi/plugin.nconnect.status/) | Ältere Widget-Quelle für Skins – leitet nur an `plugin.py` von `service.nconnect` weiter |
+| `script.nconnect.bundle` | [linux/kodi/script.nconnect.bundle/](../linux/kodi/script.nconnect.bundle/) | Offline-Installer: bringt die aktuelle `service.nconnect`- und Plugin-ZIP mit, richtet in Aeon Nox Silvo Menüpunkt und Widget ein |
+| `repository.devcatskz` | [linux/kodi/repository.devcatskz/](../linux/kodi/repository.devcatskz/) | „DevCatSKZ Repository“ für automatische Updates (Inhalt: github.com/DevCatSKZ/kodi-repo) |
+| Index-Werkzeug | [linux/kodi/repo-tools/build_repo.py](../linux/kodi/repo-tools/build_repo.py) | addons.xml, .md5, .sha256, index.html im kodi-repo (wird dorthin kopiert) |
+| Sprachen | [linux/kodi/i18n/](../linux/kodi/i18n/) | erzeugt die `strings.po` aller Sprachen (`service.nconnect`, `script.nconnect.bundle`) |
+| Tests | [tests/NConnect.Linux.Tests/](../tests/NConnect.Linux.Tests/), [linux/kodi/tests/](../linux/kodi/tests/) | Dienst- und Add-on-Logik ohne Gerät (siehe [Tests](#tests)) |
+| Build-Skript | [linux/build-kodi-addon.ps1](../linux/build-kodi-addon.ps1) | Veröffentlicht linux-x64/arm64/arm und packt alle Add-on-ZIPs |
+| CI | [.github/workflows/kodi.yml](../.github/workflows/kodi.yml) | Tests und Artefakt bei jedem Lauf; bei Tags Release-Anhang (das kodi-repo pflegt sie nicht) |
 
 ## Erkenntnisse vom echten Gerät (wichtig)
 
@@ -19,63 +49,262 @@ Stand: 11.10.2026, Version 0.1.0 (in Entwicklung).
 - **Suche nach dem Verbinden neu starten:** Für den eigenen Verbindungsaufbau pausiert der Kernel die Suche und nimmt
   sie nicht wieder auf, während BlueZ weiter `Discovering = true` meldet. Deshalb startet der Daemon die Suche nach
   jedem Verbinden/Trennen neu (`KickScan`) und zusätzlich jede Minute.
+- **Geteilte WLAN/BT-Antenne (Pi, Mini-PCs):** Während des Verbindungsaufbaus wird die Suche angehalten, sonst stirbt
+  der frische Link (HCI 0x3e, errno 38). Bei errno 38 und aktivem WLAN kommt einmal der Hinweis `wifi-hint`.
 - **Joystick-Schnittstelle:** Kodi auf dem Pi nutzt die Schnittstelle „linux“, und dafür hat Kodi die
   Xbox-360-Belegung bereits. Die mitgelieferte udev-Belegung schadet nicht.
 - **Texte nach Installation per Dateikopie:** Kopiert man das Add-on von Hand statt über die ZIP-Installation, behält
   Kodi einen leeren Text-Zwischenspeicher, bis Kodi neu startet. Bei der normalen ZIP-Installation tritt das nicht auf.
 - **Schriften:** Der Aeon-Nox-Skin kann „→ ✓ ✗“ nicht darstellen. Die Texte nutzen deshalb „>“, „OK“ und „--“.
 
-## Andere Controller (Xbox, PlayStation, Switch 1, 8BitDo …)
+## Programm `nconnect`
 
-[GamepadManager.cs](../linux/NConnect.Linux/Ble/GamepadManager.cs) macht N-Connect zur zentralen Stelle für alle
-Controller. Die Kernel-Treiber von LibreELEC (xpad, hid-microsoft, hid-playstation, hid-sony, hid-nintendo, hid-steam)
-übernehmen Eingaben, Vibration und Akku. N-Connect übernimmt das Koppeln:
+- **Bluetooth:** [Linux.Bluetooth](https://github.com/SuessLabs/Linux.Bluetooth) 6.0.0-pre3 über D-Bus. Bewusst
+  nicht 5.x: Das hängt an Tmds.DBus 0.20 mit CVE-2026-39959. Tmds.DBus ist explizit auf 0.95.1 festgelegt.
+  - Jedes `Device`- und `Adapter`-Objekt der Bibliothek meldet beim Anlegen einen eigenen D-Bus-Beobachter an und gibt
+    ihn erst mit `Dispose` frei. Deshalb nutzen Abfragen schlichte Proxys
+    ([BlueZ.cs](../linux/NConnect.Linux/Ble/BlueZ.cs)), nicht gebrauchte Adapter-Objekte werden sofort freigegeben,
+    das Sitzungs-Adapter-Objekt am Sitzungsende.
+- **Suche** ([Switch2Scanner.cs](../linux/NConnect.Linux/Ble/Switch2Scanner.cs)): Discovery-Filter
+  `Transport=le` bzw. `auto`, wenn andere Controller automatisch gekoppelt werden sollen, dazu `DuplicateData=true`.
+  BlueZ meldet neue Geräte über `InterfacesAdded`, bekannte über Eigenschaftsänderungen (RSSI/ManufacturerData) –
+  beides wird ausgewertet, damit ein gekoppelter Controller nach einem Tastendruck sofort erkannt wird. Je Gerät gibt
+  es genau einen Beobachter; `InterfacesRemoved` meldet ihn wieder ab. Beendet ein anderes Programm (z. B. Kodis
+  Bluetooth-Seite) die Suche, startet der Dienst sie nach spätestens 3 s neu.
+- **Gerät** ([Switch2Device.cs](../linux/NConnect.Linux/Ble/Switch2Device.cs)): Portierung der Android-Fassung mit
+  demselben Ablauf (Funktionen, Kalibrierung, Seriennummer, Kopplung 0x15, Wächter, Vibration). MTU 512 handelt der
+  eigene ATT-Client aus; Befehle und Vibration gehen als „Write Command“ (ohne Antwort). Ein Abbruch während der
+  Einrichtung wird nach dem Anlegen des Spielers noch einmal geprüft – kein Geist-Controller.
+- **Andere Controller** ([GamepadManager.cs](../linux/NConnect.Linux/Ble/GamepadManager.cs)): Die Kernel-Treiber
+  (xpad, hid-microsoft, hid-playstation, hid-sony, hid-nintendo, hid-wiimote, hid-steam) übernehmen Eingaben, Vibration
+  und Akku; N-Connect koppelt nur.
+  - Erkennen an Geräteklasse (Peripherie/Joystick/Gamepad), LE-Erscheinungsbild 0x03C3/0x03C4 oder bekanntem Namen.
+  - Koppeln, als vertrauenswürdig markieren, verbinden – danach verbindet sich das Gamepad per Tastendruck selbst.
+  - [PairingAgent.cs](../linux/NConnect.Linux/Ble/PairingAgent.cs): „NoInputNoOutput“ mit eigener D-Bus-Verbindung,
+    nicht als Standard-Agent angemeldet. Koppelt gerade die LibreELEC-Seite („InProgress“/„AlreadyExists“), hält sich
+    N-Connect heraus. Nicht-Gamepads und der Adapter-Strom werden nie angefasst.
+  - Wii-Fernbedienung / Wii U Pro: Die feste Wii-PIN setzt BlueZ selbst (Modul „wiimote“, in LibreELEC enthalten).
+- **Virtueller Controller** ([UInputPad.cs](../linux/NConnect.Linux/Output/UInputPad.cs)):
+  - Name, Kennung und Belegung wie beim Kernel-Treiber xpad: „Microsoft X-Box 360 pad“, USB 045E:028E, Version 0x0114.
+  - 11 Tasten, Sticks ±32767 (Y nach unten positiv), Trigger 0…255, Steuerkreuz als HAT0X/Y.
+  - Spieler werden über `phys` unterschieden (`nconnect/playerN`), weil Kodi die Belegung über den Namen findet.
+  - Vibration über `FF_RUMBLE`: Upload/Erase per `UI_BEGIN/END_FF_*`, abgespielt mit `EV_FF`; ioctl-Größen für 64 und
+    32 Bit. Der Leser wartet mit `poll` und liest wie die Schreiber unter einer Sperre mit Prüfung auf Dispose – nie
+    in einen geschlossenen (und womöglich neu vergebenen) fd.
+- **ATT-Socket** ([AttClient.cs](../linux/NConnect.Linux/Ble/AttClient.cs)): Gesendet wird unter einer Sperre mit
+  Prüfung auf „getrennt“; geschlossen wird der fd erst, wenn Besitzer und Leser fertig sind (Nutzungszähler), und zwar
+  unter derselben Sperre. Beim Trennen läuft `shutdown` bewusst ohne die Sperre: Ein Sender, der bei vollem
+  Sendepuffer in `write` hängt, kehrt sofort zurück, statt das Trennen bis zum Supervision-Timeout aufzuhalten.
+- **DSU/Cemuhook-Server** ([Output/DsuServer.cs](../linux/NConnect.Linux/Output/DsuServer.cs)): Port 26760,
+  standardmäßig nur lokal; `DsuNetwork` öffnet ihn fürs Heimnetz. Ist der Port beim Start belegt (meist ein gerade
+  endendes N-Connect), versucht der Daemon es nach 2, 5, 10, 20 und 30 s erneut.
+- **Feste Spielerplätze** (`slots.json`), **bekannte Controller** (`known.json`, für das ausgegraute Widget),
+  **Akku-Warnung** (`battery-low` bei 20 % und 10 %), **Trennen nach Inaktivität** (`InactivityMinutes`), nach einem
+  Trennen von Hand werden Controller 15 s ignoriert; fällt der Adapter weg, beginnt eine neue Sitzung.
+- **Einstellungen:** dieselbe `settings.json`/`Settings`-Klasse wie unter Windows und Android, dazu Linux-eigene
+  Schlüssel (`AutoPairGamepads`, `BackgroundScan`, `BatteryWarning`, `DsuNetwork`). Die Datei wird überwacht und bei
+  Änderung neu geladen.
+- **Aufrufe:** `nconnect [--data DIR] [--adapter hci0] [--kodi]`, `--selftest` (JSON-Diagnose: uinput, BlueZ, Adapter,
+  Bluetooth LE, Einstellungen), `--test-pad [s]` (Testcontroller ohne Bluetooth, gibt Vibration aus), `--version`.
+  - `--kodi` (setzt das Add-on): Endet Kodi – auch durch einen Absturz –, endet der Daemon mit: bei geschlossenem
+    stdin oder wenn sich der Elternprozess ändert (`getppid`, alle 2 s). Ohne `--kodi` (systemd, von Hand) läuft er
+    ohne stdin weiter.
+- **Veröffentlichung:** self-contained Single-File, komprimiert, Trim-Modus `partial`. Eigene Bibliotheken, Linux.Bluetooth
+  und Tmds.DBus bleiben vollständig erhalten, weil sie Reflection nutzen. `InvariantGlobalization`, weil LibreELEC kein
+  ICU hat. Größe ca. 13,8 MB (x64), 13,2 MB (arm64), 8,8 MB (arm).
 
-- **Erkennen:** Ein Gamepad im Kopplungsmodus wird an der Geräteklasse (Peripherie/Joystick/Gamepad), am LE-Erscheinungsbild
-  0x03C3/0x03C4 oder an einem bekannten Namen erkannt. Die Suche läuft dafür mit `Transport=auto` (LE und klassisch).
-- **Koppeln:** Danach wird es gekoppelt, als vertrauenswürdig markiert und verbunden, und es verbindet sich künftig per
-  Tastendruck selbst.
-- **Agent:** [PairingAgent.cs](../linux/NConnect.Linux/Ble/PairingAgent.cs) hat die Fähigkeit „NoInputNoOutput“ und
-  eine **eigene D-Bus-Verbindung**. Die gemeinsame Verbindung erlaubt keine Objekte, und BlueZ fragt den Agenten der
-  Verbindung, die `Pair()` aufruft.
-- **Keine Konflikte mit LibreELEC:**
-  - Der Agent wird nicht als Standard angemeldet.
-  - Koppelt gerade jemand über die LibreELEC-Seite („InProgress“/„AlreadyExists“), hält sich N-Connect heraus.
-  - Nicht-Gamepads und der Adapter-Strom werden nie angefasst.
-- **Ausnahmen:** Wii-Fernbedienungen, denn sie brauchen eine binäre PIN.
-- **Menü:** Die Gamepads erscheinen mit Verbindungsstatus und Akku; Aktionen „Trennen“ und „Vergessen“.
-- **Einstellung:** „Andere Controller automatisch koppeln“ (`AutoPairGamepads`, Standard: an).
+### Schnittstelle zum Add-on
 
-## Wii, DSU-Gyro, Spielerplätze, Akku, Tasten (ab 0.2/0.3)
+- **Datenordner** (`--data`, im Add-on `userdata/addon_data/service.nconnect/`): `settings.json`, `status.json`,
+  `slots.json`, `known.json`, `nconnect.log` (ab 512 KB nach `.1`), `nconnect.pid` (vom Add-on), `cache/` (Entpackordner
+  der .NET-Laufzeit).
+- **status.json** (alle 5 s und bei Änderungen). Vertrag für alle Schreiber (Linux-Daemon, Windows- und Android-App):
+  - `state`: `running` | `starting` | `stopped`. Der Daemon schreibt `starting`, solange Bluetooth noch nicht geprüft ist.
+  - `platform`: `linux` | `windows` | `android`. Fehlt das Feld (ältere Schreiber), entscheidet das Add-on über Kodis
+    Plattform.
+  - `bluetooth`: genau einer von `on` | `off` | `missing` | `no_le`. `no_le` = Adapter ohne Bluetooth LE (BlueZ meldet
+    in `Roles` kein `central`): Switch-2-Controller gehen nicht, klassische schon. `off` auch, wenn bluetoothd nicht läuft
+    (LibreELEC: Bluetooth in den Einstellungen aus).
+  - Außerdem `version`, `adapter`, `scanning`, `connecting`, `players` (mit `devices`: Adresse, Art, Akku, Seriennummer,
+    Firmware, Rate), `known`, `elsewhere` (mit anderem Gerät gekoppelt), `gamepads`, `autoPairGamepads`, `backgroundScan`.
+- **Ereignisse** als JSON-Zeilen auf stdout: `connecting`, `connected`, `paired`, `disconnected`, `disconnected-all`,
+  `failed`, `elsewhere`, `bluetooth` (Zustand wie oben), `error`, `button` (Capture/C/GL/GR), `battery-low`, `wifi-hint`,
+  `gamepad-paired`, `gamepad-pair-failed`, `gamepad-connected`, `gamepad-disconnected`.
+- **Befehle** über stdin, je Zeile einer: `reload`, `disconnect <Spieler 1…8>`, `disconnect-all`, `status`, `scan`
+  (2 Minuten suchen, wenn die Hintergrundsuche aus ist), `gamepad-disconnect <Adresse>`, `gamepad-forget <Adresse>`.
+  Jeder Befehl ist einzeln abgesichert – ein Fehler (z. B. ein D-Bus-Fehler beim Trennen) beendet den Befehlskanal nicht.
 
-- **Wii-Fernbedienung / Wii U Pro:** Die feste Wii-PIN (umgedrehte Adapter-Adresse) setzt BlueZ selbst; das Modul
-  „wiimote“ ist in LibreELEC enthalten (geprüft). Den Rest erledigt der Kernel-Treiber `hid-wiimote`. N-Connect lässt
-  „Nintendo RVL-CNT…“ deshalb einfach durch.
-- **DSU/Cemuhook-Server** ([Output/DsuServer.cs](../linux/NConnect.Linux/Output/DsuServer.cs)):
-  - Portierung der Windows-Fassung. Port 26760, standardmäßig nur lokal; `DsuNetwork` öffnet ihn fürs Heimnetz.
-  - Geprüft auf dem Pi mit einem Test-Client: 89 Pakete/s mit echten Gyro- und Beschleunigungswerten.
-- **Feste Spielerplätze:** In `slots.json` im Datenordner steht Adresse → Spieler. Ist der gemerkte Platz frei, wird
-  er wieder vergeben.
-- **Akku-Warnung:** Das Ereignis `battery-low` kommt einmal bei 20 % und einmal bei 10 %. Nach dem Laden wird zurückgesetzt.
-- **Controller-Tasten:** Bei Capture, C, GL und GR sendet der Dienst das Ereignis `button`. Das Add-on führt dann die
-  eingestellte Kodi-Aktion aus (`common.BUTTON_ACTIONS`).
+## Kodi-Add-on `service.nconnect`
+
+- **Einstiegspunkte** (`addon.xml`, `<platform>all</platform>`):
+  - `xbmc.service` → `service.py` (startet mit Kodi),
+  - `xbmc.python.script` → `default.py` (Programme → N-Connect; Argumente `help`, `selftest`, `log`, `disconnect-all`),
+  - `xbmc.python.pluginsource` → `plugin.py` (`plugin://service.nconnect/` als Home-Widget).
+- **`service.py`:**
+  - Wählt das Programm nach der Bitbreite des Python-Prozesses (`struct.calcsize('P')`), nicht nach dem Kernel: ein
+    64-Bit-Kernel mit 32-Bit-System (z. B. Raspberry Pi OS 32 Bit) bekommt `linux-arm`. Scheitert der Start (OSError,
+    z. B. „Exec format error“), wird die andere ARM-Variante versucht; passt keine, erscheint Meldung 30022 statt eines
+    Absturzes. Das Ausführungsrecht (geht beim Entpacken verloren) wird abgesichert gesetzt.
+  - Vor dem Start: `modprobe uinput`; ein N-Connect aus einer früheren, abgestürzten Kodi-Sitzung wird über
+    `nconnect.pid` erkannt (Prüfung von `/proc/<pid>/cmdline`) und beendet.
+  - Startet `nconnect --data <Datenordner> --kodi [--adapter …]`, überträgt die Kodi-Einstellungen in `settings.json`
+    (fremde Einträge bleiben stehen), zeigt Meldungen beim Verbinden und Trennen (abschaltbar; Fehler immer).
+  - Neustart nach einem Absturz nach 3/5/10/30/60 s. Ein gewollter Neustart (Menü „Neu starten“, Adapter geändert)
+    wartet, bis das alte Programm beendet ist – sonst kämpften kurz zwei Programme um Controller und DSU-Port.
+  - Befehle aus Menü und Widget kommen über `NotifyAll(service.nconnect,<befehl>)` → `onNotification`
+    (`disconnect-<n>`, `disconnect-all`, `gamepad-disconnect-<adresse>`, `gamepad-forget-<adresse>`, `scan`, `status`,
+    `restart`).
+  - Lädt Widgets neu, wenn sich Sichtbares ändert (Home-Eigenschaft `NConnect.Reload`, siehe `plugin.py`).
+- **Kodi-Belegung:** Kodi bringt für die udev-Kennung 045E:028E keine Xbox-360-Belegung mit, sondern nur für Steams
+  28DE:11FF. Das Add-on kopiert deshalb [die eigene Belegung](../linux/kodi/service.nconnect/resources/buttonmaps/udev/)
+  einmalig nach `addon_data/peripheral.joystick/resources/buttonmaps/xml/udev/`. Eine in Kodi angepasste Belegung wird
+  nie überschrieben.
+- **Menü** (`default.py`) und **Widget** (`plugin.py`): Die Controllerliste erscheint **immer** – Spieler mit Akku,
+  andere Gamepads, bekannte, gerade nicht verbundene Controller (ausgegraut), „mit anderem Gerät gekoppelt“. Bei
+  `bluetooth` = `off`/`missing`/`no_le` steht ein Hinweis davor, passend zum Schreiber der status.json: LibreELEC/Linux
+  „LibreELEC-Einstellungen > Bluetooth“, Windows „Bluetooth in den Windows-Einstellungen einschalten“, Android
+  „Bluetooth in Android einschalten“, `no_le` „Adapter mit Bluetooth LE (ab 4.0) nötig“. Jeder Klick im Widget öffnet
+  das Hauptmenü. Im Menü außerdem Trennen/Details, „Jetzt suchen“, „Alle trennen“, Anleitung, Diagnose (`--selftest`),
+  Protokoll und Einstellungen.
+- **Einstellungen:** Tastenbelegung nach Position (Xbox) oder wie beschriftet, Stick-Totzone, Joy-Con zusammenfassen,
+  Gyro-Stick samt Tempo und Umkehrung, DSU (lokal/Heimnetz), Vibration samt Stärke, Koppeln, Hintergrundsuche, andere
+  Controller automatisch koppeln, Spieler-LEDs, Verbinden-Klick, Trennen bei Nichtbenutzung, Adapter, Meldungen,
+  Akku-Warnung, Kodi-Aktionen für Capture/C/GL/GR und Hilfe-Knöpfe.
+- **Sprachen:** 12 Sprachen wie unter Windows (de, en, es, fr, it, pt, nl, pl, ru, ja, zh, ko; dazu pt_BR mit den
+  pt-Texten). Englisch (`en_gb`, Pflicht als Rückfall) und Deutsch werden von Hand gepflegt, die übrigen erzeugt
+  [generate.py](../linux/kodi/i18n/generate.py) aus `tr_a.py`/`tr_b.py`; neue Texte kommen in `EXTRA` (und werden
+  dann auch in en/de ergänzt). Die Anleitung gibt es in allen 12 Sprachen: `resources/help_<sprache>.txt` (LibreELEC)
+  und `resources/help_companion_<sprache>.txt` (Begleitmodus). Die Dialoge des Bundles stehen in
+  [tr_bundle.py](../linux/kodi/i18n/tr_bundle.py) (IDs 32000 ff., alle 13 `strings.po` werden daraus erzeugt);
+  Zusammenfassung und Beschreibung aller drei Add-ons stehen in ihrer `addon.xml` in allen 12 Sprachen.
+
+## Andere Kodi-Plattformen
+
+- **Batocera / sonstiges Linux:** wie LibreELEC – das Add-on enthält das Programm für x86_64, aarch64 und arm und läuft
+  dort, wenn alles als root läuft und BlueZ/uinput vorhanden sind. Auf Batocera koppelt bereits das System
+  Bluetooth-Controller; N-Connect ist für Switch-2-Controller gedacht. Die Bluetooth-Einstellungen liegen dort im
+  Systemmenü, nicht bei `service.libreelec.settings` (das Menü prüft, ob das Add-on existiert). **Ungetestet.**
+- **Desktop-Linux** (Ubuntu & Co., Kodi als normaler Benutzer): Das Programm braucht root für HCI-Rohzugriff und
+  /dev/uinput – als Benutzer gestartet schlägt es fehl (der Selbsttest zeigt das an). Dafür fehlen noch ein
+  systemd-Dienst bzw. eine udev-Regel. **Ungetestet.**
+- **Begleitmodus** (kein Linux-Dienst; `common.has_daemon()` ist falsch – auf Android meldet Python „Linux“, darum wird
+  Kodi gefragt): Das Add-on zeigt nur an, was eine N-Connect-App in die status.json schreibt. Trennen, Koppeln,
+  Selbsttest und Dienst-Protokoll gibt es dort nicht. Die Einstellungen der Kategorien Controller, Emulatoren,
+  Vibration, Verbindung und Kodi sind gesperrt (InfoBool-Bedingung `System.Platform.Linux + !System.Platform.Android`),
+  je Kategorie steht ein Hinweis-Knopf „Diese Einstellungen gelten nur unter LibreELEC/Linux“, der die
+  Begleitmodus-Anleitung öffnet.
+  - **Windows:** Die installierte N-Connect-App verbindet die Controller (als XInput), und
+    [KodiStatusWriter.cs](../src/Switch2Pro.Bridge/KodiStatusWriter.cs) schreibt die status.json in Kodis
+    `userdata/addon_data/service.nconnect/` (normale Installation und Microsoft-Store-Variante, siehe
+    [KodiIntegration.cs](../src/Switch2Pro.Bridge/KodiIntegration.cs)). Wird Kodi erst danach installiert, die App
+    einmal neu starten.
+  - **Android:** Die App darf nicht in Kodis Datenordner schreiben (Scoped Storage). Sie legt die Datei ab N-Connect
+    für Android **0.9.1** über MediaStore in `/sdcard/Documents/N-Connect/status.json` ab (Android 8/9: externer
+    App-Ordner); das Add-on liest dort mit
+    ([KodiStatusWriter.cs](../android/NConnect.Android/Kodi/KodiStatusWriter.cs)). Ob Kodi ab Android 11 die Datei ohne
+    „Zugriff auf alle Dateien“ lesen darf, ist **ungeprüft**.
+  - **macOS** (und iOS/tvOS): Es gibt keine N-Connect-App – das Add-on zeigt „Nur Anzeige – N-Connect gibt es für macOS
+    nicht“.
+
+## Weitere Add-ons
+
+- **`plugin.nconnect.status`:** frühere eigenständige Widget-Quelle; seit 1.1.0 nur noch eine Weiterleitung an
+  `plugin.py` von `service.nconnect`, damit Skins mit dem alten Pfad `plugin://plugin.nconnect.status/` weiter
+  funktionieren. Braucht `service.nconnect` ≥ 0.3.4.
+- **`script.nconnect.bundle`:** installiert beim ersten Kodi-Start (und auf Aufruf) fehlende Add-ons aus
+  `resources/data/<id>-<version>.zip` und trägt in Aeon Nox Silvo den Menüpunkt samt Widget ein. Die ZIPs legt das
+  Build-Skript beim Packen hinein – immer die eben gebauten. Bei jeder neuen `service.nconnect`- oder Plugin-Version
+  muss auch die Bundle-Version steigen; das Build-Skript bricht sonst beim Ablegen im Repository ab.
+
+## Bauen
+
+```powershell
+powershell -File linux/build-kodi-addon.ps1                          # alle drei Prozessoren → out/kodi/
+powershell -File linux/build-kodi-addon.ps1 -Rids linux-x64           # nur einer (schneller)
+powershell -File linux/build-kodi-addon.ps1 -Out C:\Temp\kodi        # anderer Ausgabeordner
+powershell -File linux/build-kodi-addon.ps1 -Repo                     # zusätzlich ins kodi-repo neben N-Connect
+powershell -File linux/build-kodi-addon.ps1 -Repo -NoBuild -RepoDir … # nur ablegen, vorhandene ZIPs aus -Out
+```
+
+Vor einem neuen Lauf entfernt das Skript im Ausgabeordner nur seine eigenen ZIPs (`N-Connect-Kodi-LibreELEC-*`,
+`plugin.nconnect.status-*`, `script.nconnect.bundle-*`, `repository.devcatskz-*`) – andere Dateien in `-Out` bleiben.
+
+Ergebnis (Größen mit allen drei Prozessoren):
+
+| Datei | Größe | Inhalt |
+|---|---|---|
+| `N-Connect-Kodi-LibreELEC-<V>-alle-Geraete.zip` | ca. 18 MB | `service.nconnect`, universell: x64 + arm64 + arm (empfohlen) |
+| `N-Connect-Kodi-LibreELEC-<V>-RPi4-RPi5-arm64.zip` | ca. 6,4 MB | nur arm64 (Pi 4/5 mit LibreELEC 12, 64-Bit-Boxen) |
+| `N-Connect-Kodi-LibreELEC-<V>-RPi2-RPi3-arm.zip` | ca. 5,6 MB | nur arm (Pi 2/3, 32 Bit) |
+| `N-Connect-Kodi-LibreELEC-<V>-PC-x86_64.zip` | ca. 6,7 MB | nur x64 (PC, LibreELEC Generic) |
+| `plugin.nconnect.status-<V>.zip` | < 0,1 MB | Widget-Weiterleitung |
+| `script.nconnect.bundle-<V>.zip` | ca. 18 MB | Bundle mit der universellen `service.nconnect`- und der Plugin-ZIP |
+| `repository.devcatskz-<V>.zip` | < 0,1 MB | Repository-Add-on |
+
+Die Versionen stehen in `linux/kodi/<id>/addon.xml` (unabhängig von der Windows-Version); die Programmversion wird beim
+Bauen aus der `service.nconnect`-Version gesetzt (`-p:Version`, im csproj gleich gehalten). Logo (Installer-Grafik),
+Lizenz (`LICENSE.txt`) und die Drittanbieter-Hinweise (`THIRD-PARTY-NOTICES.md` aus dem Repo-Wurzelordner: .NET-Laufzeit,
+Linux.Bluetooth, Tmds.DBus …) kommen beim Packen in jede ZIP außer dem Repository-Add-on (das enthält keinen fremden
+Code); `__pycache__`/`.pyc` nie.
+
+Installation von Hand: Kodi → Add-ons → Aus ZIP-Datei installieren (vorher „Unbekannte Quellen“ erlauben).
+Kodi aktualisiert nur Installationen aus dem Repository und nur, wenn die Version steigt.
 
 ## DevCatSKZ Repository und Release
 
-- **Öffentliches Repo:** [github.com/DevCatSKZ/kodi-repo](https://github.com/DevCatSKZ/kodi-repo).
-  - Kodi-Add-on `repository.devcatskz` mit dem Anzeigenamen „DevCatSKZ Repository“.
-  - Der Index wird mit `tools/build_repo.py` erzeugt; die zwei neuesten Versionen je Add-on bleiben erhalten.
-  - In `downloads/` liegen die Einzel-ZIPs je Gerät.
-- **Lokal veröffentlichen:** `linux/build-kodi-addon.ps1 -Repo` legt die ZIPs in die Arbeitskopie `..\kodi-repo` (neben
-  sfm und N-Connect). Danach in kodi-repo committen und pushen.
-- **CI** ([.github/workflows/kodi.yml](../.github/workflows/kodi.yml)):
-  - Jeder Push auf `linux/**` erzeugt das Artefakt „Kodi-Plugin“.
-  - Ein Tag `v…` hängt die ZIPs ans Release und legt die Plugin-Version ins Repository. Dafür braucht es das Secret
-    **`KODI_REPO_TOKEN`**: ein fein abgestufter Token, nur für `DevCatSKZ/kodi-repo`, „Contents: Read and write“.
-    Deploy-Schlüssel sind in der Organisation abgeschaltet. Ohne das Secret wird dieser Schritt übersprungen.
-- **Version des Plugins:** Sie steht in `linux/kodi/service.nconnect/addon.xml` und ist unabhängig von der
-  Windows-Version. Kodi aktualisiert nur, wenn sie steigt, und nur bei Installationen aus dem Repository, nicht bei
-  Installationen per ZIP.
+- **Öffentliches Repo:** [github.com/DevCatSKZ/kodi-repo](https://github.com/DevCatSKZ/kodi-repo), Aufbau
+  `<id>/<id>-<version>.zip`, `addons.xml`, `addons.xml.md5`, je ZIP `.sha256`, `repository.devcatskz.zip` (fester Name)
+  und `downloads/` (ZIPs je Gerät ohne Versionsnummer – darauf verweisen README und die Windows-/Android-App).
+- **Index:** `tools/build_repo.py` (Quelle: `linux/kodi/repo-tools/`, wird bei `-Repo` hineinkopiert) erzeugt
+  addons.xml, Prüfsummen und `index.html` (Wurzel und je Add-on-Ordner); die zwei neuesten Versionen je Add-on bleiben
+  erhalten (`KEEP = 2`).
+- **Dateimanager-Quelle:** Das Repo ist zusätzlich über GitHub Pages erreichbar (`https://devcatskz.github.io/kodi-repo/`),
+  dort liefert `index.html` die Verzeichnisliste, die Kodis HTTP-Quelle braucht. `raw.githubusercontent.com` liefert
+  keine Verzeichnislisten – als Quelle im Dateimanager geht das nicht (das Repository-Add-on selbst lädt von dort).
+- **Schutz:** `-Repo` überschreibt nie eine schon abgelegte Version (Hinweis „schon veröffentlicht“, für ein Update die
+  Version erhöhen) und bricht ab, wenn `service.nconnect` oder das Plugin neu sind, das Bundle aber nicht. Die
+  Download-ZIPs werden nur zusammen mit einer neuen `service.nconnect`-Version ersetzt.
+- **CI** ([kodi.yml](../.github/workflows/kodi.yml)):
+  - Jeder Push auf `linux/**`, `src/Switch2Pro.Protocol/**`, `tests/NConnect.Linux.Tests/**`,
+    `THIRD-PARTY-NOTICES.md` oder die Workflow-Datei führt die [Tests](#tests) aus, prüft, dass `generate.py` keine
+    Sprachdatei ändert, und erzeugt das Artefakt „Kodi-Plugin“ (alle ZIPs).
+  - Ein Tag `v…` hängt zusätzlich die `N-Connect-Kodi-*.zip` ans GitHub-Release.
+  - Ins kodi-repo schreibt die CI bewusst **nicht** (kein automatischer Zugang; Deploy-Keys sind in der Organisation
+    DevCatSKZ ohnehin abgeschaltet).
+- **Release von Hand** (nach dem Tag, aus einer Arbeitskopie von N-Connect auf dem Release-Stand):
+  1. kodi-repo aktuell holen: `git -C <kodi-repo> pull`.
+  2. `powershell -File linux/build-kodi-addon.ps1 -Repo -RepoDir <kodi-repo>` – baut alle ZIPs, legt neue Versionen
+     samt `downloads/` und `repository.devcatskz.zip` ab und ruft dort das Index-Werkzeug `tools/build_repo.py` auf
+     (addons.xml, .md5, .sha256, index.html; von Hand: `python tools/build_repo.py` im kodi-repo). Sollen dort
+     byteweise dieselben ZIPs wie am GitHub-Release liegen: das CI-Artefakt „Kodi-Plugin“ in einen Ordner entpacken
+     und `-Repo -NoBuild -Out <Ordner> -RepoDir <kodi-repo>` nehmen.
+  3. In `<kodi-repo>` mit `git status` prüfen (nur neue Versionen, `addons.xml*`, `index.html`, `downloads/`),
+     committen als `devcatskz <devcatskz@gmail.com>` und pushen. Kodi holt die neuen Versionen dann selbst.
+  - Liegt eine Version schon im kodi-repo, bleibt sie unverändert („schon veröffentlicht“) – für ein Update die
+    Version in der `addon.xml` erhöhen.
+
+## Tests
+
+Alles, was ohne Gerät prüfbar ist; die CI führt beides vor dem Bauen aus (unter Windows – nichts davon braucht
+Bluetooth, uinput oder libc).
+
+- **Dienst** ([tests/NConnect.Linux.Tests/](../tests/NConnect.Linux.Tests/), xUnit):
+  `dotnet test tests/NConnect.Linux.Tests -c Release`
+  - Befehlskanal: Ein fehlgeschlagener Befehl (auch eine D-Bus-Zeitüberschreitung) beendet ihn nicht; echte Befehle
+    ohne Adapter und unsinnige Zeilen laufen ins Leere, das Ende von stdin wird erkannt.
+  - status.json: `starting` ohne `bluetooth` vor der ersten Prüfung, `platform: linux`, jeder der vier
+    Bluetooth-Werte, `stopped` beim Ende; „bluetoothd läuft nicht“ gilt als `off`.
+  - Verbindungsabbruch: Lost vor dem Zuordnen zum Spieler (kein Geist-Controller), Lost danach, ohne Abbruch bleibt
+    der Controller. Virtuelle Controller legt der Dienst in den Tests nie an (`CreatePad`).
+- **Add-ons** ([linux/kodi/tests/](../linux/kodi/tests/), unittest mit nachgebauten Kodi-Modulen in `kodi_stubs.py`):
+  `py -3 -m unittest discover -s linux/kodi/tests`
+  - Programmwahl nach Bitbreite, Rückfall beim Start, Meldung 30022, Warten beim Beenden, PID-Datei samt
+    `/proc/<pid>/cmdline`-Prüfung.
+  - Hinweise je Plattform und Bluetooth-Zustand, Widget-Liste, Lesen der status.json (Alter, `starting`, Android-Pfade).
+  - Bundle: neueste mitgelieferte ZIP, Installation, Dialoge und Skin-Einträge in Kodis Sprache.
+  - Dateien: `addon.xml`/`settings.xml` wohlgeformt, Beschreibungen in allen 12 Sprachen, alle `strings.po` vollständig
+    (samt Platzhaltern), jede benutzte String-ID definiert, `generate.py` aktuell, Versionen (csproj =
+    `service.nconnect`), Index-Werkzeug `build_repo.py` (KEEP, Prüfsummen, `index.html`).
 
 ## Hintergrundsuche
 
@@ -83,133 +312,6 @@ Controller. Die Kernel-Treiber von LibreELEC (xpad, hid-microsoft, hid-playstati
 - **Wenn aus:** Gesucht wird nur nach dem Menüpunkt „Jetzt nach Controllern suchen“, dann 2 Minuten lang (Befehl `scan`).
 - **Gekoppelte klassische Gamepads** verbinden sich trotzdem selbst. **Switch-2-Controller** brauchen zum Wiederverbinden
   die Suche.
-
-## Sprachen
-
-Es gibt dieselben 12 Sprachen wie unter Windows (de, en, es, fr, it, pt, nl, pl, ru, ja, zh, ko, dazu pt_BR), und Kodi
-wählt sie nach seiner eingestellten Sprache aus. Englisch und Deutsch werden von Hand gepflegt. Die übrigen erzeugt
-[linux/kodi/i18n/generate.py](../linux/kodi/i18n/generate.py) aus `tr_a.py`/`tr_b.py`; neue Texte kommen in `EXTRA`.
-Die Anleitung (`help_*.txt`) gibt es bisher auf Deutsch und Englisch.
-
-## Überblick
-
-```
-Switch-2-Controller ──BLE──► BlueZ (bluetoothd) ──D-Bus──► nconnect (Dienst, .NET 10, root)
-                                                              │  Switch2Pro.Protocol (wie Windows/Android)
-                                                              ▼
-                                         /dev/uinput → „Microsoft X-Box 360 pad“ (045E:028E) je Spieler
-                                                              ▼
-                                         Kodi (peripheral.joystick, udev) · RetroArch · SDL-Spiele
-```
-
-| Teil | Ort | Aufgabe |
-|---|---|---|
-| `nconnect` | [linux/NConnect.Linux/](../linux/NConnect.Linux/) | Programm ohne Oberfläche: Suche, Verbindung, Belegung, virtuelle Controller, Statusdatei |
-| Kodi-Add-on `service.nconnect` | [linux/kodi/service.nconnect/](../linux/kodi/service.nconnect/) | Startet/überwacht `nconnect`, Einstellungen, Meldungen, Menü, Diagnose |
-| Build-Skript | [linux/build-kodi-addon.ps1](../linux/build-kodi-addon.ps1) | Veröffentlicht linux-x64/arm64/arm und packt die Add-on-ZIPs nach `out/kodi/` |
-
-## Andere Kodi-Plattformen (ab 0.4.0)
-
-Das Add-on ist nicht mehr LibreELEC-only (`<platform>all</platform>`):
-
-- **Batocera / sonstiges Linux:** Dasselbe wie LibreELEC – das Add-on enthält das Programm für x86_64 und
-  aarch64 und läuft dort, weil alles als root läuft und BlueZ/uinput vorhanden sind. Auf Batocera selbst koppelt
-  bereits das System Bluetooth-Controller; N-Connect ist für Switch-2-Controller gedacht, die das Standard-BlueZ
-  nicht schafft. Hinweis: die Bluetooth-Einstellungen liegen dort im Batocera-/Systemmenü, nicht bei
-  `service.libreelec.settings` (das Menü prüft, ob das Add-on existiert). **Noch nicht auf echter Hardware geprüft.**
-- **Desktop-Linux** (Ubuntu & Co., Kodi läuft als normaler Benutzer): Das Programm braucht root für HCI-Rohzugriff
-  und /dev/uinput – als Benutzer gestartet schlägt es fehl (der eingebaute Selbsttest zeigt das an). Für Kodi auf
-  Desktop-Linux müsste noch ein systemd-Dienst oder eine udev-Regel ergänzt werden; bis dahin ungetestet.
-- **Kodi auf Windows:** Es gibt keinen Linux-Dienst – die installierte N-Connect-App verbindet die Controller
-  (als XInput) und [KodiStatusWriter.cs](../src/Switch2Pro.Bridge/KodiStatusWriter.cs) schreibt dieselbe
-  `status.json` in Kodis `userdata/addon_data/service.nconnect/`. Das Add-on läuft im „Begleitmodus": es zeigt
-  Menü und Widget (verbunden farbig, bekannte/getrennte ausgegraut) und lädt die Anzeige bei Änderungen neu.
-  Trennen/Koppeln/Selbsttest/Dienst-Protokoll bleiben der App vorbehalten und werden im Menü nicht angeboten.
-  Kodi-Ordner findet [KodiIntegration.cs](../src/Switch2Pro.Bridge/KodiIntegration.cs) (normale Installation
-  und Microsoft-Store-Variante).
-
-## Programm `nconnect`
-
-- **Bluetooth:** [Linux.Bluetooth](https://github.com/SuessLabs/Linux.Bluetooth) 6.0.0-pre3 über D-Bus. Bewusst
-  nicht 5.x: Das hängt an Tmds.DBus 0.20 mit CVE-2026-39959. Tmds.DBus ist explizit auf 0.95.1 festgelegt.
-- **Suche** ([Switch2Scanner.cs](../linux/NConnect.Linux/Ble/Switch2Scanner.cs)): Der Discovery-Filter ist
-  `Transport=le, DuplicateData=true`. BlueZ meldet neue Geräte über `DeviceFound`, bekannte über
-  Eigenschaftsänderungen (RSSI/ManufacturerData). Beides wird ausgewertet, damit ein gekoppelter Controller nach einem
-  Tastendruck sofort erkannt wird. Beendet ein anderes Programm (z. B. Kodis Bluetooth-Seite) die Suche, startet der
-  Dienst sie nach spätestens 3 s neu.
-- **Gerät** ([Switch2Device.cs](../linux/NConnect.Linux/Ble/Switch2Device.cs)): Das ist eine Portierung der
-  Android-Fassung, mit demselben Ablauf (Funktionen, Kalibrierung, Seriennummer, Kopplung 0x15, Wächter, Vibration).
-  Die MTU handelt BlueZ selbst aus. Geschrieben wird ohne Antwort per `{"type":"command"}`. Wichtig: Linux.Bluetooth
-  ruft beim Anmelden an `Value` selbst `StartNotify` auf, deshalb wird erst auf `Notifying` gewartet.
-- **Verbindungsintervall:** Über debugfs (`/sys/kernel/debug/bluetooth/hciX/conn_min/max_interval` = 6/9, also
-  7,5–11,25 ms statt 30–50 ms). Ohne debugfs bleibt der Standard; das funktioniert, ist aber träger.
-- **Virtueller Controller** ([UInputPad.cs](../linux/NConnect.Linux/Output/UInputPad.cs)):
-  - Name, Kennung und Belegung wie beim Kernel-Treiber xpad: „Microsoft X-Box 360 pad“, USB 045E:028E, Version 0x0114.
-  - 11 Tasten, Sticks ±32767 (Y nach unten positiv), Trigger 0…255, Steuerkreuz als HAT0X/Y.
-  - Spieler werden über `phys` unterschieden (`nconnect/playerN`), weil Kodi die Belegung über den Namen findet.
-  - Vibration über `FF_RUMBLE`: Upload/Erase per `UI_BEGIN/END_FF_*`, abgespielt mit `EV_FF`. Die ioctl-Größen sind
-    für 64 und 32 Bit berechnet.
-- **Einstellungen:** dieselbe `settings.json`/`Settings`-Klasse wie unter Windows und Android. Die Datei wird
-  überwacht und bei Änderung neu geladen (auch Belegungen, Profile und Gyro aus Windows).
-- **Schnittstelle zum Add-on:**
-  - `status.json` (alle 5 s und bei Änderungen): Bluetooth-Zustand, Spieler, Akku, Rate, Seriennummer, Firmware,
-    „mit anderem Gerät gekoppelt“.
-  - Ereignisse als JSON-Zeilen auf stdout: `connected`, `paired`, `disconnected`, `elsewhere`, `failed`, `bluetooth`,
-    `error`.
-  - Befehle über stdin: `reload`, `disconnect <n>`, `disconnect-all`, `status`.
-- **Weitere Funktionen:** Trennen nach Inaktivität (`InactivityMinutes`), nach einem Trennen von Hand werden Controller
-  15 s ignoriert, und fällt der Adapter weg, beginnt eine neue Sitzung.
-- **Aufrufe:** `nconnect [--data DIR] [--adapter hci0]`, `--selftest` (JSON-Diagnose), `--test-pad [s]` (Testcontroller
-  ohne Bluetooth, gibt Vibration aus), `--version`.
-- **Veröffentlichung:** self-contained Single-File, komprimiert, Trim-Modus `partial`. Eigene Bibliotheken und
-  Tmds.DBus bleiben vollständig erhalten, weil sie Reflection nutzen. `InvariantGlobalization`, weil LibreELEC kein ICU
-  hat. Größe ca. 13 MB je Prozessor (ohne Trimming 38 MB).
-
-## Kodi-Add-on `service.nconnect`
-
-- `addon.xml`: hat zwei Einstiegspunkte, `xbmc.service` (startet mit Kodi) und `xbmc.python.script` (erscheint unter
-  Programme → N-Connect).
-- `service.py`:
-  - Startet das Programm passend zum Prozessor aus `bin/<rid>/nconnect` und setzt das Ausführungsrecht, das beim
-    Entpacken verloren geht.
-  - Lädt `modprobe uinput`.
-  - Überträgt die Kodi-Einstellungen in `settings.json` und lässt dabei fremde Einträge stehen.
-  - Zeigt Meldungen beim Verbinden und Trennen (abschaltbar; Fehler erscheinen immer).
-  - Startet das Programm nach einem Absturz neu: nach 3/5/10/30/60 s.
-  - Beendet es per SIGTERM, wenn Kodi schließt.
-  - Befehle aus dem Menü kommen über `NotifyAll(service.nconnect,<befehl>)` → `onNotification`.
-- **Kodi-Belegung:** Kodi bringt für die udev-Kennung 045E:028E keine Xbox-360-Belegung mit, sondern nur für Steams
-  28DE:11FF. Das Add-on kopiert deshalb [die eigene Belegung](../linux/kodi/service.nconnect/resources/buttonmaps/udev/)
-  einmalig nach `addon_data/peripheral.joystick/resources/buttonmaps/xml/udev/`. Eine in Kodi angepasste Belegung wird
-  nie überschrieben.
-- **Menü** (`default.py`): zeigt
-  - die Spieler mit Akku und Rate; wählt man einen aus: Trennen oder Details (Seriennummer, Firmware, Adresse),
-  - Hinweise zu „Bluetooth aus“, „kein Adapter“ und „mit anderem Gerät gekoppelt“,
-  - „Alle trennen“, Anleitung, Diagnose (`--selftest` mit ✓/✗), Protokoll und Einstellungen.
-- **Einstellungen:** Tastenbelegung nach Position (Xbox) oder wie beschriftet, Stick-Totzone, Joy-Con zusammenfassen,
-  Gyro-Stick (aus/immer/beim Zielen) samt Tempo und Umkehrung, Vibration samt Stärke, automatisch koppeln,
-  Spieler-LEDs, Verbinden-Klick, Trennen bei Nichtbenutzung (Standard: 15 min), Adapter, Meldungen und Hilfe-Knöpfe.
-- **Sprachen:** Englisch (`en_gb`, Pflicht als Rückfall) und Deutsch. Die Anleitung liegt in `resources/help_de.txt`
-  bzw. `help_en.txt`.
-
-## Bauen
-
-```powershell
-powershell -File linux/build-kodi-addon.ps1                 # alle drei Prozessoren
-powershell -File linux/build-kodi-addon.ps1 -Rids linux-x64  # nur einer (schneller)
-```
-
-Das Ergebnis liegt in `out/kodi/`:
-
-| Datei | Größe | Prozessoren |
-|---|---|---|
-| `service.nconnect-0.1.0.zip` | ca. 18 MB | universell: x64 + arm64 + arm |
-| `service.nconnect-0.1.0-linux-x64.zip` | ca. 6,5 MB | nur x64 |
-| `service.nconnect-0.1.0-linux-arm64.zip` | ca. 6,2 MB | nur arm64 |
-| `service.nconnect-0.1.0-linux-arm.zip` | ca. 5,4 MB | nur arm |
-
-Installation: Kodi → Add-ons → Aus ZIP-Datei installieren (vorher „Unbekannte Quellen“ erlauben).
-Raspberry Pi 4/5 mit LibreELEC 12 = arm64, ältere Pi = arm, PC = x64.
 
 ## Test in der VM (ohne Admin-Rechte, ohne Fenster)
 
@@ -226,9 +328,9 @@ Raspberry Pi 4/5 mit LibreELEC 12 = arm64, ältere Pi = arm, PC = x64.
   virtio-vga ohne virgl stürzt ab. Dafür bräuchte es ein sichtbares QEMU-Fenster (`-device virtio-vga-gl -display
   sdl,gl=on`). Im Test war Kodi deshalb per `/storage/.config/system.d/kodi.service` stillgelegt.
 
-Geprüft und bestanden:
+Damals (0.1/0.2) geprüft und bestanden:
 
-1. `nconnect --selftest`: uinput ✓, BlueZ über D-Bus ✓, debugfs ✓, Einstellungen ✓. Adapter ✗, weil die VM keinen hat.
+1. `nconnect --selftest`: uinput, BlueZ über D-Bus und Einstellungen OK; Adapter fehlt, weil die VM keinen hat.
 2. `--test-pad` und ein evdev-Prüfskript (wie ein Spiel):
    - Name, Kennung, 11 Tasten, 8 Achsen, Wertebereiche, Rauschen und Totzone stimmen; der Kernel legt zusätzlich
      `js0` an.
@@ -245,14 +347,19 @@ Geprüft und bestanden:
 
 ## Offen
 
-- **Test mit echter Hardware:** Raspberry Pi 4/5 mit LibreELEC und echten Controllern. Zu prüfen sind
-  Verbindungsaufbau, Kopplung 0x15 und Wiederverbinden per Tastendruck, Latenz, Joy-Con-Paar und Vibration. Auch die
-  Frage aus Android gehört dazu: Wirbt der Controller nach der Kopplung für die öffentliche Adapter-Adresse? Unter
-  BlueZ ist LE-Privacy normalerweise aus, das sollte also passen.
-- **Kodi-Oberfläche testen:** Belegung, Meldungen, Einstellungsdialog und Menü-Optik. Das geht auf echter Hardware oder
-  in einer VM mit GL-Fenster.
-- **Optional `AcquireNotify`** (Socket statt D-Bus-Eigenschaften) für noch weniger Last bei 8 Controllern.
-- **Optional DSU-Server** (Gyro für Dolphin/Cemu) wie unter Windows.
-- **Add-on-Repository** (`repository.nconnect`) für automatische Updates. Den Release-Workflow um die Linux-ZIPs
-  erweitern.
-- **Weitere Sprachen** (die Windows-Version hat 12).
+- **Hardwaretest der Änderungen von 0.4.4** auf dem Pi 4 (ohne Gerät nur gebaut und mit den [Tests](#tests) geprüft):
+  `--kodi` (Ende mit Kodi, auch nach `kill -9` von Kodi), PID-Datei und Beenden eines Rests, Neustart über das Menü
+  (DSU-Port danach wieder offen), `no_le`-Erkennung über `Roles` (ältere BlueZ ohne `Roles` gelten als LE-fähig),
+  poll-Leser des virtuellen Controllers samt Vibration, Trennen während laufender Vibration (ATT-`shutdown` ohne
+  Sperre), Speicherverlauf bei langer Laufzeit (vorher/nachher).
+- **Ungetestete Geräte und Controller:** Pi 2/3 (`linux-arm`), Pi 5, 64-Bit-Boxen, PCs; Kopplung von Xbox-, PlayStation-,
+  Switch-1- und Wii-Controllern, Vibration im Spiel; Klone wie der ShanWan-Pro-Controller (Issue #1, nur klassisches
+  Bluetooth) laufen unter Linux vermutlich über `hid-nintendo` – ungeprüft.
+- **Batocera** auf echter Hardware prüfen.
+- **Desktop-Linux:** systemd-Dienst oder udev-Regel, damit `nconnect` ohne root-Kodi läuft.
+- **Kodi unter Android:** prüfen, ob Kodi ab Android 11 `/sdcard/Documents/N-Connect/status.json` lesen darf
+  (Scoped Storage), mit N-Connect für Android 0.9.1.
+- **Settings im Begleitmodus:** Die Sperre nutzt InfoBool-Bedingungen in `settings.xml`; auf Kodi für Windows/Android
+  einmal ansehen, ob Sperre und Hinweis-Knopf wie gedacht erscheinen.
+- **Kodi-Repository per Dateimanager:** Weg über GitHub Pages (`https://devcatskz.github.io/kodi-repo/`) einmal in Kodi
+  durchspielen.

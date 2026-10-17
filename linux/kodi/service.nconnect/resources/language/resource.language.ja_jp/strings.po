@@ -436,10 +436,6 @@ msgctxt "#30642"
 msgid "Bluetooth adapter"
 msgstr "Bluetooth アダプター"
 
-msgctxt "#30643"
-msgid "Low latency"
-msgstr "低遅延"
-
 msgctxt "#30644"
 msgid "Settings file"
 msgstr "設定ファイル"
@@ -625,5 +621,53 @@ msgid "N-Connect app is not running"
 msgstr "N-Connect アプリが起動していません"
 
 msgctxt "#30661"
-msgid "Start the N-Connect app on this device – it reports the status here"
+msgid "Start N-Connect on this PC – it reports the status here"
 msgstr "この PC で N-Connect アプリを起動してください – ここに状態を送ります"
+
+msgctxt "#30019"
+msgid "Bluetooth adapter without LE – Switch 2 controllers cannot connect, other controllers still work"
+msgstr "LE 非対応の Bluetooth アダプターです – Switch 2 コントローラーは接続できませんが、ほかのコントローラーは使えます"
+
+msgctxt "#30520"
+msgid "These settings only apply on LibreELEC/Linux"
+msgstr "これらの設定は LibreELEC/Linux でのみ有効です"
+
+msgctxt "#30521"
+msgid "On Windows and Android the N-Connect app connects the controllers – change these settings in the app. On macOS the add-on only displays the status. Select to open the guide."
+msgstr "Windows と Android では N-Connect アプリがコントローラーを接続します – これらの設定はアプリで変更してください。macOS ではアドオンは状態を表示するだけです。選ぶとガイドを開きます。"
+
+msgctxt "#30634"
+msgid "Bluetooth without LE"
+msgstr "Bluetooth LE 非対応"
+
+msgctxt "#30635"
+msgid "Switch 2 controllers need a Bluetooth adapter with LE (4.0 or newer) – other controllers keep working"
+msgstr "Switch 2 コントローラーには LE 対応（4.0 以降）の Bluetooth アダプターが必要です – ほかのコントローラーはそのまま使えます"
+
+msgctxt "#30646"
+msgid "Bluetooth LE (Switch 2)"
+msgstr "Bluetooth LE（Switch 2）"
+
+msgctxt "#30662"
+msgid "Turn on Bluetooth in the Windows settings"
+msgstr "Windows の設定で Bluetooth をオンにしてください"
+
+msgctxt "#30663"
+msgid "Turn on Bluetooth in Android"
+msgstr "Android で Bluetooth をオンにしてください"
+
+msgctxt "#30664"
+msgid "Plug in a Bluetooth adapter or turn on Bluetooth in the Windows settings"
+msgstr "Bluetooth アダプターを接続するか、Windows の設定で Bluetooth をオンにしてください"
+
+msgctxt "#30666"
+msgid "No N-Connect app for this system"
+msgstr "このシステム用の N-Connect アプリはありません"
+
+msgctxt "#30667"
+msgid "Display only – N-Connect is not available for {0}"
+msgstr "表示のみ – N-Connect は {0} に対応していません"
+
+msgctxt "#30668"
+msgid "Start N-Connect for Android (0.9.1 or newer) on this device – it reports the status here"
+msgstr "この端末で N-Connect for Android（0.9.1 以降）を起動してください – ここに状態を送ります"

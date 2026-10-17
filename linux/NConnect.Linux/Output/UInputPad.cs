@@ -40,6 +40,17 @@ public sealed unsafe class UInputPad : IDisposable
     [DllImport("libc", SetLastError = true)] private static extern int ioctl(int fd, nuint request, nint arg);
     [DllImport("libc", SetLastError = true)] private static extern nint write(int fd, byte* buf, nint count);
     [DllImport("libc", SetLastError = true)] private static extern nint read(int fd, byte* buf, nint count);
+    [DllImport("libc", SetLastError = true)] private static extern int poll(PollFd* fds, nuint nfds, int timeout);
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct PollFd
+    {
+        public int Fd;
+        public short Events;
+        public short Revents;
+    }
+
+    private const short POLLIN = 0x001;
 
     private readonly int _fd;
     private readonly object _writeLock = new();
@@ -145,10 +156,12 @@ public sealed unsafe class UInputPad : IDisposable
     /// <summary>Neuen Gamepad-Zustand senden (nur geänderte Werte, dann SYN_REPORT).</summary>
     public void Update(GamepadState g)
     {
-        if (Volatile.Read(ref _disposed) != 0)
-            return;
         lock (_writeLock)
         {
+            // Prüfung unter der Sperre: Dispose schließt den fd ebenfalls unter ihr – sonst könnte ein Schreiber, der
+            // die Prüfung gerade passiert hat, in einen schon geschlossenen (und womöglich neu vergebenen) fd schreiben.
+            if (Volatile.Read(ref _disposed) != 0)
+                return;
             var b = g.Buttons;
             var old = _last.Buttons;
             bool first = !_hasLast;
@@ -203,19 +216,33 @@ public sealed unsafe class UInputPad : IDisposable
         write(_fd, ev, EventSize);
     }
 
-    /// <summary>Liest Ereignisse vom Kernel: Effekte hochladen/löschen (Vibration) und EV_FF (abspielen/stoppen).</summary>
+    /// <summary>
+    /// Liest Ereignisse vom Kernel: Effekte hochladen/löschen (Vibration) und EV_FF (abspielen/stoppen).
+    /// Gewartet wird mit poll (höchstens 250 ms), gelesen erst danach unter der Schreibsperre samt Prüfung auf Dispose –
+    /// so liest der Leser nie aus einem fd, den Dispose schon geschlossen hat (die Nummer kann neu vergeben sein), und er
+    /// endet spätestens 250 ms nach Dispose.
+    /// </summary>
     private void ReadLoop()
     {
         byte* ev = stackalloc byte[24];
         int o = Is64 ? 16 : 8;
+        var pfd = new PollFd { Fd = _fd, Events = POLLIN };
         while (Volatile.Read(ref _disposed) == 0)
         {
-            nint n = read(_fd, ev, EventSize);
-            if (n != EventSize)
+            pfd.Revents = 0;
+            int ready = poll(&pfd, 1, 250);
+            if (ready == 0)
+                continue; // nichts angekommen
+            nint n;
+            lock (_writeLock)
             {
                 if (Volatile.Read(ref _disposed) != 0)
                     return;
-                Thread.Sleep(50);
+                n = ready > 0 && (pfd.Revents & POLLIN) != 0 ? read(_fd, ev, EventSize) : -1;
+            }
+            if (n != EventSize)
+            {
+                Thread.Sleep(50); // Fehler oder Unterbrechung – kurz warten, nicht im Kreis drehen
                 continue;
             }
             ushort type = *(ushort*)(ev + o);
@@ -242,16 +269,19 @@ public sealed unsafe class UInputPad : IDisposable
         byte* up = stackalloc byte[104];
         new Span<byte>(up, FfUploadSize).Clear();
         *(uint*)up = requestId;
-        if (ioctl(_fd, UI_BEGIN_FF_UPLOAD, (nint)up) < 0)
-            return;
-        // effect beginnt bei Byte 8: type (u16), id (s16) … Union ab Effekt-Byte 16: strong (u16), weak (u16).
-        ushort effectType = *(ushort*)(up + 8);
-        short id = *(short*)(up + 10);
-        if (effectType == FF_RUMBLE)
-            lock (_effects)
-                _effects[id] = (*(ushort*)(up + 24), *(ushort*)(up + 26));
-        *(int*)(up + 4) = 0; // retval
-        ioctl(_fd, UI_END_FF_UPLOAD, (nint)up);
+        lock (_writeLock) // ioctl auf den fd nur, solange er offen ist (siehe ReadLoop)
+        {
+            if (Volatile.Read(ref _disposed) != 0 || ioctl(_fd, UI_BEGIN_FF_UPLOAD, (nint)up) < 0)
+                return;
+            // effect beginnt bei Byte 8: type (u16), id (s16) … Union ab Effekt-Byte 16: strong (u16), weak (u16).
+            ushort effectType = *(ushort*)(up + 8);
+            short id = *(short*)(up + 10);
+            if (effectType == FF_RUMBLE)
+                lock (_effects)
+                    _effects[id] = (*(ushort*)(up + 24), *(ushort*)(up + 26));
+            *(int*)(up + 4) = 0; // retval
+            ioctl(_fd, UI_END_FF_UPLOAD, (nint)up);
+        }
     }
 
     private void HandleErase(uint requestId)
@@ -259,13 +289,16 @@ public sealed unsafe class UInputPad : IDisposable
         byte* er = stackalloc byte[12];
         new Span<byte>(er, 12).Clear();
         *(uint*)er = requestId;
-        if (ioctl(_fd, UI_BEGIN_FF_ERASE, (nint)er) < 0)
-            return;
-        short id = (short)*(uint*)(er + 8);
-        lock (_effects)
-            _effects.Remove(id);
-        *(int*)(er + 4) = 0;
-        ioctl(_fd, UI_END_FF_ERASE, (nint)er);
+        lock (_writeLock)
+        {
+            if (Volatile.Read(ref _disposed) != 0 || ioctl(_fd, UI_BEGIN_FF_ERASE, (nint)er) < 0)
+                return;
+            short id = (short)*(uint*)(er + 8);
+            lock (_effects)
+                _effects.Remove(id);
+            *(int*)(er + 4) = 0;
+            ioctl(_fd, UI_END_FF_ERASE, (nint)er);
+        }
         Rumble?.Invoke(0, 0);
     }
 
@@ -285,7 +318,7 @@ public sealed unsafe class UInputPad : IDisposable
         lock (_writeLock)
         {
             ioctl(_fd, UI_DEV_DESTROY, 0);
-            close(_fd); // beendet auch den Leser (read kehrt mit Fehler zurück)
+            close(_fd); // der Leser sieht _disposed spätestens nach seinem poll-Zeitlimit und endet
         }
         Log.Info($"Virtueller Controller „{Name}“ entfernt");
     }

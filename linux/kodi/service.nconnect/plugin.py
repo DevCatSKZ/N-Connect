@@ -7,8 +7,8 @@ Aktualisierung: Der Dienst setzt bei jeder sichtbaren Änderung die Home-Eigensc
 den Widget-Pfad mit  ?reload=$INFO[Window(Home).Property(NConnect.Reload)]  anlegen, laden das Widget dann von
 selbst neu – auch wenn es nicht fokussiert ist. Bei anderen Skins lädt der Dienst die Liste neu, sobald sie fokussiert ist.
 
-Angezeigt werden verbundene Controller (farbig) und bekannte, aber gerade nicht verbundene (ausgegraut).
-Auswahl eines Eintrags öffnet das N-Connect-Menü.
+Angezeigt werden verbundene Controller (farbig) und bekannte, aber gerade nicht verbundene (ausgegraut) – immer,
+auch wenn Bluetooth aus ist (dann steht ein Hinweis davor). Auswahl eines Eintrags öffnet das N-Connect-Menü.
 """
 
 import sys
@@ -49,16 +49,18 @@ def listing():
         if common.has_daemon():
             add(text(30612), text(30613), 'DefaultIconWarning.png')
         else:
-            add(text(30660), text(30661), 'DefaultIconWarning.png')
+            title, detail = common.companion_hint()
+            add(title, detail, 'DefaultIconWarning.png')
     else:
         bluetooth = status.get('bluetooth')
-        if bluetooth == 'off':
-            add(text(30608), text(30609), 'DefaultIconWarning.png')
-        elif bluetooth == 'missing':
-            add(text(30610), text(30611), 'DefaultIconWarning.png')
-        elif status.get('state') == 'starting':
+        if status.get('state') == 'starting':
             add(text(30631))
         else:
+            # Bluetooth aus / kein Adapter / ohne LE: Hinweis vorneweg, die Controller trotzdem zeigen – USB- und
+            # XInput-Controller (Windows) bzw. klassische Gamepads (ohne LE) laufen weiter.
+            hint = common.bluetooth_hint(status)
+            if hint is not None:
+                add(hint[0], hint[1], 'DefaultIconWarning.png')
             players = status.get('players', [])
             connected = {d.get('address', '').lower() for p in players for d in p.get('devices', [])}
             for p in players:

@@ -436,10 +436,6 @@ msgctxt "#30642"
 msgid "Bluetooth adapter"
 msgstr "蓝牙适配器"
 
-msgctxt "#30643"
-msgid "Low latency"
-msgstr "低延迟"
-
 msgctxt "#30644"
 msgid "Settings file"
 msgstr "设置文件"
@@ -625,5 +621,53 @@ msgid "N-Connect app is not running"
 msgstr "N-Connect 应用未在运行"
 
 msgctxt "#30661"
-msgid "Start the N-Connect app on this device – it reports the status here"
+msgid "Start N-Connect on this PC – it reports the status here"
 msgstr "请在此电脑上启动 N-Connect 应用——它会将状态发送到这里"
+
+msgctxt "#30019"
+msgid "Bluetooth adapter without LE – Switch 2 controllers cannot connect, other controllers still work"
+msgstr "蓝牙适配器不支持 LE – Switch 2 手柄无法连接，其他手柄仍可使用"
+
+msgctxt "#30520"
+msgid "These settings only apply on LibreELEC/Linux"
+msgstr "这些设置仅在 LibreELEC/Linux 上生效"
+
+msgctxt "#30521"
+msgid "On Windows and Android the N-Connect app connects the controllers – change these settings in the app. On macOS the add-on only displays the status. Select to open the guide."
+msgstr "在 Windows 和 Android 上由 N-Connect 应用连接手柄 – 请在应用中更改这些设置。在 macOS 上此插件仅显示状态。选择以打开指南。"
+
+msgctxt "#30634"
+msgid "Bluetooth without LE"
+msgstr "蓝牙不支持 LE"
+
+msgctxt "#30635"
+msgid "Switch 2 controllers need a Bluetooth adapter with LE (4.0 or newer) – other controllers keep working"
+msgstr "Switch 2 手柄需要支持 LE 的蓝牙适配器（4.0 或更高）– 其他手柄仍可正常使用"
+
+msgctxt "#30646"
+msgid "Bluetooth LE (Switch 2)"
+msgstr "蓝牙 LE（Switch 2）"
+
+msgctxt "#30662"
+msgid "Turn on Bluetooth in the Windows settings"
+msgstr "请在 Windows 设置中开启蓝牙"
+
+msgctxt "#30663"
+msgid "Turn on Bluetooth in Android"
+msgstr "请在 Android 中开启蓝牙"
+
+msgctxt "#30664"
+msgid "Plug in a Bluetooth adapter or turn on Bluetooth in the Windows settings"
+msgstr "插入蓝牙适配器，或在 Windows 设置中开启蓝牙"
+
+msgctxt "#30666"
+msgid "No N-Connect app for this system"
+msgstr "此系统没有 N-Connect 应用"
+
+msgctxt "#30667"
+msgid "Display only – N-Connect is not available for {0}"
+msgstr "仅显示 – N-Connect 不支持 {0}"
+
+msgctxt "#30668"
+msgid "Start N-Connect for Android (0.9.1 or newer) on this device – it reports the status here"
+msgstr "请在此设备上启动 N-Connect for Android（0.9.1 或更高版本）——它会将状态发送到这里"
