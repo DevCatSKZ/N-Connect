@@ -212,7 +212,10 @@ public static class SwitchCard
     public const string IniFile = "switchroot/joycon_mac.ini";
     public const string BinFile = "switchroot/joycon_mac.bin";
     public const string CalFile = "switchroot/switch.cal";
-    /// <summary>Gesicherte Bluetooth-Speicherdaten von Bluepick_RCM („Export … → SD“): verschlüsseltes Switch-Save.</summary>
+    /// <summary>
+    /// Gesicherte Bluetooth-Speicherdaten von Bluepick_RCM („Export … → SD“): System-Save 8000000000000050, innerhalb
+    /// der Datei unverschlüsselt (Bluepick entschlüsselt die NAND-Ebene beim Export, siehe <see cref="SwitchBtSave"/>).
+    /// </summary>
     public const string BluepickSave = "switch/Bluepick_RCM/8000000000000050.bin";
 
     /// <summary>Ordner, an denen eine Switch-SD-Karte zu erkennen ist.</summary>
