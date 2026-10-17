@@ -75,7 +75,8 @@ internal static class Branding
         // Controller-Silhouette: Körper und zwei Griffe als eine Fläche (Winding = Vereinigung).
         using (var pad = new GraphicsPath(FillMode.Winding))
         {
-            pad.AddPath(Theme.RoundedRect(R(0.15f, 0.40f, 0.70f, 0.29f), s * 0.145f), false);
+            using (var body = Theme.RoundedRect(R(0.15f, 0.40f, 0.70f, 0.29f), s * 0.145f))
+                pad.AddPath(body, false); // AddPath kopiert – den Hilfspfad gleich freigeben
             pad.AddEllipse(R(0.155f, 0.50f, 0.235f, 0.30f));
             pad.AddEllipse(R(0.61f, 0.50f, 0.235f, 0.30f));
             if (tile && s >= 48)
@@ -98,8 +99,10 @@ internal static class Branding
             using var ink = new SolidBrush(Ink);
             using (var dpad = new GraphicsPath(FillMode.Winding))
             {
-                dpad.AddPath(Theme.RoundedRect(R(0.235f, 0.512f, 0.15f, 0.05f), s * 0.012f), false);
-                dpad.AddPath(Theme.RoundedRect(R(0.285f, 0.462f, 0.05f, 0.15f), s * 0.012f), false);
+                using (var across = Theme.RoundedRect(R(0.235f, 0.512f, 0.15f, 0.05f), s * 0.012f))
+                    dpad.AddPath(across, false);
+                using (var down = Theme.RoundedRect(R(0.285f, 0.462f, 0.05f, 0.15f), s * 0.012f))
+                    dpad.AddPath(down, false);
                 g.FillPath(ink, dpad);
             }
             float b = 0.042f;
@@ -125,7 +128,7 @@ internal static class Branding
     }
 
     /// <summary>Logo als quadratisches Bild mit transparentem Rand.</summary>
-    /// <remarks>Für die Oberfläche <see cref="LogoView"/> nutzen – ein verkleinertes Bild wird an den Kanten pixelig.</remarks>
+    /// <remarks>In der Oberfläche direkt mit <see cref="DrawLogo"/> in Zielgröße zeichnen – ein verkleinertes Bild wird an den Kanten pixelig.</remarks>
     public static Bitmap Render(int size)
     {
         var bmp = new Bitmap(size, size, PixelFormat.Format32bppArgb);
@@ -279,22 +282,5 @@ internal static class Branding
             bmp.UnlockBits(data);
         }
         w.Write(new byte[maskStride * size]);
-    }
-}
-
-/// <summary>Logo in der Oberfläche: direkt in Zielgröße auf den Fensterhintergrund gezeichnet (scharf, ohne hellen Saum).</summary>
-internal sealed class LogoView : Control
-{
-    public LogoView()
-    {
-        SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint
-                 | ControlStyles.ResizeRedraw, true);
-        TabStop = false;
-    }
-
-    protected override void OnPaint(PaintEventArgs e)
-    {
-        e.Graphics.Clear(Parent?.BackColor ?? Theme.Backdrop);
-        Branding.DrawLogo(e.Graphics, new RectangleF(0.5f, 0.5f, Width - 1f, Height - 1f));
     }
 }
