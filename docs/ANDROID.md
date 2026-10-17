@@ -16,11 +16,12 @@ von Android direkt mit Android, N-Connect sieht sie nicht:
   ShanWan-Klon 057e:2009 aus Issue #1) koppeln über Bluetooth Classic ebenfalls direkt mit Android. Dann gehen in der
   Regel nur Tasten und Sticks; ob Bewegungssteuerung und Vibration funktionieren, hängt vom Gerät bzw. Kernel
   (`hid-nintendo`) ab – unter Android 15 waren es laut Issue #1 nur Tasten.
-- Ein eigener Bluetooth-Classic-Weg ist **bewusst nicht geplant** (Entscheidung 17.10.2026): Den HID-Kanal eines
-  klassisch gekoppelten Controllers hält der Android-Bluetooth-Stack, eine öffentliche API für HID-Host-Berichte gibt
-  es nicht, und Umwege über `/dev/hidraw*` oder `/dev/input/event*` wären gerätespezifisch und bräuchten Root bzw.
-  Shell-Rechte. Hilfe und Einrichtungs-Assistent sagen das so (vorher hieß es fälschlich, ältere Switch-Controller
-  liefen „meist schon direkt“).
+- Ein eigener Bluetooth-Classic-Weg ist **derzeit nicht umgesetzt**: Den HID-Kanal eines klassisch gekoppelten
+  Controllers hält der Android-Bluetooth-Stack, eine öffentliche API für HID-Host-Berichte gibt es nicht. Mögliche
+  Wege – `/dev/hidraw*` (Root; ob Shizuku-/Shell-Rechte genügen, hängt von den Gerätedateirechten ab) oder nur für die
+  Bewegungsdaten `/dev/input/event*`, falls der Kernel `hid-nintendo` bindet – sind gerätespezifisch und **ungeprüft**
+  (siehe offene Punkte). Hilfe und Einrichtungs-Assistent sagen das so (vorher hieß es fälschlich, ältere
+  Switch-Controller liefen „meist schon direkt“).
 
 ## Was geht, was offen ist
 
@@ -118,10 +119,17 @@ Vibration: Spiel ─▶ Kernel (hid-microsoft FF) ─▶ UHID-Ausgabebericht 0x0
 Paketsichtbarkeit (`<queries>`): Shizuku, Kodi, alle startbaren Apps (`MAIN`/`LAUNCHER` und `LEANBACK_LAUNCHER` für die
 App-Auswahl) und Startbildschirme (`MAIN`/`HOME`, damit ein Wechsel dorthin das Profil nicht umschaltet).
 
-**Ohne „Geräte in der Nähe“** startet der Dienst nicht: Kachel und Autostart prüfen das vorher (Kachel → App öffnen,
-Autostart → still abbrechen mit Protokolleintrag), und `ControllerService.TryStart` fängt Ausnahmen aus
-`StartForeground`/`StartScan` ab und beendet den Dienst, statt abzustürzen (ab Android 12 wirft `startScan`, ab
-Android 14 schon `startForeground` mit Typ connectedDevice eine SecurityException).
+**Ohne „Geräte in der Nähe“** startet der Dienst nicht: Kachel, Autostart und App prüfen das **vor** dem Start
+(Kachel → App öffnen, Autostart → still abbrechen mit Protokolleintrag, App → Berechtigung erfragen). Für den Restfall
+(Berechtigung fehlt erst in `OnStartCommand`) fängt `ControllerService.TryStart` Ausnahmen aus
+`StartForeground`/`StartScan` ab und beendet den Dienst mit Protokolleintrag (ab Android 12 wirft `startScan`, ab
+Android 14 schon `startForeground` mit Typ connectedDevice eine SecurityException). Einen Absturz schließt das nicht
+in jedem Fall aus: Endet ein per `startForegroundService` gestarteter Dienst, ohne dass `startForeground` gelungen
+ist, beendet Android die App („did not then call startForeground“, `fgRequired`). Deshalb prüft `TryStart` die
+Berechtigung erst **nach** `StartAsForeground` – bis Android 13 gelingt `startForeground` auch ohne sie; ob Android ab
+14 den abgelehnten Aufruf gelten lässt, ist nicht auf einem Gerät geprüft. Praktisch kaum erreichbar: Zwischen der
+Prüfung beim Aufrufer und `OnStartCommand` liegen nur Millisekunden, und entzieht man eine Berechtigung, beendet
+Android den App-Prozess ohnehin.
 
 ## Ausgabe: virtueller Controller ohne Root
 
@@ -247,8 +255,11 @@ Linux-Dienst, damit Menü und Home-Widget des Kodi-Add-ons ihn anzeigen:
   später Takt kann es nicht mehr überschreiben.
 - **Neuinstallation:** Eine alte status.json gehört dann der früheren Installation; die App sieht sie nicht und darf
   sie nicht ändern, Android legt die neue unter einem Ausweichnamen an (z. B. `status (1).json`). Die App bleibt dann
-  bei dieser Datei (Hinweis im Protokoll) und versucht bei jedem Start, wieder `status.json` zu bekommen. Das Kodi-Add-on
-  muss dafür auch `status*.json` im Ordner lesen (siehe offene Punkte).
+  bei dieser Datei und versucht bei jedem Start, wieder `status.json` zu bekommen. Solange sie die Ausweichdatei nutzt
+  (`KodiStatusWriter.FallbackName`), steht das im Protokoll und **sichtbar in Hilfe › Kodi** (die Karte ist dann schon
+  aufgeklappt): alte `status.json` mit einem Dateimanager löschen, N-Connect beenden und wieder öffnen. Das Kodi-Add-on
+  liest bisher nur `status.json` und zeigt bis dahin keinen Stand; es sollte auch `status*.json` im Ordner lesen
+  (siehe offene Punkte).
 
 ## Oberfläche
 
@@ -274,7 +285,8 @@ App-Sprache aus den Android-Einstellungen), unbekannte Sprachen fallen auf Engli
 - Die Bausteine in `UI/Ui.cs` (Title, Body, Caption, Section, Rich, Button, Toast …) übersetzen selbst – Texte dort
   einfach deutsch übergeben. Außerhalb davon (Dialoge, Benachrichtigung, Menü, Touch-Editor) `L.T` direkt nutzen.
 - **Neue oder geänderte Texte:** in `android/i18n/*.json` eintragen (`{"deutsch": {"en": …, "es": …, …}}`) und
-  `python android/i18n/generate.py` ausführen. Das Skript schreibt `L.Texts.cs` sowie `Resources/values-xx/strings.xml`
+  `python android/i18n/generate.py` ausführen (`--check` schreibt nie und meldet zusätzlich, ob `L.Texts.cs` und die
+  `strings.xml` veraltet sind – für die CI). Das Skript schreibt `L.Texts.cs` sowie `Resources/values-xx/strings.xml`
   (Name der Bedienungshilfe, Titel des Assistenten) und **bricht ohne zu schreiben ab**, wenn
   - ein deutscher Text doppelt vorkommt (in einer oder mehreren Dateien – vorher gewann stillschweigend die letzte),
   - eine der 11 Übersetzungen oder ein Platzhalter `{0}` fehlt,
@@ -313,6 +325,8 @@ dotnet build -t:Install -c Debug "-p:AdbTarget=-s adb-R5CRA1GQW0Z-ECDAJk._adb-tl
 - Voraussetzungen: .NET 10 SDK + Workload `android`, JDK 21 (`C:\Program Files\Microsoft\jdk-21.0.10.7-hotspot`, in der
   csproj hinterlegt – JDK 25 ist zu neu), Android-SDK unter `%LOCALAPPDATA%\Android\Sdk`.
 - Die Windows-CI baut nur `Switch2Pro.Protocol.Tests` und `Switch2Pro.Bridge` – das Android-Projekt stört sie nicht.
+  Ohne Android-Workload lauffähig und für die CI vorgesehen: `dotnet test android/NConnect.Android.Tests` und
+  `python android/i18n/generate.py --check` (siehe „Tests ohne Gerät“).
 - **Shizuku vom PC starten** (spart die Kopplung per kabellosem Debugging beim Testen):
   `adb shell <APK-Ordner>/lib/arm64/libshizuku.so` (Ordner über `adb shell pm path moe.shizuku.privileged.api`).
 - **Protokoll lesen:** `adb shell "run-as com.devcatskz.nconnect cat files/nconnect.log"` (Logcat ist auf dem Pixel
@@ -336,8 +350,8 @@ Android-freien Quelldateien direkt mit (`UpdateCheck.Releases.cs`, `ProfileEdit.
   `rate`.
 - Übersetzungen: alle Tabellen gleich lang, Tastennamen und Editor-Ziele in allen 11 Sprachen.
 
-Dazu `python android/i18n/generate.py` (Abbruch bei fehlenden/doppelten Texten) und der Debug-Build mit
-TreatWarningsAsErrors.
+Dazu `python android/i18n/generate.py --check` (Abbruch bei fehlenden/doppelten Texten oder veralteter `L.Texts.cs`)
+und der Debug-Build mit TreatWarningsAsErrors.
 
 ### Teststand 0.9.1
 
@@ -354,7 +368,13 @@ status.json mit Kodi (insbesondere ab Android 11 und nach Neuinstallation), Andr
 3. Touch-Steuerung und Editor auf dem Gerät vollständig testen; Root-Weg testen.
 4. Kodi für Android: prüfen, ob Kodi `/sdcard/Documents/N-Connect/status.json` einer anderen App ab Android 11 lesen
    darf (ohne „Zugriff auf alle Dateien“ sieht eine App Nicht-Mediendateien anderer Apps dort normalerweise nicht).
-   Das Add-on sollte außerdem `status*.json` lesen (Ausweichname nach einer Neuinstallation).
+   Das Add-on sollte außerdem die neueste `status*.json` im Ordner lesen (Ausweichname nach einer Neuinstallation,
+   z. B. `status (1).json`); bis dahin hilft nur der Hinweis in Hilfe › Kodi.
 5. DSU: Android-Emulatoren mit DSU-Client ermitteln und in Hilfe/Doku nennen.
 6. Verteilung über F-Droid oder Play Store prüfen.
-7. Andere Controller-Arten unter Android bleiben bewusst außen vor (siehe oben); GameCube-Trigger prüfen.
+7. Bluetooth-Classic-Controller (Issue #1, ShanWan-Klon 057e:2009): Issue beantworten (Android 0.9 kann nur
+   Switch 2 über BLE), das angehängte Diagnose-ZIP auswerten, auf einem Testgerät `ls -l /dev/hidraw*` und
+   `getevent -lp` prüfen bzw. vom Nutzer erfragen und erst dann über einen eigenen Weg (hidraw/evdev) entscheiden.
+   Dafür fehlt unter Android auch ein Gegenstück zu HidHide (Original und virtueller Xbox-Controller erschienen sonst
+   doppelt).
+8. GameCube-Trigger prüfen.

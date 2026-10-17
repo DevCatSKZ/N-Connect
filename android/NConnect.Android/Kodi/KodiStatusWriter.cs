@@ -41,6 +41,13 @@ public sealed partial class KodiStatusWriter : IDisposable
     private string? _lastError;
     private long _lastWrite;
     private volatile bool _stopped;
+    private volatile string? _fallbackName;
+
+    /// <summary>
+    /// Ausweichdatei (z. B. „status (1).json“), solange „status.json“ einer früheren Installation gehört – sonst null.
+    /// Hilfe › Kodi zeigt dann einen Hinweis: Das Kodi-Add-on liest womöglich nur „status.json“.
+    /// </summary>
+    public string? FallbackName => _fallbackName;
 
     public KodiStatusWriter(ControllerService service)
     {
@@ -202,8 +209,9 @@ public sealed partial class KodiStatusWriter : IDisposable
     /// <summary>
     /// Eigene status.json suchen, sonst anlegen. Nach einer Neuinstallation gehört eine alte status.json der früheren
     /// Installation: Die App sieht sie nicht und darf sie nicht ändern, Android legt die neue dann unter einem anderen
-    /// Namen an (z. B. „status (1).json“). Dann bleibt es bei dieser Ausweichdatei (Hinweis im Protokoll); bei jedem
-    /// Start wird erneut versucht, wieder „status.json“ zu bekommen – etwa nachdem die alte Datei gelöscht wurde.
+    /// Namen an (z. B. „status (1).json“). Dann bleibt es bei dieser Ausweichdatei (Hinweis im Protokoll und in
+    /// Hilfe › Kodi); bei jedem Start wird erneut versucht, wieder „status.json“ zu bekommen – etwa nachdem die alte Datei
+    /// gelöscht wurde.
     /// </summary>
     [System.Runtime.Versioning.SupportedOSPlatform("android29.0")]
     private global::Android.Net.Uri? OpenOrCreate(ContentResolver resolver)
@@ -214,26 +222,34 @@ public sealed partial class KodiStatusWriter : IDisposable
         if (own.FirstOrDefault(f => f.Name == FileName).Uri is { } exact)
         {
             DeleteOthers(resolver, own, exact);
+            _fallbackName = null;
             return exact;
         }
         var created = Insert(resolver, FileName);
         if (created is null)
-            return own.Count > 0 ? own[0].Uri : null;
+            return own.Count > 0 ? UseFallback(own[0].Uri, own[0].Name) : null;
         string? name = DisplayName(resolver, created);
         if (name == FileName)
         {
             DeleteOthers(resolver, own, created);
+            _fallbackName = null;
             return created;
         }
         if (own.Count > 0)
         {
             // Weiterhin belegt: bei der bisherigen Ausweichdatei bleiben, den neuen Doppelgänger wieder entfernen.
             resolver.Delete(created, null, null);
-            return own[0].Uri;
+            return UseFallback(own[0].Uri, own[0].Name);
         }
+        return UseFallback(created, name ?? "?");
+    }
+
+    private global::Android.Net.Uri UseFallback(global::Android.Net.Uri uri, string name)
+    {
         Log.Warn($"Kodi-status.json: „{FileName}“ gehört einer früheren Installation von N-Connect – schreibe „{name}“. " +
                  "Die alte Datei im Ordner Documents/N-Connect löschen, dann nimmt N-Connect beim nächsten Start wieder „status.json“.");
-        return created;
+        _fallbackName = name;
+        return uri;
     }
 
     [System.Runtime.Versioning.SupportedOSPlatform("android29.0")]

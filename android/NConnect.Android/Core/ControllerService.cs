@@ -60,6 +60,9 @@ public sealed class ControllerService : Service
     /// <summary>Adressen, deren Verbindungsaufbau gerade läuft (für den Kodi-Status).</summary>
     public IReadOnlyCollection<string> Connecting => [.. _connecting.Keys];
 
+    /// <summary>Ausweichname der Kodi-status.json nach einer Neuinstallation (sonst null) – Hinweis in Hilfe › Kodi.</summary>
+    public string? KodiStatusFallback => _kodiStatus?.FallbackName;
+
     /// <summary>Dienst starten (aus einer Activity heraus).</summary>
     public static void Start(Context context)
     {
@@ -123,9 +126,12 @@ public sealed class ControllerService : Service
     private bool _outputWatch;
 
     /// <summary>
-    /// Als Vordergrunddienst starten und suchen. Fehlt „Geräte in der Nähe“ (Kachel oder Autostart vor der Einrichtung,
-    /// Berechtigung entzogen) oder lehnt Android den Start ab, beendet sich der Dienst mit einem Protokolleintrag – ab
-    /// Android 12 würfe die Suche, ab Android 14 schon StartForeground eine SecurityException.
+    /// Als Vordergrunddienst starten und suchen. Fehlt „Geräte in der Nähe“ oder lehnt Android den Start ab, beendet sich
+    /// der Dienst mit einem Protokolleintrag – ab Android 12 würfe die Suche, ab Android 14 schon StartForeground eine
+    /// SecurityException. Die Berechtigung wird bewusst erst nach StartAsForeground geprüft: Endet ein per
+    /// StartForegroundService gestarteter Dienst ohne StartForeground, beendet Android die App („did not then call
+    /// startForeground“). Bis Android 13 klappt StartForeground auch ohne die Berechtigung; ob Android ab 14 den
+    /// abgelehnten Aufruf gelten lässt, ist nicht auf einem Gerät geprüft – Kachel, Autostart und App prüfen deshalb vorher.
     /// </summary>
     private bool TryStart()
     {

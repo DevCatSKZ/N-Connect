@@ -132,26 +132,26 @@ public sealed class HelpPage(MainActivity host) : IPage
     {
     }
 
-    /// <summary>Aufklappbare Karte: Titel antippen zeigt/versteckt den Text.</summary>
-    private View Topic(string title, string html, View? extra = null)
+    /// <summary>Aufklappbare Karte: Titel antippen zeigt/versteckt den Text (<paramref name="open"/>: schon aufgeklappt).</summary>
+    private View Topic(string title, string html, View? extra = null, bool open = false)
     {
         var header = new LinearLayout(host) { Orientation = Orientation.Horizontal, Clickable = true };
         header.SetGravity(GravityFlags.CenterVertical);
         var titleView = Ui.Title(host, title);
         header.AddView(titleView, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1f));
-        var arrow = Ui.Title(host, "▾");
+        var arrow = Ui.Title(host, open ? "▴" : "▾");
         header.AddView(arrow);
         var body = Ui.Column(host);
-        body.Visibility = ViewStates.Gone;
+        body.Visibility = open ? ViewStates.Visible : ViewStates.Gone;
         body.SetPadding(0, Ui.Dp(host, 10), 0, 0);
         body.AddView(Ui.Rich(host, html));
         if (extra is not null)
             body.AddView(extra);
         header.Click += (_, _) =>
         {
-            bool open = body.Visibility != ViewStates.Visible;
-            body.Visibility = open ? ViewStates.Visible : ViewStates.Gone;
-            arrow.Text = open ? "▴" : "▾";
+            bool show = body.Visibility != ViewStates.Visible;
+            body.Visibility = show ? ViewStates.Visible : ViewStates.Gone;
+            arrow.Text = show ? "▴" : "▾";
         };
         return Ui.Card(host, header, body);
     }
@@ -162,7 +162,15 @@ public sealed class HelpPage(MainActivity host) : IPage
     {
         bool kodi = KodiRepository.IsKodiInstalled(host);
         bool direct = OutputRouter.Shell is { } s && s.HasPermission();
+        // Nach einer Neuinstallation schreibt N-Connect womöglich in eine Ausweichdatei (KodiStatusWriter.FallbackName).
+        string? fallback = kodi ? Core.ControllerService.Instance?.KodiStatusFallback : null;
         string html =
+            (fallback is not null
+                ? L.F("<b>Kodi findet den Status womöglich nicht:</b> Im Ordner Documents/N-Connect liegt noch eine " +
+                      "status.json einer früheren Installation, die N-Connect nicht ändern darf – N-Connect schreibt " +
+                      "deshalb in <i>{0}</i>. Lösche die alte status.json mit einem Dateimanager, beende N-Connect " +
+                      "(Benachrichtigung → Beenden) und öffne es wieder.<br><br>", fallback)
+                : "") +
             L.T("Über das <b>DevCatSKZ Repository</b> bekommst du unsere Kodi-Plugins – mit automatischen Updates.<br><br>") +
             (kodi
                 ? (direct
@@ -183,7 +191,7 @@ public sealed class HelpPage(MainActivity host) : IPage
             : Ui.Buttons(host,
                 Ui.Button(host, "Kodi installieren", () => KodiRepository.OpenKodiInStore(host), Ui.ButtonStyle.Outlined),
                 Ui.Button(host, "Mehr Infos", OpenRepoPage, Ui.ButtonStyle.Text));
-        return Topic("Kodi: DevCatSKZ Repository", html, buttons);
+        return Topic("Kodi: DevCatSKZ Repository", html, buttons, open: fallback is not null);
     }
 
     private void OpenRepoPage() =>
