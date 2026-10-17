@@ -324,7 +324,11 @@ internal static partial class Tr
         ["N-Connect: ViGEmBus fehlt"] = "N-Connect: ViGEmBus mancante",
         ["Neue Version verfügbar"] = "Nuova versione disponibile",
         ["Einstellungen fehlerhaft"] = "Impostazioni danneggiate",
-        ["settings.json konnte nicht gelesen werden – es gelten die Standardwerte."] = "Impossibile leggere settings.json – si applicano i valori predefiniti.",
+        ["settings.json konnte nicht gelesen werden – es gelten die Standardwerte. Die beschädigte Datei wird als „settings.json.unlesbar-…“ aufbewahrt (Klicken öffnet den Ordner)."] =
+            "Impossibile leggere settings.json – si applicano i valori predefiniti. Il file danneggiato viene conservato come «settings.json.unlesbar-…» (fai clic per aprire la cartella).",
+        ["Einstellungen wiederhergestellt"] = "Impostazioni ripristinate",
+        ["Die Einstellungen waren beschädigt und wurden aus der letzten Sicherung wiederhergestellt. Die zuletzt geänderten Werte fehlen womöglich (Klicken öffnet den Ordner)."] =
+            "Le impostazioni erano danneggiate e sono state ripristinate dall'ultimo backup. Le modifiche più recenti potrebbero mancare (fai clic per aprire la cartella).",
         ["Ohne ViGEmBus kann kein virtueller Controller erzeugt werden. Bitte das Setup erneut ausführen oder ViGEmBus installieren (Rechtsklick auf das Symbol → ViGEmBus herunterladen)."] =
             "Senza ViGEmBus non è possibile creare un controller virtuale. Esegui di nuovo l'installazione o installa ViGEmBus (tasto destro sull'icona → Scarica ViGEmBus).",
 
@@ -668,6 +672,9 @@ internal static partial class Tr
         ["HidHide aktuell halten"] = "Mantieni HidHide aggiornato",
         ["Beim Start nach einer neuen HidHide-Version suchen. Installiert wird nur nach Rückfrage (geprüfter Download vom Hersteller, Neustart nötig)."] =
             "Cerca una nuova versione di HidHide all'avvio. L'installazione avviene solo dopo conferma (download verificato dal produttore, riavvio necessario).",
+        ["Lizenzen Dritter"] = "Licenze di terze parti",
+        ["Open-Source-Software und übernommener Code in N-Connect – mit Lizenzen und Copyright-Vermerken."] =
+            "Software open source e codice adattato in N-Connect – con licenze e note di copyright.",
         ["Der Download hat nicht geklappt oder die Datei war fehlerhaft. Die Release-Seite im Browser öffnen?"] =
             "Il download non è riuscito o il file era difettoso. Aprire la pagina della versione nel browser?",
         ["Alle Controller trennen"] = "Disconnetti tutti i controller",
