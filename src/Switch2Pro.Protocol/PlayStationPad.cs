@@ -341,9 +341,9 @@ public static class PlayStationPad
     /// DualSense-Ausgabebericht (DS5EffectsState_t, 47 Byte Effekte).
     /// USB: 48 Byte, ID 0x02, Effekte ab Byte 1. Bluetooth: 78 Byte, ID 0x31, Byte 1 = 0x02,
     /// Effekte ab Byte 2, CRC32 über 0xA2+Daten am Ende.
-    /// Rumble: Firmware ≥ 2.24 braucht EnableBits3 0x04, ältere EnableBits1 0x01 mit halben Werten –
-    /// wir kennen die Firmware ggf. nicht → beide Bits setzen schadet nichts? Nein: nur eines. Wir setzen
-    /// das moderne Bit und fallen auf die einfache Emulation zurück, wenn firmware &lt; 0x0224.
+    /// Vibration: Firmware ≥ 2.24 braucht EnableBits3 0x04, ältere EnableBits1 0x01 mit halben Werten. Gesetzt wird
+    /// immer nur eines davon, je nach <paramref name="firmwareHasImprovedRumble"/> (Firmware ≥ 0x0224, siehe
+    /// <see cref="DualSenseFirmware"/>).
     /// </summary>
     public static byte[] BuildDualSenseOutput(bool bluetooth, byte small, byte large,
         (byte R, byte G, byte B)? lightbar, int playerIndex, bool firmwareHasImprovedRumble)

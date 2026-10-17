@@ -135,7 +135,10 @@ public static class Switch1
             return false;
         var c = new ImuCalibration(S16(d, 0), S16(d, 1), S16(d, 2), S16(d, 3), S16(d, 4), S16(d, 5),
             S16(d, 6), S16(d, 7), S16(d, 8), S16(d, 9), S16(d, 10), S16(d, 11));
-        if (c.AccelSensX == c.AccelOriginX || c.GyroSensX == c.GyroOriginX)
+        // Empfindlichkeit = Nullpunkt auf irgendeiner Achse → Division durch 0 in ToSwitch2Axes: die Achse stünde
+        // dauerhaft am Anschlag (Gyro dreht ständig). Dann lieber die Standardwerte.
+        if (c.AccelSensX == c.AccelOriginX || c.AccelSensY == c.AccelOriginY || c.AccelSensZ == c.AccelOriginZ
+            || c.GyroSensX == c.GyroOriginX || c.GyroSensY == c.GyroOriginY || c.GyroSensZ == c.GyroOriginZ)
             return false;
         calibration = c;
         return true;
@@ -146,11 +149,7 @@ public static class Switch1
 
     // ---------- Eingaben ----------
 
-    /// <summary>
-    /// Vollbericht 0x30 (mit Report-ID). Die Bewegungsdaten werden in die Einheiten und Achsen
-    /// der Switch-2-Controller umgerechnet (Gyro 2000 °/s ≙ 32767, Beschl. 4096 ≙ 1 g), damit der
-    /// Rest der Kette (DS4-Ausgabe) für alle Controller gleich ist.
-    /// </summary>
+    /// <summary>Unterbefehle für Zubehör am rechten Joy-Con (Ring-Con): Gerät abfragen, Abfrage einschalten, Format.</summary>
     public const byte SubExternalDeviceInfo = 0x59, SubEnableExternalPolling = 0x5A, SubExternalFormat = 0x5C;
     public const ushort ExternalRingCon = 0x2000;
 
@@ -186,6 +185,11 @@ public static class Switch1
         return true;
     }
 
+    /// <summary>
+    /// Vollbericht 0x30 (mit Report-ID; auch 0x21 und 0x31, die denselben Kopf haben). Die Bewegungsdaten werden in die
+    /// Einheiten und Achsen der Switch-2-Controller umgerechnet (Gyro 2000 °/s ≙ 32767, Beschl. 4096 ≙ 1 g), damit der
+    /// Rest der Kette (DS4-Ausgabe) für alle Controller gleich ist.
+    /// </summary>
     public static bool TryParseFull(ReadOnlySpan<byte> r, ControllerKind kind, in ImuCalibration imu, out ControllerState state)
     {
         state = new ControllerState();
