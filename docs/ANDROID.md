@@ -323,9 +323,9 @@ dotnet build -t:Install -c Debug "-p:AdbTarget=-s adb-R5CRA1GQW0Z-ECDAJk._adb-tl
 
 ### Tests ohne Gerät
 
-`dotnet test android/NConnect.Android.Tests` (xUnit, net8.0) kompiliert die Android-freien Quelldateien direkt mit
-(`UpdateCheck.Releases.cs`, `ProfileEdit.cs`, `GameProfileWatcher.Pick.cs`, `KodiStatusWriter.Contract.cs`,
-`L.Texts.cs`) und prüft:
+`dotnet test android/NConnect.Android.Tests` (xUnit, net8.0, braucht kein Android-Workload) kompiliert die
+Android-freien Quelldateien direkt mit (`UpdateCheck.Releases.cs`, `ProfileEdit.cs`, `GameProfileWatcher.Pick.cs`,
+`KodiStatusWriter.Contract.cs`, `L.Texts.cs`) und prüft:
 
 - Update-Prüfung: Version aus dem APK-Namen, Releases ohne APK/Entwürfe/Vorabversionen/fremde Adressen übersprungen,
   höchste APK gewinnt unabhängig vom Tag, kein erneutes Angebot nach der Installation.
