@@ -37,6 +37,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- tests/NConnect.Linux.Tests prüft Befehlskanal, status.json und Verbindungsabbruch ohne Gerät. -->
+    <InternalsVisibleTo Include="NConnect.Linux.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\src\Switch2Pro.Protocol\Switch2Pro.Protocol.csproj" />
     <!-- 6.x nutzt das gepatchte Tmds.DBus (≥ 0.92, CVE-2026-39959); 5.67.1 hängt an der verwundbaren 0.20. -->
     <PackageReference Include="Linux.Bluetooth" Version="6.0.0-pre3" />
