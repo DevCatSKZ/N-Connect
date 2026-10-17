@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.nconnect.status" name="N-Connect Status" version="1.1.1" provider-name="devcatskz">
+    <!-- Ältere Widget-Quelle für Skins (plugin://plugin.nconnect.status/). Die Anzeige liegt in service.nconnect
+         (plugin.py) – dieses Add-on leitet nur weiter, damit bestehende Widget-Einstellungen weiter funktionieren.
+         Das Symbol (resources/icon.png) legt linux/build-kodi-addon.ps1 beim Packen hinein. -->
+    <requires>
+        <import addon="xbmc.python" version="3.0.0"/>
+        <import addon="service.nconnect" version="0.3.4"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="default.py">
+        <provides>video</provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="de_DE">Verbundene Controller als Widget</summary>
+        <summary lang="en_GB">Connected controllers as a widget</summary>
+        <summary lang="es_ES">Mandos conectados como widget</summary>
+        <summary lang="fr_FR">Manettes connectées en widget</summary>
+        <summary lang="it_IT">Controller connessi come widget</summary>
+        <summary lang="pt_PT">Comandos ligados como widget</summary>
+        <summary lang="pt_BR">Controles conectados como widget</summary>
+        <summary lang="nl_NL">Verbonden controllers als widget</summary>
+        <summary lang="pl_PL">Połączone kontrolery jako widżet</summary>
+        <summary lang="ru_RU">Подключённые контроллеры в виде виджета</summary>
+        <summary lang="ja_JP">接続中のコントローラーをウィジェットに表示</summary>
+        <summary lang="zh_CN">以小部件显示已连接的手柄</summary>
+        <summary lang="ko_KR">연결된 컨트롤러를 위젯으로 표시</summary>
+        <description lang="de_DE">Zeigt die über N-Connect verbundenen Controller (Name, Akku, Ladestatus) und bekannte, gerade nicht verbundene als Liste an. Für Skin-Widgets mit dem älteren Pfad plugin://plugin.nconnect.status/ – die Anzeige kommt aus N-Connect (service.nconnect).</description>
+        <description lang="en_GB">Lists the controllers connected via N-Connect (name, battery, charging) and known ones that are currently not connected. For skin widgets with the older path plugin://plugin.nconnect.status/ – the display comes from N-Connect (service.nconnect).</description>
+        <description lang="es_ES">Muestra en una lista los mandos conectados mediante N-Connect (nombre, batería, carga) y los conocidos que ahora no están conectados. Para widgets de skin con la ruta antigua plugin://plugin.nconnect.status/; la vista procede de N-Connect (service.nconnect).</description>
+        <description lang="fr_FR">Affiche sous forme de liste les manettes connectées via N-Connect (nom, batterie, charge) et les manettes connues actuellement déconnectées. Pour les widgets de skin utilisant l'ancien chemin plugin://plugin.nconnect.status/ – l'affichage provient de N-Connect (service.nconnect).</description>
+        <description lang="it_IT">Mostra in un elenco i controller collegati tramite N-Connect (nome, batteria, ricarica) e quelli noti al momento non collegati. Per i widget delle skin con il vecchio percorso plugin://plugin.nconnect.status/ – la visualizzazione proviene da N-Connect (service.nconnect).</description>
+        <description lang="pt_PT">Mostra numa lista os comandos ligados através do N-Connect (nome, bateria, carregamento) e os conhecidos que de momento não estão ligados. Para widgets de skin com o caminho antigo plugin://plugin.nconnect.status/ – a apresentação vem do N-Connect (service.nconnect).</description>
+        <description lang="pt_BR">Mostra em uma lista os controles conectados pelo N-Connect (nome, bateria, carregamento) e os conhecidos que no momento não estão conectados. Para widgets de skin com o caminho antigo plugin://plugin.nconnect.status/ – a exibição vem do N-Connect (service.nconnect).</description>
+        <description lang="nl_NL">Toont de via N-Connect verbonden controllers (naam, batterij, opladen) en bekende controllers die nu niet verbonden zijn als lijst. Voor skin-widgets met het oudere pad plugin://plugin.nconnect.status/ – de weergave komt van N-Connect (service.nconnect).</description>
+        <description lang="pl_PL">Wyświetla listę kontrolerów połączonych przez N-Connect (nazwa, bateria, ładowanie) oraz znanych, które nie są teraz połączone. Dla widżetów skórek ze starszą ścieżką plugin://plugin.nconnect.status/ – widok pochodzi z N-Connect (service.nconnect).</description>
+        <description lang="ru_RU">Показывает списком контроллеры, подключённые через N-Connect (имя, заряд, зарядка), а также известные, но сейчас не подключённые. Для виджетов скинов со старым путём plugin://plugin.nconnect.status/ – отображение берётся из N-Connect (service.nconnect).</description>
+        <description lang="ja_JP">N-Connect で接続中のコントローラー（名前、バッテリー、充電）と、既知で現在未接続のコントローラーを一覧表示します。旧パス plugin://plugin.nconnect.status/ を使うスキンのウィジェット用です。表示内容は N-Connect（service.nconnect）から取得します。</description>
+        <description lang="zh_CN">以列表显示通过 N-Connect 连接的手柄（名称、电量、充电状态）以及已知但当前未连接的手柄。用于使用旧路径 plugin://plugin.nconnect.status/ 的皮肤小部件——显示内容来自 N-Connect（service.nconnect）。</description>
+        <description lang="ko_KR">N-Connect로 연결된 컨트롤러(이름, 배터리, 충전)와 알려져 있지만 지금은 연결되지 않은 컨트롤러를 목록으로 보여 줍니다. 이전 경로 plugin://plugin.nconnect.status/를 쓰는 스킨 위젯용이며, 표시 내용은 N-Connect(service.nconnect)에서 가져옵니다.</description>
+        <platform>all</platform>
+        <license>MIT</license>
+        <source>https://github.com/DevCatSKZ/N-Connect</source>
+        <website>https://github.com/DevCatSKZ/N-Connect</website>
+        <news>1.1.1: Quellcode im N-Connect-Repository, Anbieter devcatskz, Beschreibung in 12 Sprachen – Anzeige unverändert (kommt aus service.nconnect)[CR]1.1.0: Widget zeigt auch bekannte, gerade nicht verbundene Controller und lädt sich bei Änderungen selbst neu</news>
+        <assets>
+            <icon>resources/icon.png</icon>
+        </assets>
+    </extension>
+</addon>

@@ -436,10 +436,6 @@ msgctxt "#30642"
 msgid "Bluetooth adapter"
 msgstr "블루투스 어댑터"
 
-msgctxt "#30643"
-msgid "Low latency"
-msgstr "낮은 지연 시간"
-
 msgctxt "#30644"
 msgid "Settings file"
 msgstr "설정 파일"
@@ -625,5 +621,53 @@ msgid "N-Connect app is not running"
 msgstr "N-Connect 앱이 실행 중이 아닙니다"
 
 msgctxt "#30661"
-msgid "Start the N-Connect app on this device – it reports the status here"
+msgid "Start N-Connect on this PC – it reports the status here"
 msgstr "이 PC에서 N-Connect 앱을 실행하세요 – 여기로 상태를 보냅니다"
+
+msgctxt "#30019"
+msgid "Bluetooth adapter without LE – Switch 2 controllers cannot connect, other controllers still work"
+msgstr "LE를 지원하지 않는 블루투스 어댑터 – Switch 2 컨트롤러는 연결할 수 없지만 다른 컨트롤러는 됩니다"
+
+msgctxt "#30520"
+msgid "These settings only apply on LibreELEC/Linux"
+msgstr "이 설정은 LibreELEC/Linux에서만 적용됩니다"
+
+msgctxt "#30521"
+msgid "On Windows and Android the N-Connect app connects the controllers – change these settings in the app. On macOS the add-on only displays the status. Select to open the guide."
+msgstr "Windows와 Android에서는 N-Connect 앱이 컨트롤러를 연결합니다 – 이 설정은 앱에서 바꾸세요. macOS에서는 애드온이 상태만 표시합니다. 선택하면 안내를 엽니다."
+
+msgctxt "#30634"
+msgid "Bluetooth without LE"
+msgstr "블루투스 LE 미지원"
+
+msgctxt "#30635"
+msgid "Switch 2 controllers need a Bluetooth adapter with LE (4.0 or newer) – other controllers keep working"
+msgstr "Switch 2 컨트롤러에는 LE를 지원하는 블루투스 어댑터(4.0 이상)가 필요합니다 – 다른 컨트롤러는 계속 작동합니다"
+
+msgctxt "#30646"
+msgid "Bluetooth LE (Switch 2)"
+msgstr "블루투스 LE (Switch 2)"
+
+msgctxt "#30662"
+msgid "Turn on Bluetooth in the Windows settings"
+msgstr "Windows 설정에서 블루투스를 켜세요"
+
+msgctxt "#30663"
+msgid "Turn on Bluetooth in Android"
+msgstr "Android에서 블루투스를 켜세요"
+
+msgctxt "#30664"
+msgid "Plug in a Bluetooth adapter or turn on Bluetooth in the Windows settings"
+msgstr "블루투스 어댑터를 연결하거나 Windows 설정에서 블루투스를 켜세요"
+
+msgctxt "#30666"
+msgid "No N-Connect app for this system"
+msgstr "이 시스템용 N-Connect 앱이 없습니다"
+
+msgctxt "#30667"
+msgid "Display only – N-Connect is not available for {0}"
+msgstr "표시 전용 – N-Connect는 {0}용이 없습니다"
+
+msgctxt "#30668"
+msgid "Start N-Connect for Android (0.9.1 or newer) on this device – it reports the status here"
+msgstr "이 기기에서 N-Connect for Android(0.9.1 이상)를 실행하세요 – 여기로 상태를 보냅니다"

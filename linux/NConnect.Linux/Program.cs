@@ -2,10 +2,11 @@ using System.Runtime.InteropServices;
 using NConnect.Linux;
 
 // N-Connect für Linux – Aufruf:
-//   nconnect [--data <Ordner>] [--adapter hci0]
+//   nconnect [--data <Ordner>] [--adapter hci0] [--kodi]
 //   nconnect --selftest [--data <Ordner>]   (Diagnose ohne Controller)
 // <Ordner> enthält settings.json (gleiche Einstellungsdatei wie Windows/Android), status.json und nconnect.log.
 // Ereignisse für das Kodi-Add-on erscheinen als JSON-Zeilen auf stdout, das Protokoll auf stderr.
+// --kodi: vom Kodi-Add-on gestartet – endet mit Kodi (stdin geschlossen oder Elternprozess weg), auch nach einem Absturz.
 
 string data = Arg("--data") ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config", "nconnect");
 Directory.CreateDirectory(data);
@@ -27,7 +28,7 @@ using var sigint = PosixSignalRegistration.Create(PosixSignal.SIGINT, c => { c.C
 
 try
 {
-    await using var daemon = new Daemon(data, Arg("--adapter"));
+    await using var daemon = new Daemon(data, Arg("--adapter"), withKodi: args.Contains("--kodi"));
     await daemon.RunAsync(stop.Token);
 }
 catch (OperationCanceledException)

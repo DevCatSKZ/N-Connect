@@ -35,7 +35,7 @@ class Service(xbmc.Monitor):
         self.adapter = common.adapter_setting()
         self.failures = 0
         self.last_bluetooth = None
-        self.stopping = False
+        self.stop_requested = False  # stop() von außen (Neustart, Adapterwechsel) – kein Absturz
         self._last_widget_refresh = 0.0
         self._fingerprint = None
         self._dirty = False
@@ -81,39 +81,56 @@ class Service(xbmc.Monitor):
     # ---------- Programm starten/stoppen ----------
 
     def start(self):
-        binary = common.binary_path()
-        if binary is None:
-            common.log('kein Programm für Prozessor ' + common.machine(), xbmc.LOGERROR)
-            self.notify(text(30022, common.machine()), error=True)
-            return False
-        common.ensure_data_dir()
-        try:
-            common.mark_starting()
-        except OSError:
-            pass
-        self.load_uinput()
-        args = [binary, '--data', common.DATA_DIR]
-        if self.adapter:
-            args += ['--adapter', self.adapter]
-        common.log('starte ' + ' '.join(args))
-        with self.lock:
-            self.process = subprocess.Popen(
-                args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
-                env=common.environment(), bufsize=1, universal_newlines=True, encoding='utf-8', errors='replace')
-        threading.Thread(target=self.read_events, args=(self.process,), name='nconnect-events', daemon=True).start()
-        return True
+        candidates = common.binary_candidates()
+        if candidates:
+            try:
+                common.ensure_data_dir()
+                common.mark_starting()
+            except OSError:
+                pass
+            common.stop_leftover()
+            self.load_uinput()
+        for binary in candidates:
+            # --kodi: das Programm endet mit Kodi (auch nach einem Absturz), statt verwaist weiterzulaufen.
+            args = [binary, '--data', common.DATA_DIR, '--kodi']
+            if self.adapter:
+                args += ['--adapter', self.adapter]
+            common.log('starte ' + ' '.join(args))
+            try:
+                process = subprocess.Popen(
+                    args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+                    env=common.environment(), bufsize=1, universal_newlines=True, encoding='utf-8', errors='replace')
+            except OSError as e:
+                # z. B. „Exec format error“: 64-Bit-Programm auf 32-Bit-System – die andere Variante versuchen
+                common.log('{0} startet nicht: {1}'.format(binary, e), xbmc.LOGWARNING)
+                continue
+            with self.lock:
+                self.process = process
+                self.stop_requested = False
+                common.write_pid(process.pid)
+            threading.Thread(target=self.read_events, args=(process,), name='nconnect-events', daemon=True).start()
+            return True
+        common.log('kein lauffähiges Programm für Prozessor ' + common.machine(), xbmc.LOGERROR)
+        self.notify(text(30022, common.machine()), error=True)
+        return False
 
     def stop(self):
+        """Programm beenden und auf sein Ende warten. self.process bleibt so lange gesetzt – erst danach startet die
+        Hauptschleife ein neues (sonst kämpften kurz zwei Programme um Controller und DSU-Port)."""
         with self.lock:
-            process, self.process = self.process, None
-        if process is None or process.poll() is not None:
-            return
-        process.terminate()  # SIGTERM: trennt die Controller sauber und entfernt die virtuellen Controller
-        try:
-            process.wait(timeout=8)
-        except subprocess.TimeoutExpired:
-            process.kill()
-            process.wait()
+            process = self.process
+            self.stop_requested = True
+        if process is not None and process.poll() is None:
+            process.terminate()  # SIGTERM: trennt die Controller sauber und entfernt die virtuellen Controller
+            try:
+                process.wait(timeout=8)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait()
+        with self.lock:
+            if process is not None and self.process is process:
+                self.process = None
+                common.clear_pid()
 
     @staticmethod
     def load_uinput():
@@ -190,6 +207,8 @@ class Service(xbmc.Monitor):
                     self.notify(text(30015), duration=8000, error=True)
                 elif state == 'missing':
                     self.notify(text(30016), duration=8000, error=True)
+                elif state == 'no_le':
+                    self.notify(text(30019), duration=8000, error=True)
         if name in WIDGET_EVENTS:
             self.refresh_widget()
 
@@ -202,6 +221,8 @@ class Service(xbmc.Monitor):
     # ---------- Kodi-Rückrufe ----------
 
     def onSettingsChanged(self):
+        if not common.has_daemon():
+            return  # Begleitmodus: Die N-Connect-App liest Kodis Einstellungen nicht – nichts zu übertragen
         try:
             common.write_settings_json()
         except OSError as e:
@@ -269,8 +290,11 @@ class Service(xbmc.Monitor):
                 break
             with self.lock:
                 process, self.process = self.process, None
-            if process is None:
-                continue  # gewollter Neustart (Adapter geändert / „restart“)
+                requested, self.stop_requested = self.stop_requested, False
+                if process is not None:
+                    common.clear_pid()
+            if process is None or requested:
+                continue  # gewollter Neustart (Adapter geändert / „restart“): das alte Programm ist schon beendet
             # Unerwartet beendet: mit wachsender Pause neu starten; wer länger lief, fängt wieder bei 3 s an.
             if time.time() - started > 120:
                 self.failures = 0

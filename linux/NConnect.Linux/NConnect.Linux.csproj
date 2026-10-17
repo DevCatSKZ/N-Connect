@@ -9,7 +9,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>nconnect</AssemblyName>
     <RootNamespace>NConnect.Linux</RootNamespace>
-    <Version>0.1.0</Version>
+    <Version>0.4.4</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <!-- LibreELEC hat kein ICU: Kulturdaten werden nicht gebraucht. -->
@@ -34,6 +34,11 @@
     <TrimmerRootAssembly Include="Linux.Bluetooth" />
     <TrimmerRootAssembly Include="Tmds.DBus" />
     <TrimmerRootAssembly Include="nconnect" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- tests/NConnect.Linux.Tests prüft Befehlskanal, status.json und Verbindungsabbruch ohne Gerät. -->
+    <InternalsVisibleTo Include="NConnect.Linux.Tests" />
   </ItemGroup>
 
   <ItemGroup>

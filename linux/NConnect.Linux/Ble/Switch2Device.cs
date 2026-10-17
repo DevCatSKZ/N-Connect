@@ -45,7 +45,8 @@ public sealed class Switch2Device : IAsyncDisposable
     public event Action<Switch2Device, ControllerState>? StateReceived;
     public event Action<Switch2Device>? Lost;
 
-    private Switch2Device(string address, ControllerKind kind)
+    /// <summary>Nur das Objekt, noch ohne Verbindung (verbunden wird in <see cref="ConnectAsync"/>; Tests nutzen es direkt).</summary>
+    internal Switch2Device(string address, ControllerKind kind)
     {
         Address = address;
         Kind = kind;
@@ -373,7 +374,7 @@ public sealed class Switch2Device : IAsyncDisposable
         }
     }
 
-    private void RaiseLost()
+    internal void RaiseLost()
     {
         if (Interlocked.Exchange(ref _lostRaised, 1) == 0)
             Lost?.Invoke(this);

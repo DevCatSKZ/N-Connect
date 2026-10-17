@@ -1,0 +1,17 @@
+[B]Tryb towarzyszący[/B]
+W tym systemie kontrolerów nie łączy dodatek, tylko aplikacja N-Connect. Dodatek pokazuje jedynie to, co przekazuje aplikacja: menu (Programy > N-Connect) i widżet ekranu głównego z połączonymi i znanymi kontrolerami oraz ich baterią.
+
+[B]Windows[/B]
+Zainstaluj i uruchom N-Connect dla Windows (github.com/DevCatSKZ/N-Connect). Aplikacja łączy kontrolery jako kontrolery Xbox – Kodi rozpoznaje je bez konfiguracji. Zapisuje swój stan w folderze danych Kodi; jeśli nie działa, pojawia się tu „Aplikacja N-Connect nie jest uruchomiona”. Kodi zainstalowane po N-Connect: uruchom N-Connect jeden raz ponownie.
+
+[B]Android[/B]
+Zainstaluj i uruchom N-Connect dla Androida 0.9.1 lub nowszy. Aplikacja zapisuje swój stan w folderze Documents/N-Connect, skąd odczytuje go dodatek. Jeśli Kodi nadal nic nie pokazuje, Android może blokować dostęp: zezwól Kodi na dostęp do plików (pamięci) w ustawieniach Androida. Kodi zainstalowane po N-Connect: uruchom N-Connect jeden raz ponownie.
+
+[B]macOS[/B]
+N-Connect nie jest dostępny dla macOS – dodatek może tu tylko wyświetlać i pozostaje pusty.
+
+[B]Ustawienia[/B]
+Układ przycisków, żyroskop, wibracje, parowanie itd. ustawiasz w aplikacji N-Connect. Ustawienia tego dodatku działają tylko w LibreELEC/Linux.
+
+[B]Widżet na ekranie głównym[/B]
+Zależnie od skórki: Ustawienia skórki > Ekran główny > Widżety > Dodatki > N-Connect.

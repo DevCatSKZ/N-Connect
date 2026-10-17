@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Linux.Bluetooth;
@@ -6,6 +7,7 @@ using NConnect.Linux.Ble;
 using NConnect.Linux.Core;
 using NConnect.Linux.Output;
 using Switch2Pro.Protocol;
+using Tmds.DBus;
 
 namespace NConnect.Linux;
 
@@ -13,15 +15,20 @@ namespace NConnect.Linux;
 /// Der Dienst: wartet auf einen Bluetooth-Adapter, sucht Switch-2-Controller, verbindet sie und legt je Spieler einen
 /// virtuellen Xbox-360-Controller an. Schreibt den Zustand nach status.json, meldet Ereignisse als JSON-Zeilen auf
 /// stdout und nimmt Befehle zeilenweise über stdin an (für das Kodi-Add-on):
-///   reload | disconnect &lt;Spieler 1…8&gt; | disconnect-all | status
+///   reload | disconnect &lt;Spieler 1…8&gt; | disconnect-all | status | scan
+///   | gamepad-disconnect &lt;Adresse&gt; | gamepad-forget &lt;Adresse&gt;
+/// Aus Kodi gestartet (<c>--kodi</c>) endet er mit Kodi: bei geschlossenem stdin oder wenn der Elternprozess weg ist.
 /// </summary>
 public sealed class Daemon : IAsyncDisposable
 {
     private const int QuietMs = 15000;
     private static readonly JsonSerializerOptions StatusJson = new() { WriteIndented = true };
 
+    [DllImport("libc")] private static extern int getppid();
+
     private readonly string _dataDir;
     private readonly string? _adapterName;
+    private readonly bool _withKodi;
     private readonly string _settingsPath;
     private readonly string _statusPath;
     private readonly List<Player> _players = [];
@@ -32,17 +39,22 @@ public sealed class Daemon : IAsyncDisposable
     private readonly object _stdoutLock = new();
     private volatile Settings _settings;
     private FileSystemWatcher? _settingsWatcher;
+    private CancellationTokenSource? _run;
     private CancellationTokenSource? _session;
+    private Adapter? _adapter;
     private Switch2Scanner? _scanner;
-    private string _adapterState = "starting";
+    /// <summary>„on“ | „off“ | „missing“ | „no_le“ (Vertrag der status.json); null = noch nicht geprüft.</summary>
+    private volatile string? _adapterState;
     private string? _adapterAddress;
     private int _adapterIndex;
     private ulong _hostAddress;
 
-    public Daemon(string dataDir, string? adapterName)
+    /// <param name="withKodi">Aus Kodi gestartet: mit Kodi enden (stdin zu oder Elternprozess weg).</param>
+    public Daemon(string dataDir, string? adapterName, bool withKodi = false)
     {
         _dataDir = dataDir;
         _adapterName = adapterName;
+        _withKodi = withKodi;
         _settingsPath = Path.Combine(dataDir, "settings.json");
         _statusPath = Path.Combine(dataDir, "status.json");
         _settings = Settings.Load(_settingsPath);
@@ -50,15 +62,24 @@ public sealed class Daemon : IAsyncDisposable
             Log.Warn($"settings.json nicht lesbar ({error}) – Standardwerte");
     }
 
+    /// <summary>Legt den virtuellen Controller eines Spielers an (Tests ersetzen das – dort gibt es kein /dev/uinput).</summary>
+    internal Func<string, UInputPad?> CreatePad { get; init; } = phys => UInputPad.Create(phys);
+
     private Settings CurrentSettings() => _settings;
 
     public async Task RunAsync(CancellationToken stop)
     {
+        using var run = CancellationTokenSource.CreateLinkedTokenSource(stop);
+        _run = run;
+        stop = run.Token;
         WatchSettings();
         ApplyDsu();
+        _ = Task.Run(() => RetryDsuAsync(stop), stop);
         _ = Task.Run(() => StatusWriterAsync(stop), stop);
         _ = Task.Run(() => ReadCommandsAsync(stop), stop);
         _ = Task.Run(() => InactivityAsync(stop), stop);
+        if (_withKodi)
+            _ = Task.Run(() => WatchParentAsync(stop), stop);
         RequestStatus();
 
         // Eine „Sitzung“ je verfügbarem Adapter. Verschwindet er (Bluetooth aus, bluetoothd neu gestartet, Dongle
@@ -73,12 +94,64 @@ public sealed class Daemon : IAsyncDisposable
             {
                 break;
             }
+            catch (Exception e) when (IsBluetoothServiceDown(e))
+            {
+                // bluetoothd läuft nicht – unter LibreELEC heißt das: Bluetooth ist in den Einstellungen ausgeschaltet.
+                if (_adapterState != "off")
+                    Log.Warn("Bluetooth-Dienst (bluetoothd) läuft nicht – Bluetooth ist aus");
+                SetAdapterState("off");
+            }
             catch (Exception e)
             {
                 Log.Warn($"Bluetooth nicht verfügbar: {Log.Reason(e)}");
+                if (_adapterState is null)
+                    SetAdapterState("missing"); // gar kein BlueZ/D-Bus – nicht ewig „startet …“ anzeigen
             }
             await EndSessionAsync().ConfigureAwait(false);
             await Task.Delay(5000, stop).ConfigureAwait(false);
+        }
+    }
+
+    /// <summary>bluetoothd läuft nicht (der D-Bus-Name org.bluez hat keinen Besitzer) – das ist „off“, nicht „missing“.</summary>
+    internal static bool IsBluetoothServiceDown(Exception e) =>
+        e is DBusException { ErrorName: "org.freedesktop.DBus.Error.ServiceUnknown" or "org.freedesktop.DBus.Error.NameHasNoOwner" };
+
+    /// <summary>Den Dienst von innen beenden (Kodi weg) – wie SIGTERM: Controller trennen, Pads entfernen.</summary>
+    private void StopRunning(string reason)
+    {
+        Log.Info($"{reason} – N-Connect beendet sich");
+        try
+        {
+            _run?.Cancel();
+        }
+        catch (ObjectDisposedException)
+        {
+            // läuft schon nicht mehr
+        }
+    }
+
+    /// <summary>
+    /// Aus Kodi gestartet: Endet Kodi (auch durch einen Absturz), wird der Daemon an init weitergereicht – dann mit
+    /// beenden. Sonst liefe er verwaist weiter, hielte Controller und DSU-Port, und der nächste Kodi-Start legte ein
+    /// zweites Programm daneben. (Geschlossenes stdin fängt dasselbe meist schon früher ab.)
+    /// </summary>
+    private async Task WatchParentAsync(CancellationToken stop)
+    {
+        int parent = getppid();
+        try
+        {
+            while (!stop.IsCancellationRequested)
+            {
+                await Task.Delay(2000, stop).ConfigureAwait(false);
+                if (getppid() != parent)
+                {
+                    StopRunning("Kodi läuft nicht mehr");
+                    return;
+                }
+            }
+        }
+        catch (OperationCanceledException)
+        {
         }
     }
 
@@ -90,6 +163,7 @@ public sealed class Daemon : IAsyncDisposable
             SetAdapterState("missing");
             return;
         }
+        _adapter = adapter; // wird in EndSessionAsync freigegeben
         if (!await adapter.GetPoweredAsync().ConfigureAwait(false))
         {
             SetAdapterState("off");
@@ -99,7 +173,11 @@ public sealed class Daemon : IAsyncDisposable
         _hostAddress = ParseAddress(_adapterAddress);
         _adapterIndex = int.TryParse(AdapterId(adapter).Replace("hci", ""), out int index) ? index : 0;
         Log.Info($"Bluetooth-Adapter {AdapterId(adapter)} ({_adapterAddress})");
-        SetAdapterState("on");
+        bool le = await BlueZ.SupportsLeAsync(adapter).ConfigureAwait(false) != false;
+        if (!le)
+            Log.Warn($"{AdapterId(adapter)} kann kein Bluetooth LE – Switch-2-Controller lassen sich damit nicht verbinden, " +
+                     "andere Controller (Xbox, PlayStation, Switch 1 …) schon");
+        SetAdapterState(le ? "on" : "no_le");
 
         _session = CancellationTokenSource.CreateLinkedTokenSource(stop);
         _gamepads = new GamepadManager(adapter) { Enabled = AutoPairGamepads() };
@@ -269,15 +347,42 @@ public sealed class Daemon : IAsyncDisposable
 
     // ---------- DSU-Server (Gyro für Emulatoren) ----------
 
+    private readonly object _dsuLock = new();
+    private static readonly int[] DsuRetrySeconds = [2, 5, 10, 20, 30];
+
     private void ApplyDsu()
     {
-        bool want = _settings.DsuServer;
-        bool network = LinuxSetting("DsuNetwork", false);
-        var current = DsuServer.Instance;
-        if (current is not null && (!want || current.Network != network))
-            current.Dispose();
-        if (want && DsuServer.Instance is null)
-            DsuServer.Start(network);
+        lock (_dsuLock)
+        {
+            bool want = _settings.DsuServer;
+            bool network = LinuxSetting("DsuNetwork", false);
+            var current = DsuServer.Instance;
+            if (current is not null && (!want || current.Network != network))
+                current.Dispose();
+            if (want && DsuServer.Instance is null)
+                DsuServer.Start(network);
+        }
+    }
+
+    /// <summary>
+    /// Port beim Start belegt – meist von einem N-Connect, das sich gerade noch beendet (Neustart über das Menü oder
+    /// nach Adapterwechsel). Einige Male nachfassen; danach erst wieder bei einer Einstellungsänderung.
+    /// </summary>
+    private async Task RetryDsuAsync(CancellationToken stop)
+    {
+        try
+        {
+            foreach (int seconds in DsuRetrySeconds)
+            {
+                if (!_settings.DsuServer || DsuServer.Instance is not null)
+                    return;
+                await Task.Delay(seconds * 1000, stop).ConfigureAwait(false);
+                ApplyDsu();
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
     }
 
     // ---------- Akku-Warnung ----------
@@ -402,8 +507,14 @@ public sealed class Daemon : IAsyncDisposable
     private async Task<Adapter?> FindAdapterAsync()
     {
         var adapters = await BlueZManager.GetAdaptersAsync().ConfigureAwait(false);
-        return _adapterName is null ? adapters.FirstOrDefault()
+        var chosen = _adapterName is null ? adapters.FirstOrDefault()
             : adapters.FirstOrDefault(a => string.Equals(AdapterId(a), _adapterName, StringComparison.OrdinalIgnoreCase));
+        // Jedes Adapter-Objekt beobachtet D-Bus-Signale, bis es freigegeben wird – die übrigen sofort freigeben
+        // (bei ausgeschaltetem Bluetooth wird alle 5 s neu gesucht).
+        foreach (var a in adapters)
+            if (!ReferenceEquals(a, chosen))
+                a.Dispose();
+        return chosen;
     }
 
     /// <summary>„hci0“ – Linux.Bluetooth liefert als Name den D-Bus-Pfad („/org/bluez/hci0“).</summary>
@@ -439,6 +550,8 @@ public sealed class Daemon : IAsyncDisposable
         _elsewhere.Clear();
         _session?.Dispose();
         _session = null;
+        _adapter?.Dispose();
+        _adapter = null;
     }
 
     // ---------- Controller finden und verbinden ----------
@@ -572,7 +685,7 @@ public sealed class Daemon : IAsyncDisposable
         });
     }
 
-    private void AddToPlayer(Switch2Device device)
+    internal void AddToPlayer(Switch2Device device)
     {
         var settings = _settings;
         Player player;
@@ -604,12 +717,11 @@ public sealed class Daemon : IAsyncDisposable
         RememberSlot(device.Address, player.Index);
         RememberKnown(device);
         device.StateReceived += player.OnState;
-        device.Lost += OnLost;
         if (!pairing)
         {
             try
             {
-                player.AttachOutput(UInputPad.Create($"nconnect/player{player.Index + 1}"));
+                player.AttachOutput(CreatePad($"nconnect/player{player.Index + 1}"));
             }
             catch (Exception e)
             {
@@ -631,6 +743,13 @@ public sealed class Daemon : IAsyncDisposable
             ["kind"] = device.Kind.ToString(),
         });
         RequestStatus();
+        // Erst jetzt auf den Abbruch hören – und danach noch einmal nachsehen: Lost meldet sich nur einmal. Riss die
+        // Verbindung schon während der Einrichtung oben ab, ginge die Meldung sonst verloren, und der Controller bliebe
+        // als Geist verbunden (neue Verbindungsversuche würden als „schon verbunden“ verworfen). OnLost verträgt den
+        // doppelten Aufruf; erst nach dem Anlegen des Pads, damit dieses mit entfernt wird.
+        device.Lost += OnLost;
+        if (device.IsLost)
+            OnLost(device);
     }
 
     private void OnLost(Switch2Device device) => _ = Task.Run(async () =>
@@ -799,13 +918,10 @@ public sealed class Daemon : IAsyncDisposable
         try
         {
             using var reader = new StreamReader(Console.OpenStandardInput());
-            while (!stop.IsCancellationRequested)
-            {
-                string? line = await reader.ReadLineAsync(stop).ConfigureAwait(false);
-                if (line is null)
-                    return; // kein stdin (systemd) – nur Statusdatei und Signale
-                await HandleCommandAsync(line.Trim()).ConfigureAwait(false);
-            }
+            // Aus Kodi gestartet: stdin zu = Kodi beendet oder abgestürzt → mit beenden. Sonst (systemd, von Hand):
+            // kein stdin – nur Statusdatei und Signale.
+            if (await ReadCommandsAsync(reader, HandleCommandAsync, stop).ConfigureAwait(false) && _withKodi)
+                StopRunning("Kodi hat die Verbindung geschlossen");
         }
         catch (OperationCanceledException)
         {
@@ -816,7 +932,31 @@ public sealed class Daemon : IAsyncDisposable
         }
     }
 
-    private async Task HandleCommandAsync(string line)
+    /// <summary>
+    /// Liest Befehle zeilenweise und führt sie aus; true = Eingabe zu Ende (stdin geschlossen). Jeder Befehl ist
+    /// einzeln abgesichert: Ein Fehler (z. B. D-Bus-Fehler beim Trennen eines Gamepads, das sich gerade selbst getrennt
+    /// hat) darf den Befehlskanal nicht beenden – sonst gingen alle weiteren Menübefehle bis zum Neustart ins Leere.
+    /// </summary>
+    internal static async Task<bool> ReadCommandsAsync(TextReader reader, Func<string, Task> handle, CancellationToken stop)
+    {
+        while (!stop.IsCancellationRequested)
+        {
+            string? line = await reader.ReadLineAsync(stop).ConfigureAwait(false);
+            if (line is null)
+                return true;
+            try
+            {
+                await handle(line.Trim()).ConfigureAwait(false);
+            }
+            catch (Exception e) when (e is not OperationCanceledException || !stop.IsCancellationRequested)
+            {
+                Log.Warn($"Befehl „{line.Trim()}“ fehlgeschlagen: {Log.Reason(e)}");
+            }
+        }
+        return false;
+    }
+
+    internal async Task HandleCommandAsync(string line)
     {
         string[] parts = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         switch (parts.FirstOrDefault())
@@ -842,8 +982,8 @@ public sealed class Daemon : IAsyncDisposable
                 await RefreshGamepadsAsync().ConfigureAwait(false);
                 break;
             case "gamepad-forget" when parts.Length > 1 && _gamepads is { } g2:
-                await g2.ForgetAsync(parts[1]).ConfigureAwait(false);
-                Log.Info($"{parts[1]}: Kopplung gelöscht");
+                if (await g2.ForgetAsync(parts[1]).ConfigureAwait(false))
+                    Log.Info($"{parts[1]}: Kopplung gelöscht");
                 await RefreshGamepadsAsync().ConfigureAwait(false);
                 break;
             case null:
@@ -856,7 +996,7 @@ public sealed class Daemon : IAsyncDisposable
 
     // ---------- Status und Ereignisse ----------
 
-    private void SetAdapterState(string state)
+    internal void SetAdapterState(string state)
     {
         if (_adapterState == state)
             return;
@@ -897,16 +1037,18 @@ public sealed class Daemon : IAsyncDisposable
         }
     }
 
-    private void WriteStatus(string state)
+    internal void WriteStatus(string state)
     {
         List<Player> players;
         lock (_players)
             players = [.. _players];
+        string? bluetooth = _adapterState;
         var status = new JsonObject
         {
-            ["state"] = state,
+            // Bluetooth noch nicht geprüft: „starting“ – das Add-on zeigt dann „startet …“ statt eines falschen Hinweises.
+            ["state"] = state == "running" && bluetooth is null ? "starting" : state,
+            ["platform"] = "linux",
             ["version"] = typeof(Daemon).Assembly.GetName().Version?.ToString(3),
-            ["bluetooth"] = _adapterState,
             ["adapter"] = _adapterAddress,
             ["scanning"] = _scanner?.Scanning == true,
             ["connecting"] = new JsonArray([.. _connecting.Keys.Select(a => (JsonNode)a)]),
@@ -950,6 +1092,8 @@ public sealed class Daemon : IAsyncDisposable
                 ["battery"] = g.Battery,
             })]),
         };
+        if (bluetooth is not null)
+            status["bluetooth"] = bluetooth; // genau einer von on | off | missing | no_le
         try
         {
             string temp = _statusPath + ".tmp";

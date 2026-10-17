@@ -3,7 +3,9 @@
 Baut den Index eines Kodi-Repositorys (DevCatSKZ/kodi-repo) aus den Add-on-ZIPs im Ordner.
 
 Aufbau:  <repo>/<addon-id>/<addon-id>-<version>.zip   (beliebig viele Add-ons und Versionen)
-Erzeugt: addons.xml, addons.xml.md5, je ZIP eine .sha256, je Add-on icon.png (aus dem neuesten ZIP).
+Erzeugt: addons.xml, addons.xml.md5, je ZIP eine .sha256, je Add-on icon.png (aus dem neuesten ZIP),
+         index.html (Wurzel und je Add-on-Ordner) – Verzeichnisliste für Kodis Dateimanager-Quelle über GitHub Pages
+         (https://devcatskz.github.io/kodi-repo/); raw.githubusercontent.com liefert keine Verzeichnislisten.
 Ältere Versionen werden bis auf KEEP Stück entfernt, damit das Repository klein bleibt.
 
 Neues Plugin veröffentlichen:  ZIP nach <repo>/<id>/ kopieren → python tools/build_repo.py → committen.
@@ -38,9 +40,16 @@ def extract_icon(zip_path, addon_id, xml_text, target):
             pass
 
 
+def write_index(folder, names):
+    """Verzeichnisliste im Format, das Kodis HTTP-Quelle versteht: je Eintrag <a href="X">X</a> (Text = Link)."""
+    links = ''.join('<a href="{0}">{0}</a><br>\n'.format(n) for n in names)
+    (folder / 'index.html').write_text('<html><body>\n' + links + '</body></html>\n', encoding='utf-8', newline='\n')
+
+
 def main(repo):
     entries = []
-    for folder in sorted(p for p in repo.iterdir() if p.is_dir() and not p.name.startswith(('.', 'tools'))):
+    folders = []
+    for folder in sorted(p for p in repo.iterdir() if p.is_dir() and not p.name.startswith(('.', 'tools', 'downloads'))):
         zips = []
         for z in folder.glob('{0}-*.zip'.format(folder.name)):
             version = z.stem[len(folder.name) + 1:]
@@ -58,11 +67,14 @@ def main(repo):
         xml_text = read_addon_xml(newest, folder.name)
         extract_icon(newest, folder.name, xml_text, folder / 'icon.png')
         entries.append(re.sub(r'^\s*<\?xml[^>]*\?>\s*', '', xml_text).strip())
+        write_index(folder, [z.name for _, _, z in reversed(zips[-KEEP:])])
+        folders.append(folder.name + '/')
         print('{0} {1}'.format(folder.name, version))
     addons = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<addons>\n' + '\n'.join(entries) + '\n</addons>\n'
     ET.fromstring(addons.encode('utf-8'))  # muss gültiges XML sein
     (repo / 'addons.xml').write_text(addons, encoding='utf-8', newline='\n')
     (repo / 'addons.xml.md5').write_text(hashlib.md5(addons.encode('utf-8')).hexdigest(), encoding='utf-8')
+    write_index(repo, (['repository.devcatskz.zip'] if (repo / 'repository.devcatskz.zip').is_file() else []) + folders)
     print('addons.xml mit {0} Add-ons'.format(len(entries)))
 
 

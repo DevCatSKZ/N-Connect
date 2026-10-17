@@ -14,7 +14,7 @@ import xbmcgui
 from resources.lib import common
 from resources.lib.common import text
 
-CHECK_NAMES = {'uinput': 30640, 'bluez': 30641, 'adapter': 30642, 'debugfs': 30643, 'settings': 30644}
+CHECK_NAMES = {'uinput': 30640, 'bluez': 30641, 'adapter': 30642, 'le': 30646, 'settings': 30644}
 
 
 def show_help():
@@ -27,19 +27,29 @@ def show_log():
 
 
 def run_selftest():
-    binary = common.binary_path()
-    if binary is None:
+    if not common.has_daemon():
+        show_help()  # Begleitmodus: Es gibt kein Programm zu prüfen – die Anleitung erklärt, was hier geht
+        return
+    candidates = common.binary_candidates()
+    if not candidates:
         xbmcgui.Dialog().ok(text(30622), text(30022, common.machine()))
         return
     progress = xbmcgui.DialogProgress()
     progress.create(text(30622), text(30645))
+    output = ''
     try:
-        result = subprocess.run([binary, '--selftest', '--data', common.DATA_DIR], stdout=subprocess.PIPE,
-                                stderr=subprocess.DEVNULL, env=common.environment(), timeout=60,
-                                universal_newlines=True, encoding='utf-8', errors='replace')
-        output = result.stdout
-    except (OSError, subprocess.TimeoutExpired) as e:
-        output = json.dumps({'check': 'start', 'ok': False, 'required': True, 'detail': str(e)})
+        for binary in candidates:  # wie beim Dienst: passt die erste Variante nicht (32/64 Bit), die nächste
+            try:
+                result = subprocess.run([binary, '--selftest', '--data', common.DATA_DIR], stdout=subprocess.PIPE,
+                                        stderr=subprocess.DEVNULL, env=common.environment(), timeout=60,
+                                        universal_newlines=True, encoding='utf-8', errors='replace')
+                output = result.stdout
+                break
+            except OSError as e:
+                output = json.dumps({'check': 'start', 'ok': False, 'required': True, 'detail': str(e)})
+            except subprocess.TimeoutExpired as e:
+                output = json.dumps({'check': 'start', 'ok': False, 'required': True, 'detail': str(e)})
+                break
     finally:
         progress.close()
     lines, passed = [], True
@@ -103,13 +113,19 @@ def menu():
             if common.has_daemon():
                 entries.append((item(text(30612), text(30613), 'DefaultIconWarning.png'), ('restart', None)))
             else:
-                entries.append((item(text(30660), text(30661), 'DefaultIconWarning.png'), ('help', None)))
-        elif status.get('bluetooth') == 'off':
-            entries.append((item(text(30608), text(30609), 'DefaultIconWarning.png'), ('libreelec', None)))
-        elif status.get('bluetooth') == 'missing':
-            entries.append((item(text(30610), text(30611), 'DefaultIconWarning.png'), ('libreelec', None)))
-        elif status.get('bluetooth') != 'on':
-            entries.append((item(text(30630)), ('refresh', None)))
+                title, detail = common.companion_hint()
+                entries.append((item(title, detail, 'DefaultIconWarning.png'), ('help', None)))
+        else:
+            # Bluetooth aus / kein Adapter / ohne LE: Hinweis oben – die Controller darunter trotzdem zeigen (USB- und
+            # XInput-Controller unter Windows, klassische Gamepads ohne LE laufen ja weiter).
+            hint = common.bluetooth_hint(status)
+            if hint is not None:
+                # LibreELEC-Einstellungen öffnen hilft nur bei aus/fehlt unter Linux; sonst die Anleitung.
+                linux = common.status_platform(status) == 'linux' and status.get('bluetooth') != 'no_le'
+                entries.append((item(hint[0], hint[1], 'DefaultIconWarning.png'),
+                                ('libreelec' if linux else 'help', None)))
+            elif status.get('bluetooth') not in common.BLUETOOTH_STATES:
+                entries.append((item(text(30630)), ('refresh', None)))
         if status is not None:
             players = status.get('players', [])
             for p in players:
@@ -133,7 +149,7 @@ def menu():
                 entries.append((item(text(30606, f.get('name')), text(30607), 'DefaultIconInfo.png'), ('help', None)))
             if not players and not status.get('gamepads') and not status.get('known') and status.get('bluetooth') == 'on':
                 entries.append((item(text(30604), text(30605), 'DefaultIconInfo.png'), ('help', None)))
-            if status.get('bluetooth') == 'on' and not status.get('backgroundScan', True) and common.has_daemon():
+            if status.get('bluetooth') in ('on', 'no_le') and not status.get('backgroundScan', True) and common.has_daemon():
                 entries.append((item(text(30632), text(30633)), ('scan', None)))
             if players and common.has_daemon():
                 entries.append((item(text(30614)), ('disconnect-all', None)))
