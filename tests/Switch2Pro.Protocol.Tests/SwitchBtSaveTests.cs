@@ -61,7 +61,7 @@ public class SwitchBtSaveTests
     [Fact]
     public void Aeltere_Kopplung_mit_anderem_Schluessel_bleibt_stehen()
     {
-        // Welcher Eintrag der aktuelle ist, ist noch offen – bisher werden beide geliefert, in Dateireihenfolge.
+        // Parse liefert beide, in Dateireihenfolge; den aktuellen wählt erst Current.
         var save = new byte[SaveSize];
         Entry(save, Table, AddressL, Key1, "Joy-Con (L)");
         Entry(save, Table + SwitchBtSave.EntrySize, AddressL, Key2, "Joy-Con (L)");
@@ -72,6 +72,45 @@ public class SwitchBtSaveTests
         Assert.All(devices, d => Assert.Equal("0A:0B:0C:0D:0E:01", d.Address));
         Assert.Equal(Key1, devices[0].LinkKey);
         Assert.Equal(Key2, devices[1].LinkKey);
+    }
+
+    [Fact]
+    public void Current_waehlt_je_Adresse_den_ersten_Eintrag()
+    {
+        // Aufbau wie im echten Save vom 04.10.2026: aktuelle Kopplung vorne, ältere derselben Adresse dahinter, die
+        // Journal-Kopie gleich.
+        var save = new byte[SaveSize];
+        foreach (int table in new[] { Table, Copy })
+        {
+            Entry(save, table, AddressL, Key1, "Joy-Con (L)");
+            Entry(save, table + SwitchBtSave.EntrySize, AddressR, Key2, "Joy-Con (R)");
+            Entry(save, table + 2 * SwitchBtSave.EntrySize, AddressL, Key2, "Joy-Con (L)"); // ältere Kopplung
+        }
+
+        var all = SwitchBtSave.Parse(save);
+        var current = SwitchBtSave.Current(all);
+
+        Assert.Equal(3, all.Count);
+        Assert.Equal(2, current.Count);
+        Assert.Equal("0A:0B:0C:0D:0E:01", current[0].Address);
+        Assert.Equal(Key1, current[0].LinkKey);
+        Assert.Equal(0x58000, current[0].Offset);
+        Assert.Equal("0A:0B:0C:0D:0E:02", current[1].Address);
+        Assert.Equal(Key2, current[1].LinkKey);
+    }
+
+    [Fact]
+    public void Current_nimmt_einen_Eintrag_nur_aus_der_Journal_Kopie_und_vergleicht_ohne_Gross_Klein()
+    {
+        var save = new byte[SaveSize];
+        Entry(save, Copy, AddressR, Key2, "Pro Controller"); // nur in der zweiten Kopie
+        var parsed = SwitchBtSave.Parse(save);
+        Assert.Equal(0x5C000, Assert.Single(SwitchBtSave.Current(parsed)).Offset);
+
+        var a = new SwitchBtDevice(0, "0a:0b:0c:0d:0e:01", "Joy-Con (L)", Key1);
+        var b = new SwitchBtDevice(0x200, "0A:0B:0C:0D:0E:01", "Joy-Con (L)", Key2);
+        Assert.Same(a, Assert.Single(SwitchBtSave.Current([a, b])));
+        Assert.Empty(SwitchBtSave.Current([]));
     }
 
     [Fact]
