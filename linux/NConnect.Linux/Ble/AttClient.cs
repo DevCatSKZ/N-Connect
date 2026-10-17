@@ -40,6 +40,10 @@ public sealed class AttClient : IDisposable
     private volatile TaskCompletionSource<byte[]>? _pending;
     private volatile byte _pendingOpcode;
     private int _closed, _lostRaised;
+    // Wer den Socket noch benutzt: Besitzer (bis Dispose) und – solange er läuft – der Leser. Geschlossen wird erst,
+    // wenn beide fertig sind: Ein close() unter dem laufenden read() gäbe die fd-Nummer frei, und der Leser läse
+    // danach womöglich aus einem neu geöffneten fremden Socket oder einer Datei.
+    private int _users = 1;
 
     public int Mtu { get; private set; } = 23;
     public ushort HciHandle { get; private set; }
@@ -80,6 +84,7 @@ public sealed class AttClient : IDisposable
         }
 
         client.HciHandle = ReadHciHandle(fd);
+        Interlocked.Increment(ref client._users);
         client._reader.Start();
         return client;
     }
@@ -136,6 +141,10 @@ public sealed class AttClient : IDisposable
     {
         lock (_writeLock)
         {
+            // Prüfung unter der Sperre: Dispose schließt ebenfalls unter ihr – nie in einen schon geschlossenen
+            // (und womöglich neu vergebenen) fd schreiben.
+            if (Volatile.Read(ref _closed) != 0)
+                throw new IOException("Verbindung getrennt.");
             fixed (byte* p = pdu)
                 if (write(_fd, p, pdu.Length) != pdu.Length)
                     throw new IOException($"Senden fehlgeschlagen (errno {Marshal.GetLastPInvokeError()}).");
@@ -197,8 +206,15 @@ public sealed class AttClient : IDisposable
             }
         }
         _pending?.TrySetException(new IOException("Verbindung getrennt."));
-        if (Interlocked.Exchange(ref _lostRaised, 1) == 0 && Volatile.Read(ref _closed) == 0)
-            Lost?.Invoke();
+        try
+        {
+            if (Interlocked.Exchange(ref _lostRaised, 1) == 0 && Volatile.Read(ref _closed) == 0)
+                Lost?.Invoke();
+        }
+        finally
+        {
+            Release();
+        }
     }
 
     private static void ThrowIfError(byte[] rsp, string what)
@@ -315,7 +331,7 @@ public sealed class AttClient : IDisposable
     public bool WriteCommand(ushort handle, ReadOnlySpan<byte> value)
     {
         if (Volatile.Read(ref _closed) != 0)
-            return false;
+            return false; // schneller Ausstieg; die verbindliche Prüfung macht Send unter der Sperre
         Span<byte> pdu = stackalloc byte[3 + value.Length];
         pdu[0] = WriteCmd;
         BinaryPrimitives.WriteUInt16LittleEndian(pdu[1..], handle);
@@ -394,10 +410,22 @@ public sealed class AttClient : IDisposable
 
     public void Dispose()
     {
-        if (Interlocked.Exchange(ref _closed, 1) != 0)
+        lock (_writeLock)
+        {
+            if (Interlocked.Exchange(ref _closed, 1) != 0)
+                return;
+            shutdown(_fd, 2); // weckt den Leser (read liefert 0) und beendet die Verbindung
+        }
+        Release();
+    }
+
+    /// <summary>Besitzer oder Leser ist fertig – der Letzte schließt den fd (unter der Schreibsperre).</summary>
+    private void Release()
+    {
+        if (Interlocked.Decrement(ref _users) != 0)
             return;
-        shutdown(_fd, 2); // weckt den Leser
-        close(_fd);
+        lock (_writeLock)
+            close(_fd);
     }
 }
 
