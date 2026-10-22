@@ -14,3 +14,6 @@ signing.props
 # Gebaute Android-Pakete (werden ans GitHub-Release gehängt, nicht eingecheckt).
 *.apk
 *.aab
+
+# Agenten-Hinweise bleiben lokal
+AGENTS.md
