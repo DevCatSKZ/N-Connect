@@ -1,7 +1,7 @@
 # SKZ Connect für Android
 
 Stand: 17.10.2026 · Version **0.9.1 (Beta)**, versionCode 10 – erscheint als signierte APK `SKZ-Connect-Android-0.9.1.apk`
-am nächsten GitHub-Release (die Vorgängerin 0.9.0 hängt an v1.0.20) · Projekt `android/NConnect.Android`
+am nächsten GitHub-Release (die Vorgängerin 0.9.0 hängt an v1.0.20) · Projekt `android/SkzConnect.Android`
 
 SKZ Connect für Android verbindet **Switch-2-Controller** (Pro Controller 2, Joy-Con 2, GameCube-Controller) per
 Bluetooth LE mit Android-Geräten und gibt sie als **virtuellen Xbox-Controller** an Spiele, Emulatoren und
@@ -50,14 +50,14 @@ von Android direkt mit Android, SKZ Connect sieht sie nicht:
 ## Aufbau
 
 ```
-android/NConnect.Android/
-  NConnect.Android.csproj   net10.0-android, minSdk 26, Version 0.9.1 / versionCode 10, verweist auf ../../src/Switch2Pro.Protocol
+android/SkzConnect.Android/
+  SkzConnect.Android.csproj   net10.0-android, minSdk 26, Version 0.9.1 / versionCode 10, verweist auf ../../src/Switch2Pro.Protocol
   AndroidManifest.xml       Berechtigungen, <queries> (Shizuku, Kodi, startbare Apps, Startbildschirme), Provider
   AppPrefs.cs               App-Einstellungen (SharedPreferences) + Settings (geteilte JSON-Klasse)
-  Log.cs                    Logcat + Speicher + Datei files/nconnect.log
+  Log.cs                    Logcat + Speicher + Datei files/skzconnect.log
   Texts.cs                  gemeinsame Nutzertexte (Android-Begriffe)
   L.cs, L.Texts.cs          Übersetzung (L.T/L.F); L.Texts.cs erzeugt android/i18n/generate.py
-  NConnectTile.cs           Schnelleinstellungen-Kachel (Dienst starten/beenden)
+  SkzConnectTile.cs           Schnelleinstellungen-Kachel (Dienst starten/beenden)
   Core/ControllerService.cs Vordergrunddienst (connectedDevice), Benachrichtigung, Neuverbinden, Wartungstakt
   Core/Player.cs            Spielerplatz: Paar/einzeln → Belegung → Makros → Gyro-Stick → Ausgabe (+ DSU)
   Core/KnownControllers.cs  gekoppelte Controller (files/known_controllers.json)
@@ -79,7 +79,7 @@ android/NConnect.Android/
   Touch/                    Bedienungshilfe, Touch-Ausgabe (Gesten), Layout, Overlay-Editor
   UI/                       Assistent, Hauptfenster (Controller · Einstellungen · Hilfe), Baukasten, Design,
                             ProfileDialogs.cs (Profile und Belegungs-Editor), AppPicker.cs (App-Auswahl mit Symbol)
-android/NConnect.Android.Tests/  xUnit-Tests (net10.0) für die Android-freien Teile, siehe „Tests ohne Gerät“
+android/SkzConnect.Android.Tests/  xUnit-Tests (net10.0) für die Android-freien Teile, siehe „Tests ohne Gerät“
 android/i18n/               Übersetzungstabellen (*.json) und generate.py
 ```
 
@@ -215,7 +215,7 @@ Emulatoren nennt deshalb keine Namen).
 
 ## Schnelleinstellungen-Kachel und Autostart
 
-- **Kachel** (`NConnectTile`): startet/beendet den Dienst. Bewusst **keine aktive Kachel** (ohne ACTIVE_TILE) – Android
+- **Kachel** (`SkzConnectTile`): startet/beendet den Dienst. Bewusst **keine aktive Kachel** (ohne ACTIVE_TILE) – Android
   fragt den Zustand bei jedem Öffnen der Schnelleinstellungen ab, nach dem Antippen steht sofort der Zielzustand da,
   zusätzlich meldet der Dienst Start/Ende per `RequestListeningState`. Einfarbiges Symbol `ic_stat_controller`. Ohne
   abgeschlossene Einrichtung oder ohne „Geräte in der Nähe“ öffnet die Kachel die App; lehnt Android den Start des
@@ -303,9 +303,9 @@ App-Sprache aus den Android-Einstellungen), unbekannte Sprachen fallen auf Engli
 
 ## Release
 
-- Version in `NConnect.Android.csproj`: `ApplicationDisplayVersion` (0.9.1) und `ApplicationVersion` (10) – bei jeder
+- Version in `SkzConnect.Android.csproj`: `ApplicationDisplayVersion` (0.9.1) und `ApplicationVersion` (10) – bei jeder
   veröffentlichten APK erhöhen.
-- Signatur: `%USERPROFILE%\.nconnect\nconnect-release.jks` + `signing.props` (wird von der csproj importiert, falls
+- Signatur: `%USERPROFILE%\.skzconnect\skzconnect-release.jks` + `signing.props` (wird von der csproj importiert, falls
   vorhanden). **Nie ins Repository oder in die CI** – deshalb baut die CI keine APK.
 - `dotnet publish -c Release` → `bin/Release/net10.0-android/publish/com.devcatskz.nconnect-Signed.apk`, als
   **`SKZ-Connect-Android-<Version>.apk`** an das GitHub-Release hängen (`gh release upload v1.0.x …`). Der Dateiname ist
@@ -315,7 +315,7 @@ App-Sprache aus den Android-Einstellungen), unbekannte Sprachen fallen auf Engli
 ## Bauen, installieren, testen
 
 ```powershell
-cd android\NConnect.Android
+cd android\SkzConnect.Android
 dotnet build -c Debug
 # Gerät gezielt (zwei Geräte per Wireless-adb verbunden):
 dotnet build -t:Install -c Debug "-p:AdbTarget=-s adb-61291JEA326097-kWTmyn._adb-tls-connect._tcp"   # Pixel 10a
@@ -324,12 +324,12 @@ dotnet build -t:Install -c Debug "-p:AdbTarget=-s adb-R5CRA1GQW0Z-ECDAJk._adb-tl
 
 - Voraussetzungen: .NET 10 SDK + Workload `android`, JDK 21 (`C:\Program Files\Microsoft\jdk-21.0.10.7-hotspot`, in der
   csproj hinterlegt – JDK 25 ist zu neu), Android-SDK unter `%LOCALAPPDATA%\Android\Sdk`.
-- Die CI (`.github/workflows/build.yml`) testet die ganze Projektmappe, darunter `android/NConnect.Android.Tests`
+- Die CI (`.github/workflows/build.yml`) testet die ganze Projektmappe, darunter `android/SkzConnect.Android.Tests`
   (ohne Android-Workload). Der Job „Android kompilieren“ prüft `python android/i18n/generate.py --check` und baut die
   App als Debug-Build ohne Signatur; das signierte APK entsteht weiterhin nur lokal (siehe oben).
 - **Shizuku vom PC starten** (spart die Kopplung per kabellosem Debugging beim Testen):
   `adb shell <APK-Ordner>/lib/arm64/libshizuku.so` (Ordner über `adb shell pm path moe.shizuku.privileged.api`).
-- **Protokoll lesen:** `adb shell "run-as com.devcatskz.nconnect cat files/nconnect.log"` (Logcat ist auf dem Pixel
+- **Protokoll lesen:** `adb shell "run-as com.devcatskz.nconnect cat files/skzconnect.log"` (Logcat ist auf dem Pixel
   nach wenigen Minuten überschrieben).
 - Screenshots: `adb shell screencap -p /sdcard/x.png` + `adb pull` (PowerShell-Umleitung verfälscht Binärdaten).
   **Nur wenn SKZ Connect im Vordergrund ist** – der Nutzer verwendet das Gerät nebenbei.
@@ -337,7 +337,7 @@ dotnet build -t:Install -c Debug "-p:AdbTarget=-s adb-R5CRA1GQW0Z-ECDAJk._adb-tl
 
 ### Tests ohne Gerät
 
-`dotnet test android/NConnect.Android.Tests` (xUnit, net10.0, braucht kein Android-Workload) kompiliert die
+`dotnet test android/SkzConnect.Android.Tests` (xUnit, net10.0, braucht kein Android-Workload) kompiliert die
 Android-freien Quelldateien direkt mit (`UpdateCheck.Releases.cs`, `ProfileEdit.cs`, `GameProfileWatcher.Pick.cs`,
 `KodiStatusWriter.Contract.cs`, `L.Texts.cs`) und prüft:
 

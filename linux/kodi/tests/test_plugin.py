@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Widget plugin://service.nconnect/: Hinweis passend zum Schreiber der status.json, Controllerliste immer sichtbar."""
+"""Widget plugin://service.skzconnect/: Hinweis passend zum Schreiber der status.json, Controllerliste immer sichtbar."""
 import sys
 import unittest
 from unittest import mock
@@ -9,7 +9,7 @@ from kodi_stubs import STATE
 from resources.lib import common
 from resources.lib.common import text
 
-plugin = kodi_stubs.load('service.nconnect', 'plugin.py', 'nconnect_plugin')
+plugin = kodi_stubs.load('service.skzconnect', 'plugin.py', 'skzconnect_plugin')
 
 PLAYER = {'player': 1, 'name': 'Pro Controller 2', 'battery': 80, 'charging': False,
           'devices': [{'address': 'AA:BB:CC:DD:EE:01', 'kind': 'Pro2', 'name': 'Pro Controller 2', 'battery': 80}]}
@@ -24,7 +24,7 @@ class WidgetTest(unittest.TestCase):
         with mock.patch.object(common, 'read_status', return_value=status), \
                 mock.patch.object(common, 'has_daemon', return_value=has_daemon), \
                 mock.patch.object(common, 'kodi_platform', return_value=kodi), \
-                mock.patch.object(sys, 'argv', ['plugin://service.nconnect/', '1', '']):
+                mock.patch.object(sys, 'argv', ['plugin://service.skzconnect/', '1', '']):
             plugin.main()
         return [(item.label, item.label2) for item in STATE.items]
 
@@ -60,9 +60,9 @@ class WidgetTest(unittest.TestCase):
                          [(text(30604), text(30605))])
 
     def test_klick_oeffnet_das_menue(self):
-        with mock.patch.object(sys, 'argv', ['plugin://service.nconnect/', '1', '?action=menu']):
+        with mock.patch.object(sys, 'argv', ['plugin://service.skzconnect/', '1', '?action=menu']):
             plugin.main()
-        self.assertEqual(STATE.builtins, ['RunScript(service.nconnect)'])
+        self.assertEqual(STATE.builtins, ['RunScript(service.skzconnect)'])
 
 
 if __name__ == '__main__':

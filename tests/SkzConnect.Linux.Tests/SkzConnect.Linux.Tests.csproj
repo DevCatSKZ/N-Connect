@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Tests für die ohne Gerät prüfbare Logik des Linux-Dienstes skzconnect (Befehlskanal, status.json, Verbindungsabbruch).
+       Läuft auch unter Windows: Nichts davon ruft libc, BlueZ oder /dev/uinput auf, virtuelle Controller entstehen nie. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <!-- skzconnect ist ein self-contained Programm; die Tests brauchen nur seine Assembly. -->
+    <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="4.0.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\linux\SkzConnect.Linux\SkzConnect.Linux.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+</Project>

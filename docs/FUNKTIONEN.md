@@ -522,14 +522,14 @@ erneut versucht – ebenso, wenn ViGEm keinen virtuellen Controller anlegen kann
   sie von der Windows-Sprache abweicht. Fehlen die Argumente beim allerersten Start (im Setup „Jetzt starten“
   abgewählt, weiteres Benutzerkonto), gilt die Wahl, die das Setup im eigenen Deinstallationsschlüssel in HKLM merkt
   (`Inno Setup CodeFile: Language`/`Theme`, nur gelesen; Sprache leer, wenn nicht bewusst gewählt). Stilles Update
-  (Ein-Klick-Update, winget): keine Argumente, es ändert sich nichts. Werte älterer Setups (bis 1.0.21: `HKCU\Software\N-Connect\Language`/`Theme`)
+  (Ein-Klick-Update, winget): keine Argumente, es ändert sich nichts. Werte älterer Setups (bis 1.0.21: `HKCU\Software\SKZ Connect\Language`/`Theme`)
   übernimmt die installierte App beim nächsten Start einmalig und löscht sie. Die Setup-Seite „Darstellung“ wählt
   die Wahl der letzten Installation vor. Anleitung im Programmordner in der Setup-Sprache: Deutsch `Anleitung.md`,
   sonst `README.md` (englisch). Die Deinstallation entfernt den Autostart in allen angemeldeten Benutzerprofilen
   (nur Einträge, die auf diese Installation zeigen).
 - **Kodi auf diesem PC** (`KodiStatusWriter`): Ist in einer Kodi-Installation (normal oder Microsoft Store) das
-  Add-on `service.nconnect` installiert, schreibt SKZ Connect alle 3 s bei Änderung, sonst alle 10 s als Herzschlag
-  `userdata/addon_data/service.nconnect/status.json` (gleiches Format wie der Linux-Dienst; die Berichtsrate zählt
+  Add-on `service.skzconnect` installiert, schreibt SKZ Connect alle 3 s bei Änderung, sonst alle 10 s als Herzschlag
+  `userdata/addon_data/service.skzconnect/status.json` (gleiches Format wie der Linux-Dienst; die Berichtsrate zählt
   nicht als Änderung). Ohne Add-on wird nichts geschrieben und kein Ordner angelegt; ob Kodi/Add-on da sind, wird alle
   30 s neu geprüft (kein Neustart nötig). Felder u. a. `"platform": "windows"` und `"bluetooth"` aus dem
   Bluetooth-Zustand (`ControllerManager.Bluetooth`, nicht aus dem Meldungstext): `on`, `off` (aus oder Suche startet

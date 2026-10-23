@@ -18,9 +18,9 @@ Kodi/LibreELEC (Linux-Dienst und Kodi-Add-on, Begleitmodus unter Kodi für Windo
 | Teil | Version im Code | Zuletzt veröffentlicht |
 |---|---|---|
 | Windows-App | 1.0.22 (`src/Switch2Pro.Bridge/Switch2Pro.Bridge.csproj`) | 1.0.21 (15.10.2026) |
-| Android | 0.9.1 Beta, versionCode 10 (`android/NConnect.Android/NConnect.Android.csproj`) | 0.9.0 (APK an v1.0.20) |
-| Kodi `service.nconnect` mit Dienst `nconnect` | 0.4.4 (`linux/kodi/service.nconnect/addon.xml`, `linux/NConnect.Linux/NConnect.Linux.csproj`) | 0.4.3 |
-| Kodi `plugin.nconnect.status` / `script.nconnect.bundle` / `repository.devcatskz` | 1.1.1 / 1.0.2 / 1.0.2 | 1.1.0 / 1.0.1 / 1.0.2 |
+| Android | 0.9.1 Beta, versionCode 10 (`android/SkzConnect.Android/SkzConnect.Android.csproj`) | 0.9.0 (APK an v1.0.20) |
+| Kodi `service.skzconnect` mit Dienst `skzconnect` | 0.4.4 (`linux/kodi/service.skzconnect/addon.xml`, `linux/SkzConnect.Linux/SkzConnect.Linux.csproj`) | 0.4.3 |
+| Kodi `plugin.skzconnect.status` / `script.skzconnect.bundle` / `repository.devcatskz` | 1.1.1 / 1.0.2 / 1.0.2 | 1.1.0 / 1.0.1 / 1.0.2 |
 
 ## Repositories und Ordner
 
@@ -44,7 +44,7 @@ dotnet build Switch2Pro.sln -c Release                  # Warnungen gelten als F
 dotnet test Switch2Pro.sln -c Release                   # alle .NET-Tests (Protokoll, Windows, Linux, Android ohne Workload)
 py -3 -m unittest discover -s linux/kodi/tests          # Logik der Kodi-Add-ons
 py -3 android/i18n/generate.py --check                  # Android-Übersetzungen vollständig und aktuell
-dotnet build android/NConnect.Android -c Debug          # Android-App (braucht die Workload)
+dotnet build android/SkzConnect.Android -c Debug          # Android-App (braucht die Workload)
 dotnet publish src/Switch2Pro.Bridge -c Release -r win-x64 --self-contained -p:PublishSingleFile=true `
   -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -p:DebugType=none `
   -o out\publish\win-x64
@@ -67,16 +67,16 @@ Freigabe des Nutzers.
 
 1. **Versionen erhöhen:** Windows `<Version>` in `src/Switch2Pro.Bridge/Switch2Pro.Bridge.csproj` (muss zum Tag
    passen, sonst warnt die CI). Bei einer neuen APK `ApplicationDisplayVersion` und `ApplicationVersion` in
-   `android/NConnect.Android/NConnect.Android.csproj`. Bei Kodi-Änderungen `version` und `news` in
-   `linux/kodi/<id>/addon.xml` und die Version in `linux/NConnect.Linux/NConnect.Linux.csproj`; ist
-   `service.nconnect` oder das Plugin neu, auch `script.nconnect.bundle` erhöhen.
+   `android/SkzConnect.Android/SkzConnect.Android.csproj`. Bei Kodi-Änderungen `version` und `news` in
+   `linux/kodi/<id>/addon.xml` und die Version in `linux/SkzConnect.Linux/SkzConnect.Linux.csproj`; ist
+   `service.skzconnect` oder das Plugin neu, auch `script.skzconnect.bundle` erhöhen.
 2. **Release-Text** `docs/release-notes/v<Version>.md`: erst Deutsch, dann Englisch, Download-Tabelle, je Plattform
    „Neu“ und „Behoben“. Die CI übernimmt ihn als Beschreibung des Releases.
 3. **Prüfen:** Bauen und alle Tests wie oben, Commit auf `main`, Push.
 4. **Tag:** `git tag v<Version>` und `git push origin v<Version>`. `build.yml` baut Setup und Portable-ZIP und legt
    das Release an; `kodi.yml` hängt die `SKZ-Connect-Kodi-*.zip` an.
-5. **APK (nur lokal):** `dotnet publish android/NConnect.Android -c Release` signiert mit dem Schlüssel aus
-   `%USERPROFILE%\.nconnect` (über `signing.props`); prüfen mit `apksigner verify --print-certs`. Die Datei
+5. **APK (nur lokal):** `dotnet publish android/SkzConnect.Android -c Release` signiert mit dem Schlüssel aus
+   `%USERPROFILE%\.skzconnect` (über `signing.props`); prüfen mit `apksigner verify --print-certs`. Die Datei
    `bin/Release/net10.0-android/publish/com.devcatskz.nconnect-Signed.apk` als `SKZ-Connect-Android-<Version>.apk`
    anhängen (`gh release upload v<Version> …`) – der Name ist Pflicht, die Update-Prüfung der App liest die Version
    daraus. Übergangsweise zusätzlich eine Kopie als `N-Connect-Android-<Version>.apk` anhängen: App-Versionen bis

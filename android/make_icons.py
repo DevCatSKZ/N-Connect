@@ -10,7 +10,7 @@ from PIL import Image
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 SOURCE = ROOT / 'src' / 'Switch2Pro.Bridge' / 'SKZ-Connect.png'
-RES = ROOT / 'android' / 'NConnect.Android' / 'Resources'
+RES = ROOT / 'android' / 'SkzConnect.Android' / 'Resources'
 DENSITIES = {'mdpi': 1, 'hdpi': 1.5, 'xhdpi': 2, 'xxhdpi': 3, 'xxxhdpi': 4}
 BORDER = 16  # heller Rand des Windows-Icons wird abgeschnitten
 

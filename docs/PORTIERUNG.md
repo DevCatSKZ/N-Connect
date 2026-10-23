@@ -17,7 +17,7 @@ Wer in einer anderen Sprache portiert, nutzt [PROTOKOLLE.md](PROTOKOLLE.md) und 
 
 ## 2. Was plattformabhängig ist – und was es anderswo gibt
 
-| Aufgabe in SKZ Connect (Windows) | Linux (umgesetzt im Dienst `nconnect`) | Android (umgesetzt in der App) | macOS (nicht umgesetzt) |
+| Aufgabe in SKZ Connect (Windows) | Linux (umgesetzt im Dienst `skzconnect`) | Android (umgesetzt in der App) | macOS (nicht umgesetzt) |
 |---|---|---|---|
 | **BLE-Suche** – `BluetoothLEAdvertisementWatcher` (aktiv) | BlueZ über D-Bus (`Adapter1.StartDiscovery`, Filter `Transport=le` bzw. `auto`), Herstellerdaten aus `Device1.ManufacturerData` | `BluetoothLeScanner` mit Filter auf die Nintendo-Herstellerdaten | CoreBluetooth `scanForPeripherals` |
 | **BLE verbinden ohne Kopplung**, GATT, Benachrichtigungen – `BluetoothLEDevice`, `GattSession.MaintainConnection` | eigener ATT-Client über einen L2CAP-Socket, weil BlueZ an den „Secondary Services“ der Controller hängen bleibt | `BluetoothGatt` | `CBCentralManager.connect`, `setNotifyValue`, `writeValue(.withoutResponse)` |
@@ -30,7 +30,7 @@ Wer in einer anderen Sprache portiert, nutzt [PROTOKOLLE.md](PROTOKOLLE.md) und 
 | **Original vor Spielen verstecken** – HidHide | nicht nötig | nicht nötig | – |
 | **Tastatur/Maus senden** – `SendInput` | nicht umgesetzt (`uinput`) | Touch-Steuerung über Bedienungshilfe | `CGEvent` (Bedienungshilfen-Freigabe) |
 | **Autostart** – `HKCU\…\Run` | Kodi-Add-on startet den Dienst (oder systemd) | Boot-Empfänger „Mit Android starten“ | LaunchAgent |
-| **Pfade** – `%APPDATA%`, `%LOCALAPPDATA%` | Datenordner `--data` (im Add-on `userdata/addon_data/service.nconnect/`) | App-Speicher | `~/Library/Application Support` |
+| **Pfade** – `%APPDATA%`, `%LOCALAPPDATA%` | Datenordner `--data` (im Add-on `userdata/addon_data/service.skzconnect/`) | App-Speicher | `~/Library/Application Support` |
 | **Oberfläche** – WinForms, selbst gezeichnet | Kodi-Add-on (Python: Menü, Widget, Einstellungen) | eigene Android-Oberfläche in C# | – |
 | **Update** – Inno-Setup-Installer | Kodi-Repository | APK von GitHub mit Update-Prüfung in der App | – |
 
@@ -46,7 +46,7 @@ wurde nicht aufgeteilt.
 2. **Doppelte Logik in die Bibliothek ziehen**, sobald eine dritte Fassung entstünde: Spieler-/Paarverwaltung und die
    Ablaufsteuerung von `Player` (Belegung anwenden, Makros, Gyro-Maus/-Stick, Gesten) hängen nur über
    `IControllerLink`, `IVirtualPad` und die Eingabe-Ausgabe an der Plattform.
-3. **Steam Deck / Desktop-Linux:** Der Linux-Dienst läuft grundsätzlich ohne Kodi (`nconnect` ohne `--kodi`), ist dort
+3. **Steam Deck / Desktop-Linux:** Der Linux-Dienst läuft grundsätzlich ohne Kodi (`skzconnect` ohne `--kodi`), ist dort
    aber ungetestet; `hid-nintendo` und Steam Input decken die Classic-Controller bereits ab.
 4. **macOS:** Ohne öffentliche API für virtuelle Gamepads ist nur eine Anzeige oder ein eigener Treiber mit
    Sonderberechtigung möglich.

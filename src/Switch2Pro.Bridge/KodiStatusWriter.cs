@@ -4,10 +4,10 @@ using Switch2Pro.Protocol;
 namespace Switch2Pro.Bridge;
 
 /// <summary>
-/// Schreibt den aktuellen Stand als status.json in Kodis Add-on-Datenordner (userdata/addon_data/service.nconnect)
+/// Schreibt den aktuellen Stand als status.json in Kodis Add-on-Datenordner (userdata/addon_data/service.skzconnect)
 /// – gleiches Format wie der Linux-Dienst, damit das Kodi-Add-on (Menü und Home-Widget) auf jeder Plattform
 /// dieselbe Anzeige hat. Auf Windows verbindet die App die Controller selbst; das Add-on zeigt nur an.
-/// Geschrieben wird nur in Kodi-Installationen, in denen das Add-on service.nconnect installiert ist; das wird alle
+/// Geschrieben wird nur in Kodi-Installationen, in denen das Add-on service.skzconnect installiert ist; das wird alle
 /// 30 s neu geprüft, damit ein später installiertes Kodi bzw. Add-on ohne Neustart von SKZ Connect erkannt wird.
 /// </summary>
 internal sealed class KodiStatusWriter : IDisposable

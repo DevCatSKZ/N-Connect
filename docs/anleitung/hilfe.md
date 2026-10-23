@@ -157,7 +157,7 @@ welches System – und möglichst mit Diagnose.
 - **Android:** *Hilfe › Diagnose › Teilen* (oder *Protokoll anzeigen*). Das Protokoll enthält außer den
   Bluetooth-Adressen der Controller keine persönlichen Daten.
 - **Kodi:** Menü › *Diagnose ausführen* und *Protokoll anzeigen*; die Datei liegt unter
-  `userdata/addon_data/service.nconnect/nconnect.log`.
+  `userdata/addon_data/service.skzconnect/skzconnect.log`.
 
 Besonders hilfreich sind Rückmeldungen zu Controllern, die noch nicht mit echter Hardware geprüft sind: DualShock 4,
 DualSense, Xbox über Bluetooth oder Wireless-Adapter, Kabel-Controller von HORI, PowerA und PDP sowie Joy-Con im

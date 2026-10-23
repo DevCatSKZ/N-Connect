@@ -337,18 +337,18 @@ einzelnen Eintrag im Save zu ändern, würde beides zerstören. Deshalb schreibt
 Save, sondern in Atmosphères **`bluetooth_devices.db`** (unsignierte Datei, gleiches Eintragsformat).
 
 Neue Menüpunkte (Abschnitt „-- SKZ Connect (PC) --“):
-- **„SKZ Connect: use PC pairing on Switch“** (`bt_nconnect_enable`):
+- **„SKZ Connect: use PC pairing on Switch“** (`bt_skzconnect_enable`):
   1. Joy-Con-Dump von den Schienen (vorhandene Routine). Ein Joy-Con gilt als „mit dem PC gekoppelt“, wenn
      Adresse, Host und Schlüssel gesetzt sind und der Host **nicht** die Konsolenadresse aus CAL0 ist.
   2. `sd:/atmosphere/bluetooth_devices.db` = `u64` Anzahl + je Joy-Con ein 0x200-Eintrag. Eine vorhandene
-     Datei wird einmalig nach `bluetooth_devices.db.nconnect.bak` verschoben.
+     Datei wird einmalig nach `bluetooth_devices.db.skzconnect.bak` verschoben.
   3. `sd:/config/MissionControl/missioncontrol.ini` (bei Bedarf aus `.template` angelegt): `[bluetooth]`
      `host_address=<PC-Adresse>`.
   4. `sd:/atmosphere/config/system_settings.ini`: `[atmosphere] enable_external_bluetooth_db = u8!0x1`.
-  5. Status für SKZ Connect: `sd:/switch/Bluepick_RCM/nconnect.ini` (Adressen, **keine** Schlüssel).
+  5. Status für SKZ Connect: `sd:/switch/Bluepick_RCM/skzconnect.ini` (Adressen, **keine** Schlüssel).
   Voraussetzung: MissionControl installiert (`atmosphere/contents/010000000000BD00/exefs.nsp`).
-- **„SKZ Connect: restore Switch identity“** (`bt_nconnect_disable`): `host_address` auskommentieren, externe
-  Datenbank abschalten, `bluetooth_devices.db` nach `.nconnect.bak` verschieben.
+- **„SKZ Connect: restore Switch identity“** (`bt_skzconnect_disable`): `host_address` auskommentieren, externe
+  Datenbank abschalten, `bluetooth_devices.db` nach `.skzconnect.bak` verschieben.
 - **Schutz:** FULL AUTO, „Disable external BT db override“ und „Delete bluetooth_devices.db“ erkennen den
   aktiven SKZ-Connect-Modus und lassen die externe Datenbank in Ruhe. Die Statusanzeige zeigt den Modus an.
 
@@ -408,7 +408,7 @@ Erkennung muss über VID `057E` / Ordnerstruktur erfolgen, nicht über feste Nam
   Connections, daher erwartet `0x04`.)
 - Start ohne CFW (OFW) nutzt die echte Adresse der Switch → Joy-Con verbindet dort nicht.
 - Pro Controller: Schlüssel nur aus der Windows-Registry (`BTHPORT\Parameters\Keys`, SYSTEM-Rechte, nur lesen).
-- SKZ Connect: MTP-Erkennung der Switch, Anzeige von `switch/Bluepick_RCM/nconnect.ini`, Hinweis „Switch aus“.
+- SKZ Connect: MTP-Erkennung der Switch, Anzeige von `switch/Bluepick_RCM/skzconnect.ini`, Hinweis „Switch aus“.
 - MTP: Überschreiben nur nach Löschen; instabile Verbindungen abfangen.
 
 **Nur für die verworfenen bzw. alternativen Wege (§4, §5b, §5c):**

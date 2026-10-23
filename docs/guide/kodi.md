@@ -1,8 +1,8 @@
 # SKZ Connect for Kodi
 
-[Deutsch](../anleitung/kodi.md) · **English** · As of add-on `service.nconnect` 0.4.4
+[Deutsch](../anleitung/kodi.md) · **English** · As of add-on `service.skzconnect` 0.4.4
 
-On LibreELEC, the add-on starts the `nconnect` service together with Kodi. It connects Switch 2 controllers via
+On LibreELEC, the add-on starts the `skzconnect` service together with Kodi. It connects Switch 2 controllers via
 Bluetooth LE and creates a virtual Xbox 360 controller for each player, which Kodi, RetroArch and games recognize
 without any setup. It can pair other Bluetooth controllers automatically. On Kodi for Windows and Android, the add-on
 only shows the status of the SKZ Connect app there (companion mode). Problems and solutions:
@@ -64,7 +64,7 @@ The [release](https://github.com/DevCatSKZ/SKZ-Connect/releases/latest) has the 
 | `SKZ-Connect-Kodi-LibreELEC-…-RPi2-RPi3-arm.zip` | Raspberry Pi 2 and 3 (32-bit) |
 | `SKZ-Connect-Kodi-LibreELEC-…-PC-x86_64.zip` | PCs with LibreELEC Generic |
 
-The *SKZ Connect Bundle Installer* add-on (`script.nconnect.bundle`, in the repository) installs SKZ Connect and the
+The *SKZ Connect Bundle Installer* add-on (`script.skzconnect.bundle`, in the repository) installs SKZ Connect and the
 widget add-on without internet and adds a menu item with widget to the Aeon Nox Silvo skin; restart Kodi afterwards.
 
 ## Connecting controllers
@@ -119,7 +119,7 @@ emulators, vibration, connection and Kodi are locked and carry a notice. Setting
 
 In the menu, *Run diagnostics* checks whether Bluetooth, the adapter with Bluetooth LE and the virtual controller
 (uinput) are ready. *Show log* shows the latest entries; the file is at
-`userdata/addon_data/service.nconnect/nconnect.log`. Both help when reporting a bug as an
+`userdata/addon_data/service.skzconnect/skzconnect.log`. Both help when reporting a bug as an
 [issue](https://github.com/DevCatSKZ/SKZ-Connect/issues).
 
 Technical details (developer documentation, German): [LINUX-KODI.md](../LINUX-KODI.md).

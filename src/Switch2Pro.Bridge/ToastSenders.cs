@@ -6,12 +6,12 @@ namespace Switch2Pro.Bridge;
 /// Gerätemeldungen von Windows („… verbunden“, „Gerät wird eingerichtet“) stummschalten, solange SKZ Connect
 /// die Meldung übernimmt. Windows prüft je Benachrichtigungs-Absender den Wert „Enabled“ in der Registry;
 /// fehlt er, ist der Absender an. Wir setzen ihn nur herunter, wenn er nicht schon aus war, und merken uns
-/// das je Absender (Markierwert „NConnect“), damit „Wiederherstellen“ genau unsere Eingriffe zurücknimmt.
+/// das je Absender (Markierwert „SkzConnect“), damit „Wiederherstellen“ genau unsere Eingriffe zurücknimmt.
 /// </summary>
 internal static class ToastSenders
 {
     private const string Base = @"Software\Microsoft\Windows\CurrentVersion\Notifications\Settings";
-    private const string Marker = "NConnect";
+    private const string Marker = "SkzConnect";
 
     /// <summary>
     /// Absender der Windows-Gerätemeldungen: Bluetooth verbunden/getrennt (Bthprops), Geräteeinrichtung

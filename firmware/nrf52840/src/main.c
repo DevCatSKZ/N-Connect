@@ -1,7 +1,7 @@
 /*
  * SKZ-Connect-Funkadapter für den nRF52840-Dongle (Zephyr / nRF Connect SDK), Weg A.
  *
- * Der Dongle gibt sich als der PC-Bluetooth-Adapter aus (öffentliche Adresse = NCONNECT_HOST_ADDR_LE aus dem
+ * Der Dongle gibt sich als der PC-Bluetooth-Adapter aus (öffentliche Adresse = SKZCONNECT_HOST_ADDR_LE aus dem
  * SKZ-Connect-Export), verbindet sich mit den Switch-2-Controllern, die für diese Adresse werben, und reicht den
  * rohen Eingabebericht 0x05 über USB-CDC an SKZ Connect weiter. Vibration/Spieler-LED kommen von SKZ Connect zurück.
  *
@@ -25,9 +25,9 @@
 #include <zephyr/logging/log.h>
 #include <string.h>
 
-#include "nconnect_pairing.h"   /* liefert NCONNECT_HOST_ADDR_LE[6] (niedrigstes Byte zuerst) */
+#include "skzconnect_pairing.h"   /* liefert SKZCONNECT_HOST_ADDR_LE[6] (niedrigstes Byte zuerst) */
 
-LOG_MODULE_REGISTER(nconnect, LOG_LEVEL_INF);
+LOG_MODULE_REGISTER(skzconnect, LOG_LEVEL_INF);
 
 /* ----------------------------------------------------------------------------- Protokoll (ADAPTER-PROTOKOLL.md) */
 
@@ -270,7 +270,7 @@ static bool match_host(struct net_buf_simple *ad, uint16_t *pid_out)
             const uint8_t *d = &m[2];              /* entspricht SKZ Connect "data" (ohne companyId) */
             /* Nintendo 0x0553, Kennung 01 00 03 7E, PID in d[5..6], Host in d[10..15] (LE). */
             if (company == 0x0553 && d[0] == 0x01 && d[1] == 0x00 && d[2] == 0x03 && d[3] == 0x7E) {
-                if (memcmp(&d[10], NCONNECT_HOST_ADDR_LE, 6) == 0) {
+                if (memcmp(&d[10], SKZCONNECT_HOST_ADDR_LE, 6) == 0) {
                     if (pid_out) *pid_out = d[5] | (d[6] << 8);
                     return true;
                 }
@@ -343,7 +343,7 @@ static void handle_pc_frame(const uint8_t *frame, size_t n)
         break;
     }
     case MSG_SETHOST:
-        /* Optional: SKZ Connect kann die Host-Adresse überschreiben. v0 nutzt die kompilierte NCONNECT_HOST_ADDR_LE. */
+        /* Optional: SKZ Connect kann die Host-Adresse überschreiben. v0 nutzt die kompilierte SKZCONNECT_HOST_ADDR_LE. */
         break;
     case MSG_RUMBLE:
         if (slot < MAX_SLOTS && slots[slot].in_use && dlen >= 2 && slots[slot].vib_handle) {
@@ -381,7 +381,7 @@ int main(void)
     if (led.port) gpio_pin_configure_dt(&led, GPIO_OUTPUT_ACTIVE);
 
     /* Öffentliche Adresse = PC-Adapter-Adresse, VOR bt_enable(). */
-    bt_ctlr_set_public_addr(NCONNECT_HOST_ADDR_LE);   /* PRÜFEN: bei SoftDevice-Controller ggf. HCI-VS nötig */
+    bt_ctlr_set_public_addr(SKZCONNECT_HOST_ADDR_LE);   /* PRÜFEN: bei SoftDevice-Controller ggf. HCI-VS nötig */
 
     int err = bt_enable(NULL);
     if (err) { LOG_ERR("bt_enable %d", err); return 0; }

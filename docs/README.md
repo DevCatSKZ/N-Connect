@@ -3,7 +3,7 @@
 Beschreibung der Funktionen, des Aufbaus und der Controller-Protokolle von SKZ Connect – Grundlage für die
 Weiterentwicklung der Windows-App, der Android-App und des Linux-Dienstes mit Kodi-Add-on.
 
-Stand: 17.10.2026 – Windows 1.0.22, Android 0.9.1 (Beta), Kodi `service.nconnect` 0.4.4; alle .NET-Projekte auf
+Stand: 17.10.2026 – Windows 1.0.22, Android 0.9.1 (Beta), Kodi `service.skzconnect` 0.4.4; alle .NET-Projekte auf
 .NET 10. Die Angaben sind aus dem Code abgeleitet; wo etwas nur geschätzt oder nicht mit echter Hardware geprüft
 ist, steht das dabei.
 
@@ -14,7 +14,7 @@ ist, steht das dabei.
 | [PROTOKOLLE.md](PROTOKOLLE.md) | Controller-Protokolle bis auf Byte-Ebene: Switch 2 (BLE/USB), Switch 1/NSO, Wii, Kabel-Pads, DSU, DS4 |
 | [PORTIERUNG.md](PORTIERUNG.md) | Was plattformunabhängig ist, was plattformabhängig ist und wie Android und Linux es lösen |
 | [ANDROID.md](ANDROID.md) | SKZ Connect für Android: Aufbau, virtueller Xbox-Controller über UHID mit Shizuku oder Root, Touch, Bauen, Tests, Release, offene Punkte |
-| [LINUX-KODI.md](LINUX-KODI.md) | Linux-Dienst `nconnect` (BlueZ, uinput) und Kodi-Add-ons: Aufbau, `status.json`-Vertrag, Begleitmodus, Bauen, Tests, kodi-repo |
+| [LINUX-KODI.md](LINUX-KODI.md) | Linux-Dienst `skzconnect` (BlueZ, uinput) und Kodi-Add-ons: Aufbau, `status.json`-Vertrag, Begleitmodus, Bauen, Tests, kodi-repo |
 | [SWITCH-IDENTITAET.md](SWITCH-IDENTITAET.md), [UEBERGABE-SWITCH-IDENTITAET.md](UEBERGABE-SWITCH-IDENTITAET.md) | Ruhendes Vorhaben: Joy-Con an Switch und PC ohne neues Koppeln (mit Bluepick_RCM) |
 | [VERLAUF.md](VERLAUF.md) | Entwicklung bis 1.0.22 und Erkenntnisse, die man nicht wiederholen sollte |
 | [release-notes/](release-notes/) | Release-Texte je Version (Deutsch und Englisch); die CI übernimmt `v<Version>.md` ins GitHub-Release |

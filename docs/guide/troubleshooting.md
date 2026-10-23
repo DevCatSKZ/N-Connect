@@ -155,7 +155,7 @@ which system – and ideally with diagnostics.
 - **Android:** *Help › Diagnostics › Share* (or *Show log*). Apart from the controllers' Bluetooth addresses, the log
   contains no personal data.
 - **Kodi:** menu › *Run diagnostics* and *Show log*; the file is at
-  `userdata/addon_data/service.nconnect/nconnect.log`.
+  `userdata/addon_data/service.skzconnect/skzconnect.log`.
 
 Feedback is especially helpful for controllers that have not yet been tested with real hardware: DualShock 4,
 DualSense, Xbox via Bluetooth or Wireless Adapter, wired controllers by HORI, PowerA and PDP, and Joy-Con in the

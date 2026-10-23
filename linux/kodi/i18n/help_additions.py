@@ -3,7 +3,7 @@
 Idempotent: bereits ergänzte Dateien bleiben unverändert. Aufruf: python linux/kodi/i18n/help_additions.py"""
 import pathlib
 
-RES = pathlib.Path(__file__).parent.parent / 'service.nconnect' / 'resources'
+RES = pathlib.Path(__file__).parent.parent / 'service.skzconnect' / 'resources'
 
 WII = {
     'de': '   • Wii-Fernbedienung / Wii U Pro Controller: rote SYNC-Taste (im Batteriefach bzw. hinten) drücken',

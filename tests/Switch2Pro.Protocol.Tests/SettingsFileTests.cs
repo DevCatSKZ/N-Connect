@@ -8,7 +8,7 @@ public class SettingsFileTests
 {
     private static string NewFolder()
     {
-        string dir = Path.Combine(Path.GetTempPath(), "nconnect-tests-" + Guid.NewGuid().ToString("N"));
+        string dir = Path.Combine(Path.GetTempPath(), "skzconnect-tests-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(dir);
         return dir;
     }
@@ -284,7 +284,7 @@ public class SettingsHandEditTests
 {
     private static Settings LoadJson(string json)
     {
-        string dir = Path.Combine(Path.GetTempPath(), "nconnect-tests-" + Guid.NewGuid().ToString("N"));
+        string dir = Path.Combine(Path.GetTempPath(), "skzconnect-tests-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(dir);
         try
         {
@@ -327,7 +327,7 @@ public class SettingsHandEditTests
         Assert.Equal(OutputMode.Xbox360, s.OutputMode);
         Assert.Equal(FaceButtonLayout.Xbox, s.Layout);
         Assert.Equal(GyroSource.Right, s.PairGyroSource);
-        Assert.Equal(ConnectNotifications.NConnect, s.ConnectNotify);
+        Assert.Equal(ConnectNotifications.SkzConnect, s.ConnectNotify);
         Assert.Equal(GyroStickMode.Off, s.GyroStick);
         Assert.Equal(15, s.InactivityMinutes); // der Rest der Datei bleibt erhalten
         Assert.Equal(ExtraButtonTarget.LS, Assert.Single(s.Remap).Value);
@@ -345,7 +345,7 @@ public class SettingsHandEditTests
     public void Unbekannte_Werte_landen_nicht_als_Zahl_in_der_Datei()
     {
         var s = LoadJson("""{ "OutputMode": "Xbox720", "Remap": { "GX": "A", "GL": "Laser" }, "ControllerKinds": { "AA:BB:CC:DD:EE:01": "Pro3" } }""");
-        string dir = Path.Combine(Path.GetTempPath(), "nconnect-tests-" + Guid.NewGuid().ToString("N"));
+        string dir = Path.Combine(Path.GetTempPath(), "skzconnect-tests-" + Guid.NewGuid().ToString("N"));
         try
         {
             string path = Path.Combine(dir, "settings.json");

@@ -1,16 +1,16 @@
 # Hinweise zu Drittanbieter-Software / Third-Party Notices
 
-**Deutsch:** SKZ Connect (Windows-App, Android-App, Linux-Dienst `nconnect` und Kodi-Add-on `service.nconnect`) enthält
+**Deutsch:** SKZ Connect (Windows-App, Android-App, Linux-Dienst `skzconnect` und Kodi-Add-on `service.skzconnect`) enthält
 oder nutzt Software, Quellcode und Daten Dritter. Diese Datei nennt jede Komponente mit Version, Plattform,
 Projekt-URL, Lizenz und Copyright-Vermerk und enthält die vollständigen Lizenztexte (Abschnitt D). Die Lizenz von
 SKZ Connect selbst (MIT) steht in `LICENSE`. Die Rechte an den Drittkomponenten verbleiben bei ihren Inhabern.
 
-**English:** SKZ Connect (Windows app, Android app, Linux daemon `nconnect` and Kodi add-on `service.nconnect`) includes
+**English:** SKZ Connect (Windows app, Android app, Linux daemon `skzconnect` and Kodi add-on `service.skzconnect`) includes
 or uses third-party software, source code and data. This file lists every component with its version, platform,
 project URL, licence and copyright notice, and contains the complete licence texts (section D). SKZ Connect's own licence
 (MIT) is in `LICENSE`. All third-party components remain the property of their respective owners.
 
-Stand / As of: 2026-10-17 – SKZ Connect für Windows 1.0.22, Android 0.9.1, Kodi-Add-on 0.4.4 (Linux-Dienst `nconnect`).
+Stand / As of: 2026-10-17 – SKZ Connect für Windows 1.0.22, Android 0.9.1, Kodi-Add-on 0.4.4 (Linux-Dienst `skzconnect`).
 
 Nintendo, Nintendo Switch, Joy-Con, Wii, Xbox, PlayStation, DualShock und DualSense sind Marken ihrer jeweiligen
 Inhaber. SKZ Connect ist ein unabhängiges Projekt und steht in keiner Verbindung zu diesen Unternehmen.
@@ -279,7 +279,7 @@ Plattform: Android. Lizenz jeweils Apache-2.0 (Text: [D.2](#d2-apache-license-20
 
 ### A.14 Material Icons
 
-- Verwendung: Vektor-Symbole in `android/NConnect.Android/Resources/drawable/` – `check` (ic_check), `close`
+- Verwendung: Vektor-Symbole in `android/SkzConnect.Android/Resources/drawable/` – `check` (ic_check), `close`
   (ic_cross), `warning` (ic_warn), `bluetooth` (ic_bluetooth), `battery_full` (ic_battery), `videogame_asset`
   (ic_nav_controller, ic_stat_controller), `help_outline` (ic_nav_help), `tune` (ic_nav_settings)
 - Plattform: Android
@@ -290,7 +290,7 @@ Plattform: Android. Lizenz jeweils Apache-2.0 (Text: [D.2](#d2-apache-license-20
 ### A.15 Linux.Bluetooth
 
 - Version: 6.0.0-pre3 (NuGet)
-- Plattform: Linux/Kodi (Dienst `nconnect`)
+- Plattform: Linux/Kodi (Dienst `skzconnect`)
 - Projekt: https://github.com/SuessLabs/Linux.Bluetooth
 - Lizenz: Apache-2.0 (Text: [D.2](#d2-apache-license-20)); keine NOTICE-Datei
 - Copyright 2022 Xeno Innovations, Inc. (laut LICENSE); Copyright 2026 Xeno Innovations, Inc. (Angabe im Paket);
@@ -299,7 +299,7 @@ Plattform: Android. Lizenz jeweils Apache-2.0 (Text: [D.2](#d2-apache-license-20
 ### A.16 Tmds.DBus
 
 - Version: 0.95.1 (NuGet)
-- Plattform: Linux/Kodi (Dienst `nconnect`)
+- Plattform: Linux/Kodi (Dienst `skzconnect`)
 - Projekt: https://github.com/tmds/Tmds.DBus
 - Lizenz: MIT (Text: [D.1](#d1-mit-lizenz))
 - Copyright 2006 Alp Toker <alp@atoker.com>
@@ -309,7 +309,7 @@ Plattform: Android. Lizenz jeweils Apache-2.0 (Text: [D.2](#d2-apache-license-20
 ### A.17 .NET-Laufzeit (Linux)
 
 - Version: .NET 10 (Microsoft.NETCore.App 10.0.x für linux-x64, linux-arm64, linux-arm), self-contained und gekürzt
-  in der Programmdatei `nconnect` enthalten
+  in der Programmdatei `skzconnect` enthalten
 - Plattform: Linux/Kodi
 - Projekt: https://github.com/dotnet/runtime
 - Lizenz: MIT (Text: [D.1](#d1-mit-lizenz))

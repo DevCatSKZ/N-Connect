@@ -240,7 +240,7 @@ internal static class RenderCheck
             (pages[^1].Page as ScrollPage)?.ShowOnly(null);
 
             // Fenster „Kopplungsdaten“ mit einer nachgebauten Switch-SD-Karte (ausgedachte Daten, Ordner im Temp-Verzeichnis).
-            string sd = Path.Combine(Path.GetTempPath(), "nconnect-render-sd");
+            string sd = Path.Combine(Path.GetTempPath(), "skzconnect-render-sd");
             Directory.CreateDirectory(Path.Combine(sd, "Nintendo"));
             Directory.CreateDirectory(Path.Combine(sd, "switchroot"));
             File.WriteAllText(Path.Combine(sd, SwitchCard.IniFile),

@@ -44,7 +44,7 @@ Der Export führt alle bekannten Controller auf und markiert, welche übernehmba
 2. **Exportieren:** SKZ Connect → *Joy-Con & Wii* → *Kopplungsdaten* → **Für ESP32 exportieren** → ZIP speichern.
    Das Fenster zeigt danach die Adresse und welche Controller übernehmbar sind. Der Export braucht keine
    Administratorrechte und enthält keine Schlüssel.
-3. **ESP32 einrichten:** `nconnect_pairing.h` aus dem ZIP in das ESP-IDF-Projekt kopieren und die Firmware bauen
+3. **ESP32 einrichten:** `skzconnect_pairing.h` aus dem ZIP in das ESP-IDF-Projekt kopieren und die Firmware bauen
    (Abschnitt 5).
 4. **Benutzen:** ESP32 an den anderen PC stecken, am Controller eine Taste drücken → er verbindet sich mit dem ESP32.
    Zurück am ersten PC: Taste drücken → er verbindet sich wieder mit dem Stick.
@@ -62,11 +62,11 @@ ZIP `SKZ-Connect-ESP32-<PC>.zip`:
 
 | Datei | Inhalt |
 |---|---|
-| `nconnect_pairing.h` | C-Header für ESP-IDF: Host-Adresse in beiden Byte-Reihenfolgen, Tabelle der übernehmbaren Controller |
-| `nconnect-esp32.json` | alles maschinenlesbar, auch nicht übernehmbare Controller mit Grund |
+| `skzconnect_pairing.h` | C-Header für ESP-IDF: Host-Adresse in beiden Byte-Reihenfolgen, Tabelle der übernehmbaren Controller |
+| `skzconnect-esp32.json` | alles maschinenlesbar, auch nicht übernehmbare Controller mit Grund |
 | `LIESMICH.txt` | Kurzanleitung |
 
-### 4.1 `nconnect-esp32.json` (Format `n-connect-esp32`, Version 1)
+### 4.1 `skzconnect-esp32.json` (Format `n-connect-esp32`, Version 1)
 
 ```json
 {
@@ -104,26 +104,26 @@ ZIP `SKZ-Connect-ESP32-<PC>.zip`:
 - `transport` = `BLE` oder `Classic`; `supportedBle` nur bei Switch-2-Controllern (BLE, unverschlüsselt).
 - Felder ohne Wert fehlen. Kalibrierwerte sind 12-Bit-Rohwerte wie in [PROTOKOLLE 0](../PROTOKOLLE.md).
 
-### 4.2 `nconnect_pairing.h`
+### 4.2 `skzconnect_pairing.h`
 
 ```c
-#define NCONNECT_HOST_ADDR_STR "98:B6:E9:01:02:03"
-static const uint8_t NCONNECT_HOST_ADDR[6]    = { 0x98, 0xB6, 0xE9, 0x01, 0x02, 0x03 }; // für esp_iface_mac_addr_set
-static const uint8_t NCONNECT_HOST_ADDR_LE[6] = { 0x03, 0x02, 0x01, 0xE9, 0xB6, 0x98 }; // wie in der Werbung / NimBLE
+#define SKZCONNECT_HOST_ADDR_STR "98:B6:E9:01:02:03"
+static const uint8_t SKZCONNECT_HOST_ADDR[6]    = { 0x98, 0xB6, 0xE9, 0x01, 0x02, 0x03 }; // für esp_iface_mac_addr_set
+static const uint8_t SKZCONNECT_HOST_ADDR_LE[6] = { 0x03, 0x02, 0x01, 0xE9, 0xB6, 0x98 }; // wie in der Werbung / NimBLE
 
 typedef struct {
     uint8_t addr[6], addr_le[6];
-    uint16_t pid;            // NCONNECT_PID_PRO2 0x2069, _JOYCON2_L 0x2067, _JOYCON2_R 0x2066, _GAMECUBE2 0x2073
+    uint16_t pid;            // SKZCONNECT_PID_PRO2 0x2069, _JOYCON2_L 0x2067, _JOYCON2_R 0x2066, _GAMECUBE2 0x2073
     const char *name;
     int8_t player_slot;      // -1 = keiner
-    uint8_t output;          // NCONNECT_OUTPUT_DEFAULT / _XBOX360 / _DS4
+    uint8_t output;          // SKZCONNECT_OUTPUT_DEFAULT / _XBOX360 / _DS4
     uint8_t single_joycon;
     uint8_t has_stick_cal;   // Bit 0 links, Bit 1 rechts
     int16_t stick_cal[2][6]; // Mitte X, Max X, Min X, Mitte Y, Max Y, Min Y
-} nconnect_controller_t;
+} skzconnect_controller_t;
 
-#define NCONNECT_CONTROLLER_COUNT 2
-static const nconnect_controller_t NCONNECT_CONTROLLERS[NCONNECT_CONTROLLER_COUNT] = { … };
+#define SKZCONNECT_CONTROLLER_COUNT 2
+static const skzconnect_controller_t SKZCONNECT_CONTROLLERS[SKZCONNECT_CONTROLLER_COUNT] = { … };
 ```
 
 Erzeugt von `Esp32Export.ToHeader` (`src/Switch2Pro.Protocol/Esp32Export.cs`, Tests in `Esp32ExportTests`).
@@ -141,17 +141,17 @@ SKZ Connect unter Windows tut (`ControllerManager.OnAdvertisement`, `Switch2BleL
 ### 5.2 Adresse übernehmen – vor dem Start von Bluetooth
 ```c
 #include "esp_mac.h"
-#include "nconnect_pairing.h"
+#include "skzconnect_pairing.h"
 
 void app_main(void) {
     // Muss vor nimble_port_init() / esp_bt_controller_init() stehen; der Bluetooth-Controller liest sie per
     // esp_read_mac(…, ESP_MAC_BT) beim Start.
-    ESP_ERROR_CHECK(esp_iface_mac_addr_set(NCONNECT_HOST_ADDR, ESP_MAC_BT));
+    ESP_ERROR_CHECK(esp_iface_mac_addr_set(SKZCONNECT_HOST_ADDR, ESP_MAC_BT));
     ESP_ERROR_CHECK(nimble_port_init());
     …
 }
 ```
-Beim Start loggt der Controller „Bluetooth MAC: …“. Dort muss die Adresse aus `NCONNECT_HOST_ADDR_STR` stehen. Eigene
+Beim Start loggt der Controller „Bluetooth MAC: …“. Dort muss die Adresse aus `SKZCONNECT_HOST_ADDR_STR` stehen. Eigene
 Verbindungen mit `BLE_OWN_ADDR_PUBLIC` aufbauen, keine Zufallsadresse.
 
 ### 5.3 Werbung erkennen
@@ -163,7 +163,7 @@ Kennung 0x0553 (LE: 53 05) | 01 00 03 | 7E xx | PID (LE) | … | Byte 10–15: H
 (Byte-Zählung ohne die zwei Kennungs-Bytes, wie in [PROTOKOLLE 1.1](../PROTOKOLLE.md).)
 
 - PID bestimmt die Art (`0x2069` Pro 2, `0x2067`/`0x2066` Joy-Con 2 L/R, `0x2073` GameCube).
-- **Byte 10–15 == `NCONNECT_HOST_ADDR_LE`** → der Controller sucht „deinen PC“ → verbinden.
+- **Byte 10–15 == `SKZCONNECT_HOST_ADDR_LE`** → der Controller sucht „deinen PC“ → verbinden.
 - Byte 10–15 alle 0 → SYNC-Modus. Der ESP32 könnte hier selbst koppeln (Befehl 0x15 mit seiner Adresse, PROTOKOLLE
   1.6). Er sollte es aber **nicht** tun, damit die Kopplung mit dem Stick erhalten bleibt.
 - Nach dem Trennen wirbt der Controller noch kurz weiter. SKZ Connect wartet 3 s und verbindet erst nach einer Pause

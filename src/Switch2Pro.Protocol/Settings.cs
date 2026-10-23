@@ -63,7 +63,7 @@ public enum GyroSource { Right, Left }
 public enum ConnectNotifications
 {
     /// <summary>SKZ Connect zeigt die Meldung (mit dem echten Controller-Namen); Gerätemeldungen von Windows aus.</summary>
-    NConnect,
+    SkzConnect,
     /// <summary>Nur die Gerätemeldung von Windows; SKZ Connect meldet beim Verbinden/Trennen nichts.</summary>
     Windows,
     /// <summary>Beide Meldungen (SKZ Connect und Windows).</summary>
@@ -303,7 +303,7 @@ public sealed class Settings
     /// Meldung beim Verbinden/Trennen: SKZ Connect (Standard, zeigt den echten Controller-Namen und schaltet die
     /// Gerätemeldungen von Windows ab), nur Windows, beide oder keine.
     /// </summary>
-    public ConnectNotifications ConnectNotify { get; set; } = ConnectNotifications.NConnect;
+    public ConnectNotifications ConnectNotify { get; set; } = ConnectNotifications.SkzConnect;
     /// <summary>
     /// Bekannte Controller per Tastendruck wieder verbinden (ohne SYNC). Achtung: Läuft das Programm,
     /// verbindet sich ein bekannter Controller dann mit dem PC statt mit der Switch 2.
@@ -820,7 +820,7 @@ public sealed class Settings
         if (!Enum.IsDefined(PairGyroSource))
             PairGyroSource = GyroSource.Right;
         if (!Enum.IsDefined(ConnectNotify))
-            ConnectNotify = ConnectNotifications.NConnect;
+            ConnectNotify = ConnectNotifications.SkzConnect;
         UprightJoyCons.RemoveAll(a => a is null);
         NamedProfiles.RemoveAll(p => p is null || string.IsNullOrWhiteSpace(p.Name));
         NamedProfiles = NamedProfiles.Select(p => p with

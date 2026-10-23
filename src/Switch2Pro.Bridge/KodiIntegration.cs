@@ -12,7 +12,11 @@ internal static class KodiIntegration
 {
     public const string AddonId = "repository.devcatskz";
     /// <summary>Add-on, dessen status.json das Kodi-Menü und das Home-Widget anzeigen.</summary>
-    public const string ServiceAddonId = "service.nconnect";
+    public const string ServiceAddonId = "service.skzconnect";
+    /// <summary>Add-on-Kennung der Vorversionen („service.nconnect"). Solange sie noch installiert ist,
+    /// schreibt <see cref="KodiStatusWriter"/> die status.json dorthin mit – sonst verlieren alte
+    /// Kodi-Installationen ihre Anzeige, bis das neue Add-on installiert wird.</summary>
+    private const string LegacyServiceAddonId = "service.nconnect";
     public const string RepositoryZipName = "repository.devcatskz.zip";
     public const string PluginZipName = "SKZ-Connect-Kodi-LibreELEC-alle-Geraete.zip";
     private const string RepositoryUrl = "https://github.com/DevCatSKZ/kodi-repo/raw/main/repository.devcatskz.zip";
@@ -49,15 +53,20 @@ internal static class KodiIntegration
 
     public static bool KodiFound => FindAddonFolders().Count > 0;
 
-    /// <summary>Datenordner des Add-ons (userdata/addon_data/service.nconnect) je Kodi-Installation, in der das
-    /// Add-on service.nconnect installiert ist. Dorthin schreibt <see cref="KodiStatusWriter"/> die status.json – daraus
+    /// <summary>Datenordner des Add-ons (userdata/addon_data/service.skzconnect) je Kodi-Installation, in der das
+    /// Add-on service.skzconnect installiert ist. Dorthin schreibt <see cref="KodiStatusWriter"/> die status.json – daraus
     /// lesen Menü und Widget. Ohne Add-on liest sie niemand; dann wird auch kein leerer Datenordner angelegt.</summary>
     public static List<string> FindDataDirs()
     {
         var result = new List<string>();
         foreach (string addons in FindAddonFolders())
-            if (Directory.Exists(Path.Combine(addons, ServiceAddonId)) && Directory.GetParent(addons) is { } kodi)
-                result.Add(Path.Combine(kodi.FullName, "userdata", "addon_data", ServiceAddonId));
+        {
+            if (Directory.GetParent(addons) is not { } kodi)
+                continue;
+            foreach (string id in new[] { ServiceAddonId, LegacyServiceAddonId })
+                if (Directory.Exists(Path.Combine(addons, id)))
+                    result.Add(Path.Combine(kodi.FullName, "userdata", "addon_data", id));
+        }
         return result;
     }
 

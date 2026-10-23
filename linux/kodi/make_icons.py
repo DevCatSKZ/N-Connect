@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Erzeugt die Controller-Icons für das Add-on-Menü und das Kodi-Widget (service.nconnect/resources/icons/).
+"""Erzeugt die Controller-Icons für das Add-on-Menü und das Kodi-Widget (service.skzconnect/resources/icons/).
 Einmalig bzw. bei Design-Änderungen ausführen: python linux/kodi/make_icons.py – die PNGs werden eingecheckt.
 
 Die Zeichnung läuft auf 512 px mit weichen Kanten und wird am Ende auf 128 px herunterskaliert
@@ -11,7 +11,7 @@ import zlib
 
 S = 512          # Render-Auflösung
 OUT_S = 128      # Ausgabe-Größe
-OUT = pathlib.Path(__file__).parent / 'service.nconnect' / 'resources' / 'icons'
+OUT = pathlib.Path(__file__).parent / 'service.skzconnect' / 'resources' / 'icons'
 
 # Controller-Farben (an die echten Gehäuse angelehnt)
 BLUE = (86, 180, 233)      # Joy-Con links (Neon-Blau)

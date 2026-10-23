@@ -73,7 +73,7 @@ public class PairingDataTests
     [Fact]
     public void SdKarte_WirdErkanntUndNurGelesen()
     {
-        string root = Path.Combine(Path.GetTempPath(), "nconnect-sd-" + Guid.NewGuid().ToString("N"));
+        string root = Path.Combine(Path.GetTempPath(), "skzconnect-sd-" + Guid.NewGuid().ToString("N"));
         try
         {
             Directory.CreateDirectory(Path.Combine(root, "Nintendo"));

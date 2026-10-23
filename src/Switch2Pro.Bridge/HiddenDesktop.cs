@@ -11,7 +11,7 @@ namespace Switch2Pro.Bridge;
 internal static class HiddenDesktop
 {
     private const string Name = "SKZ-Connect-Pruefhilfe";
-    private const string Marker = "NCONNECT_PRUEFHILFE_DESKTOP";
+    private const string Marker = "SKZCONNECT_PRUEFHILFE_DESKTOP";
 
     /// <summary>Läuft dieser Prozess bereits auf dem unsichtbaren Desktop?</summary>
     public static bool Active => Environment.GetEnvironmentVariable(Marker) == "1";

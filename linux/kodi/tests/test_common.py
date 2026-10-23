@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""service.nconnect/resources/lib/common.py: Programmwahl, Plattform-Hinweise, status.json, PID-Datei."""
+"""service.skzconnect/resources/lib/common.py: Programmwahl, Plattform-Hinweise, status.json, PID-Datei."""
 import json
 import os
 import time
@@ -47,7 +47,7 @@ class BinaryCandidatesTest(unittest.TestCase):
         self.addon = os.path.join(kodi_stubs.ROOT, 'addon-bin')
         for rid in ('linux-arm64', 'linux-arm'):
             os.makedirs(os.path.join(self.addon, 'bin', rid), exist_ok=True)
-            with open(os.path.join(self.addon, 'bin', rid, 'nconnect'), 'wb') as f:
+            with open(os.path.join(self.addon, 'bin', rid, 'skzconnect'), 'wb') as f:
                 f.write(b'\x7fELF')
 
     def candidates(self, has_daemon=True, chmod=None):
@@ -59,8 +59,8 @@ class BinaryCandidatesTest(unittest.TestCase):
 
     def test_reihenfolge_wie_runtime_ids_nur_vorhandene(self):
         found = self.candidates()
-        self.assertEqual(found, [os.path.join(self.addon, 'bin', 'linux-arm', 'nconnect'),
-                                 os.path.join(self.addon, 'bin', 'linux-arm64', 'nconnect')])
+        self.assertEqual(found, [os.path.join(self.addon, 'bin', 'linux-arm', 'skzconnect'),
+                                 os.path.join(self.addon, 'bin', 'linux-arm64', 'skzconnect')])
 
     def test_begleitmodus_ohne_programm(self):
         self.assertEqual(self.candidates(has_daemon=False), [])
@@ -232,20 +232,20 @@ class PidFileTest(unittest.TestCase):
         self.assertFalse(os.path.exists(common.PID_FILE))
         common.clear_pid()  # fehlende Datei ist kein Fehler
 
-    def test_is_nconnect_prueft_programm_und_datenordner(self):
-        with self.cmdline('/storage/.kodi/addons/service.nconnect/bin/linux-arm64/nconnect', '--data', common.DATA_DIR,
+    def test_is_skzconnect_prueft_programm_und_datenordner(self):
+        with self.cmdline('/storage/.kodi/addons/service.skzconnect/bin/linux-arm64/skzconnect', '--data', common.DATA_DIR,
                           '--kodi'):
-            self.assertTrue(common._is_nconnect(1234))
+            self.assertTrue(common._is_skzconnect(1234))
         with self.cmdline('/usr/bin/kodi.bin', '--data', common.DATA_DIR):
-            self.assertFalse(common._is_nconnect(1234))  # PID inzwischen an ein anderes Programm vergeben
-        with self.cmdline('/opt/nconnect/nconnect', '--data', '/var/lib/nconnect'):
-            self.assertFalse(common._is_nconnect(1234))  # anderes SKZ Connect (z. B. systemd) – nicht unseres
+            self.assertFalse(common._is_skzconnect(1234))  # PID inzwischen an ein anderes Programm vergeben
+        with self.cmdline('/opt/skzconnect/skzconnect', '--data', '/var/lib/skzconnect'):
+            self.assertFalse(common._is_skzconnect(1234))  # anderes SKZ Connect (z. B. systemd) – nicht unseres
         with mock.patch.object(common, 'open', mock.Mock(side_effect=OSError(2, 'No such file')), create=True):
-            self.assertFalse(common._is_nconnect(1234))  # läuft nicht mehr
+            self.assertFalse(common._is_skzconnect(1234))  # läuft nicht mehr
 
     def stop_leftover(self, alive):
         kill = mock.Mock()
-        with mock.patch.object(common, '_is_nconnect', side_effect=alive), \
+        with mock.patch.object(common, '_is_skzconnect', side_effect=alive), \
                 mock.patch.object(common.os, 'kill', kill), \
                 mock.patch.object(common, 'signal', self.signal), \
                 mock.patch.object(common.time, 'sleep'):

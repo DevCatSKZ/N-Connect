@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Erzeugt die Kodi-Sprachdateien (strings.po) von service.nconnect aus resource.language.en_gb (Quelle) und den
+Erzeugt die Kodi-Sprachdateien (strings.po) von service.skzconnect aus resource.language.en_gb (Quelle) und den
 Übersetzungen in tr_a.py/tr_b.py, dazu die des Bundle-Installers aus tr_bundle.py. Gleiche Sprachen wie SKZ Connect für
 Windows. Aufruf: python linux/kodi/i18n/generate.py
-service.nconnect: Englisch und Deutsch werden von Hand gepflegt; hier werden dort nur fehlende Einträge aus EXTRA
-ergänzt. script.nconnect.bundle: alle Sprachdateien kommen aus tr_bundle.py.
+service.skzconnect: Englisch und Deutsch werden von Hand gepflegt; hier werden dort nur fehlende Einträge aus EXTRA
+ergänzt. script.skzconnect.bundle: alle Sprachdateien kommen aus tr_bundle.py.
 """
 import pathlib
 import re
@@ -15,8 +15,8 @@ from tr_a import ES, FR, IT, NL, PT  # noqa: E402
 from tr_b import JA, KO, PL, RU, ZH  # noqa: E402
 from tr_bundle import BUNDLE  # noqa: E402
 
-LANG_DIR = pathlib.Path(__file__).parent.parent / 'service.nconnect' / 'resources' / 'language'
-BUNDLE_LANG_DIR = pathlib.Path(__file__).parent.parent / 'script.nconnect.bundle' / 'resources' / 'language'
+LANG_DIR = pathlib.Path(__file__).parent.parent / 'service.skzconnect' / 'resources' / 'language'
+BUNDLE_LANG_DIR = pathlib.Path(__file__).parent.parent / 'script.skzconnect.bundle' / 'resources' / 'language'
 
 # Neue Texte, die in allen Sprachen ergänzt werden: ID -> {Sprache: Text}; "en" ist die Quelle (msgid).
 EXTRA = {
@@ -377,14 +377,14 @@ def header(name, addon_id, folder):
 
 
 def write_bundle():
-    """Alle Sprachdateien von script.nconnect.bundle (en_gb mit leerem msgstr = Quelle)."""
+    """Alle Sprachdateien von script.skzconnect.bundle (en_gb mit leerem msgstr = Quelle)."""
     for folder, code in [('en_gb', 'en'), ('de_de', 'de')] + [(f, c) for f, c, _ in TARGETS]:
-        lines = header('SKZ Connect Bundle Installer', 'script.nconnect.bundle', folder)
+        lines = header('SKZ Connect Bundle Installer', 'script.skzconnect.bundle', folder)
         lines += [entry(i, t['en'], '' if code == 'en' else t[code]) for i, t in sorted(BUNDLE.items())]
         out = BUNDLE_LANG_DIR / ('resource.language.' + folder)
         out.mkdir(parents=True, exist_ok=True)
         (out / 'strings.po').write_text('\n'.join(lines), encoding='utf-8', newline='\n')
-    print('script.nconnect.bundle: {0} Texte in {1} Sprachdateien'.format(len(BUNDLE), len(TARGETS) + 2))
+    print('script.skzconnect.bundle: {0} Texte in {1} Sprachdateien'.format(len(BUNDLE), len(TARGETS) + 2))
 
 
 def main():
@@ -393,7 +393,7 @@ def main():
     append_missing(LANG_DIR / 'resource.language.de_de' / 'strings.po', 'de')
     source = [(int(m.group(1)), m.group(2)) for m in ENTRY.finditer(en_path.read_text(encoding='utf-8'))]
     for folder, code, table in TARGETS:
-        lines = header('SKZ Connect', 'service.nconnect', folder)
+        lines = header('SKZ Connect', 'service.skzconnect', folder)
         missing = []
         for i, msgid in source:
             msgid = msgid.replace('\\"', '"').replace('\\\\', '\\')

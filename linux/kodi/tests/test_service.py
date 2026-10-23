@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""service.nconnect/service.py: Programmstart mit Rückfall, Warten beim Beenden, Meldungen zum Bluetooth-Zustand."""
+"""service.skzconnect/service.py: Programmstart mit Rückfall, Warten beim Beenden, Meldungen zum Bluetooth-Zustand."""
 import io
 import json
 import os
@@ -12,7 +12,7 @@ from kodi_stubs import STATE
 from resources.lib import common
 from resources.lib.common import text
 
-service = kodi_stubs.load('service.nconnect', 'service.py', 'nconnect_service')
+service = kodi_stubs.load('service.skzconnect', 'service.py', 'skzconnect_service')
 
 
 class FakeProcess:
@@ -41,7 +41,7 @@ class FakeProcess:
     def wait(self, timeout=None):
         self.calls.append('wait')
         if self.returncode is None:
-            raise subprocess.TimeoutExpired('nconnect', timeout)
+            raise subprocess.TimeoutExpired('skzconnect', timeout)
         return self.returncode
 
 
@@ -64,9 +64,9 @@ class StartTest(unittest.TestCase):
     def test_rueckfall_auf_die_andere_variante(self):
         process = FakeProcess()
         popen = mock.Mock(side_effect=[OSError(8, 'Exec format error'), process])
-        self.assertTrue(self.start(['/bin/linux-arm64/nconnect', '/bin/linux-arm/nconnect'], popen))
+        self.assertTrue(self.start(['/bin/linux-arm64/skzconnect', '/bin/linux-arm/skzconnect'], popen))
         self.assertIs(self.svc.process, process)
-        self.assertEqual(popen.call_args_list[1].args[0], ['/bin/linux-arm/nconnect', '--data', common.DATA_DIR, '--kodi'])
+        self.assertEqual(popen.call_args_list[1].args[0], ['/bin/linux-arm/skzconnect', '--data', common.DATA_DIR, '--kodi'])
         with open(common.PID_FILE) as f:
             self.assertEqual(f.read(), '4321')
         with open(common.STATUS_JSON) as f:
@@ -76,7 +76,7 @@ class StartTest(unittest.TestCase):
     def test_adapter_wird_uebergeben(self):
         self.svc.adapter = 'hci1'
         popen = mock.Mock(return_value=FakeProcess())
-        self.assertTrue(self.start(['/bin/linux-x64/nconnect'], popen))
+        self.assertTrue(self.start(['/bin/linux-x64/skzconnect'], popen))
         self.assertEqual(popen.call_args.args[0][-2:], ['--adapter', 'hci1'])
 
     def test_kein_programm_meldung_statt_absturz(self):
@@ -85,7 +85,7 @@ class StartTest(unittest.TestCase):
 
     def test_keine_variante_startet(self):
         popen = mock.Mock(side_effect=OSError(8, 'Exec format error'))
-        self.assertFalse(self.start(['/bin/linux-arm64/nconnect', '/bin/linux-arm/nconnect'], popen))
+        self.assertFalse(self.start(['/bin/linux-arm64/skzconnect', '/bin/linux-arm/skzconnect'], popen))
         self.assertEqual(popen.call_count, 2)
         self.assertEqual(STATE.notifications, [(text(30022, 'aarch64'), 'error')])
         self.assertIsNone(self.svc.process)
@@ -132,8 +132,8 @@ class EventTest(unittest.TestCase):
 
     def test_befehle_aus_dem_menue(self):
         self.svc.send = mock.Mock()
-        self.svc.onNotification('service.nconnect', 'Other.gamepad-forget-AA:BB:CC:DD:EE:FF', '')
-        self.svc.onNotification('service.nconnect', 'Other.disconnect-2', '')
+        self.svc.onNotification('service.skzconnect', 'Other.gamepad-forget-AA:BB:CC:DD:EE:FF', '')
+        self.svc.onNotification('service.skzconnect', 'Other.disconnect-2', '')
         self.svc.onNotification('anderes.addon', 'Other.disconnect-all', '')
         self.assertEqual([c.args[0] for c in self.svc.send.call_args_list],
                          ['gamepad-forget AA:BB:CC:DD:EE:FF', 'disconnect 2'])

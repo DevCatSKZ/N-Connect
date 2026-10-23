@@ -96,7 +96,7 @@ internal sealed class TrayApp : ApplicationContext
         // die Windows-Gerätemeldungen blendet ToastSenders.Apply ein bzw. aus.
         _manager.ConnectionNotify += message => _ui.Post(_ =>
         {
-            if (_settings.ConnectNotify is not (ConnectNotifications.NConnect or ConnectNotifications.Both))
+            if (_settings.ConnectNotify is not (ConnectNotifications.SkzConnect or ConnectNotifications.Both))
                 return;
             _balloonUrl = null;
             Balloon(2500, "SKZ Connect", message, ToolTipIcon.Info);
@@ -438,7 +438,7 @@ internal sealed class TrayApp : ApplicationContext
     /// werden die Gerätemeldungen von Windows stummgeschaltet; bei „Windows“ bzw. „Beide“ kommen sie wieder.
     /// </summary>
     private void ApplyConnectNotify() =>
-        ToastSenders.Apply(_settings.ConnectNotify is ConnectNotifications.NConnect or ConnectNotifications.None);
+        ToastSenders.Apply(_settings.ConnectNotify is ConnectNotifications.SkzConnect or ConnectNotifications.None);
 
     private void UpdateTooltip()
     {

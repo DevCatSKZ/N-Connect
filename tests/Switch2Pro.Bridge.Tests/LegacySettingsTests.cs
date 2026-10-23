@@ -5,7 +5,7 @@ namespace Switch2Pro.Bridge.Tests;
 /// <summary>Einstellungsdateien älterer Versionen laden weiter, auch mit Feldern des entfernten Funkadapters.</summary>
 public sealed class LegacySettingsTests : IDisposable
 {
-    private readonly string _dir = Path.Combine(Path.GetTempPath(), "nconnect-bridge-tests-" + Guid.NewGuid().ToString("N"));
+    private readonly string _dir = Path.Combine(Path.GetTempPath(), "skzconnect-bridge-tests-" + Guid.NewGuid().ToString("N"));
 
     public LegacySettingsTests() => Directory.CreateDirectory(_dir);
 

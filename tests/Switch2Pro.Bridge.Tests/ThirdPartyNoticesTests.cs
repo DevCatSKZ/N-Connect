@@ -21,9 +21,9 @@ public sealed partial class ThirdPartyNoticesTests
         string iss = File.ReadAllText(RepoFile("installer", "SKZ-Connect.iss"));
         Assert.Contains($"Source: \"..\\{SettingsForm.NoticesFile}\"; DestDir: \"{{app}}\"", iss);
         // Android: dieselbe Datei als Asset (Hilfe → Lizenzen), nicht als zweite Kopie im Projekt.
-        string android = File.ReadAllText(RepoFile("android", "NConnect.Android", "NConnect.Android.csproj"));
+        string android = File.ReadAllText(RepoFile("android", "SkzConnect.Android", "SkzConnect.Android.csproj"));
         Assert.Contains($"<AndroidAsset Include=\"..\\..\\{SettingsForm.NoticesFile}\"", android);
-        Assert.False(File.Exists(RepoFile("android", "NConnect.Android", "Assets", SettingsForm.NoticesFile)));
+        Assert.False(File.Exists(RepoFile("android", "SkzConnect.Android", "Assets", SettingsForm.NoticesFile)));
     }
 
     /// <summary>Projekte, deren Pakete mit SKZ Connect weitergegeben werden (ohne Tests und Prüfwerkzeuge).</summary>
@@ -31,8 +31,8 @@ public sealed partial class ThirdPartyNoticesTests
     [
         "src/Switch2Pro.Bridge/Switch2Pro.Bridge.csproj",
         "src/Switch2Pro.Protocol/Switch2Pro.Protocol.csproj",
-        "android/NConnect.Android/NConnect.Android.csproj",
-        "linux/NConnect.Linux/NConnect.Linux.csproj",
+        "android/SkzConnect.Android/SkzConnect.Android.csproj",
+        "linux/SkzConnect.Linux/SkzConnect.Linux.csproj",
     ];
 
     [Theory]

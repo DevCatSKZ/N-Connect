@@ -28,8 +28,8 @@ Festgehalten:
 
 ## Bauen und Flashen
 
-Nur für Versuche mit der Referenz. `src/main.c` erwartet eine Datei `nconnect_pairing.h` neben sich, die
-`NCONNECT_HOST_ADDR_LE[6]` definiert (Adresse des PC-Adapters, niedrigstes Byte zuerst). SKZ Connect erzeugt diese
+Nur für Versuche mit der Referenz. `src/main.c` erwartet eine Datei `skzconnect_pairing.h` neben sich, die
+`SKZCONNECT_HOST_ADDR_LE[6]` definiert (Adresse des PC-Adapters, niedrigstes Byte zuerst). SKZ Connect erzeugt diese
 Datei nicht mehr; sie muss von Hand angelegt werden.
 
 Voraussetzungen: nRF Connect SDK (Zephyr) ab v2.6 mit Toolchain (`west`, arm-none-eabi-gcc) und `nrfutil` oder
@@ -38,8 +38,8 @@ Voraussetzungen: nRF Connect SDK (Zephyr) ab v2.6 mit Toolchain (`west`, arm-non
 ```sh
 west build -b nrf52840dongle_nrf52840 .
 nrfutil pkg generate --hw-version 52 --sd-req 0x00 \
-  --application build/zephyr/zephyr.hex --application-version 1 nconnect_dfu.zip
-nrfutil dfu usb-serial -pkg nconnect_dfu.zip -p COM<n>
+  --application build/zephyr/zephyr.hex --application-version 1 skzconnect_dfu.zip
+nrfutil dfu usb-serial -pkg skzconnect_dfu.zip -p COM<n>
 ```
 
 Zum Flashen den Dongle anstecken und die seitliche RESET-Taste drücken, bis die rote LED pulsiert (DFU-Modus). Der

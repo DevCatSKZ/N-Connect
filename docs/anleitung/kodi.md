@@ -1,8 +1,8 @@
 # SKZ Connect für Kodi
 
-**Deutsch** · [English](../guide/kodi.md) · Stand: Add-on `service.nconnect` 0.4.4
+**Deutsch** · [English](../guide/kodi.md) · Stand: Add-on `service.skzconnect` 0.4.4
 
-Unter LibreELEC startet das Add-on mit Kodi den Dienst `nconnect`. Er verbindet Switch-2-Controller per Bluetooth LE
+Unter LibreELEC startet das Add-on mit Kodi den Dienst `skzconnect`. Er verbindet Switch-2-Controller per Bluetooth LE
 und legt für jeden Spieler einen virtuellen Xbox-360-Controller an, den Kodi, RetroArch und Spiele ohne Einrichtung
 erkennen. Andere Bluetooth-Controller kann er automatisch koppeln. Unter Kodi für Windows und Android zeigt das Add-on
 nur den Stand der dortigen SKZ-Connect-App an (Begleitmodus). Probleme und Lösungen: [Hilfe](hilfe.md#kodi).
@@ -63,7 +63,7 @@ Am [Release](https://github.com/DevCatSKZ/SKZ-Connect/releases/latest) liegen di
 | `SKZ-Connect-Kodi-LibreELEC-…-RPi2-RPi3-arm.zip` | Raspberry Pi 2 und 3 (32 Bit) |
 | `SKZ-Connect-Kodi-LibreELEC-…-PC-x86_64.zip` | PCs mit LibreELEC Generic |
 
-Das Add-on *SKZ Connect Bundle Installer* (`script.nconnect.bundle`, im Repository) installiert SKZ Connect und das
+Das Add-on *SKZ Connect Bundle Installer* (`script.skzconnect.bundle`, im Repository) installiert SKZ Connect und das
 Widget-Add-on ohne Internet und trägt im Skin Aeon Nox Silvo einen Menüpunkt mit Widget ein; danach Kodi neu starten.
 
 ## Controller verbinden
@@ -117,7 +117,7 @@ Emulatoren, Vibration, Verbindung und Kodi sind gesperrt und tragen einen Hinwei
 
 Im Menü prüft *Diagnose ausführen*, ob Bluetooth, der Adapter mit Bluetooth LE und der virtuelle Controller (uinput)
 bereit sind. *Protokoll anzeigen* zeigt die letzten Einträge; die Datei liegt unter
-`userdata/addon_data/service.nconnect/nconnect.log`. Beides hilft beim Melden eines Fehlers als
+`userdata/addon_data/service.skzconnect/skzconnect.log`. Beides hilft beim Melden eines Fehlers als
 [Issue](https://github.com/DevCatSKZ/SKZ-Connect/issues).
 
 Technik (Entwicklerdoku): [LINUX-KODI.md](../LINUX-KODI.md).

@@ -5,7 +5,7 @@ installer/redist/
 *.user
 __pycache__/
 .vs/
-# Signaturschlüssel und Passwörter gehören nie ins Repository (Android: %USERPROFILE%\.nconnect).
+# Signaturschlüssel und Passwörter gehören nie ins Repository (Android: %USERPROFILE%\.skzconnect).
 *.pfx
 *.p12
 *.jks

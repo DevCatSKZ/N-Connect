@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Release-Signatur (Schlüssel und Passwort liegen nur lokal in %USERPROFILE%\.skzconnect, nie im Repository). -->
+  <Import Project="$(USERPROFILE)\.skzconnect\signing.props" Condition="Exists('$(USERPROFILE)\.skzconnect\signing.props')" />
+  <!-- SKZ Connect für Android. Teilt sich die Protokoll-Bibliothek mit der Windows-Version. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0-android</TargetFramework>
+    <SupportedOSPlatformVersion>26</SupportedOSPlatformVersion>
+    <OutputType>Exe</OutputType>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>SkzConnect.Android</RootNamespace>
+    <ApplicationId>com.devcatskz.nconnect</ApplicationId>
+    <ApplicationTitle>SKZ Connect</ApplicationTitle>
+    <ApplicationVersion>10</ApplicationVersion>
+    <ApplicationDisplayVersion>0.9.1</ApplicationDisplayVersion>
+    <!-- Shizuku wird per Reflection angesprochen, Einstellungen per JSON: nicht voll trimmen. -->
+    <TrimMode>partial</TrimMode>
+  </PropertyGroup>
+
+  <!-- Lokale Werkzeuge (JDK 25 im PATH ist für .NET Android zu neu). Auf anderen Rechnern per Umgebung überschreibbar. -->
+  <PropertyGroup Condition="'$(JavaSdkDirectory)' == '' And Exists('C:\Program Files\Microsoft\jdk-21.0.10.7-hotspot')">
+    <JavaSdkDirectory>C:\Program Files\Microsoft\jdk-21.0.10.7-hotspot</JavaSdkDirectory>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(AndroidSdkDirectory)' == '' And Exists('$(LOCALAPPDATA)\Android\Sdk')">
+    <AndroidSdkDirectory>$(LOCALAPPDATA)\Android\Sdk</AndroidSdkDirectory>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Switch2Pro.Protocol\Switch2Pro.Protocol.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Xamarin.Google.Android.Material" Version="1.14.0.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Lizenzhinweise für Hilfe › Lizenzen: dieselbe Datei wie im Repository-Wurzelordner, keine zweite Kopie. -->
+    <AndroidAsset Include="..\..\THIRD-PARTY-NOTICES.md" Link="Assets\THIRD-PARTY-NOTICES.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Shizuku: Shell-Rechte ohne Root (für den hid-Befehl). Nur paketiert, Aufruf per Reflection (ShizukuShell). -->
+    <AndroidMavenLibrary Include="dev.rikka.shizuku:api" Version="13.1.5" Bind="false" VerifyDependencies="false" />
+    <AndroidMavenLibrary Include="dev.rikka.shizuku:provider" Version="13.1.5" Bind="false" VerifyDependencies="false" />
+    <AndroidMavenLibrary Include="dev.rikka.shizuku:shared" Version="13.1.5" Bind="false" VerifyDependencies="false" />
+    <AndroidMavenLibrary Include="dev.rikka.shizuku:aidl" Version="13.1.5" Bind="false" VerifyDependencies="false" />
+  </ItemGroup>
+</Project>

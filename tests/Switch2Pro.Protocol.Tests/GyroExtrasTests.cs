@@ -85,7 +85,7 @@ public class GyroExtrasTests
     [Fact]
     public void Einstellungen_WerdenAufgeraeumt()
     {
-        string path = Path.Combine(Path.GetTempPath(), $"nconnect-test-{Guid.NewGuid():N}.json");
+        string path = Path.Combine(Path.GetTempPath(), $"skzconnect-test-{Guid.NewGuid():N}.json");
         try
         {
             File.WriteAllText(path, """{ "GyroAcceleration": 99, "FlickCountsPer360": 5, "FlickTime": -1, "FlickStick": true, "GameLeds": false }""");

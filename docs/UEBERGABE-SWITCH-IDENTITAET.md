@@ -44,10 +44,10 @@ es tut). Die Doku verwendet Platzhalter.
 
 **Bluepick_RCM 1.0.6** (gebaut, offline geprüft, **nicht auf der Switch getestet**):
 - `source/keys/keys.c`, Abschnitt „SKZ Connect: the Switch takes over the PC's Bluetooth identity“:
-  `bt_nconnect_enable`, `bt_nconnect_disable`, Hilfsfunktionen `_nc_*` (INI setzen, Datenbank schreiben,
-  `_nc_active()`).
+  `bt_skzconnect_enable`, `bt_skzconnect_disable`, Hilfsfunktionen `_sc_*` (INI setzen, Datenbank schreiben,
+  `_sc_active()`).
 - Schutz: `bt_full_auto`, `bt_atmo_disable`, `bt_atmo_purge_db` lassen die externe Datenbank in Ruhe, solange
-  `_nc_active()` gilt.
+  `_sc_active()` gilt.
 - `source/main.c`: neue Menüzeilen 23–25; Grey-out-Indizes jetzt hekate **32**, RCM **35** (in AGENTS.md §4
   nachgeführt). `source/keys/keys.h`: Deklarationen. `Versions.inc`: 1.0.6.
 - Offline-Prüfung: Ein aus `joycon_mac.bin` erzeugter Datenbankeintrag ist Byte für Byte identisch mit dem
@@ -81,7 +81,7 @@ es tut). Die Doku verwendet Platzhalter.
 ## 5. Danach (Reihenfolge nach Absprache mit dem Nutzer)
 
 - Testbefund „Joy-Con unter HOS an die Schiene stecken“ auswerten (neue Kopplung? → ggf. Rückweg nötig).
-- SKZ Connect: Switch per MTP erkennen (VID `057E`, nicht über Namen), `switch/Bluepick_RCM/nconnect.ini`
+- SKZ Connect: Switch per MTP erkennen (VID `057E`, nicht über Namen), `switch/Bluepick_RCM/skzconnect.ini`
   anzeigen, Hinweis „Switch aus, wenn am PC gespielt wird“. Vorhandene Bausteine: `SwitchCardWatcher.cs`
   (nur Laufwerke), `SwitchPairingData.cs`, `PairingDataForm.cs` (dort stehen Texte, die den neuen Weg noch
   ausschließen – Stand Commit `898100a` Zeilen 287–288 und 360 – anpassen).

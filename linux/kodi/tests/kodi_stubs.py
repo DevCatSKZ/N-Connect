@@ -19,13 +19,13 @@ import types
 sys.dont_write_bytecode = True  # keine __pycache__ in den Add-on-Quellordnern
 
 KODI_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # linux/kodi
-ROOT = tempfile.mkdtemp(prefix='nconnect-kodi-tests-')
+ROOT = tempfile.mkdtemp(prefix='skzconnect-kodi-tests-')
 atexit.register(shutil.rmtree, ROOT, True)
 
 STATE = types.SimpleNamespace()
 
 
-def reset(addon='service.nconnect'):
+def reset(addon='service.skzconnect'):
     """Vor jedem Test: nichts gesammelt, keine Kodi-Bedingung erfüllt, Englisch, Standard-Einstellungen."""
     STATE.addon = addon            # Add-on, das xbmcaddon.Addon() ohne ID meint
     STATE.language = 'en_gb'
@@ -196,8 +196,8 @@ xbmcplugin.endOfDirectory = lambda handle, succeeded=True, updateListing=False, 
 sys.modules.update({'xbmc': xbmc, 'xbmcaddon': xbmcaddon, 'xbmcvfs': xbmcvfs, 'xbmcgui': xbmcgui,
                     'xbmcplugin': xbmcplugin})
 
-# service.nconnect als Wurzel für „from resources.lib import common“ (wie in Kodi: der Add-on-Ordner im Suchpfad)
-SERVICE_DIR = os.path.join(KODI_DIR, 'service.nconnect')
+# service.skzconnect als Wurzel für „from resources.lib import common“ (wie in Kodi: der Add-on-Ordner im Suchpfad)
+SERVICE_DIR = os.path.join(KODI_DIR, 'service.skzconnect')
 if SERVICE_DIR not in sys.path:
     sys.path.insert(0, SERVICE_DIR)
 

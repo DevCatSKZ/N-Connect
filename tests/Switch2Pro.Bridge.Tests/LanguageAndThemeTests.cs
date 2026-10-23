@@ -179,7 +179,7 @@ public sealed class LanguageAndThemeTests : IDisposable
     [Fact]
     public void AutomatischBleibtNachSpeichernUndLadenErhalten()
     {
-        string dir = Path.Combine(Path.GetTempPath(), "nconnect-bridge-tests-" + Guid.NewGuid().ToString("N"));
+        string dir = Path.Combine(Path.GetTempPath(), "skzconnect-bridge-tests-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(dir);
         try
         {

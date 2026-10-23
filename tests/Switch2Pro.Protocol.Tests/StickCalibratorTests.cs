@@ -91,7 +91,7 @@ public class StickCalibratorTests
     [Fact]
     public void Einstellungen_KalibrierungUeberlebtSpeichern()
     {
-        string path = Path.Combine(Path.GetTempPath(), $"nconnect-test-{Guid.NewGuid():N}.json");
+        string path = Path.Combine(Path.GetTempPath(), $"skzconnect-test-{Guid.NewGuid():N}.json");
         try
         {
             var s = new Settings();

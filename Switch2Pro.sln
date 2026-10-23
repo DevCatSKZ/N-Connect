@@ -15,11 +15,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Switch2Pro.Protocol.Tests",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Switch2Pro.Bridge.Tests", "tests\Switch2Pro.Bridge.Tests\Switch2Pro.Bridge.Tests.csproj", "{3B7E5A21-9C4D-4F8E-A6B2-71D0C5E8F934}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NConnect.Linux", "linux\NConnect.Linux\NConnect.Linux.csproj", "{53AFD50B-2AF6-4F5B-BF08-FFB37525CC9A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkzConnect.Linux", "linux\SkzConnect.Linux\SkzConnect.Linux.csproj", "{53AFD50B-2AF6-4F5B-BF08-FFB37525CC9A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NConnect.Linux.Tests", "tests\NConnect.Linux.Tests\NConnect.Linux.Tests.csproj", "{ACC30F0B-0C86-4B38-BB8F-3714D722087F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkzConnect.Linux.Tests", "tests\SkzConnect.Linux.Tests\SkzConnect.Linux.Tests.csproj", "{ACC30F0B-0C86-4B38-BB8F-3714D722087F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NConnect.Android.Tests", "android\NConnect.Android.Tests\NConnect.Android.Tests.csproj", "{D4DADFB9-60A0-4BF4-B157-CF10401D04DB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkzConnect.Android.Tests", "android\SkzConnect.Android.Tests\SkzConnect.Android.Tests.csproj", "{D4DADFB9-60A0-4BF4-B157-CF10401D04DB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{07C2787E-EAC7-C090-1BA3-A61EC2A24D84}"
 EndProject

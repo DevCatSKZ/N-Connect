@@ -1,7 +1,7 @@
-# Prüft und baut die Kodi-Add-ons von SKZ Connect (service.nconnect für LibreELEC/Linux samt Begleitmodus,
-# plugin.nconnect.status, script.nconnect.bundle, repository.devcatskz).
+# Prüft und baut die Kodi-Add-ons von SKZ Connect (service.skzconnect für LibreELEC/Linux samt Begleitmodus,
+# plugin.skzconnect.status, script.skzconnect.bundle, repository.devcatskz).
 # - Jeder Lauf: Tests (Linux-Dienst und Add-on-Logik, Sprachdateien aktuell), dann alle ZIPs als Artefakt „Kodi-Plugin“.
-# - Tag „v1.2.3“: Die service.nconnect-ZIPs zusätzlich ans GitHub-Release.
+# - Tag „v1.2.3“: Die service.skzconnect-ZIPs zusätzlich ans GitHub-Release.
 # Das DevCatSKZ Repository (github.com/DevCatSKZ/kodi-repo) pflegt die CI bewusst nicht – Deploy-Keys sind in der
 # Organisation abgeschaltet. Beim Release von Hand (siehe docs/LINUX-KODI.md):
 #   powershell -File linux/build-kodi-addon.ps1 -Repo -RepoDir <kodi-repo>, dort committen (devcatskz) und pushen.
@@ -15,7 +15,7 @@ on:
     paths:
       - "linux/**"
       - "src/Switch2Pro.Protocol/**"
-      - "tests/NConnect.Linux.Tests/**"
+      - "tests/SkzConnect.Linux.Tests/**"
       - "THIRD-PARTY-NOTICES.md"
       - "Directory.Build.props"
       - ".github/workflows/kodi.yml"
@@ -41,7 +41,7 @@ jobs:
           python-version: "3.12"
 
       - name: Linux-Dienst testen
-        run: dotnet test tests/NConnect.Linux.Tests -c Release
+        run: dotnet test tests/SkzConnect.Linux.Tests -c Release
 
       - name: Add-on-Logik testen, Sprachdateien aktuell
         run: |

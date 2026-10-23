@@ -234,10 +234,10 @@ jobs:
       # Ergänzt fehlende Pakete im Android-SDK des Runners (Plattform und Build-Tools, die .NET Android verlangt).
       - name: Android-SDK vervollständigen
         run: >
-          dotnet build android/NConnect.Android -t:InstallAndroidDependencies -f net10.0-android
+          dotnet build android/SkzConnect.Android -t:InstallAndroidDependencies -f net10.0-android
           "-p:AndroidSdkDirectory=$env:ANDROID_HOME" "-p:JavaSdkDirectory=$env:JAVA_HOME" -p:AcceptAndroidSDKLicenses=True
 
       - name: Android-App kompilieren (Debug)
         run: >
-          dotnet build android/NConnect.Android -c Debug
+          dotnet build android/SkzConnect.Android -c Debug
           "-p:AndroidSdkDirectory=$env:ANDROID_HOME" "-p:JavaSdkDirectory=$env:JAVA_HOME"

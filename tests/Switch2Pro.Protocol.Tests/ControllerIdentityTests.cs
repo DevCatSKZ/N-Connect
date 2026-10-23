@@ -39,7 +39,7 @@ public class ControllerIdentityTests
     [Fact]
     public void SpeichernUndLaden_BehaeltNamenUndPlaetze()
     {
-        string path = Path.Combine(Path.GetTempPath(), $"nconnect-test-{Guid.NewGuid():N}.json");
+        string path = Path.Combine(Path.GetTempPath(), $"skzconnect-test-{Guid.NewGuid():N}.json");
         try
         {
             var s = new Settings();
@@ -59,7 +59,7 @@ public class ControllerIdentityTests
     [Fact]
     public void Laden_RaeumtUngueltigeEintraegeAuf()
     {
-        string path = Path.Combine(Path.GetTempPath(), $"nconnect-test-{Guid.NewGuid():N}.json");
+        string path = Path.Combine(Path.GetTempPath(), $"skzconnect-test-{Guid.NewGuid():N}.json");
         try
         {
             File.WriteAllText(path, """{ "ControllerNames": { "A": "  ", "B": "Gut" }, "PlayerSlots": { "A": 12, "B": 1 } }""");
@@ -92,7 +92,7 @@ public class ControllerIdentityTests
     [Fact]
     public void Ausgabeart_SpeichernLadenUndAufraeumen()
     {
-        string path = Path.Combine(Path.GetTempPath(), $"nconnect-test-{Guid.NewGuid():N}.json");
+        string path = Path.Combine(Path.GetTempPath(), $"skzconnect-test-{Guid.NewGuid():N}.json");
         try
         {
             File.WriteAllText(path, """{ "ControllerOutputs": { "A": "DualShock4", "B": 7 }, "HideFromGames": false }""");

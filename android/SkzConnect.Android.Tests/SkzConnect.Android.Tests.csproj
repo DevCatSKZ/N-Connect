@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Tests für die Teile der Android-App, die ohne Gerät prüfbar sind: Update-Prüfung (Release-Liste, Netzfehler, Download),
+    Autostart-Broadcasts, Profile je Spiel, Erkennung der App im Vordergrund, status.json-Vertrag und Übersetzungstabellen.
+    Die Quelldateien haben keine Android-Abhängigkeiten und werden direkt mitkompiliert (das Android-Projekt selbst lässt
+    sich hier nicht laden).
+    Aufruf: dotnet test android/SkzConnect.Android.Tests
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>SkzConnect.Android.Tests</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="4.0.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Switch2Pro.Protocol\Switch2Pro.Protocol.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\SkzConnect.Android\Core\UpdateCheck.Releases.cs" Link="App\UpdateCheck.Releases.cs" />
+    <Compile Include="..\SkzConnect.Android\Core\UpdateCheck.Http.cs" Link="App\UpdateCheck.Http.cs" />
+    <Compile Include="..\SkzConnect.Android\Core\BootReceiver.Actions.cs" Link="App\BootReceiver.Actions.cs" />
+    <Compile Include="..\SkzConnect.Android\Profiles\ProfileEdit.cs" Link="App\ProfileEdit.cs" />
+    <Compile Include="..\SkzConnect.Android\Profiles\GameProfileWatcher.Pick.cs" Link="App\GameProfileWatcher.Pick.cs" />
+    <Compile Include="..\SkzConnect.Android\Kodi\KodiStatusWriter.Contract.cs" Link="App\KodiStatusWriter.Contract.cs" />
+    <Compile Include="..\SkzConnect.Android\L.Texts.cs" Link="App\L.Texts.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+</Project>

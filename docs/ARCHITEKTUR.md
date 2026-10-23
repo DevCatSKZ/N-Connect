@@ -9,17 +9,17 @@ src/Switch2Pro.Protocol           Bibliothek ohne Betriebssystem-Abhängigkeit (
                                   Belegung, Einstellungen, DSU – genutzt von Windows, Android und Linux
 src/Switch2Pro.Bridge             Windows-App „SKZ Connect“ (WinForms, net10.0-windows10.0.22621.0): Verbindungen,
                                   virtuelle Controller über ViGEmBus, Oberfläche
-android/NConnect.Android          SKZ Connect für Android (net10.0-android, minSdk 26) – siehe ANDROID.md
-android/NConnect.Android.Tests    xUnit-Tests für die Android-freien Teile (net10.0, ohne Android-Workload)
+android/SkzConnect.Android          SKZ Connect für Android (net10.0-android, minSdk 26) – siehe ANDROID.md
+android/SkzConnect.Android.Tests    xUnit-Tests für die Android-freien Teile (net10.0, ohne Android-Workload)
 android/i18n                      Übersetzungstabellen der Android-App und generate.py
-linux/NConnect.Linux              Linux-Dienst „nconnect“ (net10.0, BlueZ über D-Bus, uinput) – siehe LINUX-KODI.md
-linux/kodi                        Kodi-Add-ons (service.nconnect, plugin.nconnect.status, script.nconnect.bundle,
+linux/SkzConnect.Linux              Linux-Dienst „skzconnect“ (net10.0, BlueZ über D-Bus, uinput) – siehe LINUX-KODI.md
+linux/kodi                        Kodi-Add-ons (service.skzconnect, plugin.skzconnect.status, script.skzconnect.bundle,
                                   repository.devcatskz), Übersetzungen, Index-Werkzeug, Python-Tests
 linux/build-kodi-addon.ps1        baut den Dienst für x64/arm64/arm und packt die Kodi-ZIPs
 tests/Switch2Pro.Protocol.Tests   xUnit-Tests der Bibliothek (net10.0)
 tests/Switch2Pro.Bridge.Tests     xUnit-Tests der Windows-App (net10.0-windows): Gerätekette, Kodi-Statusdatei,
                                   Sprache/Darstellung, alte Einstellungsfelder, Übersetzungen, Lizenzhinweise, Versionen
-tests/NConnect.Linux.Tests        xUnit-Tests des Linux-Dienstes (net10.0, laufen auch unter Windows)
+tests/SkzConnect.Linux.Tests        xUnit-Tests des Linux-Dienstes (net10.0, laufen auch unter Windows)
 tools/Switch2Pro.BleProbe         Diagnose: Switch-2-Controller per BLE suchen, verbinden, Berichte ausgeben
 tools/Switch2Pro.UsbProbe         Diagnose: Switch-2-Controller am USB-Kabel (bindet Usb/UsbNative.cs der App ein)
 tools/Switch2Pro.BtIdentityProbe  Diagnose zum ruhenden Vorhaben „Switch-Identität“ (Herstellerbefehle nur mit Freigabe)
@@ -198,7 +198,7 @@ Kopplung entfernen → Wii: `PairWii` (binäre PIN), sonst `PairJustWorks` (WinR
 | `%APPDATA%\SKZ-Connect\settings.json` | `Settings` als JSON (Enums als Text), siehe `Settings.cs`; daneben `settings.json.bak` und ggf. `settings.json.unlesbar-<Zeit>` |
 | `%LOCALAPPDATA%\SKZ-Connect\bridge.log` | Protokoll (ab 1 MB einmal rotiert) |
 | `%LOCALAPPDATA%\SKZ-Connect\battery.json` | Gemessener Spannungssprung beim Laden je Seriennummer |
-| `<Kodi>\userdata\addon_data\service.nconnect\status.json` | Status für das Kodi-Add-on (nur, wenn es installiert ist) |
+| `<Kodi>\userdata\addon_data\service.skzconnect\status.json` | Status für das Kodi-Add-on (nur, wenn es installiert ist) |
 | `*.ncprofile.json` | Exportiertes Profil (`NamedProfile`) |
 | `*.ncpair` | Kopplungsdaten PC → PC (`PairingTransfer`) |
 

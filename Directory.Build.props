@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <!-- Standard für Bibliothek, Tests und Werkzeuge. Die Apps tragen ihre eigene Version: Windows in
-         Switch2Pro.Bridge.csproj, Linux in NConnect.Linux.csproj, Android als ApplicationDisplayVersion. -->
+         Switch2Pro.Bridge.csproj, Linux in SkzConnect.Linux.csproj, Android als ApplicationDisplayVersion. -->
     <Version>1.0.0</Version>
     <Company>devcatskz</Company>
     <Authors>devcatskz</Authors>

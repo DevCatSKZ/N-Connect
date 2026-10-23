@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Texte des Bundle-Installers (script.nconnect.bundle) in allen 12 Sprachen – ID -> {Sprache: Text}, "en" ist die
+"""Texte des Bundle-Installers (script.skzconnect.bundle) in allen 12 Sprachen – ID -> {Sprache: Text}, "en" ist die
 Quelle (msgid). generate.py schreibt daraus alle strings.po des Bundles (auch en_gb und de_de)."""
 
 BUNDLE = {
