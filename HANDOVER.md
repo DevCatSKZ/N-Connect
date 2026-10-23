@@ -95,6 +95,33 @@ Freigabe des Nutzers.
 
 ## Bekannte Grenzen und offene Punkte
 
+### Umbenannte Kennungen (seit 23.10.)
+
+Alle „nconnect"-Kennungen wurden auf „skzconnect" umgestellt: Kodi-Add-ons (`service.skzconnect`,
+`plugin.skzconnect.status`, `script.skzconnect.bundle`), .NET-Projekte (`SkzConnect.*`), das
+Linux-Binärprogramm `skzconnect`, der Datenordner `~/.config/skzconnect` (wird einmalig aus
+`~/.config/nconnect` übernommen) und die Android-Einstellungsdatei (wird einmalig migriert).
+Auf GitHub steht kein „nconnect" mehr in Pfaden, Repos, Releases (Titel+Texte) oder der Webseite.
+
+Bewusst **behalten** (brechen sonst bestehende Installationen):
+
+- `applicationId com.devcatskz.nconnect` samt Provider-Authorities – die Paketkennung der
+  installierten Android-App; ändern bedeutet: keine Updates, Datenverlust.
+- Update-Check liest weiter die alten Asset-Namen `N-Connect-*` (Windows + Android); `build.yml`
+  legt Release-Dateien unter beiden Namen ab. Kann entfallen, sobald keine Installation < 1.0.23
+  mehr im Umlauf ist.
+- `PairingTransfer.FormatId`/`FileExtension` („n-connect-pairings"/“.ncpair") – Wire- und
+  Dateiformat; Exporte und Geräte alter Versionen müssen kompatibel bleiben.
+- Legacy-Zeichenfolgen für Migration: Registry `N-Connect`, Autostart-Eintrag und Datenordner
+  der Vorversion (Dialogs.cs, Log.cs).
+- `service.nconnect` als alte Add-on-Kennung: `KodiIntegration.FindDataDirs` schreibt
+  die status.json auch in `addon_data/service.nconnect`, solange das alte Add-on noch
+  installiert ist. Alter Kodi-Installationen bekommen keine Add-on-Updates mehr – Umstieg
+  über das neue Bundle (`script.skzconnect.bundle`) oder das LibreELEC-Zip.
+- Signatur-Alias im Android-Keystore heißt intern `nconnect` (liegt nur lokal unter
+  `%USERPROFILE%\.skzconnect`, nicht im Repository).
+
+
 ### Code-Signatur fehlt
 
 Es gibt keine Repo-Secrets. Setup und EXE sind unsigniert, Windows zeigt die SmartScreen-Warnung. `build.yml`
