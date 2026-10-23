@@ -53,6 +53,9 @@ public sealed class PairingFileException(PairingFileError error, string message)
 /// </summary>
 public static class PairingTransfer
 {
+    // Format-Kennung und Dateiendung bleiben aus Kompatibilitätsgründen die der Vorversion
+    // (hieß „N-Connect"): Bestehende Exporte müssen sich weiter einlesen lassen, und Geräte mit
+    // älteren Versionen erkennen die Dateien sonst nicht mehr.
     public const string FormatId = "n-connect-pairings";
     public const int Version = 1;
     public const string FileExtension = ".ncpair";

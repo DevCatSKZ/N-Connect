@@ -66,11 +66,11 @@ ZIP `SKZ-Connect-ESP32-<PC>.zip`:
 | `skzconnect-esp32.json` | alles maschinenlesbar, auch nicht übernehmbare Controller mit Grund |
 | `LIESMICH.txt` | Kurzanleitung |
 
-### 4.1 `skzconnect-esp32.json` (Format `n-connect-esp32`, Version 1)
+### 4.1 `skzconnect-esp32.json` (Format `skzconnect-esp32`, Version 1)
 
 ```json
 {
-  "format": "n-connect-esp32",
+  "format": "skzconnect-esp32",
   "version": 1,
   "created": "2026-10-10T20:15:00Z",
   "sourcePc": "MEIN-PC",
