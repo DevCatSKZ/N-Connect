@@ -79,7 +79,9 @@ Freigabe des Nutzers.
    `%USERPROFILE%\.nconnect` (über `signing.props`); prüfen mit `apksigner verify --print-certs`. Die Datei
    `bin/Release/net10.0-android/publish/com.devcatskz.nconnect-Signed.apk` als `SKZ-Connect-Android-<Version>.apk`
    anhängen (`gh release upload v<Version> …`) – der Name ist Pflicht, die Update-Prüfung der App liest die Version
-   daraus. SHA-256 und Signatur der APK in die Release-Beschreibung aufnehmen (wie bei 1.0.20).
+   daraus. Übergangsweise zusätzlich eine Kopie als `N-Connect-Android-<Version>.apk` anhängen: App-Versionen bis
+   0.9.1 suchen nur nach dem alten Namen. SHA-256 und Signatur der APK in die Release-Beschreibung aufnehmen
+   (wie bei 1.0.20).
 6. **kodi-repo von Hand:** `git -C ..\kodi-repo status` (keine offenen Altlasten), `git -C ..\kodi-repo pull`, dann
    `powershell -File linux/build-kodi-addon.ps1 -Repo -RepoDir ..\kodi-repo`. Für byte-gleiche ZIPs wie am Release das
    CI-Artefakt „Kodi-Plugin“ entpacken und `-Repo -NoBuild -Out <Ordner> -RepoDir ..\kodi-repo` nehmen. Das Skript ruft
