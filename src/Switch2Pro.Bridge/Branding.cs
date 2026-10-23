@@ -6,9 +6,10 @@ using System.Drawing.Text;
 namespace Switch2Pro.Bridge;
 
 /// <summary>
-/// Logo von N-Connect im Stil von Windows 11: weiße Controller-Silhouette mit Verbindungssignal auf einer blauen,
-/// abgerundeten Kachel. Wird als Vektor gezeichnet (Fenster, Infobereich) und per <c>--render-brand</c> als
-/// Programm-Icon und Installer-Grafiken gespeichert (ohne Fenster).
+/// Logo von N-Connect in der DevCat-Bildsprache (wie SKZ Monitor und SKZ Remote): Gamepad mit Katzenohren und
+/// leuchtenden Cyan-Augen auf dunkler Navy-Kachel, Iris-Verlauf (Teal-Blau-Violett) am Rahmen, amber Nase und
+/// Wi-Fi-Bögen als Connect-Signatur. Wird als Vektor gezeichnet (Fenster, Infobereich) und per
+/// <c>--render-brand</c> als Programm-Icon und Installer-Grafiken gespeichert (ohne Fenster).
 /// </summary>
 internal static class Branding
 {
@@ -37,15 +38,55 @@ internal static class Branding
         return (Icon)temp.Clone();
     }
 
-    // Farben des App-Icons (Windows-Blau, Kachel von hell oben nach tief unten).
-    private static readonly Color TileTop = Color.FromArgb(0x4C, 0xB4, 0xFF);
-    private static readonly Color TileBottom = Color.FromArgb(0x00, 0x5A, 0xD0);
-    private static readonly Color Ink = Color.FromArgb(0x0B, 0x4F, 0xB5); // Details auf der weißen Silhouette
+    // Farben des App-Icons: Navy-Kachel wie bei SKZ Monitor/Remote, Iris-Verlauf und DevCat-Akzente.
+    private static readonly Color TileTop = Color.FromArgb(0x0E, 0x18, 0x24);
+    private static readonly Color TileBottom = Color.FromArgb(0x06, 0x0D, 0x14);
+    private static readonly Color IrisTeal = Color.FromArgb(45, 225, 194);
+    private static readonly Color IrisBlue = Color.FromArgb(86, 138, 255);
+    private static readonly Color IrisViolet = Color.FromArgb(124, 92, 255);
+    private static readonly Color EyeCyan = Color.FromArgb(72, 240, 210);
+    private static readonly Color Amber = Color.FromArgb(255, 194, 75);
+    private static readonly Color DimTeal = Color.FromArgb(110, 190, 200);
+    private static readonly Color Face = Color.FromArgb(10, 16, 24);
+
+    /// <summary>Iris-Verlauf Teal-Blau-Violett über dem Logo-Rechteck (wie im Python-Generator).</summary>
+    private static LinearGradientBrush Iris(RectangleF r) => new(r, IrisTeal, IrisViolet, 25f)
+    {
+        InterpolationColors = new ColorBlend
+        {
+            Colors = [IrisTeal, IrisBlue, IrisViolet],
+            Positions = [0f, 0.5f, 1f],
+        },
+    };
+
+    /// <summary>Gamepad-Silhouette: Kapsel-Körper und zwei Griff-Ellipsen als eine Fläche.</summary>
+    private static GraphicsPath PadPath(RectangleF r, float s)
+    {
+        var pad = new GraphicsPath(FillMode.Winding);
+        RectangleF R(float x, float y, float w, float h) => new(r.X + x * s, r.Y + y * s, w * s, h * s);
+        using (var body = Theme.RoundedRect(R(0.19f, 0.36f, 0.62f, 0.36f), s * 0.18f))
+            pad.AddPath(body, false); // AddPath kopiert – den Hilfspfad gleich freigeben
+        pad.AddEllipse(R(0.157f, 0.595f, 0.156f, 0.21f));
+        pad.AddEllipse(R(0.687f, 0.595f, 0.156f, 0.21f));
+        return pad;
+    }
+
+    /// <summary>Katzenauge (Mandelform): zwei Bezier-Bögen, oben und unten gespiegelt.</summary>
+    private static GraphicsPath LeafEye(float ecx, float ecy, float rx, float ry, float s, RectangleF r)
+    {
+        float X(float x) => r.X + x * s;
+        float Y(float y) => r.Y + y * s;
+        var eye = new GraphicsPath();
+        float cx = rx * 0.62f;
+        eye.AddBezier(X(ecx - rx), Y(ecy), X(ecx - cx), Y(ecy - ry), X(ecx + cx), Y(ecy - ry), X(ecx + rx), Y(ecy));
+        eye.AddBezier(X(ecx + rx), Y(ecy), X(ecx + cx), Y(ecy + ry), X(ecx - cx), Y(ecy + ry), X(ecx - rx), Y(ecy));
+        eye.CloseFigure();
+        return eye;
+    }
 
     /// <summary>
-    /// App-Icon im Stil von Windows 11: abgerundete Kachel im Windows-Blau, weiße Controller-Silhouette, darüber ein
-    /// Verbindungssignal. Vektor – in jeder Größe scharf; kleine Größen lassen Details weg (16 px: nur Kachel und
-    /// Silhouette, ab 24 px Steuerkreuz und Tasten, ab 32 px Signal, ab 48 px Lichtkante und Schatten).
+    /// App-Icon: Gamepad-Katze im DevCat-Stil auf Navy-Kachel. Vektor – in jeder Größe scharf; kleine Größen lassen
+    /// Details weg (ab 24 px Steuerkreuz und Tasten, ab 32 px Wi-Fi-Signal, ab 48 px Lichtkante).
     /// </summary>
     public static void DrawLogo(Graphics g, RectangleF r, bool tile = true)
     {
@@ -62,68 +103,102 @@ internal static class Branding
                 g.FillPath(back, tilePath);
             if (s >= 48)
             {
-                // Lichtkante oben und leicht dunklerer Rand – gibt der Kachel Tiefe wie bei Windows-11-Icons.
-                using var edge = new Pen(Color.FromArgb(70, 0, 30, 90), Math.Max(1f, s / 96f));
+                // Lichtkante oben und dunklerer Rand – gibt der Kachel Tiefe wie bei Windows-11-Icons.
+                using var edge = new Pen(Color.FromArgb(60, 0, 10, 20), Math.Max(1f, s / 96f));
                 g.DrawPath(edge, tilePath);
-                using var shine = new LinearGradientBrush(r, Color.FromArgb(28, 255, 255, 255), Color.FromArgb(0, 255, 255, 255),
+                using var shine = new LinearGradientBrush(r, Color.FromArgb(22, 255, 255, 255), Color.FromArgb(0, 255, 255, 255),
                     LinearGradientMode.Vertical);
                 using var upper = Theme.RoundedRect(R(0.02f, 0.02f, 0.96f, 0.5f), s * 0.21f);
                 g.FillPath(shine, upper);
             }
         }
 
-        // Controller-Silhouette: Körper und zwei Griffe als eine Fläche (Winding = Vereinigung).
-        using (var pad = new GraphicsPath(FillMode.Winding))
+        // Gesichtsfläche des Pads dunkel füllen (Glas-Look), Rahmen im Iris-Verlauf.
+        float rim = Math.Max(1.4f, s * 0.033f);
+        using (var pad = PadPath(r, s))
         {
-            using (var body = Theme.RoundedRect(R(0.15f, 0.40f, 0.70f, 0.29f), s * 0.145f))
-                pad.AddPath(body, false); // AddPath kopiert – den Hilfspfad gleich freigeben
-            pad.AddEllipse(R(0.155f, 0.50f, 0.235f, 0.30f));
-            pad.AddEllipse(R(0.61f, 0.50f, 0.235f, 0.30f));
-            if (tile && s >= 48)
-            {
-                // weicher Schatten unter der Silhouette
-                using var shadowMatrix = new Matrix();
-                shadowMatrix.Translate(0, s * 0.025f);
-                using var shadow = (GraphicsPath)pad.Clone();
-                shadow.Transform(shadowMatrix);
-                using var shadowBrush = new SolidBrush(Color.FromArgb(55, 0, 20, 70));
-                g.FillPath(shadowBrush, shadow);
-            }
-            using var white = new SolidBrush(Color.FromArgb(0xF7, 0xFA, 0xFF));
-            g.FillPath(white, pad);
+            using var face = new SolidBrush(Color.FromArgb(tile ? 200 : 120, Face));
+            g.FillPath(face, pad);
+            using var iris = Iris(r);
+            using var rimPen = new Pen(iris, rim);
+            g.DrawPath(rimPen, pad);
         }
+
+        // Katzenohren auf der Oberkante: Iris-Dreieck mit dunklem Kern.
+        using (var iris = Iris(r))
+        {
+            foreach (int sgn in new[] { -1, 1 })
+            {
+                float bcx = 0.5f + sgn * 0.186f;
+                float bh = 0.115f;
+                float ax = bcx + sgn * 0.0124f;
+                var outer = new[] { P(ax, 0.245f), P(bcx - bh, 0.376f), P(bcx + bh, 0.376f) };
+                using var earPath = new GraphicsPath();
+                earPath.AddPolygon(outer);
+                // gleicher Verlauf wie der Pad-Rahmen: links Teal, rechts Violett
+                g.FillPath(iris, earPath);
+                using var innerPath = new GraphicsPath();
+                innerPath.AddPolygon(new[]
+                {
+                    P(ax + (bcx - ax) * 0.20f, 0.245f + 0.115f * 0.36f),
+                    P(bcx - bh * 0.52f, 0.376f), P(bcx + bh * 0.52f, 0.376f),
+                });
+                using var dark = new SolidBrush(Color.FromArgb(tile ? 255 : 220, Face));
+                g.FillPath(dark, innerPath);
+            }
+        }
+
+        // Katzenaugen: leuchtende Cyan-Blätter mit dunkler Schlitzpupille.
+        float er = 0.092f;
+        float ey = 0.468f;
+        using var eyeBrush = new SolidBrush(EyeCyan);
+        using var pupilBrush = new SolidBrush(Face);
+        foreach (int sgn in new[] { -1, 1 })
+        {
+            float ecx = 0.5f + sgn * 0.105f;
+            using var eye = LeafEye(ecx, ey, er, er * 0.28f, s, r);
+            g.FillPath(eyeBrush, eye);
+            // vertikale Pupille (läuft wie im Generator über den Blattrand hinaus und verschmilzt mit dem Dunkel)
+            float pw = er * 0.34f, ph = er * 0.62f;
+            using var pupil = Theme.RoundedRect(R(ecx - pw / 2, ey - ph / 2, pw, ph), pw / 2);
+            g.FillPath(pupilBrush, pupil);
+        }
+
+        // Nase (Amber-Dreieck) unter den Augen.
+        using (var nose = new SolidBrush(Amber))
+            g.FillPolygon(nose, new[] { P(0.45f, 0.555f), P(0.55f, 0.555f), P(0.5f, 0.593f) });
 
         if (s >= 24)
         {
-            // Steuerkreuz links, vier Tasten rechts.
-            using var ink = new SolidBrush(Ink);
+            // Steuerkreuz links, vier Tasten rechts – dezent in Dim-Teal.
+            using var dim = new SolidBrush(DimTeal);
             using (var dpad = new GraphicsPath(FillMode.Winding))
             {
-                using (var across = Theme.RoundedRect(R(0.235f, 0.512f, 0.15f, 0.05f), s * 0.012f))
+                using (var across = Theme.RoundedRect(R(0.252f, 0.585f, 0.068f, 0.026f), s * 0.013f))
                     dpad.AddPath(across, false);
-                using (var down = Theme.RoundedRect(R(0.285f, 0.462f, 0.05f, 0.15f), s * 0.012f))
+                using (var down = Theme.RoundedRect(R(0.273f, 0.564f, 0.026f, 0.068f), s * 0.013f))
                     dpad.AddPath(down, false);
-                g.FillPath(ink, dpad);
+                g.FillPath(dim, dpad);
             }
-            float b = 0.042f;
-            foreach (var (x, y) in new[] { (0.69f, 0.47f), (0.75f, 0.537f), (0.69f, 0.604f), (0.63f, 0.537f) })
-                g.FillEllipse(ink, R(x - b / 2, y - b / 2, b, b));
+            float b = 0.036f;
+            foreach (var (x, y) in new[] { (0.672f, 0.556f), (0.756f, 0.556f), (0.672f, 0.640f), (0.756f, 0.640f) })
+                g.FillEllipse(dim, R(x - b / 2, y - b / 2, b, b));
         }
 
         if (s >= 32)
         {
-            // Verbindungssignal über dem Controller: Punkt und zwei Bögen.
-            float w = Math.Max(1.5f, s * 0.04f);
-            using var pen = new Pen(Color.FromArgb(0xF7, 0xFA, 0xFF), w) { StartCap = LineCap.Round, EndCap = LineCap.Round };
-            var center = P(0.5f, 0.355f);
-            foreach (float radius in new[] { 0.085f, 0.15f })
+            // Wi-Fi-Bögen oben mittig zwischen den Ohren (Connect-Signatur), Amber wie die Nase.
+            float w = Math.Max(1.5f, s * 0.018f);
+            using var pen = new Pen(Amber, w) { StartCap = LineCap.Round, EndCap = LineCap.Round };
+            var center = P(0.5f, 0.344f);
+            foreach (float radius in new[] { 0.048f, 0.088f })
             {
                 float rr = radius * s;
-                g.DrawArc(pen, center.X - rr, center.Y - rr, rr * 2, rr * 2, 232, 76);
+                g.DrawArc(pen, center.X - rr, center.Y - rr, rr * 2, rr * 2, 205, 130);
             }
-            float d = s * 0.055f;
-            using var dot = new SolidBrush(Color.FromArgb(0xF7, 0xFA, 0xFF));
-            g.FillEllipse(dot, center.X - d / 2, center.Y - d / 2, d, d);
+            float d = s * 0.026f;
+            using var dot = new SolidBrush(Amber);
+            g.FillEllipse(dot, center.X - d / 2, center.Y - s * 0.008f - d / 2, d, d);
         }
     }
 
@@ -162,9 +237,9 @@ internal static class Branding
         g.SmoothingMode = SmoothingMode.AntiAlias;
         g.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
         var all = new Rectangle(0, 0, w, h);
-        using (var back = new LinearGradientBrush(all, Color.FromArgb(0x2B, 0x2B, 0x2B), Color.FromArgb(0x1A, 0x1A, 0x1A), LinearGradientMode.Vertical))
+        using (var back = new LinearGradientBrush(all, TileTop, TileBottom, LinearGradientMode.Vertical))
             g.FillRectangle(back, all);
-        Glow(g, new PointF(w * 0.5f, h * 0.30f), w * 0.85f, TileTop, 55); // dezenter blauer Schein hinter dem Icon
+        Glow(g, new PointF(w * 0.5f, h * 0.30f), w * 0.85f, IrisTeal, 45); // dezenter Schein hinter dem Icon
 
         float logo = 84 * k;
         DrawLogo(g, new RectangleF((w - logo) / 2, h * 0.20f, logo, logo));
@@ -178,9 +253,9 @@ internal static class Branding
             g.DrawString("Switch · Switch 2 · Wii · Wii U\nController für Windows", sub, muted,
                 new RectangleF(6 * k, y + 30 * k, w - 12 * k, 40 * k), center);
 
-        // Feine Akzentlinie im Windows-Blau am unteren Rand.
+        // Feine Akzentlinie im Iris-Verlauf am unteren Rand.
         float barY = h - 10 * k;
-        using (var bar = new LinearGradientBrush(new RectangleF(0, barY, w, 3 * k), TileTop, TileBottom, LinearGradientMode.Horizontal))
+        using (var bar = Iris(new RectangleF(0, barY, w, 3 * k)))
             g.FillRectangle(bar, 24 * k, barY, w - 48 * k, 3 * k);
         return bmp;
     }
