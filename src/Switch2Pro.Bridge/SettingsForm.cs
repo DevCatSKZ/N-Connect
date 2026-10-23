@@ -1199,7 +1199,7 @@ internal sealed class SettingsForm : UiForm
         if (_loading)
             return;
         string mode = ThemeMode(_themeMode.SelectedIndex);
-        string? scheme = _scheme.SelectedIndex == 0 ? null : _scheme.SelectedId; // Neon = Standard, nicht speichern
+        string? scheme = _scheme.SelectedIndex == 0 ? null : _scheme.SelectedId; // erstes Schema = Standard, nicht speichern
         if (mode == _settings.Theme && _transparency.Checked == _settings.Transparency && scheme == _settings.ColorScheme)
             return;
         _settings.Theme = mode;

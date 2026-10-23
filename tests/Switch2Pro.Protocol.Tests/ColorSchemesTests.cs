@@ -6,13 +6,18 @@ namespace Switch2Pro.Protocol.Tests;
 public class ColorSchemesTests
 {
     [Fact]
-    public void FuenfSchemata_WindowsIstStandard()
+    public void VierzehnSchemata_HoloGlasIstStandard()
     {
-        Assert.Equal(["windows", "neon", "aurora", "sunset", "joycon"], ColorSchemes.All.Select(s => s.Id));
-        Assert.Equal("windows", ColorSchemes.ById(null).Id);
-        Assert.Equal("windows", ColorSchemes.ById("gibt-es-nicht").Id);
+        Assert.Equal(
+            ["hologlas", "mitternacht", "tageslicht", "nova", "abendrot", "tiefsee", "sakura", "graphit",
+             "samtpfoten", "windows", "neon", "aurora", "sunset", "joycon"],
+            ColorSchemes.All.Select(s => s.Id));
+        Assert.Equal("hologlas", ColorSchemes.ById(null).Id);
+        Assert.Equal("hologlas", ColorSchemes.ById("gibt-es-nicht").Id);
         Assert.Equal("aurora", ColorSchemes.ById("aurora").Id);
         Assert.False(ColorSchemes.ById("windows").Neon);
+        Assert.False(ColorSchemes.ById("graphit").Neon);
+        Assert.True(ColorSchemes.ById("hologlas").Neon);
     }
 
     [Fact]
@@ -20,8 +25,15 @@ public class ColorSchemesTests
     {
         foreach (var s in ColorSchemes.All)
         {
-            Assert.True(s.DarkPalette.Dark);
             Assert.False(s.LightPalette.Dark);
+            if (s.Id == "tageslicht")
+            {
+                // helles Schema ohne dunkle Variante: beide Paletten gleich (wie in SKZ/Kartarium)
+                Assert.False(s.DarkPalette.Dark);
+                Assert.Equal(s.DarkPalette.Window, s.LightPalette.Window);
+                continue;
+            }
+            Assert.True(s.DarkPalette.Dark);
             Assert.True(ColorSchemes.Luminance(s.DarkPalette.Window) < ColorSchemes.Luminance(s.LightPalette.Window));
         }
     }

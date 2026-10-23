@@ -28,10 +28,57 @@ public static class ColorSchemes
         int controlBorder, int accent, int accent2, int pressed) =>
         new(dark, window, surface, control, border, text, muted, canvas, controlBorder, accent, accent2, pressed);
 
-    /// <summary>Alle Farbschemata (das erste ist der Standard).</summary>
+    /// <summary>Kartarium-Schema (wie SKZ Monitor / SKZ Remote): aus den wenigen Basiswerten werden
+    /// Steuerfläche, Rand, gedämpfter Text und kräftigerer Rand abgeleitet – gleiche Formeln wie themes.js.</summary>
+    private static PaletteColors Karta(int bg, int surface, int mutedRgb, float mutedA, int accent, int accent2,
+        int highlight, int text, bool prism) =>
+        P(true, bg, surface,
+            Blend(surface, text, 0.055f),
+            Blend(surface, accent, prism ? 0.24f : 0.12f),
+            text,
+            Blend(bg, mutedRgb, mutedA),
+            Blend(bg, surface, 0.55f),
+            Blend(surface, accent, prism ? 0.34f : 0.22f),
+            accent, accent2, highlight);
+
+    /// <summary>Gemeinsame Hell-Palette aller Kartarium-Schemata (Kartarium liefert nur diese eine).</summary>
+    private static readonly PaletteColors Tageslicht =
+        P(false, 0xEDF1F6, 0xFFFFFF, 0xE9EDF3, 0xD8DEE7, 0x0E1726, 0x51617A, 0xF3F8FA, 0xC4CCDA,
+            0x0E9E8C, 0x6A4AE0, 0xD98A12);
+
+    /// <summary>Alle Farbschemata (das erste ist der Standard). Reihenfolge wie in SKZ Monitor / SKZ Remote:
+    /// Kartarium-Schemata zuerst, danach die N-Connect-Klassiker.</summary>
     public static readonly ColorScheme[] All =
     [
-        // Windows (Standard): Farben von Windows 11 (Fluent) – Hintergrund #202020, Karten #2B2B2B, Steuerelemente #373737,
+        // Kartarium-Schemata (DevCat-Familie)
+        new("hologlas", "Holo-Glas",
+            Karta(0x040A10, 0x0B141C, 0xEAF7F3, 0xE0 / 255f, 0x2DE1C2, 0x7C5CFF, 0xFFC24B, 0xF0FBF8, true),
+            Tageslicht),
+        new("mitternacht", "Mitternacht",
+            Karta(0x0A0A0F, 0x12121A, 0xF5F5FA, 0xCC / 255f, 0x6C8BFF, 0x9C6CFF, 0xFBBF24, 0xF5F5FA, false),
+            Tageslicht, Neon: false),
+        // Tageslicht ist ein helles Schema: beide Paletten gleich (wie in SKZ – Kartarium hat kein dunkles Tageslicht).
+        new("tageslicht", "Tageslicht", Tageslicht, Tageslicht, Neon: false),
+        new("nova", "Nova",
+            Karta(0x020407, 0x0A0E14, 0xD6E2EC, 0xC8 / 255f, 0x2DE1C2, 0x7C5CFF, 0xFFC24B, 0xF0FBF8, true),
+            Tageslicht),
+        new("abendrot", "Abendrot",
+            Karta(0x120A10, 0x1D1018, 0xF6E6DC, 0xE0 / 255f, 0xFF9A5A, 0xE0607E, 0xFFD27A, 0xFFF5EE, true),
+            Tageslicht),
+        new("tiefsee", "Tiefsee",
+            Karta(0x020B14, 0x071624, 0xDCEFF5, 0xE0 / 255f, 0x22E3F0, 0x3D7BFF, 0x7CFFC4, 0xEAFBFF, true),
+            Tageslicht),
+        new("sakura", "Sakura",
+            Karta(0x0F0A14, 0x181220, 0xF5E4EC, 0xE0 / 255f, 0xFF8FB8, 0xB48CFF, 0xFFE1EC, 0xFFF4F8, true),
+            Tageslicht),
+        new("graphit", "Graphit",
+            Karta(0x050506, 0x0F1012, 0xDCE3EA, 0xD6 / 255f, 0x8FB6FF, 0xC9D1DC, 0xFFFFFF, 0xF2F4F7, false),
+            Tageslicht, Neon: false),
+        new("samtpfoten", "Samtpfoten",
+            Karta(0x0D0B1A, 0x17142A, 0xF2EADC, 0xE0 / 255f, 0xFFC857, 0x7FD1AE, 0xFF9EAA, 0xFFF8EC, true),
+            Tageslicht),
+        // N-Connect-Klassiker
+        // Windows: Farben von Windows 11 (Fluent) – Hintergrund #202020, Karten #2B2B2B, Steuerelemente #373737,
         // Akzent im Windows-Standardblau (dunkel #4CC2FF mit schwarzer Schrift wie in Windows, hell #005FB8 mit weißer).
         new("windows", "Windows",
             P(true, 0x202020, 0x2B2B2B, 0x373737, 0x1D1D1D, 0xFFFFFF, 0xC5C5C5, 0x272727, 0x4A4A4A, 0x4CC2FF, 0x4CC2FF, 0x4CC2FF),

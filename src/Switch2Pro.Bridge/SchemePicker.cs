@@ -26,9 +26,13 @@ internal sealed class SchemePicker : Control, ISelfTranslating
                  | ControlStyles.Selectable, true);
         TabStop = true;
         Cursor = Cursors.Hand;
-        Size = new Size(Theme.Schemes.Length * (TileW + Gap) - Gap + S(4), TileH + S(4));
+        int rows = (Theme.Schemes.Length + Cols - 1) / Cols;
+        Size = new Size(Cols * (TileW + Gap) - Gap + S(4), rows * (TileH + Gap) - Gap + S(4));
         _hoverAnim = Theme.Schemes.Select(_ => new Anim(this)).ToArray();
     }
+
+    /// <summary>Kacheln je Zeile: bis acht Schemata eine Zeile, sonst zwei gleich breite Zeilen.</summary>
+    private static int Cols => Theme.Schemes.Length <= 8 ? Theme.Schemes.Length : (Theme.Schemes.Length + 1) / 2;
 
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public int SelectedIndex
@@ -51,7 +55,7 @@ internal sealed class SchemePicker : Control, ISelfTranslating
     protected override void ScaleControl(SizeF factor, BoundsSpecified specified) =>
         base.ScaleControl(factor, specified & ~BoundsSpecified.Size);
 
-    private Rectangle Tile(int i) => new(S(2) + i * (TileW + Gap), S(2), TileW, TileH);
+    private Rectangle Tile(int i) => new(S(2) + (i % Cols) * (TileW + Gap), S(2) + (i / Cols) * (TileH + Gap), TileW, TileH);
 
     private int HitTest(Point pt)
     {
@@ -90,13 +94,16 @@ internal sealed class SchemePicker : Control, ISelfTranslating
             SelectedIndex = hit;
     }
 
-    protected override bool IsInputKey(Keys keyData) => keyData is Keys.Left or Keys.Right || base.IsInputKey(keyData);
+    protected override bool IsInputKey(Keys keyData) =>
+        keyData is Keys.Left or Keys.Right or Keys.Up or Keys.Down || base.IsInputKey(keyData);
 
     protected override void OnKeyDown(KeyEventArgs e)
     {
         base.OnKeyDown(e);
         if (e.KeyCode == Keys.Left) SelectedIndex = Math.Max(0, _selected - 1);
         if (e.KeyCode == Keys.Right) SelectedIndex = Math.Min(Theme.Schemes.Length - 1, _selected + 1);
+        if (e.KeyCode == Keys.Up) SelectedIndex = Math.Max(0, _selected - Cols);
+        if (e.KeyCode == Keys.Down) SelectedIndex = Math.Min(Theme.Schemes.Length - 1, _selected + Cols);
     }
 
     protected override void OnGotFocus(EventArgs e) { base.OnGotFocus(e); Invalidate(); }
