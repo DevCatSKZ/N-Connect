@@ -32,15 +32,16 @@ internal static class Branding
         {
             // Fällt auf das gezeichnete Symbol zurück.
         }
-        using var bmp = Render(32);
+        using var bmp = Render(32, tile: false);
         IntPtr handle = bmp.GetHicon();
         using var temp = Icon.FromHandle(handle);
         return (Icon)temp.Clone();
     }
 
     // Farben des App-Icons: Navy-Kachel wie bei SKZ Monitor/Remote, Iris-Verlauf und DevCat-Akzente.
-    private static readonly Color TileTop = Color.FromArgb(0x0E, 0x18, 0x24);
-    private static readonly Color TileBottom = Color.FromArgb(0x06, 0x0D, 0x14);
+    // Navy-Verlauf identisch zu den SKZ-Icons (oben dunkler, unten minimal heller).
+    private static readonly Color TileTop = Color.FromArgb(0x06, 0x0D, 0x14);
+    private static readonly Color TileBottom = Color.FromArgb(0x0A, 0x12, 0x1B);
     private static readonly Color IrisTeal = Color.FromArgb(45, 225, 194);
     private static readonly Color IrisBlue = Color.FromArgb(86, 138, 255);
     private static readonly Color IrisViolet = Color.FromArgb(124, 92, 255);
@@ -114,10 +115,12 @@ internal static class Branding
         }
 
         // Gesichtsfläche des Pads dunkel füllen (Glas-Look), Rahmen im Iris-Verlauf.
+        // Ohne Kachel (Tray/ICO) fast deckend: dunkles Glyph mit leuchtenden Augen bleibt auf hellem
+        // und dunklem Grund lesbar.
         float rim = Math.Max(1.4f, s * 0.033f);
         using (var pad = PadPath(r, s))
         {
-            using var face = new SolidBrush(Color.FromArgb(tile ? 200 : 120, Face));
+            using var face = new SolidBrush(Color.FromArgb(tile ? 200 : 235, Face));
             g.FillPath(face, pad);
             using var iris = Iris(r);
             using var rimPen = new Pen(iris, rim);
@@ -143,7 +146,7 @@ internal static class Branding
                     P(ax + (bcx - ax) * 0.20f, 0.245f + 0.115f * 0.36f),
                     P(bcx - bh * 0.52f, 0.376f), P(bcx + bh * 0.52f, 0.376f),
                 });
-                using var dark = new SolidBrush(Color.FromArgb(tile ? 255 : 220, Face));
+                using var dark = new SolidBrush(Face);
                 g.FillPath(dark, innerPath);
             }
         }
@@ -202,15 +205,15 @@ internal static class Branding
         }
     }
 
-    /// <summary>Logo als quadratisches Bild mit transparentem Rand.</summary>
+    /// <summary>Logo als quadratisches Bild. <paramref name="tile"/> false = nur das Glyph (Tray, ICO, Navy-Fläche).</summary>
     /// <remarks>In der Oberfläche direkt mit <see cref="DrawLogo"/> in Zielgröße zeichnen – ein verkleinertes Bild wird an den Kanten pixelig.</remarks>
-    public static Bitmap Render(int size)
+    public static Bitmap Render(int size, bool tile = true)
     {
         var bmp = new Bitmap(size, size, PixelFormat.Format32bppArgb);
         using var g = Graphics.FromImage(bmp);
         g.Clear(Color.Transparent);
         float margin = size >= 48 ? size / 32f : 0;
-        DrawLogo(g, new RectangleF(margin, margin, size - 2 * margin, size - 2 * margin));
+        DrawLogo(g, new RectangleF(margin, margin, size - 2 * margin, size - 2 * margin), tile);
         return bmp;
     }
 
@@ -218,9 +221,22 @@ internal static class Branding
     public static void RenderAll(string folder)
     {
         Directory.CreateDirectory(folder);
+        // ICO: nur das Glyph mit transparentem Grund – wie bei SKZ, im Tray soll kein Kasten kleben.
         WriteIco(Path.Combine(folder, "N-Connect.ico"), [16, 20, 24, 32, 40, 48, 64, 96, 128, 256]);
-        using (var png = Render(512))
+        // PNG-Master (Android, Kodi, Installer, Website): Navy-Fläche wie bei den SKZ-Icons, Glyph ~94 %.
+        using (var png = new Bitmap(512, 512, PixelFormat.Format32bppArgb))
+        {
+            using (var g = Graphics.FromImage(png))
+            {
+                g.SmoothingMode = SmoothingMode.AntiAlias;
+                var all = new Rectangle(0, 0, 512, 512);
+                using (var back = new LinearGradientBrush(all, TileTop, TileBottom, LinearGradientMode.Vertical))
+                    g.FillRectangle(back, all);
+                float m = 512 * 0.03f;
+                DrawLogo(g, new RectangleF(m, m, 512 - 2 * m, 512 - 2 * m), tile: false);
+            }
             png.Save(Path.Combine(folder, "N-Connect.png"), ImageFormat.Png);
+        }
         // Inno Setup wählt je nach Bildschirmskalierung die passende Größe (100 %, 150 %, 200 %).
         foreach (var (w, h, tag) in new[] { (164, 314, "100"), (246, 471, "150"), (328, 628, "200") })
             SaveBmp(WizardImage(w, h), Path.Combine(folder, $"wizard-{tag}.bmp"));
@@ -297,7 +313,7 @@ internal static class Branding
     {
         var images = sizes.Select(size =>
         {
-            using var bmp = Render(size);
+            using var bmp = Render(size, tile: false);
             using var ms = new MemoryStream();
             if (size >= 256)
                 bmp.Save(ms, ImageFormat.Png);

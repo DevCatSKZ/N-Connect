@@ -951,8 +951,8 @@ internal sealed class TrayApp : ApplicationContext
         {
             g.SmoothingMode = SmoothingMode.AntiAlias;
             g.Clear(Color.Transparent);
-            // Logo; mit Akkuanzeige etwas kleiner und nach oben gerückt.
-            Branding.DrawLogo(g, battery is null ? new RectangleF(0, 0, 32, 32) : new RectangleF(5, 0, 22, 22));
+            // Nur das Glyph (ohne Kachel); mit Akkuanzeige etwas kleiner und nach oben gerückt.
+            Branding.DrawLogo(g, battery is null ? new RectangleF(0, 0, 32, 32) : new RectangleF(5, 0, 22, 22), tile: false);
             if (battery is { } percent)
             {
                 var frame = new RectangleF(1, 23, 27, 8);
