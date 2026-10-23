@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="script.nconnect.bundle" name="SKZ Connect Bundle Installer" version="1.0.2" provider-name="devcatskz">
+<addon id="script.nconnect.bundle" name="SKZ Connect Bundle Installer" version="1.0.3" provider-name="devcatskz">
     <!-- Offline-Installer: bringt service.nconnect und plugin.nconnect.status als ZIPs mit (resources/data). Die ZIPs
          und das Symbol legt linux/build-kodi-addon.ps1 beim Packen hinein – jeweils die aktuelle Version. Bei jeder
          neuen service.nconnect- oder Plugin-Version auch hier die Version erhöhen (das Build-Skript prüft das).
