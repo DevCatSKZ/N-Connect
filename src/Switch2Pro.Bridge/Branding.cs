@@ -60,15 +60,26 @@ internal static class Branding
         },
     };
 
-    /// <summary>Gamepad-Silhouette: Kapsel-Körper und zwei Griff-Ellipsen als eine Fläche.</summary>
+    /// <summary>Gamepad-Silhouette: Kapsel-Körper und zwei leicht auswärts gekippte Griffe als eine Fläche.</summary>
     private static GraphicsPath PadPath(RectangleF r, float s)
     {
         var pad = new GraphicsPath(FillMode.Winding);
         RectangleF R(float x, float y, float w, float h) => new(r.X + x * s, r.Y + y * s, w * s, h * s);
-        using (var body = Theme.RoundedRect(R(0.19f, 0.36f, 0.62f, 0.36f), s * 0.18f))
+        using (var body = Theme.RoundedRect(R(0.20f, 0.35f, 0.60f, 0.40f), s * 0.13f))
             pad.AddPath(body, false); // AddPath kopiert – den Hilfspfad gleich freigeben
-        pad.AddEllipse(R(0.157f, 0.595f, 0.156f, 0.21f));
-        pad.AddEllipse(R(0.687f, 0.595f, 0.156f, 0.21f));
+        // Griffe: gedrehte Ellipsen unter den Ecken – liest sich wie die Handauflagen eines Pro-Controllers.
+        void Grip(float cx, float angle)
+        {
+            using var grip = new GraphicsPath();
+            grip.AddEllipse(new RectangleF(-0.075f * s, -0.135f * s, 0.15f * s, 0.27f * s));
+            using var m = new System.Drawing.Drawing2D.Matrix();
+            m.RotateAt(angle, PointF.Empty);
+            m.Translate(r.X + cx * s, r.Y + 0.735f * s, MatrixOrder.Append);
+            grip.Transform(m);
+            pad.AddPath(grip, false);
+        }
+        Grip(0.5f - 0.265f, 20f);
+        Grip(0.5f + 0.265f, -20f);
         return pad;
     }
 
@@ -127,15 +138,16 @@ internal static class Branding
             g.DrawPath(rimPen, pad);
         }
 
-        // Katzenohren auf der Oberkante: Iris-Dreieck mit dunklem Kern.
+        // Katzenohren auf der Oberkante: Iris-Dreieck mit dunklem Kern, spitz und weit genug
+        // auseinander, dass in der Mitte Platz für das Wi-Fi-Signal bleibt.
         using (var iris = Iris(r))
         {
             foreach (int sgn in new[] { -1, 1 })
             {
-                float bcx = 0.5f + sgn * 0.186f;
-                float bh = 0.115f;
-                float ax = bcx + sgn * 0.0124f;
-                var outer = new[] { P(ax, 0.245f), P(bcx - bh, 0.376f), P(bcx + bh, 0.376f) };
+                float bcx = 0.5f + sgn * 0.180f;
+                float bh = 0.105f;
+                float ax = bcx + sgn * 0.014f;
+                var outer = new[] { P(ax, 0.232f), P(bcx - bh, 0.372f), P(bcx + bh, 0.372f) };
                 using var earPath = new GraphicsPath();
                 earPath.AddPolygon(outer);
                 // gleicher Verlauf wie der Pad-Rahmen: links Teal, rechts Violett
@@ -143,48 +155,49 @@ internal static class Branding
                 using var innerPath = new GraphicsPath();
                 innerPath.AddPolygon(new[]
                 {
-                    P(ax + (bcx - ax) * 0.20f, 0.245f + 0.115f * 0.36f),
-                    P(bcx - bh * 0.52f, 0.376f), P(bcx + bh * 0.52f, 0.376f),
+                    P(ax + (bcx - ax) * 0.20f, 0.232f + 0.115f * 0.36f),
+                    P(bcx - bh * 0.52f, 0.372f), P(bcx + bh * 0.52f, 0.372f),
                 });
                 using var dark = new SolidBrush(Face);
                 g.FillPath(dark, innerPath);
             }
         }
 
-        // Katzenaugen: leuchtende Cyan-Blätter mit dunkler Schlitzpupille.
-        float er = 0.092f;
-        float ey = 0.468f;
+        // Katzenaugen: leuchtende Cyan-Mandeln mit dunkler Schlitzpupille – weit genug nach außen
+        // und hoch genug, damit das Gesicht katzig bleibt.
+        float er = 0.098f;
+        float ey = 0.500f;
         using var eyeBrush = new SolidBrush(EyeCyan);
         using var pupilBrush = new SolidBrush(Face);
         foreach (int sgn in new[] { -1, 1 })
         {
-            float ecx = 0.5f + sgn * 0.105f;
-            using var eye = LeafEye(ecx, ey, er, er * 0.28f, s, r);
+            float ecx = 0.5f + sgn * 0.125f;
+            using var eye = LeafEye(ecx, ey, er, er * 0.42f, s, r);
             g.FillPath(eyeBrush, eye);
-            // vertikale Pupille (läuft wie im Generator über den Blattrand hinaus und verschmilzt mit dem Dunkel)
-            float pw = er * 0.34f, ph = er * 0.62f;
+            // vertikale Pupille (läuft über den Blattrand hinaus und verschmilzt mit dem Dunkel)
+            float pw = er * 0.30f, ph = er * 0.62f;
             using var pupil = Theme.RoundedRect(R(ecx - pw / 2, ey - ph / 2, pw, ph), pw / 2);
             g.FillPath(pupilBrush, pupil);
         }
 
         // Nase (Amber-Dreieck) unter den Augen.
         using (var nose = new SolidBrush(Amber))
-            g.FillPolygon(nose, new[] { P(0.45f, 0.555f), P(0.55f, 0.555f), P(0.5f, 0.593f) });
+            g.FillPolygon(nose, new[] { P(0.455f, 0.575f), P(0.545f, 0.575f), P(0.5f, 0.618f) });
 
         if (s >= 24)
         {
-            // Steuerkreuz links, vier Tasten rechts – dezent in Dim-Teal.
+            // Steuerkreuz links, vier Tasten als Raute rechts – dezent in Dim-Teal.
             using var dim = new SolidBrush(DimTeal);
             using (var dpad = new GraphicsPath(FillMode.Winding))
             {
-                using (var across = Theme.RoundedRect(R(0.252f, 0.585f, 0.068f, 0.026f), s * 0.013f))
+                using (var across = Theme.RoundedRect(R(0.245f, 0.604f, 0.11f, 0.032f), s * 0.016f))
                     dpad.AddPath(across, false);
-                using (var down = Theme.RoundedRect(R(0.273f, 0.564f, 0.026f, 0.068f), s * 0.013f))
+                using (var down = Theme.RoundedRect(R(0.284f, 0.565f, 0.032f, 0.11f), s * 0.016f))
                     dpad.AddPath(down, false);
                 g.FillPath(dim, dpad);
             }
-            float b = 0.036f;
-            foreach (var (x, y) in new[] { (0.672f, 0.556f), (0.756f, 0.556f), (0.672f, 0.640f), (0.756f, 0.640f) })
+            float b = 0.034f;
+            foreach (var (x, y) in new[] { (0.715f, 0.565f), (0.765f, 0.615f), (0.715f, 0.665f), (0.665f, 0.615f) })
                 g.FillEllipse(dim, R(x - b / 2, y - b / 2, b, b));
         }
 
@@ -193,15 +206,15 @@ internal static class Branding
             // Wi-Fi-Bögen oben mittig zwischen den Ohren (Connect-Signatur), Amber wie die Nase.
             float w = Math.Max(1.5f, s * 0.018f);
             using var pen = new Pen(Amber, w) { StartCap = LineCap.Round, EndCap = LineCap.Round };
-            var center = P(0.5f, 0.344f);
-            foreach (float radius in new[] { 0.048f, 0.088f })
+            var center = P(0.5f, 0.236f);
+            foreach (float radius in new[] { 0.042f, 0.078f })
             {
                 float rr = radius * s;
-                g.DrawArc(pen, center.X - rr, center.Y - rr, rr * 2, rr * 2, 205, 130);
+                g.DrawArc(pen, center.X - rr, center.Y - rr, rr * 2, rr * 2, 208, 124);
             }
             float d = s * 0.026f;
             using var dot = new SolidBrush(Amber);
-            g.FillEllipse(dot, center.X - d / 2, center.Y - s * 0.008f - d / 2, d, d);
+            g.FillEllipse(dot, center.X - d / 2, center.Y - d / 2, d, d);
         }
     }
 
