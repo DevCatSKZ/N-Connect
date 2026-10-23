@@ -282,9 +282,9 @@ internal static class Prompt
 internal static class Autostart
 {
     private const string RunKey = @"Software\Microsoft\Windows\CurrentVersion\Run";
-    private const string RunValue = "N-Connect";
-    /// <summary>Eintrag der Vorversion (vor der Umbenennung in N-Connect).</summary>
-    private const string LegacyRunValue = "Switch2ProBridge";
+    private const string RunValue = "SKZ Connect";
+    /// <summary>Einträge der Vorversionen (vor den Umbenennungen in N-Connect bzw. SKZ Connect).</summary>
+    private static readonly string[] LegacyRunValues = ["N-Connect", "Switch2ProBridge"];
 
     /// <summary>Autostart für den angemeldeten Benutzer (von der App gesetzt).</summary>
     public static bool IsEnabled
@@ -315,15 +315,21 @@ internal static class Autostart
             key.DeleteValue(RunValue, throwOnMissingValue: false);
     }
 
-    /// <summary>Autostart der Vorversion auf den neuen Namen und die neue EXE umstellen.</summary>
+    /// <summary>Autostart der Vorversionen auf den neuen Namen und die neue EXE umstellen.</summary>
     public static void MigrateLegacy()
     {
         try
         {
             using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(RunKey, writable: true);
-            if (key?.GetValue(LegacyRunValue) is not string)
+            bool found = false;
+            foreach (string legacy in LegacyRunValues)
+                if (key?.GetValue(legacy) is string)
+                {
+                    key.DeleteValue(legacy, throwOnMissingValue: false);
+                    found = true;
+                }
+            if (!found)
                 return;
-            key.DeleteValue(LegacyRunValue, throwOnMissingValue: false);
             Set(true);
         }
         catch (Exception e) when (e is UnauthorizedAccessException or System.Security.SecurityException or IOException)

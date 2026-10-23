@@ -133,7 +133,7 @@ internal static class UiFonts
     public static Font Title => Get("Segoe UI Variable Display Semibold", "Segoe UI Semibold", 21f, FontStyle.Regular);
 }
 
-/// <summary>Schriftzug „N-Connect“ im Navigationskopf, gefüllt mit dem Neon-Verlauf des Logos.</summary>
+/// <summary>Schriftzug „SKZ Connect“ im Navigationskopf, gefüllt mit dem Neon-Verlauf des Logos.</summary>
 internal sealed class Wordmark : Control, ISelfTranslating
 {
     /// <summary>Größe (skaliert über UiScale) setzt das Steuerelement selbst – WinForms nur Lage überlassen.</summary>
@@ -144,7 +144,7 @@ internal sealed class Wordmark : Control, ISelfTranslating
     {
         SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint
                  | ControlStyles.ResizeRedraw, true);
-        Text = "N-Connect";
+        Text = "SKZ Connect";
         Size = new Size(UiScale.Px(200), UiScale.Px(34));
     }
 

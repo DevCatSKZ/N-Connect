@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Installiert die mitgelieferten N-Connect-Add-ons und richtet (falls vorhanden) im Skin Aeon Nox Silvo den
+"""Installiert die mitgelieferten SKZ-Connect-Add-ons und richtet (falls vorhanden) im Skin Aeon Nox Silvo den
 Menüpunkt samt Controller-Widget ein."""
 import json
 import os
@@ -26,7 +26,7 @@ SHORTCUTS_DIR = os.path.join(PROFILE_DIR, 'addon_data', 'script.skinshortcuts')
 MENU_XML = os.path.join(SHORTCUTS_DIR, 'mainmenu.DATA.xml')
 PROPS_FILE = os.path.join(SHORTCUTS_DIR, SKIN_ID + '.properties')
 
-MENU_LABEL = 'N-Connect'
+MENU_LABEL = 'SKZ Connect'
 WIDGET_PATH = ('plugin://plugin.nconnect.status/?reload='
                '$INFO[Window(Home).Property(widgetreload)]'
                '$INFO[Window(Home).Property(widgetreload2)]'
@@ -60,7 +60,7 @@ def widget_props():
 
 
 def log(msg):
-    xbmc.log('[N-Connect Bundle] ' + msg, xbmc.LOGINFO)
+    xbmc.log('[SKZ Connect Bundle] ' + msg, xbmc.LOGINFO)
 
 
 def _version_key(name, addonid):
@@ -115,7 +115,7 @@ def shortcut_exists():
 
 
 def integrate_silvo():
-    """N-Connect-Menüpunkt und Controller-Widget in Aeon Nox Silvo eintragen."""
+    """SKZ-Connect-Menüpunkt und Controller-Widget in Aeon Nox Silvo eintragen."""
     if not os.path.isdir(SHORTCUTS_DIR):
         return False
     changed = False
@@ -176,13 +176,13 @@ def run(interactive=True):
     if interactive:
         dialog = xbmcgui.Dialog()
         if installed:
-            dialog.ok('N-Connect Bundle', text(32000, ', '.join(installed)) + '\n\n' + text(32001))
+            dialog.ok('SKZ Connect Bundle', text(32000, ', '.join(installed)) + '\n\n' + text(32001))
         else:
             msg = text(32002)
             if skin_done:
                 msg += '\n' + text(32003)
-            dialog.ok('N-Connect Bundle', msg)
+            dialog.ok('SKZ Connect Bundle', msg)
         if installed or skin_done:
-            if dialog.yesno('N-Connect Bundle', text(32004)):
+            if dialog.yesno('SKZ Connect Bundle', text(32004)):
                 xbmc.executebuiltin('RestartApp')
     return installed, skin_done

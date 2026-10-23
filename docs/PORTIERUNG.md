@@ -1,6 +1,6 @@
 # Portierung auf andere Plattformen
 
-Stand: 1.0.22. Neben Windows gibt es zwei Portierungen, beide auf derselben Bibliothek: N-Connect für Android
+Stand: 1.0.22. Neben Windows gibt es zwei Portierungen, beide auf derselben Bibliothek: SKZ Connect für Android
 ([ANDROID.md](ANDROID.md)) und den Linux-Dienst mit Kodi-Add-on ([LINUX-KODI.md](LINUX-KODI.md)). Dieses Dokument
 beschreibt, was sich übernehmen lässt, was plattformabhängig ist und wie die beiden Portierungen es gelöst haben.
 
@@ -17,13 +17,13 @@ Wer in einer anderen Sprache portiert, nutzt [PROTOKOLLE.md](PROTOKOLLE.md) und 
 
 ## 2. Was plattformabhängig ist – und was es anderswo gibt
 
-| Aufgabe in N-Connect (Windows) | Linux (umgesetzt im Dienst `nconnect`) | Android (umgesetzt in der App) | macOS (nicht umgesetzt) |
+| Aufgabe in SKZ Connect (Windows) | Linux (umgesetzt im Dienst `nconnect`) | Android (umgesetzt in der App) | macOS (nicht umgesetzt) |
 |---|---|---|---|
 | **BLE-Suche** – `BluetoothLEAdvertisementWatcher` (aktiv) | BlueZ über D-Bus (`Adapter1.StartDiscovery`, Filter `Transport=le` bzw. `auto`), Herstellerdaten aus `Device1.ManufacturerData` | `BluetoothLeScanner` mit Filter auf die Nintendo-Herstellerdaten | CoreBluetooth `scanForPeripherals` |
 | **BLE verbinden ohne Kopplung**, GATT, Benachrichtigungen – `BluetoothLEDevice`, `GattSession.MaintainConnection` | eigener ATT-Client über einen L2CAP-Socket, weil BlueZ an den „Secondary Services“ der Controller hängen bleibt | `BluetoothGatt` | `CBCentralManager.connect`, `setNotifyValue`, `writeValue(.withoutResponse)` |
 | **Verbindungsintervall** anfordern (`RequestPreferredConnectionParameters`) | BlueZ wählt 48,75 ms (etwa 20 Eingaben/s); der ATT-Client fordert per `HCI LE Connection Update` 6–9 × 1,25 ms an (raw-HCI-Socket, root), Ergebnis etwa 89/s | `requestConnectionPriority(HIGH)` | nicht steuerbar |
 | **Adapter-Adresse** (für die Switch-2-Kopplung 0x15) – `BluetoothAdapter.BluetoothAddress` | `Adapter1.Address` | `BluetoothAdapter.getAddress()` liefert seit Android 6 nur eine Platzhalteradresse ; die eigene Adresse liest die App mit Shizuku/Root oder lässt sie eingeben (ANDROID.md) | IOBluetooth |
-| **HID** lesen/schreiben (Classic-Controller, Kabel-Pads) – SetupAPI + `hid.dll` | nicht nötig: Kernel-Treiber (`hid-nintendo`, `hid-wiimote`, `hid-playstation`, `xpad` …) übernehmen diese Controller; N-Connect koppelt nur | nicht umgesetzt: Android koppelt Classic-Controller selbst, meist nur Tasten und Sticks (Issue #1) | `IOHIDManager` |
+| **HID** lesen/schreiben (Classic-Controller, Kabel-Pads) – SetupAPI + `hid.dll` | nicht nötig: Kernel-Treiber (`hid-nintendo`, `hid-wiimote`, `hid-playstation`, `xpad` …) übernehmen diese Controller; SKZ Connect koppelt nur | nicht umgesetzt: Android koppelt Classic-Controller selbst, meist nur Tasten und Sticks (Issue #1) | `IOHIDManager` |
 | **USB-Bulk** (Switch 2 am Kabel) – WinUSB | nicht umgesetzt (libusb) | nicht umgesetzt (USB-Host-API) | libusb / IOKit |
 | **Classic-Kopplung** (Switch 1/NSO ohne PIN, Wii mit binärer PIN) – `BluetoothApis`/WinRT | BlueZ-Agent „NoInputNoOutput“ mit eigener D-Bus-Verbindung; die Wii-PIN setzt das BlueZ-Modul „wiimote“ | System-Dialog | `IOBluetoothDevicePair` |
 | **Virtueller Controller** – ViGEmBus (Xbox 360 / DualShock 4) | `uinput` als „Microsoft X-Box 360 pad“ (045E:028E) mit Vibration über `FF_RUMBLE` | UHID über den Shell-Befehl `hid` mit Shizuku oder Root: Xbox One S (045E:02FD); DualShock 4/DualSense scheitern dort an Feature-Berichten. Ohne beides: Touch-Steuerung über eine Bedienungshilfe | keine öffentliche API (nur DriverKit/`IOHIDUserDevice` mit Sonderberechtigung) – Kodi unter macOS zeigt deshalb nur an |

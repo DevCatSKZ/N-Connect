@@ -119,7 +119,7 @@ public static class XboxBtReport
 
 /// <summary>
 /// Befehle für den Android-Shell-Befehl <c>hid</c> (AOSP <c>frameworks/base/cmds/hid</c>): eine JSON-Zeile je
-/// Ereignis über stdin. Damit legt N-Connect unter Android ein virtuelles HID-Gerät an und füttert es.
+/// Ereignis über stdin. Damit legt SKZ Connect unter Android ein virtuelles HID-Gerät an und füttert es.
 /// Zahlen immer kulturunabhängig (manche Sprachen schreiben negative Zahlen mit Unicode-Minus – ungültiges JSON).
 /// </summary>
 public static class UhidCommand

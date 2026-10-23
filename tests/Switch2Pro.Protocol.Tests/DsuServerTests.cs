@@ -5,7 +5,7 @@ using Switch2Pro.Protocol;
 namespace Switch2Pro.Protocol.Tests;
 
 /// <summary>
-/// Der gemeinsame DSU-Server über echtes UDP auf 127.0.0.1 – mit freiem Port, damit ein laufendes N-Connect (26760)
+/// Der gemeinsame DSU-Server über echtes UDP auf 127.0.0.1 – mit freiem Port, damit ein laufendes SKZ Connect (26760)
 /// nicht stört. Antworten werden mit kurzer Frist erwartet; „keine Antwort“ zeigt sich daran, dass die nächste
 /// Antwort schon die auf eine spätere Anfrage ist (der Server arbeitet Anfragen der Reihe nach ab).
 /// </summary>
@@ -200,7 +200,7 @@ public sealed class DsuServerTests : IDisposable
         using (var blocker = new UdpClient(new IPEndPoint(IPAddress.Loopback, 0)))
         {
             port = ((IPEndPoint)blocker.Client.LocalEndPoint!).Port;
-            Assert.Null(DsuServer.Start(port, network: false, Info, Warn)); // belegt, z. B. altes N-Connect beendet sich noch
+            Assert.Null(DsuServer.Start(port, network: false, Info, Warn)); // belegt, z. B. altes SKZ Connect beendet sich noch
             Assert.Null(DsuServer.Instance);
         }
         var started = DsuServer.Start(port, network: false, Info, Warn);   // später erneut: jetzt frei

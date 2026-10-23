@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="repository.devcatskz" name="DevCatSKZ Repository" version="1.0.3" provider-name="devcatskz">
-  <!-- Add-on-Quelle für alle Kodi-Plugins von DevCatSKZ (N-Connect und künftige). Inhalt: GitHub-Repo
+  <!-- Add-on-Quelle für alle Kodi-Plugins von DevCatSKZ (SKZ Connect und künftige). Inhalt: GitHub-Repo
        DevCatSKZ/kodi-repo (addons.xml, Prüfsummen, ZIPs), erzeugt mit repo-tools/build_repo.py. -->
   <extension point="xbmc.addon.repository" name="DevCatSKZ Repository">
     <dir>
@@ -13,8 +13,8 @@
   <extension point="xbmc.addon.metadata">
     <summary lang="de_DE">Alle Kodi-Plugins von DevCatSKZ – mit automatischen Updates</summary>
     <summary lang="en_GB">All Kodi plugins by DevCatSKZ – with automatic updates</summary>
-    <description lang="de_DE">Einmal installieren – danach stehen alle DevCatSKZ-Plugins unter „Aus Repository installieren“ und bleiben automatisch aktuell. Enthalten: N-Connect (Controller per Bluetooth), Catnewz (Katzen-News), VeraCrypt Manager, Sunshine/Moonlight (Game-Streaming), NewPipe MOD und YouTube.</description>
-    <description lang="en_GB">Install once – all DevCatSKZ plugins then appear under "Install from repository" and stay up to date automatically. Includes: N-Connect (controllers via Bluetooth), Catnewz (cat news), VeraCrypt Manager, Sunshine/Moonlight (game streaming), NewPipe MOD and YouTube.</description>
+    <description lang="de_DE">Einmal installieren – danach stehen alle DevCatSKZ-Plugins unter „Aus Repository installieren“ und bleiben automatisch aktuell. Enthalten: SKZ Connect (Controller per Bluetooth), Catnewz (Katzen-News), VeraCrypt Manager, Sunshine/Moonlight (Game-Streaming), NewPipe MOD und YouTube.</description>
+    <description lang="en_GB">Install once – all DevCatSKZ plugins then appear under "Install from repository" and stay up to date automatically. Includes: SKZ Connect (controllers via Bluetooth), Catnewz (cat news), VeraCrypt Manager, Sunshine/Moonlight (game streaming), NewPipe MOD and YouTube.</description>
     <platform>all</platform>
     <license>MIT</license>
     <source>https://github.com/DevCatSKZ/kodi-repo</source>

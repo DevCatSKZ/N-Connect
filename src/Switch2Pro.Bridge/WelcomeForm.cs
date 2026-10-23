@@ -16,7 +16,7 @@ internal sealed class WelcomeForm : UiForm
         "   Danach reicht ein Tastendruck zum Verbinden. Pro Controller und GameCube gehen auch per USB-Kabel.\n" +
         "   Wichtig: NICHT über „Bluetooth → Gerät hinzufügen“ koppeln – das stört die Verbindung.",
         "Switch 1 (Pro Controller, Joy-Con, NES/SNES/N64/Mega Drive), Wii-Fernbedienung, Wii U Pro Controller:\n" +
-        "   SYNC-Taste drücken – N-Connect koppelt den Controller selbst (kein Umweg über die Windows-Einstellungen).\n" +
+        "   SYNC-Taste drücken – SKZ Connect koppelt den Controller selbst (kein Umweg über die Windows-Einstellungen).\n" +
         "   Danach verbindet er sich per Tastendruck. Gezielt suchen: Rechtsklick auf das Symbol → „Controller koppeln …“.",
         "Windows, Steam und Spiele sehen jeden Controller als Xbox-Controller.\n" +
         "Das Programm läuft unten rechts im Infobereich – ein Klick öffnet die Übersicht.",
@@ -27,7 +27,7 @@ internal sealed class WelcomeForm : UiForm
 
     public WelcomeForm()
     {
-        Text = Tr.T("N-Connect – Willkommen");
+        Text = Tr.T("SKZ Connect – Willkommen");
         StartPosition = FormStartPosition.CenterScreen;
         FormBorderStyle = FormBorderStyle.FixedDialog;
         MaximizeBox = MinimizeBox = false;

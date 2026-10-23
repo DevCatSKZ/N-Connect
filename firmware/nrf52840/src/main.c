@@ -1,11 +1,11 @@
 /*
- * N-Connect-Funkadapter für den nRF52840-Dongle (Zephyr / nRF Connect SDK), Weg A.
+ * SKZ-Connect-Funkadapter für den nRF52840-Dongle (Zephyr / nRF Connect SDK), Weg A.
  *
  * Der Dongle gibt sich als der PC-Bluetooth-Adapter aus (öffentliche Adresse = NCONNECT_HOST_ADDR_LE aus dem
- * N-Connect-Export), verbindet sich mit den Switch-2-Controllern, die für diese Adresse werben, und reicht den
- * rohen Eingabebericht 0x05 über USB-CDC an N-Connect weiter. Vibration/Spieler-LED kommen von N-Connect zurück.
+ * SKZ-Connect-Export), verbindet sich mit den Switch-2-Controllern, die für diese Adresse werben, und reicht den
+ * rohen Eingabebericht 0x05 über USB-CDC an SKZ Connect weiter. Vibration/Spieler-LED kommen von SKZ Connect zurück.
  *
- * Rahmenformat, Adressübernahme und das Erkennen der Werbung stammen aus dem getesteten N-Connect-Code
+ * Rahmenformat, Adressübernahme und das Erkennen der Werbung stammen aus dem getesteten SKZ-Connect-Code
  * (AdapterProtocol.cs, Advertisement.cs). Der GATT-Ablauf ist nach docs/PROTOKOLLE.md gebaut und muss mit echter
  * Hardware eingefahren werden – solche Stellen sind mit "PRÜFEN:" markiert.
  *
@@ -192,7 +192,7 @@ static void write_cmd(struct controller *c, uint8_t cmd, uint8_t sub, const uint
     bt_gatt_write_without_response(c->conn, c->cmd_handle, buf, 8 + len, false);
 }
 
-/* Eingabebericht vom Controller: roh an N-Connect weiterreichen. */
+/* Eingabebericht vom Controller: roh an SKZ Connect weiterreichen. */
 static uint8_t on_input(struct bt_conn *conn, struct bt_gatt_subscribe_params *params,
                         const void *data, uint16_t length)
 {
@@ -251,7 +251,7 @@ static void start_controller(struct controller *c)
     uint8_t pid_le[2] = { (uint8_t)c->pid, (uint8_t)(c->pid >> 8) };
     bt_addr_le_t addr; memcpy(&addr, bt_conn_get_dst(c->conn), sizeof(addr));
     uint8_t payload[8] = { pid_le[0], pid_le[1] };
-    for (int i = 0; i < 6; i++) payload[2 + i] = addr.a.val[5 - i];  /* höchstes Byte zuerst für N-Connect */
+    for (int i = 0; i < 6; i++) payload[2 + i] = addr.a.val[5 - i];  /* höchstes Byte zuerst für SKZ Connect */
     send_frame(MSG_CONNECTED, c->slot, payload, 8);
     LOG_INF("Controller verbunden, Slot %d, PID %04x", c->slot, c->pid);
 }
@@ -267,7 +267,7 @@ static bool match_host(struct net_buf_simple *ad, uint16_t *pid_out)
         if (type == BT_DATA_MANUFACTURER_DATA && len >= 1 + 2 + 16) {
             const uint8_t *m = ad->data;           /* companyId(2) + data... */
             uint16_t company = m[0] | (m[1] << 8);
-            const uint8_t *d = &m[2];              /* entspricht N-Connect "data" (ohne companyId) */
+            const uint8_t *d = &m[2];              /* entspricht SKZ Connect "data" (ohne companyId) */
             /* Nintendo 0x0553, Kennung 01 00 03 7E, PID in d[5..6], Host in d[10..15] (LE). */
             if (company == 0x0553 && d[0] == 0x01 && d[1] == 0x00 && d[2] == 0x03 && d[3] == 0x7E) {
                 if (memcmp(&d[10], NCONNECT_HOST_ADDR_LE, 6) == 0) {
@@ -327,7 +327,7 @@ static void disconnected(struct bt_conn *conn, uint8_t reason)
 
 BT_CONN_CB_DEFINE(conn_cb) = { .connected = connected, .disconnected = disconnected };
 
-/* ------------------------------------------------------------------------------------- Befehle von N-Connect */
+/* ------------------------------------------------------------------------------------- Befehle von SKZ Connect */
 
 static void handle_pc_frame(const uint8_t *frame, size_t n)
 {
@@ -337,13 +337,13 @@ static void handle_pc_frame(const uint8_t *frame, size_t n)
     switch (type) {
     case MSG_PING: {
         uint8_t hello[1 + 16] = { PROTOCOL_VERSION };
-        const char *name = "nRF52840 N-Connect";
+        const char *name = "nRF52840 SKZ Connect";
         memcpy(&hello[1], name, strlen(name));
         send_frame(MSG_HELLO, 0, hello, 1 + strlen(name));
         break;
     }
     case MSG_SETHOST:
-        /* Optional: N-Connect kann die Host-Adresse überschreiben. v0 nutzt die kompilierte NCONNECT_HOST_ADDR_LE. */
+        /* Optional: SKZ Connect kann die Host-Adresse überschreiben. v0 nutzt die kompilierte NCONNECT_HOST_ADDR_LE. */
         break;
     case MSG_RUMBLE:
         if (slot < MAX_SLOTS && slots[slot].in_use && dlen >= 2 && slots[slot].vib_handle) {
@@ -377,7 +377,7 @@ static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET_OR(DT_ALIAS(led0), gpios
 
 int main(void)
 {
-    LOG_INF("N-Connect Funkadapter startet");
+    LOG_INF("SKZ Connect Funkadapter startet");
     if (led.port) gpio_pin_configure_dt(&led, GPIO_OUTPUT_ACTIVE);
 
     /* Öffentliche Adresse = PC-Adapter-Adresse, VOR bt_enable(). */

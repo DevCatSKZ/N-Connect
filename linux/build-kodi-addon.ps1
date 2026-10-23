@@ -1,9 +1,9 @@
-﻿# Baut N-Connect für Linux (x64, arm64, arm) und packt die Kodi-Add-ons (service.nconnect, plugin.nconnect.status,
+﻿# Baut SKZ Connect für Linux (x64, arm64, arm) und packt die Kodi-Add-ons (service.nconnect, plugin.nconnect.status,
 # script.nconnect.bundle, repository.devcatskz). Ergebnis in out/kodi/ (oder -Out) – Dateinamen sagen, wofür:
-#   N-Connect-Kodi-LibreELEC-<Version>-alle-Geraete.zip        universell: alle Prozessoren (empfohlen)
-#   N-Connect-Kodi-LibreELEC-<Version>-RPi4-RPi5-arm64.zip     Raspberry Pi 4/5 und 64-Bit-Boxen (Amlogic, Rockchip …)
-#   N-Connect-Kodi-LibreELEC-<Version>-RPi2-RPi3-arm.zip       Raspberry Pi 2/3 (32 Bit)
-#   N-Connect-Kodi-LibreELEC-<Version>-PC-x86_64.zip           PCs/Mini-PCs (LibreELEC Generic)
+#   SKZ-Connect-Kodi-LibreELEC-<Version>-alle-Geraete.zip        universell: alle Prozessoren (empfohlen)
+#   SKZ-Connect-Kodi-LibreELEC-<Version>-RPi4-RPi5-arm64.zip     Raspberry Pi 4/5 und 64-Bit-Boxen (Amlogic, Rockchip …)
+#   SKZ-Connect-Kodi-LibreELEC-<Version>-RPi2-RPi3-arm.zip       Raspberry Pi 2/3 (32 Bit)
+#   SKZ-Connect-Kodi-LibreELEC-<Version>-PC-x86_64.zip           PCs/Mini-PCs (LibreELEC Generic)
 #   plugin.nconnect.status-<Version>.zip                       Widget-Quelle für Skins (leitet an service.nconnect weiter)
 #   script.nconnect.bundle-<Version>.zip                       Offline-Installer mit der aktuellen service.nconnect-
 #                                                              und Plugin-ZIP (resources/data)
@@ -13,7 +13,7 @@
 # Aufruf: powershell -File linux/build-kodi-addon.ps1 [-Rids linux-x64,linux-arm64] [-Out <Ordner>]
 #        powershell -File linux/build-kodi-addon.ps1 -Repo [-RepoDir <Ordner>]
 #            zusätzlich in eine Arbeitskopie von DevCatSKZ/kodi-repo legen und dort den Index neu bauen
-#            (tools/build_repo.py; Standard-Ordner: kodi-repo neben dem N-Connect-Ordner)
+#            (tools/build_repo.py; Standard-Ordner: kodi-repo neben dem SKZ-Connect-Ordner)
 #        powershell -File linux/build-kodi-addon.ps1 -Repo -NoBuild [-Out <Ordner>] [-RepoDir <Ordner>]
 #            nur ins Repository legen – mit schon gebauten ZIPs in -Out (z. B. dem entpackten CI-Artefakt „Kodi-Plugin“,
 #            dann liegen dort dieselben ZIPs wie am GitHub-Release)
@@ -38,7 +38,7 @@ Add-Type -AssemblyName System.IO.Compression, System.IO.Compression.FileSystem
 $root = Split-Path -Parent $PSScriptRoot
 $project = Join-Path $PSScriptRoot 'NConnect.Linux\NConnect.Linux.csproj'
 $kodiSrc = Join-Path $PSScriptRoot 'kodi'
-$icon = Join-Path $root 'installer\art\N-Connect.png'
+$icon = Join-Path $root 'installer\art\SKZ-Connect.png'
 $license = Join-Path $root 'LICENSE'
 $notices = Join-Path $root 'THIRD-PARTY-NOTICES.md'
 $out = if ($Out) { $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Out) } else { Join-Path $root 'out\kodi' }
@@ -52,10 +52,10 @@ $version = (Get-AddonXml 'service.nconnect').addon.version
 $pluginVersion = (Get-AddonXml 'plugin.nconnect.status').addon.version
 $bundleVersion = (Get-AddonXml 'script.nconnect.bundle').addon.version
 $repoVersion = (Get-AddonXml 'repository.devcatskz').addon.version
-Write-Host "N-Connect für Kodi $version (Status-Plugin $pluginVersion, Bundle $bundleVersion, Repository $repoVersion)"
+Write-Host "SKZ Connect für Kodi $version (Status-Plugin $pluginVersion, Bundle $bundleVersion, Repository $repoVersion)"
 
 $deviceNames = @{ 'linux-arm64' = 'RPi4-RPi5-arm64'; 'linux-arm' = 'RPi2-RPi3-arm'; 'linux-x64' = 'PC-x86_64' }
-$universalZip = Join-Path $out "N-Connect-Kodi-LibreELEC-$version-alle-Geraete.zip"
+$universalZip = Join-Path $out "SKZ-Connect-Kodi-LibreELEC-$version-alle-Geraete.zip"
 $pluginZip = Join-Path $out "plugin.nconnect.status-$pluginVersion.zip"
 $bundleZip = Join-Path $out "script.nconnect.bundle-$bundleVersion.zip"
 $repoZip = Join-Path $out "repository.devcatskz-$repoVersion.zip"
@@ -110,7 +110,7 @@ if (-not $NoBuild) {
     # Nur eigene Ergebnisse entfernen (auch bei -Out auf einen vorhandenen Ordner mit anderen Dateien)
     New-Item -ItemType Directory -Force $out | Out-Null
     if (Test-Path $stage) { Remove-Item $stage -Recurse -Force }
-    foreach ($pattern in @('N-Connect-Kodi-LibreELEC-*.zip', 'plugin.nconnect.status-*.zip', 'script.nconnect.bundle-*.zip',
+    foreach ($pattern in @('SKZ-Connect-Kodi-LibreELEC-*.zip', 'plugin.nconnect.status-*.zip', 'script.nconnect.bundle-*.zip',
                            'repository.devcatskz-*.zip')) {
         Get-ChildItem $out -File -Filter $pattern | Remove-Item -Force
     }
@@ -128,7 +128,7 @@ if (-not $NoBuild) {
     # 2. service.nconnect: universell und je Gerät
     New-ServiceZip $universalZip $Rids
     foreach ($rid in $Rids) {
-        New-ServiceZip (Join-Path $out "N-Connect-Kodi-LibreELEC-$version-$($deviceNames[$rid]).zip") @($rid)
+        New-ServiceZip (Join-Path $out "SKZ-Connect-Kodi-LibreELEC-$version-$($deviceNames[$rid]).zip") @($rid)
     }
 
     # 3. Status-Plugin (Widget-Quelle älterer Skin-Einrichtungen)
@@ -186,9 +186,9 @@ if ($Repo) {
     if ($new['repository.devcatskz'] -or -not (Test-Path $fixedRepoZip)) { Copy-Item $repoZip $fixedRepoZip -Force }
     if ($new['service.nconnect']) {
         $downloads = Join-Path $RepoDir 'downloads'
-        if (Test-Path $downloads) { Get-ChildItem $downloads -Filter 'N-Connect-Kodi-LibreELEC-*.zip' | Remove-Item -Force }
+        if (Test-Path $downloads) { Get-ChildItem $downloads -Filter 'SKZ-Connect-Kodi-LibreELEC-*.zip' | Remove-Item -Force }
         New-Item -ItemType Directory -Force $downloads | Out-Null
-        foreach ($z in Get-ChildItem $out -Filter "N-Connect-Kodi-LibreELEC-$version-*.zip") {
+        foreach ($z in Get-ChildItem $out -Filter "SKZ-Connect-Kodi-LibreELEC-$version-*.zip") {
             # fester Name ohne Version, damit die Links gleich bleiben
             Copy-Item $z.FullName (Join-Path $downloads ($z.Name -replace "-$([regex]::Escape($version))-", '-')) -Force
         }

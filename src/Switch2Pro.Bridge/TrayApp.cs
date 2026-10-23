@@ -41,7 +41,7 @@ internal sealed class TrayApp : ApplicationContext
         if (_settings.LoadError is { } err)
             Log.Warn($"settings.json fehlerhaft, nutze Standardwerte: {err}");
 
-        _icon = new NotifyIcon { Icon = CreateIcon(), Visible = true, Text = "N-Connect" };
+        _icon = new NotifyIcon { Icon = CreateIcon(), Visible = true, Text = "SKZ Connect" };
         _icon.ContextMenuStrip = new ContextMenuStrip { Renderer = Theme.MenuRenderer(), ForeColor = Theme.Current.Text };
         _icon.ContextMenuStrip.Opening += (_, _) => BuildMenu();
         try
@@ -65,7 +65,7 @@ internal sealed class TrayApp : ApplicationContext
         _factory = PadFactory.TryCreate();
         if (_factory is null)
         {
-            _icon.Text = Tr.T("N-Connect: ViGEmBus fehlt");
+            _icon.Text = Tr.T("SKZ Connect: ViGEmBus fehlt");
             Balloon(10000, "ViGEmBus-Treiber fehlt",
                 "Ohne ViGEmBus kann kein virtueller Controller erzeugt werden. Bitte das Setup erneut ausführen " +
                 "oder ViGEmBus installieren (Rechtsklick auf das Symbol → ViGEmBus herunterladen).", ToolTipIcon.Error);
@@ -90,16 +90,16 @@ internal sealed class TrayApp : ApplicationContext
         _manager.Notify += message => _ui.Post(_ =>
         {
             _balloonUrl = null;
-            Balloon(2500, "N-Connect", message, ToolTipIcon.Info);
+            Balloon(2500, "SKZ Connect", message, ToolTipIcon.Info);
         }, null);
-        // Verbinden/Trennen: Meldung von N-Connect nur, wenn sie auch gewählt ist (Standard);
+        // Verbinden/Trennen: Meldung von SKZ Connect nur, wenn sie auch gewählt ist (Standard);
         // die Windows-Gerätemeldungen blendet ToastSenders.Apply ein bzw. aus.
         _manager.ConnectionNotify += message => _ui.Post(_ =>
         {
             if (_settings.ConnectNotify is not (ConnectNotifications.NConnect or ConnectNotifications.Both))
                 return;
             _balloonUrl = null;
-            Balloon(2500, "N-Connect", message, ToolTipIcon.Info);
+            Balloon(2500, "SKZ Connect", message, ToolTipIcon.Info);
         }, null);
         ApplyConnectNotify();
         // Einblendung beim Verbinden (abschaltbar unter Allgemein → Verbinden).
@@ -147,7 +147,7 @@ internal sealed class TrayApp : ApplicationContext
         _reloadTimer.Tick += (_, _) => { _reloadTimer.Stop(); ReloadSettings(); };
         void Changed(object? sender, FileSystemEventArgs e) => _ui.Post(_ => { _reloadTimer.Stop(); _reloadTimer.Start(); }, null);
         _settingsWatcher.Changed += Changed;
-        // Viele Editoren (und N-Connect selbst) speichern über eine Zwischendatei, die die alte ersetzt.
+        // Viele Editoren (und SKZ Connect selbst) speichern über eine Zwischendatei, die die alte ersetzt.
         _settingsWatcher.Created += Changed;
         _settingsWatcher.Renamed += (s, e) => Changed(s, e);
 
@@ -314,7 +314,7 @@ internal sealed class TrayApp : ApplicationContext
     }
 
     /// <summary>
-    /// Nach der Installation startet N-Connect standardmäßig mit Windows (unsichtbar im Infobereich). Einmalig beim
+    /// Nach der Installation startet SKZ Connect standardmäßig mit Windows (unsichtbar im Infobereich). Einmalig beim
     /// ersten Start eingerichtet – danach entscheidet nur noch der Schalter unter „Allgemein“.
     /// </summary>
     private void EnableAutostartOnce()
@@ -434,7 +434,7 @@ internal sealed class TrayApp : ApplicationContext
     }
 
     /// <summary>
-    /// Einstellung „Meldung bei Verbinden“ anwenden: Meldet N-Connect (Standard) oder gar niemand,
+    /// Einstellung „Meldung bei Verbinden“ anwenden: Meldet SKZ Connect (Standard) oder gar niemand,
     /// werden die Gerätemeldungen von Windows stummgeschaltet; bei „Windows“ bzw. „Beide“ kommen sie wieder.
     /// </summary>
     private void ApplyConnectNotify() =>
@@ -444,14 +444,14 @@ internal sealed class TrayApp : ApplicationContext
     {
         string text;
         if (_manager is null)
-            text = "N-Connect: ViGEmBus fehlt";
+            text = "SKZ Connect: ViGEmBus fehlt";
         else if (_manager.AdapterProblem is { } problem)
-            text = $"N-Connect: {problem}";
+            text = $"SKZ Connect: {problem}";
         else
         {
             var players = _manager.Players;
             text = players.Count == 0
-                ? "N-Connect: warte auf Controller (SYNC drücken)"
+                ? "SKZ Connect: warte auf Controller (SYNC drücken)"
                 : string.Join("\n", players.Select(p => $"P{p.Index + 1} {ShortLabel(p)} {Battery(p)}"));
         }
         // NotifyIcon.Text ist auf 127 Zeichen begrenzt.
@@ -480,7 +480,7 @@ internal sealed class TrayApp : ApplicationContext
         var update = _settings.CheckForUpdates ? await UpdateCheck.FindAsync(CancellationToken.None) : null;
         if (update is null)
         {
-            // Erst N-Connect, dann HidHide – nie zwei Update-Meldungen auf einmal.
+            // Erst SKZ Connect, dann HidHide – nie zwei Update-Meldungen auf einmal.
             await CheckForHidHideUpdateAsync();
             return;
         }
@@ -502,41 +502,41 @@ internal sealed class TrayApp : ApplicationContext
     private bool _updating;
 
     /// <summary>
-    /// Ein-Klick-Update: nachfragen, Installer herunterladen und prüfen, still installieren lassen, N-Connect beenden.
-    /// Der Installer schließt N-Connect ohnehin und startet es danach wieder.
+    /// Ein-Klick-Update: nachfragen, Installer herunterladen und prüfen, still installieren lassen, SKZ Connect beenden.
+    /// Der Installer schließt SKZ Connect ohnehin und startet es danach wieder.
     /// </summary>
     private async Task InstallUpdateAsync()
     {
         if (_update is not { Setup: { } setup } update || _updating)
             return;
         bool portable = setup.IsZip;
-        if (Tr.Show(null, $"Version {update.Version} herunterladen und installieren? N-Connect wird dafür kurz beendet und " +
+        if (Tr.Show(null, $"Version {update.Version} herunterladen und installieren? SKZ Connect wird dafür kurz beendet und " +
                           "danach wieder gestartet." + (portable ? "" : " Windows fragt dabei nach Administratorrechten."),
-                "N-Connect aktualisieren", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                "SKZ Connect aktualisieren", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
             return;
         _updating = true;
         try
         {
             _balloonUrl = null;
-            Balloon(3000, "N-Connect aktualisieren", $"Lade Version {update.Version} herunter …", ToolTipIcon.Info);
+            Balloon(3000, "SKZ Connect aktualisieren", $"Lade Version {update.Version} herunter …", ToolTipIcon.Info);
             string? path = await UpdateCheck.DownloadAsync(setup, null, CancellationToken.None);
             if (path is null)
             {
                 if (Tr.Show(null, "Der Download hat nicht geklappt oder die Datei war fehlerhaft. Die Release-Seite im Browser öffnen?",
-                        "N-Connect aktualisieren", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+                        "SKZ Connect aktualisieren", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
                     Open(update.Url);
                 return;
             }
             if (portable)
             {
                 // ZIP: neue EXE neben die laufende kopieren – geht erst, nachdem dieser Prozess beendet ist.
-                // Ein kleines Skript wartet darauf, ersetzt die Datei und startet N-Connect wieder.
+                // Ein kleines Skript wartet darauf, ersetzt die Datei und startet SKZ Connect wieder.
                 if (!PreparePortableUpdate(path))
                 {
                     Log.Warn("Update: ZIP konnte nicht entpackt werden");
                     return;
                 }
-                Log.Info($"Update auf {update.Version}: portable EXE vorbereitet, N-Connect wird beendet");
+                Log.Info($"Update auf {update.Version}: portable EXE vorbereitet, SKZ Connect wird beendet");
                 ExitThread();
                 return;
             }
@@ -547,11 +547,11 @@ internal sealed class TrayApp : ApplicationContext
             }
             catch (System.ComponentModel.Win32Exception e)
             {
-                // Administratorrechte abgelehnt o. Ä.: N-Connect läuft einfach weiter.
+                // Administratorrechte abgelehnt o. Ä.: SKZ Connect läuft einfach weiter.
                 Log.Info($"Update: Installer nicht gestartet: {Log.Reason(e)}");
                 return;
             }
-            Log.Info($"Update auf {update.Version}: Installer gestartet, N-Connect wird beendet");
+            Log.Info($"Update auf {update.Version}: Installer gestartet, SKZ Connect wird beendet");
             ExitThread();
         }
         finally
@@ -569,18 +569,18 @@ internal sealed class TrayApp : ApplicationContext
 
     /// <summary>
     /// Portable-Update: ZIP entpacken, ein Hilfsskript schreiben, das nach unserem Prozess-Ende die neue EXE (und ihre
-    /// Begleitdateien) neben die alte kopiert und N-Connect wieder startet. Liefert false, wenn das ZIP kein N-Connect.exe
+    /// Begleitdateien) neben die alte kopiert und SKZ Connect wieder startet. Liefert false, wenn das ZIP kein SKZ-Connect.exe
     /// enthielt.
     /// </summary>
     private bool PreparePortableUpdate(string zipPath)
     {
         try
         {
-            string dir = Path.Combine(Path.GetTempPath(), "N-Connect-Update", "portable");
+            string dir = Path.Combine(Path.GetTempPath(), "SKZ-Connect-Update", "portable");
             if (Directory.Exists(dir))
                 Directory.Delete(dir, recursive: true);
             System.IO.Compression.ZipFile.ExtractToDirectory(zipPath, dir);
-            string? exe = Directory.GetFiles(dir, "N-Connect.exe", SearchOption.AllDirectories).FirstOrDefault();
+            string? exe = Directory.GetFiles(dir, "SKZ-Connect.exe", SearchOption.AllDirectories).FirstOrDefault();
             string? target = Environment.ProcessPath;
             if (exe is null || target is null || Path.GetDirectoryName(exe) is not { } source
                 || Path.GetDirectoryName(target) is not { } targetDir)
@@ -589,7 +589,7 @@ internal sealed class TrayApp : ApplicationContext
                 .Select(name => (From: Path.Combine(source, name), To: Path.Combine(targetDir, name)))
                 .Where(file => File.Exists(file.From))
                 .ToList();
-            string script = Path.Combine(Path.GetTempPath(), "N-Connect-Update", "update.cmd");
+            string script = Path.Combine(Path.GetTempPath(), "SKZ-Connect-Update", "update.cmd");
             // UTF-8 ohne BOM + chcp 65001: sonst liest cmd Umlaute im Pfad (z. B. Benutzername „Jürgen“) in der
             // OEM-Codepage falsch und findet weder die neue noch die alte EXE.
             File.WriteAllText(script, PortableUpdateScript(Environment.ProcessId, exe, target, companions),
@@ -609,7 +609,7 @@ internal sealed class TrayApp : ApplicationContext
     /// <summary>
     /// Hilfsskript fürs Portable-Update: wartet auf das Ende von Prozess <paramref name="pid"/>, ersetzt die EXE (mehrere
     /// Versuche, sie kann kurz nach Prozess-Ende noch gesperrt sein), kopiert danach die Begleitdateien
-    /// (<see cref="PortableCompanionFiles"/>) und startet N-Connect wieder. Klappt das Ersetzen der EXE nicht, bleiben auch
+    /// (<see cref="PortableCompanionFiles"/>) und startet SKZ Connect wieder. Klappt das Ersetzen der EXE nicht, bleiben auch
     /// die Begleitdateien alt – sie gehören zur EXE, die weiterläuft. Ein Fehler beim Kopieren einer Begleitdatei hält den
     /// Neustart nicht auf.
     /// </summary>
@@ -655,7 +655,7 @@ internal sealed class TrayApp : ApplicationContext
 
     /// <summary>
     /// HidHide-Update: nachfragen, Installer von GitHub laden, Signatur von Nefarius prüfen und das offizielle Setup
-    /// (mit Oberfläche) starten. Es entfernt die alte Version und verlangt einen Neustart; danach versteckt N-Connect
+    /// (mit Oberfläche) starten. Es entfernt die alte Version und verlangt einen Neustart; danach versteckt SKZ Connect
     /// die Controller neu (siehe <see cref="Settings.HidHideVersion"/>).
     /// </summary>
     private async Task InstallHidHideUpdateAsync(HidHideUpdate.Update update)
@@ -664,7 +664,7 @@ internal sealed class TrayApp : ApplicationContext
             return;
         if (Tr.Show(null, $"HidHide {update.Version} herunterladen und installieren? Das HidHide-Setup entfernt zuerst die alte " +
                           "Version und verlangt einen Neustart von Windows – bitte seinen Anweisungen folgen. Windows fragt dabei " +
-                          "nach Administratorrechten. Danach versteckt N-Connect die Controller automatisch neu.",
+                          "nach Administratorrechten. Danach versteckt SKZ Connect die Controller automatisch neu.",
                 "HidHide aktualisieren", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
             return;
         _updating = true;
@@ -742,7 +742,7 @@ internal sealed class TrayApp : ApplicationContext
         var menu = _icon.ContextMenuStrip!;
         foreach (var item in menu.Items.Cast<ToolStripItem>().ToList())
             item.Dispose(); // entfernt das Element zugleich aus dem Menü
-        menu.Items.Add(new ToolStripMenuItem("N-Connect") { Enabled = false, Font = _boldFont ??= new Font(menu.Font, FontStyle.Bold) });
+        menu.Items.Add(new ToolStripMenuItem("SKZ Connect") { Enabled = false, Font = _boldFont ??= new Font(menu.Font, FontStyle.Bold) });
 
         if (_manager is null)
         {
@@ -871,7 +871,7 @@ internal sealed class TrayApp : ApplicationContext
         if (_settings.ForcedProfile is null)
         {
             _balloonUrl = null;
-            Balloon(1500, "N-Connect", $"Profil „{detected ?? "Standard"}“ aktiv", ToolTipIcon.None);
+            Balloon(1500, "SKZ Connect", $"Profil „{detected ?? "Standard"}“ aktiv", ToolTipIcon.None);
         }
     }
 

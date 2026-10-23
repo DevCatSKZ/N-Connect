@@ -32,7 +32,7 @@ public interface IAgentManager1 : IDBusObject
 }
 
 /// <summary>
-/// Bluetooth-Agent für die Kopplungen, die N-Connect selbst anstößt (Xbox, PlayStation, Switch 1 …). Fähigkeit
+/// Bluetooth-Agent für die Kopplungen, die SKZ Connect selbst anstößt (Xbox, PlayStation, Switch 1 …). Fähigkeit
 /// „NoInputNoOutput“: Kopplung ohne PIN-Eingabe („Just Works“), wie bei Gamepads üblich. Er wird nicht als
 /// Standard-Agent angemeldet – Kopplungen aus den LibreELEC-Einstellungen laufen weiter über deren eigenen Agenten.
 /// </summary>

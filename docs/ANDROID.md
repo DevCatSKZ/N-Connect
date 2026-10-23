@@ -1,15 +1,15 @@
-# N-Connect für Android
+# SKZ Connect für Android
 
-Stand: 17.10.2026 · Version **0.9.1 (Beta)**, versionCode 10 – erscheint als signierte APK `N-Connect-Android-0.9.1.apk`
+Stand: 17.10.2026 · Version **0.9.1 (Beta)**, versionCode 10 – erscheint als signierte APK `SKZ-Connect-Android-0.9.1.apk`
 am nächsten GitHub-Release (die Vorgängerin 0.9.0 hängt an v1.0.20) · Projekt `android/NConnect.Android`
 
-N-Connect für Android verbindet **Switch-2-Controller** (Pro Controller 2, Joy-Con 2, GameCube-Controller) per
+SKZ Connect für Android verbindet **Switch-2-Controller** (Pro Controller 2, Joy-Con 2, GameCube-Controller) per
 Bluetooth LE mit Android-Geräten und gibt sie als **virtuellen Xbox-Controller** an Spiele, Emulatoren und
 Cloud-Gaming weiter – oder als **Touch-Steuerung** für Spiele ohne Controller-Unterstützung.
 
 **Nur Switch-2-Controller.** Sie sprechen kein HID, sondern ein eigenes BLE-GATT-Protokoll, das Android von sich aus
 nicht nutzen kann – das ist der Mehrwert der App. Alle anderen Controller verbindet man in den Bluetooth-Einstellungen
-von Android direkt mit Android, N-Connect sieht sie nicht:
+von Android direkt mit Android, SKZ Connect sieht sie nicht:
 
 - **Xbox- und PlayStation-Controller** laufen dort nativ (Kernel-Treiber `hid-microsoft`, `hid-playstation`/`hid-sony`).
 - **Ältere Switch-Controller** (Pro Controller der Switch 1, Joy-Con der ersten Generation, Nachbauten wie der
@@ -68,10 +68,10 @@ android/NConnect.Android/
   Ble/Switch2Scanner.cs     BLE-Suche, Nintendo-Herstellerdaten 0x0553 (Kopf 01 00 03 7E)
   Ble/Switch2Device.cs      GATT-Verbindung – Portierung von Switch2BleLink (Windows)
   Profiles/GameProfileWatcher.cs       App im Vordergrund (UsageStats) → Profil; Startbildschirme erkennen
-  Profiles/GameProfileWatcher.Pick.cs  Auswahl der Vordergrund-App (ohne N-Connect/Startbildschirm, getestet)
+  Profiles/GameProfileWatcher.Pick.cs  Auswahl der Vordergrund-App (ohne SKZ-Connect/Startbildschirm, getestet)
   Profiles/ProfileEdit.cs   Profile anlegen (Kopie der Standardbelegung), Tasten/Makros ändern, umbenennen, löschen
   Kodi/KodiRepository.cs    DevCatSKZ Repository herunterladen oder per Shell direkt in Kodi legen
-  Kodi/KodiStatusWriter.cs  status.json für das Kodi-Add-on (Documents/N-Connect über MediaStore)
+  Kodi/KodiStatusWriter.cs  status.json für das Kodi-Add-on (Documents/SKZ Connect über MediaStore)
   Kodi/KodiStatusWriter.Contract.cs  status.json-Vertrag: "bluetooth", "platform", Änderungsprüfung (getestet)
   Output/PrivilegedShell.cs Root (su) und Shizuku (Reflection) – starten Befehle mit Shell-Rechten
   Output/VirtualPads.cs     UhidPad (hid-Prozess je Spieler), CompositePad
@@ -190,7 +190,7 @@ belegten Plätzen ohne wartenden Joy-Con gar nicht. Fehlversuche warten zunehmen
 Einstellungen › Profile › **Profile je Spiel verwalten** (braucht einmal „Zugriff auf Nutzungsdaten“):
 
 - **Neues Profil:** Spiel aus der App-Auswahl wählen (`UI/AppPicker.cs`: alle startbaren Apps mit Name und Symbol,
-  Suchfeld; ohne N-Connect selbst und ohne Startbildschirme), Namen bestätigen. Das Profil startet mit einer **festen
+  Suchfeld; ohne SKZ Connect selbst und ohne Startbildschirme), Namen bestätigen. Das Profil startet mit einer **festen
   Kopie der Standardbelegung** aller Android-Controller-Arten (Pro Controller 2, Joy-Con-Paar, Joy-Con 2 L/R,
   GameCube) – spätere Änderungen am Standard (z. B. A/B/X/Y) ändern das Profil nicht (`ProfileEdit.CopyOfStandard`).
 - **Profil antippen:** Spiel ändern, **Tastenbelegung bearbeiten** (Controller-Art wählen → Taste → Ziel), umbenennen,
@@ -199,7 +199,7 @@ Einstellungen › Profile › **Profile je Spiel verwalten** (braucht einmal „
   über `MacroScript`; Tastatur-Schritte `Key:` gibt es unter Android nicht und werden abgelehnt). „Alles auf Standard“
   setzt eine Controller-Art zurück. Gespeichert wird in `NamedProfile.Buttons` der gemeinsamen `Settings`.
 - **Erkennung** (`GameProfileWatcher.Poll`, alle 5 s im Wartungstakt des Dienstes): letzte ActivityResumed-App der
-  letzten 15 s, **ohne N-Connect und ohne Startbildschirme** – wer kurz in N-Connect oder auf den Startbildschirm
+  letzten 15 s, **ohne SKZ Connect und ohne Startbildschirme** – wer kurz in SKZ Connect oder auf den Startbildschirm
   wechselt, behält sein Profil. „Aktives Profil“ wählt ein Profil auch fest. Umbenennen/Löschen ziehen das fest
   gewählte bzw. erkannte Profil mit; „Belegung zurücksetzen“ lässt Profile und Farbschema stehen.
 - Auf Android 8/9 prüft `HasAccess` mit `CheckOpNoThrow` (`UnsafeCheckOpNoThrow` gibt es erst ab API 29 – vorher
@@ -229,7 +229,7 @@ Emulatoren nennt deshalb keine Namen).
 Einstellungen › Allgemein › **Nach Updates suchen** (`Core/UpdateCheck*.cs`):
 
 - Die APKs hängen an den gemeinsamen Releases, deren Tag die **Windows-Version** ist (v1.0.x). Verglichen wird deshalb
-  die Version im **Dateinamen** `N-Connect-Android-<x.y.z>.apk`; Releases ohne APK, Entwürfe und Vorabversionen zählen
+  die Version im **Dateinamen** `SKZ-Connect-Android-<x.y.z>.apk`; Releases ohne APK, Entwürfe und Vorabversionen zählen
   nicht, gewählt wird die höchste APK-Version (vorher wurde der Tag 1.0.21 mit 0.9.0 verglichen und jede Prüfung
   meldete ein Update).
 - Download nur von GitHub (auch nach Umleitung), Größe und SHA-256 (`digest` der GitHub-API) werden geprüft; eine schon
@@ -241,10 +241,10 @@ Einstellungen › Allgemein › **Nach Updates suchen** (`Core/UpdateCheck*.cs`)
 
 ## Kodi-Status (status.json)
 
-`Kodi/KodiStatusWriter.cs` schreibt – nur wenn Kodi installiert ist – denselben Stand wie N-Connect für Windows und der
+`Kodi/KodiStatusWriter.cs` schreibt – nur wenn Kodi installiert ist – denselben Stand wie SKZ Connect für Windows und der
 Linux-Dienst, damit Menü und Home-Widget des Kodi-Add-ons ihn anzeigen:
 
-- Ort: ab Android 10 `/sdcard/Documents/N-Connect/status.json` über MediaStore (ohne Speicher-Berechtigung), auf
+- Ort: ab Android 10 `/sdcard/Documents/SKZ-Connect/status.json` über MediaStore (ohne Speicher-Berechtigung), auf
   Android 8/9 der externe App-Ordner. Die Datei wird **einmal angelegt und dann mit `"wt"` überschrieben** (vorher
   fünf MediaStore-Aufrufe plus Datei anlegen/löschen bei jedem Schreiben).
 - Takt 3 s, geschrieben wird bei Änderungen und spätestens alle 10 s (Herzschlag – das Add-on wertet nur Dateien bis
@@ -257,7 +257,7 @@ Linux-Dienst, damit Menü und Home-Widget des Kodi-Add-ons ihn anzeigen:
   sie nicht ändern, Android legt die neue unter einem Ausweichnamen an (z. B. `status (1).json`). Die App bleibt dann
   bei dieser Datei und versucht bei jedem Start, wieder `status.json` zu bekommen. Solange sie die Ausweichdatei nutzt
   (`KodiStatusWriter.FallbackName`), steht das im Protokoll und **sichtbar in Hilfe › Kodi** (die Karte ist dann schon
-  aufgeklappt): alte `status.json` mit einem Dateimanager löschen, N-Connect beenden und wieder öffnen. Das Kodi-Add-on
+  aufgeklappt): alte `status.json` mit einem Dateimanager löschen, SKZ Connect beenden und wieder öffnen. Das Kodi-Add-on
   liest bisher nur `status.json` und zeigt bis dahin keinen Stand; es sollte auch `status*.json` im Ordner lesen
   (siehe offene Punkte).
 
@@ -298,7 +298,7 @@ App-Sprache aus den Android-Einstellungen), unbekannte Sprachen fallen auf Engli
   `L.T` laufen, prüft `TranslationTests` (Unit-Test).
 - Testen ohne Systemsprache zu ändern: `adb shell cmd locale set-app-locales com.devcatskz.nconnect --locales fr-FR`,
   App neu starten.
-- Der Name des virtuellen Controllers ist übersetzt („N-Connect Player 1“, „N-Connect Joueur 1“ …); für ru/ja/zh/ko
+- Der Name des virtuellen Controllers ist übersetzt („SKZ Connect Player 1“, „SKZ Connect Joueur 1“ …); für ru/ja/zh/ko
   bewusst englisch, damit Emulatoren keine Probleme mit nicht-lateinischen Gerätenamen haben.
 
 ## Release
@@ -308,7 +308,7 @@ App-Sprache aus den Android-Einstellungen), unbekannte Sprachen fallen auf Engli
 - Signatur: `%USERPROFILE%\.nconnect\nconnect-release.jks` + `signing.props` (wird von der csproj importiert, falls
   vorhanden). **Nie ins Repository oder in die CI** – deshalb baut die CI keine APK.
 - `dotnet publish -c Release` → `bin/Release/net10.0-android/publish/com.devcatskz.nconnect-Signed.apk`, als
-  **`N-Connect-Android-<Version>.apk`** an das GitHub-Release hängen (`gh release upload v1.0.x …`). Der Dateiname ist
+  **`SKZ-Connect-Android-<Version>.apk`** an das GitHub-Release hängen (`gh release upload v1.0.x …`). Der Dateiname ist
   Pflicht: Die Update-Prüfung liest die Version daraus (Releases ohne passend benannte APK sieht sie nicht).
   README/Webseite verlinken die APK mit fester Versionsnummer – Links bei einer neuen APK anpassen.
 
@@ -332,7 +332,7 @@ dotnet build -t:Install -c Debug "-p:AdbTarget=-s adb-R5CRA1GQW0Z-ECDAJk._adb-tl
 - **Protokoll lesen:** `adb shell "run-as com.devcatskz.nconnect cat files/nconnect.log"` (Logcat ist auf dem Pixel
   nach wenigen Minuten überschrieben).
 - Screenshots: `adb shell screencap -p /sdcard/x.png` + `adb pull` (PowerShell-Umleitung verfälscht Binärdaten).
-  **Nur wenn N-Connect im Vordergrund ist** – der Nutzer verwendet das Gerät nebenbei.
+  **Nur wenn SKZ Connect im Vordergrund ist** – der Nutzer verwendet das Gerät nebenbei.
 - `pm clear com.devcatskz.nconnect` simuliert den Erststart.
 
 ### Tests ohne Gerät
@@ -346,7 +346,7 @@ Android-freien Quelldateien direkt mit (`UpdateCheck.Releases.cs`, `ProfileEdit.
 - Profile: Kopie der Standardbelegung für jede Taste aller Android-Controller-Arten, Unabhängigkeit vom späteren
   Standard, geänderte Tasten/keine Funktion/Gyro/Makro wirken in `Mapping.Evaluate`, Makro-Prüfung ohne `Key:`,
   eindeutige Namen, Umbenennen/Löschen mit fest gewähltem und erkanntem Profil, Speichern und Laden.
-- Vordergrund-App ohne N-Connect und Startbildschirme; status.json-Werte `bluetooth`/`platform`, Änderungsprüfung ohne
+- Vordergrund-App ohne SKZ Connect und Startbildschirme; status.json-Werte `bluetooth`/`platform`, Änderungsprüfung ohne
   `rate`.
 - Übersetzungen: alle Tabellen gleich lang, Tastennamen und Editor-Ziele in allen 11 Sprachen.
 
@@ -366,7 +366,7 @@ status.json mit Kodi (insbesondere ab Android 11 und nach Neuinstallation), Andr
    „Teststand 0.9.1“ auf dem Pixel 10a und dem Galaxy A52s durchgehen.
 2. Wiederverbinden ohne SYNC über längere Zeit und nach Handy-Neustart prüfen.
 3. Touch-Steuerung und Editor auf dem Gerät vollständig testen; Root-Weg testen.
-4. Kodi für Android: prüfen, ob Kodi `/sdcard/Documents/N-Connect/status.json` einer anderen App ab Android 11 lesen
+4. Kodi für Android: prüfen, ob Kodi `/sdcard/Documents/SKZ-Connect/status.json` einer anderen App ab Android 11 lesen
    darf (ohne „Zugriff auf alle Dateien“ sieht eine App Nicht-Mediendateien anderer Apps dort normalerweise nicht).
    Das Add-on sollte außerdem die neueste `status*.json` im Ordner lesen (Ausweichname nach einer Neuinstallation,
    z. B. `status (1).json`); bis dahin hilft nur der Hinweis in Hilfe › Kodi.

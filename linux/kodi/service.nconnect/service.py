@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-N-Connect-Dienst für Kodi: startet das N-Connect-Programm (BlueZ → virtueller Xbox-360-Controller), überträgt die
+SKZ-Connect-Dienst für Kodi: startet das SKZ-Connect-Programm (BlueZ → virtueller Xbox-360-Controller), überträgt die
 Einstellungen, zeigt Meldungen beim Verbinden/Trennen und startet das Programm neu, falls es unerwartet endet.
 """
 
@@ -54,7 +54,7 @@ class Service(xbmc.Monitor):
            im Widget-Pfad laden die Liste damit selbst neu – auch ohne Fokus, ohne andere Listen anzufassen.
         2. Container.Refresh trifft immer den gerade fokussierten Container – ein blindes Aufrufen lud früher alle
            paar Sekunden Hauptmenü und andere Listen neu (Home-Bildschirm blieb schwarz). Daher nur, wenn dort
-           gerade eine N-Connect-Liste fokussiert ist (für Skins mit festem Pfad); sonst nachholen, sobald sie es ist.
+           gerade eine SKZ-Connect-Liste fokussiert ist (für Skins mit festem Pfad); sonst nachholen, sobald sie es ist.
         """
         now = time.time()
         if self._dirty and now - self._last_widget_refresh >= 1.5:
@@ -188,7 +188,7 @@ class Service(xbmc.Monitor):
             self.notify(text(30026, ev.get('name')), error=True)
         elif name == 'battery-low':
             # Wichtige Meldung: auch bei abgeschalteten Verbindungsmeldungen anzeigen (eigene Einstellung im Dienst).
-            xbmcgui.Dialog().notification('N-Connect', text(30028, ev.get('name'), ev.get('battery')),
+            xbmcgui.Dialog().notification('SKZ Connect', text(30028, ev.get('name'), ev.get('battery')),
                                           xbmcgui.NOTIFICATION_WARNING, 8000, sound=True)
         elif name == 'button':
             action = common.button_action(ev.get('button'))
@@ -196,7 +196,7 @@ class Service(xbmc.Monitor):
                 xbmc.executebuiltin(action)
         elif name == 'wifi-hint':
             # Funkkoexistenz: WLAN frisst die Verbindung – wichtig genug, um immer zu melden.
-            xbmcgui.Dialog().notification('N-Connect', text(30029), xbmcgui.NOTIFICATION_WARNING, 10000)
+            xbmcgui.Dialog().notification('SKZ Connect', text(30029), xbmcgui.NOTIFICATION_WARNING, 10000)
         elif name == 'error':
             self.notify(text(30017), error=True)
         elif name == 'bluetooth':
@@ -216,13 +216,13 @@ class Service(xbmc.Monitor):
         if not error and not common.notifications_enabled():
             return
         xbmcgui.Dialog().notification(
-            'N-Connect', message, xbmcgui.NOTIFICATION_ERROR if error else common.ICON, duration, sound=False)
+            'SKZ Connect', message, xbmcgui.NOTIFICATION_ERROR if error else common.ICON, duration, sound=False)
 
     # ---------- Kodi-Rückrufe ----------
 
     def onSettingsChanged(self):
         if not common.has_daemon():
-            return  # Begleitmodus: Die N-Connect-App liest Kodis Einstellungen nicht – nichts zu übertragen
+            return  # Begleitmodus: Die SKZ-Connect-App liest Kodis Einstellungen nicht – nichts zu übertragen
         try:
             common.write_settings_json()
         except OSError as e:
@@ -254,9 +254,9 @@ class Service(xbmc.Monitor):
     # ---------- Hauptschleife ----------
 
     def run_companion(self):
-        """Ohne Linux-Dienst (Windows, Android, macOS): Die N-Connect-App verbindet die Controller und schreibt
+        """Ohne Linux-Dienst (Windows, Android, macOS): Die SKZ-Connect-App verbindet die Controller und schreibt
         status.json selbst. Dieser Dienst sorgt nur dafür, dass Widgets bei sichtbaren Änderungen neu laden."""
-        common.log('Begleitmodus auf {0} – Status kommt von der N-Connect-App'.format(platform.system()))
+        common.log('Begleitmodus auf {0} – Status kommt von der SKZ-Connect-App'.format(platform.system()))
         while not self.abortRequested():
             self.watch_status()
             if self.waitForAbort(1):
@@ -300,7 +300,7 @@ class Service(xbmc.Monitor):
                 self.failures = 0
             delay = RESTART_DELAYS[min(self.failures, len(RESTART_DELAYS) - 1)]
             self.failures += 1
-            common.log('N-Connect beendet (Code {0}), Neustart in {1} s'.format(process.returncode, delay), xbmc.LOGWARNING)
+            common.log('SKZ Connect beendet (Code {0}), Neustart in {1} s'.format(process.returncode, delay), xbmc.LOGWARNING)
             if self.failures == 3:
                 self.notify(text(30018), error=True)
             if self.waitForAbort(delay):

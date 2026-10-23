@@ -16,12 +16,15 @@ internal static partial class Tr
         ["Einrichten fehlgeschlagen – der Kodi-Ordner ist nicht beschreibbar. Nutze „Repository herunterladen“."] = "追加に失敗しました – Kodi のフォルダーに書き込めません。「リポジトリをダウンロード」を使ってください。",
         ["Herunterladen …"] = "ダウンロード …",
         ["DevCatSKZ Repository in Kodi einrichten"] = "DevCatSKZ Repository を Kodi に追加",
-        ["Legt das Repository direkt in Kodi ab. Darüber kommen unsere Kodi-Plugins mit automatischen Updates. Danach in Kodi: Add-ons → Meine Add-ons → Add-on-Repository → DevCatSKZ Repository → Aktivieren."] = "リポジトリを Kodi に直接追加します。ここから Kodi 用プラグインが自動更新付きで届きます。その後 Kodi で: アドオン → マイアドオン → アドオンリポジトリ → DevCatSKZ Repository → 有効化。",
+                ["Kodi ist auf diesem PC installiert. Legt das Repository direkt in Kodi ab. Darüber kommen unsere Kodi-Plugins mit automatischen Updates. Danach in Kodi: Add-ons → Meine Add-ons → Add-on-Repository → DevCatSKZ Repository → Aktivieren."] = "Kodi がこの PC にインストールされています。リポジトリを Kodi に直接配置します。これにより、私たちの Kodi プラグインが自動更新されます。その後 Kodi で：アドオン → マイアドオン → アドオンリポジトリ → DevCatSKZ Repository → 有効化。",
         ["Kodi ist auf diesem PC nicht installiert. Mit Kodi für Windows funktionieren deine Controller auch ohne Plugin – sie erscheinen dort als Xbox-Controller."] = "この PC には Kodi がインストールされていません。Windows 版 Kodi ではプラグインなしでもコントローラーが Xbox コントローラーとして使えます。",
         ["Repository herunterladen"] = "リポジトリをダウンロード",
         ["Speichert repository.devcatskz.zip im Download-Ordner – zum Installieren auf einem anderen Gerät über „Aus ZIP-Datei installieren“."] = "repository.devcatskz.zip をダウンロードフォルダーに保存します – ほかの機器で「zip ファイルからインストール」するために。",
         ["Kodi-Plugin für LibreELEC"] = "LibreELEC 用 Kodi プラグイン",
-        ["Für Raspberry Pi und andere Geräte mit LibreELEC: N-Connect als Kodi-Plugin (alle Geräte). Am einfachsten über das DevCatSKZ Repository."] = "LibreELEC の Raspberry Pi などの機器向け: Kodi プラグイン版 N-Connect（全機器対応）。DevCatSKZ Repository からが最も簡単です。",
+                ["Braucht Kodi ein Plugin?"] = "Kodi にプラグインは必要ですか？",
+                ["Nur auf anderen Geräten: Kodi für Windows braucht keins – deine Controller erscheinen dort als Xbox-Controller. Auf Raspberry Pi, LibreELEC und anderen Kodi-Geräten zeigt das Plugin verbundene Controller und Akkustand."] = "他のデバイスでのみ必要です：Windows 版 Kodi では不要です – コントローラーは Xbox コントローラーとして表示されます。Raspberry Pi、LibreELEC、その他の Kodi デバイスでは、プラグインが接続中のコントローラーとバッテリー残量を表示します。",
+                ["Kodi-Plugin für LibreELEC (installiert)"] = "LibreELEC 用 Kodi プラグイン（インストール済み）",
+        ["Für Raspberry Pi und andere Geräte mit LibreELEC: SKZ Connect als Kodi-Plugin (alle Geräte). Am einfachsten über das DevCatSKZ Repository."] = "LibreELEC の Raspberry Pi などの機器向け: Kodi プラグイン版 SKZ Connect（全機器対応）。DevCatSKZ Repository からが最も簡単です。",
         // ---------- Fenster, Reiter, Abschnitte ----------
         ["Controller"] = "コントローラー",
         // ---------- Desktop-Modus, Testseite, Vorlagen, Diagnose ----------
@@ -55,7 +58,7 @@ internal static partial class Tr
         ["Protokoll, Einstellungen und Systeminfos als ZIP-Datei – zum Anhängen an eine Fehlermeldung. Enthält keine Kopplungsschlüssel."] = "ログ、設定、システム情報を ZIP ファイルにまとめます。不具合報告に添付してください。ペアリング キーは含まれません。",
         // ---------- Desktop-Widget ----------
         ["Desktop-Widget"] = "デスクトップ ウィジェット",
-        ["Kleines Kärtchen auf dem Desktop: verbundene Controller, Akku, Verbindung und Ausgabe auf einen Blick. Mit der Maus verschieben, Rechtsklick für Optionen, Doppelklick öffnet N-Connect."] = "デスクトップ上の小さなカード：接続中のコントローラー、バッテリー、接続方法、出力をひと目で確認できます。マウスでドラッグして移動、右クリックでオプション、ダブルクリックで N-Connect を開きます。",
+        ["Kleines Kärtchen auf dem Desktop: verbundene Controller, Akku, Verbindung und Ausgabe auf einen Blick. Mit der Maus verschieben, Rechtsklick für Optionen, Doppelklick öffnet SKZ Connect."] = "デスクトップ上の小さなカード：接続中のコントローラー、バッテリー、接続方法、出力をひと目で確認できます。マウスでドラッグして移動、右クリックでオプション、ダブルクリックで SKZ Connect を開きます。",
         ["Immer im Vordergrund"] = "常に手前に表示",
         ["Widget bleibt über allen Fenstern sichtbar (sonst nur auf dem Desktop)."] = "ウィジェットをすべてのウィンドウの手前に表示します（オフのときはデスクトップ上のみ）。",
         ["Kompakte Ansicht"] = "コンパクト表示",
@@ -64,7 +67,7 @@ internal static partial class Tr
         ["nativ"] = "ネイティブ",
         ["Xbox · nativ"] = "Xbox · ネイティブ",
         ["Controller einschalten oder SYNC drücken"] = "コントローラーの電源を入れるか SYNC を押してください",
-        ["N-Connect öffnen"] = "N-Connect を開く",
+        ["SKZ Connect öffnen"] = "SKZ Connect を開く",
         ["Position zurücksetzen"] = "位置をリセット",
         ["Widget ausblenden"] = "ウィジェットを非表示",
         // ---------- Status-Kopfzeile, Ansicht ----------
@@ -105,9 +108,9 @@ internal static partial class Tr
         ["Beim Verbinden kurz vibrieren"] = "接続時に短く振動する",
         ["Meldung bei Verbinden"] = "接続時の通知",
         ["Wer meldet, wenn ein Controller verbunden oder getrennt wird."] = "コントローラーの接続・切断時に通知するものを選びます。",
-        ["„N-Connect“ zeigt den echten Controller-Namen und schaltet die Gerätemeldungen von Windows ab."] = "「N-Connect」は実際のコントローラー名を表示し、Windowsのデバイス通知をオフにします。",
-        ["N-Connect (empfohlen)"] = "N-Connect（推奨）",
-        ["N-Connect und Windows"] = "N-Connect と Windows",
+        ["„SKZ Connect“ zeigt den echten Controller-Namen und schaltet die Gerätemeldungen von Windows ab."] = "「SKZ Connect」は実際のコントローラー名を表示し、Windowsのデバイス通知をオフにします。",
+        ["SKZ Connect (empfohlen)"] = "SKZ Connect（推奨）",
+        ["SKZ Connect und Windows"] = "SKZ Connect と Windows",
         ["Keine"] = "なし",
         ["Gekoppelte Controller per Tastendruck verbinden (ohne SYNC)"] = "ペアリング済みコントローラーをボタン一つで接続（SYNC 不要）",
         ["Automatisch mit Windows starten"] = "Windows と一緒に自動で起動",
@@ -320,8 +323,8 @@ internal static partial class Tr
         ["Kurzanleitung"] = "クイックガイド",
         ["Protokoll öffnen"] = "ログを開く",
         ["Beenden"] = "終了",
-        ["N-Connect: warte auf Controller (SYNC drücken)"] = "N-Connect：コントローラー待機中（SYNC を押してください）",
-        ["N-Connect: ViGEmBus fehlt"] = "N-Connect：ViGEmBus がありません",
+        ["SKZ Connect: warte auf Controller (SYNC drücken)"] = "SKZ Connect：コントローラー待機中（SYNC を押してください）",
+        ["SKZ Connect: ViGEmBus fehlt"] = "SKZ Connect：ViGEmBus がありません",
         ["Neue Version verfügbar"] = "新しいバージョンがあります",
         ["Einstellungen fehlerhaft"] = "設定が壊れています",
         ["settings.json konnte nicht gelesen werden – es gelten die Standardwerte. Die beschädigte Datei wird als „settings.json.unlesbar-…“ aufbewahrt (Klicken öffnet den Ordner)."] =
@@ -378,7 +381,7 @@ internal static partial class Tr
         ["Profil exportieren"] = "プロファイルをエクスポート",
         ["Profil importieren"] = "プロファイルをインポート",
         // ---------- Kurzanleitung (WelcomeForm, je Absatz ein Schlüssel) ----------
-        ["N-Connect – Willkommen"] = "N-Connect – ようこそ",
+        ["SKZ Connect – Willkommen"] = "SKZ Connect – ようこそ",
         ["So verbindest du deine Controller:"] = "コントローラーの接続方法：",
         ["Switch 2 (Pro Controller, Joy-Con 2, GameCube):\n" +
          "   Kurz die kleine SYNC-Taste drücken – nach ein paar Sekunden vibriert der Controller.\n" +
@@ -389,10 +392,10 @@ internal static partial class Tr
             "   以降はボタンを押すだけで接続できます。Pro Controller と GameCube は USB ケーブルでも使えます。\n" +
             "   重要：「Bluetooth → デバイスの追加」からペアリングしないでください – 接続が不安定になります。",
         ["Switch 1 (Pro Controller, Joy-Con, NES/SNES/N64/Mega Drive), Wii-Fernbedienung, Wii U Pro Controller:\n" +
-         "   SYNC-Taste drücken – N-Connect koppelt den Controller selbst (kein Umweg über die Windows-Einstellungen).\n" +
+         "   SYNC-Taste drücken – SKZ Connect koppelt den Controller selbst (kein Umweg über die Windows-Einstellungen).\n" +
          "   Danach verbindet er sich per Tastendruck. Gezielt suchen: Rechtsklick auf das Symbol → „Controller koppeln …“."] =
             "Switch 1（Pro Controller、Joy-Con、NES/SNES/N64/Mega Drive）、Wiiリモコン、Wii U Pro Controller：\n" +
-            "   SYNC ボタンを押します – N-Connect が自動でペアリングします（Windows の設定は不要です）。\n" +
+            "   SYNC ボタンを押します – SKZ Connect が自動でペアリングします（Windows の設定は不要です）。\n" +
             "   以降はボタンを押すだけで接続します。手動で検索：アイコンを右クリック → 「コントローラーをペアリング …」。",
         ["Windows, Steam und Spiele sehen jeden Controller als Xbox-Controller.\n" +
          "Das Programm läuft unten rechts im Infobereich – ein Klick öffnet die Übersicht."] =
@@ -496,8 +499,8 @@ internal static partial class Tr
             "Xbox 360 はほぼすべてのゲームと Steam で動作。DualShock 4 はさらにモーション操作を追加（Steam、エミュレーター）。個別設定のないすべてのコントローラーに適用（カード → 設定 → ボタン）。",
         ["Original-Controller verstecken"] = "元のコントローラーを隠す",
         ["Controller verbinden"] = "コントローラーを接続",
-        ["SYNC-Taste am Controller drücken – N-Connect findet und koppelt ihn selbst. Danach reicht künftig ein Tastendruck."] =
-            "コントローラーの SYNC ボタンを押してください – N-Connect が自動で検出してペアリングします。以降はボタン一つで接続できます。",
+        ["SYNC-Taste am Controller drücken – SKZ Connect findet und koppelt ihn selbst. Danach reicht künftig ein Tastendruck."] =
+            "コントローラーの SYNC ボタンを押してください – SKZ Connect が自動で検出してペアリングします。以降はボタン一つで接続できます。",
         ["So kommt der Controller in den Kopplungsmodus"] = "コントローラーをペアリングモードにする方法",
         ["Switch 2: Pro Controller, Joy-Con 2, GameCube"] = "Switch 2：Pro Controller、Joy-Con 2、GameCube",
         ["Kurz die kleine SYNC-Taste drücken."] = "小さな SYNC ボタンを短く押します。",
@@ -550,8 +553,8 @@ internal static partial class Tr
         ["HidHide installieren …"] = "HidHide をインストール …",
         ["Empfohlen: Steam und viele Spiele kennen Switch-1-, NSO- und USB-Controller selbst und sähen sie sonst doppelt. Läuft nach der Installation ohne Rückfrage (sonst fragt Windows nach Adminrechten)."] =
             "推奨：Steam と多くのゲームは Switch 1、NSO、USB コントローラーを自動認識するため、二重表示になります。インストール後は確認なしで動作します（それ以外は Windows が管理者権限を求めます）。",
-        ["Steam und viele Spiele sehen Switch-1-, NSO- und USB-Controller sonst doppelt. Dafür wird das kostenlose HidHide gebraucht (bei der N-Connect-Installation dabei, hier nachträglich)."] =
-            "これがないと Steam と多くのゲームで Switch 1、NSO、USB コントローラーが二重表示されます。無料の HidHide が必要です（N-Connect のインストールに同梱、ここから後でインストール可能）。",
+        ["Steam und viele Spiele sehen Switch-1-, NSO- und USB-Controller sonst doppelt. Dafür wird das kostenlose HidHide gebraucht (bei der SKZ-Connect-Installation dabei, hier nachträglich)."] =
+            "これがないと Steam と多くのゲームで Switch 1、NSO、USB コントローラーが二重表示されます。無料の HidHide が必要です（SKZ Connect のインストールに同梱、ここから後でインストール可能）。",
         ["Erscheint als"] = "表示名",
         ["Wie allgemein"] = "全般と同じ",
         ["Nur für diesen Controller. Xbox 360 läuft überall; DualShock 4 bringt zusätzlich Gyro nach Steam und in Emulatoren. „Wie allgemein“ folgt der Seite „Allgemein“."] =
@@ -568,8 +571,8 @@ internal static partial class Tr
             "元のコントローラーは隠されていません（確認をキャンセル）。後で行う場合：コントローラー → 設定 → その他 →「二重表示？」。",
         ["Original-Controller nicht versteckt (Fehler, Details im Protokoll). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."] =
             "元のコントローラーは隠されていません（エラー、詳細はログを参照）。後で行う場合：コントローラー → 設定 → その他 →「二重表示？」。",
-        ["Eine ältere N-Connect-Version hat das eigene virtuelle DualShock 4 vor Spielen versteckt. Freigeben hat nicht geklappt – bitte im HidHide Configuration Client den Haken beim virtuellen DualShock 4 entfernen."] =
-            "以前のバージョンの N-Connect が自身の仮想 DualShock 4 をゲームから隠しました。再表示できませんでした – HidHide Configuration Client で仮想 DualShock 4 のチェックを外してください。",
+        ["Eine ältere SKZ-Connect-Version hat das eigene virtuelle DualShock 4 vor Spielen versteckt. Freigeben hat nicht geklappt – bitte im HidHide Configuration Client den Haken beim virtuellen DualShock 4 entfernen."] =
+            "以前のバージョンの SKZ Connect が自身の仮想 DualShock 4 をゲームから隠しました。再表示できませんでした – HidHide Configuration Client で仮想 DualShock 4 のチェックを外してください。",
         ["Tastenanordnung A/B/X/Y"] = "ボタン配置 A/B/X/Y",
         ["Xbox: nach Position (untere Taste = A). Nintendo: nach Beschriftung (A bleibt A)."] = "Xbox：位置で決定（下のボタン = A）。Nintendo：表示どおり（A は A のまま）。",
         ["Verbinden"] = "接続",
@@ -577,14 +580,14 @@ internal static partial class Tr
         ["Gekoppelte Controller verbinden sich ohne SYNC-Taste."] = "ペアリング済みコントローラーは SYNC ボタンなしで接続します。",
         ["Ohne Eingabe trennen nach"] = "操作がない場合に切断",
         ["Spart Akku, wenn ein Controller liegen bleibt."] = "コントローラーが放置されている場合にバッテリーを節約します。",
-        ["N-Connect startet unsichtbar im Infobereich."] = "N-Connect は通知領域に最小化して起動します。",
+        ["SKZ Connect startet unsichtbar im Infobereich."] = "SKZ Connect は通知領域に最小化して起動します。",
         ["Darstellung und Sprache"] = "外観と言語",
         ["Farbmodus"] = "カラーモード",
         ["Mica-Effekt"] = "Mica エフェクト",
         ["Durchscheinende Titelleiste (ab Windows 11)."] = "半透明のタイトルバー（Windows 11 以降）。",
         ["Erweitert"] = "詳細",
         ["Gyro für Emulatoren (DSU)"] = "エミュレーター用ジャイロ（DSU）",
-        ["Cemuhook-Server auf Port 26760 – wirkt nach einem Neustart von N-Connect."] = "ポート 26760 の Cemuhook サーバー – N-Connect の再起動後に有効。",
+        ["Cemuhook-Server auf Port 26760 – wirkt nach einem Neustart von SKZ Connect."] = "ポート 26760 の Cemuhook サーバー – SKZ Connect の再起動後に有効。",
         ["Nach Updates suchen"] = "アップデートを確認",
         ["Beim Start auf GitHub nach einer neuen Version suchen."] = "起動時に GitHub で新しいバージョンを確認。",
         ["Tastenbelegungen und Werte zurücksetzen. Gekoppelte Controller bleiben erhalten."] = "ボタン割り当てと設定値をリセット。ペアリング済みコントローラーは保持されます。",
@@ -645,11 +648,11 @@ internal static partial class Tr
         ["Programme (*.exe)|*.exe"] = "プログラム (*.exe)|*.exe",
         ["Kein Controller verbunden\n\n" +
          "Switch-2-Controller: kurz die SYNC-Taste drücken – danach reicht ein beliebiger Tastendruck.\n" +
-         "Switch-1-, NSO- und Wii-Controller: SYNC-Taste drücken – N-Connect koppelt sie selbst.\n" +
+         "Switch-1-, NSO- und Wii-Controller: SYNC-Taste drücken – SKZ Connect koppelt sie selbst.\n" +
          "Oder hier gezielt suchen und koppeln:"] =
             "コントローラーが接続されていません\n\n" +
             "Switch 2 コントローラー：SYNC ボタンを短く押す – 以降は任意のボタンで接続。\n" +
-            "Switch 1、NSO、Wii コントローラー：SYNC ボタンを押す – N-Connect が自動でペアリング。\n" +
+            "Switch 1、NSO、Wii コントローラー：SYNC ボタンを押す – SKZ Connect が自動でペアリング。\n" +
             "またはここで直接検索・ペアリング：",
         ["Controller suchen …"] = "コントローラーを検索 …",
         ["Kein Controller verbunden"] = "コントローラーが接続されていません",
@@ -668,22 +671,22 @@ internal static partial class Tr
         ["Rechten Joy-Con umbenennen …"] = "右 Joy-Con の名前を変更 …",
         ["Controller umbenennen"] = "コントローラーの名前を変更",
         ["Spielerplatz"] = "プレイヤー位置",
-        ["N-Connect aktualisieren"] = "N-Connect を更新",
+        ["SKZ Connect aktualisieren"] = "SKZ Connect を更新",
         ["HidHide aktualisieren"] = "HidHide を更新",
         ["HidHide-Update verfügbar"] = "HidHide のアップデートがあります",
         ["HidHide aktuell halten"] = "HidHide を最新に保つ",
         ["Beim Start nach einer neuen HidHide-Version suchen. Installiert wird nur nach Rückfrage (geprüfter Download vom Hersteller, Neustart nötig)."] =
             "起動時に HidHide の新しいバージョンを確認。確認後のみインストールします（メーカーからの検証済みダウンロード、再起動が必要）。",
         ["Lizenzen Dritter"] = "サードパーティのライセンス",
-        ["Open-Source-Software und übernommener Code in N-Connect – mit Lizenzen und Copyright-Vermerken."] =
-            "N-Connect に含まれるオープンソースソフトウェアと流用したコード – ライセンスと著作権表示付き。",
+        ["Open-Source-Software und übernommener Code in SKZ Connect – mit Lizenzen und Copyright-Vermerken."] =
+            "SKZ Connect に含まれるオープンソースソフトウェアと流用したコード – ライセンスと著作権表示付き。",
         ["Der Download hat nicht geklappt oder die Datei war fehlerhaft. Die Release-Seite im Browser öffnen?"] =
             "ダウンロードに失敗したか、ファイルが破損していました。ブラウザでリリースページを開きますか？",
         ["Alle Controller trennen"] = "すべてのコントローラーを切断",
         ["Sticks kalibrieren"] = "スティックをキャリブレーション",
         ["Kalibrieren …"] = "キャリブレーション …",
-        ["Gegen Drift oder zu kleinen Ausschlag: Mitte und Rand neu messen. Wird nur in N-Connect gespeichert, der Controller bleibt unverändert."] =
-            "ドリフトや小さすぎる可動域に対処：中央と端を再測定。N-Connect のみに保存され、コントローラーは変更されません。",
+        ["Gegen Drift oder zu kleinen Ausschlag: Mitte und Rand neu messen. Wird nur in SKZ Connect gespeichert, der Controller bleibt unverändert."] =
+            "ドリフトや小さすぎる可動域に対処：中央と端を再測定。SKZ Connect のみに保存され、コントローラーは変更されません。",
         ["Linker Stick"] = "左スティック",
         ["Rechter Stick"] = "右スティック",
         ["Stick"] = "スティック",
@@ -789,14 +792,14 @@ internal static partial class Tr
         ["Von der Switch-SD-Karte (Bluepick_RCM/hekate) oder von einem anderen PC übernehmen, oder für einen anderen PC exportieren."] =
             "Switch の SD カード（Bluepick_RCM/hekate）や別の PC から引き継ぐか、別の PC 用にエクスポートします。",
         ["Bei Switch-SD-Karte nachfragen"] = "Switch の SD カードが挿入されたら確認",
-        ["Steckt eine SD-Karte der Switch im PC (Kartenleser oder hekate „USB Tools“), bietet N-Connect die Übernahme an. Die Karte wird nur gelesen."] =
-            "Switch の SD カードが PC に挿入されている場合（カードリーダーまたは hekate「USB Tools」）、N-Connect が引き継ぎを提案します。カードは読み取りのみです。",
+        ["Steckt eine SD-Karte der Switch im PC (Kartenleser oder hekate „USB Tools“), bietet SKZ Connect die Übernahme an. Die Karte wird nur gelesen."] =
+            "Switch の SD カードが PC に挿入されている場合（カードリーダーまたは hekate「USB Tools」）、SKZ Connect が引き継ぎを提案します。カードは読み取りのみです。",
         ["Switch-SD-Karte erkannt"] = "Switch の SD カードを検出",
         ["Kopplungsdaten der Controller gefunden – klicken, um sie anzusehen und zu übernehmen."] =
             "コントローラーのペアリングデータが見つかりました – クリックして確認・引き継ぎます。",
         ["Klicken, um Kopplungsdaten der Controller zu übernehmen."] = "クリックしてコントローラーのペアリングデータを引き継ぎます。",
-        ["Controller-Kopplungen von der Switch-SD-Karte oder von einem anderen PC übernehmen – oder für einen anderen PC exportieren. Es werden nur Einstellungen von N-Connect geändert; Windows und der Bluetooth-Adapter bleiben unverändert."] =
-            "Switch の SD カードや別の PC からコントローラーのペアリングを引き継ぐか、別の PC 用にエクスポートします。変更されるのは N-Connect の設定のみで、Windows と Bluetooth アダプターは変更されません。",
+        ["Controller-Kopplungen von der Switch-SD-Karte oder von einem anderen PC übernehmen – oder für einen anderen PC exportieren. Es werden nur Einstellungen von SKZ Connect geändert; Windows und der Bluetooth-Adapter bleiben unverändert."] =
+            "Switch の SD カードや別の PC からコントローラーのペアリングを引き継ぐか、別の PC 用にエクスポートします。変更されるのは SKZ Connect の設定のみで、Windows と Bluetooth アダプターは変更されません。",
         ["Spieler-Reihenfolge – Spieler 1 ist für Windows, Steam und Spiele der erste Controller. Mit ‹ › umsortieren."] =
             "プレイヤー順序 – プレイヤー 1 は Windows、Steam、ゲームで最初のコントローラーです。‹ › で並べ替えます。",
         ["Von der Switch-SD-Karte"] = "Switch の SD カードから",
@@ -804,7 +807,7 @@ internal static partial class Tr
             "Bluepick_RCM または hekate で作成されたペアリングデータ（switchroot/joycon_mac.ini）",
         ["Einlesen …"] = "読み込む …",
         ["Von einem anderen PC"] = "別の PC から",
-        ["Mit N-Connect exportierte Datei (*.ncpair)"] = "N-Connect でエクスポートされたファイル（*.ncpair）",
+        ["Mit SKZ Connect exportierte Datei (*.ncpair)"] = "SKZ Connect でエクスポートされたファイル（*.ncpair）",
         ["Datei öffnen …"] = "ファイルを開く …",
         ["Inhalt"] = "内容",
         ["Weitergeben und sichern"] = "共有とバックアップ",
@@ -836,26 +839,26 @@ internal static partial class Tr
         ["Joy-Con (R)"] = "Joy-Con（右）",
         ["HORI-Controller (links)"] = "HORI コントローラー（左）",
         ["HORI-Controller (rechts)"] = "HORI コントローラー（右）",
-        ["Hinweis: Pro Controller stehen nur im Bluetooth-Speicher der Switch (8000000000000050.bin); dieses Speicherabbild kann N-Connect nicht auswerten."] =
-            "注意：Pro Controller は Switch の Bluetooth メモリ（8000000000000050.bin）にのみ記録されています。N-Connect はこのメモリイメージを解析できません。",
+        ["Hinweis: Pro Controller stehen nur im Bluetooth-Speicher der Switch (8000000000000050.bin); dieses Speicherabbild kann SKZ Connect nicht auswerten."] =
+            "注意：Pro Controller は Switch の Bluetooth メモリ（8000000000000050.bin）にのみ記録されています。SKZ Connect はこのメモリイメージを解析できません。",
         ["Was diese Daten können – und was nicht:"] = "このデータでできること – できないこと：",
         ["Die Daten zeigen, welche Controller mit deiner Switch gekoppelt sind und an welche Bluetooth-Adresse sie gebunden sind."] =
             "データには、どのコントローラーが Switch とペアリングされているか、どの Bluetooth アドレスに紐付いているかが表示されます。",
         ["Ein Switch-1-Controller verbindet sich auf Tastendruck nur mit dem Gerät, dessen Adresse er gespeichert hat – hier mit der Switch. Der Bluetooth-Adapter des PCs hat eine andere Adresse, deshalb kann Windows diese Kopplung nicht einfach weiterverwenden."] =
             "Switch 1 コントローラーは、記憶したアドレスのデバイス（ここでは Switch）にのみボタン一つで再接続します。PC の Bluetooth アダプターは別のアドレスを持つため、Windows はこのペアリングをそのまま再利用できません。",
-        ["Die Adresse des PC-Adapters zu ändern, unterstützt N-Connect bewusst nicht (herstellerabhängig, riskant und nicht vorgesehen)."] =
-            "N-Connect は PC アダプターのアドレス変更を意図的にサポートしていません（メーカー依存、リスクあり、非推奨）。",
-        ["Windows bietet keinen offiziellen Weg, fremde Kopplungsschlüssel einzutragen: Sie liegen in einem Teil der Registrierung, auf den nur das System zugreifen darf. N-Connect ändert dort nichts."] =
-            "Windows には他デバイスのペアリングキーを登録する公式な方法はありません。レジストリのシステム専用領域に保存されるため、N-Connect はそこを変更しません。",
+        ["Die Adresse des PC-Adapters zu ändern, unterstützt SKZ Connect bewusst nicht (herstellerabhängig, riskant und nicht vorgesehen)."] =
+            "SKZ Connect は PC アダプターのアドレス変更を意図的にサポートしていません（メーカー依存、リスクあり、非推奨）。",
+        ["Windows bietet keinen offiziellen Weg, fremde Kopplungsschlüssel einzutragen: Sie liegen in einem Teil der Registrierung, auf den nur das System zugreifen darf. SKZ Connect ändert dort nichts."] =
+            "Windows には他デバイスのペアリングキーを登録する公式な方法はありません。レジストリのシステム専用領域に保存されるため、SKZ Connect はそこを変更しません。",
         ["So klappt der Wechsel am einfachsten: am PC den Controller einmal per SYNC-Taste in den Windows-Bluetooth-Einstellungen koppeln. Zurück an der Switch die Joy-Con an die Konsole stecken bzw. den Pro Controller per USB-Kabel anschließen – dann sind sie ohne Menü wieder mit der Switch gekoppelt."] =
             "最も簡単な切り替え方法：PC で Windows の Bluetooth 設定から SYNC ボタンで一度ペアリング。Switch に戻ったら Joy-Con を本体に取り付けるか、Pro Controller を USB ケーブルで接続 – メニューなしで再度ペアリングされます。",
-        ["„Übernehmen“ merkt sich diese Controller in N-Connect (Liste bekannter Controller, Zuordnung zur Switch). Kopplungsschlüssel werden nicht gespeichert."] =
-            "「適用」はこれらのコントローラーを N-Connect に記憶します（既知のコントローラーリスト、Switch への関連付け）。ペアリングキーは保存されません。",
-        ["N-Connect-Kopplungsdaten"] = "N-Connect ペアリングデータ",
+        ["„Übernehmen“ merkt sich diese Controller in SKZ Connect (Liste bekannter Controller, Zuordnung zur Switch). Kopplungsschlüssel werden nicht gespeichert."] =
+            "「適用」はこれらのコントローラーを SKZ Connect に記憶します（既知のコントローラーリスト、Switch への関連付け）。ペアリングキーは保存されません。",
+        ["SKZ-Connect-Kopplungsdaten"] = "SKZ Connect ペアリングデータ",
         ["Kopplungsdaten von einem anderen PC öffnen"] = "別の PC のペアリングデータを開く",
         ["Die Datei ist zu groß."] = "ファイルが大きすぎます。",
         ["Keine Kopplungsdaten-Datei."] = "ペアリングデータファイルではありません。",
-        ["Die Datei stammt von einer neueren N-Connect-Version."] = "ファイルは新しいバージョンの N-Connect で作成されています。",
+        ["Die Datei stammt von einer neueren SKZ-Connect-Version."] = "ファイルは新しいバージョンの SKZ Connect で作成されています。",
         ["Die Datei ist mit einem Passwort geschützt."] = "ファイルはパスワードで保護されています。",
         ["Falsches Passwort oder die Datei wurde verändert."] = "パスワードが間違っているか、ファイルが変更されています。",
         ["Die Datei ist beschädigt."] = "ファイルが破損しています。",
@@ -868,20 +871,20 @@ internal static partial class Tr
         ["Was du erwarten kannst:"] = "期待できること：",
         ["Gleiche Adapter-Adresse (z. B. derselbe USB-Bluetooth-Stick umgesteckt): Switch-2-Controller verbinden sich hier auf Tastendruck wie am anderen PC."] =
             "同じアダプターアドレス（例：同じ USB Bluetooth ドングルを差し替え）：Switch 2 コントローラーはここでもボタン一つで接続します。",
-        ["Switch-1-Controller (Pro Controller, Joy-Con) brauchen zusätzlich die Kopplung in Windows. Die kann N-Connect nicht übertragen – einmal per SYNC-Taste koppeln."] =
-            "Switch 1 コントローラー（Pro Controller、Joy-Con）は追加で Windows でのペアリングが必要です。N-Connect はこれを転送できません – SYNC ボタンで一度ペアリングしてください。",
+        ["Switch-1-Controller (Pro Controller, Joy-Con) brauchen zusätzlich die Kopplung in Windows. Die kann SKZ Connect nicht übertragen – einmal per SYNC-Taste koppeln."] =
+            "Switch 1 コントローラー（Pro Controller、Joy-Con）は追加で Windows でのペアリングが必要です。SKZ Connect はこれを転送できません – SYNC ボタンで一度ペアリングしてください。",
         ["Anderer Bluetooth-Adapter: Controller verbinden sich auf Tastendruck nur mit dem Gerät, mit dem sie zuletzt gekoppelt wurden. Hier einmal SYNC drücken – danach verbinden sie sich mit diesem PC (am anderen PC dann wieder per SYNC)."] =
             "別の Bluetooth アダプターの場合：コントローラーは最後にペアリングしたデバイスにのみボタン一つで再接続します。ここで一度 SYNC を押す – その後この PC に接続します（もう一方の PC では再度 SYNC）。",
         ["Tipp: Wer denselben USB-Bluetooth-Stick zwischen den PCs umsteckt, nimmt die Adresse mit – Switch-2-Controller verbinden sich dann an beiden PCs ohne SYNC."] =
             "ヒント：同じ USB Bluetooth ドングルを PC 間で差し替えるとアドレスも移動します – Switch 2 コントローラーは両方の PC で SYNC なしで接続します。",
         ["Übernommen werden die Einstellungen je Controller (Joy-Con einzeln/hochkant, Gyro-Kalibrierung) und die Liste bekannter Controller."] =
             "引き継がれるのはコントローラー別設定（Joy-Con の単体/縦向き、ジャイロキャリブレーション）と既知のコントローラーリストです。",
-        ["Die Datei enthält Kopplungsschlüssel. Windows bietet keinen offiziellen Weg, sie einzutragen – N-Connect übernimmt sie deshalb nicht."] =
-            "ファイルにペアリングキーが含まれています。Windows には公式な登録方法がないため、N-Connect はそれらを引き継ぎません。",
-        ["„Übernehmen“ ergänzt die Controller-Listen und Einstellungen von N-Connect (nichts wird gelöscht). Vorher wird eine Sicherung angelegt."] =
-            "「適用」は N-Connect のコントローラーリストと設定を追加します（何も削除されません）。事前にバックアップが作成されます。",
-        ["Kopplungsdaten in N-Connect übernehmen? Vorher wird eine Sicherung der Einstellungen angelegt."] =
-            "ペアリングデータを N-Connect に引き継ぎますか？事前に設定のバックアップが作成されます。",
+        ["Die Datei enthält Kopplungsschlüssel. Windows bietet keinen offiziellen Weg, sie einzutragen – SKZ Connect übernimmt sie deshalb nicht."] =
+            "ファイルにペアリングキーが含まれています。Windows には公式な登録方法がないため、SKZ Connect はそれらを引き継ぎません。",
+        ["„Übernehmen“ ergänzt die Controller-Listen und Einstellungen von SKZ Connect (nichts wird gelöscht). Vorher wird eine Sicherung angelegt."] =
+            "「適用」は SKZ Connect のコントローラーリストと設定を追加します（何も削除されません）。事前にバックアップが作成されます。",
+        ["Kopplungsdaten in SKZ Connect übernehmen? Vorher wird eine Sicherung der Einstellungen angelegt."] =
+            "ペアリングデータを SKZ Connect に引き継ぎますか？事前に設定のバックアップが作成されます。",
         ["Nichts zu ändern – diese Daten sind schon übernommen."] = "変更するものはありません – このデータはすでに引き継がれています。",
         ["Übernommen. Die Sicherung lässt sich hier über „Sicherung wiederherstellen“ zurückholen."] =
             "完了。「バックアップを復元」でここから復元できます。",
@@ -890,8 +893,8 @@ internal static partial class Tr
         ["Alle Einstellungen durch diese Sicherung ersetzen?"] = "すべての設定をこのバックアップで置き換えますか？",
         ["Sicherung wiederhergestellt."] = "バックアップを復元しました。",
         ["Kopplungsdaten für einen anderen PC speichern"] = "別の PC 用にペアリングデータを保存",
-        ["Gespeichert. Die Datei am anderen PC in N-Connect unter „Joy-Con & Wii“ → „Kopplungsdaten“ → „Von einem anderen PC“ öffnen."] =
-            "保存しました。別の PC で N-Connect の「Joy-Con と Wii」→「ペアリングデータ」→「別の PC から」からファイルを開いてください。",
+        ["Gespeichert. Die Datei am anderen PC in SKZ Connect unter „Joy-Con & Wii“ → „Kopplungsdaten“ → „Von einem anderen PC“ öffnen."] =
+            "保存しました。別の PC で SKZ Connect の「Joy-Con と Wii」→「ペアリングデータ」→「別の PC から」からファイルを開いてください。",
         ["Kopplungsdaten exportieren"] = "ペアリングデータをエクスポート",
         ["Passwort eingeben"] = "パスワードを入力",
         ["Passwort (optional). Ohne Passwort steht der Inhalt lesbar in der Datei. Mit Kopplungsschlüsseln ist ein Passwort Pflicht."] =
@@ -953,10 +956,10 @@ internal static partial class Tr
         (Re(@"^HidHide (?<v>.+) ist erschienen \(installiert: (?<i>.+)\)\. Klicken zum Installieren\.$"),
             m => $"HidHide {m.Groups["v"]} が公開されました（インストール済み：{m.Groups["i"]}）。クリックでインストール。"),
         (Re(@"^Lade HidHide (?<v>.+) herunter …$"), m => $"HidHide {m.Groups["v"]} をダウンロード中 …"),
-        (Re(@"^HidHide (?<v>.+) herunterladen und installieren\? Das HidHide-Setup entfernt zuerst die alte Version und verlangt einen Neustart von Windows – bitte seinen Anweisungen folgen\. Windows fragt dabei nach Administratorrechten\. Danach versteckt N-Connect die Controller automatisch neu\.$"),
-            m => $"HidHide {m.Groups["v"]} をダウンロードしてインストールしますか？HidHide のセットアップは古いバージョンを先に削除し、Windows の再起動が必要です – 指示に従ってください。Windows から管理者権限を求められます。その後、N-Connect がコントローラーを自動で再び非表示にします。"),
-        (Re(@"^Version (?<v>.+) herunterladen und installieren\? N-Connect wird dafür kurz beendet und danach wieder gestartet\.(?<a> Windows fragt dabei nach Administratorrechten\.)?$"),
-            m => $"バージョン {m.Groups["v"]} をダウンロードしてインストールしますか？N-Connect はいったん終了し、その後再起動します。" +
+        (Re(@"^HidHide (?<v>.+) herunterladen und installieren\? Das HidHide-Setup entfernt zuerst die alte Version und verlangt einen Neustart von Windows – bitte seinen Anweisungen folgen\. Windows fragt dabei nach Administratorrechten\. Danach versteckt SKZ Connect die Controller automatisch neu\.$"),
+            m => $"HidHide {m.Groups["v"]} をダウンロードしてインストールしますか？HidHide のセットアップは古いバージョンを先に削除し、Windows の再起動が必要です – 指示に従ってください。Windows から管理者権限を求められます。その後、SKZ Connect がコントローラーを自動で再び非表示にします。"),
+        (Re(@"^Version (?<v>.+) herunterladen und installieren\? SKZ Connect wird dafür kurz beendet und danach wieder gestartet\.(?<a> Windows fragt dabei nach Administratorrechten\.)?$"),
+            m => $"バージョン {m.Groups["v"]} をダウンロードしてインストールしますか？SKZ Connect はいったん終了し、その後再起動します。" +
                  (m.Groups["a"].Success ? "Windows から管理者権限を求められます。" : "")),
         (Re(@"^(?<t>.+) · (?<r>\d+) Berichte/s$"), m => $"{T(m.Groups["t"].Value)} · {m.Groups["r"]} レポート/秒"),
         (Re(@"^(?<p>\d+ %)(?<v>  \(.*\))?  ⚡ lädt$"), m => $"{m.Groups["p"]}{m.Groups["v"]}  ⚡ 充電中"),
@@ -990,7 +993,7 @@ internal static partial class Tr
         // Tooltip „P1 Pro 2 57 %“: Namen bleiben, wie sie sind.
         (Re(@"^P(?<n>\d+) (?<k>.+)$"), m => m.Value),
         (Re(@"^Bluetooth nicht verfügbar: (?<e>.*)$"), m => $"Bluetooth を利用できません：{m.Groups["e"]}"),
-        (Re(@"^N-Connect: (?<p>.+)$"), m => $"N-Connect：{T(m.Groups["p"].Value)}"),
+        (Re(@"^SKZ Connect: (?<p>.+)$"), m => $"SKZ Connect：{T(m.Groups["p"].Value)}"),
         (Re(@"^(?<k>.+) per USB ist von einem anderen Programm belegt \(z\. B\. Steam\)\.$"),
             m => $"{N(m, "k")} の USB は別のプログラム（例：Steam）が使用中です。"),
         (Re(@"^Schon (?<n>\d+) Controller verbunden – (?<k>.+) wird nicht verwendet\.$"),

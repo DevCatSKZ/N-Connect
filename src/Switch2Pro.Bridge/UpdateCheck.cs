@@ -12,14 +12,14 @@ namespace Switch2Pro.Bridge;
 /// </summary>
 internal static class UpdateCheck
 {
-    private const string Releases = "https://api.github.com/repos/DevCatSKZ/N-Connect/releases?per_page=30";
+    private const string Releases = "https://api.github.com/repos/DevCatSKZ/SKZ-Connect/releases?per_page=30";
     private const string TagPrefix = "v";
 
     /// <summary>Gefundene Version: Seite des Releases und – falls vorhanden – die passende Paket-Datei.</summary>
     public sealed record Update(Version Version, string Url, Installer? Setup = null);
 
     /// <summary>Paket-Datei eines Releases (Name, Download-Adresse, Größe, SHA-256 als Hex – falls GitHub sie liefert).
-    /// Installiert: „N-Connect-Setup-….exe“; portable: „N-Connect-Portable-….zip“.</summary>
+    /// Installiert: „SKZ-Connect-Setup-….exe“; portable: „SKZ-Connect-Portable-….zip“.</summary>
     public sealed record Installer(string Name, string Url, long Size, string? Sha256)
     {
         public bool IsZip => Name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase);
@@ -28,7 +28,9 @@ internal static class UpdateCheck
     /// <summary>Paket unter den Dateien eines Releases: Setup-EXE, in der portablen Variante das ZIP.</summary>
     private static Installer? FindInstaller(JsonElement release)
     {
-        string prefix = Paths.IsPortable ? "N-Connect-Portable" : "N-Connect-Setup";
+        // Übergangsweise beide Asset-Namen: die letzten Releases hießen noch N-Connect-…
+        string[] prefixes = Paths.IsPortable ? ["SKZ-Connect-Portable", "N-Connect-Portable"]
+                                             : ["SKZ-Connect-Setup", "N-Connect-Setup"];
         string extension = Paths.IsPortable ? ".zip" : ".exe";
         if (!release.TryGetProperty("assets", out var assets) || assets.ValueKind != JsonValueKind.Array)
             return null;
@@ -36,7 +38,7 @@ internal static class UpdateCheck
         {
             string? name = asset.TryGetProperty("name", out var n) ? n.GetString() : null;
             string? url = asset.TryGetProperty("browser_download_url", out var u) ? u.GetString() : null;
-            if (name is null || url is null || !name.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)
+            if (name is null || url is null || !prefixes.Any(p => name.StartsWith(p, StringComparison.OrdinalIgnoreCase))
                 || !name.EndsWith(extension, StringComparison.OrdinalIgnoreCase) || !IsGitHub(url))
                 continue;
             long size = asset.TryGetProperty("size", out var s) && s.TryGetInt64(out long v) ? v : 0;
@@ -60,13 +62,13 @@ internal static class UpdateCheck
     /// </summary>
     public static async Task<string?> DownloadAsync(Installer setup, IProgress<int>? progress, CancellationToken ct)
     {
-        string folder = Path.Combine(Path.GetTempPath(), "N-Connect-Update");
+        string folder = Path.Combine(Path.GetTempPath(), "SKZ-Connect-Update");
         string path = Path.Combine(folder, Path.GetFileName(setup.Name));
         try
         {
             Directory.CreateDirectory(folder);
             using var http = new HttpClient { Timeout = TimeSpan.FromMinutes(5) };
-            http.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("N-Connect", Current.ToString()));
+            http.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("SKZ-Connect", Current.ToString()));
             using var response = await http.GetAsync(setup.Url, HttpCompletionOption.ResponseHeadersRead, ct);
             if (!response.IsSuccessStatusCode || response.RequestMessage?.RequestUri is not { } final || !IsGitHub(final.ToString()))
             {
@@ -155,7 +157,7 @@ internal static class UpdateCheck
         try
         {
             using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(15) };
-            http.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("N-Connect", Current.ToString()));
+            http.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("SKZ-Connect", Current.ToString()));
             http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
             using var response = await http.GetAsync(Releases, ct);
             if (!response.IsSuccessStatusCode)

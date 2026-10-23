@@ -7,7 +7,7 @@ namespace NConnect.Android.Tests;
 
 /// <summary>
 /// Netzteil der Update-Prüfung mit einem nachgebauten HttpMessageHandler. Vorher meldete die App ohne Netz, bei 403
-/// (Rate-Limit) und bei 5xx „N-Connect ist auf dem neuesten Stand“; eine System.Net.WebException (so verpackt
+/// (Rate-Limit) und bei 5xx „SKZ Connect ist auf dem neuesten Stand“; eine System.Net.WebException (so verpackt
 /// AndroidMessageHandler Java-IOExceptions nach dem Verbinden) ließ die Prüfung still abbrechen und beim Download den nicht
 /// schließbaren Fortschrittsdialog stehen. Jetzt: jeder Fehler ist ein Ergebnis, nie eine Ausnahme.
 /// </summary>
@@ -80,9 +80,9 @@ public sealed class UpdateCheckNetworkTests : IDisposable
     private static string ReleaseList(string assetName) =>
         $$"""
         [{"tag_name":"v1.0.23","draft":false,"prerelease":false,
-          "html_url":"https://github.com/DevCatSKZ/N-Connect/releases/tag/v1.0.23",
+          "html_url":"https://github.com/DevCatSKZ/SKZ-Connect/releases/tag/v1.0.23",
           "assets":[{"name":"{{assetName}}","size":1000,
-                     "browser_download_url":"https://github.com/DevCatSKZ/N-Connect/releases/download/v1.0.23/{{assetName}}"}]}]
+                     "browser_download_url":"https://github.com/DevCatSKZ/SKZ-Connect/releases/download/v1.0.23/{{assetName}}"}]}]
         """;
 
     // ---------- Prüfung ----------
@@ -136,18 +136,18 @@ public sealed class UpdateCheckNetworkTests : IDisposable
     [Fact]
     public async Task Pruefung_NeuereApk_IstVerfuegbar()
     {
-        var handler = new Handler(_ => Json(ReleaseList("N-Connect-Android-0.9.2.apk")));
+        var handler = new Handler(_ => Json(ReleaseList("SKZ-Connect-Android-0.9.2.apk")));
         var result = await UpdateCheck.CheckAsync(Installed, CancellationToken.None, handler);
         Assert.Equal(UpdateCheck.CheckStatus.Available, result.Status);
         Assert.Equal(new Version(0, 9, 2), result.Update!.Version);
         // GitHub verlangt einen User-Agent.
-        Assert.Contains(handler.Last!.Headers.UserAgent, p => p.Product?.Name == "N-Connect" && p.Product.Version == "0.9.1");
+        Assert.Contains(handler.Last!.Headers.UserAgent, p => p.Product?.Name == "SKZ-Connect" && p.Product.Version == "0.9.1");
     }
 
     [Theory]
-    [InlineData("N-Connect-Android-0.9.1.apk")] // dieselbe Version
-    [InlineData("N-Connect-Android-0.9.0.apk")] // ältere
-    [InlineData("N-Connect-Setup-1.0.23.exe")]  // keine APK an den Releases
+    [InlineData("SKZ-Connect-Android-0.9.1.apk")] // dieselbe Version
+    [InlineData("SKZ-Connect-Android-0.9.0.apk")] // ältere
+    [InlineData("SKZ-Connect-Setup-1.0.23.exe")]  // keine APK an den Releases
     public async Task Pruefung_OhneNeuereApk_IstAktuell(string assetName)
     {
         var result = await UpdateCheck.CheckAsync(Installed, CancellationToken.None, new Handler(_ => Json(ReleaseList(assetName))));
@@ -169,11 +169,11 @@ public sealed class UpdateCheckNetworkTests : IDisposable
     private static readonly byte[] Payload = Encoding.ASCII.GetBytes(new string('x', 200_000));
 
     private static UpdateCheck.Apk ApkFor(byte[] content, long? size = null, string? sha = null) =>
-        new("N-Connect-Android-0.9.2.apk", new Version(0, 9, 2),
-            "https://github.com/DevCatSKZ/N-Connect/releases/download/v1.0.23/N-Connect-Android-0.9.2.apk",
+        new("SKZ-Connect-Android-0.9.2.apk", new Version(0, 9, 2),
+            "https://github.com/DevCatSKZ/SKZ-Connect/releases/download/v1.0.23/SKZ-Connect-Android-0.9.2.apk",
             size ?? content.Length, sha ?? Convert.ToHexString(SHA256.HashData(content)));
 
-    private string Target => Path.Combine(_dir, "N-Connect-Android-0.9.2.apk");
+    private string Target => Path.Combine(_dir, "SKZ-Connect-Android-0.9.2.apk");
 
     private static Handler Serves(byte[] content) =>
         new(_ => new HttpResponseMessage(HttpStatusCode.OK) { Content = new ByteArrayContent(content) });
@@ -248,7 +248,7 @@ public sealed class UpdateCheckNetworkTests : IDisposable
         var handler = new Handler(_ => new HttpResponseMessage(HttpStatusCode.OK)
         {
             Content = new ByteArrayContent(Payload),
-            RequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://example.com/N-Connect-Android-0.9.2.apk"),
+            RequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://example.com/SKZ-Connect-Android-0.9.2.apk"),
         });
         var result = await UpdateCheck.DownloadToAsync(ApkFor(Payload), Target, Installed, null, CancellationToken.None, handler);
         Assert.False(result.Ok);

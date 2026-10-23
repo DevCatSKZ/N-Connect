@@ -1,19 +1,19 @@
 # Hinweise zu Drittanbieter-Software / Third-Party Notices
 
-**Deutsch:** N-Connect (Windows-App, Android-App, Linux-Dienst `nconnect` und Kodi-Add-on `service.nconnect`) enthält
+**Deutsch:** SKZ Connect (Windows-App, Android-App, Linux-Dienst `nconnect` und Kodi-Add-on `service.nconnect`) enthält
 oder nutzt Software, Quellcode und Daten Dritter. Diese Datei nennt jede Komponente mit Version, Plattform,
 Projekt-URL, Lizenz und Copyright-Vermerk und enthält die vollständigen Lizenztexte (Abschnitt D). Die Lizenz von
-N-Connect selbst (MIT) steht in `LICENSE`. Die Rechte an den Drittkomponenten verbleiben bei ihren Inhabern.
+SKZ Connect selbst (MIT) steht in `LICENSE`. Die Rechte an den Drittkomponenten verbleiben bei ihren Inhabern.
 
-**English:** N-Connect (Windows app, Android app, Linux daemon `nconnect` and Kodi add-on `service.nconnect`) includes
+**English:** SKZ Connect (Windows app, Android app, Linux daemon `nconnect` and Kodi add-on `service.nconnect`) includes
 or uses third-party software, source code and data. This file lists every component with its version, platform,
-project URL, licence and copyright notice, and contains the complete licence texts (section D). N-Connect's own licence
+project URL, licence and copyright notice, and contains the complete licence texts (section D). SKZ Connect's own licence
 (MIT) is in `LICENSE`. All third-party components remain the property of their respective owners.
 
-Stand / As of: 2026-10-17 – N-Connect für Windows 1.0.22, Android 0.9.1, Kodi-Add-on 0.4.4 (Linux-Dienst `nconnect`).
+Stand / As of: 2026-10-17 – SKZ Connect für Windows 1.0.22, Android 0.9.1, Kodi-Add-on 0.4.4 (Linux-Dienst `nconnect`).
 
 Nintendo, Nintendo Switch, Joy-Con, Wii, Xbox, PlayStation, DualShock und DualSense sind Marken ihrer jeweiligen
-Inhaber. N-Connect ist ein unabhängiges Projekt und steht in keiner Verbindung zu diesen Unternehmen.
+Inhaber. SKZ Connect ist ein unabhängiges Projekt und steht in keiner Verbindung zu diesen Unternehmen.
 
 ## Inhalt
 
@@ -67,7 +67,7 @@ Inhaber. N-Connect ist ein unabhängiges Projekt und steht in keiner Verbindung 
 
 ### A.1 Nefarius.ViGEm.Client
 
-- Version: 1.21.256 (NuGet), in `N-Connect.exe` eingebunden
+- Version: 1.21.256 (NuGet), in `SKZ-Connect.exe` eingebunden
 - Plattform: Windows
 - Projekt: https://github.com/nefarius/ViGEm.NET
 - Lizenz: MIT (Text: [D.1](#d1-mit-lizenz))
@@ -83,7 +83,7 @@ In der Bibliothek eingebettet und mit ihr weitergegeben:
 
 ### A.2 ViGEmBus
 
-- Version: 1.22.0 – offizieller, signierter Installer, unverändert weitergegeben; das N-Connect-Setup installiert ihn,
+- Version: 1.22.0 – offizieller, signierter Installer, unverändert weitergegeben; das SKZ-Connect-Setup installiert ihn,
   wenn kein ViGEmBus ab 1.17 vorhanden ist
 - Plattform: Windows (Setup)
 - Projekt: https://github.com/nefarius/ViGEmBus
@@ -92,7 +92,7 @@ In der Bibliothek eingebettet und mit ihr weitergegeben:
 
 ### A.3 HidHide
 
-- Version: 1.5.230.0 (x64) – offizieller, signierter Installer, unverändert weitergegeben. N-Connect kann außerdem
+- Version: 1.5.230.0 (x64) – offizieller, signierter Installer, unverändert weitergegeben. SKZ Connect kann außerdem
   auf Nachfrage neuere offizielle HidHide-Installer direkt von GitHub laden; für diese gilt die Lizenz der jeweiligen
   Version.
 - Plattform: Windows (Setup)
@@ -104,7 +104,7 @@ In der Bibliothek eingebettet und mit ihr weitergegeben:
 ### A.4 .NET-Laufzeit und Windows Desktop Runtime (Windows)
 
 - Version: .NET 10 (Microsoft.NETCore.App und Microsoft.WindowsDesktop.App 10.0.x; der Release-Build ist
-  self-contained, d. h. die Laufzeit steckt in `N-Connect.exe`)
+  self-contained, d. h. die Laufzeit steckt in `SKZ-Connect.exe`)
 - Plattform: Windows
 - Projekte: https://github.com/dotnet/runtime, https://github.com/dotnet/winforms
 - Lizenz: MIT (Text: [D.1](#d1-mit-lizenz))
@@ -125,7 +125,7 @@ In der Bibliothek eingebettet und mit ihr weitergegeben:
 
 ### A.6 Inno Setup
 
-- Verwendung: Das Setup-Programm `N-Connect-Setup-<Version>.exe` wird mit Inno Setup 6 erstellt und enthält dessen
+- Verwendung: Das Setup-Programm `SKZ-Connect-Setup-<Version>.exe` wird mit Inno Setup 6 erstellt und enthält dessen
   Setup-Kern sowie die Sprachdateien von Inno Setup.
 - Plattform: Windows (Setup)
 - Projekt: https://jrsoftware.org/isinfo.php
@@ -349,7 +349,7 @@ Nach C# übertragen und angepasst (geänderte Fassung, nicht die Original-Softwa
 - **NS2Pro-Bridge-Windows** – https://github.com/TohruUehera/NS2Pro-Bridge-Windows – MIT
   (Text: [D.1](#d1-mit-lizenz)) – Copyright (c) 2026 NS2 Pro Compatibility contributors
 - Plattform: alle
-- In N-Connect: Bluetooth-Start-Sequenz (`Switch2Pro.Protocol/Commands.cs`, `InitSequence`) und das
+- In SKZ Connect: Bluetooth-Start-Sequenz (`Switch2Pro.Protocol/Commands.cs`, `InitSequence`) und das
   Bluetooth-Vibrationspaket (`Switch2Pro.Protocol/Rumble.cs`).
 
 Laut THIRD_PARTY_NOTICES.md von NS2Pro-Bridge-Windows stammen diese Protokollkonstanten aus:
@@ -367,7 +367,7 @@ Laut THIRD_PARTY_NOTICES.md von NS2Pro-Bridge-Windows stammen diese Protokollkon
 - Projekt: https://android.googlesource.com/platform/cts/
 - Lizenz: Apache-2.0 (Text: [D.2](#d2-apache-license-20))
 - Copyright (C) The Android Open Source Project
-- In N-Connect: HID-Berichtsdeskriptor und Berichtsaufbau des Xbox One S Controllers (Bluetooth) in
+- In SKZ Connect: HID-Berichtsdeskriptor und Berichtsaufbau des Xbox One S Controllers (Bluetooth) in
   `Switch2Pro.Protocol/XboxBtReport.cs`
 
 ---

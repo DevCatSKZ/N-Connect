@@ -4,20 +4,20 @@ using Switch2Pro.Protocol;
 namespace Switch2Pro.Bridge;
 
 /// <summary>
-/// Sprache und Darstellung aus dem Installer: Das Setup startet N-Connect nach der Installation im Kontext des
+/// Sprache und Darstellung aus dem Installer: Das Setup startet SKZ Connect nach der Installation im Kontext des
 /// angemeldeten Benutzers mit „--setup-theme=dark|light|system“ und, falls dort bewusst eine andere Sprache als der
 /// Vorschlag des Setups gewählt wurde (ChosenLangCode), „--setup-lang=xx“ (beim stillen Update ohne Argumente). Übernommen
 /// wird nur, was in settings.json noch nicht gewählt ist – danach entscheidet allein die App, spätere Setups
 /// überschreiben nichts. Beim allerersten Start ohne diese Argumente (im Setup „Jetzt starten“ abgewählt, weiteres
 /// Benutzerkonto) gilt die Wahl, die das Setup in seinem Deinstallationsschlüssel (HKLM) merkt. Ältere Installer
-/// schrieben die Wahl im Admin-Kontext nach HKCU\Software\N-Connect: diese Werte einmalig übernehmen und löschen.
+/// schrieben die Wahl im Admin-Kontext nach HKCU\Software\SKZ Connect: diese Werte einmalig übernehmen und löschen.
 /// </summary>
 internal static class InstallerChoices
 {
-    private const string LegacyKey = @"Software\N-Connect";
+    private const string LegacyKey = @"Software\SKZ Connect";
 
     /// <summary>
-    /// Deinstallationsschlüssel des Setups (AppId aus installer/N-Connect.iss). Inno Setup legt dort die Werte aus
+    /// Deinstallationsschlüssel des Setups (AppId aus installer/SKZ-Connect.iss). Inno Setup legt dort die Werte aus
     /// SetPreviousData als „Inno Setup CodeFile: Name“ ab (RegisterPreviousData im Setup: Language, Theme).
     /// </summary>
     internal const string SetupKey = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{6F3C2B9E-52A1-4C8B-9E44-2D5F1B7A9C31}_is1";
@@ -31,7 +31,7 @@ internal static class InstallerChoices
         string windows = Tr.WindowsLanguage();
         string? language = Arg(args, "--setup-lang="), theme = Arg(args, "--setup-theme=");
         bool changed = Adopt(settings, language, theme, windows);
-        // Portable Variante: Die Registry gehört einer installierten N-Connect-Version (falls vorhanden) – nicht anfassen.
+        // Portable Variante: Die Registry gehört einer installierten SKZ-Connect-Version (falls vorhanden) – nicht anfassen.
         if (firstRun && language is null && theme is null && !Paths.IsPortable)
         {
             var setup = ReadSetup();
@@ -57,7 +57,7 @@ internal static class InstallerChoices
     /// speichert die App ausdrücklich als "auto" bzw. "dark"). Unbekannte Codes werden ignoriert. Die Sprache nur, wenn
     /// sie von der Windows-Sprache <paramref name="windowsLanguage"/> abweicht: Sonst ergibt null dieselbe Sprache und
     /// folgt weiter Windows. Das Setup übergibt die Sprache ohnehin nur, wenn sie dort bewusst gewählt wurde
-    /// (ChosenLangCode in installer/N-Connect.iss). Liefert true, wenn sich etwas geändert hat.
+    /// (ChosenLangCode in installer/SKZ-Connect.iss). Liefert true, wenn sich etwas geändert hat.
     /// </summary>
     internal static bool Adopt(Settings settings, string? language, string? theme, string windowsLanguage)
     {

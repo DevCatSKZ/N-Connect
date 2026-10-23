@@ -3,7 +3,7 @@ using System.Text.Json.Nodes;
 namespace NConnect.Android.Kodi;
 
 /// <summary>
-/// Gemeinsamer status.json-Vertrag mit N-Connect für Windows und dem Linux-Dienst (das Kodi-Add-on liest ihn) – ohne
+/// Gemeinsamer status.json-Vertrag mit SKZ Connect für Windows und dem Linux-Dienst (das Kodi-Add-on liest ihn) – ohne
 /// Android-Abhängigkeiten, damit er sich ohne Gerät testen lässt (android/NConnect.Android.Tests).
 /// </summary>
 public sealed partial class KodiStatusWriter

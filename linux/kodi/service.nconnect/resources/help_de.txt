@@ -7,20 +7,20 @@ Bluetooth muss eingeschaltet sein: LibreELEC-Einstellungen > Bluetooth > aktivie
    • Joy-Con 2: an der flachen Innenseite zwischen SL und SR
    • GameCube-Controller (Switch 2): oben am Controller
 2. Nach wenigen Sekunden erscheint „Spieler 1: … verbunden“. Der Controller ist jetzt ein Xbox-Controller für Kodi und Spiele.
-3. N-Connect koppelt den Controller dabei mit diesem Gerät.
+3. SKZ Connect koppelt den Controller dabei mit diesem Gerät.
 
 [B]Wiederverbinden[/B]
 Einfach eine beliebige Taste drücken (z. B. HOME) – ohne SYNC. Das klappt, solange der Controller nicht an einem anderen Gerät per SYNC gekoppelt wurde.
 
 [B]Andere Controller (Xbox, PlayStation, Switch 1, 8BitDo …)[/B]
-N-Connect koppelt sie automatisch – einfach in den Kopplungsmodus bringen:
+SKZ Connect koppelt sie automatisch – einfach in den Kopplungsmodus bringen:
    • Xbox: Verbindungstaste oben drücken, bis das Xbox-Logo schnell blinkt
    • PlayStation 4: SHARE + PS gedrückt halten, bis die Leuchtleiste blinkt
    • PlayStation 5: ERSTELLEN + PS gedrückt halten, bis das Licht blinkt
    • Switch 1 Pro Controller / Joy-Con: SYNC-Taste drücken
    • 8BitDo: Kopplungstaste bzw. laut Anleitung (Switch- oder X-Input-Modus)
    • Wii-Fernbedienung / Wii U Pro Controller: rote SYNC-Taste (im Batteriefach bzw. hinten) drücken
-Danach genügt ein Tastendruck zum Verbinden. Im N-Connect-Menü lassen sie sich trennen oder vergessen.
+Danach genügt ein Tastendruck zum Verbinden. Im SKZ-Connect-Menü lassen sie sich trennen oder vergessen.
 
 [B]Joy-Con[/B]
 Ein linker und ein rechter Joy-Con werden automatisch zu einem Controller zusammengefasst. Für zwei Spieler mit je einem quer gehaltenen Joy-Con: Einstellungen > Controller > „Zusammenfassen“ ausschalten.
@@ -33,7 +33,7 @@ Steuerkreuz/Stick: bewegen · untere Taste: auswählen · rechte Taste: zurück 
 Belegung ändern: Kodi-Einstellungen > System > Eingabe > Angeschlossene Controller konfigurieren.
 
 [B]Controller-Tasten in Kodi[/B]
-Capture macht ein Bildschirmfoto, die C-Taste öffnet das N-Connect-Menü. Ändern unter Einstellungen > Kodi > Controller-Tasten in Kodi (auch für die GL/GR-Rückseitentasten des Pro Controller 2). Wird ein Akku schwach, zeigt N-Connect eine Warnung.
+Capture macht ein Bildschirmfoto, die C-Taste öffnet das SKZ-Connect-Menü. Ändern unter Einstellungen > Kodi > Controller-Tasten in Kodi (auch für die GL/GR-Rückseitentasten des Pro Controller 2). Wird ein Akku schwach, zeigt SKZ Connect eine Warnung.
 
 [B]Spielerplätze und Gyro für Emulatoren[/B]
 Jeder Controller bekommt beim nächsten Verbinden wieder denselben Spielerplatz. Emulatoren wie Dolphin, Cemu oder Citra erhalten über DSU/Cemuhook (Port 26760) die Bewegungsdaten – im Emulator als Bewegungsquelle „DSU“ bzw. „Cemuhook“ mit 127.0.0.1 einstellen. Einstellungen > Emulatoren.
@@ -46,4 +46,4 @@ Der Controller erscheint überall als „Xbox 360 Controller“ und braucht kein
 • Meldung „mit einem anderen Gerät gekoppelt“: SYNC drücken, dann wird er hier neu gekoppelt.
 • Eingaben verzögert: Abstand zum Bluetooth-Adapter verringern; ein USB-Verlängerungskabel für den Stick hilft bei USB-3-Störungen.
 • Verbindung wird sofort wieder abgelehnt (errno 38): WLAN stört Bluetooth – ausschalten, wenn es nicht gebraucht wird (LibreELEC-Einstellungen > Verbindungen).
-• Protokoll anzeigen und beim Melden eines Fehlers mitschicken: github.com/DevCatSKZ/N-Connect/issues
+• Protokoll anzeigen und beim Melden eines Fehlers mitschicken: github.com/DevCatSKZ/SKZ-Connect/issues

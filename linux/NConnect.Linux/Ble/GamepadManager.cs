@@ -12,10 +12,10 @@ public sealed record GamepadInfo(string Address, string Name, bool Connected, in
 
 /// <summary>
 /// Verwaltet alle Gamepads, die Linux selbst kann (Xbox: xpad/hid-microsoft, PlayStation: hid-playstation/hid-sony,
-/// Switch 1 Pro/Joy-Con: hid-nintendo, Steam …). N-Connect übernimmt nur das Koppeln: Ein Gamepad im Kopplungsmodus
+/// Switch 1 Pro/Joy-Con: hid-nintendo, Steam …). SKZ Connect übernimmt nur das Koppeln: Ein Gamepad im Kopplungsmodus
 /// wird automatisch gekoppelt, als vertrauenswürdig markiert und verbunden – danach verbindet es sich per Tastendruck
 /// selbst (BlueZ). Eingaben, Vibration und Akku liefert der Kernel-Treiber, Kodi sieht den Controller direkt.
-/// Switch-2-Controller sind ausgenommen (die steuert N-Connect selbst). Wii-Fernbedienungen: Kopplung mit der
+/// Switch-2-Controller sind ausgenommen (die steuert SKZ Connect selbst). Wii-Fernbedienungen: Kopplung mit der
 /// SYNC-Taste im Batteriefach (dauerhaft; mit 1+2 nur vorübergehend).
 /// </summary>
 public sealed partial class GamepadManager(Adapter adapter)
@@ -96,7 +96,7 @@ public sealed partial class GamepadManager(Adapter adapter)
                                   || e.Message.Contains("AlreadyExists", StringComparison.OrdinalIgnoreCase))
         {
             // Wird gerade anderswo gekoppelt (z. B. über die LibreELEC-Einstellungen) – nicht dazwischenfunken.
-            Log.Info($"{address}: „{name}“ wird bereits anderweitig gekoppelt – N-Connect hält sich heraus");
+            Log.Info($"{address}: „{name}“ wird bereits anderweitig gekoppelt – SKZ Connect hält sich heraus");
             _quietUntil[address] = Environment.TickCount64 + RetryAfterFailureMs;
         }
         catch (Exception e)

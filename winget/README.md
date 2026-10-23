@@ -1,21 +1,21 @@
 # winget-Manifeste
 
-Die vier YAML-Dateien beschreiben N-Connect für den Windows Package Manager (Paket `DevCatSKZ.N-Connect`, Setup und
-portable ZIP). `winget install DevCatSKZ.N-Connect` funktioniert erst, wenn die Manifeste bei
+Die vier YAML-Dateien beschreiben SKZ Connect für den Windows Package Manager (Paket `DevCatSKZ.SKZ-Connect`, Setup und
+portable ZIP). `winget install DevCatSKZ.SKZ-Connect` funktioniert erst, wenn die Manifeste bei
 [microsoft/winget-pkgs](https://github.com/microsoft/winget-pkgs) eingereicht und dort angenommen sind (Stand
 17.10.2026: noch nicht eingereicht). Eingereicht wird je Version unter
-`manifests/d/DevCatSKZ/N-Connect/<Version>/`, mit dem GitHub-Konto des Nutzers.
+`manifests/d/DevCatSKZ/SKZ-Connect/<Version>/`, mit dem GitHub-Konto des Nutzers.
 
 ## Bei jedem Release aktualisieren
 
 Erst nach dem Release, denn die Prüfsummen gehören zu den fertigen Dateien am GitHub-Release.
 
 - `PackageVersion` in allen vier Dateien, `ReleaseDate` und `ReleaseNotesUrl` auf den neuen Tag,
-- `InstallerUrl` auf `N-Connect-Setup-<Version>.exe` und `N-Connect-Portable-<Version>.zip` des Releases,
+- `InstallerUrl` auf `SKZ-Connect-Setup-<Version>.exe` und `SKZ-Connect-Portable-<Version>.zip` des Releases,
 - `InstallerSha256` aus den heruntergeladenen Release-Dateien neu rechnen:
 
 ```powershell
-Get-FileHash .\N-Connect-Setup-<Version>.exe, .\N-Connect-Portable-<Version>.zip -Algorithm SHA256
+Get-FileHash .\SKZ-Connect-Setup-<Version>.exe, .\SKZ-Connect-Portable-<Version>.zip -Algorithm SHA256
 ```
 
 Prüfen: `winget validate --manifest <Ordner>` mit einem Ordner, der nur die vier YAML-Dateien enthält – diese
@@ -29,9 +29,9 @@ Mit [wingetcreate](https://github.com/microsoft/winget-create), ebenfalls nur mi
 wingetcreate submit <Ordner mit den YAML-Dateien>
 ```
 
-Alternativ von Hand: Fork von `microsoft/winget-pkgs`, die Dateien nach `manifests/d/DevCatSKZ/N-Connect/<Version>/`
+Alternativ von Hand: Fork von `microsoft/winget-pkgs`, die Dateien nach `manifests/d/DevCatSKZ/SKZ-Connect/<Version>/`
 legen und einen Pull Request öffnen. Die Validierung dort läuft automatisch, die Moderation dauert meist einige Tage.
-Ist das Paket einmal aufgenommen, erzeugt `wingetcreate update DevCatSKZ.N-Connect -v <Version> -u <Setup-URL>
+Ist das Paket einmal aufgenommen, erzeugt `wingetcreate update DevCatSKZ.SKZ-Connect -v <Version> -u <Setup-URL>
 <ZIP-URL>` die Manifeste für spätere Versionen.
 
 ## Hinweise

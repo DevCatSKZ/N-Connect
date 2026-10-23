@@ -1,6 +1,6 @@
-; Installer „N-Connect“ – Controller unter Windows (Switch 1/2, NSO, Wii, Wii U, PlayStation, Xbox).
+; Installer „SKZ Connect“ – Controller unter Windows (Switch 1/2, NSO, Wii, Wii U, PlayStation, Xbox).
 ; Bauen: siehe .github/workflows/build.yml (Inno Setup 6).
-; Erwartet:  ..\out\publish\win-x64\N-Connect.exe  (dotnet publish, self-contained)
+; Erwartet:  ..\out\publish\win-x64\SKZ-Connect.exe  (dotnet publish, self-contained)
 ;            redist\ViGEmBus_Setup.msi  ODER  redist\ViGEmBus_Setup.exe  (offizieller ViGEmBus-Installer)
 ;            redist\HidHide_Setup.exe  (optional, offizieller HidHide-Installer)
 ;            ..\README.md, ..\README.en.md, ..\THIRD-PARTY-NOTICES.md
@@ -8,15 +8,15 @@
 ; Installation an die App (siehe SetupArgs) und merkt sie im eigenen Deinstallationsschlüssel (RegisterPreviousData);
 ; die App übernimmt sie nur, solange in ihren Einstellungen noch nichts gewählt ist.
 
-#define AppName "N-Connect"
+#define AppName "SKZ Connect"
 #ifndef AppVersion
   #define AppVersion "1.0.0"
 #endif
 ; Dateiversion des Setups nur aus Zahlen: „1.0.22-ci.7“ (CI-Build ohne Tag) → 1.0.22.
 #define FileVersion Copy(AppVersion, 1, Pos("-", AppVersion + "-") - 1)
-#define AppExe "N-Connect.exe"
-; Geplante Aufgabe, über die N-Connect Controller ohne UAC-Abfrage per HidHide versteckt (Name wie HidHide.TaskName).
-#define HidHideTask "N-Connect HidHide"
+#define AppExe "SKZ-Connect.exe"
+; Geplante Aufgabe, über die SKZ Connect Controller ohne UAC-Abfrage per HidHide versteckt (Name wie HidHide.TaskName).
+#define HidHideTask "SKZ Connect HidHide"
 #if FileExists(AddBackslash(SourcePath) + "redist\ViGEmBus_Setup.msi")
   #define ViGEmFile "ViGEmBus_Setup.msi"
 #elif FileExists(AddBackslash(SourcePath) + "redist\ViGEmBus_Setup.exe")
@@ -36,17 +36,17 @@ AppName={#AppName}
 AppVersion={#AppVersion}
 VersionInfoVersion={#FileVersion}
 AppPublisher=devcatskz
-DefaultDirName={autopf}\N-Connect
+DefaultDirName={autopf}\SKZ-Connect
 DefaultGroupName={#AppName}
 DisableProgramGroupPage=yes
 DisableDirPage=auto
 OutputDir=..\out
-OutputBaseFilename=N-Connect-Setup-{#AppVersion}
+OutputBaseFilename=SKZ-Connect-Setup-{#AppVersion}
 Compression=lzma2/max
 SolidCompression=yes
 WizardStyle=modern
-; Logo und Banner (erzeugt mit „N-Connect.exe --render-brand installer\art“).
-SetupIconFile=art\N-Connect.ico
+; Logo und Banner (erzeugt mit „SKZ-Connect.exe --render-brand installer\art“).
+SetupIconFile=art\SKZ-Connect.ico
 WizardImageFile=art\wizard-100.bmp,art\wizard-150.bmp,art\wizard-200.bmp
 WizardSmallImageFile=art\wizard-small-100.bmp,art\wizard-small-150.bmp,art\wizard-small-200.bmp
 WizardImageStretch=no
@@ -124,14 +124,14 @@ english.ViGEmFailed=ViGEmBus could not be installed. Without it no virtual contr
 
 german.InstallingHidHide=Installiere HidHide (verhindert doppelte Controller in Steam und Spielen) …
 english.InstallingHidHide=Installing HidHide (prevents duplicate controllers in Steam and games) …
-german.ConfiguringHidHide=Gebe N-Connect in HidHide frei …
-english.ConfiguringHidHide=Allowing N-Connect in HidHide …
+german.ConfiguringHidHide=Gebe SKZ Connect in HidHide frei …
+english.ConfiguringHidHide=Allowing SKZ Connect in HidHide …
 
 ; Seite „Darstellung“ (Programm-Theme): Standard ist Dunkel bzw. die Wahl der letzten Installation.
 german.ThemeCaption=Darstellung
 english.ThemeCaption=Appearance
-german.ThemeDescription=Wie soll N-Connect aussehen?
-english.ThemeDescription=How should N-Connect look?
+german.ThemeDescription=Wie soll SKZ Connect aussehen?
+english.ThemeDescription=How should SKZ Connect look?
 german.ThemeSubCaption=Wählen Sie das Farbschema des Programms:
 english.ThemeSubCaption=Choose the color scheme of the application:
 german.ThemeDark=Dunkel (empfohlen)
@@ -146,9 +146,9 @@ InstallingViGEm=Installing ViGEmBus (virtual controller driver) …
 LaunchNow=Launch now
 ViGEmFailed=ViGEmBus could not be installed. Without it no virtual controller can be created. You can install it manually later: https://github.com/nefarius/ViGEmBus/releases
 InstallingHidHide=Installing HidHide (prevents duplicate controllers in Steam and games) …
-ConfiguringHidHide=Allowing N-Connect in HidHide …
+ConfiguringHidHide=Allowing SKZ Connect in HidHide …
 ThemeCaption=Appearance
-ThemeDescription=How should N-Connect look?
+ThemeDescription=How should SKZ Connect look?
 ThemeSubCaption=Choose the color scheme of the application:
 ThemeDark=Dark (recommended)
 ThemeLight=Light
@@ -169,13 +169,15 @@ Source: "redist\HidHide_Setup.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall;
 ; Reste der Vorversion („Nintendo Controller für Windows“, Switch2ProBridge.exe) beim Update entfernen.
 Type: files; Name: "{app}\Switch2ProBridge.exe"
 Type: files; Name: "{autoprograms}\Nintendo Controller für Windows.lnk"
+; Installationsordner der Vorversion „N-Connect“ (das Update legt unter SKZ-Connect an).
+Type: filesandordirs; Name: "{autopf}\N-Connect"
 ; Anleitung der anderen Sprache aus einer früheren Installation.
 Type: files; Name: "{app}\README.md"; Languages: german
 Type: files; Name: "{app}\Anleitung.md"; Languages: not german
 
 [Registry]
 Root: HKLM; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: none; ValueName: "Switch2ProBridge"; Flags: deletevalue
-; Autostart richtet N-Connect beim ersten Start selbst ein (für den Benutzer, HKCU\…\Run, in der App abschaltbar;
+; Autostart richtet SKZ Connect beim ersten Start selbst ein (für den Benutzer, HKCU\…\Run, in der App abschaltbar;
 ; beim Deinstallieren entfernt RemoveAutostartEntries ihn). Einträge älterer Versionen für alle Benutzer entfernen –
 ; sie ließen sich in der App nicht abschalten.
 Root: HKLM; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: none; ValueName: "N-Connect"; Flags: deletevalue
@@ -195,13 +197,15 @@ Filename: "{tmp}\{#ViGEmFile}"; Parameters: "/exenoui /qn /norestart"; StatusMsg
 ; HidHide immer still mitinstallieren, wenn es fehlt (gleicher Installer-Typ wie ViGEmBus). Neustart fragt das Setup am Ende.
 Filename: "{tmp}\HidHide_Setup.exe"; Parameters: "/exenoui /qn /norestart"; StatusMsg: "{cm:InstallingHidHide}"; Flags: waituntilterminated; Check: HidHideMissing
 #endif
-; N-Connect gleich als erlaubtes Programm eintragen und Verstecken einschalten (Fehlschlag, z. B. vor dem Neustart, ist
+; SKZ Connect gleich als erlaubtes Programm eintragen und Verstecken einschalten (Fehlschlag, z. B. vor dem Neustart, ist
 ; unkritisch – die App holt das beim ersten Verstecken nach).
 Filename: "{code:HidHideCli}"; Parameters: "--app-reg ""{app}\{#AppExe}"" --cloak-on"; StatusMsg: "{cm:ConfiguringHidHide}"; Flags: runhidden waituntilterminated skipifdoesntexist; Check: HidHideInstalled
 ; Programm im Kontext des angemeldeten Benutzers starten (zeigt beim ersten Start die Kurzanleitung) und ihm dabei
 ; Sprache und Darstellung des Setups mitgeben (beim stillen Update nicht, siehe SetupArgs). Läuft auch still, damit
-; N-Connect nach dem Ein-Klick-Update wieder startet.
+; SKZ Connect nach dem Ein-Klick-Update wieder startet.
 Filename: "{app}\{#AppExe}"; Parameters: "{code:SetupArgs}"; Description: "{cm:LaunchNow}"; Flags: nowait postinstall runasoriginaluser
+; Geplante Aufgabe der Vorversion entfernen (hieß „N-Connect HidHide“).
+Filename: "{sys}\schtasks.exe"; Parameters: "/Delete /TN ""N-Connect HidHide"" /F"; Flags: runhidden skipifdoesntexist
 
 [UninstallRun]
 Filename: "{cmd}"; Parameters: "/C taskkill /IM {#AppExe} /F"; Flags: runhidden; RunOnceId: "KillBridge"
@@ -320,9 +324,9 @@ begin
   Result := HidHideWasMissing and HidHideInstalled;
 end;
 
-// Die Aufgabe startet {app}\N-Connect.exe als SYSTEM, und jeder angemeldete Benutzer darf sie starten. Das ist nur
+// Die Aufgabe startet {app}\SKZ-Connect.exe als SYSTEM, und jeder angemeldete Benutzer darf sie starten. Das ist nur
 // sicher, wenn Benutzer ohne Adminrechte die EXE und ihren Ordner nicht ändern können – unter „Programme“ ist das so.
-// Ein frei gewählter Ordner (z. B. C:\N-Connect, D:\Tools\N-Connect) erbt dagegen oft „Ändern“ für alle angemeldeten
+// Ein frei gewählter Ordner (z. B. C:\SKZ Connect, D:\Tools\SKZ Connect) erbt dagegen oft „Ändern“ für alle angemeldeten
 // Benutzer (so auf C:\): Dort könnte jeder die EXE oder eine DLL daneben austauschen und über die Aufgabe als SYSTEM
 // starten. Deshalb nur unter „Programme“ (Pfad ausgeschrieben, ohne „..“; im Zweifel keine Aufgabe).
 function AppDirIsProtected: Boolean;
@@ -334,7 +338,7 @@ begin
             or (Pos(Lowercase(AddBackslash(ExpandConstant('{commonpf32}'))), Dir) = 1);
 end;
 
-// Aufgabe „N-Connect HidHide“: startet „N-Connect.exe --hidhide-helper "<IDs>"“ als SYSTEM. Angemeldete Benutzer
+// Aufgabe „SKZ Connect HidHide“: startet „SKZ-Connect.exe --hidhide-helper "<IDs>"“ als SYSTEM. Angemeldete Benutzer
 // dürfen sie nur lesen und starten (GRGX), nicht ändern – so versteckt die App neue Controller ohne UAC-Abfrage.
 // Der Helfer versteckt nur angeschlossene, echte Nintendo-/Sony-Controller und Kabel-Pads (keine virtuellen Pads)
 // und gibt nur sich selbst frei; aus der Sperrliste nehmen („unhide|…“) darf er nur eigene virtuelle Pads. Nur für
@@ -347,7 +351,7 @@ var
 begin
   Xml :=
     '<Task version="1.2" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">' +
-    '<RegistrationInfo><Author>N-Connect</Author><Description>N-Connect: Controller per HidHide vor Spielen verstecken (ohne Adminabfrage).</Description></RegistrationInfo>' +
+    '<RegistrationInfo><Author>SKZ Connect</Author><Description>SKZ Connect: Controller per HidHide vor Spielen verstecken (ohne Adminabfrage).</Description></RegistrationInfo>' +
     '<Principals><Principal id="Author"><UserId>S-1-5-18</UserId><RunLevel>HighestAvailable</RunLevel></Principal></Principals>' +
     '<Settings><MultipleInstancesPolicy>Queue</MultipleInstancesPolicy><DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>' +
     '<StopIfGoingOnBatteries>false</StopIfGoingOnBatteries><AllowStartOnDemand>true</AllowStartOnDemand><Enabled>true</Enabled>' +
@@ -462,7 +466,7 @@ end;
 // Wahl für die nächste Installation merken (auch beim stillen Update, dann unverändert; Sprache leer, wenn nicht bewusst
 // gewählt). Im Deinstallationsschlüssel (HKLM, „Inno Setup CodeFile: Theme/Language“) liest sie auch die App beim
 // allerersten Start ohne Argumente (InstallerChoices) – etwa wenn „Jetzt starten“ abgewählt war oder ein weiteres
-// Benutzerkonto N-Connect startet.
+// Benutzerkonto SKZ Connect startet.
 procedure RegisterPreviousData(PreviousDataKey: Integer);
 begin
   SetPreviousData(PreviousDataKey, 'Theme', ThemeValue);
@@ -475,10 +479,10 @@ begin
     RegisterHidHideTask;
 end;
 
-// Autostart (HKCU\…\Run, Wert „N-Connect“) setzt die App selbst für den angemeldeten Benutzer. Die Deinstallation läuft
+// Autostart (HKCU\…\Run, Wert „SKZ Connect“) setzt die App selbst für den angemeldeten Benutzer. Die Deinstallation läuft
 // mit Adminrechten – ihr HKCU ist nach einer UAC-Abfrage mit anderem Konto nicht das des Benutzers. Deshalb in allen
 // geladenen Benutzerprofilen (HKEY_USERS = alle angemeldeten Benutzer) nur Einträge entfernen, die auf diese
-// Installation zeigen; dazu dort Reste älterer Installer (Software\N-Connect: Language, Theme). Profile nicht
+// Installation zeigen; dazu dort Reste älterer Installer (Software\SKZ Connect: Language, Theme). Profile nicht
 // angemeldeter Benutzer behalten einen toten Eintrag, den Windows beim Anmelden übergeht.
 procedure RemoveAutostartEntries;
 var
@@ -492,19 +496,23 @@ begin
   for I := 0 to GetArrayLength(Users) - 1 do
   begin
     Key := Users[I] + '\Software\Microsoft\Windows\CurrentVersion\Run';
-    if RegQueryStringValue(HKU, Key, 'N-Connect', Command) and (Pos(Exe, Lowercase(Command)) > 0) then
+    if RegQueryStringValue(HKU, Key, 'SKZ Connect', Command) and (Pos(Exe, Lowercase(Command)) > 0) then
     begin
-      if RegDeleteValue(HKU, Key, 'N-Connect') then
+      if RegDeleteValue(HKU, Key, 'SKZ Connect') then
         Log('Autostart entfernt: HKU\' + Key)
       else
         Log('Autostart nicht entfernt: HKU\' + Key);
     end;
-    Key := Users[I] + '\Software\N-Connect';
-    if RegKeyExists(HKU, Key) then
+    RegDeleteValue(HKU, Key, 'N-Connect'); // Autostart-Eintrag der Vorversion miträumen
+    for Command in TArrayOfString(['SKZ Connect', 'N-Connect']) do
     begin
-      RegDeleteValue(HKU, Key, 'Language');
-      RegDeleteValue(HKU, Key, 'Theme');
-      RegDeleteKeyIfEmpty(HKU, Key);
+      Key := Users[I] + '\Software\' + Command;
+      if RegKeyExists(HKU, Key) then
+      begin
+        RegDeleteValue(HKU, Key, 'Language');
+        RegDeleteValue(HKU, Key, 'Theme');
+        RegDeleteKeyIfEmpty(HKU, Key);
+      end;
     end;
   end;
 end;

@@ -156,7 +156,7 @@ public sealed class ControllerService : Service
     }
 
     /// <summary>
-    /// Hält den Ausgabeweg aktuell: ist (noch) keiner aktiv – etwa weil Shizuku erst nach N-Connect gestartet wurde –,
+    /// Hält den Ausgabeweg aktuell: ist (noch) keiner aktiv – etwa weil Shizuku erst nach SKZ Connect gestartet wurde –,
     /// wird alle 2 s nachgeprüft und sofort übernommen; fällt Shizuku weg (Neustart), merkt die App das ebenso.
     /// Bei gesundem Weg genügt eine Prüfung alle 15 s (Akku).
     /// </summary>
@@ -404,7 +404,7 @@ public sealed class ControllerService : Service
         device.Lost += OnLost;
         KnownControllers.Remember(device.Address, device.Kind, device.SerialNumber);
         if (!pairing)
-            player.AttachOutput(OutputRouter.CreatePad(player.Index, L.F("N-Connect Spieler {0}", player.Index + 1)));
+            player.AttachOutput(OutputRouter.CreatePad(player.Index, L.F("SKZ Connect Spieler {0}", player.Index + 1)));
         _ = device.SetPlayerAsync(player.Index);
         _ = device.PlayConnectFeedbackAsync();
         Log.Info(pairing ? $"Joy-Con zusammengefasst (Spieler {player.Index + 1})"
@@ -490,7 +490,7 @@ public sealed class ControllerService : Service
         await Task.Run(() =>
         {
             foreach (var p in players)
-                p.AttachOutput(OutputRouter.CreatePad(p.Index, L.F("N-Connect Spieler {0}", p.Index + 1)));
+                p.AttachOutput(OutputRouter.CreatePad(p.Index, L.F("SKZ Connect Spieler {0}", p.Index + 1)));
         });
         RaiseChanged();
     }
@@ -550,7 +550,7 @@ public sealed class ControllerService : Service
         var manager = context.GetSystemService(NotificationService)!.JavaCast<NotificationManager>()!;
         var channel = new NotificationChannel(Channel, L.T("Controller-Verbindung"), NotificationImportance.Low)
         {
-            Description = L.T("Zeigt, welche Controller verbunden sind, solange N-Connect im Hintergrund läuft."),
+            Description = L.T("Zeigt, welche Controller verbunden sind, solange SKZ Connect im Hintergrund läuft."),
         };
         channel.SetShowBadge(false);
         manager.CreateNotificationChannel(channel);
@@ -571,7 +571,7 @@ public sealed class ControllerService : Service
             _ => L.F("{0} Controller verbunden", players.Count),
         };
         string text = players.Count == 0
-            ? (BluetoothOn ? "SYNC-Taste drücken oder eine Taste an einem gekoppelten Controller." : "Schalte Bluetooth ein, damit N-Connect Controller findet.")
+            ? (BluetoothOn ? "SYNC-Taste drücken oder eine Taste an einem gekoppelten Controller." : "Schalte Bluetooth ein, damit SKZ Connect Controller findet.")
             : OutputRouter.Describe();
 
         var open = PendingIntent.GetActivity(this, 0, new Intent(this, typeof(MainActivity)).SetFlags(ActivityFlags.SingleTop),

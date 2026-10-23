@@ -7,20 +7,20 @@ O Bluetooth tem de estar ligado: definições do LibreELEC > Bluetooth > ativar.
    • Joy-Con 2: no lado plano interior, entre SL e SR
    • Comando GameCube (Switch 2): na parte de cima
 2. Após alguns segundos aparece «Jogador 1: … ligado». O comando funciona agora como comando Xbox no Kodi e nos jogos.
-3. Ao mesmo tempo, o N-Connect emparelha o comando com este dispositivo.
+3. Ao mesmo tempo, o SKZ Connect emparelha o comando com este dispositivo.
 
 [B]Voltar a ligar[/B]
 Basta premir qualquer botão (p. ex. HOME), sem SYNC. Funciona enquanto o comando não for emparelhado com outro dispositivo através de SYNC.
 
 [B]Outros comandos (Xbox, PlayStation, Switch 1, 8BitDo …)[/B]
-O N-Connect emparelha-os automaticamente; basta colocá-los em modo de emparelhamento:
+O SKZ Connect emparelha-os automaticamente; basta colocá-los em modo de emparelhamento:
    • Xbox: prima o botão de emparelhamento em cima até o logótipo piscar depressa
    • PlayStation 4: mantenha SHARE + PS até a barra de luz piscar
    • PlayStation 5: mantenha CRIAR + PS até a luz piscar
    • Pro Controller / Joy-Con da Switch 1: prima o botão SYNC
    • 8BitDo: botão de emparelhamento ou conforme o manual (modo Switch ou X-input)
    • Wiimote / Comando Pro da Wii U: prima o botão vermelho SYNC (no compartimento das pilhas ou atrás)
-Depois, basta premir um botão para voltar a ligá-los. No menu do N-Connect pode desligá-los ou esquecê-los.
+Depois, basta premir um botão para voltar a ligá-los. No menu do SKZ Connect pode desligá-los ou esquecê-los.
 
 [B]Joy-Con[/B]
 Um Joy-Con esquerdo e um direito são combinados automaticamente num comando. Para dois jogadores com um Joy-Con na horizontal cada: Definições > Comando > desativar «Combinar».
@@ -33,7 +33,7 @@ Botões direcionais/analógico: mover · botão de baixo: selecionar · botão d
 Para alterar a atribuição: definições do Kodi > Sistema > Entrada > Configurar comandos ligados.
 
 [B]Botões do comando no Kodi[/B]
-Captura tira uma captura de ecrã e o botão C abre o menu do N-Connect. Altera-se em Definições > Kodi > Botões do comando no Kodi (também para os botões traseiros GL/GR do Pro Controller 2). Quando uma bateria está fraca, o N-Connect mostra um aviso.
+Captura tira uma captura de ecrã e o botão C abre o menu do SKZ-Connect. Altera-se em Definições > Kodi > Botões do comando no Kodi (também para os botões traseiros GL/GR do Pro Controller 2). Quando uma bateria está fraca, o SKZ Connect mostra um aviso.
 
 [B]Lugares dos jogadores e giroscópio para emuladores[/B]
 Cada comando recupera o mesmo lugar de jogador ao voltar a ligar-se. Emuladores como Dolphin, Cemu ou Citra recebem o movimento por DSU/Cemuhook (porta 26760): escolha «DSU» ou «Cemuhook» com 127.0.0.1 como fonte de movimento. Definições > Emuladores.
@@ -46,4 +46,4 @@ O comando aparece em todo o lado como «Xbox 360 Controller» e não precisa de 
 • Mensagem «emparelhado com outro dispositivo»: prima SYNC para o emparelhar aqui novamente.
 • Atraso nos comandos: aproxime-se do adaptador Bluetooth; uma extensão USB para a pen ajuda contra interferências de USB 3.
 • A ligação é recusada de imediato (errno 38): o Wi-Fi interfere no Bluetooth – desliga-o se não for usado (Definições do LibreELEC > Ligações).
-• Mostre o registo e anexe-o ao comunicar um problema: github.com/DevCatSKZ/N-Connect/issues
+• Mostre o registo e anexe-o ao comunicar um problema: github.com/DevCatSKZ/SKZ-Connect/issues

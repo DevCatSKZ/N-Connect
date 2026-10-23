@@ -1,17 +1,17 @@
 [B]Companion mode[/B]
-On this system the add-on does not connect the controllers – the N-Connect app does. The add-on only shows what the app reports: the menu (Programs > N-Connect) and the home widget with connected and known controllers and their battery.
+On this system the add-on does not connect the controllers – the SKZ Connect app does. The add-on only shows what the app reports: the menu (Programs > SKZ Connect) and the home widget with connected and known controllers and their battery.
 
 [B]Windows[/B]
-Install and start N-Connect for Windows (github.com/DevCatSKZ/N-Connect). The app connects the controllers as Xbox controllers – Kodi recognises them without setup. It writes its status into Kodi's data folder; if it is not running, "N-Connect app is not running" is shown here. Kodi installed after N-Connect: restart N-Connect once.
+Install and start SKZ Connect for Windows (github.com/DevCatSKZ/SKZ-Connect). The app connects the controllers as Xbox controllers – Kodi recognises them without setup. It writes its status into Kodi's data folder; if it is not running, "SKZ Connect app is not running" is shown here. Kodi installed after SKZ Connect: restart SKZ Connect once.
 
 [B]Android[/B]
-Install and start N-Connect for Android 0.9.1 or newer. The app stores its status in the Documents/N-Connect folder, where the add-on reads it. If Kodi still shows nothing, Android may block the access: allow Kodi access to files (storage) in the Android settings. Kodi installed after N-Connect: restart N-Connect once.
+Install and start SKZ Connect for Android 0.9.1 or newer. The app stores its status in the Documents/SKZ Connect folder, where the add-on reads it. If Kodi still shows nothing, Android may block the access: allow Kodi access to files (storage) in the Android settings. Kodi installed after SKZ Connect: restart SKZ Connect once.
 
 [B]macOS[/B]
-N-Connect is not available for macOS – the add-on can only display here and stays empty.
+SKZ Connect is not available for macOS – the add-on can only display here and stays empty.
 
 [B]Settings[/B]
-Button layout, gyro, rumble, pairing and so on are set in the N-Connect app. The settings of this add-on only apply on LibreELEC/Linux.
+Button layout, gyro, rumble, pairing and so on are set in the SKZ Connect app. The settings of this add-on only apply on LibreELEC/Linux.
 
 [B]Widget on the home screen[/B]
-Depending on the skin: Skin settings > Home > Widgets > Add-ons > N-Connect.
+Depending on the skin: Skin settings > Home > Widgets > Add-ons > SKZ-Connect.

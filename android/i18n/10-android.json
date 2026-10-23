@@ -12,18 +12,18 @@
   "zh": "缺少蓝牙访问权限",
   "ko": "블루투스 액세스 권한 없음"
  },
- "N-Connect braucht die Berechtigung „Geräte in der Nähe“, um deine Controller zu finden.": {
-  "en": "N-Connect needs the “Nearby devices” permission to find your controllers.",
-  "es": "N-Connect necesita el permiso «Dispositivos cercanos» para encontrar tus mandos.",
-  "fr": "N-Connect a besoin de l'autorisation « Appareils à proximité » pour trouver vos manettes.",
-  "it": "N-Connect ha bisogno dell'autorizzazione «Dispositivi nelle vicinanze» per trovare i tuoi controller.",
-  "pt": "O N-Connect precisa da autorização «Dispositivos próximos» para encontrar os seus comandos.",
-  "nl": "N-Connect heeft de toestemming ‘Apparaten in de buurt’ nodig om je controllers te vinden.",
-  "pl": "N-Connect potrzebuje uprawnienia „Urządzenia w pobliżu”, aby znaleźć twoje kontrolery.",
-  "ru": "N-Connect нужно разрешение «Устройства поблизости», чтобы находить ваши контроллеры.",
-  "ja": "コントローラーを見つけるには、N-Connect に「付近のデバイス」の権限が必要です。",
-  "zh": "N-Connect 需要“附近的设备”权限才能找到你的控制器。",
-  "ko": "N-Connect가 컨트롤러를 찾으려면 '근처 기기' 권한이 필요합니다."
+ "SKZ Connect braucht die Berechtigung „Geräte in der Nähe“, um deine Controller zu finden.": {
+  "en": "SKZ Connect needs the “Nearby devices” permission to find your controllers.",
+  "es": "SKZ Connect necesita el permiso «Dispositivos cercanos» para encontrar tus mandos.",
+  "fr": "SKZ Connect a besoin de l'autorisation « Appareils à proximité » pour trouver vos manettes.",
+  "it": "SKZ Connect ha bisogno dell'autorizzazione «Dispositivi nelle vicinanze» per trovare i tuoi controller.",
+  "pt": "O SKZ Connect precisa da autorização «Dispositivos próximos» para encontrar os seus comandos.",
+  "nl": "SKZ Connect heeft de toestemming ‘Apparaten in de buurt’ nodig om je controllers te vinden.",
+  "pl": "SKZ Connect potrzebuje uprawnienia „Urządzenia w pobliżu”, aby znaleźć twoje kontrolery.",
+  "ru": "SKZ Connect нужно разрешение «Устройства поблизости», чтобы находить ваши контроллеры.",
+  "ja": "コントローラーを見つけるには、SKZ Connect に「付近のデバイス」の権限が必要です。",
+  "zh": "SKZ Connect 需要“附近的设备”权限才能找到你的控制器。",
+  "ko": "SKZ Connect가 컨트롤러를 찾으려면 '근처 기기' 권한이 필요합니다."
  },
  "Erlauben": {
   "en": "Allow",
@@ -38,18 +38,18 @@
   "zh": "允许",
   "ko": "허용"
  },
- "N-Connect ist pausiert": {
-  "en": "N-Connect is paused",
-  "es": "N-Connect está en pausa",
-  "fr": "N-Connect est en pause",
-  "it": "N-Connect è in pausa",
-  "pt": "O N-Connect está em pausa",
-  "nl": "N-Connect is gepauzeerd",
-  "pl": "N-Connect jest wstrzymany",
-  "ru": "N-Connect приостановлен",
-  "ja": "N-Connect は一時停止中です",
-  "zh": "N-Connect 已暂停",
-  "ko": "N-Connect 일시 중지됨"
+ "SKZ Connect ist pausiert": {
+  "en": "SKZ Connect is paused",
+  "es": "SKZ Connect está en pausa",
+  "fr": "SKZ Connect est en pause",
+  "it": "SKZ Connect è in pausa",
+  "pt": "O SKZ Connect está em pausa",
+  "nl": "SKZ Connect is gepauzeerd",
+  "pl": "SKZ Connect jest wstrzymany",
+  "ru": "SKZ Connect приостановлен",
+  "ja": "SKZ Connect は一時停止中です",
+  "zh": "SKZ Connect 已暂停",
+  "ko": "SKZ Connect 일시 중지됨"
  },
  "Starte die Suche, damit sich deine Controller verbinden können.": {
   "en": "Start the search so your controllers can connect.",
@@ -90,18 +90,18 @@
   "zh": "蓝牙已关闭",
   "ko": "블루투스가 꺼져 있음"
  },
- "Schalte Bluetooth ein – N-Connect sucht dann sofort nach Controllern.": {
-  "en": "Turn on Bluetooth – N-Connect will search for controllers right away.",
-  "es": "Activa el Bluetooth: N-Connect buscará mandos de inmediato.",
-  "fr": "Activez le Bluetooth – N-Connect cherchera aussitôt des manettes.",
-  "it": "Attiva il Bluetooth: N-Connect cercherà subito i controller.",
-  "pt": "Ligue o Bluetooth – o N-Connect procura comandos de imediato.",
-  "nl": "Zet Bluetooth aan – N-Connect zoekt dan meteen naar controllers.",
-  "pl": "Włącz Bluetooth – N-Connect od razu zacznie szukać kontrolerów.",
-  "ru": "Включите Bluetooth – N-Connect сразу начнёт искать контроллеры.",
-  "ja": "Bluetooth をオンにすると、N-Connect がすぐにコントローラーを探します。",
-  "zh": "打开蓝牙 – N-Connect 会立即搜索控制器。",
-  "ko": "블루투스를 켜세요 – N-Connect가 바로 컨트롤러를 검색합니다."
+ "Schalte Bluetooth ein – SKZ Connect sucht dann sofort nach Controllern.": {
+  "en": "Turn on Bluetooth – SKZ Connect will search for controllers right away.",
+  "es": "Activa el Bluetooth: SKZ Connect buscará mandos de inmediato.",
+  "fr": "Activez le Bluetooth – SKZ Connect cherchera aussitôt des manettes.",
+  "it": "Attiva il Bluetooth: SKZ Connect cercherà subito i controller.",
+  "pt": "Ligue o Bluetooth – o SKZ Connect procura comandos de imediato.",
+  "nl": "Zet Bluetooth aan – SKZ Connect zoekt dan meteen naar controllers.",
+  "pl": "Włącz Bluetooth – SKZ Connect od razu zacznie szukać kontrolerów.",
+  "ru": "Включите Bluetooth – SKZ Connect сразу начнёт искать контроллеры.",
+  "ja": "Bluetooth をオンにすると、SKZ Connect がすぐにコントローラーを探します。",
+  "zh": "打开蓝牙 – SKZ Connect 会立即搜索控制器。",
+  "ko": "블루투스를 켜세요 – SKZ Connect가 바로 컨트롤러를 검색합니다."
  },
  "Ändern": {
   "en": "Change",
@@ -454,18 +454,18 @@
   "zh": "触控操作已关闭",
   "ko": "터치 조작이 꺼져 있음"
  },
- "Schalte „N-Connect Touch-Steuerung“ in den Bedienungshilfen ein.": {
-  "en": "Turn on “N-Connect touch controls” in Accessibility.",
-  "es": "Activa «Control táctil de N-Connect» en Accesibilidad.",
-  "fr": "Activez « Commandes tactiles N-Connect » dans Accessibilité.",
-  "it": "Attiva «Controllo touch di N-Connect» in Accessibilità.",
-  "pt": "Ligue «Controlo tátil do N-Connect» em Acessibilidade.",
-  "nl": "Zet ‘N-Connect aanraakbediening’ aan bij Toegankelijkheid.",
-  "pl": "Włącz „Sterowanie dotykowe N-Connect” w Ułatwieniach dostępu.",
-  "ru": "Включите «Сенсорное управление N-Connect» в разделе «Спец. возможности».",
-  "ja": "ユーザー補助で「N-Connect タッチ操作」をオンにしてください。",
-  "zh": "请在无障碍中开启“N-Connect 触控操作”。",
-  "ko": "접근성에서 'N-Connect 터치 조작'을 켜세요."
+ "Schalte „SKZ Connect Touch-Steuerung“ in den Bedienungshilfen ein.": {
+  "en": "Turn on “SKZ Connect touch controls” in Accessibility.",
+  "es": "Activa «Control táctil de SKZ Connect» en Accesibilidad.",
+  "fr": "Activez « Commandes tactiles SKZ Connect » dans Accessibilité.",
+  "it": "Attiva «Controllo touch di SKZ Connect» in Accessibilità.",
+  "pt": "Ligue «Controlo tátil do SKZ Connect» em Acessibilidade.",
+  "nl": "Zet ‘SKZ Connect aanraakbediening’ aan bij Toegankelijkheid.",
+  "pl": "Włącz „Sterowanie dotykowe SKZ Connect” w Ułatwieniach dostępu.",
+  "ru": "Включите «Сенсорное управление SKZ Connect» в разделе «Спец. возможности».",
+  "ja": "ユーザー補助で「SKZ Connect タッチ操作」をオンにしてください。",
+  "zh": "请在无障碍中开启“SKZ Connect 触控操作”。",
+  "ko": "접근성에서 'SKZ Connect 터치 조작'을 켜세요."
  },
  "Shizuku ist nicht installiert": {
   "en": "Shizuku is not installed",
@@ -480,18 +480,18 @@
   "zh": "未安装 Shizuku",
   "ko": "Shizuku가 설치되어 있지 않음"
  },
- "Ohne Shizuku kann N-Connect keinen Xbox-Controller anlegen.": {
-  "en": "Without Shizuku, N-Connect can't create an Xbox controller.",
-  "es": "Sin Shizuku, N-Connect no puede crear un mando de Xbox.",
-  "fr": "Sans Shizuku, N-Connect ne peut pas créer de manette Xbox.",
-  "it": "Senza Shizuku, N-Connect non può creare un controller Xbox.",
-  "pt": "Sem o Shizuku, o N-Connect não consegue criar um comando Xbox.",
-  "nl": "Zonder Shizuku kan N-Connect geen Xbox-controller aanmaken.",
-  "pl": "Bez Shizuku N-Connect nie może utworzyć kontrolera Xbox.",
-  "ru": "Без Shizuku N-Connect не может создать контроллер Xbox.",
-  "ja": "Shizuku がないと、N-Connect は Xbox コントローラーを作成できません。",
-  "zh": "没有 Shizuku，N-Connect 无法创建 Xbox 控制器。",
-  "ko": "Shizuku가 없으면 N-Connect가 Xbox 컨트롤러를 만들 수 없습니다."
+ "Ohne Shizuku kann SKZ Connect keinen Xbox-Controller anlegen.": {
+  "en": "Without Shizuku, SKZ Connect can't create an Xbox controller.",
+  "es": "Sin Shizuku, SKZ Connect no puede crear un mando de Xbox.",
+  "fr": "Sans Shizuku, SKZ Connect ne peut pas créer de manette Xbox.",
+  "it": "Senza Shizuku, SKZ Connect non può creare un controller Xbox.",
+  "pt": "Sem o Shizuku, o SKZ Connect não consegue criar um comando Xbox.",
+  "nl": "Zonder Shizuku kan SKZ Connect geen Xbox-controller aanmaken.",
+  "pl": "Bez Shizuku SKZ Connect nie może utworzyć kontrolera Xbox.",
+  "ru": "Без Shizuku SKZ Connect не может создать контроллер Xbox.",
+  "ja": "Shizuku がないと、SKZ Connect は Xbox コントローラーを作成できません。",
+  "zh": "没有 Shizuku，SKZ Connect 无法创建 Xbox 控制器。",
+  "ko": "Shizuku가 없으면 SKZ Connect가 Xbox 컨트롤러를 만들 수 없습니다."
  },
  "Shizuku ist nicht gestartet": {
   "en": "Shizuku is not running",
@@ -532,31 +532,31 @@
   "zh": "正在连接 Shizuku …",
   "ko": "Shizuku에 연결 중 …"
  },
- "Einen Moment – N-Connect übernimmt den Zugriff automatisch.": {
-  "en": "One moment – N-Connect takes over access automatically.",
-  "es": "Un momento: N-Connect obtiene el acceso automáticamente.",
-  "fr": "Un instant – N-Connect récupère l'accès automatiquement.",
-  "it": "Un momento: N-Connect ottiene l'accesso automaticamente.",
-  "pt": "Um momento – o N-Connect obtém o acesso automaticamente.",
-  "nl": "Een moment – N-Connect neemt de toegang automatisch over.",
-  "pl": "Chwileczkę – N-Connect automatycznie przejmie dostęp.",
-  "ru": "Секунду – N-Connect получит доступ автоматически.",
-  "ja": "少々お待ちください – N-Connect が自動的にアクセスを引き継ぎます。",
-  "zh": "请稍候 – N-Connect 会自动接管访问权限。",
-  "ko": "잠시만 기다리세요 – N-Connect가 자동으로 액세스를 가져옵니다."
+ "Einen Moment – SKZ Connect übernimmt den Zugriff automatisch.": {
+  "en": "One moment – SKZ Connect takes over access automatically.",
+  "es": "Un momento: SKZ Connect obtiene el acceso automáticamente.",
+  "fr": "Un instant – SKZ Connect récupère l'accès automatiquement.",
+  "it": "Un momento: SKZ Connect ottiene l'accesso automaticamente.",
+  "pt": "Um momento – o SKZ Connect obtém o acesso automaticamente.",
+  "nl": "Een moment – SKZ Connect neemt de toegang automatisch over.",
+  "pl": "Chwileczkę – SKZ Connect automatycznie przejmie dostęp.",
+  "ru": "Секунду – SKZ Connect получит доступ автоматически.",
+  "ja": "少々お待ちください – SKZ Connect が自動的にアクセスを引き継ぎます。",
+  "zh": "请稍候 – SKZ Connect 会自动接管访问权限。",
+  "ko": "잠시만 기다리세요 – SKZ Connect가 자동으로 액세스를 가져옵니다."
  },
- "N-Connect hat noch keinen Shizuku-Zugriff": {
-  "en": "N-Connect has no Shizuku access yet",
-  "es": "N-Connect aún no tiene acceso a Shizuku",
-  "fr": "N-Connect n'a pas encore accès à Shizuku",
-  "it": "N-Connect non ha ancora accesso a Shizuku",
-  "pt": "O N-Connect ainda não tem acesso ao Shizuku",
-  "nl": "N-Connect heeft nog geen Shizuku-toegang",
-  "pl": "N-Connect nie ma jeszcze dostępu do Shizuku",
-  "ru": "У N-Connect пока нет доступа к Shizuku",
-  "ja": "N-Connect にはまだ Shizuku へのアクセスがありません",
-  "zh": "N-Connect 尚无 Shizuku 访问权限",
-  "ko": "N-Connect에 아직 Shizuku 액세스 권한이 없음"
+ "SKZ Connect hat noch keinen Shizuku-Zugriff": {
+  "en": "SKZ Connect has no Shizuku access yet",
+  "es": "SKZ Connect aún no tiene acceso a Shizuku",
+  "fr": "SKZ Connect n'a pas encore accès à Shizuku",
+  "it": "SKZ Connect non ha ancora accesso a Shizuku",
+  "pt": "O SKZ Connect ainda não tem acesso ao Shizuku",
+  "nl": "SKZ Connect heeft nog geen Shizuku-toegang",
+  "pl": "SKZ Connect nie ma jeszcze dostępu do Shizuku",
+  "ru": "У SKZ Connect пока нет доступа к Shizuku",
+  "ja": "SKZ Connect にはまだ Shizuku へのアクセスがありません",
+  "zh": "SKZ Connect 尚无 Shizuku 访问权限",
+  "ko": "SKZ Connect에 아직 Shizuku 액세스 권한이 없음"
  },
  "Tippe auf „Beheben“ und erlaube den Zugriff.": {
   "en": "Tap “Fix” and allow access.",
@@ -584,18 +584,18 @@
   "zh": "没有 root 权限",
   "ko": "루트 액세스 없음"
  },
- "Erlaube N-Connect den Root-Zugriff (z. B. in Magisk).": {
-  "en": "Allow N-Connect root access (e.g. in Magisk).",
-  "es": "Concede a N-Connect acceso root (p. ej. en Magisk).",
-  "fr": "Accordez l'accès root à N-Connect (par ex. dans Magisk).",
-  "it": "Concedi a N-Connect l'accesso root (ad es. in Magisk).",
-  "pt": "Conceda ao N-Connect acesso root (p. ex. no Magisk).",
-  "nl": "Geef N-Connect roottoegang (bijv. in Magisk).",
-  "pl": "Przyznaj N-Connect dostęp root (np. w Magisk).",
-  "ru": "Предоставьте N-Connect root-доступ (например, в Magisk).",
-  "ja": "N-Connect に root アクセスを許可してください（例：Magisk）。",
-  "zh": "请授予 N-Connect root 权限（例如在 Magisk 中）。",
-  "ko": "N-Connect에 루트 액세스를 허용하세요(예: Magisk)."
+ "Erlaube SKZ Connect den Root-Zugriff (z. B. in Magisk).": {
+  "en": "Allow SKZ Connect root access (e.g. in Magisk).",
+  "es": "Concede a SKZ Connect acceso root (p. ej. en Magisk).",
+  "fr": "Accordez l'accès root à SKZ Connect (par ex. dans Magisk).",
+  "it": "Concedi a SKZ Connect l'accesso root (ad es. in Magisk).",
+  "pt": "Conceda ao SKZ Connect acesso root (p. ex. no Magisk).",
+  "nl": "Geef SKZ Connect roottoegang (bijv. in Magisk).",
+  "pl": "Przyznaj SKZ Connect dostęp root (np. w Magisk).",
+  "ru": "Предоставьте SKZ Connect root-доступ (например, в Magisk).",
+  "ja": "SKZ Connect に root アクセスを許可してください（例：Magisk）。",
+  "zh": "请授予 SKZ Connect root 权限（例如在 Magisk 中）。",
+  "ko": "SKZ Connect에 루트 액세스를 허용하세요(예: Magisk)."
  },
  "Noch kein Ausgabeweg eingerichtet": {
   "en": "No output method set up yet",
@@ -636,44 +636,44 @@
   "zh": "帮助",
   "ko": "도움말"
  },
- "So funktioniert N-Connect": {
-  "en": "How N-Connect works",
-  "es": "Cómo funciona N-Connect",
-  "fr": "Comment fonctionne N-Connect",
-  "it": "Come funziona N-Connect",
-  "pt": "Como funciona o N-Connect",
-  "nl": "Zo werkt N-Connect",
-  "pl": "Jak działa N-Connect",
-  "ru": "Как работает N-Connect",
-  "ja": "N-Connect のしくみ",
-  "zh": "N-Connect 的工作原理",
-  "ko": "N-Connect 작동 방식"
+ "So funktioniert SKZ Connect": {
+  "en": "How SKZ Connect works",
+  "es": "Cómo funciona SKZ Connect",
+  "fr": "Comment fonctionne SKZ Connect",
+  "it": "Come funziona SKZ Connect",
+  "pt": "Como funciona o SKZ Connect",
+  "nl": "Zo werkt SKZ Connect",
+  "pl": "Jak działa SKZ Connect",
+  "ru": "Как работает SKZ Connect",
+  "ja": "SKZ Connect のしくみ",
+  "zh": "SKZ Connect 的工作原理",
+  "ko": "SKZ Connect 작동 방식"
  },
- "N-Connect verbindet deine <b>Switch-2-Controller</b> (Pro Controller 2, Joy-Con 2, GameCube-Controller) per Bluetooth mit deinem Handy oder Tablet und gibt sie an Spiele weiter.<br><br>Android kann diese Controller nicht von selbst nutzen – N-Connect übersetzt sie in einen ganz normalen <b>Xbox-Controller</b>, den praktisch jedes Spiel und jeder Emulator versteht. Für Spiele ohne Controller-Unterstützung gibt es zusätzlich die <b>Touch-Steuerung</b>.<br><br><b>Andere Controller:</b> N-Connect für Android unterstützt nur Switch-2-Controller (über Bluetooth LE). <b>Xbox- und PlayStation-Controller</b> laufen unter Android direkt – einfach in den Bluetooth-Einstellungen von Android koppeln. <b>Ältere Switch-Controller</b> (Pro Controller der Switch 1, Joy-Con der ersten Generation, Nachbauten) verbindest du dort ebenfalls direkt mit Android – N-Connect erkennt sie nicht. Dann gehen in der Regel nur Tasten und Sticks; Bewegungssteuerung und Vibration je nach Gerät nicht.": {
-  "en": "N-Connect connects your <b>Switch 2 controllers</b> (Pro Controller 2, Joy-Con 2, GameCube controller) to your phone or tablet via Bluetooth and passes them on to games.<br><br>Android can't use these controllers on its own – N-Connect turns them into a regular <b>Xbox controller</b> that practically every game and emulator understands. For games without controller support there are also <b>touch controls</b>.<br><br><b>Other controllers:</b> N-Connect for Android only supports Switch 2 controllers (via Bluetooth LE). <b>Xbox and PlayStation controllers</b> work on Android directly – just pair them in Android's Bluetooth settings. <b>Older Switch controllers</b> (Switch 1 Pro Controller, first-generation Joy-Con, third-party clones) also connect directly to Android there – N-Connect doesn't detect them. Usually only buttons and sticks work then; motion controls and vibration may not, depending on the device.",
-  "es": "N-Connect conecta tus <b>mandos de Switch 2</b> (Pro Controller 2, Joy-Con 2, mando de GameCube) por Bluetooth a tu móvil o tableta y los pasa a los juegos.<br><br>Android no puede usar estos mandos por sí solo: N-Connect los convierte en un <b>mando de Xbox</b> normal que entiende prácticamente cualquier juego y emulador. Para juegos sin soporte de mando existe además el <b>control táctil</b>.<br><br><b>Otros mandos:</b> N-Connect para Android solo es compatible con mandos de Switch 2 (por Bluetooth LE). Los <b>mandos de Xbox y PlayStation</b> funcionan directamente en Android: basta con vincularlos en los ajustes de Bluetooth de Android. Los <b>mandos de Switch más antiguos</b> (Pro Controller de Switch 1, Joy-Con de primera generación, imitaciones) también se conectan ahí directamente a Android; N-Connect no los detecta. Normalmente solo funcionan los botones y los sticks; el control por movimiento y la vibración, según el dispositivo, no.",
-  "fr": "N-Connect relie vos <b>manettes Switch 2</b> (Pro Controller 2, Joy-Con 2, manette GameCube) en Bluetooth à votre téléphone ou tablette et les transmet aux jeux.<br><br>Android ne sait pas utiliser ces manettes tout seul – N-Connect les transforme en une <b>manette Xbox</b> tout à fait normale, que presque tous les jeux et émulateurs comprennent. Pour les jeux sans prise en charge des manettes, il existe aussi les <b>commandes tactiles</b>.<br><br><b>Autres manettes :</b> N-Connect pour Android ne prend en charge que les manettes Switch 2 (via Bluetooth LE). Les <b>manettes Xbox et PlayStation</b> fonctionnent directement sous Android – associez-les simplement dans les paramètres Bluetooth d'Android. Les <b>anciennes manettes Switch</b> (Pro Controller de la Switch 1, Joy-Con de première génération, copies) s'y connectent aussi directement à Android – N-Connect ne les détecte pas. En général, seuls les boutons et les sticks fonctionnent alors ; les commandes de mouvement et la vibration non, selon l'appareil.",
-  "it": "N-Connect collega i tuoi <b>controller Switch 2</b> (Pro Controller 2, Joy-Con 2, controller GameCube) via Bluetooth al tuo telefono o tablet e li passa ai giochi.<br><br>Android non può usare questi controller da solo: N-Connect li trasforma in un normalissimo <b>controller Xbox</b>, che praticamente ogni gioco ed emulatore capisce. Per i giochi senza supporto ai controller c'è anche il <b>controllo touch</b>.<br><br><b>Altri controller:</b> N-Connect per Android supporta solo i controller Switch 2 (via Bluetooth LE). I <b>controller Xbox e PlayStation</b> funzionano direttamente su Android: basta associarli nelle impostazioni Bluetooth di Android. Anche i <b>vecchi controller Switch</b> (Pro Controller di Switch 1, Joy-Con di prima generazione, imitazioni) si collegano lì direttamente ad Android: N-Connect non li rileva. Di solito funzionano solo tasti e stick; i controlli di movimento e la vibrazione, a seconda del dispositivo, no.",
-  "pt": "O N-Connect liga os seus <b>comandos Switch 2</b> (Pro Controller 2, Joy-Con 2, comando GameCube) por Bluetooth ao seu telemóvel ou tablet e passa-os aos jogos.<br><br>O Android não consegue usar estes comandos sozinho – o N-Connect transforma-os num <b>comando Xbox</b> perfeitamente normal, que praticamente todos os jogos e emuladores entendem. Para jogos sem suporte de comando existe ainda o <b>controlo tátil</b>.<br><br><b>Outros comandos:</b> o N-Connect para Android só suporta comandos Switch 2 (por Bluetooth LE). Os <b>comandos Xbox e PlayStation</b> funcionam diretamente no Android – basta emparelhá-los nas definições de Bluetooth do Android. Os <b>comandos Switch mais antigos</b> (Pro Controller da Switch 1, Joy-Con da primeira geração, imitações) também se ligam aí diretamente ao Android – o N-Connect não os deteta. Normalmente só funcionam os botões e os manípulos; o controlo por movimento e a vibração, consoante o dispositivo, não.",
-  "nl": "N-Connect verbindt je <b>Switch 2-controllers</b> (Pro Controller 2, Joy-Con 2, GameCube-controller) via Bluetooth met je telefoon of tablet en geeft ze door aan games.<br><br>Android kan deze controllers niet zelf gebruiken – N-Connect maakt er een heel gewone <b>Xbox-controller</b> van, die vrijwel elke game en emulator begrijpt. Voor games zonder controllerondersteuning is er ook nog de <b>aanraakbediening</b>.<br><br><b>Andere controllers:</b> N-Connect voor Android ondersteunt alleen Switch 2-controllers (via Bluetooth LE). <b>Xbox- en PlayStation-controllers</b> werken direct onder Android – koppel ze gewoon in de Bluetooth-instellingen van Android. <b>Oudere Switch-controllers</b> (Pro Controller van de Switch 1, Joy-Con van de eerste generatie, namaakexemplaren) verbind je daar ook direct met Android – N-Connect herkent ze niet. Meestal werken dan alleen knoppen en sticks; bewegingsbesturing en trillen afhankelijk van het apparaat niet.",
-  "pl": "N-Connect łączy twoje <b>kontrolery Switch 2</b> (Pro Controller 2, Joy-Con 2, kontroler GameCube) przez Bluetooth z telefonem lub tabletem i przekazuje je grom.<br><br>Android nie potrafi sam używać tych kontrolerów – N-Connect zamienia je w zwykły <b>kontroler Xbox</b>, który rozumie praktycznie każda gra i każdy emulator. Dla gier bez obsługi kontrolerów jest dodatkowo <b>sterowanie dotykowe</b>.<br><br><b>Inne kontrolery:</b> N-Connect dla Androida obsługuje tylko kontrolery Switch 2 (przez Bluetooth LE). <b>Kontrolery Xbox i PlayStation</b> działają w Androidzie bezpośrednio – wystarczy sparować je w ustawieniach Bluetooth Androida. <b>Starsze kontrolery Switch</b> (Pro Controller od Switch 1, Joy-Con pierwszej generacji, podróbki) również łączysz tam bezpośrednio z Androidem – N-Connect ich nie wykrywa. Zwykle działają wtedy tylko przyciski i drążki; sterowanie ruchem i wibracje, zależnie od urządzenia, nie.",
-  "ru": "N-Connect подключает ваши <b>контроллеры Switch 2</b> (Pro Controller 2, Joy-Con 2, контроллер GameCube) по Bluetooth к телефону или планшету и передаёт их играм.<br><br>Android не умеет сам использовать эти контроллеры – N-Connect превращает их в самый обычный <b>контроллер Xbox</b>, который понимает практически любая игра и любой эмулятор. Для игр без поддержки контроллеров есть ещё <b>сенсорное управление</b>.<br><br><b>Другие контроллеры:</b> N-Connect для Android поддерживает только контроллеры Switch 2 (через Bluetooth LE). <b>Контроллеры Xbox и PlayStation</b> работают в Android напрямую – просто выполните сопряжение в настройках Bluetooth Android. <b>Старые контроллеры Switch</b> (Pro Controller от Switch 1, Joy-Con первого поколения, копии) тоже подключаются там напрямую к Android – N-Connect их не обнаруживает. Обычно тогда работают только кнопки и стики; управление движением и вибрация – в зависимости от устройства – нет.",
-  "ja": "N-Connect は <b>Switch 2 コントローラー</b>（Pro Controller 2、Joy-Con 2、ゲームキューブコントローラー）を Bluetooth でスマートフォンやタブレットに接続し、ゲームに渡します。<br><br>Android はこれらのコントローラーを単独では使えません – N-Connect がほぼすべてのゲームとエミュレーターが理解できるごく普通の <b>Xbox コントローラー</b>に変換します。コントローラー非対応のゲーム向けには <b>タッチ操作</b> もあります。<br><br><b>その他のコントローラー：</b>Android 版 N-Connect が対応するのは Switch 2 コントローラー（Bluetooth LE 経由）のみです。<b>Xbox と PlayStation のコントローラー</b>は Android でそのまま使えます – Android の Bluetooth 設定でペアリングするだけです。<b>旧型の Switch コントローラー</b>（Switch 1 の Pro コントローラー、初代 Joy-Con、互換品）も同じくそこで Android に直接接続します – N-Connect はこれらを検出しません。その場合、通常使えるのはボタンとスティックだけで、モーション操作と振動は端末によっては使えません。",
-  "zh": "N-Connect 通过蓝牙将你的 <b>Switch 2 控制器</b>（Pro Controller 2、Joy-Con 2、GameCube 控制器）连接到手机或平板，并传递给游戏。<br><br>Android 本身无法使用这些控制器 – N-Connect 会把它们转换成一个普通的 <b>Xbox 控制器</b>，几乎所有游戏和模拟器都能识别。对于不支持控制器的游戏，还提供 <b>触控操作</b>。<br><br><b>其他控制器：</b>Android 版 N-Connect 仅支持 Switch 2 控制器（通过蓝牙 LE）。<b>Xbox 和 PlayStation 控制器</b>在 Android 上可直接使用 – 只需在 Android 的蓝牙设置中配对。<b>旧款 Switch 控制器</b>（Switch 1 Pro 控制器、第一代 Joy-Con、仿制品）同样在那里直接连接到 Android – N-Connect 不会识别它们。此时通常只有按键和摇杆可用；体感操作和振动视设备而定可能无法使用。",
-  "ko": "N-Connect는 <b>Switch 2 컨트롤러</b>(Pro Controller 2, Joy-Con 2, 게임큐브 컨트롤러)를 블루투스로 휴대전화나 태블릿에 연결하고 게임에 전달합니다.<br><br>Android는 이 컨트롤러를 스스로 사용할 수 없습니다 – N-Connect가 거의 모든 게임과 에뮬레이터가 이해하는 평범한 <b>Xbox 컨트롤러</b>로 변환합니다. 컨트롤러를 지원하지 않는 게임을 위해 <b>터치 조작</b>도 있습니다.<br><br><b>다른 컨트롤러:</b> Android용 N-Connect는 Switch 2 컨트롤러(블루투스 LE)만 지원합니다. <b>Xbox 및 PlayStation 컨트롤러</b>는 Android에서 바로 작동합니다 – Android 블루투스 설정에서 페어링하기만 하면 됩니다. <b>이전 Switch 컨트롤러</b>(Switch 1 Pro 컨트롤러, 1세대 Joy-Con, 호환 제품)도 그곳에서 Android에 직접 연결합니다 – N-Connect는 이를 인식하지 않습니다. 이 경우 보통 버튼과 스틱만 작동하며, 모션 조작과 진동은 기기에 따라 작동하지 않습니다."
+ "SKZ Connect verbindet deine <b>Switch-2-Controller</b> (Pro Controller 2, Joy-Con 2, GameCube-Controller) per Bluetooth mit deinem Handy oder Tablet und gibt sie an Spiele weiter.<br><br>Android kann diese Controller nicht von selbst nutzen – SKZ Connect übersetzt sie in einen ganz normalen <b>Xbox-Controller</b>, den praktisch jedes Spiel und jeder Emulator versteht. Für Spiele ohne Controller-Unterstützung gibt es zusätzlich die <b>Touch-Steuerung</b>.<br><br><b>Andere Controller:</b> SKZ Connect für Android unterstützt nur Switch-2-Controller (über Bluetooth LE). <b>Xbox- und PlayStation-Controller</b> laufen unter Android direkt – einfach in den Bluetooth-Einstellungen von Android koppeln. <b>Ältere Switch-Controller</b> (Pro Controller der Switch 1, Joy-Con der ersten Generation, Nachbauten) verbindest du dort ebenfalls direkt mit Android – SKZ Connect erkennt sie nicht. Dann gehen in der Regel nur Tasten und Sticks; Bewegungssteuerung und Vibration je nach Gerät nicht.": {
+  "en": "SKZ Connect connects your <b>Switch 2 controllers</b> (Pro Controller 2, Joy-Con 2, GameCube controller) to your phone or tablet via Bluetooth and passes them on to games.<br><br>Android can't use these controllers on its own – SKZ Connect turns them into a regular <b>Xbox controller</b> that practically every game and emulator understands. For games without controller support there are also <b>touch controls</b>.<br><br><b>Other controllers:</b> SKZ Connect for Android only supports Switch 2 controllers (via Bluetooth LE). <b>Xbox and PlayStation controllers</b> work on Android directly – just pair them in Android's Bluetooth settings. <b>Older Switch controllers</b> (Switch 1 Pro Controller, first-generation Joy-Con, third-party clones) also connect directly to Android there – SKZ Connect doesn't detect them. Usually only buttons and sticks work then; motion controls and vibration may not, depending on the device.",
+  "es": "SKZ Connect conecta tus <b>mandos de Switch 2</b> (Pro Controller 2, Joy-Con 2, mando de GameCube) por Bluetooth a tu móvil o tableta y los pasa a los juegos.<br><br>Android no puede usar estos mandos por sí solo: SKZ Connect los convierte en un <b>mando de Xbox</b> normal que entiende prácticamente cualquier juego y emulador. Para juegos sin soporte de mando existe además el <b>control táctil</b>.<br><br><b>Otros mandos:</b> SKZ Connect para Android solo es compatible con mandos de Switch 2 (por Bluetooth LE). Los <b>mandos de Xbox y PlayStation</b> funcionan directamente en Android: basta con vincularlos en los ajustes de Bluetooth de Android. Los <b>mandos de Switch más antiguos</b> (Pro Controller de Switch 1, Joy-Con de primera generación, imitaciones) también se conectan ahí directamente a Android; SKZ Connect no los detecta. Normalmente solo funcionan los botones y los sticks; el control por movimiento y la vibración, según el dispositivo, no.",
+  "fr": "SKZ Connect relie vos <b>manettes Switch 2</b> (Pro Controller 2, Joy-Con 2, manette GameCube) en Bluetooth à votre téléphone ou tablette et les transmet aux jeux.<br><br>Android ne sait pas utiliser ces manettes tout seul – SKZ Connect les transforme en une <b>manette Xbox</b> tout à fait normale, que presque tous les jeux et émulateurs comprennent. Pour les jeux sans prise en charge des manettes, il existe aussi les <b>commandes tactiles</b>.<br><br><b>Autres manettes :</b> SKZ Connect pour Android ne prend en charge que les manettes Switch 2 (via Bluetooth LE). Les <b>manettes Xbox et PlayStation</b> fonctionnent directement sous Android – associez-les simplement dans les paramètres Bluetooth d'Android. Les <b>anciennes manettes Switch</b> (Pro Controller de la Switch 1, Joy-Con de première génération, copies) s'y connectent aussi directement à Android – SKZ Connect ne les détecte pas. En général, seuls les boutons et les sticks fonctionnent alors ; les commandes de mouvement et la vibration non, selon l'appareil.",
+  "it": "SKZ Connect collega i tuoi <b>controller Switch 2</b> (Pro Controller 2, Joy-Con 2, controller GameCube) via Bluetooth al tuo telefono o tablet e li passa ai giochi.<br><br>Android non può usare questi controller da solo: SKZ Connect li trasforma in un normalissimo <b>controller Xbox</b>, che praticamente ogni gioco ed emulatore capisce. Per i giochi senza supporto ai controller c'è anche il <b>controllo touch</b>.<br><br><b>Altri controller:</b> SKZ Connect per Android supporta solo i controller Switch 2 (via Bluetooth LE). I <b>controller Xbox e PlayStation</b> funzionano direttamente su Android: basta associarli nelle impostazioni Bluetooth di Android. Anche i <b>vecchi controller Switch</b> (Pro Controller di Switch 1, Joy-Con di prima generazione, imitazioni) si collegano lì direttamente ad Android: SKZ Connect non li rileva. Di solito funzionano solo tasti e stick; i controlli di movimento e la vibrazione, a seconda del dispositivo, no.",
+  "pt": "O SKZ Connect liga os seus <b>comandos Switch 2</b> (Pro Controller 2, Joy-Con 2, comando GameCube) por Bluetooth ao seu telemóvel ou tablet e passa-os aos jogos.<br><br>O Android não consegue usar estes comandos sozinho – o SKZ Connect transforma-os num <b>comando Xbox</b> perfeitamente normal, que praticamente todos os jogos e emuladores entendem. Para jogos sem suporte de comando existe ainda o <b>controlo tátil</b>.<br><br><b>Outros comandos:</b> o SKZ Connect para Android só suporta comandos Switch 2 (por Bluetooth LE). Os <b>comandos Xbox e PlayStation</b> funcionam diretamente no Android – basta emparelhá-los nas definições de Bluetooth do Android. Os <b>comandos Switch mais antigos</b> (Pro Controller da Switch 1, Joy-Con da primeira geração, imitações) também se ligam aí diretamente ao Android – o SKZ Connect não os deteta. Normalmente só funcionam os botões e os manípulos; o controlo por movimento e a vibração, consoante o dispositivo, não.",
+  "nl": "SKZ Connect verbindt je <b>Switch 2-controllers</b> (Pro Controller 2, Joy-Con 2, GameCube-controller) via Bluetooth met je telefoon of tablet en geeft ze door aan games.<br><br>Android kan deze controllers niet zelf gebruiken – SKZ Connect maakt er een heel gewone <b>Xbox-controller</b> van, die vrijwel elke game en emulator begrijpt. Voor games zonder controllerondersteuning is er ook nog de <b>aanraakbediening</b>.<br><br><b>Andere controllers:</b> SKZ Connect voor Android ondersteunt alleen Switch 2-controllers (via Bluetooth LE). <b>Xbox- en PlayStation-controllers</b> werken direct onder Android – koppel ze gewoon in de Bluetooth-instellingen van Android. <b>Oudere Switch-controllers</b> (Pro Controller van de Switch 1, Joy-Con van de eerste generatie, namaakexemplaren) verbind je daar ook direct met Android – SKZ Connect herkent ze niet. Meestal werken dan alleen knoppen en sticks; bewegingsbesturing en trillen afhankelijk van het apparaat niet.",
+  "pl": "SKZ Connect łączy twoje <b>kontrolery Switch 2</b> (Pro Controller 2, Joy-Con 2, kontroler GameCube) przez Bluetooth z telefonem lub tabletem i przekazuje je grom.<br><br>Android nie potrafi sam używać tych kontrolerów – SKZ Connect zamienia je w zwykły <b>kontroler Xbox</b>, który rozumie praktycznie każda gra i każdy emulator. Dla gier bez obsługi kontrolerów jest dodatkowo <b>sterowanie dotykowe</b>.<br><br><b>Inne kontrolery:</b> SKZ Connect dla Androida obsługuje tylko kontrolery Switch 2 (przez Bluetooth LE). <b>Kontrolery Xbox i PlayStation</b> działają w Androidzie bezpośrednio – wystarczy sparować je w ustawieniach Bluetooth Androida. <b>Starsze kontrolery Switch</b> (Pro Controller od Switch 1, Joy-Con pierwszej generacji, podróbki) również łączysz tam bezpośrednio z Androidem – SKZ Connect ich nie wykrywa. Zwykle działają wtedy tylko przyciski i drążki; sterowanie ruchem i wibracje, zależnie od urządzenia, nie.",
+  "ru": "SKZ Connect подключает ваши <b>контроллеры Switch 2</b> (Pro Controller 2, Joy-Con 2, контроллер GameCube) по Bluetooth к телефону или планшету и передаёт их играм.<br><br>Android не умеет сам использовать эти контроллеры – SKZ Connect превращает их в самый обычный <b>контроллер Xbox</b>, который понимает практически любая игра и любой эмулятор. Для игр без поддержки контроллеров есть ещё <b>сенсорное управление</b>.<br><br><b>Другие контроллеры:</b> SKZ Connect для Android поддерживает только контроллеры Switch 2 (через Bluetooth LE). <b>Контроллеры Xbox и PlayStation</b> работают в Android напрямую – просто выполните сопряжение в настройках Bluetooth Android. <b>Старые контроллеры Switch</b> (Pro Controller от Switch 1, Joy-Con первого поколения, копии) тоже подключаются там напрямую к Android – SKZ Connect их не обнаруживает. Обычно тогда работают только кнопки и стики; управление движением и вибрация – в зависимости от устройства – нет.",
+  "ja": "SKZ Connect は <b>Switch 2 コントローラー</b>（Pro Controller 2、Joy-Con 2、ゲームキューブコントローラー）を Bluetooth でスマートフォンやタブレットに接続し、ゲームに渡します。<br><br>Android はこれらのコントローラーを単独では使えません – SKZ Connect がほぼすべてのゲームとエミュレーターが理解できるごく普通の <b>Xbox コントローラー</b>に変換します。コントローラー非対応のゲーム向けには <b>タッチ操作</b> もあります。<br><br><b>その他のコントローラー：</b>Android 版 SKZ Connect が対応するのは Switch 2 コントローラー（Bluetooth LE 経由）のみです。<b>Xbox と PlayStation のコントローラー</b>は Android でそのまま使えます – Android の Bluetooth 設定でペアリングするだけです。<b>旧型の Switch コントローラー</b>（Switch 1 の Pro コントローラー、初代 Joy-Con、互換品）も同じくそこで Android に直接接続します – SKZ Connect はこれらを検出しません。その場合、通常使えるのはボタンとスティックだけで、モーション操作と振動は端末によっては使えません。",
+  "zh": "SKZ Connect 通过蓝牙将你的 <b>Switch 2 控制器</b>（Pro Controller 2、Joy-Con 2、GameCube 控制器）连接到手机或平板，并传递给游戏。<br><br>Android 本身无法使用这些控制器 – SKZ Connect 会把它们转换成一个普通的 <b>Xbox 控制器</b>，几乎所有游戏和模拟器都能识别。对于不支持控制器的游戏，还提供 <b>触控操作</b>。<br><br><b>其他控制器：</b>Android 版 SKZ Connect 仅支持 Switch 2 控制器（通过蓝牙 LE）。<b>Xbox 和 PlayStation 控制器</b>在 Android 上可直接使用 – 只需在 Android 的蓝牙设置中配对。<b>旧款 Switch 控制器</b>（Switch 1 Pro 控制器、第一代 Joy-Con、仿制品）同样在那里直接连接到 Android – SKZ Connect 不会识别它们。此时通常只有按键和摇杆可用；体感操作和振动视设备而定可能无法使用。",
+  "ko": "SKZ Connect는 <b>Switch 2 컨트롤러</b>(Pro Controller 2, Joy-Con 2, 게임큐브 컨트롤러)를 블루투스로 휴대전화나 태블릿에 연결하고 게임에 전달합니다.<br><br>Android는 이 컨트롤러를 스스로 사용할 수 없습니다 – SKZ Connect가 거의 모든 게임과 에뮬레이터가 이해하는 평범한 <b>Xbox 컨트롤러</b>로 변환합니다. 컨트롤러를 지원하지 않는 게임을 위해 <b>터치 조작</b>도 있습니다.<br><br><b>다른 컨트롤러:</b> Android용 SKZ Connect는 Switch 2 컨트롤러(블루투스 LE)만 지원합니다. <b>Xbox 및 PlayStation 컨트롤러</b>는 Android에서 바로 작동합니다 – Android 블루투스 설정에서 페어링하기만 하면 됩니다. <b>이전 Switch 컨트롤러</b>(Switch 1 Pro 컨트롤러, 1세대 Joy-Con, 호환 제품)도 그곳에서 Android에 직접 연결합니다 – SKZ Connect는 이를 인식하지 않습니다. 이 경우 보통 버튼과 스틱만 작동하며, 모션 조작과 진동은 기기에 따라 작동하지 않습니다."
  },
- "<b>Beim ersten Mal:</b> Halte die kleine runde <b>SYNC-Taste</b> am Controller gedrückt, bis die Lichter hin- und herlaufen. N-Connect findet ihn automatisch – du musst nichts antippen.<br><br><b>Danach:</b> Einfach eine Taste drücken – der Controller verbindet sich von selbst wieder.<br><br><b>Joy-Con:</b> Verbinde beide nacheinander. Sie werden automatisch zu einem Controller zusammengefasst (abschaltbar in den Einstellungen).<br><br><b>Wichtig:</b> Ein Controller merkt sich immer nur <b>ein</b> Gerät. Willst du ihn wieder an der Switch 2 nutzen, drücke dort erneut SYNC – danach am Handy ebenfalls.": {
-  "en": "<b>The first time:</b> Hold the small round <b>SYNC button</b> on the controller until the lights run back and forth. N-Connect finds it automatically – you don't need to tap anything.<br><br><b>After that:</b> Just press a button – the controller reconnects by itself.<br><br><b>Joy-Con:</b> Connect both one after the other. They are automatically combined into one controller (can be turned off in the settings).<br><br><b>Important:</b> A controller only remembers <b>one</b> device. To use it with the Switch 2 again, press SYNC there – and later on the phone again.",
-  "es": "<b>La primera vez:</b> Mantén pulsado el pequeño <b>botón SYNC</b> redondo del mando hasta que las luces vayan de un lado a otro. N-Connect lo encuentra automáticamente: no tienes que tocar nada.<br><br><b>Después:</b> Basta con pulsar un botón y el mando se vuelve a conectar solo.<br><br><b>Joy-Con:</b> Conecta los dos uno tras otro. Se combinan automáticamente en un solo mando (se puede desactivar en los ajustes).<br><br><b>Importante:</b> Un mando solo recuerda <b>un</b> dispositivo. Si quieres volver a usarlo en la Switch 2, pulsa SYNC allí y después también en el móvil.",
-  "fr": "<b>La première fois :</b> Maintenez le petit <b>bouton SYNC</b> rond de la manette jusqu'à ce que les voyants défilent. N-Connect la trouve automatiquement – vous n'avez rien à toucher.<br><br><b>Ensuite :</b> Appuyez simplement sur un bouton – la manette se reconnecte toute seule.<br><br><b>Joy-Con :</b> Connectez les deux l'un après l'autre. Ils sont automatiquement réunis en une seule manette (désactivable dans les paramètres).<br><br><b>Important :</b> Une manette ne mémorise qu'<b>un seul</b> appareil. Pour la réutiliser sur la Switch 2, appuyez à nouveau sur SYNC là-bas – puis de même sur le téléphone.",
-  "it": "<b>La prima volta:</b> Tieni premuto il piccolo <b>tasto SYNC</b> rotondo sul controller finché le luci scorrono avanti e indietro. N-Connect lo trova automaticamente: non devi toccare nulla.<br><br><b>Dopo:</b> Basta premere un tasto e il controller si riconnette da solo.<br><br><b>Joy-Con:</b> Collegali entrambi uno dopo l'altro. Vengono uniti automaticamente in un unico controller (disattivabile nelle impostazioni).<br><br><b>Importante:</b> Un controller ricorda sempre <b>un solo</b> dispositivo. Se vuoi usarlo di nuovo con la Switch 2, premi di nuovo SYNC lì, e poi anche sul telefono.",
-  "pt": "<b>Da primeira vez:</b> Mantenha premido o pequeno <b>botão SYNC</b> redondo do comando até as luzes correrem de um lado para o outro. O N-Connect encontra-o automaticamente – não precisa de tocar em nada.<br><br><b>Depois:</b> Basta premir um botão – o comando volta a ligar-se sozinho.<br><br><b>Joy-Con:</b> Ligue os dois um após o outro. São automaticamente combinados num só comando (pode desativar nas definições).<br><br><b>Importante:</b> Um comando lembra-se sempre de <b>um só</b> dispositivo. Para o voltar a usar na Switch 2, prima SYNC lá – e depois também no telemóvel.",
-  "nl": "<b>De eerste keer:</b> Houd de kleine ronde <b>SYNC-knop</b> op de controller ingedrukt tot de lampjes heen en weer lopen. N-Connect vindt hem automatisch – je hoeft niets aan te tikken.<br><br><b>Daarna:</b> Druk gewoon op een knop – de controller maakt vanzelf weer verbinding.<br><br><b>Joy-Con:</b> Verbind ze allebei na elkaar. Ze worden automatisch samengevoegd tot één controller (uit te schakelen in de instellingen).<br><br><b>Belangrijk:</b> Een controller onthoudt altijd maar <b>één</b> apparaat. Wil je hem weer op de Switch 2 gebruiken, druk daar dan opnieuw op SYNC – en daarna op de telefoon ook.",
-  "pl": "<b>Za pierwszym razem:</b> Przytrzymaj mały okrągły <b>przycisk SYNC</b> na kontrolerze, aż diody zaczną biegać w tę i z powrotem. N-Connect znajdzie go automatycznie – nie musisz niczego stukać.<br><br><b>Później:</b> Wystarczy nacisnąć przycisk – kontroler sam połączy się ponownie.<br><br><b>Joy-Con:</b> Połącz oba po kolei. Zostaną automatycznie połączone w jeden kontroler (można to wyłączyć w ustawieniach).<br><br><b>Ważne:</b> Kontroler pamięta zawsze tylko <b>jedno</b> urządzenie. Jeśli chcesz znów używać go z Switch 2, naciśnij tam ponownie SYNC – a potem tak samo na telefonie.",
-  "ru": "<b>В первый раз:</b> Удерживайте маленькую круглую <b>кнопку SYNC</b> на контроллере, пока огоньки не побегут туда-сюда. N-Connect найдёт его автоматически – ничего нажимать не нужно.<br><br><b>Потом:</b> Просто нажмите любую кнопку – контроллер сам подключится снова.<br><br><b>Joy-Con:</b> Подключите оба по очереди. Они автоматически объединяются в один контроллер (можно отключить в настройках).<br><br><b>Важно:</b> Контроллер помнит только <b>одно</b> устройство. Чтобы снова использовать его с Switch 2, нажмите там SYNC – а потом так же на телефоне.",
-  "ja": "<b>初回：</b>コントローラーの小さな丸い <b>SYNC ボタン</b> を、ランプが左右に流れるまで長押しします。N-Connect が自動的に見つけるので、何もタップする必要はありません。<br><br><b>2 回目以降：</b>ボタンを押すだけで、コントローラーが自動的に再接続します。<br><br><b>Joy-Con：</b>2 本を順番に接続します。自動的に 1 台のコントローラーにまとめられます（設定でオフにできます）。<br><br><b>重要：</b>コントローラーが記憶できる機器は常に <b>1 台</b> だけです。Switch 2 で再び使うには、そちらで SYNC を押してください – その後スマートフォンでも同様です。",
-  "zh": "<b>首次使用：</b>按住控制器上的小圆形 <b>SYNC 按钮</b>，直到指示灯来回闪动。N-Connect 会自动找到它 – 你无需点按任何东西。<br><br><b>之后：</b>只需按下任意按键，控制器就会自动重新连接。<br><br><b>Joy-Con：</b>依次连接两只。它们会自动合并为一个控制器（可在设置中关闭）。<br><br><b>重要：</b>控制器始终只记住 <b>一台</b> 设备。若想再次在 Switch 2 上使用，请在那里重新按 SYNC – 之后在手机上也一样。",
-  "ko": "<b>처음:</b> 컨트롤러의 작고 둥근 <b>SYNC 버튼</b>을 표시등이 좌우로 움직일 때까지 길게 누르세요. N-Connect가 자동으로 찾아내므로 아무것도 탭할 필요가 없습니다.<br><br><b>그 후:</b> 버튼만 누르면 컨트롤러가 자동으로 다시 연결됩니다.<br><br><b>Joy-Con:</b> 두 개를 차례로 연결하세요. 자동으로 하나의 컨트롤러로 합쳐집니다(설정에서 끌 수 있음).<br><br><b>중요:</b> 컨트롤러는 항상 <b>한 대</b>의 기기만 기억합니다. Switch 2에서 다시 사용하려면 그곳에서 SYNC를 다시 누르세요 – 그 후 휴대전화에서도 마찬가지입니다."
+ "<b>Beim ersten Mal:</b> Halte die kleine runde <b>SYNC-Taste</b> am Controller gedrückt, bis die Lichter hin- und herlaufen. SKZ Connect findet ihn automatisch – du musst nichts antippen.<br><br><b>Danach:</b> Einfach eine Taste drücken – der Controller verbindet sich von selbst wieder.<br><br><b>Joy-Con:</b> Verbinde beide nacheinander. Sie werden automatisch zu einem Controller zusammengefasst (abschaltbar in den Einstellungen).<br><br><b>Wichtig:</b> Ein Controller merkt sich immer nur <b>ein</b> Gerät. Willst du ihn wieder an der Switch 2 nutzen, drücke dort erneut SYNC – danach am Handy ebenfalls.": {
+  "en": "<b>The first time:</b> Hold the small round <b>SYNC button</b> on the controller until the lights run back and forth. SKZ Connect finds it automatically – you don't need to tap anything.<br><br><b>After that:</b> Just press a button – the controller reconnects by itself.<br><br><b>Joy-Con:</b> Connect both one after the other. They are automatically combined into one controller (can be turned off in the settings).<br><br><b>Important:</b> A controller only remembers <b>one</b> device. To use it with the Switch 2 again, press SYNC there – and later on the phone again.",
+  "es": "<b>La primera vez:</b> Mantén pulsado el pequeño <b>botón SYNC</b> redondo del mando hasta que las luces vayan de un lado a otro. SKZ Connect lo encuentra automáticamente: no tienes que tocar nada.<br><br><b>Después:</b> Basta con pulsar un botón y el mando se vuelve a conectar solo.<br><br><b>Joy-Con:</b> Conecta los dos uno tras otro. Se combinan automáticamente en un solo mando (se puede desactivar en los ajustes).<br><br><b>Importante:</b> Un mando solo recuerda <b>un</b> dispositivo. Si quieres volver a usarlo en la Switch 2, pulsa SYNC allí y después también en el móvil.",
+  "fr": "<b>La première fois :</b> Maintenez le petit <b>bouton SYNC</b> rond de la manette jusqu'à ce que les voyants défilent. SKZ Connect la trouve automatiquement – vous n'avez rien à toucher.<br><br><b>Ensuite :</b> Appuyez simplement sur un bouton – la manette se reconnecte toute seule.<br><br><b>Joy-Con :</b> Connectez les deux l'un après l'autre. Ils sont automatiquement réunis en une seule manette (désactivable dans les paramètres).<br><br><b>Important :</b> Une manette ne mémorise qu'<b>un seul</b> appareil. Pour la réutiliser sur la Switch 2, appuyez à nouveau sur SYNC là-bas – puis de même sur le téléphone.",
+  "it": "<b>La prima volta:</b> Tieni premuto il piccolo <b>tasto SYNC</b> rotondo sul controller finché le luci scorrono avanti e indietro. SKZ Connect lo trova automaticamente: non devi toccare nulla.<br><br><b>Dopo:</b> Basta premere un tasto e il controller si riconnette da solo.<br><br><b>Joy-Con:</b> Collegali entrambi uno dopo l'altro. Vengono uniti automaticamente in un unico controller (disattivabile nelle impostazioni).<br><br><b>Importante:</b> Un controller ricorda sempre <b>un solo</b> dispositivo. Se vuoi usarlo di nuovo con la Switch 2, premi di nuovo SYNC lì, e poi anche sul telefono.",
+  "pt": "<b>Da primeira vez:</b> Mantenha premido o pequeno <b>botão SYNC</b> redondo do comando até as luzes correrem de um lado para o outro. O SKZ Connect encontra-o automaticamente – não precisa de tocar em nada.<br><br><b>Depois:</b> Basta premir um botão – o comando volta a ligar-se sozinho.<br><br><b>Joy-Con:</b> Ligue os dois um após o outro. São automaticamente combinados num só comando (pode desativar nas definições).<br><br><b>Importante:</b> Um comando lembra-se sempre de <b>um só</b> dispositivo. Para o voltar a usar na Switch 2, prima SYNC lá – e depois também no telemóvel.",
+  "nl": "<b>De eerste keer:</b> Houd de kleine ronde <b>SYNC-knop</b> op de controller ingedrukt tot de lampjes heen en weer lopen. SKZ Connect vindt hem automatisch – je hoeft niets aan te tikken.<br><br><b>Daarna:</b> Druk gewoon op een knop – de controller maakt vanzelf weer verbinding.<br><br><b>Joy-Con:</b> Verbind ze allebei na elkaar. Ze worden automatisch samengevoegd tot één controller (uit te schakelen in de instellingen).<br><br><b>Belangrijk:</b> Een controller onthoudt altijd maar <b>één</b> apparaat. Wil je hem weer op de Switch 2 gebruiken, druk daar dan opnieuw op SYNC – en daarna op de telefoon ook.",
+  "pl": "<b>Za pierwszym razem:</b> Przytrzymaj mały okrągły <b>przycisk SYNC</b> na kontrolerze, aż diody zaczną biegać w tę i z powrotem. SKZ Connect znajdzie go automatycznie – nie musisz niczego stukać.<br><br><b>Później:</b> Wystarczy nacisnąć przycisk – kontroler sam połączy się ponownie.<br><br><b>Joy-Con:</b> Połącz oba po kolei. Zostaną automatycznie połączone w jeden kontroler (można to wyłączyć w ustawieniach).<br><br><b>Ważne:</b> Kontroler pamięta zawsze tylko <b>jedno</b> urządzenie. Jeśli chcesz znów używać go z Switch 2, naciśnij tam ponownie SYNC – a potem tak samo na telefonie.",
+  "ru": "<b>В первый раз:</b> Удерживайте маленькую круглую <b>кнопку SYNC</b> на контроллере, пока огоньки не побегут туда-сюда. SKZ Connect найдёт его автоматически – ничего нажимать не нужно.<br><br><b>Потом:</b> Просто нажмите любую кнопку – контроллер сам подключится снова.<br><br><b>Joy-Con:</b> Подключите оба по очереди. Они автоматически объединяются в один контроллер (можно отключить в настройках).<br><br><b>Важно:</b> Контроллер помнит только <b>одно</b> устройство. Чтобы снова использовать его с Switch 2, нажмите там SYNC – а потом так же на телефоне.",
+  "ja": "<b>初回：</b>コントローラーの小さな丸い <b>SYNC ボタン</b> を、ランプが左右に流れるまで長押しします。SKZ Connect が自動的に見つけるので、何もタップする必要はありません。<br><br><b>2 回目以降：</b>ボタンを押すだけで、コントローラーが自動的に再接続します。<br><br><b>Joy-Con：</b>2 本を順番に接続します。自動的に 1 台のコントローラーにまとめられます（設定でオフにできます）。<br><br><b>重要：</b>コントローラーが記憶できる機器は常に <b>1 台</b> だけです。Switch 2 で再び使うには、そちらで SYNC を押してください – その後スマートフォンでも同様です。",
+  "zh": "<b>首次使用：</b>按住控制器上的小圆形 <b>SYNC 按钮</b>，直到指示灯来回闪动。SKZ Connect 会自动找到它 – 你无需点按任何东西。<br><br><b>之后：</b>只需按下任意按键，控制器就会自动重新连接。<br><br><b>Joy-Con：</b>依次连接两只。它们会自动合并为一个控制器（可在设置中关闭）。<br><br><b>重要：</b>控制器始终只记住 <b>一台</b> 设备。若想再次在 Switch 2 上使用，请在那里重新按 SYNC – 之后在手机上也一样。",
+  "ko": "<b>처음:</b> 컨트롤러의 작고 둥근 <b>SYNC 버튼</b>을 표시등이 좌우로 움직일 때까지 길게 누르세요. SKZ Connect가 자동으로 찾아내므로 아무것도 탭할 필요가 없습니다.<br><br><b>그 후:</b> 버튼만 누르면 컨트롤러가 자동으로 다시 연결됩니다.<br><br><b>Joy-Con:</b> 두 개를 차례로 연결하세요. 자동으로 하나의 컨트롤러로 합쳐집니다(설정에서 끌 수 있음).<br><br><b>중요:</b> 컨트롤러는 항상 <b>한 대</b>의 기기만 기억합니다. Switch 2에서 다시 사용하려면 그곳에서 SYNC를 다시 누르세요 – 그 후 휴대전화에서도 마찬가지입니다."
  },
  "Shizuku einrichten (ohne Root)": {
   "en": "Set up Shizuku (no root)",
@@ -688,18 +688,18 @@
   "zh": "设置 Shizuku（无需 root）",
   "ko": "Shizuku 설정(루트 불필요)"
  },
- "Shizuku gibt N-Connect die Rechte, einen virtuellen Xbox-Controller anzulegen – ganz ohne Root.<br><br><b>1.</b> Installiere <b>Shizuku</b> aus dem Play Store.<br><b>2.</b> Aktiviere die <b>Entwickleroptionen</b>: Einstellungen → Über das Telefon → 7× auf <i>Build-Nummer</i> tippen.<br><b>3.</b> Verbinde dich mit einem <b>WLAN</b> und schalte in den Entwickleroptionen <b>Kabelloses Debugging</b> ein.<br><b>4.</b> Öffne Shizuku und tippe bei „Über kabelloses Debugging starten“ auf <b>Kopplung</b>. Folge der Anleitung (Kopplungscode in den Benachrichtigungen eingeben), danach auf <b>Starten</b>.<br><b>5.</b> Zurück in N-Connect: Einrichtung öffnen und <b>Zugriff erlauben</b>.<br><br><b>Nach jedem Neustart</b> des Handys musst du in Shizuku einmal auf „Starten“ tippen (WLAN nötig). Die Kopplung bleibt erhalten.": {
-  "en": "Shizuku gives N-Connect the rights to create a virtual Xbox controller – without root.<br><br><b>1.</b> Install <b>Shizuku</b> from the Play Store.<br><b>2.</b> Enable <b>Developer options</b>: Settings → About phone → tap <i>Build number</i> 7×.<br><b>3.</b> Connect to a <b>Wi-Fi</b> network and turn on <b>Wireless debugging</b> in Developer options.<br><b>4.</b> Open Shizuku and tap <b>Pairing</b> under “Start via Wireless debugging”. Follow the instructions (enter the pairing code in the notification), then tap <b>Start</b>.<br><b>5.</b> Back in N-Connect: open the setup and tap <b>Allow access</b>.<br><br><b>After every restart</b> of the phone you need to tap “Start” once in Shizuku (Wi-Fi required). The pairing is kept.",
-  "es": "Shizuku da a N-Connect los permisos para crear un mando de Xbox virtual, sin root.<br><br><b>1.</b> Instala <b>Shizuku</b> desde Play Store.<br><b>2.</b> Activa las <b>Opciones para desarrolladores</b>: Ajustes → Información del teléfono → toca 7 veces <i>Número de compilación</i>.<br><b>3.</b> Conéctate a una red <b>Wi-Fi</b> y activa la <b>Depuración inalámbrica</b> en las Opciones para desarrolladores.<br><b>4.</b> Abre Shizuku y, en «Iniciar mediante depuración inalámbrica», toca <b>Vincular</b>. Sigue las instrucciones (introduce el código de vinculación en la notificación) y luego toca <b>Iniciar</b>.<br><b>5.</b> De vuelta en N-Connect: abre la configuración y toca <b>Permitir acceso</b>.<br><br><b>Tras cada reinicio</b> del móvil tienes que tocar una vez «Iniciar» en Shizuku (requiere Wi-Fi). La vinculación se conserva.",
-  "fr": "Shizuku donne à N-Connect les droits de créer une manette Xbox virtuelle – sans root.<br><br><b>1.</b> Installez <b>Shizuku</b> depuis le Play Store.<br><b>2.</b> Activez les <b>Options pour les développeurs</b> : Paramètres → À propos du téléphone → appuyez 7× sur <i>Numéro de build</i>.<br><b>3.</b> Connectez-vous à un réseau <b>Wi-Fi</b> et activez le <b>Débogage sans fil</b> dans les Options pour les développeurs.<br><b>4.</b> Ouvrez Shizuku et, sous « Démarrer via le débogage sans fil », appuyez sur <b>Association</b>. Suivez les instructions (saisissez le code d'association dans la notification), puis appuyez sur <b>Démarrer</b>.<br><b>5.</b> De retour dans N-Connect : ouvrez la configuration et appuyez sur <b>Autoriser l'accès</b>.<br><br><b>Après chaque redémarrage</b> du téléphone, vous devez appuyer une fois sur « Démarrer » dans Shizuku (Wi-Fi nécessaire). L'association est conservée.",
-  "it": "Shizuku dà a N-Connect i permessi per creare un controller Xbox virtuale, senza root.<br><br><b>1.</b> Installa <b>Shizuku</b> dal Play Store.<br><b>2.</b> Attiva le <b>Opzioni sviluppatore</b>: Impostazioni → Informazioni sul telefono → tocca 7 volte <i>Numero build</i>.<br><b>3.</b> Connettiti a una rete <b>Wi-Fi</b> e attiva il <b>Debug wireless</b> nelle Opzioni sviluppatore.<br><b>4.</b> Apri Shizuku e, in «Avvia tramite debug wireless», tocca <b>Accoppiamento</b>. Segui le istruzioni (inserisci il codice di accoppiamento nella notifica), poi tocca <b>Avvia</b>.<br><b>5.</b> Di nuovo in N-Connect: apri la configurazione e tocca <b>Consenti accesso</b>.<br><br><b>Dopo ogni riavvio</b> del telefono devi toccare una volta «Avvia» in Shizuku (serve il Wi-Fi). L'accoppiamento resta.",
-  "pt": "O Shizuku dá ao N-Connect os direitos para criar um comando Xbox virtual – sem root.<br><br><b>1.</b> Instale o <b>Shizuku</b> a partir da Play Store.<br><b>2.</b> Ative as <b>Opções de programador</b>: Definições → Acerca do telemóvel → toque 7× em <i>Número de compilação</i>.<br><b>3.</b> Ligue-se a uma rede <b>Wi-Fi</b> e ative a <b>Depuração sem fios</b> nas Opções de programador.<br><b>4.</b> Abra o Shizuku e, em «Iniciar através da depuração sem fios», toque em <b>Emparelhamento</b>. Siga as instruções (introduza o código de emparelhamento na notificação) e depois toque em <b>Iniciar</b>.<br><b>5.</b> De volta ao N-Connect: abra a configuração e toque em <b>Permitir acesso</b>.<br><br><b>Após cada reinício</b> do telemóvel tem de tocar uma vez em «Iniciar» no Shizuku (requer Wi-Fi). O emparelhamento mantém-se.",
-  "nl": "Shizuku geeft N-Connect de rechten om een virtuele Xbox-controller aan te maken – helemaal zonder root.<br><br><b>1.</b> Installeer <b>Shizuku</b> uit de Play Store.<br><b>2.</b> Schakel de <b>Ontwikkelaarsopties</b> in: Instellingen → Over de telefoon → tik 7× op <i>Buildnummer</i>.<br><b>3.</b> Maak verbinding met een <b>wifi</b>-netwerk en zet in de Ontwikkelaarsopties <b>Draadloze foutopsporing</b> aan.<br><b>4.</b> Open Shizuku en tik bij ‘Starten via draadloze foutopsporing’ op <b>Koppelen</b>. Volg de instructies (koppelingscode in de melding invoeren) en tik daarna op <b>Starten</b>.<br><b>5.</b> Terug in N-Connect: open de installatie en tik op <b>Toegang toestaan</b>.<br><br><b>Na elke herstart</b> van de telefoon moet je in Shizuku één keer op ‘Starten’ tikken (wifi nodig). De koppeling blijft behouden.",
-  "pl": "Shizuku daje N-Connect uprawnienia do utworzenia wirtualnego kontrolera Xbox – całkowicie bez roota.<br><br><b>1.</b> Zainstaluj <b>Shizuku</b> ze Sklepu Play.<br><b>2.</b> Włącz <b>Opcje programisty</b>: Ustawienia → Informacje o telefonie → stuknij 7× <i>Numer kompilacji</i>.<br><b>3.</b> Połącz się z siecią <b>Wi-Fi</b> i włącz w Opcjach programisty <b>Debugowanie bezprzewodowe</b>.<br><b>4.</b> Otwórz Shizuku i przy „Uruchom przez debugowanie bezprzewodowe” stuknij <b>Parowanie</b>. Postępuj zgodnie z instrukcją (wpisz kod parowania w powiadomieniu), a potem stuknij <b>Uruchom</b>.<br><b>5.</b> Z powrotem w N-Connect: otwórz konfigurację i stuknij <b>Zezwól na dostęp</b>.<br><br><b>Po każdym ponownym uruchomieniu</b> telefonu musisz raz stuknąć „Uruchom” w Shizuku (wymagane Wi-Fi). Parowanie zostaje zachowane.",
-  "ru": "Shizuku даёт N-Connect права на создание виртуального контроллера Xbox – совсем без root.<br><br><b>1.</b> Установите <b>Shizuku</b> из Play Маркета.<br><b>2.</b> Включите <b>режим разработчика</b>: Настройки → О телефоне → 7 раз нажмите <i>Номер сборки</i>.<br><b>3.</b> Подключитесь к сети <b>Wi-Fi</b> и включите <b>Отладку по Wi-Fi</b> в параметрах разработчика.<br><b>4.</b> Откройте Shizuku и в пункте «Запуск через отладку по Wi-Fi» нажмите <b>Сопряжение</b>. Следуйте инструкции (введите код сопряжения в уведомлении), затем нажмите <b>Запустить</b>.<br><b>5.</b> Вернитесь в N-Connect: откройте настройку и нажмите <b>Разрешить доступ</b>.<br><br><b>После каждой перезагрузки</b> телефона нужно один раз нажать «Запустить» в Shizuku (нужен Wi-Fi). Сопряжение сохраняется.",
-  "ja": "Shizuku は N-Connect に仮想 Xbox コントローラーを作成する権限を与えます – root は不要です。<br><br><b>1.</b> Play ストアから <b>Shizuku</b> をインストールします。<br><b>2.</b> <b>開発者向けオプション</b>を有効にします：設定 → デバイス情報 → <i>ビルド番号</i> を 7 回タップ。<br><b>3.</b> <b>Wi-Fi</b> に接続し、開発者向けオプションで <b>ワイヤレス デバッグ</b> をオンにします。<br><b>4.</b> Shizuku を開き、「ワイヤレス デバッグで起動」の <b>ペアリング</b> をタップします。案内に従い（通知にペア設定コードを入力）、その後 <b>開始</b> をタップします。<br><b>5.</b> N-Connect に戻り、セットアップを開いて <b>アクセスを許可</b> をタップします。<br><br>スマートフォンを<b>再起動するたびに</b>、Shizuku で一度「開始」をタップする必要があります（Wi-Fi が必要）。ペアリングは保持されます。",
-  "zh": "Shizuku 让 N-Connect 有权限创建虚拟 Xbox 控制器 – 完全无需 root。<br><br><b>1.</b> 从 Play 商店安装 <b>Shizuku</b>。<br><b>2.</b> 启用 <b>开发者选项</b>：设置 → 关于手机 → 点按 <i>版本号</i> 7 次。<br><b>3.</b> 连接到 <b>WLAN</b> 并在开发者选项中开启 <b>无线调试</b>。<br><b>4.</b> 打开 Shizuku，在“通过无线调试启动”下点按 <b>配对</b>。按照说明操作（在通知中输入配对码），然后点按 <b>启动</b>。<br><b>5.</b> 回到 N-Connect：打开设置向导并点按 <b>允许访问</b>。<br><br>手机<b>每次重启后</b>，都需要在 Shizuku 中点按一次“启动”（需要 WLAN）。配对会保留。",
-  "ko": "Shizuku는 N-Connect에 가상 Xbox 컨트롤러를 만들 권한을 줍니다 – 루트 없이.<br><br><b>1.</b> Play 스토어에서 <b>Shizuku</b>를 설치하세요.<br><b>2.</b> <b>개발자 옵션</b>을 활성화하세요: 설정 → 휴대전화 정보 → <i>빌드 번호</i>를 7번 탭.<br><b>3.</b> <b>Wi-Fi</b>에 연결하고 개발자 옵션에서 <b>무선 디버깅</b>을 켜세요.<br><b>4.</b> Shizuku를 열고 '무선 디버깅으로 시작'에서 <b>페어링</b>을 탭하세요. 안내에 따라(알림에 페어링 코드 입력) 진행한 다음 <b>시작</b>을 탭하세요.<br><b>5.</b> N-Connect로 돌아와 설정을 열고 <b>액세스 허용</b>을 탭하세요.<br><br>휴대전화를 <b>재부팅할 때마다</b> Shizuku에서 '시작'을 한 번 탭해야 합니다(Wi-Fi 필요). 페어링은 유지됩니다."
+ "Shizuku gibt SKZ Connect die Rechte, einen virtuellen Xbox-Controller anzulegen – ganz ohne Root.<br><br><b>1.</b> Installiere <b>Shizuku</b> aus dem Play Store.<br><b>2.</b> Aktiviere die <b>Entwickleroptionen</b>: Einstellungen → Über das Telefon → 7× auf <i>Build-Nummer</i> tippen.<br><b>3.</b> Verbinde dich mit einem <b>WLAN</b> und schalte in den Entwickleroptionen <b>Kabelloses Debugging</b> ein.<br><b>4.</b> Öffne Shizuku und tippe bei „Über kabelloses Debugging starten“ auf <b>Kopplung</b>. Folge der Anleitung (Kopplungscode in den Benachrichtigungen eingeben), danach auf <b>Starten</b>.<br><b>5.</b> Zurück in SKZ Connect: Einrichtung öffnen und <b>Zugriff erlauben</b>.<br><br><b>Nach jedem Neustart</b> des Handys musst du in Shizuku einmal auf „Starten“ tippen (WLAN nötig). Die Kopplung bleibt erhalten.": {
+  "en": "Shizuku gives SKZ Connect the rights to create a virtual Xbox controller – without root.<br><br><b>1.</b> Install <b>Shizuku</b> from the Play Store.<br><b>2.</b> Enable <b>Developer options</b>: Settings → About phone → tap <i>Build number</i> 7×.<br><b>3.</b> Connect to a <b>Wi-Fi</b> network and turn on <b>Wireless debugging</b> in Developer options.<br><b>4.</b> Open Shizuku and tap <b>Pairing</b> under “Start via Wireless debugging”. Follow the instructions (enter the pairing code in the notification), then tap <b>Start</b>.<br><b>5.</b> Back in SKZ Connect: open the setup and tap <b>Allow access</b>.<br><br><b>After every restart</b> of the phone you need to tap “Start” once in Shizuku (Wi-Fi required). The pairing is kept.",
+  "es": "Shizuku da a SKZ Connect los permisos para crear un mando de Xbox virtual, sin root.<br><br><b>1.</b> Instala <b>Shizuku</b> desde Play Store.<br><b>2.</b> Activa las <b>Opciones para desarrolladores</b>: Ajustes → Información del teléfono → toca 7 veces <i>Número de compilación</i>.<br><b>3.</b> Conéctate a una red <b>Wi-Fi</b> y activa la <b>Depuración inalámbrica</b> en las Opciones para desarrolladores.<br><b>4.</b> Abre Shizuku y, en «Iniciar mediante depuración inalámbrica», toca <b>Vincular</b>. Sigue las instrucciones (introduce el código de vinculación en la notificación) y luego toca <b>Iniciar</b>.<br><b>5.</b> De vuelta en SKZ Connect: abre la configuración y toca <b>Permitir acceso</b>.<br><br><b>Tras cada reinicio</b> del móvil tienes que tocar una vez «Iniciar» en Shizuku (requiere Wi-Fi). La vinculación se conserva.",
+  "fr": "Shizuku donne à SKZ Connect les droits de créer une manette Xbox virtuelle – sans root.<br><br><b>1.</b> Installez <b>Shizuku</b> depuis le Play Store.<br><b>2.</b> Activez les <b>Options pour les développeurs</b> : Paramètres → À propos du téléphone → appuyez 7× sur <i>Numéro de build</i>.<br><b>3.</b> Connectez-vous à un réseau <b>Wi-Fi</b> et activez le <b>Débogage sans fil</b> dans les Options pour les développeurs.<br><b>4.</b> Ouvrez Shizuku et, sous « Démarrer via le débogage sans fil », appuyez sur <b>Association</b>. Suivez les instructions (saisissez le code d'association dans la notification), puis appuyez sur <b>Démarrer</b>.<br><b>5.</b> De retour dans SKZ Connect : ouvrez la configuration et appuyez sur <b>Autoriser l'accès</b>.<br><br><b>Après chaque redémarrage</b> du téléphone, vous devez appuyer une fois sur « Démarrer » dans Shizuku (Wi-Fi nécessaire). L'association est conservée.",
+  "it": "Shizuku dà a SKZ Connect i permessi per creare un controller Xbox virtuale, senza root.<br><br><b>1.</b> Installa <b>Shizuku</b> dal Play Store.<br><b>2.</b> Attiva le <b>Opzioni sviluppatore</b>: Impostazioni → Informazioni sul telefono → tocca 7 volte <i>Numero build</i>.<br><b>3.</b> Connettiti a una rete <b>Wi-Fi</b> e attiva il <b>Debug wireless</b> nelle Opzioni sviluppatore.<br><b>4.</b> Apri Shizuku e, in «Avvia tramite debug wireless», tocca <b>Accoppiamento</b>. Segui le istruzioni (inserisci il codice di accoppiamento nella notifica), poi tocca <b>Avvia</b>.<br><b>5.</b> Di nuovo in SKZ Connect: apri la configurazione e tocca <b>Consenti accesso</b>.<br><br><b>Dopo ogni riavvio</b> del telefono devi toccare una volta «Avvia» in Shizuku (serve il Wi-Fi). L'accoppiamento resta.",
+  "pt": "O Shizuku dá ao SKZ Connect os direitos para criar um comando Xbox virtual – sem root.<br><br><b>1.</b> Instale o <b>Shizuku</b> a partir da Play Store.<br><b>2.</b> Ative as <b>Opções de programador</b>: Definições → Acerca do telemóvel → toque 7× em <i>Número de compilação</i>.<br><b>3.</b> Ligue-se a uma rede <b>Wi-Fi</b> e ative a <b>Depuração sem fios</b> nas Opções de programador.<br><b>4.</b> Abra o Shizuku e, em «Iniciar através da depuração sem fios», toque em <b>Emparelhamento</b>. Siga as instruções (introduza o código de emparelhamento na notificação) e depois toque em <b>Iniciar</b>.<br><b>5.</b> De volta ao SKZ Connect: abra a configuração e toque em <b>Permitir acesso</b>.<br><br><b>Após cada reinício</b> do telemóvel tem de tocar uma vez em «Iniciar» no Shizuku (requer Wi-Fi). O emparelhamento mantém-se.",
+  "nl": "Shizuku geeft SKZ Connect de rechten om een virtuele Xbox-controller aan te maken – helemaal zonder root.<br><br><b>1.</b> Installeer <b>Shizuku</b> uit de Play Store.<br><b>2.</b> Schakel de <b>Ontwikkelaarsopties</b> in: Instellingen → Over de telefoon → tik 7× op <i>Buildnummer</i>.<br><b>3.</b> Maak verbinding met een <b>wifi</b>-netwerk en zet in de Ontwikkelaarsopties <b>Draadloze foutopsporing</b> aan.<br><b>4.</b> Open Shizuku en tik bij ‘Starten via draadloze foutopsporing’ op <b>Koppelen</b>. Volg de instructies (koppelingscode in de melding invoeren) en tik daarna op <b>Starten</b>.<br><b>5.</b> Terug in SKZ Connect: open de installatie en tik op <b>Toegang toestaan</b>.<br><br><b>Na elke herstart</b> van de telefoon moet je in Shizuku één keer op ‘Starten’ tikken (wifi nodig). De koppeling blijft behouden.",
+  "pl": "Shizuku daje SKZ Connect uprawnienia do utworzenia wirtualnego kontrolera Xbox – całkowicie bez roota.<br><br><b>1.</b> Zainstaluj <b>Shizuku</b> ze Sklepu Play.<br><b>2.</b> Włącz <b>Opcje programisty</b>: Ustawienia → Informacje o telefonie → stuknij 7× <i>Numer kompilacji</i>.<br><b>3.</b> Połącz się z siecią <b>Wi-Fi</b> i włącz w Opcjach programisty <b>Debugowanie bezprzewodowe</b>.<br><b>4.</b> Otwórz Shizuku i przy „Uruchom przez debugowanie bezprzewodowe” stuknij <b>Parowanie</b>. Postępuj zgodnie z instrukcją (wpisz kod parowania w powiadomieniu), a potem stuknij <b>Uruchom</b>.<br><b>5.</b> Z powrotem w SKZ Connect: otwórz konfigurację i stuknij <b>Zezwól na dostęp</b>.<br><br><b>Po każdym ponownym uruchomieniu</b> telefonu musisz raz stuknąć „Uruchom” w Shizuku (wymagane Wi-Fi). Parowanie zostaje zachowane.",
+  "ru": "Shizuku даёт SKZ Connect права на создание виртуального контроллера Xbox – совсем без root.<br><br><b>1.</b> Установите <b>Shizuku</b> из Play Маркета.<br><b>2.</b> Включите <b>режим разработчика</b>: Настройки → О телефоне → 7 раз нажмите <i>Номер сборки</i>.<br><b>3.</b> Подключитесь к сети <b>Wi-Fi</b> и включите <b>Отладку по Wi-Fi</b> в параметрах разработчика.<br><b>4.</b> Откройте Shizuku и в пункте «Запуск через отладку по Wi-Fi» нажмите <b>Сопряжение</b>. Следуйте инструкции (введите код сопряжения в уведомлении), затем нажмите <b>Запустить</b>.<br><b>5.</b> Вернитесь в SKZ Connect: откройте настройку и нажмите <b>Разрешить доступ</b>.<br><br><b>После каждой перезагрузки</b> телефона нужно один раз нажать «Запустить» в Shizuku (нужен Wi-Fi). Сопряжение сохраняется.",
+  "ja": "Shizuku は SKZ Connect に仮想 Xbox コントローラーを作成する権限を与えます – root は不要です。<br><br><b>1.</b> Play ストアから <b>Shizuku</b> をインストールします。<br><b>2.</b> <b>開発者向けオプション</b>を有効にします：設定 → デバイス情報 → <i>ビルド番号</i> を 7 回タップ。<br><b>3.</b> <b>Wi-Fi</b> に接続し、開発者向けオプションで <b>ワイヤレス デバッグ</b> をオンにします。<br><b>4.</b> Shizuku を開き、「ワイヤレス デバッグで起動」の <b>ペアリング</b> をタップします。案内に従い（通知にペア設定コードを入力）、その後 <b>開始</b> をタップします。<br><b>5.</b> SKZ Connect に戻り、セットアップを開いて <b>アクセスを許可</b> をタップします。<br><br>スマートフォンを<b>再起動するたびに</b>、Shizuku で一度「開始」をタップする必要があります（Wi-Fi が必要）。ペアリングは保持されます。",
+  "zh": "Shizuku 让 SKZ Connect 有权限创建虚拟 Xbox 控制器 – 完全无需 root。<br><br><b>1.</b> 从 Play 商店安装 <b>Shizuku</b>。<br><b>2.</b> 启用 <b>开发者选项</b>：设置 → 关于手机 → 点按 <i>版本号</i> 7 次。<br><b>3.</b> 连接到 <b>WLAN</b> 并在开发者选项中开启 <b>无线调试</b>。<br><b>4.</b> 打开 Shizuku，在“通过无线调试启动”下点按 <b>配对</b>。按照说明操作（在通知中输入配对码），然后点按 <b>启动</b>。<br><b>5.</b> 回到 SKZ Connect：打开设置向导并点按 <b>允许访问</b>。<br><br>手机<b>每次重启后</b>，都需要在 Shizuku 中点按一次“启动”（需要 WLAN）。配对会保留。",
+  "ko": "Shizuku는 SKZ Connect에 가상 Xbox 컨트롤러를 만들 권한을 줍니다 – 루트 없이.<br><br><b>1.</b> Play 스토어에서 <b>Shizuku</b>를 설치하세요.<br><b>2.</b> <b>개발자 옵션</b>을 활성화하세요: 설정 → 휴대전화 정보 → <i>빌드 번호</i>를 7번 탭.<br><b>3.</b> <b>Wi-Fi</b>에 연결하고 개발자 옵션에서 <b>무선 디버깅</b>을 켜세요.<br><b>4.</b> Shizuku를 열고 '무선 디버깅으로 시작'에서 <b>페어링</b>을 탭하세요. 안내에 따라(알림에 페어링 코드 입력) 진행한 다음 <b>시작</b>을 탭하세요.<br><b>5.</b> SKZ Connect로 돌아와 설정을 열고 <b>액세스 허용</b>을 탭하세요.<br><br>휴대전화를 <b>재부팅할 때마다</b> Shizuku에서 '시작'을 한 번 탭해야 합니다(Wi-Fi 필요). 페어링은 유지됩니다."
  },
  "Shizuku öffnen": {
   "en": "Open Shizuku",
@@ -766,18 +766,18 @@
   "zh": "使用 root",
   "ko": "루트로 사용"
  },
- "Ist dein Gerät gerootet (z. B. Magisk, KernelSU oder APatch), wähle in der Einrichtung <b>Root</b> und erlaube N-Connect den Zugriff im Root-Dialog. Root funktioniert dauerhaft – auch nach einem Neustart, ohne WLAN.": {
-  "en": "If your device is rooted (e.g. Magisk, KernelSU or APatch), choose <b>Root</b> in the setup and grant N-Connect access in the root dialog. Root works permanently – even after a restart, without Wi-Fi.",
-  "es": "Si tu dispositivo está rooteado (p. ej. Magisk, KernelSU o APatch), elige <b>Root</b> en la configuración y concede acceso a N-Connect en el diálogo de root. Root funciona de forma permanente, incluso tras un reinicio y sin Wi-Fi.",
-  "fr": "Si votre appareil est rooté (par ex. Magisk, KernelSU ou APatch), choisissez <b>Root</b> dans la configuration et accordez l'accès à N-Connect dans la boîte de dialogue root. Root fonctionne durablement – même après un redémarrage, sans Wi-Fi.",
-  "it": "Se il tuo dispositivo ha i permessi di root (ad es. Magisk, KernelSU o APatch), scegli <b>Root</b> nella configurazione e concedi a N-Connect l'accesso nella finestra di root. Root funziona in modo permanente, anche dopo un riavvio e senza Wi-Fi.",
-  "pt": "Se o seu dispositivo tiver root (p. ex. Magisk, KernelSU ou APatch), escolha <b>Root</b> na configuração e conceda ao N-Connect o acesso na caixa de diálogo de root. O root funciona de forma permanente – mesmo após um reinício, sem Wi-Fi.",
-  "nl": "Is je apparaat geroot (bijv. Magisk, KernelSU of APatch), kies dan in de installatie <b>Root</b> en geef N-Connect toegang in het rootvenster. Root werkt blijvend – ook na een herstart, zonder wifi.",
-  "pl": "Jeśli twoje urządzenie ma roota (np. Magisk, KernelSU lub APatch), wybierz w konfiguracji <b>Root</b> i przyznaj N-Connect dostęp w oknie roota. Root działa na stałe – także po ponownym uruchomieniu, bez Wi-Fi.",
-  "ru": "Если на вашем устройстве есть root (например, Magisk, KernelSU или APatch), выберите в настройке <b>Root</b> и разрешите N-Connect доступ в диалоге root. Root работает постоянно – и после перезагрузки, без Wi-Fi.",
-  "ja": "端末が root 化されている場合（例：Magisk、KernelSU、APatch）、セットアップで <b>Root</b> を選び、root ダイアログで N-Connect にアクセスを許可してください。root は再起動後も Wi-Fi なしで常に機能します。",
-  "zh": "如果你的设备已 root（例如 Magisk、KernelSU 或 APatch），请在设置向导中选择 <b>Root</b>，并在 root 对话框中允许 N-Connect 访问。root 永久有效 – 重启后也无需 WLAN。",
-  "ko": "기기가 루팅되어 있다면(예: Magisk, KernelSU 또는 APatch) 설정에서 <b>Root</b>를 선택하고 루트 대화상자에서 N-Connect에 액세스를 허용하세요. 루트는 재부팅 후에도 Wi-Fi 없이 계속 작동합니다."
+ "Ist dein Gerät gerootet (z. B. Magisk, KernelSU oder APatch), wähle in der Einrichtung <b>Root</b> und erlaube SKZ Connect den Zugriff im Root-Dialog. Root funktioniert dauerhaft – auch nach einem Neustart, ohne WLAN.": {
+  "en": "If your device is rooted (e.g. Magisk, KernelSU or APatch), choose <b>Root</b> in the setup and grant SKZ Connect access in the root dialog. Root works permanently – even after a restart, without Wi-Fi.",
+  "es": "Si tu dispositivo está rooteado (p. ej. Magisk, KernelSU o APatch), elige <b>Root</b> en la configuración y concede acceso a SKZ Connect en el diálogo de root. Root funciona de forma permanente, incluso tras un reinicio y sin Wi-Fi.",
+  "fr": "Si votre appareil est rooté (par ex. Magisk, KernelSU ou APatch), choisissez <b>Root</b> dans la configuration et accordez l'accès à SKZ Connect dans la boîte de dialogue root. Root fonctionne durablement – même après un redémarrage, sans Wi-Fi.",
+  "it": "Se il tuo dispositivo ha i permessi di root (ad es. Magisk, KernelSU o APatch), scegli <b>Root</b> nella configurazione e concedi a SKZ Connect l'accesso nella finestra di root. Root funziona in modo permanente, anche dopo un riavvio e senza Wi-Fi.",
+  "pt": "Se o seu dispositivo tiver root (p. ex. Magisk, KernelSU ou APatch), escolha <b>Root</b> na configuração e conceda ao SKZ Connect o acesso na caixa de diálogo de root. O root funciona de forma permanente – mesmo após um reinício, sem Wi-Fi.",
+  "nl": "Is je apparaat geroot (bijv. Magisk, KernelSU of APatch), kies dan in de installatie <b>Root</b> en geef SKZ Connect toegang in het rootvenster. Root werkt blijvend – ook na een herstart, zonder wifi.",
+  "pl": "Jeśli twoje urządzenie ma roota (np. Magisk, KernelSU lub APatch), wybierz w konfiguracji <b>Root</b> i przyznaj SKZ Connect dostęp w oknie roota. Root działa na stałe – także po ponownym uruchomieniu, bez Wi-Fi.",
+  "ru": "Если на вашем устройстве есть root (например, Magisk, KernelSU или APatch), выберите в настройке <b>Root</b> и разрешите SKZ Connect доступ в диалоге root. Root работает постоянно – и после перезагрузки, без Wi-Fi.",
+  "ja": "端末が root 化されている場合（例：Magisk、KernelSU、APatch）、セットアップで <b>Root</b> を選び、root ダイアログで SKZ Connect にアクセスを許可してください。root は再起動後も Wi-Fi なしで常に機能します。",
+  "zh": "如果你的设备已 root（例如 Magisk、KernelSU 或 APatch），请在设置向导中选择 <b>Root</b>，并在 root 对话框中允许 SKZ Connect 访问。root 永久有效 – 重启后也无需 WLAN。",
+  "ko": "기기가 루팅되어 있다면(예: Magisk, KernelSU 또는 APatch) 설정에서 <b>Root</b>를 선택하고 루트 대화상자에서 SKZ Connect에 액세스를 허용하세요. 루트는 재부팅 후에도 Wi-Fi 없이 계속 작동합니다."
  },
  "Touch-Steuerung einrichten": {
   "en": "Set up touch controls",
@@ -792,18 +792,18 @@
   "zh": "设置触控操作",
   "ko": "터치 조작 설정"
  },
- "Für Spiele, die keinen Controller unterstützen, tippt N-Connect die Bildschirmknöpfe für dich.<br><br><b>1.</b> Einstellungen → Bedienungshilfen → <b>N-Connect Touch-Steuerung</b> einschalten.<br><b>2.</b> In N-Connect „Touch-Steuerung“ als Weg wählen oder zusätzlich einschalten.<br><b>3.</b> Spiel öffnen, Benachrichtigungsleiste herunterziehen und bei N-Connect auf <b>Touch-Layout bearbeiten</b> tippen.<br><b>4.</b> Mit „Taste hinzufügen“ Tasten und Sticks anlegen und auf die Knöpfe des Spiels ziehen. Gedrückt halten entfernt eine Taste. <b>Speichern</b> – fertig.<br><br>Sticks werden zu einem ziehenden Finger – ideal für virtuelle Joysticks in Spielen.": {
-  "en": "For games that don't support controllers, N-Connect taps the on-screen buttons for you.<br><br><b>1.</b> Settings → Accessibility → turn on <b>N-Connect touch controls</b>.<br><b>2.</b> In N-Connect, choose “Touch controls” as the method or turn them on additionally.<br><b>3.</b> Open the game, pull down the notification shade and tap <b>Edit touch layout</b> on N-Connect.<br><b>4.</b> Use “Add button” to create buttons and sticks and drag them onto the game's buttons. Long-press removes a button. <b>Save</b> – done.<br><br>Sticks become a dragging finger – ideal for virtual joysticks in games.",
-  "es": "En juegos que no admiten mandos, N-Connect toca los botones en pantalla por ti.<br><br><b>1.</b> Ajustes → Accesibilidad → activa <b>Control táctil de N-Connect</b>.<br><b>2.</b> En N-Connect, elige «Control táctil» como método o actívalo adicionalmente.<br><b>3.</b> Abre el juego, desliza hacia abajo la barra de notificaciones y toca <b>Editar diseño táctil</b> en N-Connect.<br><b>4.</b> Con «Añadir botón» crea botones y sticks y arrástralos sobre los botones del juego. Mantener pulsado elimina un botón. <b>Guardar</b>, y listo.<br><br>Los sticks se convierten en un dedo que se arrastra: ideal para joysticks virtuales en los juegos.",
-  "fr": "Pour les jeux qui ne prennent pas en charge les manettes, N-Connect appuie sur les boutons à l'écran à votre place.<br><br><b>1.</b> Paramètres → Accessibilité → activez <b>Commandes tactiles N-Connect</b>.<br><b>2.</b> Dans N-Connect, choisissez « Commandes tactiles » comme méthode ou activez-les en plus.<br><b>3.</b> Ouvrez le jeu, faites glisser le volet des notifications et appuyez sur <b>Modifier la disposition tactile</b> sous N-Connect.<br><b>4.</b> Avec « Ajouter un bouton », créez des boutons et des sticks et faites-les glisser sur les boutons du jeu. Un appui long supprime un bouton. <b>Enregistrer</b> – c'est fini.<br><br>Les sticks deviennent un doigt qui glisse – idéal pour les joysticks virtuels des jeux.",
-  "it": "Per i giochi che non supportano i controller, N-Connect tocca i pulsanti a schermo per te.<br><br><b>1.</b> Impostazioni → Accessibilità → attiva <b>Controllo touch di N-Connect</b>.<br><b>2.</b> In N-Connect scegli «Controllo touch» come metodo o attivalo in aggiunta.<br><b>3.</b> Apri il gioco, trascina giù la tendina delle notifiche e tocca <b>Modifica layout touch</b> su N-Connect.<br><b>4.</b> Con «Aggiungi tasto» crea tasti e stick e trascinali sui pulsanti del gioco. Tenere premuto rimuove un tasto. <b>Salva</b>: fatto.<br><br>Gli stick diventano un dito che trascina: ideale per i joystick virtuali nei giochi.",
-  "pt": "Em jogos que não suportam comandos, o N-Connect toca nos botões do ecrã por si.<br><br><b>1.</b> Definições → Acessibilidade → ligue <b>Controlo tátil do N-Connect</b>.<br><b>2.</b> No N-Connect, escolha «Controlo tátil» como método ou ligue-o adicionalmente.<br><b>3.</b> Abra o jogo, deslize a barra de notificações para baixo e toque em <b>Editar esquema tátil</b> no N-Connect.<br><b>4.</b> Com «Adicionar botão», crie botões e manípulos e arraste-os para os botões do jogo. Manter premido remove um botão. <b>Guardar</b> – pronto.<br><br>Os manípulos tornam-se um dedo que arrasta – ideal para joysticks virtuais nos jogos.",
-  "nl": "Voor games die geen controller ondersteunen, tikt N-Connect de schermknoppen voor je aan.<br><br><b>1.</b> Instellingen → Toegankelijkheid → zet <b>N-Connect aanraakbediening</b> aan.<br><b>2.</b> Kies in N-Connect ‘Aanraakbediening’ als methode of zet hem extra aan.<br><b>3.</b> Open de game, trek het meldingenpaneel omlaag en tik bij N-Connect op <b>Aanraakindeling bewerken</b>.<br><b>4.</b> Maak met ‘Knop toevoegen’ knoppen en sticks aan en sleep ze naar de knoppen van de game. Lang indrukken verwijdert een knop. <b>Opslaan</b> – klaar.<br><br>Sticks worden een slepende vinger – ideaal voor virtuele joysticks in games.",
-  "pl": "W grach, które nie obsługują kontrolerów, N-Connect stuka przyciski ekranowe za ciebie.<br><br><b>1.</b> Ustawienia → Ułatwienia dostępu → włącz <b>Sterowanie dotykowe N-Connect</b>.<br><b>2.</b> W N-Connect wybierz „Sterowanie dotykowe” jako metodę lub włącz je dodatkowo.<br><b>3.</b> Otwórz grę, przeciągnij w dół panel powiadomień i stuknij przy N-Connect <b>Edytuj układ dotykowy</b>.<br><b>4.</b> Przyciskiem „Dodaj przycisk” utwórz przyciski i drążki i przeciągnij je na przyciski gry. Przytrzymanie usuwa przycisk. <b>Zapisz</b> – gotowe.<br><br>Drążki stają się przesuwającym się palcem – idealne do wirtualnych joysticków w grach.",
-  "ru": "В играх без поддержки контроллеров N-Connect нажимает экранные кнопки за вас.<br><br><b>1.</b> Настройки → Спец. возможности → включите <b>Сенсорное управление N-Connect</b>.<br><b>2.</b> В N-Connect выберите «Сенсорное управление» как способ или включите его дополнительно.<br><b>3.</b> Откройте игру, потяните вниз шторку уведомлений и нажмите у N-Connect <b>Изменить сенсорную раскладку</b>.<br><b>4.</b> Кнопкой «Добавить кнопку» создайте кнопки и стики и перетащите их на кнопки игры. Долгое нажатие удаляет кнопку. <b>Сохранить</b> – готово.<br><br>Стики превращаются в скользящий палец – идеально для виртуальных джойстиков в играх.",
-  "ja": "コントローラー非対応のゲームでは、N-Connect が代わりに画面上のボタンをタップします。<br><br><b>1.</b> 設定 → ユーザー補助 → <b>N-Connect タッチ操作</b> をオンにします。<br><b>2.</b> N-Connect で「タッチ操作」を方法として選ぶか、追加でオンにします。<br><b>3.</b> ゲームを開き、通知パネルを下に引いて、N-Connect の <b>タッチ配置を編集</b> をタップします。<br><b>4.</b> 「ボタンを追加」でボタンとスティックを作成し、ゲームのボタンへドラッグします。長押しでボタンを削除します。<b>保存</b> で完了です。<br><br>スティックはドラッグする指になります – ゲームの仮想ジョイスティックに最適です。",
-  "zh": "对于不支持控制器的游戏，N-Connect 会替你点按屏幕按钮。<br><br><b>1.</b> 设置 → 无障碍 → 开启 <b>N-Connect 触控操作</b>。<br><b>2.</b> 在 N-Connect 中选择“触控操作”作为方式，或额外开启。<br><b>3.</b> 打开游戏，下拉通知栏，在 N-Connect 处点按 <b>编辑触控布局</b>。<br><b>4.</b> 用“添加按键”创建按键和摇杆，并拖到游戏的按钮上。长按可删除按键。<b>保存</b> – 完成。<br><br>摇杆会变成一根拖动的手指 – 非常适合游戏中的虚拟摇杆。",
-  "ko": "컨트롤러를 지원하지 않는 게임에서는 N-Connect가 대신 화면 버튼을 탭합니다.<br><br><b>1.</b> 설정 → 접근성 → <b>N-Connect 터치 조작</b>을 켜세요.<br><b>2.</b> N-Connect에서 '터치 조작'을 방식으로 선택하거나 추가로 켜세요.<br><b>3.</b> 게임을 열고 알림 창을 내려 N-Connect의 <b>터치 레이아웃 편집</b>을 탭하세요.<br><b>4.</b> '버튼 추가'로 버튼과 스틱을 만들어 게임의 버튼 위로 드래그하세요. 길게 누르면 버튼이 삭제됩니다. <b>저장</b> – 완료.<br><br>스틱은 드래그하는 손가락이 됩니다 – 게임의 가상 조이스틱에 이상적입니다."
+ "Für Spiele, die keinen Controller unterstützen, tippt SKZ Connect die Bildschirmknöpfe für dich.<br><br><b>1.</b> Einstellungen → Bedienungshilfen → <b>SKZ Connect Touch-Steuerung</b> einschalten.<br><b>2.</b> In SKZ Connect „Touch-Steuerung“ als Weg wählen oder zusätzlich einschalten.<br><b>3.</b> Spiel öffnen, Benachrichtigungsleiste herunterziehen und bei SKZ Connect auf <b>Touch-Layout bearbeiten</b> tippen.<br><b>4.</b> Mit „Taste hinzufügen“ Tasten und Sticks anlegen und auf die Knöpfe des Spiels ziehen. Gedrückt halten entfernt eine Taste. <b>Speichern</b> – fertig.<br><br>Sticks werden zu einem ziehenden Finger – ideal für virtuelle Joysticks in Spielen.": {
+  "en": "For games that don't support controllers, SKZ Connect taps the on-screen buttons for you.<br><br><b>1.</b> Settings → Accessibility → turn on <b>SKZ Connect touch controls</b>.<br><b>2.</b> In SKZ Connect, choose “Touch controls” as the method or turn them on additionally.<br><b>3.</b> Open the game, pull down the notification shade and tap <b>Edit touch layout</b> on SKZ-Connect.<br><b>4.</b> Use “Add button” to create buttons and sticks and drag them onto the game's buttons. Long-press removes a button. <b>Save</b> – done.<br><br>Sticks become a dragging finger – ideal for virtual joysticks in games.",
+  "es": "En juegos que no admiten mandos, SKZ Connect toca los botones en pantalla por ti.<br><br><b>1.</b> Ajustes → Accesibilidad → activa <b>Control táctil de SKZ Connect</b>.<br><b>2.</b> En SKZ Connect, elige «Control táctil» como método o actívalo adicionalmente.<br><b>3.</b> Abre el juego, desliza hacia abajo la barra de notificaciones y toca <b>Editar diseño táctil</b> en SKZ-Connect.<br><b>4.</b> Con «Añadir botón» crea botones y sticks y arrástralos sobre los botones del juego. Mantener pulsado elimina un botón. <b>Guardar</b>, y listo.<br><br>Los sticks se convierten en un dedo que se arrastra: ideal para joysticks virtuales en los juegos.",
+  "fr": "Pour les jeux qui ne prennent pas en charge les manettes, SKZ Connect appuie sur les boutons à l'écran à votre place.<br><br><b>1.</b> Paramètres → Accessibilité → activez <b>Commandes tactiles SKZ Connect</b>.<br><b>2.</b> Dans SKZ Connect, choisissez « Commandes tactiles » comme méthode ou activez-les en plus.<br><b>3.</b> Ouvrez le jeu, faites glisser le volet des notifications et appuyez sur <b>Modifier la disposition tactile</b> sous SKZ-Connect.<br><b>4.</b> Avec « Ajouter un bouton », créez des boutons et des sticks et faites-les glisser sur les boutons du jeu. Un appui long supprime un bouton. <b>Enregistrer</b> – c'est fini.<br><br>Les sticks deviennent un doigt qui glisse – idéal pour les joysticks virtuels des jeux.",
+  "it": "Per i giochi che non supportano i controller, SKZ Connect tocca i pulsanti a schermo per te.<br><br><b>1.</b> Impostazioni → Accessibilità → attiva <b>Controllo touch di SKZ Connect</b>.<br><b>2.</b> In SKZ Connect scegli «Controllo touch» come metodo o attivalo in aggiunta.<br><b>3.</b> Apri il gioco, trascina giù la tendina delle notifiche e tocca <b>Modifica layout touch</b> su SKZ-Connect.<br><b>4.</b> Con «Aggiungi tasto» crea tasti e stick e trascinali sui pulsanti del gioco. Tenere premuto rimuove un tasto. <b>Salva</b>: fatto.<br><br>Gli stick diventano un dito che trascina: ideale per i joystick virtuali nei giochi.",
+  "pt": "Em jogos que não suportam comandos, o SKZ Connect toca nos botões do ecrã por si.<br><br><b>1.</b> Definições → Acessibilidade → ligue <b>Controlo tátil do SKZ Connect</b>.<br><b>2.</b> No SKZ Connect, escolha «Controlo tátil» como método ou ligue-o adicionalmente.<br><b>3.</b> Abra o jogo, deslize a barra de notificações para baixo e toque em <b>Editar esquema tátil</b> no SKZ-Connect.<br><b>4.</b> Com «Adicionar botão», crie botões e manípulos e arraste-os para os botões do jogo. Manter premido remove um botão. <b>Guardar</b> – pronto.<br><br>Os manípulos tornam-se um dedo que arrasta – ideal para joysticks virtuais nos jogos.",
+  "nl": "Voor games die geen controller ondersteunen, tikt SKZ Connect de schermknoppen voor je aan.<br><br><b>1.</b> Instellingen → Toegankelijkheid → zet <b>SKZ Connect aanraakbediening</b> aan.<br><b>2.</b> Kies in SKZ Connect ‘Aanraakbediening’ als methode of zet hem extra aan.<br><b>3.</b> Open de game, trek het meldingenpaneel omlaag en tik bij SKZ Connect op <b>Aanraakindeling bewerken</b>.<br><b>4.</b> Maak met ‘Knop toevoegen’ knoppen en sticks aan en sleep ze naar de knoppen van de game. Lang indrukken verwijdert een knop. <b>Opslaan</b> – klaar.<br><br>Sticks worden een slepende vinger – ideaal voor virtuele joysticks in games.",
+  "pl": "W grach, które nie obsługują kontrolerów, SKZ Connect stuka przyciski ekranowe za ciebie.<br><br><b>1.</b> Ustawienia → Ułatwienia dostępu → włącz <b>Sterowanie dotykowe SKZ Connect</b>.<br><b>2.</b> W SKZ Connect wybierz „Sterowanie dotykowe” jako metodę lub włącz je dodatkowo.<br><b>3.</b> Otwórz grę, przeciągnij w dół panel powiadomień i stuknij przy SKZ Connect <b>Edytuj układ dotykowy</b>.<br><b>4.</b> Przyciskiem „Dodaj przycisk” utwórz przyciski i drążki i przeciągnij je na przyciski gry. Przytrzymanie usuwa przycisk. <b>Zapisz</b> – gotowe.<br><br>Drążki stają się przesuwającym się palcem – idealne do wirtualnych joysticków w grach.",
+  "ru": "В играх без поддержки контроллеров SKZ Connect нажимает экранные кнопки за вас.<br><br><b>1.</b> Настройки → Спец. возможности → включите <b>Сенсорное управление SKZ Connect</b>.<br><b>2.</b> В SKZ Connect выберите «Сенсорное управление» как способ или включите его дополнительно.<br><b>3.</b> Откройте игру, потяните вниз шторку уведомлений и нажмите у SKZ Connect <b>Изменить сенсорную раскладку</b>.<br><b>4.</b> Кнопкой «Добавить кнопку» создайте кнопки и стики и перетащите их на кнопки игры. Долгое нажатие удаляет кнопку. <b>Сохранить</b> – готово.<br><br>Стики превращаются в скользящий палец – идеально для виртуальных джойстиков в играх.",
+  "ja": "コントローラー非対応のゲームでは、SKZ Connect が代わりに画面上のボタンをタップします。<br><br><b>1.</b> 設定 → ユーザー補助 → <b>SKZ Connect タッチ操作</b> をオンにします。<br><b>2.</b> SKZ Connect で「タッチ操作」を方法として選ぶか、追加でオンにします。<br><b>3.</b> ゲームを開き、通知パネルを下に引いて、SKZ Connect の <b>タッチ配置を編集</b> をタップします。<br><b>4.</b> 「ボタンを追加」でボタンとスティックを作成し、ゲームのボタンへドラッグします。長押しでボタンを削除します。<b>保存</b> で完了です。<br><br>スティックはドラッグする指になります – ゲームの仮想ジョイスティックに最適です。",
+  "zh": "对于不支持控制器的游戏，SKZ Connect 会替你点按屏幕按钮。<br><br><b>1.</b> 设置 → 无障碍 → 开启 <b>SKZ Connect 触控操作</b>。<br><b>2.</b> 在 SKZ Connect 中选择“触控操作”作为方式，或额外开启。<br><b>3.</b> 打开游戏，下拉通知栏，在 SKZ Connect 处点按 <b>编辑触控布局</b>。<br><b>4.</b> 用“添加按键”创建按键和摇杆，并拖到游戏的按钮上。长按可删除按键。<b>保存</b> – 完成。<br><br>摇杆会变成一根拖动的手指 – 非常适合游戏中的虚拟摇杆。",
+  "ko": "컨트롤러를 지원하지 않는 게임에서는 SKZ Connect가 대신 화면 버튼을 탭합니다.<br><br><b>1.</b> 설정 → 접근성 → <b>SKZ Connect 터치 조작</b>을 켜세요.<br><b>2.</b> SKZ Connect에서 '터치 조작'을 방식으로 선택하거나 추가로 켜세요.<br><b>3.</b> 게임을 열고 알림 창을 내려 SKZ Connect의 <b>터치 레이아웃 편집</b>을 탭하세요.<br><b>4.</b> '버튼 추가'로 버튼과 스틱을 만들어 게임의 버튼 위로 드래그하세요. 길게 누르면 버튼이 삭제됩니다. <b>저장</b> – 완료.<br><br>스틱은 드래그하는 손가락이 됩니다 – 게임의 가상 조이스틱에 이상적입니다."
  },
  "Bedienungshilfen öffnen": {
   "en": "Open Accessibility",
@@ -831,18 +831,18 @@
   "zh": "在游戏和模拟器中",
   "ko": "게임 및 에뮬레이터에서"
  },
- "Spiele sehen einen <b>Xbox-Controller</b> (Name „N-Connect Spieler 1“ usw.).<br><br>• <b>Emulatoren</b> (z. B. Dolphin, PPSSPP, RetroArch, Eden): In den Controller-Einstellungen des Emulators „N-Connect Spieler 1“ auswählen und ggf. die Tasten zuweisen.<br>• <b>Cloud-Gaming</b> (Xbox Cloud, GeForce NOW, Steam Link): funktioniert direkt.<br>• <b>Tastenlayout:</b> Unter Einstellungen → Tastenbelegung wählst du, ob A/B nach Position (Xbox) oder nach Beschriftung (Switch) zugeordnet wird.<br>• <b>Bewegungssteuerung:</b> Unter „Gyro-Zielen“ steuert das Neigen des Controllers den rechten Stick.": {
-  "en": "Games see an <b>Xbox controller</b> (named “N-Connect Player 1” etc.).<br><br>• <b>Emulators</b> (e.g. Dolphin, PPSSPP, RetroArch, Eden): select “N-Connect Player 1” in the emulator's controller settings and map the buttons if needed.<br>• <b>Cloud gaming</b> (Xbox Cloud, GeForce NOW, Steam Link): works right away.<br>• <b>Button layout:</b> Under Settings → Button layout you choose whether A/B are mapped by position (Xbox) or by label (Switch).<br>• <b>Motion controls:</b> With “Gyro aiming”, tilting the controller moves the right stick.",
-  "es": "Los juegos ven un <b>mando de Xbox</b> (llamado «N-Connect Jugador 1», etc.).<br><br>• <b>Emuladores</b> (p. ej. Dolphin, PPSSPP, RetroArch, Eden): selecciona «N-Connect Jugador 1» en los ajustes de mando del emulador y asigna los botones si es necesario.<br>• <b>Juego en la nube</b> (Xbox Cloud, GeForce NOW, Steam Link): funciona directamente.<br>• <b>Distribución de botones:</b> En Ajustes → Asignación de botones eliges si A/B se asignan por posición (Xbox) o por rotulación (Switch).<br>• <b>Control por movimiento:</b> Con «Apuntado giroscópico», inclinar el mando mueve el stick derecho.",
-  "fr": "Les jeux voient une <b>manette Xbox</b> (nommée « N-Connect Joueur 1 », etc.).<br><br>• <b>Émulateurs</b> (par ex. Dolphin, PPSSPP, RetroArch, Eden) : sélectionnez « N-Connect Joueur 1 » dans les paramètres de manette de l'émulateur et assignez les boutons si besoin.<br>• <b>Cloud gaming</b> (Xbox Cloud, GeForce NOW, Steam Link) : fonctionne directement.<br>• <b>Disposition des boutons :</b> Dans Paramètres → Disposition des boutons, vous choisissez si A/B sont attribués selon la position (Xbox) ou selon l'inscription (Switch).<br>• <b>Détection de mouvement :</b> Avec « Visée gyroscopique », incliner la manette déplace le stick droit.",
-  "it": "I giochi vedono un <b>controller Xbox</b> (chiamato «N-Connect Giocatore 1», ecc.).<br><br>• <b>Emulatori</b> (ad es. Dolphin, PPSSPP, RetroArch, Eden): seleziona «N-Connect Giocatore 1» nelle impostazioni dei controller dell'emulatore e assegna i tasti se necessario.<br>• <b>Cloud gaming</b> (Xbox Cloud, GeForce NOW, Steam Link): funziona subito.<br>• <b>Disposizione dei tasti:</b> In Impostazioni → Assegnazione tasti scegli se A/B vengono assegnati per posizione (Xbox) o per etichetta (Switch).<br>• <b>Controlli di movimento:</b> Con «Mira giroscopica», inclinare il controller muove lo stick destro.",
-  "pt": "Os jogos veem um <b>comando Xbox</b> (chamado «N-Connect Jogador 1», etc.).<br><br>• <b>Emuladores</b> (p. ex. Dolphin, PPSSPP, RetroArch, Eden): selecione «N-Connect Jogador 1» nas definições de comandos do emulador e atribua os botões, se necessário.<br>• <b>Jogos na nuvem</b> (Xbox Cloud, GeForce NOW, Steam Link): funciona diretamente.<br>• <b>Esquema de botões:</b> Em Definições → Atribuição de botões escolhe se A/B são atribuídos pela posição (Xbox) ou pela inscrição (Switch).<br>• <b>Controlo por movimento:</b> Com «Mira giroscópica», inclinar o comando move o manípulo direito.",
-  "nl": "Games zien een <b>Xbox-controller</b> (naam ‘N-Connect Speler 1’ enz.).<br><br>• <b>Emulators</b> (bijv. Dolphin, PPSSPP, RetroArch, Eden): kies in de controllerinstellingen van de emulator ‘N-Connect Speler 1’ en wijs indien nodig de knoppen toe.<br>• <b>Cloudgaming</b> (Xbox Cloud, GeForce NOW, Steam Link): werkt direct.<br>• <b>Knopindeling:</b> Onder Instellingen → Knoptoewijzing kies je of A/B op positie (Xbox) of op opschrift (Switch) worden toegewezen.<br>• <b>Bewegingsbesturing:</b> Met ‘Gyro-richten’ stuurt het kantelen van de controller de rechterstick.",
-  "pl": "Gry widzą <b>kontroler Xbox</b> (o nazwie „N-Connect Gracz 1” itd.).<br><br>• <b>Emulatory</b> (np. Dolphin, PPSSPP, RetroArch, Eden): w ustawieniach kontrolera emulatora wybierz „N-Connect Gracz 1” i w razie potrzeby przypisz przyciski.<br>• <b>Granie w chmurze</b> (Xbox Cloud, GeForce NOW, Steam Link): działa od razu.<br>• <b>Układ przycisków:</b> W Ustawienia → Przypisanie przycisków wybierasz, czy A/B są przypisane według położenia (Xbox), czy według opisu (Switch).<br>• <b>Sterowanie ruchem:</b> Przy „Celowaniu żyroskopem” przechylanie kontrolera steruje prawym drążkiem.",
-  "ru": "Игры видят <b>контроллер Xbox</b> (с именем «N-Connect Player 1» и т. д.).<br><br>• <b>Эмуляторы</b> (например, Dolphin, PPSSPP, RetroArch, Eden): выберите «N-Connect Player 1» в настройках контроллера эмулятора и при необходимости назначьте кнопки.<br>• <b>Облачный гейминг</b> (Xbox Cloud, GeForce NOW, Steam Link): работает сразу.<br>• <b>Раскладка кнопок:</b> В Настройки → Назначение кнопок вы выбираете, назначаются ли A/B по положению (Xbox) или по надписи (Switch).<br>• <b>Управление движением:</b> В режиме «Прицеливание гироскопом» наклон контроллера управляет правым стиком.",
-  "ja": "ゲームには <b>Xbox コントローラー</b>（名前は「N-Connect Player 1」など）として見えます。<br><br>• <b>エミュレーター</b>（例：Dolphin、PPSSPP、RetroArch、Eden）：エミュレーターのコントローラー設定で「N-Connect Player 1」を選び、必要に応じてボタンを割り当てます。<br>• <b>クラウドゲーミング</b>（Xbox Cloud、GeForce NOW、Steam Link）：そのまま使えます。<br>• <b>ボタン配置：</b>設定 → ボタン配置で、A/B を位置（Xbox）で割り当てるか表記（Switch）で割り当てるかを選べます。<br>• <b>モーション操作：</b>「ジャイロエイム」では、コントローラーを傾けると右スティックが動きます。",
-  "zh": "游戏会看到一个 <b>Xbox 控制器</b>（名称为“N-Connect Player 1”等）。<br><br>• <b>模拟器</b>（例如 Dolphin、PPSSPP、RetroArch、Eden）：在模拟器的控制器设置中选择“N-Connect Player 1”，必要时分配按键。<br>• <b>云游戏</b>（Xbox Cloud、GeForce NOW、Steam Link）：可直接使用。<br>• <b>按键布局：</b>在 设置 → 按键分配 中，选择 A/B 按位置（Xbox）还是按标识（Switch）分配。<br>• <b>体感操作：</b>使用“陀螺仪瞄准”时，倾斜控制器即可控制右摇杆。",
-  "ko": "게임에는 <b>Xbox 컨트롤러</b>(이름: 'N-Connect Player 1' 등)로 보입니다.<br><br>• <b>에뮬레이터</b>(예: Dolphin, PPSSPP, RetroArch, Eden): 에뮬레이터의 컨트롤러 설정에서 'N-Connect Player 1'을 선택하고 필요하면 버튼을 지정하세요.<br>• <b>클라우드 게이밍</b>(Xbox Cloud, GeForce NOW, Steam Link): 바로 작동합니다.<br>• <b>버튼 배치:</b> 설정 → 버튼 배치에서 A/B를 위치(Xbox) 기준으로 할지 표기(Switch) 기준으로 할지 선택합니다.<br>• <b>모션 조작:</b> '자이로 조준'에서는 컨트롤러를 기울이면 오른쪽 스틱이 움직입니다."
+ "Spiele sehen einen <b>Xbox-Controller</b> (Name „SKZ Connect Spieler 1“ usw.).<br><br>• <b>Emulatoren</b> (z. B. Dolphin, PPSSPP, RetroArch, Eden): In den Controller-Einstellungen des Emulators „SKZ Connect Spieler 1“ auswählen und ggf. die Tasten zuweisen.<br>• <b>Cloud-Gaming</b> (Xbox Cloud, GeForce NOW, Steam Link): funktioniert direkt.<br>• <b>Tastenlayout:</b> Unter Einstellungen → Tastenbelegung wählst du, ob A/B nach Position (Xbox) oder nach Beschriftung (Switch) zugeordnet wird.<br>• <b>Bewegungssteuerung:</b> Unter „Gyro-Zielen“ steuert das Neigen des Controllers den rechten Stick.": {
+  "en": "Games see an <b>Xbox controller</b> (named “SKZ Connect Player 1” etc.).<br><br>• <b>Emulators</b> (e.g. Dolphin, PPSSPP, RetroArch, Eden): select “SKZ Connect Player 1” in the emulator's controller settings and map the buttons if needed.<br>• <b>Cloud gaming</b> (Xbox Cloud, GeForce NOW, Steam Link): works right away.<br>• <b>Button layout:</b> Under Settings → Button layout you choose whether A/B are mapped by position (Xbox) or by label (Switch).<br>• <b>Motion controls:</b> With “Gyro aiming”, tilting the controller moves the right stick.",
+  "es": "Los juegos ven un <b>mando de Xbox</b> (llamado «SKZ Connect Jugador 1», etc.).<br><br>• <b>Emuladores</b> (p. ej. Dolphin, PPSSPP, RetroArch, Eden): selecciona «SKZ Connect Jugador 1» en los ajustes de mando del emulador y asigna los botones si es necesario.<br>• <b>Juego en la nube</b> (Xbox Cloud, GeForce NOW, Steam Link): funciona directamente.<br>• <b>Distribución de botones:</b> En Ajustes → Asignación de botones eliges si A/B se asignan por posición (Xbox) o por rotulación (Switch).<br>• <b>Control por movimiento:</b> Con «Apuntado giroscópico», inclinar el mando mueve el stick derecho.",
+  "fr": "Les jeux voient une <b>manette Xbox</b> (nommée « SKZ Connect Joueur 1 », etc.).<br><br>• <b>Émulateurs</b> (par ex. Dolphin, PPSSPP, RetroArch, Eden) : sélectionnez « SKZ Connect Joueur 1 » dans les paramètres de manette de l'émulateur et assignez les boutons si besoin.<br>• <b>Cloud gaming</b> (Xbox Cloud, GeForce NOW, Steam Link) : fonctionne directement.<br>• <b>Disposition des boutons :</b> Dans Paramètres → Disposition des boutons, vous choisissez si A/B sont attribués selon la position (Xbox) ou selon l'inscription (Switch).<br>• <b>Détection de mouvement :</b> Avec « Visée gyroscopique », incliner la manette déplace le stick droit.",
+  "it": "I giochi vedono un <b>controller Xbox</b> (chiamato «SKZ Connect Giocatore 1», ecc.).<br><br>• <b>Emulatori</b> (ad es. Dolphin, PPSSPP, RetroArch, Eden): seleziona «SKZ Connect Giocatore 1» nelle impostazioni dei controller dell'emulatore e assegna i tasti se necessario.<br>• <b>Cloud gaming</b> (Xbox Cloud, GeForce NOW, Steam Link): funziona subito.<br>• <b>Disposizione dei tasti:</b> In Impostazioni → Assegnazione tasti scegli se A/B vengono assegnati per posizione (Xbox) o per etichetta (Switch).<br>• <b>Controlli di movimento:</b> Con «Mira giroscopica», inclinare il controller muove lo stick destro.",
+  "pt": "Os jogos veem um <b>comando Xbox</b> (chamado «SKZ Connect Jogador 1», etc.).<br><br>• <b>Emuladores</b> (p. ex. Dolphin, PPSSPP, RetroArch, Eden): selecione «SKZ Connect Jogador 1» nas definições de comandos do emulador e atribua os botões, se necessário.<br>• <b>Jogos na nuvem</b> (Xbox Cloud, GeForce NOW, Steam Link): funciona diretamente.<br>• <b>Esquema de botões:</b> Em Definições → Atribuição de botões escolhe se A/B são atribuídos pela posição (Xbox) ou pela inscrição (Switch).<br>• <b>Controlo por movimento:</b> Com «Mira giroscópica», inclinar o comando move o manípulo direito.",
+  "nl": "Games zien een <b>Xbox-controller</b> (naam ‘SKZ Connect Speler 1’ enz.).<br><br>• <b>Emulators</b> (bijv. Dolphin, PPSSPP, RetroArch, Eden): kies in de controllerinstellingen van de emulator ‘SKZ Connect Speler 1’ en wijs indien nodig de knoppen toe.<br>• <b>Cloudgaming</b> (Xbox Cloud, GeForce NOW, Steam Link): werkt direct.<br>• <b>Knopindeling:</b> Onder Instellingen → Knoptoewijzing kies je of A/B op positie (Xbox) of op opschrift (Switch) worden toegewezen.<br>• <b>Bewegingsbesturing:</b> Met ‘Gyro-richten’ stuurt het kantelen van de controller de rechterstick.",
+  "pl": "Gry widzą <b>kontroler Xbox</b> (o nazwie „SKZ Connect Gracz 1” itd.).<br><br>• <b>Emulatory</b> (np. Dolphin, PPSSPP, RetroArch, Eden): w ustawieniach kontrolera emulatora wybierz „SKZ Connect Gracz 1” i w razie potrzeby przypisz przyciski.<br>• <b>Granie w chmurze</b> (Xbox Cloud, GeForce NOW, Steam Link): działa od razu.<br>• <b>Układ przycisków:</b> W Ustawienia → Przypisanie przycisków wybierasz, czy A/B są przypisane według położenia (Xbox), czy według opisu (Switch).<br>• <b>Sterowanie ruchem:</b> Przy „Celowaniu żyroskopem” przechylanie kontrolera steruje prawym drążkiem.",
+  "ru": "Игры видят <b>контроллер Xbox</b> (с именем «SKZ Connect Player 1» и т. д.).<br><br>• <b>Эмуляторы</b> (например, Dolphin, PPSSPP, RetroArch, Eden): выберите «SKZ Connect Player 1» в настройках контроллера эмулятора и при необходимости назначьте кнопки.<br>• <b>Облачный гейминг</b> (Xbox Cloud, GeForce NOW, Steam Link): работает сразу.<br>• <b>Раскладка кнопок:</b> В Настройки → Назначение кнопок вы выбираете, назначаются ли A/B по положению (Xbox) или по надписи (Switch).<br>• <b>Управление движением:</b> В режиме «Прицеливание гироскопом» наклон контроллера управляет правым стиком.",
+  "ja": "ゲームには <b>Xbox コントローラー</b>（名前は「SKZ Connect Player 1」など）として見えます。<br><br>• <b>エミュレーター</b>（例：Dolphin、PPSSPP、RetroArch、Eden）：エミュレーターのコントローラー設定で「SKZ Connect Player 1」を選び、必要に応じてボタンを割り当てます。<br>• <b>クラウドゲーミング</b>（Xbox Cloud、GeForce NOW、Steam Link）：そのまま使えます。<br>• <b>ボタン配置：</b>設定 → ボタン配置で、A/B を位置（Xbox）で割り当てるか表記（Switch）で割り当てるかを選べます。<br>• <b>モーション操作：</b>「ジャイロエイム」では、コントローラーを傾けると右スティックが動きます。",
+  "zh": "游戏会看到一个 <b>Xbox 控制器</b>（名称为“SKZ Connect Player 1”等）。<br><br>• <b>模拟器</b>（例如 Dolphin、PPSSPP、RetroArch、Eden）：在模拟器的控制器设置中选择“SKZ Connect Player 1”，必要时分配按键。<br>• <b>云游戏</b>（Xbox Cloud、GeForce NOW、Steam Link）：可直接使用。<br>• <b>按键布局：</b>在 设置 → 按键分配 中，选择 A/B 按位置（Xbox）还是按标识（Switch）分配。<br>• <b>体感操作：</b>使用“陀螺仪瞄准”时，倾斜控制器即可控制右摇杆。",
+  "ko": "게임에는 <b>Xbox 컨트롤러</b>(이름: 'SKZ Connect Player 1' 등)로 보입니다.<br><br>• <b>에뮬레이터</b>(예: Dolphin, PPSSPP, RetroArch, Eden): 에뮬레이터의 컨트롤러 설정에서 'SKZ Connect Player 1'을 선택하고 필요하면 버튼을 지정하세요.<br>• <b>클라우드 게이밍</b>(Xbox Cloud, GeForce NOW, Steam Link): 바로 작동합니다.<br>• <b>버튼 배치:</b> 설정 → 버튼 배치에서 A/B를 위치(Xbox) 기준으로 할지 표기(Switch) 기준으로 할지 선택합니다.<br>• <b>모션 조작:</b> '자이로 조준'에서는 컨트롤러를 기울이면 오른쪽 스틱이 움직입니다."
  },
  "Probleme lösen": {
   "en": "Troubleshooting",
@@ -857,18 +857,18 @@
   "zh": "故障排除",
   "ko": "문제 해결"
  },
- "<b>Controller wird nicht gefunden:</b> Bluetooth an? SYNC-Taste lange genug gedrückt, bis die Lichter laufen? Ist er gerade mit der Switch oder einem PC verbunden, schalte dort zuerst Bluetooth aus.<br><br><b>Verbunden, aber das Spiel reagiert nicht:</b> Auf der Controller-Startseite muss oben „Bereit“ stehen. Steht dort „Shizuku ist nicht gestartet“, öffne Shizuku und tippe auf Starten.<br><br><b>Verbindung bricht beim Spielen ab:</b> Nimm N-Connect in den Akku-Einstellungen von der Optimierung aus (Einstellungen → Apps → N-Connect → Akku → <i>Nicht eingeschränkt</i>).<br><br><b>Doppelte Eingaben:</b> Ist Touch-Steuerung zusätzlich an und das Spiel unterstützt Controller, schalte Touch aus.<br><br><b>Controller verbindet sich nicht mehr von selbst:</b> Einmal SYNC drücken – dann merkt er sich dieses Gerät neu.": {
-  "en": "<b>Controller isn't found:</b> Is Bluetooth on? Did you hold SYNC long enough for the lights to run? If it's currently connected to the Switch or a PC, turn off Bluetooth there first.<br><br><b>Connected, but the game doesn't react:</b> The controller page must say “Ready” at the top. If it says “Shizuku is not running”, open Shizuku and tap Start.<br><br><b>Connection drops while playing:</b> Exclude N-Connect from battery optimization (Settings → Apps → N-Connect → Battery → <i>Unrestricted</i>).<br><br><b>Double inputs:</b> If touch controls are also on and the game supports controllers, turn touch off.<br><br><b>Controller no longer reconnects by itself:</b> Press SYNC once – it will remember this device again.",
-  "es": "<b>No se encuentra el mando:</b> ¿Está activado el Bluetooth? ¿Has mantenido pulsado SYNC hasta que se muevan las luces? Si está conectado a la Switch o a un PC, desactiva primero el Bluetooth allí.<br><br><b>Conectado, pero el juego no responde:</b> En la página de mandos debe poner «Listo» arriba. Si pone «Shizuku no está iniciado», abre Shizuku y toca Iniciar.<br><br><b>La conexión se corta mientras juegas:</b> Excluye N-Connect de la optimización de batería (Ajustes → Aplicaciones → N-Connect → Batería → <i>Sin restricciones</i>).<br><br><b>Entradas dobles:</b> Si el control táctil también está activado y el juego admite mandos, desactiva el táctil.<br><br><b>El mando ya no se conecta solo:</b> Pulsa SYNC una vez y volverá a recordar este dispositivo.",
-  "fr": "<b>La manette est introuvable :</b> Le Bluetooth est-il activé ? Avez-vous maintenu SYNC assez longtemps pour que les voyants défilent ? Si elle est connectée à la Switch ou à un PC, désactivez d'abord le Bluetooth là-bas.<br><br><b>Connectée, mais le jeu ne réagit pas :</b> La page des manettes doit afficher « Prêt » en haut. Si elle affiche « Shizuku n'est pas démarré », ouvrez Shizuku et appuyez sur Démarrer.<br><br><b>La connexion coupe en jouant :</b> Excluez N-Connect de l'optimisation de la batterie (Paramètres → Applications → N-Connect → Batterie → <i>Non restreinte</i>).<br><br><b>Entrées en double :</b> Si les commandes tactiles sont aussi activées et que le jeu prend en charge les manettes, désactivez le tactile.<br><br><b>La manette ne se reconnecte plus toute seule :</b> Appuyez une fois sur SYNC – elle mémorisera de nouveau cet appareil.",
-  "it": "<b>Il controller non viene trovato:</b> Il Bluetooth è attivo? Hai tenuto premuto SYNC abbastanza a lungo da far scorrere le luci? Se è connesso alla Switch o a un PC, disattiva prima lì il Bluetooth.<br><br><b>Connesso, ma il gioco non reagisce:</b> Nella pagina dei controller in alto deve comparire «Pronto». Se compare «Shizuku non è avviato», apri Shizuku e tocca Avvia.<br><br><b>La connessione cade mentre giochi:</b> Escludi N-Connect dall'ottimizzazione della batteria (Impostazioni → App → N-Connect → Batteria → <i>Senza restrizioni</i>).<br><br><b>Input doppi:</b> Se anche il controllo touch è attivo e il gioco supporta i controller, disattiva il touch.<br><br><b>Il controller non si riconnette più da solo:</b> Premi SYNC una volta: memorizzerà di nuovo questo dispositivo.",
-  "pt": "<b>O comando não é encontrado:</b> O Bluetooth está ligado? Manteve SYNC premido tempo suficiente até as luzes correrem? Se estiver ligado à Switch ou a um PC, desligue primeiro o Bluetooth lá.<br><br><b>Ligado, mas o jogo não reage:</b> Na página dos comandos tem de aparecer «Pronto» no topo. Se aparecer «O Shizuku não está iniciado», abra o Shizuku e toque em Iniciar.<br><br><b>A ligação cai durante o jogo:</b> Exclua o N-Connect da otimização da bateria (Definições → Apps → N-Connect → Bateria → <i>Sem restrições</i>).<br><br><b>Entradas duplicadas:</b> Se o controlo tátil também estiver ligado e o jogo suportar comandos, desligue o tátil.<br><br><b>O comando já não se liga sozinho:</b> Prima SYNC uma vez – volta a memorizar este dispositivo.",
-  "nl": "<b>Controller wordt niet gevonden:</b> Staat Bluetooth aan? SYNC lang genoeg ingedrukt tot de lampjes lopen? Is hij nu met de Switch of een pc verbonden, zet daar dan eerst Bluetooth uit.<br><br><b>Verbonden, maar de game reageert niet:</b> Op de controllerpagina moet bovenaan ‘Klaar’ staan. Staat daar ‘Shizuku is niet gestart’, open dan Shizuku en tik op Starten.<br><br><b>Verbinding valt weg tijdens het spelen:</b> Sluit N-Connect uit van batterijoptimalisatie (Instellingen → Apps → N-Connect → Batterij → <i>Onbeperkt</i>).<br><br><b>Dubbele invoer:</b> Staat de aanraakbediening ook aan en ondersteunt de game controllers, zet aanraken dan uit.<br><br><b>Controller maakt niet meer vanzelf verbinding:</b> Druk één keer op SYNC – dan onthoudt hij dit apparaat opnieuw.",
-  "pl": "<b>Kontroler nie zostaje znaleziony:</b> Czy Bluetooth jest włączony? Czy przytrzymano SYNC wystarczająco długo, aż diody zaczną biegać? Jeśli jest właśnie połączony ze Switch lub komputerem, najpierw wyłącz tam Bluetooth.<br><br><b>Połączony, ale gra nie reaguje:</b> Na stronie kontrolerów u góry musi być „Gotowe”. Jeśli jest tam „Shizuku nie jest uruchomione”, otwórz Shizuku i stuknij Uruchom.<br><br><b>Połączenie zrywa się podczas gry:</b> Wyłącz N-Connect z optymalizacji baterii (Ustawienia → Aplikacje → N-Connect → Bateria → <i>Bez ograniczeń</i>).<br><br><b>Podwójne wejścia:</b> Jeśli sterowanie dotykowe jest dodatkowo włączone, a gra obsługuje kontrolery, wyłącz dotyk.<br><br><b>Kontroler nie łączy się już sam:</b> Naciśnij raz SYNC – wtedy ponownie zapamięta to urządzenie.",
-  "ru": "<b>Контроллер не находится:</b> Bluetooth включён? Кнопку SYNC удерживали достаточно долго, пока не побежали огоньки? Если он сейчас подключён к Switch или ПК, сначала выключите там Bluetooth.<br><br><b>Подключён, но игра не реагирует:</b> На странице контроллеров вверху должно быть «Готово». Если там написано «Shizuku не запущен», откройте Shizuku и нажмите «Запустить».<br><br><b>Связь обрывается во время игры:</b> Исключите N-Connect из оптимизации батареи (Настройки → Приложения → N-Connect → Батарея → <i>Без ограничений</i>).<br><br><b>Двойной ввод:</b> Если сенсорное управление тоже включено, а игра поддерживает контроллеры, выключите сенсорное управление.<br><br><b>Контроллер больше не подключается сам:</b> Нажмите один раз SYNC – он снова запомнит это устройство.",
-  "ja": "<b>コントローラーが見つからない：</b>Bluetooth はオンですか？ランプが流れるまで SYNC を十分長く押しましたか？Switch や PC に接続中の場合は、先にそちらの Bluetooth をオフにしてください。<br><br><b>接続されたがゲームが反応しない：</b>コントローラーページの上部に「準備完了」と表示されている必要があります。「Shizuku が起動していません」と表示されている場合は、Shizuku を開いて開始をタップしてください。<br><br><b>プレイ中に接続が切れる：</b>N-Connect をバッテリー最適化の対象外にしてください（設定 → アプリ → N-Connect → バッテリー → <i>制限なし</i>）。<br><br><b>入力が二重になる：</b>タッチ操作も有効で、ゲームがコントローラーに対応している場合は、タッチをオフにしてください。<br><br><b>コントローラーが自動で再接続しなくなった：</b>SYNC を一度押すと、この機器を再び記憶します。",
-  "zh": "<b>找不到控制器：</b>蓝牙开了吗？SYNC 是否按得足够久，直到指示灯闪动？如果它正连接着 Switch 或电脑，请先关闭那边的蓝牙。<br><br><b>已连接，但游戏没有反应：</b>控制器页面顶部必须显示“就绪”。如果显示“Shizuku 未启动”，请打开 Shizuku 并点按启动。<br><br><b>游戏时连接中断：</b>请将 N-Connect 从电池优化中排除（设置 → 应用 → N-Connect → 电池 → <i>无限制</i>）。<br><br><b>输入重复：</b>如果同时开启了触控操作，而游戏支持控制器，请关闭触控。<br><br><b>控制器不再自动重新连接：</b>按一次 SYNC – 它会重新记住这台设备。",
-  "ko": "<b>컨트롤러를 찾을 수 없음:</b> 블루투스가 켜져 있나요? 표시등이 움직일 때까지 SYNC를 충분히 길게 눌렀나요? Switch나 PC에 연결되어 있다면 먼저 그쪽의 블루투스를 끄세요.<br><br><b>연결됐지만 게임이 반응하지 않음:</b> 컨트롤러 페이지 상단에 '준비됨'이 표시되어야 합니다. 'Shizuku가 시작되지 않음'이 표시되면 Shizuku를 열고 시작을 탭하세요.<br><br><b>게임 중 연결이 끊김:</b> N-Connect를 배터리 최적화에서 제외하세요(설정 → 애플리케이션 → N-Connect → 배터리 → <i>제한 없음</i>).<br><br><b>입력이 중복됨:</b> 터치 조작도 켜져 있고 게임이 컨트롤러를 지원한다면 터치를 끄세요.<br><br><b>컨트롤러가 더 이상 자동으로 연결되지 않음:</b> SYNC를 한 번 누르면 이 기기를 다시 기억합니다."
+ "<b>Controller wird nicht gefunden:</b> Bluetooth an? SYNC-Taste lange genug gedrückt, bis die Lichter laufen? Ist er gerade mit der Switch oder einem PC verbunden, schalte dort zuerst Bluetooth aus.<br><br><b>Verbunden, aber das Spiel reagiert nicht:</b> Auf der Controller-Startseite muss oben „Bereit“ stehen. Steht dort „Shizuku ist nicht gestartet“, öffne Shizuku und tippe auf Starten.<br><br><b>Verbindung bricht beim Spielen ab:</b> Nimm SKZ Connect in den Akku-Einstellungen von der Optimierung aus (Einstellungen → Apps → SKZ Connect → Akku → <i>Nicht eingeschränkt</i>).<br><br><b>Doppelte Eingaben:</b> Ist Touch-Steuerung zusätzlich an und das Spiel unterstützt Controller, schalte Touch aus.<br><br><b>Controller verbindet sich nicht mehr von selbst:</b> Einmal SYNC drücken – dann merkt er sich dieses Gerät neu.": {
+  "en": "<b>Controller isn't found:</b> Is Bluetooth on? Did you hold SYNC long enough for the lights to run? If it's currently connected to the Switch or a PC, turn off Bluetooth there first.<br><br><b>Connected, but the game doesn't react:</b> The controller page must say “Ready” at the top. If it says “Shizuku is not running”, open Shizuku and tap Start.<br><br><b>Connection drops while playing:</b> Exclude SKZ Connect from battery optimization (Settings → Apps → SKZ Connect → Battery → <i>Unrestricted</i>).<br><br><b>Double inputs:</b> If touch controls are also on and the game supports controllers, turn touch off.<br><br><b>Controller no longer reconnects by itself:</b> Press SYNC once – it will remember this device again.",
+  "es": "<b>No se encuentra el mando:</b> ¿Está activado el Bluetooth? ¿Has mantenido pulsado SYNC hasta que se muevan las luces? Si está conectado a la Switch o a un PC, desactiva primero el Bluetooth allí.<br><br><b>Conectado, pero el juego no responde:</b> En la página de mandos debe poner «Listo» arriba. Si pone «Shizuku no está iniciado», abre Shizuku y toca Iniciar.<br><br><b>La conexión se corta mientras juegas:</b> Excluye SKZ Connect de la optimización de batería (Ajustes → Aplicaciones → SKZ Connect → Batería → <i>Sin restricciones</i>).<br><br><b>Entradas dobles:</b> Si el control táctil también está activado y el juego admite mandos, desactiva el táctil.<br><br><b>El mando ya no se conecta solo:</b> Pulsa SYNC una vez y volverá a recordar este dispositivo.",
+  "fr": "<b>La manette est introuvable :</b> Le Bluetooth est-il activé ? Avez-vous maintenu SYNC assez longtemps pour que les voyants défilent ? Si elle est connectée à la Switch ou à un PC, désactivez d'abord le Bluetooth là-bas.<br><br><b>Connectée, mais le jeu ne réagit pas :</b> La page des manettes doit afficher « Prêt » en haut. Si elle affiche « Shizuku n'est pas démarré », ouvrez Shizuku et appuyez sur Démarrer.<br><br><b>La connexion coupe en jouant :</b> Excluez SKZ Connect de l'optimisation de la batterie (Paramètres → Applications → SKZ Connect → Batterie → <i>Non restreinte</i>).<br><br><b>Entrées en double :</b> Si les commandes tactiles sont aussi activées et que le jeu prend en charge les manettes, désactivez le tactile.<br><br><b>La manette ne se reconnecte plus toute seule :</b> Appuyez une fois sur SYNC – elle mémorisera de nouveau cet appareil.",
+  "it": "<b>Il controller non viene trovato:</b> Il Bluetooth è attivo? Hai tenuto premuto SYNC abbastanza a lungo da far scorrere le luci? Se è connesso alla Switch o a un PC, disattiva prima lì il Bluetooth.<br><br><b>Connesso, ma il gioco non reagisce:</b> Nella pagina dei controller in alto deve comparire «Pronto». Se compare «Shizuku non è avviato», apri Shizuku e tocca Avvia.<br><br><b>La connessione cade mentre giochi:</b> Escludi SKZ Connect dall'ottimizzazione della batteria (Impostazioni → App → SKZ Connect → Batteria → <i>Senza restrizioni</i>).<br><br><b>Input doppi:</b> Se anche il controllo touch è attivo e il gioco supporta i controller, disattiva il touch.<br><br><b>Il controller non si riconnette più da solo:</b> Premi SYNC una volta: memorizzerà di nuovo questo dispositivo.",
+  "pt": "<b>O comando não é encontrado:</b> O Bluetooth está ligado? Manteve SYNC premido tempo suficiente até as luzes correrem? Se estiver ligado à Switch ou a um PC, desligue primeiro o Bluetooth lá.<br><br><b>Ligado, mas o jogo não reage:</b> Na página dos comandos tem de aparecer «Pronto» no topo. Se aparecer «O Shizuku não está iniciado», abra o Shizuku e toque em Iniciar.<br><br><b>A ligação cai durante o jogo:</b> Exclua o SKZ Connect da otimização da bateria (Definições → Apps → SKZ Connect → Bateria → <i>Sem restrições</i>).<br><br><b>Entradas duplicadas:</b> Se o controlo tátil também estiver ligado e o jogo suportar comandos, desligue o tátil.<br><br><b>O comando já não se liga sozinho:</b> Prima SYNC uma vez – volta a memorizar este dispositivo.",
+  "nl": "<b>Controller wordt niet gevonden:</b> Staat Bluetooth aan? SYNC lang genoeg ingedrukt tot de lampjes lopen? Is hij nu met de Switch of een pc verbonden, zet daar dan eerst Bluetooth uit.<br><br><b>Verbonden, maar de game reageert niet:</b> Op de controllerpagina moet bovenaan ‘Klaar’ staan. Staat daar ‘Shizuku is niet gestart’, open dan Shizuku en tik op Starten.<br><br><b>Verbinding valt weg tijdens het spelen:</b> Sluit SKZ Connect uit van batterijoptimalisatie (Instellingen → Apps → SKZ Connect → Batterij → <i>Onbeperkt</i>).<br><br><b>Dubbele invoer:</b> Staat de aanraakbediening ook aan en ondersteunt de game controllers, zet aanraken dan uit.<br><br><b>Controller maakt niet meer vanzelf verbinding:</b> Druk één keer op SYNC – dan onthoudt hij dit apparaat opnieuw.",
+  "pl": "<b>Kontroler nie zostaje znaleziony:</b> Czy Bluetooth jest włączony? Czy przytrzymano SYNC wystarczająco długo, aż diody zaczną biegać? Jeśli jest właśnie połączony ze Switch lub komputerem, najpierw wyłącz tam Bluetooth.<br><br><b>Połączony, ale gra nie reaguje:</b> Na stronie kontrolerów u góry musi być „Gotowe”. Jeśli jest tam „Shizuku nie jest uruchomione”, otwórz Shizuku i stuknij Uruchom.<br><br><b>Połączenie zrywa się podczas gry:</b> Wyłącz SKZ Connect z optymalizacji baterii (Ustawienia → Aplikacje → SKZ Connect → Bateria → <i>Bez ograniczeń</i>).<br><br><b>Podwójne wejścia:</b> Jeśli sterowanie dotykowe jest dodatkowo włączone, a gra obsługuje kontrolery, wyłącz dotyk.<br><br><b>Kontroler nie łączy się już sam:</b> Naciśnij raz SYNC – wtedy ponownie zapamięta to urządzenie.",
+  "ru": "<b>Контроллер не находится:</b> Bluetooth включён? Кнопку SYNC удерживали достаточно долго, пока не побежали огоньки? Если он сейчас подключён к Switch или ПК, сначала выключите там Bluetooth.<br><br><b>Подключён, но игра не реагирует:</b> На странице контроллеров вверху должно быть «Готово». Если там написано «Shizuku не запущен», откройте Shizuku и нажмите «Запустить».<br><br><b>Связь обрывается во время игры:</b> Исключите SKZ Connect из оптимизации батареи (Настройки → Приложения → SKZ Connect → Батарея → <i>Без ограничений</i>).<br><br><b>Двойной ввод:</b> Если сенсорное управление тоже включено, а игра поддерживает контроллеры, выключите сенсорное управление.<br><br><b>Контроллер больше не подключается сам:</b> Нажмите один раз SYNC – он снова запомнит это устройство.",
+  "ja": "<b>コントローラーが見つからない：</b>Bluetooth はオンですか？ランプが流れるまで SYNC を十分長く押しましたか？Switch や PC に接続中の場合は、先にそちらの Bluetooth をオフにしてください。<br><br><b>接続されたがゲームが反応しない：</b>コントローラーページの上部に「準備完了」と表示されている必要があります。「Shizuku が起動していません」と表示されている場合は、Shizuku を開いて開始をタップしてください。<br><br><b>プレイ中に接続が切れる：</b>SKZ Connect をバッテリー最適化の対象外にしてください（設定 → アプリ → SKZ Connect → バッテリー → <i>制限なし</i>）。<br><br><b>入力が二重になる：</b>タッチ操作も有効で、ゲームがコントローラーに対応している場合は、タッチをオフにしてください。<br><br><b>コントローラーが自動で再接続しなくなった：</b>SYNC を一度押すと、この機器を再び記憶します。",
+  "zh": "<b>找不到控制器：</b>蓝牙开了吗？SYNC 是否按得足够久，直到指示灯闪动？如果它正连接着 Switch 或电脑，请先关闭那边的蓝牙。<br><br><b>已连接，但游戏没有反应：</b>控制器页面顶部必须显示“就绪”。如果显示“Shizuku 未启动”，请打开 Shizuku 并点按启动。<br><br><b>游戏时连接中断：</b>请将 SKZ Connect 从电池优化中排除（设置 → 应用 → SKZ Connect → 电池 → <i>无限制</i>）。<br><br><b>输入重复：</b>如果同时开启了触控操作，而游戏支持控制器，请关闭触控。<br><br><b>控制器不再自动重新连接：</b>按一次 SYNC – 它会重新记住这台设备。",
+  "ko": "<b>컨트롤러를 찾을 수 없음:</b> 블루투스가 켜져 있나요? 표시등이 움직일 때까지 SYNC를 충분히 길게 눌렀나요? Switch나 PC에 연결되어 있다면 먼저 그쪽의 블루투스를 끄세요.<br><br><b>연결됐지만 게임이 반응하지 않음:</b> 컨트롤러 페이지 상단에 '준비됨'이 표시되어야 합니다. 'Shizuku가 시작되지 않음'이 표시되면 Shizuku를 열고 시작을 탭하세요.<br><br><b>게임 중 연결이 끊김:</b> SKZ Connect를 배터리 최적화에서 제외하세요(설정 → 애플리케이션 → SKZ Connect → 배터리 → <i>제한 없음</i>).<br><br><b>입력이 중복됨:</b> 터치 조작도 켜져 있고 게임이 컨트롤러를 지원한다면 터치를 끄세요.<br><br><b>컨트롤러가 더 이상 자동으로 연결되지 않음:</b> SYNC를 한 번 누르면 이 기기를 다시 기억합니다."
  },
  "Akku-Einstellungen öffnen": {
   "en": "Open battery settings",
@@ -1286,18 +1286,18 @@
   "zh": "编辑触控布局",
   "ko": "터치 레이아웃 편집"
  },
- "Erst die Bedienungshilfe „N-Connect Touch-Steuerung“ einschalten.": {
-  "en": "First turn on the accessibility service “N-Connect touch controls”.",
-  "es": "Primero activa el servicio de accesibilidad «Control táctil de N-Connect».",
-  "fr": "Activez d'abord le service d'accessibilité « Commandes tactiles N-Connect ».",
-  "it": "Prima attiva il servizio di accessibilità «Controllo touch di N-Connect».",
-  "pt": "Primeiro ligue o serviço de acessibilidade «Controlo tátil do N-Connect».",
-  "nl": "Zet eerst de toegankelijkheidsservice ‘N-Connect aanraakbediening’ aan.",
-  "pl": "Najpierw włącz usługę ułatwień dostępu „Sterowanie dotykowe N-Connect”.",
-  "ru": "Сначала включите службу спец. возможностей «Сенсорное управление N-Connect».",
-  "ja": "先にユーザー補助サービス「N-Connect タッチ操作」をオンにしてください。",
-  "zh": "请先开启无障碍服务“N-Connect 触控操作”。",
-  "ko": "먼저 접근성 서비스 'N-Connect 터치 조작'을 켜세요."
+ "Erst die Bedienungshilfe „SKZ Connect Touch-Steuerung“ einschalten.": {
+  "en": "First turn on the accessibility service “SKZ Connect touch controls”.",
+  "es": "Primero activa el servicio de accesibilidad «Control táctil de SKZ Connect».",
+  "fr": "Activez d'abord le service d'accessibilité « Commandes tactiles SKZ Connect ».",
+  "it": "Prima attiva il servizio di accessibilità «Controllo touch di SKZ Connect».",
+  "pt": "Primeiro ligue o serviço de acessibilidade «Controlo tátil do SKZ Connect».",
+  "nl": "Zet eerst de toegankelijkheidsservice ‘SKZ Connect aanraakbediening’ aan.",
+  "pl": "Najpierw włącz usługę ułatwień dostępu „Sterowanie dotykowe SKZ Connect”.",
+  "ru": "Сначала включите службу спец. возможностей «Сенсорное управление SKZ Connect».",
+  "ja": "先にユーザー補助サービス「SKZ Connect タッチ操作」をオンにしてください。",
+  "zh": "请先开启无障碍服务“SKZ Connect 触控操作”。",
+  "ko": "먼저 접근성 서비스 'SKZ Connect 터치 조작'을 켜세요."
  },
  "Legt fest, wohin welche Taste tippt. Am besten direkt im Spiel über die Benachrichtigung.": {
   "en": "Sets where each button taps. Best done right in the game via the notification.",
@@ -1559,18 +1559,18 @@
   "zh": "打开时自动搜索",
   "ko": "열 때 자동으로 검색"
  },
- "N-Connect startet die Controller-Suche, sobald du die App öffnest.": {
-  "en": "N-Connect starts searching for controllers as soon as you open the app.",
-  "es": "N-Connect empieza a buscar mandos en cuanto abres la app.",
-  "fr": "N-Connect lance la recherche de manettes dès que vous ouvrez l'appli.",
-  "it": "N-Connect avvia la ricerca dei controller non appena apri l'app.",
-  "pt": "O N-Connect começa a procurar comandos assim que abre a app.",
-  "nl": "N-Connect begint met zoeken naar controllers zodra je de app opent.",
-  "pl": "N-Connect zaczyna szukać kontrolerów, gdy tylko otworzysz aplikację.",
-  "ru": "N-Connect начинает поиск контроллеров, как только вы открываете приложение.",
-  "ja": "アプリを開くとすぐに、N-Connect がコントローラーの検索を開始します。",
-  "zh": "打开应用后，N-Connect 会立即开始搜索控制器。",
-  "ko": "앱을 열자마자 N-Connect가 컨트롤러 검색을 시작합니다."
+ "SKZ Connect startet die Controller-Suche, sobald du die App öffnest.": {
+  "en": "SKZ Connect starts searching for controllers as soon as you open the app.",
+  "es": "SKZ Connect empieza a buscar mandos en cuanto abres la app.",
+  "fr": "SKZ Connect lance la recherche de manettes dès que vous ouvrez l'appli.",
+  "it": "SKZ Connect avvia la ricerca dei controller non appena apri l'app.",
+  "pt": "O SKZ Connect começa a procurar comandos assim que abre a app.",
+  "nl": "SKZ Connect begint met zoeken naar controllers zodra je de app opent.",
+  "pl": "SKZ Connect zaczyna szukać kontrolerów, gdy tylko otworzysz aplikację.",
+  "ru": "SKZ Connect начинает поиск контроллеров, как только вы открываете приложение.",
+  "ja": "アプリを開くとすぐに、SKZ Connect がコントローラーの検索を開始します。",
+  "zh": "打开应用后，SKZ Connect 会立即开始搜索控制器。",
+  "ko": "앱을 열자마자 SKZ Connect가 컨트롤러 검색을 시작합니다."
  },
  "Bluetooth-Adresse dieses Geräts": {
   "en": "Bluetooth address of this device",
@@ -1624,18 +1624,18 @@
   "zh": "外观",
   "ko": "화면 표시"
  },
- "{0} – dieselben Schemata wie in N-Connect für Windows": {
-  "en": "{0} – the same schemes as in N-Connect for Windows",
-  "es": "{0}: los mismos esquemas que en N-Connect para Windows",
-  "fr": "{0} – les mêmes thèmes que dans N-Connect pour Windows",
-  "it": "{0}: gli stessi schemi di N-Connect per Windows",
-  "pt": "{0} – os mesmos esquemas que no N-Connect para Windows",
-  "nl": "{0} – dezelfde schema's als in N-Connect voor Windows",
-  "pl": "{0} – te same schematy co w N-Connect dla Windows",
-  "ru": "{0} – те же схемы, что и в N-Connect для Windows",
-  "ja": "{0} – N-Connect for Windows と同じ配色",
-  "zh": "{0} – 与 Windows 版 N-Connect 相同的配色方案",
-  "ko": "{0} – Windows용 N-Connect와 같은 색 구성표"
+ "{0} – dieselben Schemata wie in SKZ Connect für Windows": {
+  "en": "{0} – the same schemes as in SKZ Connect for Windows",
+  "es": "{0}: los mismos esquemas que en SKZ Connect para Windows",
+  "fr": "{0} – les mêmes thèmes que dans SKZ Connect pour Windows",
+  "it": "{0}: gli stessi schemi di SKZ Connect per Windows",
+  "pt": "{0} – os mesmos esquemas que no SKZ Connect para Windows",
+  "nl": "{0} – dezelfde schema's als in SKZ Connect voor Windows",
+  "pl": "{0} – te same schematy co w SKZ Connect dla Windows",
+  "ru": "{0} – те же схемы, что и в SKZ Connect для Windows",
+  "ja": "{0} – SKZ Connect for Windows と同じ配色",
+  "zh": "{0} – 与 Windows 版 SKZ Connect 相同的配色方案",
+  "ko": "{0} – Windows용 SKZ Connect와 같은 색 구성표"
  },
  "Hell oder dunkel": {
   "en": "Light or dark",
@@ -1715,18 +1715,18 @@
   "zh": "将所有控制器设置恢复为默认值。",
   "ko": "모든 컨트롤러 설정을 기본값으로."
  },
- "Über N-Connect": {
-  "en": "About N-Connect",
-  "es": "Acerca de N-Connect",
-  "fr": "À propos de N-Connect",
-  "it": "Informazioni su N-Connect",
-  "pt": "Acerca do N-Connect",
-  "nl": "Over N-Connect",
-  "pl": "O N-Connect",
-  "ru": "О N-Connect",
-  "ja": "N-Connect について",
-  "zh": "关于 N-Connect",
-  "ko": "N-Connect 정보"
+ "Über SKZ Connect": {
+  "en": "About SKZ Connect",
+  "es": "Acerca de SKZ Connect",
+  "fr": "À propos de SKZ Connect",
+  "it": "Informazioni su SKZ Connect",
+  "pt": "Acerca do SKZ Connect",
+  "nl": "Over SKZ Connect",
+  "pl": "O SKZ Connect",
+  "ru": "О SKZ Connect",
+  "ja": "SKZ Connect について",
+  "zh": "关于 SKZ Connect",
+  "ko": "SKZ Connect 정보"
  },
  "Version {0} · Open Source (MIT) · von devcatskz": {
   "en": "Version {0} · Open source (MIT) · by devcatskz",
@@ -1858,18 +1858,18 @@
   "zh": "瞄准时（按住 ZL）",
   "ko": "조준 시(ZL 누름)"
  },
- "Mit Shizuku oder Root liest N-Connect die Adresse selbst aus. Sonst findest du sie unter Einstellungen → Über das Telefon → Bluetooth-Adresse.": {
-  "en": "With Shizuku or root, N-Connect reads the address itself. Otherwise you'll find it under Settings → About phone → Bluetooth address.",
-  "es": "Con Shizuku o root, N-Connect lee la dirección por sí mismo. Si no, la encontrarás en Ajustes → Información del teléfono → Dirección Bluetooth.",
-  "fr": "Avec Shizuku ou root, N-Connect lit l'adresse lui-même. Sinon, vous la trouverez sous Paramètres → À propos du téléphone → Adresse Bluetooth.",
-  "it": "Con Shizuku o root, N-Connect legge l'indirizzo da solo. Altrimenti lo trovi in Impostazioni → Informazioni sul telefono → Indirizzo Bluetooth.",
-  "pt": "Com Shizuku ou root, o N-Connect lê o endereço sozinho. Caso contrário, encontra-o em Definições → Acerca do telemóvel → Endereço Bluetooth.",
-  "nl": "Met Shizuku of root leest N-Connect het adres zelf uit. Anders vind je het onder Instellingen → Over de telefoon → Bluetooth-adres.",
-  "pl": "Z Shizuku lub rootem N-Connect sam odczytuje adres. W przeciwnym razie znajdziesz go w Ustawienia → Informacje o telefonie → Adres Bluetooth.",
-  "ru": "С Shizuku или root N-Connect сам считывает адрес. Иначе вы найдёте его в Настройки → О телефоне → Адрес Bluetooth.",
-  "ja": "Shizuku または root があれば、N-Connect がアドレスを自動で読み取ります。ない場合は 設定 → デバイス情報 → Bluetooth アドレス で確認できます。",
-  "zh": "使用 Shizuku 或 root 时，N-Connect 会自动读取地址。否则可在 设置 → 关于手机 → 蓝牙地址 中找到。",
-  "ko": "Shizuku나 루트가 있으면 N-Connect가 주소를 직접 읽습니다. 그렇지 않으면 설정 → 휴대전화 정보 → 블루투스 주소에서 찾을 수 있습니다."
+ "Mit Shizuku oder Root liest SKZ Connect die Adresse selbst aus. Sonst findest du sie unter Einstellungen → Über das Telefon → Bluetooth-Adresse.": {
+  "en": "With Shizuku or root, SKZ Connect reads the address itself. Otherwise you'll find it under Settings → About phone → Bluetooth address.",
+  "es": "Con Shizuku o root, SKZ Connect lee la dirección por sí mismo. Si no, la encontrarás en Ajustes → Información del teléfono → Dirección Bluetooth.",
+  "fr": "Avec Shizuku ou root, SKZ Connect lit l'adresse lui-même. Sinon, vous la trouverez sous Paramètres → À propos du téléphone → Adresse Bluetooth.",
+  "it": "Con Shizuku o root, SKZ Connect legge l'indirizzo da solo. Altrimenti lo trovi in Impostazioni → Informazioni sul telefono → Indirizzo Bluetooth.",
+  "pt": "Com Shizuku ou root, o SKZ Connect lê o endereço sozinho. Caso contrário, encontra-o em Definições → Acerca do telemóvel → Endereço Bluetooth.",
+  "nl": "Met Shizuku of root leest SKZ Connect het adres zelf uit. Anders vind je het onder Instellingen → Over de telefoon → Bluetooth-adres.",
+  "pl": "Z Shizuku lub rootem SKZ Connect sam odczytuje adres. W przeciwnym razie znajdziesz go w Ustawienia → Informacje o telefonie → Adres Bluetooth.",
+  "ru": "С Shizuku или root SKZ Connect сам считывает адрес. Иначе вы найдёте его в Настройки → О телефоне → Адрес Bluetooth.",
+  "ja": "Shizuku または root があれば、SKZ Connect がアドレスを自動で読み取ります。ない場合は 設定 → デバイス情報 → Bluetooth アドレス で確認できます。",
+  "zh": "使用 Shizuku 或 root 时，SKZ Connect 会自动读取地址。否则可在 设置 → 关于手机 → 蓝牙地址 中找到。",
+  "ko": "Shizuku나 루트가 있으면 SKZ Connect가 주소를 직접 읽습니다. 그렇지 않으면 설정 → 휴대전화 정보 → 블루투스 주소에서 찾을 수 있습니다."
  },
  "Speichern": {
   "en": "Save",
@@ -1949,18 +1949,18 @@
   "zh": "开启触控操作",
   "ko": "터치 조작 켜기"
  },
- "Tippe in der folgenden Liste auf „N-Connect Touch-Steuerung“ (ggf. unter „Installierte Apps“) und schalte sie ein. N-Connect führt damit nur Berührungen aus und liest keine Inhalte.": {
-  "en": "In the following list, tap “N-Connect touch controls” (possibly under “Installed apps”) and turn it on. N-Connect only performs touches with it and doesn't read any content.",
-  "es": "En la siguiente lista, toca «Control táctil de N-Connect» (quizá en «Aplicaciones instaladas») y actívalo. N-Connect solo realiza toques con él y no lee ningún contenido.",
-  "fr": "Dans la liste suivante, appuyez sur « Commandes tactiles N-Connect » (éventuellement sous « Applications installées ») et activez-les. N-Connect ne fait qu'effectuer des appuis et ne lit aucun contenu.",
-  "it": "Nell'elenco seguente tocca «Controllo touch di N-Connect» (eventualmente in «App installate») e attivalo. N-Connect esegue solo tocchi e non legge alcun contenuto.",
-  "pt": "Na lista seguinte, toque em «Controlo tátil do N-Connect» (eventualmente em «Apps instaladas») e ligue-o. O N-Connect apenas executa toques e não lê qualquer conteúdo.",
-  "nl": "Tik in de volgende lijst op ‘N-Connect aanraakbediening’ (eventueel onder ‘Geïnstalleerde apps’) en zet hem aan. N-Connect voert daarmee alleen aanrakingen uit en leest geen inhoud.",
-  "pl": "Na poniższej liście stuknij „Sterowanie dotykowe N-Connect” (ew. w „Zainstalowane aplikacje”) i włącz je. N-Connect wykonuje dzięki temu tylko dotknięcia i nie odczytuje żadnych treści.",
-  "ru": "В следующем списке нажмите «Сенсорное управление N-Connect» (возможно, в разделе «Установленные приложения») и включите его. N-Connect с его помощью только выполняет касания и не читает содержимое.",
-  "ja": "次のリストで「N-Connect タッチ操作」（「インストール済みアプリ」内の場合あり）をタップしてオンにしてください。N-Connect はタッチを実行するだけで、内容は一切読み取りません。",
-  "zh": "在接下来的列表中点按“N-Connect 触控操作”（可能位于“已安装的应用”下）并开启。N-Connect 只用它执行触摸，不会读取任何内容。",
-  "ko": "다음 목록에서 'N-Connect 터치 조작'(필요하면 '설치된 앱' 아래)을 탭하고 켜세요. N-Connect는 이를 통해 터치만 수행하며 어떤 내용도 읽지 않습니다."
+ "Tippe in der folgenden Liste auf „SKZ Connect Touch-Steuerung“ (ggf. unter „Installierte Apps“) und schalte sie ein. SKZ Connect führt damit nur Berührungen aus und liest keine Inhalte.": {
+  "en": "In the following list, tap “SKZ Connect touch controls” (possibly under “Installed apps”) and turn it on. SKZ Connect only performs touches with it and doesn't read any content.",
+  "es": "En la siguiente lista, toca «Control táctil de SKZ Connect» (quizá en «Aplicaciones instaladas») y actívalo. SKZ Connect solo realiza toques con él y no lee ningún contenido.",
+  "fr": "Dans la liste suivante, appuyez sur « Commandes tactiles SKZ Connect » (éventuellement sous « Applications installées ») et activez-les. SKZ Connect ne fait qu'effectuer des appuis et ne lit aucun contenu.",
+  "it": "Nell'elenco seguente tocca «Controllo touch di SKZ Connect» (eventualmente in «App installate») e attivalo. SKZ Connect esegue solo tocchi e non legge alcun contenuto.",
+  "pt": "Na lista seguinte, toque em «Controlo tátil do SKZ Connect» (eventualmente em «Apps instaladas») e ligue-o. O SKZ Connect apenas executa toques e não lê qualquer conteúdo.",
+  "nl": "Tik in de volgende lijst op ‘SKZ Connect aanraakbediening’ (eventueel onder ‘Geïnstalleerde apps’) en zet hem aan. SKZ Connect voert daarmee alleen aanrakingen uit en leest geen inhoud.",
+  "pl": "Na poniższej liście stuknij „Sterowanie dotykowe SKZ Connect” (ew. w „Zainstalowane aplikacje”) i włącz je. SKZ Connect wykonuje dzięki temu tylko dotknięcia i nie odczytuje żadnych treści.",
+  "ru": "В следующем списке нажмите «Сенсорное управление SKZ Connect» (возможно, в разделе «Установленные приложения») и включите его. SKZ Connect с его помощью только выполняет касания и не читает содержимое.",
+  "ja": "次のリストで「SKZ Connect タッチ操作」（「インストール済みアプリ」内の場合あり）をタップしてオンにしてください。SKZ Connect はタッチを実行するだけで、内容は一切読み取りません。",
+  "zh": "在接下来的列表中点按“SKZ Connect 触控操作”（可能位于“已安装的应用”下）并开启。SKZ Connect 只用它执行触摸，不会读取任何内容。",
+  "ko": "다음 목록에서 'SKZ Connect 터치 조작'(필요하면 '설치된 앱' 아래)을 탭하고 켜세요. SKZ Connect는 이를 통해 터치만 수행하며 어떤 내용도 읽지 않습니다."
  },
  "Zu den Bedienungshilfen": {
   "en": "Go to Accessibility",
@@ -1988,18 +1988,18 @@
   "zh": "稍后",
   "ko": "나중에"
  },
- "N-Connect einrichten": {
-  "en": "Set up N-Connect",
-  "es": "Configurar N-Connect",
-  "fr": "Configurer N-Connect",
-  "it": "Configura N-Connect",
-  "pt": "Configurar o N-Connect",
-  "nl": "N-Connect instellen",
-  "pl": "Konfiguracja N-Connect",
-  "ru": "Настройка N-Connect",
-  "ja": "N-Connect のセットアップ",
-  "zh": "设置 N-Connect",
-  "ko": "N-Connect 설정"
+ "SKZ Connect einrichten": {
+  "en": "Set up SKZ Connect",
+  "es": "Configurar SKZ Connect",
+  "fr": "Configurer SKZ Connect",
+  "it": "Configura SKZ Connect",
+  "pt": "Configurar o SKZ Connect",
+  "nl": "SKZ Connect instellen",
+  "pl": "Konfiguracja SKZ Connect",
+  "ru": "Настройка SKZ Connect",
+  "ja": "SKZ Connect のセットアップ",
+  "zh": "设置 SKZ Connect",
+  "ko": "SKZ Connect 설정"
  },
  "Weiter": {
   "en": "Next",
@@ -2027,18 +2027,18 @@
   "zh": "开始吧",
   "ko": "시작하기"
  },
- "Willkommen bei N-Connect": {
-  "en": "Welcome to N-Connect",
-  "es": "Bienvenido a N-Connect",
-  "fr": "Bienvenue dans N-Connect",
-  "it": "Benvenuto in N-Connect",
-  "pt": "Bem-vindo ao N-Connect",
-  "nl": "Welkom bij N-Connect",
-  "pl": "Witaj w N-Connect",
-  "ru": "Добро пожаловать в N-Connect",
-  "ja": "N-Connect へようこそ",
-  "zh": "欢迎使用 N-Connect",
-  "ko": "N-Connect에 오신 것을 환영합니다"
+ "Willkommen bei SKZ Connect": {
+  "en": "Welcome to SKZ Connect",
+  "es": "Bienvenido a SKZ Connect",
+  "fr": "Bienvenue dans SKZ Connect",
+  "it": "Benvenuto in SKZ Connect",
+  "pt": "Bem-vindo ao SKZ Connect",
+  "nl": "Welkom bij SKZ Connect",
+  "pl": "Witaj w SKZ Connect",
+  "ru": "Добро пожаловать в SKZ Connect",
+  "ja": "SKZ Connect へようこそ",
+  "zh": "欢迎使用 SKZ Connect",
+  "ko": "SKZ Connect에 오신 것을 환영합니다"
  },
  "Spiele mit deinen Nintendo-Switch-2-Controllern auf diesem Gerät – in Android-Spielen, Emulatoren und beim Cloud-Gaming.": {
   "en": "Play with your Nintendo Switch 2 controllers on this device – in Android games, emulators and cloud gaming.",
@@ -2105,18 +2105,18 @@
   "zh": "只需几步：允许蓝牙、选择游戏如何识别你的控制器，并连接第一个控制器。大约需要两分钟。",
   "ko": "몇 단계만으로 블루투스를 허용하고, 게임에서 컨트롤러가 보이는 방식을 고르고, 첫 컨트롤러를 연결합니다. 약 2분 걸립니다."
  },
- "N-Connect unterstützt nur Switch-2-Controller. Xbox- und PlayStation-Controller laufen direkt über die Bluetooth-Einstellungen von Android. Ältere Switch-Controller (Switch 1, Nachbauten) koppelst du ebenfalls dort – meist nur mit Tasten und Sticks, ohne Bewegungssteuerung und Vibration.": {
-  "en": "N-Connect only supports Switch 2 controllers. Xbox and PlayStation controllers work directly via Android's Bluetooth settings. Older Switch controllers (Switch 1, clones) are paired there too – usually with buttons and sticks only, without motion controls and vibration.",
-  "es": "N-Connect solo es compatible con mandos de Switch 2. Los mandos de Xbox y PlayStation funcionan directamente desde los ajustes de Bluetooth de Android. Los mandos de Switch más antiguos (Switch 1, imitaciones) también se vinculan ahí, normalmente solo con botones y sticks, sin control por movimiento ni vibración.",
-  "fr": "N-Connect ne prend en charge que les manettes Switch 2. Les manettes Xbox et PlayStation fonctionnent directement via les paramètres Bluetooth d'Android. Les anciennes manettes Switch (Switch 1, copies) s'y associent aussi – en général uniquement avec les boutons et les sticks, sans commandes de mouvement ni vibration.",
-  "it": "N-Connect supporta solo i controller Switch 2. I controller Xbox e PlayStation funzionano direttamente tramite le impostazioni Bluetooth di Android. Anche i vecchi controller Switch (Switch 1, imitazioni) si associano lì, di solito solo con tasti e stick, senza controlli di movimento né vibrazione.",
-  "pt": "O N-Connect só suporta comandos Switch 2. Os comandos Xbox e PlayStation funcionam diretamente através das definições de Bluetooth do Android. Os comandos Switch mais antigos (Switch 1, imitações) também se emparelham aí – normalmente só com botões e manípulos, sem controlo por movimento nem vibração.",
-  "nl": "N-Connect ondersteunt alleen Switch 2-controllers. Xbox- en PlayStation-controllers werken direct via de Bluetooth-instellingen van Android. Oudere Switch-controllers (Switch 1, namaak) koppel je daar ook – meestal alleen met knoppen en sticks, zonder bewegingsbesturing en trillen.",
-  "pl": "N-Connect obsługuje tylko kontrolery Switch 2. Kontrolery Xbox i PlayStation działają bezpośrednio przez ustawienia Bluetooth Androida. Starsze kontrolery Switch (Switch 1, podróbki) również parujesz tam – zwykle tylko z przyciskami i drążkami, bez sterowania ruchem i wibracji.",
-  "ru": "N-Connect поддерживает только контроллеры Switch 2. Контроллеры Xbox и PlayStation работают напрямую через настройки Bluetooth Android. Старые контроллеры Switch (Switch 1, копии) тоже подключаются там – обычно только с кнопками и стиками, без управления движением и вибрации.",
-  "ja": "N-Connect が対応するのは Switch 2 コントローラーのみです。Xbox と PlayStation のコントローラーは Android の Bluetooth 設定からそのまま使えます。旧型の Switch コントローラー（Switch 1、互換品）も同じくそこでペアリングします – 通常はボタンとスティックのみで、モーション操作と振動は使えません。",
-  "zh": "N-Connect 仅支持 Switch 2 控制器。Xbox 和 PlayStation 控制器可直接通过 Android 的蓝牙设置使用。旧款 Switch 控制器（Switch 1、仿制品）同样在那里配对 – 通常只有按键和摇杆可用，没有体感操作和振动。",
-  "ko": "N-Connect는 Switch 2 컨트롤러만 지원합니다. Xbox 및 PlayStation 컨트롤러는 Android 블루투스 설정을 통해 바로 작동합니다. 이전 Switch 컨트롤러(Switch 1, 호환 제품)도 그곳에서 페어링합니다 – 보통 버튼과 스틱만 작동하며 모션 조작과 진동은 지원되지 않습니다."
+ "SKZ Connect unterstützt nur Switch-2-Controller. Xbox- und PlayStation-Controller laufen direkt über die Bluetooth-Einstellungen von Android. Ältere Switch-Controller (Switch 1, Nachbauten) koppelst du ebenfalls dort – meist nur mit Tasten und Sticks, ohne Bewegungssteuerung und Vibration.": {
+  "en": "SKZ Connect only supports Switch 2 controllers. Xbox and PlayStation controllers work directly via Android's Bluetooth settings. Older Switch controllers (Switch 1, clones) are paired there too – usually with buttons and sticks only, without motion controls and vibration.",
+  "es": "SKZ Connect solo es compatible con mandos de Switch 2. Los mandos de Xbox y PlayStation funcionan directamente desde los ajustes de Bluetooth de Android. Los mandos de Switch más antiguos (Switch 1, imitaciones) también se vinculan ahí, normalmente solo con botones y sticks, sin control por movimiento ni vibración.",
+  "fr": "SKZ Connect ne prend en charge que les manettes Switch 2. Les manettes Xbox et PlayStation fonctionnent directement via les paramètres Bluetooth d'Android. Les anciennes manettes Switch (Switch 1, copies) s'y associent aussi – en général uniquement avec les boutons et les sticks, sans commandes de mouvement ni vibration.",
+  "it": "SKZ Connect supporta solo i controller Switch 2. I controller Xbox e PlayStation funzionano direttamente tramite le impostazioni Bluetooth di Android. Anche i vecchi controller Switch (Switch 1, imitazioni) si associano lì, di solito solo con tasti e stick, senza controlli di movimento né vibrazione.",
+  "pt": "O SKZ Connect só suporta comandos Switch 2. Os comandos Xbox e PlayStation funcionam diretamente através das definições de Bluetooth do Android. Os comandos Switch mais antigos (Switch 1, imitações) também se emparelham aí – normalmente só com botões e manípulos, sem controlo por movimento nem vibração.",
+  "nl": "SKZ Connect ondersteunt alleen Switch 2-controllers. Xbox- en PlayStation-controllers werken direct via de Bluetooth-instellingen van Android. Oudere Switch-controllers (Switch 1, namaak) koppel je daar ook – meestal alleen met knoppen en sticks, zonder bewegingsbesturing en trillen.",
+  "pl": "SKZ Connect obsługuje tylko kontrolery Switch 2. Kontrolery Xbox i PlayStation działają bezpośrednio przez ustawienia Bluetooth Androida. Starsze kontrolery Switch (Switch 1, podróbki) również parujesz tam – zwykle tylko z przyciskami i drążkami, bez sterowania ruchem i wibracji.",
+  "ru": "SKZ Connect поддерживает только контроллеры Switch 2. Контроллеры Xbox и PlayStation работают напрямую через настройки Bluetooth Android. Старые контроллеры Switch (Switch 1, копии) тоже подключаются там – обычно только с кнопками и стиками, без управления движением и вибрации.",
+  "ja": "SKZ Connect が対応するのは Switch 2 コントローラーのみです。Xbox と PlayStation のコントローラーは Android の Bluetooth 設定からそのまま使えます。旧型の Switch コントローラー（Switch 1、互換品）も同じくそこでペアリングします – 通常はボタンとスティックのみで、モーション操作と振動は使えません。",
+  "zh": "SKZ Connect 仅支持 Switch 2 控制器。Xbox 和 PlayStation 控制器可直接通过 Android 的蓝牙设置使用。旧款 Switch 控制器（Switch 1、仿制品）同样在那里配对 – 通常只有按键和摇杆可用，没有体感操作和振动。",
+  "ko": "SKZ Connect는 Switch 2 컨트롤러만 지원합니다. Xbox 및 PlayStation 컨트롤러는 Android 블루투스 설정을 통해 바로 작동합니다. 이전 Switch 컨트롤러(Switch 1, 호환 제품)도 그곳에서 페어링합니다 – 보통 버튼과 스틱만 작동하며 모션 조작과 진동은 지원되지 않습니다."
  },
  "Berechtigungen": {
   "en": "Permissions",
@@ -2170,18 +2170,18 @@
   "zh": "已允许。",
   "ko": "허용됨."
  },
- "Nötig, um Controller zu finden und zu verbinden. N-Connect fragt nicht nach deinem Standort.": {
-  "en": "Needed to find and connect controllers. N-Connect doesn't ask for your location.",
-  "es": "Necesario para encontrar y conectar mandos. N-Connect no pide tu ubicación.",
-  "fr": "Nécessaire pour trouver et connecter les manettes. N-Connect ne demande pas votre position.",
-  "it": "Necessario per trovare e collegare i controller. N-Connect non chiede la tua posizione.",
-  "pt": "Necessário para encontrar e ligar comandos. O N-Connect não pede a sua localização.",
-  "nl": "Nodig om controllers te vinden en te verbinden. N-Connect vraagt niet naar je locatie.",
-  "pl": "Potrzebne do znajdowania i łączenia kontrolerów. N-Connect nie pyta o twoją lokalizację.",
-  "ru": "Нужно для поиска и подключения контроллеров. N-Connect не запрашивает ваше местоположение.",
-  "ja": "コントローラーの検索と接続に必要です。N-Connect が位置情報を求めることはありません。",
-  "zh": "用于查找和连接控制器。N-Connect 不会请求你的位置信息。",
-  "ko": "컨트롤러를 찾고 연결하는 데 필요합니다. N-Connect는 위치를 묻지 않습니다."
+ "Nötig, um Controller zu finden und zu verbinden. SKZ Connect fragt nicht nach deinem Standort.": {
+  "en": "Needed to find and connect controllers. SKZ Connect doesn't ask for your location.",
+  "es": "Necesario para encontrar y conectar mandos. SKZ Connect no pide tu ubicación.",
+  "fr": "Nécessaire pour trouver et connecter les manettes. SKZ Connect ne demande pas votre position.",
+  "it": "Necessario per trovare e collegare i controller. SKZ Connect non chiede la tua posizione.",
+  "pt": "Necessário para encontrar e ligar comandos. O SKZ Connect não pede a sua localização.",
+  "nl": "Nodig om controllers te vinden en te verbinden. SKZ Connect vraagt niet naar je locatie.",
+  "pl": "Potrzebne do znajdowania i łączenia kontrolerów. SKZ Connect nie pyta o twoją lokalizację.",
+  "ru": "Нужно для поиска и подключения контроллеров. SKZ Connect не запрашивает ваше местоположение.",
+  "ja": "コントローラーの検索と接続に必要です。SKZ Connect が位置情報を求めることはありません。",
+  "zh": "用于查找和连接控制器。SKZ Connect 不会请求你的位置信息。",
+  "ko": "컨트롤러를 찾고 연결하는 데 필요합니다. SKZ Connect는 위치를 묻지 않습니다."
  },
  "Benachrichtigungen": {
   "en": "Notifications",
@@ -2235,18 +2235,18 @@
   "zh": "无限制 – 游戏时连接保持稳定。",
   "ko": "제한 없음 – 게임 중에도 연결이 안정적으로 유지됩니다."
  },
- "Verhindert, dass Android N-Connect beim Spielen beendet und die Controller trennt.": {
-  "en": "Prevents Android from closing N-Connect while you play and disconnecting the controllers.",
-  "es": "Evita que Android cierre N-Connect mientras juegas y desconecte los mandos.",
-  "fr": "Empêche Android de fermer N-Connect pendant le jeu et de déconnecter les manettes.",
-  "it": "Impedisce che Android chiuda N-Connect mentre giochi e scolleghi i controller.",
-  "pt": "Impede que o Android feche o N-Connect durante o jogo e desligue os comandos.",
-  "nl": "Voorkomt dat Android N-Connect tijdens het spelen afsluit en de controllers loskoppelt.",
-  "pl": "Zapobiega zamykaniu N-Connect przez Androida podczas gry i rozłączaniu kontrolerów.",
-  "ru": "Не даёт Android закрывать N-Connect во время игры и отключать контроллеры.",
-  "ja": "プレイ中に Android が N-Connect を終了してコントローラーを切断するのを防ぎます。",
-  "zh": "防止 Android 在游戏时关闭 N-Connect 并断开控制器。",
-  "ko": "게임 중 Android가 N-Connect를 종료하고 컨트롤러 연결을 끊는 것을 막습니다."
+ "Verhindert, dass Android SKZ Connect beim Spielen beendet und die Controller trennt.": {
+  "en": "Prevents Android from closing SKZ Connect while you play and disconnecting the controllers.",
+  "es": "Evita que Android cierre SKZ Connect mientras juegas y desconecte los mandos.",
+  "fr": "Empêche Android de fermer SKZ Connect pendant le jeu et de déconnecter les manettes.",
+  "it": "Impedisce che Android chiuda SKZ Connect mentre giochi e scolleghi i controller.",
+  "pt": "Impede que o Android feche o SKZ Connect durante o jogo e desligue os comandos.",
+  "nl": "Voorkomt dat Android SKZ Connect tijdens het spelen afsluit en de controllers loskoppelt.",
+  "pl": "Zapobiega zamykaniu SKZ Connect przez Androida podczas gry i rozłączaniu kontrolerów.",
+  "ru": "Не даёт Android закрывать SKZ Connect во время игры и отключать контроллеры.",
+  "ja": "プレイ中に Android が SKZ Connect を終了してコントローラーを切断するのを防ぎます。",
+  "zh": "防止 Android 在游戏时关闭 SKZ Connect 并断开控制器。",
+  "ko": "게임 중 Android가 SKZ Connect를 종료하고 컨트롤러 연결을 끊는 것을 막습니다."
  },
  "Nicht einschränken": {
   "en": "Don't restrict",
@@ -2443,18 +2443,18 @@
   "zh": "设置 Shizuku",
   "ko": "Shizuku 설정"
  },
- "Shizuku erlaubt N-Connect, einen virtuellen Xbox-Controller anzulegen. Drei Schritte:": {
-  "en": "Shizuku allows N-Connect to create a virtual Xbox controller. Three steps:",
-  "es": "Shizuku permite a N-Connect crear un mando de Xbox virtual. Tres pasos:",
-  "fr": "Shizuku permet à N-Connect de créer une manette Xbox virtuelle. Trois étapes :",
-  "it": "Shizuku permette a N-Connect di creare un controller Xbox virtuale. Tre passaggi:",
-  "pt": "O Shizuku permite ao N-Connect criar um comando Xbox virtual. Três passos:",
-  "nl": "Shizuku laat N-Connect een virtuele Xbox-controller aanmaken. Drie stappen:",
-  "pl": "Shizuku pozwala N-Connect utworzyć wirtualny kontroler Xbox. Trzy kroki:",
-  "ru": "Shizuku позволяет N-Connect создать виртуальный контроллер Xbox. Три шага:",
-  "ja": "Shizuku により、N-Connect が仮想 Xbox コントローラーを作成できます。3 つのステップ：",
-  "zh": "Shizuku 让 N-Connect 可以创建虚拟 Xbox 控制器。三个步骤：",
-  "ko": "Shizuku를 사용하면 N-Connect가 가상 Xbox 컨트롤러를 만들 수 있습니다. 세 단계:"
+ "Shizuku erlaubt SKZ Connect, einen virtuellen Xbox-Controller anzulegen. Drei Schritte:": {
+  "en": "Shizuku allows SKZ Connect to create a virtual Xbox controller. Three steps:",
+  "es": "Shizuku permite a SKZ Connect crear un mando de Xbox virtual. Tres pasos:",
+  "fr": "Shizuku permet à SKZ Connect de créer une manette Xbox virtuelle. Trois étapes :",
+  "it": "Shizuku permette a SKZ Connect di creare un controller Xbox virtuale. Tre passaggi:",
+  "pt": "O Shizuku permite ao SKZ Connect criar um comando Xbox virtual. Três passos:",
+  "nl": "Shizuku laat SKZ Connect een virtuele Xbox-controller aanmaken. Drie stappen:",
+  "pl": "Shizuku pozwala SKZ Connect utworzyć wirtualny kontroler Xbox. Trzy kroki:",
+  "ru": "Shizuku позволяет SKZ Connect создать виртуальный контроллер Xbox. Три шага:",
+  "ja": "Shizuku により、SKZ Connect が仮想 Xbox コントローラーを作成できます。3 つのステップ：",
+  "zh": "Shizuku 让 SKZ Connect 可以创建虚拟 Xbox 控制器。三个步骤：",
+  "ko": "Shizuku를 사용하면 SKZ Connect가 가상 Xbox 컨트롤러를 만들 수 있습니다. 세 단계:"
  },
  "1. Shizuku installieren": {
   "en": "1. Install Shizuku",
@@ -2534,31 +2534,31 @@
   "zh": "在 Shizuku 中：“通过无线调试启动”→ 配对 → 启动。每次重启后点一次“启动”。",
   "ko": "Shizuku에서: '무선 디버깅으로 시작' → 페어링 → 시작. 재부팅할 때마다 '시작' 한 번."
  },
- "3. N-Connect den Zugriff erlauben": {
-  "en": "3. Allow N-Connect access",
-  "es": "3. Permitir el acceso a N-Connect",
-  "fr": "3. Autoriser l'accès à N-Connect",
-  "it": "3. Consenti l'accesso a N-Connect",
-  "pt": "3. Permitir o acesso ao N-Connect",
-  "nl": "3. N-Connect toegang geven",
-  "pl": "3. Zezwól N-Connect na dostęp",
-  "ru": "3. Разрешить доступ N-Connect",
-  "ja": "3. N-Connect にアクセスを許可",
-  "zh": "3. 允许 N-Connect 访问",
-  "ko": "3. N-Connect에 액세스 허용"
+ "3. SKZ Connect den Zugriff erlauben": {
+  "en": "3. Allow SKZ Connect access",
+  "es": "3. Permitir el acceso a SKZ Connect",
+  "fr": "3. Autoriser l'accès à SKZ Connect",
+  "it": "3. Consenti l'accesso a SKZ Connect",
+  "pt": "3. Permitir o acesso ao SKZ Connect",
+  "nl": "3. SKZ Connect toegang geven",
+  "pl": "3. Zezwól SKZ Connect na dostęp",
+  "ru": "3. Разрешить доступ SKZ Connect",
+  "ja": "3. SKZ Connect にアクセスを許可",
+  "zh": "3. 允许 SKZ Connect 访问",
+  "ko": "3. SKZ Connect에 액세스 허용"
  },
- "Shizuku fragt einmal, ob N-Connect es nutzen darf.": {
-  "en": "Shizuku asks once whether N-Connect may use it.",
-  "es": "Shizuku pregunta una vez si N-Connect puede usarlo.",
-  "fr": "Shizuku demande une fois si N-Connect peut l'utiliser.",
-  "it": "Shizuku chiede una volta se N-Connect può usarlo.",
-  "pt": "O Shizuku pergunta uma vez se o N-Connect o pode usar.",
-  "nl": "Shizuku vraagt één keer of N-Connect het mag gebruiken.",
-  "pl": "Shizuku zapyta raz, czy N-Connect może z niego korzystać.",
-  "ru": "Shizuku один раз спросит, может ли N-Connect его использовать.",
-  "ja": "Shizuku が一度だけ、N-Connect の使用を許可するか確認します。",
-  "zh": "Shizuku 会询问一次是否允许 N-Connect 使用它。",
-  "ko": "Shizuku가 N-Connect의 사용을 허용할지 한 번 묻습니다."
+ "Shizuku fragt einmal, ob SKZ Connect es nutzen darf.": {
+  "en": "Shizuku asks once whether SKZ Connect may use it.",
+  "es": "Shizuku pregunta una vez si SKZ Connect puede usarlo.",
+  "fr": "Shizuku demande une fois si SKZ Connect peut l'utiliser.",
+  "it": "Shizuku chiede una volta se SKZ Connect può usarlo.",
+  "pt": "O Shizuku pergunta uma vez se o SKZ Connect o pode usar.",
+  "nl": "Shizuku vraagt één keer of SKZ Connect het mag gebruiken.",
+  "pl": "Shizuku zapyta raz, czy SKZ Connect może z niego korzystać.",
+  "ru": "Shizuku один раз спросит, может ли SKZ Connect его использовать.",
+  "ja": "Shizuku が一度だけ、SKZ Connect の使用を許可するか確認します。",
+  "zh": "Shizuku 会询问一次是否允许 SKZ Connect 使用它。",
+  "ko": "Shizuku가 SKZ Connect의 사용을 허용할지 한 번 묻습니다."
  },
  "Zugriff erlauben": {
   "en": "Allow access",
@@ -2599,31 +2599,31 @@
   "zh": "root 权限",
   "ko": "루트 액세스"
  },
- "Root-Zugriff für N-Connect": {
-  "en": "Root access for N-Connect",
-  "es": "Acceso root para N-Connect",
-  "fr": "Accès root pour N-Connect",
-  "it": "Accesso root per N-Connect",
-  "pt": "Acesso root para o N-Connect",
-  "nl": "Roottoegang voor N-Connect",
-  "pl": "Dostęp root dla N-Connect",
-  "ru": "Root-доступ для N-Connect",
-  "ja": "N-Connect の root アクセス",
-  "zh": "N-Connect 的 root 权限",
-  "ko": "N-Connect의 루트 액세스"
+ "Root-Zugriff für SKZ Connect": {
+  "en": "Root access for SKZ Connect",
+  "es": "Acceso root para SKZ Connect",
+  "fr": "Accès root pour SKZ Connect",
+  "it": "Accesso root per SKZ Connect",
+  "pt": "Acesso root para o SKZ Connect",
+  "nl": "Roottoegang voor SKZ Connect",
+  "pl": "Dostęp root dla SKZ Connect",
+  "ru": "Root-доступ для SKZ Connect",
+  "ja": "SKZ Connect の root アクセス",
+  "zh": "SKZ Connect 的 root 权限",
+  "ko": "SKZ Connect의 루트 액세스"
  },
- "Tippe auf „Zugriff anfragen“ und erlaube N-Connect im Root-Dialog (z. B. Magisk).": {
-  "en": "Tap “Request access” and allow N-Connect in the root dialog (e.g. Magisk).",
-  "es": "Toca «Solicitar acceso» y permite N-Connect en el diálogo de root (p. ej. Magisk).",
-  "fr": "Appuyez sur « Demander l'accès » et autorisez N-Connect dans la boîte de dialogue root (par ex. Magisk).",
-  "it": "Tocca «Richiedi accesso» e consenti N-Connect nella finestra di root (ad es. Magisk).",
-  "pt": "Toque em «Pedir acesso» e permita o N-Connect na caixa de diálogo de root (p. ex. Magisk).",
-  "nl": "Tik op ‘Toegang aanvragen’ en sta N-Connect toe in het rootvenster (bijv. Magisk).",
-  "pl": "Stuknij „Poproś o dostęp” i zezwól N-Connect w oknie roota (np. Magisk).",
-  "ru": "Нажмите «Запросить доступ» и разрешите N-Connect в диалоге root (например, Magisk).",
-  "ja": "「アクセスをリクエスト」をタップし、root ダイアログで N-Connect を許可してください（例：Magisk）。",
-  "zh": "点按“请求访问”，并在 root 对话框中允许 N-Connect（例如 Magisk）。",
-  "ko": "'액세스 요청'을 탭하고 루트 대화상자(예: Magisk)에서 N-Connect를 허용하세요."
+ "Tippe auf „Zugriff anfragen“ und erlaube SKZ Connect im Root-Dialog (z. B. Magisk).": {
+  "en": "Tap “Request access” and allow SKZ Connect in the root dialog (e.g. Magisk).",
+  "es": "Toca «Solicitar acceso» y permite SKZ Connect en el diálogo de root (p. ej. Magisk).",
+  "fr": "Appuyez sur « Demander l'accès » et autorisez SKZ Connect dans la boîte de dialogue root (par ex. Magisk).",
+  "it": "Tocca «Richiedi accesso» e consenti SKZ Connect nella finestra di root (ad es. Magisk).",
+  "pt": "Toque em «Pedir acesso» e permita o SKZ Connect na caixa de diálogo de root (p. ex. Magisk).",
+  "nl": "Tik op ‘Toegang aanvragen’ en sta SKZ Connect toe in het rootvenster (bijv. Magisk).",
+  "pl": "Stuknij „Poproś o dostęp” i zezwól SKZ Connect w oknie roota (np. Magisk).",
+  "ru": "Нажмите «Запросить доступ» и разрешите SKZ Connect в диалоге root (например, Magisk).",
+  "ja": "「アクセスをリクエスト」をタップし、root ダイアログで SKZ Connect を許可してください（例：Magisk）。",
+  "zh": "点按“请求访问”，并在 root 对话框中允许 SKZ Connect（例如 Magisk）。",
+  "ko": "'액세스 요청'을 탭하고 루트 대화상자(예: Magisk)에서 SKZ Connect를 허용하세요."
  },
  "Auf diesem Gerät wurde kein Root gefunden. Wähle stattdessen Shizuku.": {
   "en": "No root was found on this device. Choose Shizuku instead.",
@@ -2677,18 +2677,18 @@
   "zh": "触控操作是一项无障碍服务。它只执行触摸，不会读取屏幕上的任何内容。",
   "ko": "터치 조작은 접근성 서비스입니다. 터치만 수행하며 화면의 어떤 내용도 읽지 않습니다."
  },
- "Bedienungshilfe „N-Connect Touch-Steuerung“": {
-  "en": "Accessibility service “N-Connect touch controls”",
-  "es": "Servicio de accesibilidad «Control táctil de N-Connect»",
-  "fr": "Service d'accessibilité « Commandes tactiles N-Connect »",
-  "it": "Servizio di accessibilità «Controllo touch di N-Connect»",
-  "pt": "Serviço de acessibilidade «Controlo tátil do N-Connect»",
-  "nl": "Toegankelijkheidsservice ‘N-Connect aanraakbediening’",
-  "pl": "Usługa ułatwień dostępu „Sterowanie dotykowe N-Connect”",
-  "ru": "Служба спец. возможностей «Сенсорное управление N-Connect»",
-  "ja": "ユーザー補助サービス「N-Connect タッチ操作」",
-  "zh": "无障碍服务“N-Connect 触控操作”",
-  "ko": "접근성 서비스 'N-Connect 터치 조작'"
+ "Bedienungshilfe „SKZ Connect Touch-Steuerung“": {
+  "en": "Accessibility service “SKZ Connect touch controls”",
+  "es": "Servicio de accesibilidad «Control táctil de SKZ Connect»",
+  "fr": "Service d'accessibilité « Commandes tactiles SKZ Connect »",
+  "it": "Servizio di accessibilità «Controllo touch di SKZ Connect»",
+  "pt": "Serviço de acessibilidade «Controlo tátil do SKZ Connect»",
+  "nl": "Toegankelijkheidsservice ‘SKZ Connect aanraakbediening’",
+  "pl": "Usługa ułatwień dostępu „Sterowanie dotykowe SKZ Connect”",
+  "ru": "Служба спец. возможностей «Сенсорное управление SKZ Connect»",
+  "ja": "ユーザー補助サービス「SKZ Connect タッチ操作」",
+  "zh": "无障碍服务“SKZ Connect 触控操作”",
+  "ko": "접근성 서비스 'SKZ Connect 터치 조작'"
  },
  "Eingeschaltet. Das Touch-Layout legst du später direkt im Spiel fest.": {
   "en": "Turned on. You'll set up the touch layout later, right in the game.",
@@ -2703,18 +2703,18 @@
   "zh": "已开启。触控布局稍后直接在游戏中设置。",
   "ko": "켜짐. 터치 레이아웃은 나중에 게임 안에서 바로 정합니다."
  },
- "Der Knopf öffnet direkt den Schalter für „N-Connect Touch-Steuerung“ – einschalten und zurückkehren.": {
-  "en": "The button opens the switch for “N-Connect touch controls” directly – turn it on and come back.",
-  "es": "El botón abre directamente el interruptor de «Control táctil de N-Connect»: actívalo y vuelve.",
-  "fr": "Le bouton ouvre directement l'interrupteur de « Commandes tactiles N-Connect » – activez-le et revenez.",
-  "it": "Il pulsante apre direttamente l'interruttore di «Controllo touch di N-Connect»: attivalo e torna indietro.",
-  "pt": "O botão abre diretamente o interruptor de «Controlo tátil do N-Connect» – ligue-o e volte.",
-  "nl": "De knop opent direct de schakelaar voor ‘N-Connect aanraakbediening’ – inschakelen en terugkeren.",
-  "pl": "Przycisk otwiera bezpośrednio przełącznik „Sterowanie dotykowe N-Connect” – włącz go i wróć.",
-  "ru": "Кнопка сразу открывает переключатель «Сенсорное управление N-Connect» – включите его и вернитесь.",
-  "ja": "ボタンを押すと「N-Connect タッチ操作」のスイッチが直接開きます – オンにして戻ってください。",
-  "zh": "该按钮会直接打开“N-Connect 触控操作”的开关 – 开启后返回即可。",
-  "ko": "버튼을 누르면 'N-Connect 터치 조작' 스위치가 바로 열립니다 – 켜고 돌아오세요."
+ "Der Knopf öffnet direkt den Schalter für „SKZ Connect Touch-Steuerung“ – einschalten und zurückkehren.": {
+  "en": "The button opens the switch for “SKZ Connect touch controls” directly – turn it on and come back.",
+  "es": "El botón abre directamente el interruptor de «Control táctil de SKZ Connect»: actívalo y vuelve.",
+  "fr": "Le bouton ouvre directement l'interrupteur de « Commandes tactiles SKZ Connect » – activez-le et revenez.",
+  "it": "Il pulsante apre direttamente l'interruttore di «Controllo touch di SKZ Connect»: attivalo e torna indietro.",
+  "pt": "O botão abre diretamente o interruptor de «Controlo tátil do SKZ Connect» – ligue-o e volte.",
+  "nl": "De knop opent direct de schakelaar voor ‘SKZ Connect aanraakbediening’ – inschakelen en terugkeren.",
+  "pl": "Przycisk otwiera bezpośrednio przełącznik „Sterowanie dotykowe SKZ Connect” – włącz go i wróć.",
+  "ru": "Кнопка сразу открывает переключатель «Сенсорное управление SKZ Connect» – включите его и вернитесь.",
+  "ja": "ボタンを押すと「SKZ Connect タッチ操作」のスイッチが直接開きます – オンにして戻ってください。",
+  "zh": "该按钮会直接打开“SKZ Connect 触控操作”的开关 – 开启后返回即可。",
+  "ko": "버튼을 누르면 'SKZ Connect 터치 조작' 스위치가 바로 열립니다 – 켜고 돌아오세요."
  },
  "Ist der Schalter ausgegraut oder erscheint „Eingeschränkte Einstellung“? Dann in der App-Info oben rechts auf ⋮ tippen → „Eingeschränkte Einstellungen zulassen“ und danach erneut einschalten.": {
   "en": "Is the switch grayed out or does “Restricted setting” appear? Then tap ⋮ at the top right in App info → “Allow restricted settings” and turn it on again.",
@@ -2885,18 +2885,18 @@
   "zh": "完成！",
   "ko": "완료!"
  },
- "N-Connect läuft jetzt im Hintergrund, solange die Benachrichtigung zu sehen ist. Starte einfach dein Spiel.": {
-  "en": "N-Connect now runs in the background as long as the notification is visible. Just start your game.",
-  "es": "N-Connect se ejecuta ahora en segundo plano mientras se vea la notificación. Simplemente inicia tu juego.",
-  "fr": "N-Connect tourne maintenant en arrière-plan tant que la notification est visible. Lancez simplement votre jeu.",
-  "it": "N-Connect ora funziona in background finché la notifica è visibile. Avvia semplicemente il tuo gioco.",
-  "pt": "O N-Connect funciona agora em segundo plano enquanto a notificação estiver visível. Basta iniciar o seu jogo.",
-  "nl": "N-Connect draait nu op de achtergrond zolang de melding zichtbaar is. Start gewoon je game.",
-  "pl": "N-Connect działa teraz w tle, dopóki widać powiadomienie. Po prostu uruchom grę.",
-  "ru": "N-Connect теперь работает в фоне, пока видно уведомление. Просто запустите игру.",
-  "ja": "通知が表示されている間、N-Connect はバックグラウンドで動作します。あとはゲームを起動するだけです。",
-  "zh": "只要通知可见，N-Connect 就会在后台运行。直接启动你的游戏即可。",
-  "ko": "알림이 보이는 동안 N-Connect가 백그라운드에서 실행됩니다. 이제 게임을 시작하세요."
+ "SKZ Connect läuft jetzt im Hintergrund, solange die Benachrichtigung zu sehen ist. Starte einfach dein Spiel.": {
+  "en": "SKZ Connect now runs in the background as long as the notification is visible. Just start your game.",
+  "es": "SKZ Connect se ejecuta ahora en segundo plano mientras se vea la notificación. Simplemente inicia tu juego.",
+  "fr": "SKZ Connect tourne maintenant en arrière-plan tant que la notification est visible. Lancez simplement votre jeu.",
+  "it": "SKZ Connect ora funziona in background finché la notifica è visibile. Avvia semplicemente il tuo gioco.",
+  "pt": "O SKZ Connect funciona agora em segundo plano enquanto a notificação estiver visível. Basta iniciar o seu jogo.",
+  "nl": "SKZ Connect draait nu op de achtergrond zolang de melding zichtbaar is. Start gewoon je game.",
+  "pl": "SKZ Connect działa teraz w tle, dopóki widać powiadomienie. Po prostu uruchom grę.",
+  "ru": "SKZ Connect теперь работает в фоне, пока видно уведомление. Просто запустите игру.",
+  "ja": "通知が表示されている間、SKZ Connect はバックグラウンドで動作します。あとはゲームを起動するだけです。",
+  "zh": "只要通知可见，SKZ Connect 就会在后台运行。直接启动你的游戏即可。",
+  "ko": "알림이 보이는 동안 SKZ Connect가 백그라운드에서 실행됩니다. 이제 게임을 시작하세요."
  },
  "Gut zu wissen": {
   "en": "Good to know",
@@ -2924,18 +2924,18 @@
   "zh": "• 已配对的控制器按一下按键就会自动重新连接。",
   "ko": "• 페어링된 컨트롤러는 버튼을 누르면 자동으로 다시 연결됩니다."
  },
- "• Im Spiel heißt der Controller „N-Connect Spieler 1“.": {
-  "en": "• In games, the controller is called “N-Connect Player 1”.",
-  "es": "• En los juegos, el mando se llama «N-Connect Jugador 1».",
-  "fr": "• Dans les jeux, la manette s'appelle « N-Connect Joueur 1 ».",
-  "it": "• Nei giochi il controller si chiama «N-Connect Giocatore 1».",
-  "pt": "• Nos jogos, o comando chama-se «N-Connect Jogador 1».",
-  "nl": "• In games heet de controller ‘N-Connect Speler 1’.",
-  "pl": "• W grach kontroler nazywa się „N-Connect Gracz 1”.",
-  "ru": "• В играх контроллер называется «N-Connect Player 1».",
-  "ja": "• ゲーム内でのコントローラー名は「N-Connect Player 1」です。",
-  "zh": "• 在游戏中，控制器名为“N-Connect Player 1”。",
-  "ko": "• 게임에서 컨트롤러 이름은 'N-Connect Player 1'입니다."
+ "• Im Spiel heißt der Controller „SKZ Connect Spieler 1“.": {
+  "en": "• In games, the controller is called “SKZ Connect Player 1”.",
+  "es": "• En los juegos, el mando se llama «SKZ Connect Jugador 1».",
+  "fr": "• Dans les jeux, la manette s'appelle « SKZ Connect Joueur 1 ».",
+  "it": "• Nei giochi il controller si chiama «SKZ Connect Giocatore 1».",
+  "pt": "• Nos jogos, o comando chama-se «SKZ Connect Jogador 1».",
+  "nl": "• In games heet de controller ‘SKZ Connect Speler 1’.",
+  "pl": "• W grach kontroler nazywa się „SKZ Connect Gracz 1”.",
+  "ru": "• В играх контроллер называется «SKZ Connect Player 1».",
+  "ja": "• ゲーム内でのコントローラー名は「SKZ Connect Player 1」です。",
+  "zh": "• 在游戏中，控制器名为“SKZ Connect Player 1”。",
+  "ko": "• 게임에서 컨트롤러 이름은 'SKZ Connect Player 1'입니다."
  },
  "• Nach einem Neustart: Shizuku einmal öffnen und „Starten“ tippen.": {
   "en": "• After a restart: open Shizuku once and tap “Start”.",
@@ -3054,18 +3054,18 @@
   "zh": "启动 Shizuku",
   "ko": "Shizuku 시작"
  },
- "1. Einstellungen → Über das Telefon → 7× auf „Build-Nummer“ tippen (Entwickleroptionen an).\n\n2. Mit einem WLAN verbinden. Einstellungen → System → Entwickleroptionen → „Kabelloses Debugging“ einschalten.\n\n3. Shizuku öffnen → „Über kabelloses Debugging starten“ → „Kopplung“. Shizuku zeigt eine Benachrichtigung zum Eingeben des Kopplungscodes.\n\n4. In den Entwickleroptionen unter „Kabelloses Debugging“ → „Gerät über Kopplungscode koppeln“ tippen und den Code in die Shizuku-Benachrichtigung eintippen.\n\n5. In Shizuku auf „Starten“ tippen. Fertig – zurück zu N-Connect.": {
-  "en": "1. Settings → About phone → tap “Build number” 7× (Developer options on).\n\n2. Connect to a Wi-Fi network. Settings → System → Developer options → turn on “Wireless debugging”.\n\n3. Open Shizuku → “Start via Wireless debugging” → “Pairing”. Shizuku shows a notification for entering the pairing code.\n\n4. In Developer options under “Wireless debugging”, tap “Pair device with pairing code” and type the code into the Shizuku notification.\n\n5. Tap “Start” in Shizuku. Done – back to N-Connect.",
-  "es": "1. Ajustes → Información del teléfono → toca 7 veces «Número de compilación» (opciones para desarrolladores activadas).\n\n2. Conéctate a una red Wi-Fi. Ajustes → Sistema → Opciones para desarrolladores → activa «Depuración inalámbrica».\n\n3. Abre Shizuku → «Iniciar mediante depuración inalámbrica» → «Vincular». Shizuku muestra una notificación para introducir el código de vinculación.\n\n4. En las Opciones para desarrolladores, en «Depuración inalámbrica», toca «Vincular dispositivo con código de vinculación» e introduce el código en la notificación de Shizuku.\n\n5. Toca «Iniciar» en Shizuku. Listo: vuelve a N-Connect.",
-  "fr": "1. Paramètres → À propos du téléphone → appuyez 7× sur « Numéro de build » (options pour les développeurs activées).\n\n2. Connectez-vous à un réseau Wi-Fi. Paramètres → Système → Options pour les développeurs → activez « Débogage sans fil ».\n\n3. Ouvrez Shizuku → « Démarrer via le débogage sans fil » → « Association ». Shizuku affiche une notification pour saisir le code d'association.\n\n4. Dans les Options pour les développeurs, sous « Débogage sans fil », appuyez sur « Associer l'appareil avec un code d'association » et saisissez le code dans la notification de Shizuku.\n\n5. Appuyez sur « Démarrer » dans Shizuku. Terminé – retour à N-Connect.",
-  "it": "1. Impostazioni → Informazioni sul telefono → tocca 7 volte «Numero build» (Opzioni sviluppatore attive).\n\n2. Connettiti a una rete Wi-Fi. Impostazioni → Sistema → Opzioni sviluppatore → attiva «Debug wireless».\n\n3. Apri Shizuku → «Avvia tramite debug wireless» → «Accoppiamento». Shizuku mostra una notifica per inserire il codice di accoppiamento.\n\n4. Nelle Opzioni sviluppatore, in «Debug wireless», tocca «Accoppia dispositivo con codice di accoppiamento» e digita il codice nella notifica di Shizuku.\n\n5. Tocca «Avvia» in Shizuku. Fatto: torna a N-Connect.",
-  "pt": "1. Definições → Acerca do telemóvel → toque 7× em «Número de compilação» (Opções de programador ativas).\n\n2. Ligue-se a uma rede Wi-Fi. Definições → Sistema → Opções de programador → ative «Depuração sem fios».\n\n3. Abra o Shizuku → «Iniciar através da depuração sem fios» → «Emparelhamento». O Shizuku mostra uma notificação para introduzir o código de emparelhamento.\n\n4. Nas Opções de programador, em «Depuração sem fios», toque em «Sincronizar dispositivo com código de sincronização» e introduza o código na notificação do Shizuku.\n\n5. Toque em «Iniciar» no Shizuku. Pronto – volte ao N-Connect.",
-  "nl": "1. Instellingen → Over de telefoon → tik 7× op ‘Buildnummer’ (ontwikkelaarsopties aan).\n\n2. Maak verbinding met een wifi-netwerk. Instellingen → Systeem → Ontwikkelaarsopties → zet ‘Draadloze foutopsporing’ aan.\n\n3. Open Shizuku → ‘Starten via draadloze foutopsporing’ → ‘Koppelen’. Shizuku toont een melding om de koppelingscode in te voeren.\n\n4. Tik in de Ontwikkelaarsopties onder ‘Draadloze foutopsporing’ op ‘Apparaat koppelen met koppelingscode’ en typ de code in de Shizuku-melding.\n\n5. Tik in Shizuku op ‘Starten’. Klaar – terug naar N-Connect.",
-  "pl": "1. Ustawienia → Informacje o telefonie → stuknij 7× „Numer kompilacji” (opcje programisty włączone).\n\n2. Połącz się z siecią Wi-Fi. Ustawienia → System → Opcje programisty → włącz „Debugowanie bezprzewodowe”.\n\n3. Otwórz Shizuku → „Uruchom przez debugowanie bezprzewodowe” → „Parowanie”. Shizuku pokaże powiadomienie do wpisania kodu parowania.\n\n4. W Opcjach programisty w „Debugowanie bezprzewodowe” stuknij „Sparuj urządzenie za pomocą kodu parowania” i wpisz kod w powiadomieniu Shizuku.\n\n5. Stuknij „Uruchom” w Shizuku. Gotowe – wróć do N-Connect.",
-  "ru": "1. Настройки → О телефоне → 7 раз нажмите «Номер сборки» (режим разработчика включён).\n\n2. Подключитесь к сети Wi-Fi. Настройки → Система → Для разработчиков → включите «Отладку по Wi-Fi».\n\n3. Откройте Shizuku → «Запуск через отладку по Wi-Fi» → «Сопряжение». Shizuku покажет уведомление для ввода кода сопряжения.\n\n4. В разделе «Для разработчиков» → «Отладка по Wi-Fi» нажмите «Подключить устройство с помощью кода подключения» и введите код в уведомлении Shizuku.\n\n5. Нажмите «Запустить» в Shizuku. Готово – вернитесь в N-Connect.",
-  "ja": "1. 設定 → デバイス情報 →「ビルド番号」を 7 回タップ（開発者向けオプションが有効に）。\n\n2. Wi-Fi に接続します。設定 → システム → 開発者向けオプション →「ワイヤレス デバッグ」をオン。\n\n3. Shizuku を開く →「ワイヤレス デバッグで起動」→「ペアリング」。Shizuku にペア設定コード入力用の通知が表示されます。\n\n4. 開発者向けオプションの「ワイヤレス デバッグ」で「ペア設定コードによるデバイスのペア設定」をタップし、表示されたコードを Shizuku の通知に入力します。\n\n5. Shizuku で「開始」をタップ。完了 – N-Connect に戻ります。",
-  "zh": "1. 设置 → 关于手机 → 点按“版本号”7 次（开启开发者选项）。\n\n2. 连接到 WLAN。设置 → 系统 → 开发者选项 → 开启“无线调试”。\n\n3. 打开 Shizuku →“通过无线调试启动”→“配对”。Shizuku 会显示一条用于输入配对码的通知。\n\n4. 在开发者选项的“无线调试”中点按“使用配对码配对设备”，并把配对码输入到 Shizuku 的通知中。\n\n5. 在 Shizuku 中点按“启动”。完成 – 返回 N-Connect。",
-  "ko": "1. 설정 → 휴대전화 정보 → '빌드 번호'를 7번 탭(개발자 옵션 켜짐).\n\n2. Wi-Fi에 연결하세요. 설정 → 시스템 → 개발자 옵션 → '무선 디버깅'을 켜세요.\n\n3. Shizuku 열기 → '무선 디버깅으로 시작' → '페어링'. Shizuku가 페어링 코드 입력용 알림을 표시합니다.\n\n4. 개발자 옵션의 '무선 디버깅'에서 '페어링 코드로 기기 페어링'을 탭하고 코드를 Shizuku 알림에 입력하세요.\n\n5. Shizuku에서 '시작'을 탭하세요. 완료 – N-Connect로 돌아가세요."
+ "1. Einstellungen → Über das Telefon → 7× auf „Build-Nummer“ tippen (Entwickleroptionen an).\n\n2. Mit einem WLAN verbinden. Einstellungen → System → Entwickleroptionen → „Kabelloses Debugging“ einschalten.\n\n3. Shizuku öffnen → „Über kabelloses Debugging starten“ → „Kopplung“. Shizuku zeigt eine Benachrichtigung zum Eingeben des Kopplungscodes.\n\n4. In den Entwickleroptionen unter „Kabelloses Debugging“ → „Gerät über Kopplungscode koppeln“ tippen und den Code in die Shizuku-Benachrichtigung eintippen.\n\n5. In Shizuku auf „Starten“ tippen. Fertig – zurück zu SKZ-Connect.": {
+  "en": "1. Settings → About phone → tap “Build number” 7× (Developer options on).\n\n2. Connect to a Wi-Fi network. Settings → System → Developer options → turn on “Wireless debugging”.\n\n3. Open Shizuku → “Start via Wireless debugging” → “Pairing”. Shizuku shows a notification for entering the pairing code.\n\n4. In Developer options under “Wireless debugging”, tap “Pair device with pairing code” and type the code into the Shizuku notification.\n\n5. Tap “Start” in Shizuku. Done – back to SKZ-Connect.",
+  "es": "1. Ajustes → Información del teléfono → toca 7 veces «Número de compilación» (opciones para desarrolladores activadas).\n\n2. Conéctate a una red Wi-Fi. Ajustes → Sistema → Opciones para desarrolladores → activa «Depuración inalámbrica».\n\n3. Abre Shizuku → «Iniciar mediante depuración inalámbrica» → «Vincular». Shizuku muestra una notificación para introducir el código de vinculación.\n\n4. En las Opciones para desarrolladores, en «Depuración inalámbrica», toca «Vincular dispositivo con código de vinculación» e introduce el código en la notificación de Shizuku.\n\n5. Toca «Iniciar» en Shizuku. Listo: vuelve a SKZ-Connect.",
+  "fr": "1. Paramètres → À propos du téléphone → appuyez 7× sur « Numéro de build » (options pour les développeurs activées).\n\n2. Connectez-vous à un réseau Wi-Fi. Paramètres → Système → Options pour les développeurs → activez « Débogage sans fil ».\n\n3. Ouvrez Shizuku → « Démarrer via le débogage sans fil » → « Association ». Shizuku affiche une notification pour saisir le code d'association.\n\n4. Dans les Options pour les développeurs, sous « Débogage sans fil », appuyez sur « Associer l'appareil avec un code d'association » et saisissez le code dans la notification de Shizuku.\n\n5. Appuyez sur « Démarrer » dans Shizuku. Terminé – retour à SKZ-Connect.",
+  "it": "1. Impostazioni → Informazioni sul telefono → tocca 7 volte «Numero build» (Opzioni sviluppatore attive).\n\n2. Connettiti a una rete Wi-Fi. Impostazioni → Sistema → Opzioni sviluppatore → attiva «Debug wireless».\n\n3. Apri Shizuku → «Avvia tramite debug wireless» → «Accoppiamento». Shizuku mostra una notifica per inserire il codice di accoppiamento.\n\n4. Nelle Opzioni sviluppatore, in «Debug wireless», tocca «Accoppia dispositivo con codice di accoppiamento» e digita il codice nella notifica di Shizuku.\n\n5. Tocca «Avvia» in Shizuku. Fatto: torna a SKZ-Connect.",
+  "pt": "1. Definições → Acerca do telemóvel → toque 7× em «Número de compilação» (Opções de programador ativas).\n\n2. Ligue-se a uma rede Wi-Fi. Definições → Sistema → Opções de programador → ative «Depuração sem fios».\n\n3. Abra o Shizuku → «Iniciar através da depuração sem fios» → «Emparelhamento». O Shizuku mostra uma notificação para introduzir o código de emparelhamento.\n\n4. Nas Opções de programador, em «Depuração sem fios», toque em «Sincronizar dispositivo com código de sincronização» e introduza o código na notificação do Shizuku.\n\n5. Toque em «Iniciar» no Shizuku. Pronto – volte ao SKZ-Connect.",
+  "nl": "1. Instellingen → Over de telefoon → tik 7× op ‘Buildnummer’ (ontwikkelaarsopties aan).\n\n2. Maak verbinding met een wifi-netwerk. Instellingen → Systeem → Ontwikkelaarsopties → zet ‘Draadloze foutopsporing’ aan.\n\n3. Open Shizuku → ‘Starten via draadloze foutopsporing’ → ‘Koppelen’. Shizuku toont een melding om de koppelingscode in te voeren.\n\n4. Tik in de Ontwikkelaarsopties onder ‘Draadloze foutopsporing’ op ‘Apparaat koppelen met koppelingscode’ en typ de code in de Shizuku-melding.\n\n5. Tik in Shizuku op ‘Starten’. Klaar – terug naar SKZ-Connect.",
+  "pl": "1. Ustawienia → Informacje o telefonie → stuknij 7× „Numer kompilacji” (opcje programisty włączone).\n\n2. Połącz się z siecią Wi-Fi. Ustawienia → System → Opcje programisty → włącz „Debugowanie bezprzewodowe”.\n\n3. Otwórz Shizuku → „Uruchom przez debugowanie bezprzewodowe” → „Parowanie”. Shizuku pokaże powiadomienie do wpisania kodu parowania.\n\n4. W Opcjach programisty w „Debugowanie bezprzewodowe” stuknij „Sparuj urządzenie za pomocą kodu parowania” i wpisz kod w powiadomieniu Shizuku.\n\n5. Stuknij „Uruchom” w Shizuku. Gotowe – wróć do SKZ-Connect.",
+  "ru": "1. Настройки → О телефоне → 7 раз нажмите «Номер сборки» (режим разработчика включён).\n\n2. Подключитесь к сети Wi-Fi. Настройки → Система → Для разработчиков → включите «Отладку по Wi-Fi».\n\n3. Откройте Shizuku → «Запуск через отладку по Wi-Fi» → «Сопряжение». Shizuku покажет уведомление для ввода кода сопряжения.\n\n4. В разделе «Для разработчиков» → «Отладка по Wi-Fi» нажмите «Подключить устройство с помощью кода подключения» и введите код в уведомлении Shizuku.\n\n5. Нажмите «Запустить» в Shizuku. Готово – вернитесь в SKZ-Connect.",
+  "ja": "1. 設定 → デバイス情報 →「ビルド番号」を 7 回タップ（開発者向けオプションが有効に）。\n\n2. Wi-Fi に接続します。設定 → システム → 開発者向けオプション →「ワイヤレス デバッグ」をオン。\n\n3. Shizuku を開く →「ワイヤレス デバッグで起動」→「ペアリング」。Shizuku にペア設定コード入力用の通知が表示されます。\n\n4. 開発者向けオプションの「ワイヤレス デバッグ」で「ペア設定コードによるデバイスのペア設定」をタップし、表示されたコードを Shizuku の通知に入力します。\n\n5. Shizuku で「開始」をタップ。完了 – SKZ Connect に戻ります。",
+  "zh": "1. 设置 → 关于手机 → 点按“版本号”7 次（开启开发者选项）。\n\n2. 连接到 WLAN。设置 → 系统 → 开发者选项 → 开启“无线调试”。\n\n3. 打开 Shizuku →“通过无线调试启动”→“配对”。Shizuku 会显示一条用于输入配对码的通知。\n\n4. 在开发者选项的“无线调试”中点按“使用配对码配对设备”，并把配对码输入到 Shizuku 的通知中。\n\n5. 在 Shizuku 中点按“启动”。完成 – 返回 SKZ Connect。",
+  "ko": "1. 설정 → 휴대전화 정보 → '빌드 번호'를 7번 탭(개발자 옵션 켜짐).\n\n2. Wi-Fi에 연결하세요. 설정 → 시스템 → 개발자 옵션 → '무선 디버깅'을 켜세요.\n\n3. Shizuku 열기 → '무선 디버깅으로 시작' → '페어링'. Shizuku가 페어링 코드 입력용 알림을 표시합니다.\n\n4. 개발자 옵션의 '무선 디버깅'에서 '페어링 코드로 기기 페어링'을 탭하고 코드를 Shizuku 알림에 입력하세요.\n\n5. Shizuku에서 '시작'을 탭하세요. 완료 – SKZ Connect로 돌아가세요."
  },
  "Noch nicht fertig eingerichtet": {
   "en": "Setup not finished yet",
@@ -3236,18 +3236,18 @@
   "zh": "电量 {0} %",
   "ko": "배터리 {0} %"
  },
- "Halte am Controller die kleine runde SYNC-Taste gedrückt, bis die Lichter hin- und herlaufen. N-Connect verbindet ihn dann automatisch.": {
-  "en": "Hold the small round SYNC button on the controller until the lights run back and forth. N-Connect then connects it automatically.",
-  "es": "Mantén pulsado el pequeño botón SYNC redondo del mando hasta que las luces vayan de un lado a otro. N-Connect lo conectará automáticamente.",
-  "fr": "Maintenez le petit bouton SYNC rond de la manette jusqu'à ce que les voyants défilent. N-Connect la connecte alors automatiquement.",
-  "it": "Tieni premuto il piccolo tasto SYNC rotondo sul controller finché le luci scorrono avanti e indietro. N-Connect lo collega poi automaticamente.",
-  "pt": "Mantenha premido o pequeno botão SYNC redondo do comando até as luzes correrem de um lado para o outro. O N-Connect liga-o então automaticamente.",
-  "nl": "Houd de kleine ronde SYNC-knop op de controller ingedrukt tot de lampjes heen en weer lopen. N-Connect verbindt hem dan automatisch.",
-  "pl": "Przytrzymaj mały okrągły przycisk SYNC na kontrolerze, aż diody zaczną biegać w tę i z powrotem. N-Connect połączy go wtedy automatycznie.",
-  "ru": "Удерживайте маленькую круглую кнопку SYNC на контроллере, пока огоньки не побегут туда-сюда. N-Connect подключит его автоматически.",
-  "ja": "コントローラーの小さな丸い SYNC ボタンを、ランプが左右に流れるまで長押ししてください。N-Connect が自動的に接続します。",
-  "zh": "按住控制器上的小圆形 SYNC 按钮，直到指示灯来回闪动。N-Connect 随后会自动连接它。",
-  "ko": "컨트롤러의 작고 둥근 SYNC 버튼을 표시등이 좌우로 움직일 때까지 길게 누르세요. 그러면 N-Connect가 자동으로 연결합니다."
+ "Halte am Controller die kleine runde SYNC-Taste gedrückt, bis die Lichter hin- und herlaufen. SKZ Connect verbindet ihn dann automatisch.": {
+  "en": "Hold the small round SYNC button on the controller until the lights run back and forth. SKZ Connect then connects it automatically.",
+  "es": "Mantén pulsado el pequeño botón SYNC redondo del mando hasta que las luces vayan de un lado a otro. SKZ Connect lo conectará automáticamente.",
+  "fr": "Maintenez le petit bouton SYNC rond de la manette jusqu'à ce que les voyants défilent. SKZ Connect la connecte alors automatiquement.",
+  "it": "Tieni premuto il piccolo tasto SYNC rotondo sul controller finché le luci scorrono avanti e indietro. SKZ Connect lo collega poi automaticamente.",
+  "pt": "Mantenha premido o pequeno botão SYNC redondo do comando até as luzes correrem de um lado para o outro. O SKZ Connect liga-o então automaticamente.",
+  "nl": "Houd de kleine ronde SYNC-knop op de controller ingedrukt tot de lampjes heen en weer lopen. SKZ Connect verbindt hem dan automatisch.",
+  "pl": "Przytrzymaj mały okrągły przycisk SYNC na kontrolerze, aż diody zaczną biegać w tę i z powrotem. SKZ Connect połączy go wtedy automatycznie.",
+  "ru": "Удерживайте маленькую круглую кнопку SYNC на контроллере, пока огоньки не побегут туда-сюда. SKZ Connect подключит его автоматически.",
+  "ja": "コントローラーの小さな丸い SYNC ボタンを、ランプが左右に流れるまで長押ししてください。SKZ Connect が自動的に接続します。",
+  "zh": "按住控制器上的小圆形 SYNC 按钮，直到指示灯来回闪动。SKZ Connect 随后会自动连接它。",
+  "ko": "컨트롤러의 작고 둥근 SYNC 버튼을 표시등이 좌우로 움직일 때까지 길게 누르세요. 그러면 SKZ Connect가 자동으로 연결합니다."
  },
  "Bereits gekoppelte Controller verbinden sich nach einem Tastendruck von selbst – SYNC ist nur beim ersten Mal nötig.": {
   "en": "Already paired controllers reconnect by themselves at the press of a button – SYNC is only needed the first time.",
@@ -3288,18 +3288,18 @@
   "zh": "控制器连接",
   "ko": "컨트롤러 연결"
  },
- "Zeigt, welche Controller verbunden sind, solange N-Connect im Hintergrund läuft.": {
-  "en": "Shows which controllers are connected while N-Connect runs in the background.",
-  "es": "Muestra qué mandos están conectados mientras N-Connect se ejecuta en segundo plano.",
-  "fr": "Indique quelles manettes sont connectées pendant que N-Connect tourne en arrière-plan.",
-  "it": "Mostra quali controller sono connessi mentre N-Connect funziona in background.",
-  "pt": "Mostra que comandos estão ligados enquanto o N-Connect funciona em segundo plano.",
-  "nl": "Toont welke controllers verbonden zijn zolang N-Connect op de achtergrond draait.",
-  "pl": "Pokazuje, które kontrolery są połączone, gdy N-Connect działa w tle.",
-  "ru": "Показывает, какие контроллеры подключены, пока N-Connect работает в фоне.",
-  "ja": "N-Connect がバックグラウンドで動作している間、接続中のコントローラーを表示します。",
-  "zh": "在 N-Connect 后台运行期间显示已连接的控制器。",
-  "ko": "N-Connect가 백그라운드에서 실행되는 동안 연결된 컨트롤러를 표시합니다."
+ "Zeigt, welche Controller verbunden sind, solange SKZ Connect im Hintergrund läuft.": {
+  "en": "Shows which controllers are connected while SKZ Connect runs in the background.",
+  "es": "Muestra qué mandos están conectados mientras SKZ Connect se ejecuta en segundo plano.",
+  "fr": "Indique quelles manettes sont connectées pendant que SKZ Connect tourne en arrière-plan.",
+  "it": "Mostra quali controller sono connessi mentre SKZ Connect funziona in background.",
+  "pt": "Mostra que comandos estão ligados enquanto o SKZ Connect funciona em segundo plano.",
+  "nl": "Toont welke controllers verbonden zijn zolang SKZ Connect op de achtergrond draait.",
+  "pl": "Pokazuje, które kontrolery są połączone, gdy SKZ Connect działa w tle.",
+  "ru": "Показывает, какие контроллеры подключены, пока SKZ Connect работает в фоне.",
+  "ja": "SKZ Connect がバックグラウンドで動作している間、接続中のコントローラーを表示します。",
+  "zh": "在 SKZ Connect 后台运行期间显示已连接的控制器。",
+  "ko": "SKZ Connect가 백그라운드에서 실행되는 동안 연결된 컨트롤러를 표시합니다."
  },
  "Warte auf Controller": {
   "en": "Waiting for controller",
@@ -3340,18 +3340,18 @@
   "zh": "按 SYNC 按钮或已配对控制器上的任意按键。",
   "ko": "SYNC 버튼이나 페어링된 컨트롤러의 아무 버튼을 누르세요."
  },
- "Schalte Bluetooth ein, damit N-Connect Controller findet.": {
-  "en": "Turn on Bluetooth so N-Connect can find controllers.",
-  "es": "Activa el Bluetooth para que N-Connect encuentre mandos.",
-  "fr": "Activez le Bluetooth pour que N-Connect trouve des manettes.",
-  "it": "Attiva il Bluetooth affinché N-Connect trovi i controller.",
-  "pt": "Ligue o Bluetooth para que o N-Connect encontre comandos.",
-  "nl": "Zet Bluetooth aan, zodat N-Connect controllers vindt.",
-  "pl": "Włącz Bluetooth, aby N-Connect mógł znaleźć kontrolery.",
-  "ru": "Включите Bluetooth, чтобы N-Connect мог найти контроллеры.",
-  "ja": "N-Connect がコントローラーを見つけられるよう、Bluetooth をオンにしてください。",
-  "zh": "请打开蓝牙，以便 N-Connect 查找控制器。",
-  "ko": "N-Connect가 컨트롤러를 찾을 수 있도록 블루투스를 켜세요."
+ "Schalte Bluetooth ein, damit SKZ Connect Controller findet.": {
+  "en": "Turn on Bluetooth so SKZ Connect can find controllers.",
+  "es": "Activa el Bluetooth para que SKZ Connect encuentre mandos.",
+  "fr": "Activez le Bluetooth pour que SKZ Connect trouve des manettes.",
+  "it": "Attiva il Bluetooth affinché SKZ Connect trovi i controller.",
+  "pt": "Ligue o Bluetooth para que o SKZ Connect encontre comandos.",
+  "nl": "Zet Bluetooth aan, zodat SKZ Connect controllers vindt.",
+  "pl": "Włącz Bluetooth, aby SKZ Connect mógł znaleźć kontrolery.",
+  "ru": "Включите Bluetooth, чтобы SKZ Connect мог найти контроллеры.",
+  "ja": "SKZ Connect がコントローラーを見つけられるよう、Bluetooth をオンにしてください。",
+  "zh": "请打开蓝牙，以便 SKZ Connect 查找控制器。",
+  "ko": "SKZ Connect가 컨트롤러를 찾을 수 있도록 블루투스를 켜세요."
  },
  "A (unten)": {
   "en": "A (bottom)",
@@ -3561,31 +3561,31 @@
   "zh": "未设置输出",
   "ko": "출력이 설정되지 않음"
  },
- "N-Connect Touch-Steuerung": {
-  "en": "N-Connect touch controls",
-  "es": "Control táctil de N-Connect",
-  "fr": "Commandes tactiles N-Connect",
-  "it": "Controllo touch di N-Connect",
-  "pt": "Controlo tátil do N-Connect",
-  "nl": "N-Connect aanraakbediening",
-  "pl": "Sterowanie dotykowe N-Connect",
-  "ru": "Сенсорное управление N-Connect",
-  "ja": "N-Connect タッチ操作",
-  "zh": "N-Connect 触控操作",
-  "ko": "N-Connect 터치 조작"
+ "SKZ Connect Touch-Steuerung": {
+  "en": "SKZ Connect touch controls",
+  "es": "Control táctil de SKZ Connect",
+  "fr": "Commandes tactiles SKZ Connect",
+  "it": "Controllo touch di SKZ Connect",
+  "pt": "Controlo tátil do SKZ Connect",
+  "nl": "SKZ Connect aanraakbediening",
+  "pl": "Sterowanie dotykowe SKZ Connect",
+  "ru": "Сенсорное управление SKZ Connect",
+  "ja": "SKZ Connect タッチ操作",
+  "zh": "SKZ Connect 触控操作",
+  "ko": "SKZ Connect 터치 조작"
  },
- "Ermöglicht N-Connect, Tasten deines Controllers als Bildschirmberührungen auszuführen (Touch-Modus). Es werden keine Inhalte gelesen oder gespeichert.": {
-  "en": "Lets N-Connect perform your controller's buttons as screen touches (touch mode). No content is read or stored.",
-  "es": "Permite a N-Connect ejecutar los botones de tu mando como toques en pantalla (modo táctil). No se lee ni se guarda ningún contenido.",
-  "fr": "Permet à N-Connect d'exécuter les boutons de votre manette comme des appuis sur l'écran (mode tactile). Aucun contenu n'est lu ni enregistré.",
-  "it": "Consente a N-Connect di eseguire i tasti del tuo controller come tocchi sullo schermo (modalità touch). Nessun contenuto viene letto o salvato.",
-  "pt": "Permite ao N-Connect executar os botões do seu comando como toques no ecrã (modo tátil). Nenhum conteúdo é lido ou guardado.",
-  "nl": "Laat N-Connect de knoppen van je controller uitvoeren als schermaanrakingen (aanraakmodus). Er wordt geen inhoud gelezen of opgeslagen.",
-  "pl": "Pozwala N-Connect wykonywać przyciski twojego kontrolera jako dotknięcia ekranu (tryb dotykowy). Żadne treści nie są odczytywane ani zapisywane.",
-  "ru": "Позволяет N-Connect выполнять кнопки вашего контроллера как касания экрана (сенсорный режим). Никакое содержимое не читается и не сохраняется.",
-  "ja": "N-Connect がコントローラーのボタンを画面タッチとして実行できるようにします（タッチモード）。内容の読み取りや保存は一切行いません。",
-  "zh": "允许 N-Connect 将控制器的按键作为屏幕触摸执行（触控模式）。不会读取或存储任何内容。",
-  "ko": "N-Connect가 컨트롤러의 버튼을 화면 터치로 실행할 수 있게 합니다(터치 모드). 어떤 내용도 읽거나 저장하지 않습니다."
+ "Ermöglicht SKZ Connect, Tasten deines Controllers als Bildschirmberührungen auszuführen (Touch-Modus). Es werden keine Inhalte gelesen oder gespeichert.": {
+  "en": "Lets SKZ Connect perform your controller's buttons as screen touches (touch mode). No content is read or stored.",
+  "es": "Permite a SKZ Connect ejecutar los botones de tu mando como toques en pantalla (modo táctil). No se lee ni se guarda ningún contenido.",
+  "fr": "Permet à SKZ Connect d'exécuter les boutons de votre manette comme des appuis sur l'écran (mode tactile). Aucun contenu n'est lu ni enregistré.",
+  "it": "Consente a SKZ Connect di eseguire i tasti del tuo controller come tocchi sullo schermo (modalità touch). Nessun contenuto viene letto o salvato.",
+  "pt": "Permite ao SKZ Connect executar os botões do seu comando como toques no ecrã (modo tátil). Nenhum conteúdo é lido ou guardado.",
+  "nl": "Laat SKZ Connect de knoppen van je controller uitvoeren als schermaanrakingen (aanraakmodus). Er wordt geen inhoud gelezen of opgeslagen.",
+  "pl": "Pozwala SKZ Connect wykonywać przyciski twojego kontrolera jako dotknięcia ekranu (tryb dotykowy). Żadne treści nie są odczytywane ani zapisywane.",
+  "ru": "Позволяет SKZ Connect выполнять кнопки вашего контроллера как касания экрана (сенсорный режим). Никакое содержимое не читается и не сохраняется.",
+  "ja": "SKZ Connect がコントローラーのボタンを画面タッチとして実行できるようにします（タッチモード）。内容の読み取りや保存は一切行いません。",
+  "zh": "允许 SKZ Connect 将控制器的按键作为屏幕触摸执行（触控模式）。不会读取或存储任何内容。",
+  "ko": "SKZ Connect가 컨트롤러의 버튼을 화면 터치로 실행할 수 있게 합니다(터치 모드). 어떤 내용도 읽거나 저장하지 않습니다."
  },
  "Aus": {
   "en": "Off",
@@ -3600,17 +3600,17 @@
   "zh": "关闭",
   "ko": "끔"
  },
- "N-Connect Spieler {0}": {
-  "en": "N-Connect Player {0}",
-  "es": "N-Connect Jugador {0}",
-  "fr": "N-Connect Joueur {0}",
-  "it": "N-Connect Giocatore {0}",
-  "pt": "N-Connect Jogador {0}",
-  "nl": "N-Connect Speler {0}",
-  "pl": "N-Connect Gracz {0}",
-  "ru": "N-Connect Player {0}",
-  "ja": "N-Connect Player {0}",
-  "zh": "N-Connect Player {0}",
-  "ko": "N-Connect Player {0}"
+ "SKZ Connect Spieler {0}": {
+  "en": "SKZ Connect Player {0}",
+  "es": "SKZ Connect Jugador {0}",
+  "fr": "SKZ Connect Joueur {0}",
+  "it": "SKZ Connect Giocatore {0}",
+  "pt": "SKZ Connect Jogador {0}",
+  "nl": "SKZ Connect Speler {0}",
+  "pl": "SKZ Connect Gracz {0}",
+  "ru": "SKZ Connect Player {0}",
+  "ja": "SKZ Connect Player {0}",
+  "zh": "SKZ Connect Player {0}",
+  "ko": "SKZ Connect Player {0}"
  }
 }

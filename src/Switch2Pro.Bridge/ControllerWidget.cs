@@ -37,7 +37,7 @@ internal sealed class ControllerWidget : Form
         StartPosition = FormStartPosition.Manual;
         AutoScaleMode = AutoScaleMode.None;
         DoubleBuffered = true;
-        Text = "N-Connect Widget";
+        Text = "SKZ Connect Widget";
         _timer.Tick += (_, _) => UpdateContent(force: false);
         _menu.Opening += (_, _) => BuildMenu();
         ContextMenuStrip = _menu;
@@ -154,7 +154,7 @@ internal sealed class ControllerWidget : Form
             item.Click += (_, _) => { action(); UpdateContent(force: true); };
             return item;
         }
-        _menu.Items.Add(Item("N-Connect öffnen", false, _openSettings));
+        _menu.Items.Add(Item("SKZ Connect öffnen", false, _openSettings));
         _menu.Items.Add(new ToolStripSeparator());
         _menu.Items.Add(Item("Immer im Vordergrund", settings.WidgetOnTop, () => { settings.WidgetOnTop = !settings.WidgetOnTop; _saved(); }));
         _menu.Items.Add(Item("Kompakte Ansicht", settings.WidgetCompact, () => { settings.WidgetCompact = !settings.WidgetCompact; _saved(); }));
@@ -217,7 +217,7 @@ internal sealed class ControllerWidget : Form
             using (var line = Theme.LineBrush(new RectangleF(0, 0, Width, S(2))))
                 g.FillRectangle(line, 0, 0, Width, S(2));
 
-        // Kopf: Symbol im Akzentkreis, „N-Connect“, rechts Anzahl der Controller bzw. aktives Profil.
+        // Kopf: Symbol im Akzentkreis, „SKZ Connect“, rechts Anzahl der Controller bzw. aktives Profil.
         int header = HeaderH;
         var icon = new RectangleF(S(14), (header - S(26)) / 2f, S(26), S(26));
         using (var disc = Theme.AccentBrush(icon, 45))
@@ -231,7 +231,7 @@ internal sealed class ControllerWidget : Form
         int titleX = (int)icon.Right + S(10);
         string status = ProfileStatus(settings) ?? $"{_rows.Count} / {ControllerManager.MaxPlayers}";
         int statusW = Math.Min(Width / 2, TextRenderer.MeasureText(status, UiFonts.Small).Width + S(4));
-        TextRenderer.DrawText(g, "N-Connect", UiFonts.Strong, new Rectangle(titleX, 0, Width - titleX - statusW - S(20), header), p.Text,
+        TextRenderer.DrawText(g, "SKZ Connect", UiFonts.Strong, new Rectangle(titleX, 0, Width - titleX - statusW - S(20), header), p.Text,
             TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis | TextFormatFlags.NoPrefix);
         TextRenderer.DrawText(g, status, UiFonts.Small, new Rectangle(Width - statusW - S(14), 0, statusW, header), p.TextMuted,
             TextFormatFlags.VerticalCenter | TextFormatFlags.Right | TextFormatFlags.EndEllipsis | TextFormatFlags.NoPrefix);

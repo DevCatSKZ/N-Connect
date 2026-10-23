@@ -47,7 +47,7 @@ public static class ColorSchemes
             0x0E9E8C, 0x6A4AE0, 0xD98A12);
 
     /// <summary>Alle Farbschemata (das erste ist der Standard). Reihenfolge wie in SKZ Monitor / SKZ Remote:
-    /// Kartarium-Schemata zuerst, danach die N-Connect-Klassiker.</summary>
+    /// Kartarium-Schemata zuerst, danach die SKZ-Connect-Klassiker.</summary>
     public static readonly ColorScheme[] All =
     [
         // Kartarium-Schemata (DevCat-Familie)
@@ -77,7 +77,7 @@ public static class ColorSchemes
         new("samtpfoten", "Samtpfoten",
             Karta(0x0D0B1A, 0x17142A, 0xF2EADC, 0xE0 / 255f, 0xFFC857, 0x7FD1AE, 0xFF9EAA, 0xFFF8EC, true),
             Tageslicht),
-        // N-Connect-Klassiker
+        // SKZ-Connect-Klassiker
         // Windows: Farben von Windows 11 (Fluent) – Hintergrund #202020, Karten #2B2B2B, Steuerelemente #373737,
         // Akzent im Windows-Standardblau (dunkel #4CC2FF mit schwarzer Schrift wie in Windows, hell #005FB8 mit weißer).
         new("windows", "Windows",

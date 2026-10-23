@@ -8,7 +8,7 @@ namespace NConnect.Android.Profiles;
 /// </summary>
 public static class ProfileEdit
 {
-    /// <summary>Controller-Arten, die N-Connect für Android verbindet (ein hochkant gehaltener Joy-Con gilt als Paar).</summary>
+    /// <summary>Controller-Arten, die SKZ Connect für Android verbindet (ein hochkant gehaltener Joy-Con gilt als Paar).</summary>
     public static readonly ControllerKind[] Kinds =
         [ControllerKind.Pro2, ControllerKind.JoyConPair, ControllerKind.JoyCon2Left, ControllerKind.JoyCon2Right, ControllerKind.GameCube2];
 

@@ -16,12 +16,15 @@ internal static partial class Tr
         ["Einrichten fehlgeschlagen – der Kodi-Ordner ist nicht beschreibbar. Nutze „Repository herunterladen“."] = "Konfiguracja nie powiodła się – folder Kodi nie jest zapisywalny. Użyj „Pobierz repozytorium”.",
         ["Herunterladen …"] = "Pobierz …",
         ["DevCatSKZ Repository in Kodi einrichten"] = "Skonfiguruj DevCatSKZ Repository w Kodi",
-        ["Legt das Repository direkt in Kodi ab. Darüber kommen unsere Kodi-Plugins mit automatischen Updates. Danach in Kodi: Add-ons → Meine Add-ons → Add-on-Repository → DevCatSKZ Repository → Aktivieren."] = "Umieszcza repozytorium bezpośrednio w Kodi. Dzięki niemu otrzymasz nasze wtyczki do Kodi z automatycznymi aktualizacjami. Następnie w Kodi: Dodatki → Moje dodatki → Repozytorium dodatków → DevCatSKZ Repository → Włącz.",
+        ["Kodi ist auf diesem PC installiert. Legt das Repository direkt in Kodi ab. Darüber kommen unsere Kodi-Plugins mit automatischen Updates. Danach in Kodi: Add-ons → Meine Add-ons → Add-on-Repository → DevCatSKZ Repository → Aktivieren."] = "Kodi jest zainstalowany na tym komputerze. Umieszcza repozytorium bezpośrednio w Kodi. Dzięki niemu nasze wtyczki Kodi aktualizują się automatycznie. Potem w Kodi: Dodatki → Moje dodatki → Repozytoria dodatków → DevCatSKZ Repository → Włącz.",
         ["Kodi ist auf diesem PC nicht installiert. Mit Kodi für Windows funktionieren deine Controller auch ohne Plugin – sie erscheinen dort als Xbox-Controller."] = "Kodi nie jest zainstalowane na tym komputerze. W Kodi dla Windows twoje kontrolery działają nawet bez wtyczki – widoczne są tam jako kontrolery Xbox.",
         ["Repository herunterladen"] = "Pobierz repozytorium",
         ["Speichert repository.devcatskz.zip im Download-Ordner – zum Installieren auf einem anderen Gerät über „Aus ZIP-Datei installieren“."] = "Zapisuje repository.devcatskz.zip w folderze Pobrane – do instalacji na innym urządzeniu przez „Zainstaluj z pliku zip”.",
         ["Kodi-Plugin für LibreELEC"] = "Wtyczka Kodi dla LibreELEC",
-        ["Für Raspberry Pi und andere Geräte mit LibreELEC: N-Connect als Kodi-Plugin (alle Geräte). Am einfachsten über das DevCatSKZ Repository."] = "Dla Raspberry Pi i innych urządzeń z LibreELEC: N-Connect jako wtyczka Kodi (wszystkie urządzenia). Najprościej przez DevCatSKZ Repository.",
+        ["Braucht Kodi ein Plugin?"] = "Czy Kodi potrzebuje wtyczki?",
+        ["Nur auf anderen Geräten: Kodi für Windows braucht keins – deine Controller erscheinen dort als Xbox-Controller. Auf Raspberry Pi, LibreELEC und anderen Kodi-Geräten zeigt das Plugin verbundene Controller und Akkustand."] = "Tylko na innych urządzeniach: Kodi dla Windows jej nie potrzebuje – twoje kontrolery pojawiają się tam jako kontrolery Xbox. Na Raspberry Pi, LibreELEC i innych urządzeniach z Kodi wtyczka pokazuje podłączone kontrolery i poziom baterii.",
+        ["Kodi-Plugin für LibreELEC (installiert)"] = "Wtyczka Kodi dla LibreELEC (zainstalowana)",
+        ["Für Raspberry Pi und andere Geräte mit LibreELEC: SKZ Connect als Kodi-Plugin (alle Geräte). Am einfachsten über das DevCatSKZ Repository."] = "Dla Raspberry Pi i innych urządzeń z LibreELEC: SKZ Connect jako wtyczka Kodi (wszystkie urządzenia). Najprościej przez DevCatSKZ Repository.",
         // ---------- Fenster, Reiter, Abschnitte ----------
         ["Controller"] = "Kontrolery",
         // ---------- Desktop-Modus, Testseite, Vorlagen, Diagnose ----------
@@ -55,7 +58,7 @@ internal static partial class Tr
         ["Protokoll, Einstellungen und Systeminfos als ZIP-Datei – zum Anhängen an eine Fehlermeldung. Enthält keine Kopplungsschlüssel."] = "Dziennik, ustawienia i informacje o systemie w pliku ZIP – do dołączenia do zgłoszenia problemu. Nie zawiera kluczy parowania.",
         // ---------- Desktop-Widget ----------
         ["Desktop-Widget"] = "Widżet pulpitu",
-        ["Kleines Kärtchen auf dem Desktop: verbundene Controller, Akku, Verbindung und Ausgabe auf einen Blick. Mit der Maus verschieben, Rechtsklick für Optionen, Doppelklick öffnet N-Connect."] = "Mała karta na pulpicie: podłączone kontrolery, bateria, połączenie i wyjście w skrócie. Przeciągnij myszą, prawy przycisk – opcje, dwuklik otwiera N-Connect.",
+        ["Kleines Kärtchen auf dem Desktop: verbundene Controller, Akku, Verbindung und Ausgabe auf einen Blick. Mit der Maus verschieben, Rechtsklick für Optionen, Doppelklick öffnet SKZ Connect."] = "Mała karta na pulpicie: podłączone kontrolery, bateria, połączenie i wyjście w skrócie. Przeciągnij myszą, prawy przycisk – opcje, dwuklik otwiera SKZ Connect.",
         ["Immer im Vordergrund"] = "Zawsze na wierzchu",
         ["Widget bleibt über allen Fenstern sichtbar (sonst nur auf dem Desktop)."] = "Widżet pozostaje widoczny nad wszystkimi oknami (w przeciwnym razie tylko na pulpicie).",
         ["Kompakte Ansicht"] = "Widok kompaktowy",
@@ -64,7 +67,7 @@ internal static partial class Tr
         ["nativ"] = "natywny",
         ["Xbox · nativ"] = "Xbox · natywny",
         ["Controller einschalten oder SYNC drücken"] = "Włącz kontroler lub naciśnij SYNC",
-        ["N-Connect öffnen"] = "Otwórz N-Connect",
+        ["SKZ Connect öffnen"] = "Otwórz SKZ Connect",
         ["Position zurücksetzen"] = "Resetuj pozycję",
         ["Widget ausblenden"] = "Ukryj widżet",
         // ---------- Status-Kopfzeile, Ansicht ----------
@@ -105,9 +108,9 @@ internal static partial class Tr
         ["Beim Verbinden kurz vibrieren"] = "Krótko wibruj przy połączeniu",
         ["Meldung bei Verbinden"] = "Powiadomienie o połączeniu",
         ["Wer meldet, wenn ein Controller verbunden oder getrennt wird."] = "Wybierz, kto powiadamia o podłączeniu lub odłączeniu kontrolera.",
-        ["„N-Connect“ zeigt den echten Controller-Namen und schaltet die Gerätemeldungen von Windows ab."] = "\"N-Connect\" pokazuje prawdziwą nazwę kontrolera i wyłącza powiadomienia urządzeń Windows.",
-        ["N-Connect (empfohlen)"] = "N-Connect (zalecane)",
-        ["N-Connect und Windows"] = "N-Connect i Windows",
+        ["„SKZ Connect“ zeigt den echten Controller-Namen und schaltet die Gerätemeldungen von Windows ab."] = "\"SKZ Connect\" pokazuje prawdziwą nazwę kontrolera i wyłącza powiadomienia urządzeń Windows.",
+        ["SKZ Connect (empfohlen)"] = "SKZ Connect (zalecane)",
+        ["SKZ Connect und Windows"] = "SKZ Connect i Windows",
         ["Keine"] = "Brak",
         ["Gekoppelte Controller per Tastendruck verbinden (ohne SYNC)"] = "Łącz sparowane kontrolery naciśnięciem przycisku (bez SYNC)",
         ["Automatisch mit Windows starten"] = "Uruchamiaj automatycznie z Windows",
@@ -320,8 +323,8 @@ internal static partial class Tr
         ["Kurzanleitung"] = "Skrócona instrukcja",
         ["Protokoll öffnen"] = "Otwórz dziennik",
         ["Beenden"] = "Zakończ",
-        ["N-Connect: warte auf Controller (SYNC drücken)"] = "N-Connect: oczekiwanie na kontroler (naciśnij SYNC)",
-        ["N-Connect: ViGEmBus fehlt"] = "N-Connect: brak ViGEmBus",
+        ["SKZ Connect: warte auf Controller (SYNC drücken)"] = "SKZ Connect: oczekiwanie na kontroler (naciśnij SYNC)",
+        ["SKZ Connect: ViGEmBus fehlt"] = "SKZ Connect: brak ViGEmBus",
         ["Neue Version verfügbar"] = "Dostępna nowa wersja",
         ["Einstellungen fehlerhaft"] = "Uszkodzone ustawienia",
         ["settings.json konnte nicht gelesen werden – es gelten die Standardwerte. Die beschädigte Datei wird als „settings.json.unlesbar-…“ aufbewahrt (Klicken öffnet den Ordner)."] =
@@ -378,7 +381,7 @@ internal static partial class Tr
         ["Profil exportieren"] = "Eksportuj profil",
         ["Profil importieren"] = "Importuj profil",
         // ---------- Kurzanleitung (WelcomeForm, je Absatz ein Schlüssel) ----------
-        ["N-Connect – Willkommen"] = "N-Connect – Witamy",
+        ["SKZ Connect – Willkommen"] = "SKZ Connect – Witamy",
         ["So verbindest du deine Controller:"] = "Tak połączysz swoje kontrolery:",
         ["Switch 2 (Pro Controller, Joy-Con 2, GameCube):\n" +
          "   Kurz die kleine SYNC-Taste drücken – nach ein paar Sekunden vibriert der Controller.\n" +
@@ -389,10 +392,10 @@ internal static partial class Tr
             "   Potem do połączenia wystarczy jedno naciśnięcie. Pro Controller i GameCube działają też przez kabel USB.\n" +
             "   Ważne: NIE paruj przez „Bluetooth → Dodaj urządzenie” – to zakłóca połączenie.",
         ["Switch 1 (Pro Controller, Joy-Con, NES/SNES/N64/Mega Drive), Wii-Fernbedienung, Wii U Pro Controller:\n" +
-         "   SYNC-Taste drücken – N-Connect koppelt den Controller selbst (kein Umweg über die Windows-Einstellungen).\n" +
+         "   SYNC-Taste drücken – SKZ Connect koppelt den Controller selbst (kein Umweg über die Windows-Einstellungen).\n" +
          "   Danach verbindet er sich per Tastendruck. Gezielt suchen: Rechtsklick auf das Symbol → „Controller koppeln …“."] =
             "Switch 1 (Pro Controller, Joy-Con, NES/SNES/N64/Mega Drive), pilot Wii, Wii U Pro Controller:\n" +
-            "   Naciśnij przycisk SYNC – N-Connect sam sparuje kontroler (bez przechodzenia przez ustawienia Windows).\n" +
+            "   Naciśnij przycisk SYNC – SKZ Connect sam sparuje kontroler (bez przechodzenia przez ustawienia Windows).\n" +
             "   Potem łączy się jednym naciśnięciem. Wyszukiwanie ręczne: kliknij ikonę prawym przyciskiem → „Sparuj kontroler …”.",
         ["Windows, Steam und Spiele sehen jeden Controller als Xbox-Controller.\n" +
          "Das Programm läuft unten rechts im Infobereich – ein Klick öffnet die Übersicht."] =
@@ -496,8 +499,8 @@ internal static partial class Tr
             "Xbox 360 działa z niemal wszystkimi grami i Steam. DualShock 4 dodaje sterowanie ruchem (Steam, emulatory). Dotyczy wszystkich kontrolerów bez własnego ustawienia (karta → Ustawienia → Przyciski).",
         ["Original-Controller verstecken"] = "Ukryj oryginalne kontrolery",
         ["Controller verbinden"] = "Połącz kontrolery",
-        ["SYNC-Taste am Controller drücken – N-Connect findet und koppelt ihn selbst. Danach reicht künftig ein Tastendruck."] =
-            "Naciśnij przycisk SYNC na kontrolerze – N-Connect znajdzie go i sparuje sam. Potem wystarczy jedno naciśnięcie.",
+        ["SYNC-Taste am Controller drücken – SKZ Connect findet und koppelt ihn selbst. Danach reicht künftig ein Tastendruck."] =
+            "Naciśnij przycisk SYNC na kontrolerze – SKZ Connect znajdzie go i sparuje sam. Potem wystarczy jedno naciśnięcie.",
         ["So kommt der Controller in den Kopplungsmodus"] = "Jak włączyć tryb parowania kontrolera",
         ["Switch 2: Pro Controller, Joy-Con 2, GameCube"] = "Switch 2: Pro Controller, Joy-Con 2, GameCube",
         ["Kurz die kleine SYNC-Taste drücken."] = "Naciśnij krótko mały przycisk SYNC.",
@@ -550,8 +553,8 @@ internal static partial class Tr
         ["HidHide installieren …"] = "Zainstaluj HidHide …",
         ["Empfohlen: Steam und viele Spiele kennen Switch-1-, NSO- und USB-Controller selbst und sähen sie sonst doppelt. Läuft nach der Installation ohne Rückfrage (sonst fragt Windows nach Adminrechten)."] =
             "Zalecane: Steam i wiele gier samo rozpoznaje kontrolery Switch 1, NSO i USB i widziałoby je podwójnie. Po instalacji działa bez pytań (inaczej Windows prosi o uprawnienia administratora).",
-        ["Steam und viele Spiele sehen Switch-1-, NSO- und USB-Controller sonst doppelt. Dafür wird das kostenlose HidHide gebraucht (bei der N-Connect-Installation dabei, hier nachträglich)."] =
-            "W przeciwnym razie Steam i wiele gier widzi kontrolery Switch 1, NSO i USB podwójnie. Potrzebny jest bezpłatny HidHide (dołączony do instalacji N-Connect, do zainstalowania tutaj).",
+        ["Steam und viele Spiele sehen Switch-1-, NSO- und USB-Controller sonst doppelt. Dafür wird das kostenlose HidHide gebraucht (bei der SKZ-Connect-Installation dabei, hier nachträglich)."] =
+            "W przeciwnym razie Steam i wiele gier widzi kontrolery Switch 1, NSO i USB podwójnie. Potrzebny jest bezpłatny HidHide (dołączony do instalacji SKZ Connect, do zainstalowania tutaj).",
         ["Erscheint als"] = "Pojawia się jako",
         ["Wie allgemein"] = "Jak w Ogólne",
         ["Nur für diesen Controller. Xbox 360 läuft überall; DualShock 4 bringt zusätzlich Gyro nach Steam und in Emulatoren. „Wie allgemein“ folgt der Seite „Allgemein“."] =
@@ -568,8 +571,8 @@ internal static partial class Tr
             "Oryginalne kontrolery nie ukryte (przerwano zapytanie). Później: kontroler → Ustawienia → Dodatki → „Wyświetlany podwójnie?”.",
         ["Original-Controller nicht versteckt (Fehler, Details im Protokoll). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."] =
             "Oryginalne kontrolery nie ukryte (błąd, szczegóły w dzienniku). Później: kontroler → Ustawienia → Dodatki → „Wyświetlany podwójnie?”.",
-        ["Eine ältere N-Connect-Version hat das eigene virtuelle DualShock 4 vor Spielen versteckt. Freigeben hat nicht geklappt – bitte im HidHide Configuration Client den Haken beim virtuellen DualShock 4 entfernen."] =
-            "Starsza wersja N-Connect ukryła przed grami własnego wirtualnego DualShock 4. Nie udało się go ponownie udostępnić – odznacz wirtualnego DualShock 4 w HidHide Configuration Client.",
+        ["Eine ältere SKZ-Connect-Version hat das eigene virtuelle DualShock 4 vor Spielen versteckt. Freigeben hat nicht geklappt – bitte im HidHide Configuration Client den Haken beim virtuellen DualShock 4 entfernen."] =
+            "Starsza wersja SKZ Connect ukryła przed grami własnego wirtualnego DualShock 4. Nie udało się go ponownie udostępnić – odznacz wirtualnego DualShock 4 w HidHide Configuration Client.",
         ["Tastenanordnung A/B/X/Y"] = "Układ przycisków A/B/X/Y",
         ["Xbox: nach Position (untere Taste = A). Nintendo: nach Beschriftung (A bleibt A)."] = "Xbox: wg pozycji (dolny przycisk = A). Nintendo: wg oznaczenia (A pozostaje A).",
         ["Verbinden"] = "Połączenie",
@@ -577,14 +580,14 @@ internal static partial class Tr
         ["Gekoppelte Controller verbinden sich ohne SYNC-Taste."] = "Sparowane kontrolery łączą się bez przycisku SYNC.",
         ["Ohne Eingabe trennen nach"] = "Rozłącz bez czynności po",
         ["Spart Akku, wenn ein Controller liegen bleibt."] = "Oszczędza baterię, gdy kontroler leży bezczynnie.",
-        ["N-Connect startet unsichtbar im Infobereich."] = "N-Connect uruchamia się dyskretnie w zasobniku.",
+        ["SKZ Connect startet unsichtbar im Infobereich."] = "SKZ Connect uruchamia się dyskretnie w zasobniku.",
         ["Darstellung und Sprache"] = "Wygląd i język",
         ["Farbmodus"] = "Tryb koloru",
         ["Mica-Effekt"] = "Efekt Mica",
         ["Durchscheinende Titelleiste (ab Windows 11)."] = "Półprzezroczysty pasek tytułu (od Windows 11).",
         ["Erweitert"] = "Zaawansowane",
         ["Gyro für Emulatoren (DSU)"] = "Żyroskop dla emulatorów (DSU)",
-        ["Cemuhook-Server auf Port 26760 – wirkt nach einem Neustart von N-Connect."] = "Serwer Cemuhook na porcie 26760 – aktywny po restarcie N-Connect.",
+        ["Cemuhook-Server auf Port 26760 – wirkt nach einem Neustart von SKZ Connect."] = "Serwer Cemuhook na porcie 26760 – aktywny po restarcie SKZ Connect.",
         ["Nach Updates suchen"] = "Szukaj aktualizacji",
         ["Beim Start auf GitHub nach einer neuen Version suchen."] = "Szukaj nowej wersji na GitHub przy starcie.",
         ["Tastenbelegungen und Werte zurücksetzen. Gekoppelte Controller bleiben erhalten."] = "Resetuj przypisania przycisków i wartości. Sparowane kontrolery pozostają.",
@@ -645,11 +648,11 @@ internal static partial class Tr
         ["Programme (*.exe)|*.exe"] = "Programy (*.exe)|*.exe",
         ["Kein Controller verbunden\n\n" +
          "Switch-2-Controller: kurz die SYNC-Taste drücken – danach reicht ein beliebiger Tastendruck.\n" +
-         "Switch-1-, NSO- und Wii-Controller: SYNC-Taste drücken – N-Connect koppelt sie selbst.\n" +
+         "Switch-1-, NSO- und Wii-Controller: SYNC-Taste drücken – SKZ Connect koppelt sie selbst.\n" +
          "Oder hier gezielt suchen und koppeln:"] =
             "Brak połączonego kontrolera\n\n" +
             "Kontrolery Switch 2: naciśnij krótko przycisk SYNC – potem wystarczy dowolne naciśnięcie.\n" +
-            "Kontrolery Switch 1, NSO i Wii: naciśnij przycisk SYNC – N-Connect paruje je sam.\n" +
+            "Kontrolery Switch 1, NSO i Wii: naciśnij przycisk SYNC – SKZ Connect paruje je sam.\n" +
             "Albo wyszukaj i sparuj bezpośrednio tutaj:",
         ["Controller suchen …"] = "Szukaj kontrolerów …",
         ["Kein Controller verbunden"] = "Brak połączonego kontrolera",
@@ -668,22 +671,22 @@ internal static partial class Tr
         ["Rechten Joy-Con umbenennen …"] = "Zmień nazwę prawego Joy-Con …",
         ["Controller umbenennen"] = "Zmień nazwę kontrolera",
         ["Spielerplatz"] = "Miejsce gracza",
-        ["N-Connect aktualisieren"] = "Aktualizuj N-Connect",
+        ["SKZ Connect aktualisieren"] = "Aktualizuj SKZ Connect",
         ["HidHide aktualisieren"] = "Aktualizuj HidHide",
         ["HidHide-Update verfügbar"] = "Dostępna aktualizacja HidHide",
         ["HidHide aktuell halten"] = "Utrzymuj HidHide aktualny",
         ["Beim Start nach einer neuen HidHide-Version suchen. Installiert wird nur nach Rückfrage (geprüfter Download vom Hersteller, Neustart nötig)."] =
             "Szukaj nowej wersji HidHide przy starcie. Instalacja tylko po potwierdzeniu (zweryfikowane pobieranie od producenta, wymagany restart).",
         ["Lizenzen Dritter"] = "Licencje stron trzecich",
-        ["Open-Source-Software und übernommener Code in N-Connect – mit Lizenzen und Copyright-Vermerken."] =
-            "Oprogramowanie open source i przejęty kod w N-Connect – z licencjami i informacjami o prawach autorskich.",
+        ["Open-Source-Software und übernommener Code in SKZ Connect – mit Lizenzen und Copyright-Vermerken."] =
+            "Oprogramowanie open source i przejęty kod w SKZ Connect – z licencjami i informacjami o prawach autorskich.",
         ["Der Download hat nicht geklappt oder die Datei war fehlerhaft. Die Release-Seite im Browser öffnen?"] =
             "Pobieranie nie powiodło się lub plik był wadliwy. Otworzyć stronę wydania w przeglądarce?",
         ["Alle Controller trennen"] = "Rozłącz wszystkie kontrolery",
         ["Sticks kalibrieren"] = "Kalibruj gałki",
         ["Kalibrieren …"] = "Kalibruj …",
-        ["Gegen Drift oder zu kleinen Ausschlag: Mitte und Rand neu messen. Wird nur in N-Connect gespeichert, der Controller bleibt unverändert."] =
-            "Przeciw dryfowi lub zbyt małemu zakresowi: zmierz ponownie środek i krawędź. Zapisane tylko w N-Connect, kontroler pozostaje bez zmian.",
+        ["Gegen Drift oder zu kleinen Ausschlag: Mitte und Rand neu messen. Wird nur in SKZ Connect gespeichert, der Controller bleibt unverändert."] =
+            "Przeciw dryfowi lub zbyt małemu zakresowi: zmierz ponownie środek i krawędź. Zapisane tylko w SKZ Connect, kontroler pozostaje bez zmian.",
         ["Linker Stick"] = "Lewa gałka",
         ["Rechter Stick"] = "Prawa gałka",
         ["Stick"] = "Gałka",
@@ -789,14 +792,14 @@ internal static partial class Tr
         ["Von der Switch-SD-Karte (Bluepick_RCM/hekate) oder von einem anderen PC übernehmen, oder für einen anderen PC exportieren."] =
             "Przejmij z karty SD Switcha (Bluepick_RCM/hekate) lub z innego komputera, albo wyeksportuj dla innego komputera.",
         ["Bei Switch-SD-Karte nachfragen"] = "Pytaj przy włożonej karcie SD Switcha",
-        ["Steckt eine SD-Karte der Switch im PC (Kartenleser oder hekate „USB Tools“), bietet N-Connect die Übernahme an. Die Karte wird nur gelesen."] =
-            "Gdy karta SD Switcha jest w komputerze (czytnik kart lub hekate „USB Tools”), N-Connect proponuje przejęcie. Karta jest tylko odczytywana.",
+        ["Steckt eine SD-Karte der Switch im PC (Kartenleser oder hekate „USB Tools“), bietet SKZ Connect die Übernahme an. Die Karte wird nur gelesen."] =
+            "Gdy karta SD Switcha jest w komputerze (czytnik kart lub hekate „USB Tools”), SKZ Connect proponuje przejęcie. Karta jest tylko odczytywana.",
         ["Switch-SD-Karte erkannt"] = "Wykryto kartę SD Switcha",
         ["Kopplungsdaten der Controller gefunden – klicken, um sie anzusehen und zu übernehmen."] =
             "Znaleziono dane parowania kontrolerów – kliknij, aby je zobaczyć i przejąć.",
         ["Klicken, um Kopplungsdaten der Controller zu übernehmen."] = "Kliknij, aby przejąć dane parowania kontrolerów.",
-        ["Controller-Kopplungen von der Switch-SD-Karte oder von einem anderen PC übernehmen – oder für einen anderen PC exportieren. Es werden nur Einstellungen von N-Connect geändert; Windows und der Bluetooth-Adapter bleiben unverändert."] =
-            "Przejmij parowania kontrolerów z karty SD Switcha lub z innego komputera – albo wyeksportuj je dla innego komputera. Zmieniane są tylko ustawienia N-Connect; Windows i adapter Bluetooth pozostają bez zmian.",
+        ["Controller-Kopplungen von der Switch-SD-Karte oder von einem anderen PC übernehmen – oder für einen anderen PC exportieren. Es werden nur Einstellungen von SKZ Connect geändert; Windows und der Bluetooth-Adapter bleiben unverändert."] =
+            "Przejmij parowania kontrolerów z karty SD Switcha lub z innego komputera – albo wyeksportuj je dla innego komputera. Zmieniane są tylko ustawienia SKZ Connect; Windows i adapter Bluetooth pozostają bez zmian.",
         ["Spieler-Reihenfolge – Spieler 1 ist für Windows, Steam und Spiele der erste Controller. Mit ‹ › umsortieren."] =
             "Kolejność graczy – gracz 1 jest pierwszym kontrolerem dla Windows, Steam i gier. Zmień kolejność za pomocą ‹ ›.",
         ["Von der Switch-SD-Karte"] = "Z karty SD Switcha",
@@ -804,7 +807,7 @@ internal static partial class Tr
             "Dane parowania utworzone przez Bluepick_RCM lub hekate (switchroot/joycon_mac.ini)",
         ["Einlesen …"] = "Wczytaj …",
         ["Von einem anderen PC"] = "Z innego komputera",
-        ["Mit N-Connect exportierte Datei (*.ncpair)"] = "Plik wyeksportowany przez N-Connect (*.ncpair)",
+        ["Mit SKZ Connect exportierte Datei (*.ncpair)"] = "Plik wyeksportowany przez SKZ Connect (*.ncpair)",
         ["Datei öffnen …"] = "Otwórz plik …",
         ["Inhalt"] = "Zawartość",
         ["Weitergeben und sichern"] = "Udostępnij i zabezpiecz",
@@ -836,26 +839,26 @@ internal static partial class Tr
         ["Joy-Con (R)"] = "Joy-Con (P)",
         ["HORI-Controller (links)"] = "Kontroler HORI (lewy)",
         ["HORI-Controller (rechts)"] = "Kontroler HORI (prawy)",
-        ["Hinweis: Pro Controller stehen nur im Bluetooth-Speicher der Switch (8000000000000050.bin); dieses Speicherabbild kann N-Connect nicht auswerten."] =
-            "Uwaga: Pro Controllery widnieją tylko w pamięci Bluetooth Switcha (8000000000000050.bin); N-Connect nie może odczytać tego obrazu pamięci.",
+        ["Hinweis: Pro Controller stehen nur im Bluetooth-Speicher der Switch (8000000000000050.bin); dieses Speicherabbild kann SKZ Connect nicht auswerten."] =
+            "Uwaga: Pro Controllery widnieją tylko w pamięci Bluetooth Switcha (8000000000000050.bin); SKZ Connect nie może odczytać tego obrazu pamięci.",
         ["Was diese Daten können – und was nicht:"] = "Co te dane umożliwiają – a czego nie:",
         ["Die Daten zeigen, welche Controller mit deiner Switch gekoppelt sind und an welche Bluetooth-Adresse sie gebunden sind."] =
             "Dane pokazują, które kontrolery są sparowane z twoim Switchem i z jakim adresem Bluetooth są powiązane.",
         ["Ein Switch-1-Controller verbindet sich auf Tastendruck nur mit dem Gerät, dessen Adresse er gespeichert hat – hier mit der Switch. Der Bluetooth-Adapter des PCs hat eine andere Adresse, deshalb kann Windows diese Kopplung nicht einfach weiterverwenden."] =
             "Kontroler Switch 1 łączy się jednym naciśnięciem tylko z urządzeniem, którego adres zapamiętał – tutaj ze Switchem. Adapter Bluetooth komputera ma inny adres, więc Windows nie może po prostu ponownie użyć tego parowania.",
-        ["Die Adresse des PC-Adapters zu ändern, unterstützt N-Connect bewusst nicht (herstellerabhängig, riskant und nicht vorgesehen)."] =
-            "N-Connect celowo nie obsługuje zmiany adresu adaptera komputera (zależy od producenta, ryzykowne i nieprzewidziane).",
-        ["Windows bietet keinen offiziellen Weg, fremde Kopplungsschlüssel einzutragen: Sie liegen in einem Teil der Registrierung, auf den nur das System zugreifen darf. N-Connect ändert dort nichts."] =
-            "Windows nie oferuje oficjalnego sposobu dodawania obcych kluczy parowania: znajdują się w części rejestru zarezerwowanej dla systemu. N-Connect niczego tam nie zmienia.",
+        ["Die Adresse des PC-Adapters zu ändern, unterstützt SKZ Connect bewusst nicht (herstellerabhängig, riskant und nicht vorgesehen)."] =
+            "SKZ Connect celowo nie obsługuje zmiany adresu adaptera komputera (zależy od producenta, ryzykowne i nieprzewidziane).",
+        ["Windows bietet keinen offiziellen Weg, fremde Kopplungsschlüssel einzutragen: Sie liegen in einem Teil der Registrierung, auf den nur das System zugreifen darf. SKZ Connect ändert dort nichts."] =
+            "Windows nie oferuje oficjalnego sposobu dodawania obcych kluczy parowania: znajdują się w części rejestru zarezerwowanej dla systemu. SKZ Connect niczego tam nie zmienia.",
         ["So klappt der Wechsel am einfachsten: am PC den Controller einmal per SYNC-Taste in den Windows-Bluetooth-Einstellungen koppeln. Zurück an der Switch die Joy-Con an die Konsole stecken bzw. den Pro Controller per USB-Kabel anschließen – dann sind sie ohne Menü wieder mit der Switch gekoppelt."] =
             "Najprostszy sposób na zmianę: na komputerze sparuj kontroler raz przyciskiem SYNC w ustawieniach Bluetooth Windows. Wracając do Switcha, włóż Joy-Con do konsoli lub podłącz Pro Controllera kablem USB – będą ponownie sparowane bez menu.",
-        ["„Übernehmen“ merkt sich diese Controller in N-Connect (Liste bekannter Controller, Zuordnung zur Switch). Kopplungsschlüssel werden nicht gespeichert."] =
-            "„Zastosuj” zapamiętuje te kontrolery w N-Connect (lista znanych kontrolerów, powiązanie ze Switchem). Klucze parowania nie są zapisywane.",
-        ["N-Connect-Kopplungsdaten"] = "Dane parowania N-Connect",
+        ["„Übernehmen“ merkt sich diese Controller in SKZ Connect (Liste bekannter Controller, Zuordnung zur Switch). Kopplungsschlüssel werden nicht gespeichert."] =
+            "„Zastosuj” zapamiętuje te kontrolery w SKZ Connect (lista znanych kontrolerów, powiązanie ze Switchem). Klucze parowania nie są zapisywane.",
+        ["SKZ-Connect-Kopplungsdaten"] = "Dane parowania SKZ Connect",
         ["Kopplungsdaten von einem anderen PC öffnen"] = "Otwórz dane parowania z innego komputera",
         ["Die Datei ist zu groß."] = "Plik jest zbyt duży.",
         ["Keine Kopplungsdaten-Datei."] = "To nie jest plik danych parowania.",
-        ["Die Datei stammt von einer neueren N-Connect-Version."] = "Plik pochodzi z nowszej wersji N-Connect.",
+        ["Die Datei stammt von einer neueren SKZ-Connect-Version."] = "Plik pochodzi z nowszej wersji SKZ-Connect.",
         ["Die Datei ist mit einem Passwort geschützt."] = "Plik jest zabezpieczony hasłem.",
         ["Falsches Passwort oder die Datei wurde verändert."] = "Błędne hasło lub plik został zmieniony.",
         ["Die Datei ist beschädigt."] = "Plik jest uszkodzony.",
@@ -868,20 +871,20 @@ internal static partial class Tr
         ["Was du erwarten kannst:"] = "Czego się spodziewać:",
         ["Gleiche Adapter-Adresse (z. B. derselbe USB-Bluetooth-Stick umgesteckt): Switch-2-Controller verbinden sich hier auf Tastendruck wie am anderen PC."] =
             "Ten sam adres adaptera (np. ta sama przełożona przejściówka Bluetooth USB): kontrolery Switch 2 łączą się tutaj jednym naciśnięciem jak na drugim komputerze.",
-        ["Switch-1-Controller (Pro Controller, Joy-Con) brauchen zusätzlich die Kopplung in Windows. Die kann N-Connect nicht übertragen – einmal per SYNC-Taste koppeln."] =
-            "Kontrolery Switch 1 (Pro Controller, Joy-Con) potrzebują dodatkowo parowania w Windows. N-Connect nie może go przenieść – sparuj raz przyciskiem SYNC.",
+        ["Switch-1-Controller (Pro Controller, Joy-Con) brauchen zusätzlich die Kopplung in Windows. Die kann SKZ Connect nicht übertragen – einmal per SYNC-Taste koppeln."] =
+            "Kontrolery Switch 1 (Pro Controller, Joy-Con) potrzebują dodatkowo parowania w Windows. SKZ Connect nie może go przenieść – sparuj raz przyciskiem SYNC.",
         ["Anderer Bluetooth-Adapter: Controller verbinden sich auf Tastendruck nur mit dem Gerät, mit dem sie zuletzt gekoppelt wurden. Hier einmal SYNC drücken – danach verbinden sie sich mit diesem PC (am anderen PC dann wieder per SYNC)."] =
             "Inny adapter Bluetooth: kontrolery łączą się jednym naciśnięciem tylko z urządzeniem, z którym ostatnio były sparowane. Naciśnij raz SYNC tutaj – potem łączą się z tym komputerem (na drugim komputerze znów przez SYNC).",
         ["Tipp: Wer denselben USB-Bluetooth-Stick zwischen den PCs umsteckt, nimmt die Adresse mit – Switch-2-Controller verbinden sich dann an beiden PCs ohne SYNC."] =
             "Wskazówka: kto przekłada ten sam dongle Bluetooth USB między komputerami, zabiera adres ze sobą – kontrolery Switch 2 łączą się wtedy na obu komputerach bez SYNC.",
         ["Übernommen werden die Einstellungen je Controller (Joy-Con einzeln/hochkant, Gyro-Kalibrierung) und die Liste bekannter Controller."] =
             "Przenoszone są ustawienia na kontroler (Joy-Con pojedynczo/pionowo, kalibracja żyroskopu) oraz lista znanych kontrolerów.",
-        ["Die Datei enthält Kopplungsschlüssel. Windows bietet keinen offiziellen Weg, sie einzutragen – N-Connect übernimmt sie deshalb nicht."] =
-            "Plik zawiera klucze parowania. Windows nie oferuje oficjalnego sposobu ich dodania – N-Connect ich więc nie przejmuje.",
-        ["„Übernehmen“ ergänzt die Controller-Listen und Einstellungen von N-Connect (nichts wird gelöscht). Vorher wird eine Sicherung angelegt."] =
-            "„Zastosuj” uzupełnia listy kontrolerów i ustawienia N-Connect (nic nie jest usuwane). Wcześniej tworzona jest kopia zapasowa.",
-        ["Kopplungsdaten in N-Connect übernehmen? Vorher wird eine Sicherung der Einstellungen angelegt."] =
-            "Przejąć dane parowania do N-Connect? Wcześniej zostanie utworzona kopia zapasowa ustawień.",
+        ["Die Datei enthält Kopplungsschlüssel. Windows bietet keinen offiziellen Weg, sie einzutragen – SKZ Connect übernimmt sie deshalb nicht."] =
+            "Plik zawiera klucze parowania. Windows nie oferuje oficjalnego sposobu ich dodania – SKZ Connect ich więc nie przejmuje.",
+        ["„Übernehmen“ ergänzt die Controller-Listen und Einstellungen von SKZ Connect (nichts wird gelöscht). Vorher wird eine Sicherung angelegt."] =
+            "„Zastosuj” uzupełnia listy kontrolerów i ustawienia SKZ Connect (nic nie jest usuwane). Wcześniej tworzona jest kopia zapasowa.",
+        ["Kopplungsdaten in SKZ Connect übernehmen? Vorher wird eine Sicherung der Einstellungen angelegt."] =
+            "Przejąć dane parowania do SKZ Connect? Wcześniej zostanie utworzona kopia zapasowa ustawień.",
         ["Nichts zu ändern – diese Daten sind schon übernommen."] = "Nic do zmiany – te dane zostały już przejęte.",
         ["Übernommen. Die Sicherung lässt sich hier über „Sicherung wiederherstellen“ zurückholen."] =
             "Przejęto. Kopię zapasową można przywrócić tutaj przez „Przywróć kopię zapasową”.",
@@ -890,8 +893,8 @@ internal static partial class Tr
         ["Alle Einstellungen durch diese Sicherung ersetzen?"] = "Zastąpić wszystkie ustawienia tą kopią zapasową?",
         ["Sicherung wiederhergestellt."] = "Kopia zapasowa przywrócona.",
         ["Kopplungsdaten für einen anderen PC speichern"] = "Zapisz dane parowania dla innego komputera",
-        ["Gespeichert. Die Datei am anderen PC in N-Connect unter „Joy-Con & Wii“ → „Kopplungsdaten“ → „Von einem anderen PC“ öffnen."] =
-            "Zapisano. Na drugim komputerze otwórz plik w N-Connect w „Joy-Con i Wii” → „Dane parowania” → „Z innego komputera”.",
+        ["Gespeichert. Die Datei am anderen PC in SKZ Connect unter „Joy-Con & Wii“ → „Kopplungsdaten“ → „Von einem anderen PC“ öffnen."] =
+            "Zapisano. Na drugim komputerze otwórz plik w SKZ Connect w „Joy-Con i Wii” → „Dane parowania” → „Z innego komputera”.",
         ["Kopplungsdaten exportieren"] = "Eksportuj dane parowania",
         ["Passwort eingeben"] = "Wprowadź hasło",
         ["Passwort (optional). Ohne Passwort steht der Inhalt lesbar in der Datei. Mit Kopplungsschlüsseln ist ein Passwort Pflicht."] =
@@ -953,10 +956,10 @@ internal static partial class Tr
         (Re(@"^HidHide (?<v>.+) ist erschienen \(installiert: (?<i>.+)\)\. Klicken zum Installieren\.$"),
             m => $"HidHide {m.Groups["v"]} jest dostępny (zainstalowany: {m.Groups["i"]}). Kliknij, aby zainstalować."),
         (Re(@"^Lade HidHide (?<v>.+) herunter …$"), m => $"Pobieranie HidHide {m.Groups["v"]} …"),
-        (Re(@"^HidHide (?<v>.+) herunterladen und installieren\? Das HidHide-Setup entfernt zuerst die alte Version und verlangt einen Neustart von Windows – bitte seinen Anweisungen folgen\. Windows fragt dabei nach Administratorrechten\. Danach versteckt N-Connect die Controller automatisch neu\.$"),
-            m => $"Pobrać i zainstalować HidHide {m.Groups["v"]}? Instalator HidHide najpierw usuwa starą wersję i wymaga ponownego uruchomienia Windows – postępuj zgodnie z jego instrukcjami. Windows poprosi o uprawnienia administratora. Potem N-Connect automatycznie ponownie ukryje kontrolery."),
-        (Re(@"^Version (?<v>.+) herunterladen und installieren\? N-Connect wird dafür kurz beendet und danach wieder gestartet\.(?<a> Windows fragt dabei nach Administratorrechten\.)?$"),
-            m => $"Pobrać i zainstalować wersję {m.Groups["v"]}? N-Connect zostanie na chwilę zamknięty, a potem uruchomi się ponownie." +
+        (Re(@"^HidHide (?<v>.+) herunterladen und installieren\? Das HidHide-Setup entfernt zuerst die alte Version und verlangt einen Neustart von Windows – bitte seinen Anweisungen folgen\. Windows fragt dabei nach Administratorrechten\. Danach versteckt SKZ Connect die Controller automatisch neu\.$"),
+            m => $"Pobrać i zainstalować HidHide {m.Groups["v"]}? Instalator HidHide najpierw usuwa starą wersję i wymaga ponownego uruchomienia Windows – postępuj zgodnie z jego instrukcjami. Windows poprosi o uprawnienia administratora. Potem SKZ Connect automatycznie ponownie ukryje kontrolery."),
+        (Re(@"^Version (?<v>.+) herunterladen und installieren\? SKZ Connect wird dafür kurz beendet und danach wieder gestartet\.(?<a> Windows fragt dabei nach Administratorrechten\.)?$"),
+            m => $"Pobrać i zainstalować wersję {m.Groups["v"]}? SKZ Connect zostanie na chwilę zamknięty, a potem uruchomi się ponownie." +
                  (m.Groups["a"].Success ? " Windows poprosi o uprawnienia administratora." : "")),
         (Re(@"^(?<t>.+) · (?<r>\d+) Berichte/s$"), m => $"{T(m.Groups["t"].Value)} · {m.Groups["r"]} raportów/s"),
         (Re(@"^(?<p>\d+ %)(?<v>  \(.*\))?  ⚡ lädt$"), m => $"{m.Groups["p"]}{m.Groups["v"]}  ⚡ ładowanie"),
@@ -990,7 +993,7 @@ internal static partial class Tr
         // Tooltip „P1 Pro 2 57 %“: Namen bleiben, wie sie sind.
         (Re(@"^P(?<n>\d+) (?<k>.+)$"), m => m.Value),
         (Re(@"^Bluetooth nicht verfügbar: (?<e>.*)$"), m => $"Bluetooth niedostępny: {m.Groups["e"]}"),
-        (Re(@"^N-Connect: (?<p>.+)$"), m => $"N-Connect: {T(m.Groups["p"].Value)}"),
+        (Re(@"^SKZ Connect: (?<p>.+)$"), m => $"SKZ Connect: {T(m.Groups["p"].Value)}"),
         (Re(@"^(?<k>.+) per USB ist von einem anderen Programm belegt \(z\. B\. Steam\)\.$"),
             m => $"{N(m, "k")} przez USB jest zajęty przez inny program (np. Steam)."),
         (Re(@"^Schon (?<n>\d+) Controller verbunden – (?<k>.+) wird nicht verwendet\.$"),

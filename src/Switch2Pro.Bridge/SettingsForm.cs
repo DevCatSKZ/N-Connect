@@ -43,7 +43,7 @@ internal sealed class SettingsForm : UiForm
     private readonly ToggleSwitch _widgetOnTop = new();
     private readonly ToggleSwitch _widgetCompact = new();
     private readonly Slider _widgetOpacity = Bar(40, 100, v => $"{v} %", step: 5);
-    private readonly ComboBox _notifyMode = Combo(240, "N-Connect (empfohlen)", "Windows", "N-Connect und Windows", "Keine");
+    private readonly ComboBox _notifyMode = Combo(240, "SKZ Connect (empfohlen)", "Windows", "SKZ Connect und Windows", "Keine");
     private readonly ComboBox _inactivity = Combo(160);
     private static readonly int[] InactivityChoices = [0, 5, 10, 15, 30, 60];
     private readonly List<int> _inactivityValues = [];
@@ -119,7 +119,7 @@ internal sealed class SettingsForm : UiForm
         _mapEditor = new MappingEditor(_mapping, ControllerKind.Pro2);
         _tuning = new TuningEditor(() => _settings, () => _changed(false), ControllerKind.Pro2);
 
-        Text = "N-Connect";
+        Text = "SKZ Connect";
         StartPosition = FormStartPosition.CenterScreen;
         Size = new Size(UiScale.Px(1280), UiScale.Px(880));
         MinimumSize = new Size(UiScale.Px(1060), UiScale.Px(660));
@@ -431,7 +431,7 @@ internal sealed class SettingsForm : UiForm
             Row("Kopplungen übernehmen oder weitergeben", "Von der Switch-SD-Karte (Bluepick_RCM/hekate) oder von einem anderen PC übernehmen, " +
                 "oder für einen anderen PC exportieren.", pairing, Glyph.Sync),
             Row("Bei Switch-SD-Karte nachfragen", "Steckt eine SD-Karte der Switch im PC (Kartenleser oder hekate „USB Tools“), " +
-                "bietet N-Connect die Übernahme an. Die Karte wird nur gelesen.", _switchCardHint, Glyph.Folder));
+                "bietet SKZ Connect die Übernahme an. Die Karte wird nur gelesen.", _switchCardHint, Glyph.Folder));
         return page;
     }
 
@@ -457,7 +457,7 @@ internal sealed class SettingsForm : UiForm
                 ? "Empfohlen: Steam und viele Spiele kennen Switch-1-, NSO- und USB-Controller selbst und sähen sie sonst doppelt. " +
                   "Läuft nach der Installation ohne Rückfrage (sonst fragt Windows nach Adminrechten)."
                 : "Steam und viele Spiele sehen Switch-1-, NSO- und USB-Controller sonst doppelt. Dafür wird das kostenlose " +
-                  "HidHide gebraucht (bei der N-Connect-Installation dabei, hier nachträglich).", hideContent, Glyph.Eye),
+                  "HidHide gebraucht (bei der SKZ-Connect-Installation dabei, hier nachträglich).", hideContent, Glyph.Eye),
             Row("Spieler-LED und Lichtleiste vom Spiel", "Die Spieler-LEDs zeigen den Xbox-Platz, den Windows vergibt. Bei DualShock 4 " +
                 "steuert die Lichtleiste des Spiels die HOME-LED (Switch 1 Pro Controller, rechter Joy-Con).", _gameLeds, Glyph.Flash));
         var pair = new GlyphButton("Controller koppeln …", Glyph.Bluetooth) { Enabled = _wiiPairing is not null };
@@ -469,10 +469,10 @@ internal sealed class SettingsForm : UiForm
             Row("Per Tastendruck verbinden", "Gekoppelte Controller verbinden sich ohne SYNC-Taste.", _autoReconnect, Glyph.Bluetooth),
             Row("Beim Verbinden kurz vibrieren", null, _connectFeedback, Glyph.Vibrate),
             Row("Einblendung beim Verbinden", "Kurze Anzeige am Bildschirmrand mit Spieler, Controller und Akkustand.", _connectOverlay, Glyph.Info),
-            Row("Meldung bei Verbinden", "Wer meldet, wenn ein Controller verbunden oder getrennt wird. „N-Connect“ zeigt den " +
+            Row("Meldung bei Verbinden", "Wer meldet, wenn ein Controller verbunden oder getrennt wird. „SKZ Connect“ zeigt den " +
                 "echten Controller-Namen und schaltet die Gerätemeldungen von Windows ab.", _notifyMode, Glyph.Info),
             Row("Ohne Eingabe trennen nach", "Spart Akku, wenn ein Controller liegen bleibt.", _inactivity, Glyph.Timer),
-            Row("Mit Windows starten", "N-Connect startet unsichtbar im Infobereich.", _autostart, Glyph.Power));
+            Row("Mit Windows starten", "SKZ Connect startet unsichtbar im Infobereich.", _autostart, Glyph.Power));
         page.AddGroup("Desktop-Modus",
             Row("Desktop-Modus", "Läuft kein Spiel, steuert der Controller Windows: linker Stick = Maus, rechter Stick = Scrollen, " +
                 "A = Klick, B = Rechtsklick, X = Taskansicht, Y = Bildschirmtastatur, Steuerkreuz = Pfeiltasten, LB/RB = zurück/vor, " +
@@ -481,7 +481,7 @@ internal sealed class SettingsForm : UiForm
             Row("Zeigergeschwindigkeit", "RT gedrückt halten macht den Zeiger langsam und genau.", _desktopSpeed, Glyph.Pointer));
         page.AddGroup("Desktop-Widget",
             Row("Desktop-Widget", "Kleines Kärtchen auf dem Desktop: verbundene Controller, Akku, Verbindung und Ausgabe auf einen Blick. " +
-                "Mit der Maus verschieben, Rechtsklick für Optionen, Doppelklick öffnet N-Connect.", _widget, Glyph.Layers),
+                "Mit der Maus verschieben, Rechtsklick für Optionen, Doppelklick öffnet SKZ Connect.", _widget, Glyph.Layers),
             Row("Immer im Vordergrund", "Widget bleibt über allen Fenstern sichtbar (sonst nur auf dem Desktop).", _widgetOnTop, Glyph.Eye),
             Row("Kompakte Ansicht", "Eine Zeile je Controller: Spieler, Name und Akku.", _widgetCompact, Glyph.Sliders),
             Row("Deckkraft", null, _widgetOpacity, Glyph.Palette));
@@ -504,19 +504,19 @@ internal sealed class SettingsForm : UiForm
             {
                 await KodiIntegration.InstallRepositoryAsync();
                 Tr.Show(this, "Das DevCatSKZ Repository liegt jetzt in Kodi. Starte Kodi (neu) und schalte es ein: " +
-                    "Add-ons → Meine Add-ons → Add-on-Repository → DevCatSKZ Repository → Aktivieren.", "N-Connect",
+                    "Add-ons → Meine Add-ons → Add-on-Repository → DevCatSKZ Repository → Aktivieren.", "SKZ Connect",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception e) when (e is HttpRequestException or TaskCanceledException or InvalidDataException)
             {
                 Log.Warn($"Kodi-Repository einrichten: {Log.Reason(e)}");
-                Tr.Show(this, "Download fehlgeschlagen – bitte die Internetverbindung prüfen.", "N-Connect", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Tr.Show(this, "Download fehlgeschlagen – bitte die Internetverbindung prüfen.", "SKZ Connect", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             catch (Exception e) when (e is IOException or UnauthorizedAccessException)
             {
                 Log.Warn($"Kodi-Repository einrichten: {Log.Reason(e)}");
                 Tr.Show(this, "Einrichten fehlgeschlagen – der Kodi-Ordner ist nicht beschreibbar. Nutze „Repository herunterladen“.",
-                    "N-Connect", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    "SKZ Connect", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             finally
             {
@@ -536,7 +536,7 @@ internal sealed class SettingsForm : UiForm
                 catch (Exception e) when (e is HttpRequestException or TaskCanceledException or InvalidDataException or IOException or UnauthorizedAccessException)
                 {
                     Log.Warn($"Kodi-Download: {Log.Reason(e)}");
-                    Tr.Show(this, "Download fehlgeschlagen – bitte die Internetverbindung prüfen.", "N-Connect", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    Tr.Show(this, "Download fehlgeschlagen – bitte die Internetverbindung prüfen.", "SKZ Connect", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
                 finally
                 {
@@ -545,15 +545,22 @@ internal sealed class SettingsForm : UiForm
             };
             return button;
         }
+        bool kodiPlugin = KodiIntegration.FindDataDirs().Count > 0;
         page.AddGroup("Kodi",
             Row("DevCatSKZ Repository in Kodi einrichten", kodi
-                ? "Legt das Repository direkt in Kodi ab. Darüber kommen unsere Kodi-Plugins mit automatischen Updates. Danach in Kodi: " +
-                  "Add-ons → Meine Add-ons → Add-on-Repository → DevCatSKZ Repository → Aktivieren."
+                ? "Kodi ist auf diesem PC installiert. Legt das Repository direkt in Kodi ab. Darüber kommen unsere " +
+                  "Kodi-Plugins mit automatischen Updates. Danach in Kodi: Add-ons → Meine Add-ons → Add-on-Repository → " +
+                  "DevCatSKZ Repository → Aktivieren."
                 : "Kodi ist auf diesem PC nicht installiert. Mit Kodi für Windows funktionieren deine Controller auch ohne Plugin – " +
                   "sie erscheinen dort als Xbox-Controller.", kodiSetup, Glyph.Layers),
+            new SettingRow("Braucht Kodi ein Plugin?",
+                "Nur auf anderen Geräten: Kodi für Windows braucht keins – deine Controller erscheinen dort als " +
+                "Xbox-Controller. Auf Raspberry Pi, LibreELEC und anderen Kodi-Geräten zeigt das Plugin verbundene " +
+                "Controller und Akkustand.", null, Glyph.Info),
             Row("Repository herunterladen", "Speichert repository.devcatskz.zip im Download-Ordner – zum Installieren auf einem anderen " +
                 "Gerät über „Aus ZIP-Datei installieren“.", KodiDownload(plugin: false), Glyph.Export),
-            Row("Kodi-Plugin für LibreELEC", "Für Raspberry Pi und andere Geräte mit LibreELEC: N-Connect als Kodi-Plugin (alle Geräte). " +
+            Row(kodiPlugin ? "Kodi-Plugin für LibreELEC (installiert)" : "Kodi-Plugin für LibreELEC",
+                "Für Raspberry Pi und andere Geräte mit LibreELEC: SKZ Connect als Kodi-Plugin (alle Geräte). " +
                 "Am einfachsten über das DevCatSKZ Repository.", KodiDownload(plugin: true), Glyph.Export));
         var reset = new GlyphButton("Zurücksetzen", Glyph.Refresh);
         reset.Click += (_, _) => ResetAll();
@@ -564,11 +571,11 @@ internal sealed class SettingsForm : UiForm
         page.AddGroup("Erweitert",
             Row("Diagnose exportieren", "Protokoll, Einstellungen und Systeminfos als ZIP-Datei – zum Anhängen an eine Fehlermeldung. " +
                 "Enthält keine Kopplungsschlüssel.", diagnose, Glyph.Info),
-            Row("Gyro für Emulatoren (DSU)", "Cemuhook-Server auf Port 26760 – wirkt nach einem Neustart von N-Connect.", _dsu, Glyph.Rotate),
+            Row("Gyro für Emulatoren (DSU)", "Cemuhook-Server auf Port 26760 – wirkt nach einem Neustart von SKZ Connect.", _dsu, Glyph.Rotate),
             Row("Nach Updates suchen", "Beim Start auf GitHub nach einer neuen Version suchen.", _updates, Glyph.Sync),
             Row("HidHide aktuell halten", "Beim Start nach einer neuen HidHide-Version suchen. Installiert wird nur nach Rückfrage " +
                 "(geprüfter Download vom Hersteller, Neustart nötig).", _hidHideUpdates, Glyph.Sync),
-            Row("Lizenzen Dritter", "Open-Source-Software und übernommener Code in N-Connect – mit Lizenzen und " +
+            Row("Lizenzen Dritter", "Open-Source-Software und übernommener Code in SKZ Connect – mit Lizenzen und " +
                 "Copyright-Vermerken.", notices, Glyph.Info),
             Row("Alles auf Standard", "Tastenbelegungen und Werte zurücksetzen. Gekoppelte Controller bleiben erhalten.", reset, Glyph.Refresh));
         return page;
@@ -581,7 +588,7 @@ internal sealed class SettingsForm : UiForm
         {
             Title = Tr.T("Diagnose exportieren"),
             Filter = "ZIP (*.zip)|*.zip",
-            FileName = $"N-Connect-Diagnose-{DateTime.Now:yyyyMMdd-HHmm}.zip",
+            FileName = $"SKZ-Connect-Diagnose-{DateTime.Now:yyyyMMdd-HHmm}.zip",
             InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
         };
         if (dialog.ShowDialog(this) != DialogResult.OK)
@@ -596,13 +603,13 @@ internal sealed class SettingsForm : UiForm
         catch (Exception e) when (e is IOException or UnauthorizedAccessException or System.ComponentModel.Win32Exception)
         {
             Log.Warn($"Diagnose exportieren: {Log.Reason(e)}");
-            Tr.Show(this, $"Speichern fehlgeschlagen: {e.Message}", "N-Connect", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            Tr.Show(this, $"Speichern fehlgeschlagen: {e.Message}", "SKZ Connect", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
     }
 
     /// <summary>Lizenzhinweise neben der EXE (Setup: Programmordner, portable: im ZIP).</summary>
     internal const string NoticesFile = "THIRD-PARTY-NOTICES.md";
-    private const string NoticesUrl = "https://github.com/DevCatSKZ/N-Connect/blob/main/THIRD-PARTY-NOTICES.md";
+    private const string NoticesUrl = "https://github.com/DevCatSKZ/SKZ-Connect/blob/main/THIRD-PARTY-NOTICES.md";
 
     /// <summary>
     /// THIRD-PARTY-NOTICES.md öffnen: im Programm, das für .md eingestellt ist, sonst im Editor (Windows kennt .md

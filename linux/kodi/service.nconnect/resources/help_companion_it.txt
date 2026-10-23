@@ -1,17 +1,17 @@
 [B]Modalità di accompagnamento[/B]
-Su questo sistema non è l'add-on a collegare i controller, ma l'app N-Connect. L'add-on mostra solo ciò che l'app riporta: il menu (Programmi > N-Connect) e il widget della Home con i controller collegati e noti e la loro batteria.
+Su questo sistema non è l'add-on a collegare i controller, ma l'app SKZ-Connect. L'add-on mostra solo ciò che l'app riporta: il menu (Programmi > SKZ Connect) e il widget della Home con i controller collegati e noti e la loro batteria.
 
 [B]Windows[/B]
-Installa e avvia N-Connect per Windows (github.com/DevCatSKZ/N-Connect). L'app collega i controller come controller Xbox: Kodi li riconosce senza configurazione. Scrive il suo stato nella cartella dati di Kodi; se non è in esecuzione, qui compare «L'app N-Connect non è in esecuzione». Kodi installato dopo N-Connect: riavvia N-Connect una volta.
+Installa e avvia SKZ Connect per Windows (github.com/DevCatSKZ/SKZ-Connect). L'app collega i controller come controller Xbox: Kodi li riconosce senza configurazione. Scrive il suo stato nella cartella dati di Kodi; se non è in esecuzione, qui compare «L'app SKZ Connect non è in esecuzione». Kodi installato dopo SKZ Connect: riavvia SKZ Connect una volta.
 
 [B]Android[/B]
-Installa e avvia N-Connect per Android 0.9.1 o successivo. L'app salva il suo stato nella cartella Documents/N-Connect, da cui lo legge l'add-on. Se Kodi continua a non mostrare nulla, forse Android blocca l'accesso: consenti a Kodi l'accesso ai file (memoria) nelle impostazioni di Android. Kodi installato dopo N-Connect: riavvia N-Connect una volta.
+Installa e avvia SKZ Connect per Android 0.9.1 o successivo. L'app salva il suo stato nella cartella Documents/SKZ Connect, da cui lo legge l'add-on. Se Kodi continua a non mostrare nulla, forse Android blocca l'accesso: consenti a Kodi l'accesso ai file (memoria) nelle impostazioni di Android. Kodi installato dopo SKZ Connect: riavvia SKZ Connect una volta.
 
 [B]macOS[/B]
-N-Connect non è disponibile per macOS: qui l'add-on può solo mostrare e resta vuoto.
+SKZ Connect non è disponibile per macOS: qui l'add-on può solo mostrare e resta vuoto.
 
 [B]Impostazioni[/B]
-Disposizione dei tasti, giroscopio, vibrazione, associazione ecc. si impostano nell'app N-Connect. Le impostazioni di questo add-on valgono solo su LibreELEC/Linux.
+Disposizione dei tasti, giroscopio, vibrazione, associazione ecc. si impostano nell'app SKZ-Connect. Le impostazioni di questo add-on valgono solo su LibreELEC/Linux.
 
 [B]Widget nella schermata Home[/B]
-A seconda della skin: Impostazioni skin > Home > Widget > Add-on > N-Connect.
+A seconda della skin: Impostazioni skin > Home > Widget > Add-on > SKZ-Connect.

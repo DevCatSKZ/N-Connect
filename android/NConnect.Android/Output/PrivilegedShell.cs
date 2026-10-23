@@ -19,7 +19,7 @@ public interface IPrivilegedShell
     /// <summary>Grundsätzlich vorhanden (Root installiert bzw. Shizuku läuft)?</summary>
     bool IsAvailable();
 
-    /// <summary>Hat N-Connect die Freigabe (Root gewährt bzw. Shizuku erlaubt)?</summary>
+    /// <summary>Hat SKZ Connect die Freigabe (Root gewährt bzw. Shizuku erlaubt)?</summary>
     bool HasPermission();
 
     /// <summary>Freigabe anfragen (zeigt den Root- bzw. Shizuku-Dialog). true = erteilt.</summary>

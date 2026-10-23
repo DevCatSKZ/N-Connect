@@ -2,7 +2,7 @@ namespace Switch2Pro.Bridge.Usb;
 
 /// <summary>
 /// Echtes Gerät (hängt an einem USB-Host bzw. am Bluetooth-Stack) oder virtuelles? Virtuelle Ausgabe-Controller wie
-/// unser ViGEm-DualShock-4 dürfen nie als Eingabe dienen und nie versteckt werden: N-Connect sähe sonst sein eigenes
+/// unser ViGEm-DualShock-4 dürfen nie als Eingabe dienen und nie versteckt werden: SKZ Connect sähe sonst sein eigenes
 /// Pad als neuen Controller, legte dafür wieder ein Pad an usw. (bis 8 Geister-Spieler, Issue #1).
 /// <para>
 /// Gemessen: Der ViGEm-Bus ist ein Root-Knoten (ROOT\SYSTEM\0001, Dienst „ViGEmBus“, Hardware-ID
@@ -57,7 +57,7 @@ internal static class DeviceTree
     }
 
     /// <summary>
-    /// Gehört ein Knoten der Kette zum ViGEmBus? Der Beweis für ein virtuelles Pad, das N-Connect in HidHide wieder
+    /// Gehört ein Knoten der Kette zum ViGEmBus? Der Beweis für ein virtuelles Pad, das SKZ Connect in HidHide wieder
     /// freigeben darf. Andere Software-Busse zählen hier bewusst nicht: Über USB-über-Netzwerk o. Ä. hängt dort womöglich
     /// ein echter Controller, den jemand mit Absicht versteckt hat.
     /// </summary>

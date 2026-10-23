@@ -4,8 +4,8 @@ using AndroidX.Core.Content;
 namespace NConnect.Android.Core;
 
 /// <summary>
-/// Sucht auf GitHub nach einer neueren Android-Version (Datei „N-Connect-Android-…apk“ an einem Release, siehe
-/// UpdateCheck.Releases.cs; Netzteil in UpdateCheck.Http.cs) – wie UpdateCheck in N-Connect für Windows, nur mit APK
+/// Sucht auf GitHub nach einer neueren Android-Version (Datei „SKZ-Connect-Android-…apk“ an einem Release, siehe
+/// UpdateCheck.Releases.cs; Netzteil in UpdateCheck.Http.cs) – wie UpdateCheck in SKZ Connect für Windows, nur mit APK
 /// statt Setup-EXE. Heruntergeladen wird nur nach Zustimmung, nur von GitHub, und die Datei wird geprüft (Größe,
 /// SHA-256 falls GitHub sie angibt). Android fragt vor dem Installieren noch einmal nach.
 /// </summary>
@@ -101,7 +101,7 @@ internal static partial class UpdateCheck
     public static bool CanInstall(Context ctx) =>
         !OperatingSystem.IsAndroidVersionAtLeast(26) || ctx.PackageManager!.CanRequestPackageInstalls();
 
-    /// <summary>Systemseite „Unbekannte Apps installieren“ für N-Connect öffnen.</summary>
+    /// <summary>Systemseite „Unbekannte Apps installieren“ für SKZ Connect öffnen.</summary>
     public static void OpenInstallPermission(Context ctx) =>
         ctx.StartActivity(new Intent(global::Android.Provider.Settings.ActionManageUnknownAppSources,
                 global::Android.Net.Uri.Parse($"package:{ctx.PackageName}"))!

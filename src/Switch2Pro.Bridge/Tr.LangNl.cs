@@ -16,12 +16,15 @@ internal static partial class Tr
         ["Einrichten fehlgeschlagen – der Kodi-Ordner ist nicht beschreibbar. Nutze „Repository herunterladen“."] = "Instellen mislukt – de Kodi-map is niet schrijfbaar. Gebruik „Repository downloaden”.",
         ["Herunterladen …"] = "Downloaden …",
         ["DevCatSKZ Repository in Kodi einrichten"] = "DevCatSKZ Repository in Kodi instellen",
-        ["Legt das Repository direkt in Kodi ab. Darüber kommen unsere Kodi-Plugins mit automatischen Updates. Danach in Kodi: Add-ons → Meine Add-ons → Add-on-Repository → DevCatSKZ Repository → Aktivieren."] = "Zet de repository rechtstreeks in Kodi. Daarmee komen onze Kodi-plugins met automatische updates. Daarna in Kodi: Add-ons → Mijn add-ons → Add-on-repository → DevCatSKZ Repository → Inschakelen.",
+        ["Kodi ist auf diesem PC installiert. Legt das Repository direkt in Kodi ab. Darüber kommen unsere Kodi-Plugins mit automatischen Updates. Danach in Kodi: Add-ons → Meine Add-ons → Add-on-Repository → DevCatSKZ Repository → Aktivieren."] = "Kodi is op deze pc geïnstalleerd. Plaatst de repository rechtstreeks in Kodi. Daarmee komen onze Kodi-plugins met automatische updates. Daarna in Kodi: Add-ons → Mijn add-ons → Add-on-repository → DevCatSKZ Repository → Inschakelen.",
         ["Kodi ist auf diesem PC nicht installiert. Mit Kodi für Windows funktionieren deine Controller auch ohne Plugin – sie erscheinen dort als Xbox-Controller."] = "Kodi is niet geïnstalleerd op deze pc. Met Kodi voor Windows werken je controllers ook zonder plugin – ze verschijnen daar als Xbox-controllers.",
         ["Repository herunterladen"] = "Repository downloaden",
         ["Speichert repository.devcatskz.zip im Download-Ordner – zum Installieren auf einem anderen Gerät über „Aus ZIP-Datei installieren“."] = "Slaat repository.devcatskz.zip op in de map Downloads – om op een ander apparaat te installeren via „Installeren via zip-bestand”.",
         ["Kodi-Plugin für LibreELEC"] = "Kodi-plugin voor LibreELEC",
-        ["Für Raspberry Pi und andere Geräte mit LibreELEC: N-Connect als Kodi-Plugin (alle Geräte). Am einfachsten über das DevCatSKZ Repository."] = "Voor Raspberry Pi en andere apparaten met LibreELEC: N-Connect als Kodi-plugin (alle apparaten). Het makkelijkst via de DevCatSKZ Repository.",
+        ["Braucht Kodi ein Plugin?"] = "Heeft Kodi een plugin nodig?",
+        ["Nur auf anderen Geräten: Kodi für Windows braucht keins – deine Controller erscheinen dort als Xbox-Controller. Auf Raspberry Pi, LibreELEC und anderen Kodi-Geräten zeigt das Plugin verbundene Controller und Akkustand."] = "Alleen op andere apparaten: Kodi voor Windows heeft er geen nodig – je controllers verschijnen daar als Xbox-controllers. Op Raspberry Pi, LibreELEC en andere Kodi-apparaten toont de plugin verbonden controllers en het accuniveau.",
+        ["Kodi-Plugin für LibreELEC (installiert)"] = "Kodi-plugin voor LibreELEC (geïnstalleerd)",
+        ["Für Raspberry Pi und andere Geräte mit LibreELEC: SKZ Connect als Kodi-Plugin (alle Geräte). Am einfachsten über das DevCatSKZ Repository."] = "Voor Raspberry Pi en andere apparaten met LibreELEC: SKZ Connect als Kodi-plugin (alle apparaten). Het makkelijkst via de DevCatSKZ Repository.",
         // ---------- Fenster, Reiter, Abschnitte ----------
         ["Controller"] = "Controllers",
         // ---------- Desktop-Modus, Testseite, Vorlagen, Diagnose ----------
@@ -55,7 +58,7 @@ internal static partial class Tr
         ["Protokoll, Einstellungen und Systeminfos als ZIP-Datei – zum Anhängen an eine Fehlermeldung. Enthält keine Kopplungsschlüssel."] = "Logboek, instellingen en systeeminfo als ZIP-bestand – om bij een probleemmelding te voegen. Bevat geen koppelsleutels.",
         // ---------- Desktop-Widget ----------
         ["Desktop-Widget"] = "Bureaubladwidget",
-        ["Kleines Kärtchen auf dem Desktop: verbundene Controller, Akku, Verbindung und Ausgabe auf einen Blick. Mit der Maus verschieben, Rechtsklick für Optionen, Doppelklick öffnet N-Connect."] = "Klein kaartje op het bureaublad: verbonden controllers, accu, verbinding en uitvoer in één oogopslag. Versleep het met de muis, rechtsklik voor opties, dubbelklik opent N-Connect.",
+        ["Kleines Kärtchen auf dem Desktop: verbundene Controller, Akku, Verbindung und Ausgabe auf einen Blick. Mit der Maus verschieben, Rechtsklick für Optionen, Doppelklick öffnet SKZ Connect."] = "Klein kaartje op het bureaublad: verbonden controllers, accu, verbinding en uitvoer in één oogopslag. Versleep het met de muis, rechtsklik voor opties, dubbelklik opent SKZ Connect.",
         ["Immer im Vordergrund"] = "Altijd op voorgrond",
         ["Widget bleibt über allen Fenstern sichtbar (sonst nur auf dem Desktop)."] = "De widget blijft boven alle vensters zichtbaar (anders alleen op het bureaublad).",
         ["Kompakte Ansicht"] = "Compacte weergave",
@@ -64,7 +67,7 @@ internal static partial class Tr
         ["nativ"] = "native",
         ["Xbox · nativ"] = "Xbox · native",
         ["Controller einschalten oder SYNC drücken"] = "Zet een controller aan of druk op SYNC",
-        ["N-Connect öffnen"] = "N-Connect openen",
+        ["SKZ Connect öffnen"] = "SKZ Connect openen",
         ["Position zurücksetzen"] = "Positie herstellen",
         ["Widget ausblenden"] = "Widget verbergen",
         // ---------- Status-Kopfzeile, Ansicht ----------
@@ -105,9 +108,9 @@ internal static partial class Tr
         ["Beim Verbinden kurz vibrieren"] = "Kort trillen bij verbinden",
         ["Meldung bei Verbinden"] = "Melding bij verbinden",
         ["Wer meldet, wenn ein Controller verbunden oder getrennt wird."] = "Kies wie meldt wanneer een controller verbinding maakt of verbreekt.",
-        ["„N-Connect“ zeigt den echten Controller-Namen und schaltet die Gerätemeldungen von Windows ab."] = "\"N-Connect\" toont de echte naam van de controller en schakelt de apparaatmeldings van Windows uit.",
-        ["N-Connect (empfohlen)"] = "N-Connect (aanbevolen)",
-        ["N-Connect und Windows"] = "N-Connect en Windows",
+        ["„SKZ Connect“ zeigt den echten Controller-Namen und schaltet die Gerätemeldungen von Windows ab."] = "\"SKZ Connect\" toont de echte naam van de controller en schakelt de apparaatmeldings van Windows uit.",
+        ["SKZ Connect (empfohlen)"] = "SKZ Connect (aanbevolen)",
+        ["SKZ Connect und Windows"] = "SKZ Connect en Windows",
         ["Keine"] = "Geen",
         ["Gekoppelte Controller per Tastendruck verbinden (ohne SYNC)"] = "Gekoppelde controllers verbinden met een knopdruk (zonder SYNC)",
         ["Automatisch mit Windows starten"] = "Automatisch starten met Windows",
@@ -320,8 +323,8 @@ internal static partial class Tr
         ["Kurzanleitung"] = "Snelstartgids",
         ["Protokoll öffnen"] = "Logboek openen",
         ["Beenden"] = "Afsluiten",
-        ["N-Connect: warte auf Controller (SYNC drücken)"] = "N-Connect: wachten op controller (druk op SYNC)",
-        ["N-Connect: ViGEmBus fehlt"] = "N-Connect: ViGEmBus ontbreekt",
+        ["SKZ Connect: warte auf Controller (SYNC drücken)"] = "SKZ Connect: wachten op controller (druk op SYNC)",
+        ["SKZ Connect: ViGEmBus fehlt"] = "SKZ Connect: ViGEmBus ontbreekt",
         ["Neue Version verfügbar"] = "Nieuwe versie beschikbaar",
         ["Einstellungen fehlerhaft"] = "Instellingen beschadigd",
         ["settings.json konnte nicht gelesen werden – es gelten die Standardwerte. Die beschädigte Datei wird als „settings.json.unlesbar-…“ aufbewahrt (Klicken öffnet den Ordner)."] =
@@ -378,7 +381,7 @@ internal static partial class Tr
         ["Profil exportieren"] = "Profiel exporteren",
         ["Profil importieren"] = "Profiel importeren",
         // ---------- Kurzanleitung (WelcomeForm, je Absatz ein Schlüssel) ----------
-        ["N-Connect – Willkommen"] = "N-Connect – Welkom",
+        ["SKZ Connect – Willkommen"] = "SKZ Connect – Welkom",
         ["So verbindest du deine Controller:"] = "Zo verbind je je controllers:",
         ["Switch 2 (Pro Controller, Joy-Con 2, GameCube):\n" +
          "   Kurz die kleine SYNC-Taste drücken – nach ein paar Sekunden vibriert der Controller.\n" +
@@ -389,10 +392,10 @@ internal static partial class Tr
             "   Daarna volstaat een knopdruk om te verbinden. Pro Controller en GameCube werken ook via een USB-kabel.\n" +
             "   Belangrijk: NIET koppelen via „Bluetooth → Apparaat toevoegen” – dat verstoort de verbinding.",
         ["Switch 1 (Pro Controller, Joy-Con, NES/SNES/N64/Mega Drive), Wii-Fernbedienung, Wii U Pro Controller:\n" +
-         "   SYNC-Taste drücken – N-Connect koppelt den Controller selbst (kein Umweg über die Windows-Einstellungen).\n" +
+         "   SYNC-Taste drücken – SKZ Connect koppelt den Controller selbst (kein Umweg über die Windows-Einstellungen).\n" +
          "   Danach verbindet er sich per Tastendruck. Gezielt suchen: Rechtsklick auf das Symbol → „Controller koppeln …“."] =
             "Switch 1 (Pro Controller, Joy-Con, NES/SNES/N64/Mega Drive), Wii-afstandsbediening, Wii U Pro Controller:\n" +
-            "   Druk op de SYNC-knop – N-Connect koppelt de controller zelf (geen omweg via de Windows-instellingen).\n" +
+            "   Druk op de SYNC-knop – SKZ Connect koppelt de controller zelf (geen omweg via de Windows-instellingen).\n" +
             "   Daarna verbindt hij met een knopdruk. Gericht zoeken: rechtermuisklik op het pictogram → „Controller koppelen …”.",
         ["Windows, Steam und Spiele sehen jeden Controller als Xbox-Controller.\n" +
          "Das Programm läuft unten rechts im Infobereich – ein Klick öffnet die Übersicht."] =
@@ -496,8 +499,8 @@ internal static partial class Tr
             "Xbox 360 werkt met bijna alle games en Steam. DualShock 4 voegt bewegingsbesturing toe (Steam, emulators). Geldt voor alle controllers zonder eigen instelling (kaart → Instellingen → Knoppen).",
         ["Original-Controller verstecken"] = "Originele controllers verbergen",
         ["Controller verbinden"] = "Controllers verbinden",
-        ["SYNC-Taste am Controller drücken – N-Connect findet und koppelt ihn selbst. Danach reicht künftig ein Tastendruck."] =
-            "Druk op de SYNC-knop van de controller – N-Connect vindt en koppelt hem zelf. Daarna volstaat een knopdruk.",
+        ["SYNC-Taste am Controller drücken – SKZ Connect findet und koppelt ihn selbst. Danach reicht künftig ein Tastendruck."] =
+            "Druk op de SYNC-knop van de controller – SKZ Connect vindt en koppelt hem zelf. Daarna volstaat een knopdruk.",
         ["So kommt der Controller in den Kopplungsmodus"] = "Zo komt de controller in koppelmodus",
         ["Switch 2: Pro Controller, Joy-Con 2, GameCube"] = "Switch 2: Pro Controller, Joy-Con 2, GameCube",
         ["Kurz die kleine SYNC-Taste drücken."] = "Druk kort op de kleine SYNC-knop.",
@@ -550,8 +553,8 @@ internal static partial class Tr
         ["HidHide installieren …"] = "HidHide installeren …",
         ["Empfohlen: Steam und viele Spiele kennen Switch-1-, NSO- und USB-Controller selbst und sähen sie sonst doppelt. Läuft nach der Installation ohne Rückfrage (sonst fragt Windows nach Adminrechten)."] =
             "Aanbevolen: Steam en veel games herkennen Switch 1-, NSO- en USB-controllers zelf en zouden ze anders dubbel zien. Werkt na installatie zonder te vragen (anders vraagt Windows om beheerdersrechten).",
-        ["Steam und viele Spiele sehen Switch-1-, NSO- und USB-Controller sonst doppelt. Dafür wird das kostenlose HidHide gebraucht (bei der N-Connect-Installation dabei, hier nachträglich)."] =
-            "Anders zien Steam en veel games Switch 1-, NSO- en USB-controllers dubbel. Daarvoor is de gratis HidHide nodig (meegeleverd bij de N-Connect-installatie, hier achteraf).",
+        ["Steam und viele Spiele sehen Switch-1-, NSO- und USB-Controller sonst doppelt. Dafür wird das kostenlose HidHide gebraucht (bei der SKZ-Connect-Installation dabei, hier nachträglich)."] =
+            "Anders zien Steam en veel games Switch 1-, NSO- en USB-controllers dubbel. Daarvoor is de gratis HidHide nodig (meegeleverd bij de SKZ-Connect-installatie, hier achteraf).",
         ["Erscheint als"] = "Verschijnt als",
         ["Wie allgemein"] = "Zoals in Algemeen",
         ["Nur für diesen Controller. Xbox 360 läuft überall; DualShock 4 bringt zusätzlich Gyro nach Steam und in Emulatoren. „Wie allgemein“ folgt der Seite „Allgemein“."] =
@@ -568,8 +571,8 @@ internal static partial class Tr
             "Originele controllers niet verborgen (vraag afgebroken). Inhalen: controller → Instellingen → Extra's → „Dubbel weergegeven?“.",
         ["Original-Controller nicht versteckt (Fehler, Details im Protokoll). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."] =
             "Originele controllers niet verborgen (fout, details in het logboek). Inhalen: controller → Instellingen → Extra's → „Dubbel weergegeven?“.",
-        ["Eine ältere N-Connect-Version hat das eigene virtuelle DualShock 4 vor Spielen versteckt. Freigeben hat nicht geklappt – bitte im HidHide Configuration Client den Haken beim virtuellen DualShock 4 entfernen."] =
-            "Een oudere versie van N-Connect heeft de eigen virtuele DualShock 4 voor games verborgen. Weer zichtbaar maken is mislukt – haal in HidHide Configuration Client het vinkje bij de virtuele DualShock 4 weg.",
+        ["Eine ältere SKZ-Connect-Version hat das eigene virtuelle DualShock 4 vor Spielen versteckt. Freigeben hat nicht geklappt – bitte im HidHide Configuration Client den Haken beim virtuellen DualShock 4 entfernen."] =
+            "Een oudere versie van SKZ Connect heeft de eigen virtuele DualShock 4 voor games verborgen. Weer zichtbaar maken is mislukt – haal in HidHide Configuration Client het vinkje bij de virtuele DualShock 4 weg.",
         ["Tastenanordnung A/B/X/Y"] = "Knopindeling A/B/X/Y",
         ["Xbox: nach Position (untere Taste = A). Nintendo: nach Beschriftung (A bleibt A)."] = "Xbox: op positie (onderste knop = A). Nintendo: op opschrift (A blijft A).",
         ["Verbinden"] = "Verbinden",
@@ -577,14 +580,14 @@ internal static partial class Tr
         ["Gekoppelte Controller verbinden sich ohne SYNC-Taste."] = "Gekoppelde controllers verbinden zonder SYNC-knop.",
         ["Ohne Eingabe trennen nach"] = "Verbreken zonder invoer na",
         ["Spart Akku, wenn ein Controller liegen bleibt."] = "Bespaart accu als een controller blijft liggen.",
-        ["N-Connect startet unsichtbar im Infobereich."] = "N-Connect start onzichtbaar in het systeemvak.",
+        ["SKZ Connect startet unsichtbar im Infobereich."] = "SKZ Connect start onzichtbaar in het systeemvak.",
         ["Darstellung und Sprache"] = "Weergave en taal",
         ["Farbmodus"] = "Kleurmodus",
         ["Mica-Effekt"] = "Mica-effect",
         ["Durchscheinende Titelleiste (ab Windows 11)."] = "Doorschijnende titelbalk (vanaf Windows 11).",
         ["Erweitert"] = "Geavanceerd",
         ["Gyro für Emulatoren (DSU)"] = "Gyroscoop voor emulators (DSU)",
-        ["Cemuhook-Server auf Port 26760 – wirkt nach einem Neustart von N-Connect."] = "Cemuhook-server op poort 26760 – actief na een herstart van N-Connect.",
+        ["Cemuhook-Server auf Port 26760 – wirkt nach einem Neustart von SKZ Connect."] = "Cemuhook-server op poort 26760 – actief na een herstart van SKZ Connect.",
         ["Nach Updates suchen"] = "Naar updates zoeken",
         ["Beim Start auf GitHub nach einer neuen Version suchen."] = "Bij het starten op GitHub naar een nieuwe versie zoeken.",
         ["Tastenbelegungen und Werte zurücksetzen. Gekoppelte Controller bleiben erhalten."] = "Knoptoewijzingen en waarden resetten. Gekoppelde controllers blijven behouden.",
@@ -645,11 +648,11 @@ internal static partial class Tr
         ["Programme (*.exe)|*.exe"] = "Programma's (*.exe)|*.exe",
         ["Kein Controller verbunden\n\n" +
          "Switch-2-Controller: kurz die SYNC-Taste drücken – danach reicht ein beliebiger Tastendruck.\n" +
-         "Switch-1-, NSO- und Wii-Controller: SYNC-Taste drücken – N-Connect koppelt sie selbst.\n" +
+         "Switch-1-, NSO- und Wii-Controller: SYNC-Taste drücken – SKZ Connect koppelt sie selbst.\n" +
          "Oder hier gezielt suchen und koppeln:"] =
             "Geen controller verbonden\n\n" +
             "Switch 2-controllers: druk kort op de SYNC-knop – daarna volstaat elke knopdruk.\n" +
-            "Switch 1-, NSO- en Wii-controllers: druk op de SYNC-knop – N-Connect koppelt ze zelf.\n" +
+            "Switch 1-, NSO- en Wii-controllers: druk op de SYNC-knop – SKZ Connect koppelt ze zelf.\n" +
             "Of hier gericht zoeken en koppelen:",
         ["Controller suchen …"] = "Controllers zoeken …",
         ["Kein Controller verbunden"] = "Geen controller verbonden",
@@ -668,22 +671,22 @@ internal static partial class Tr
         ["Rechten Joy-Con umbenennen …"] = "Rechter Joy-Con hernoemen …",
         ["Controller umbenennen"] = "Controller hernoemen",
         ["Spielerplatz"] = "Spelerplek",
-        ["N-Connect aktualisieren"] = "N-Connect bijwerken",
+        ["SKZ Connect aktualisieren"] = "SKZ Connect bijwerken",
         ["HidHide aktualisieren"] = "HidHide bijwerken",
         ["HidHide-Update verfügbar"] = "HidHide-update beschikbaar",
         ["HidHide aktuell halten"] = "HidHide actueel houden",
         ["Beim Start nach einer neuen HidHide-Version suchen. Installiert wird nur nach Rückfrage (geprüfter Download vom Hersteller, Neustart nötig)."] =
             "Bij het starten naar een nieuwe HidHide-versie zoeken. Geïnstalleerd wordt alleen na overleg (gecontroleerde download van de fabrikant, herstart nodig).",
         ["Lizenzen Dritter"] = "Licenties van derden",
-        ["Open-Source-Software und übernommener Code in N-Connect – mit Lizenzen und Copyright-Vermerken."] =
-            "Opensourcesoftware en overgenomen code in N-Connect – met licenties en copyrightvermeldingen.",
+        ["Open-Source-Software und übernommener Code in SKZ Connect – mit Lizenzen und Copyright-Vermerken."] =
+            "Opensourcesoftware en overgenomen code in SKZ Connect – met licenties en copyrightvermeldingen.",
         ["Der Download hat nicht geklappt oder die Datei war fehlerhaft. Die Release-Seite im Browser öffnen?"] =
             "De download is mislukt of het bestand was defect. De releasepagina in de browser openen?",
         ["Alle Controller trennen"] = "Alle controllers verbreken",
         ["Sticks kalibrieren"] = "Sticks kalibreren",
         ["Kalibrieren …"] = "Kalibreren …",
-        ["Gegen Drift oder zu kleinen Ausschlag: Mitte und Rand neu messen. Wird nur in N-Connect gespeichert, der Controller bleibt unverändert."] =
-            "Tegen drift of te kleine uitslag: midden en rand opnieuw meten. Wordt alleen in N-Connect opgeslagen, de controller blijft onveranderd.",
+        ["Gegen Drift oder zu kleinen Ausschlag: Mitte und Rand neu messen. Wird nur in SKZ Connect gespeichert, der Controller bleibt unverändert."] =
+            "Tegen drift of te kleine uitslag: midden en rand opnieuw meten. Wordt alleen in SKZ Connect opgeslagen, de controller blijft onveranderd.",
         ["Linker Stick"] = "Linker stick",
         ["Rechter Stick"] = "Rechter stick",
         ["Stick"] = "Stick",
@@ -789,14 +792,14 @@ internal static partial class Tr
         ["Von der Switch-SD-Karte (Bluepick_RCM/hekate) oder von einem anderen PC übernehmen, oder für einen anderen PC exportieren."] =
             "Overnemen van de SD-kaart van de Switch (Bluepick_RCM/hekate) of van een andere pc, of exporteren voor een andere pc.",
         ["Bei Switch-SD-Karte nachfragen"] = "Vragen bij een SD-kaart van de Switch",
-        ["Steckt eine SD-Karte der Switch im PC (Kartenleser oder hekate „USB Tools“), bietet N-Connect die Übernahme an. Die Karte wird nur gelesen."] =
-            "Zit er een SD-kaart van de Switch in de pc (kaartlezer of hekate „USB Tools“), dan biedt N-Connect de overname aan. De kaart wordt alleen gelezen.",
+        ["Steckt eine SD-Karte der Switch im PC (Kartenleser oder hekate „USB Tools“), bietet SKZ Connect die Übernahme an. Die Karte wird nur gelesen."] =
+            "Zit er een SD-kaart van de Switch in de pc (kaartlezer of hekate „USB Tools“), dan biedt SKZ Connect de overname aan. De kaart wordt alleen gelezen.",
         ["Switch-SD-Karte erkannt"] = "SD-kaart van de Switch herkend",
         ["Kopplungsdaten der Controller gefunden – klicken, um sie anzusehen und zu übernehmen."] =
             "Koppelgegevens van controllers gevonden – klik om ze te bekijken en over te nemen.",
         ["Klicken, um Kopplungsdaten der Controller zu übernehmen."] = "Klik om de koppelgegevens van controllers over te nemen.",
-        ["Controller-Kopplungen von der Switch-SD-Karte oder von einem anderen PC übernehmen – oder für einen anderen PC exportieren. Es werden nur Einstellungen von N-Connect geändert; Windows und der Bluetooth-Adapter bleiben unverändert."] =
-            "Neem controller-koppelingen over van de SD-kaart van de Switch of van een andere pc – of exporteer ze voor een andere pc. Alleen instellingen van N-Connect worden gewijzigd; Windows en de Bluetooth-adapter blijven onveranderd.",
+        ["Controller-Kopplungen von der Switch-SD-Karte oder von einem anderen PC übernehmen – oder für einen anderen PC exportieren. Es werden nur Einstellungen von SKZ Connect geändert; Windows und der Bluetooth-Adapter bleiben unverändert."] =
+            "Neem controller-koppelingen over van de SD-kaart van de Switch of van een andere pc – of exporteer ze voor een andere pc. Alleen instellingen van SKZ Connect worden gewijzigd; Windows en de Bluetooth-adapter blijven onveranderd.",
         ["Spieler-Reihenfolge – Spieler 1 ist für Windows, Steam und Spiele der erste Controller. Mit ‹ › umsortieren."] =
             "Spelervolgorde – speler 1 is voor Windows, Steam en games de eerste controller. Herschik met ‹ ›.",
         ["Von der Switch-SD-Karte"] = "Van de SD-kaart van de Switch",
@@ -804,7 +807,7 @@ internal static partial class Tr
             "Koppelgegevens gemaakt met Bluepick_RCM of hekate (switchroot/joycon_mac.ini)",
         ["Einlesen …"] = "Inlezen …",
         ["Von einem anderen PC"] = "Van een andere pc",
-        ["Mit N-Connect exportierte Datei (*.ncpair)"] = "Door N-Connect geëxporteerd bestand (*.ncpair)",
+        ["Mit SKZ Connect exportierte Datei (*.ncpair)"] = "Door SKZ Connect geëxporteerd bestand (*.ncpair)",
         ["Datei öffnen …"] = "Bestand openen …",
         ["Inhalt"] = "Inhoud",
         ["Weitergeben und sichern"] = "Delen en beveiligen",
@@ -836,26 +839,26 @@ internal static partial class Tr
         ["Joy-Con (R)"] = "Joy-Con (R)",
         ["HORI-Controller (links)"] = "HORI-controller (links)",
         ["HORI-Controller (rechts)"] = "HORI-controller (rechts)",
-        ["Hinweis: Pro Controller stehen nur im Bluetooth-Speicher der Switch (8000000000000050.bin); dieses Speicherabbild kann N-Connect nicht auswerten."] =
-            "Let op: Pro Controllers staan alleen in het Bluetooth-geheugen van de Switch (8000000000000050.bin); N-Connect kan deze geheugenafbeelding niet uitlezen.",
+        ["Hinweis: Pro Controller stehen nur im Bluetooth-Speicher der Switch (8000000000000050.bin); dieses Speicherabbild kann SKZ Connect nicht auswerten."] =
+            "Let op: Pro Controllers staan alleen in het Bluetooth-geheugen van de Switch (8000000000000050.bin); SKZ Connect kan deze geheugenafbeelding niet uitlezen.",
         ["Was diese Daten können – und was nicht:"] = "Wat deze gegevens kunnen – en wat niet:",
         ["Die Daten zeigen, welche Controller mit deiner Switch gekoppelt sind und an welche Bluetooth-Adresse sie gebunden sind."] =
             "De gegevens tonen welke controllers aan je Switch gekoppeld zijn en aan welk Bluetooth-adres ze gebonden zijn.",
         ["Ein Switch-1-Controller verbindet sich auf Tastendruck nur mit dem Gerät, dessen Adresse er gespeichert hat – hier mit der Switch. Der Bluetooth-Adapter des PCs hat eine andere Adresse, deshalb kann Windows diese Kopplung nicht einfach weiterverwenden."] =
             "Een Switch 1-controller verbindt met een knopdruk alleen met het apparaat waarvan hij het adres heeft opgeslagen – hier de Switch. De Bluetooth-adapter van de pc heeft een ander adres, dus Windows kan deze koppeling niet zomaar hergebruiken.",
-        ["Die Adresse des PC-Adapters zu ändern, unterstützt N-Connect bewusst nicht (herstellerabhängig, riskant und nicht vorgesehen)."] =
-            "N-Connect ondersteunt bewust geen adreswijziging van de pc-adapter (fabrikantafhankelijk, riskant en niet voorzien).",
-        ["Windows bietet keinen offiziellen Weg, fremde Kopplungsschlüssel einzutragen: Sie liegen in einem Teil der Registrierung, auf den nur das System zugreifen darf. N-Connect ändert dort nichts."] =
-            "Windows biedt geen officiële manier om externe koppelsleutels toe te voegen: ze staan in een deel van het register dat alleen voor het systeem toegankelijk is. N-Connect wijzigt daar niets.",
+        ["Die Adresse des PC-Adapters zu ändern, unterstützt SKZ Connect bewusst nicht (herstellerabhängig, riskant und nicht vorgesehen)."] =
+            "SKZ Connect ondersteunt bewust geen adreswijziging van de pc-adapter (fabrikantafhankelijk, riskant en niet voorzien).",
+        ["Windows bietet keinen offiziellen Weg, fremde Kopplungsschlüssel einzutragen: Sie liegen in einem Teil der Registrierung, auf den nur das System zugreifen darf. SKZ Connect ändert dort nichts."] =
+            "Windows biedt geen officiële manier om externe koppelsleutels toe te voegen: ze staan in een deel van het register dat alleen voor het systeem toegankelijk is. SKZ Connect wijzigt daar niets.",
         ["So klappt der Wechsel am einfachsten: am PC den Controller einmal per SYNC-Taste in den Windows-Bluetooth-Einstellungen koppeln. Zurück an der Switch die Joy-Con an die Konsole stecken bzw. den Pro Controller per USB-Kabel anschließen – dann sind sie ohne Menü wieder mit der Switch gekoppelt."] =
             "Zo werkt wisselen het makkelijkst: koppel de controller op de pc eenmalig met de SYNC-knop in de Windows-Bluetooth-instellingen. Terug op de Switch: plaats de Joy-Con op de console of sluit de Pro Controller aan met een usb-kabel – dan zijn ze zonder menu weer gekoppeld.",
-        ["„Übernehmen“ merkt sich diese Controller in N-Connect (Liste bekannter Controller, Zuordnung zur Switch). Kopplungsschlüssel werden nicht gespeichert."] =
-            "„Toepassen“ onthoudt deze controllers in N-Connect (lijst met bekende controllers, toewijzing aan de Switch). Koppelsleutels worden niet opgeslagen.",
-        ["N-Connect-Kopplungsdaten"] = "N-Connect-koppelgegevens",
+        ["„Übernehmen“ merkt sich diese Controller in SKZ Connect (Liste bekannter Controller, Zuordnung zur Switch). Kopplungsschlüssel werden nicht gespeichert."] =
+            "„Toepassen“ onthoudt deze controllers in SKZ Connect (lijst met bekende controllers, toewijzing aan de Switch). Koppelsleutels worden niet opgeslagen.",
+        ["SKZ-Connect-Kopplungsdaten"] = "SKZ-Connect-koppelgegevens",
         ["Kopplungsdaten von einem anderen PC öffnen"] = "Koppelgegevens van een andere pc openen",
         ["Die Datei ist zu groß."] = "Het bestand is te groot.",
         ["Keine Kopplungsdaten-Datei."] = "Geen koppelgegevensbestand.",
-        ["Die Datei stammt von einer neueren N-Connect-Version."] = "Het bestand komt van een nieuwere N-Connect-versie.",
+        ["Die Datei stammt von einer neueren SKZ-Connect-Version."] = "Het bestand komt van een nieuwere SKZ-Connect-versie.",
         ["Die Datei ist mit einem Passwort geschützt."] = "Het bestand is met een wachtwoord beveiligd.",
         ["Falsches Passwort oder die Datei wurde verändert."] = "Onjuist wachtwoord of het bestand is gewijzigd.",
         ["Die Datei ist beschädigt."] = "Het bestand is beschadigd.",
@@ -868,20 +871,20 @@ internal static partial class Tr
         ["Was du erwarten kannst:"] = "Wat je kunt verwachten:",
         ["Gleiche Adapter-Adresse (z. B. derselbe USB-Bluetooth-Stick umgesteckt): Switch-2-Controller verbinden sich hier auf Tastendruck wie am anderen PC."] =
             "Zelfde adapteradres (bijv. dezelfde Bluetooth-usb-dongle overgezet): Switch 2-controllers verbinden hier met een knopdruk zoals op de andere pc.",
-        ["Switch-1-Controller (Pro Controller, Joy-Con) brauchen zusätzlich die Kopplung in Windows. Die kann N-Connect nicht übertragen – einmal per SYNC-Taste koppeln."] =
-            "Switch 1-controllers (Pro Controller, Joy-Con) hebben daarnaast de koppeling in Windows nodig. Die kan N-Connect niet overdragen – koppel eenmaal met de SYNC-knop.",
+        ["Switch-1-Controller (Pro Controller, Joy-Con) brauchen zusätzlich die Kopplung in Windows. Die kann SKZ Connect nicht übertragen – einmal per SYNC-Taste koppeln."] =
+            "Switch 1-controllers (Pro Controller, Joy-Con) hebben daarnaast de koppeling in Windows nodig. Die kan SKZ Connect niet overdragen – koppel eenmaal met de SYNC-knop.",
         ["Anderer Bluetooth-Adapter: Controller verbinden sich auf Tastendruck nur mit dem Gerät, mit dem sie zuletzt gekoppelt wurden. Hier einmal SYNC drücken – danach verbinden sie sich mit diesem PC (am anderen PC dann wieder per SYNC)."] =
             "Andere Bluetooth-adapter: controllers verbinden met een knopdruk alleen met het apparaat waarmee ze als laatste gekoppeld zijn. Druk hier eenmaal op SYNC – daarna verbinden ze met deze pc (op de andere pc weer via SYNC).",
         ["Tipp: Wer denselben USB-Bluetooth-Stick zwischen den PCs umsteckt, nimmt die Adresse mit – Switch-2-Controller verbinden sich dann an beiden PCs ohne SYNC."] =
             "Tip: wie dezelfde Bluetooth-usb-dongle tussen pc's verplaatst, neemt het adres mee – Switch 2-controllers verbinden dan op beide pc's zonder SYNC.",
         ["Übernommen werden die Einstellungen je Controller (Joy-Con einzeln/hochkant, Gyro-Kalibrierung) und die Liste bekannter Controller."] =
             "Overgenomen worden de instellingen per controller (Joy-Con los/verticaal, gyro-kalibratie) en de lijst met bekende controllers.",
-        ["Die Datei enthält Kopplungsschlüssel. Windows bietet keinen offiziellen Weg, sie einzutragen – N-Connect übernimmt sie deshalb nicht."] =
-            "Het bestand bevat koppelsleutels. Windows biedt geen officiële manier om ze toe te voegen – N-Connect neemt ze daarom niet over.",
-        ["„Übernehmen“ ergänzt die Controller-Listen und Einstellungen von N-Connect (nichts wird gelöscht). Vorher wird eine Sicherung angelegt."] =
-            "„Toepassen“ vult de controllerlijsten en instellingen van N-Connect aan (niets wordt verwijderd). Vooraf wordt een back-up gemaakt.",
-        ["Kopplungsdaten in N-Connect übernehmen? Vorher wird eine Sicherung der Einstellungen angelegt."] =
-            "Koppelgegevens in N-Connect overnemen? Vooraf wordt een back-up van de instellingen gemaakt.",
+        ["Die Datei enthält Kopplungsschlüssel. Windows bietet keinen offiziellen Weg, sie einzutragen – SKZ Connect übernimmt sie deshalb nicht."] =
+            "Het bestand bevat koppelsleutels. Windows biedt geen officiële manier om ze toe te voegen – SKZ Connect neemt ze daarom niet over.",
+        ["„Übernehmen“ ergänzt die Controller-Listen und Einstellungen von SKZ Connect (nichts wird gelöscht). Vorher wird eine Sicherung angelegt."] =
+            "„Toepassen“ vult de controllerlijsten en instellingen van SKZ Connect aan (niets wordt verwijderd). Vooraf wordt een back-up gemaakt.",
+        ["Kopplungsdaten in SKZ Connect übernehmen? Vorher wird eine Sicherung der Einstellungen angelegt."] =
+            "Koppelgegevens in SKZ Connect overnemen? Vooraf wordt een back-up van de instellingen gemaakt.",
         ["Nichts zu ändern – diese Daten sind schon übernommen."] = "Niets te wijzigen – deze gegevens zijn al overgenomen.",
         ["Übernommen. Die Sicherung lässt sich hier über „Sicherung wiederherstellen“ zurückholen."] =
             "Overgenomen. De back-up is hier terug te halen via „Back-up terugzetten“.",
@@ -890,8 +893,8 @@ internal static partial class Tr
         ["Alle Einstellungen durch diese Sicherung ersetzen?"] = "Alle instellingen vervangen door deze back-up?",
         ["Sicherung wiederhergestellt."] = "Back-up teruggezet.",
         ["Kopplungsdaten für einen anderen PC speichern"] = "Koppelgegevens opslaan voor een andere pc",
-        ["Gespeichert. Die Datei am anderen PC in N-Connect unter „Joy-Con & Wii“ → „Kopplungsdaten“ → „Von einem anderen PC“ öffnen."] =
-            "Opgeslagen. Open het bestand op de andere pc in N-Connect onder „Joy-Con en Wii“ → „Koppelgegevens“ → „Van een andere pc“.",
+        ["Gespeichert. Die Datei am anderen PC in SKZ Connect unter „Joy-Con & Wii“ → „Kopplungsdaten“ → „Von einem anderen PC“ öffnen."] =
+            "Opgeslagen. Open het bestand op de andere pc in SKZ Connect onder „Joy-Con en Wii“ → „Koppelgegevens“ → „Van een andere pc“.",
         ["Kopplungsdaten exportieren"] = "Koppelgegevens exporteren",
         ["Passwort eingeben"] = "Wachtwoord invoeren",
         ["Passwort (optional). Ohne Passwort steht der Inhalt lesbar in der Datei. Mit Kopplungsschlüsseln ist ein Passwort Pflicht."] =
@@ -953,10 +956,10 @@ internal static partial class Tr
         (Re(@"^HidHide (?<v>.+) ist erschienen \(installiert: (?<i>.+)\)\. Klicken zum Installieren\.$"),
             m => $"HidHide {m.Groups["v"]} is verschenen (geïnstalleerd: {m.Groups["i"]}). Klik om te installeren."),
         (Re(@"^Lade HidHide (?<v>.+) herunter …$"), m => $"HidHide {m.Groups["v"]} downloaden …"),
-        (Re(@"^HidHide (?<v>.+) herunterladen und installieren\? Das HidHide-Setup entfernt zuerst die alte Version und verlangt einen Neustart von Windows – bitte seinen Anweisungen folgen\. Windows fragt dabei nach Administratorrechten\. Danach versteckt N-Connect die Controller automatisch neu\.$"),
-            m => $"HidHide {m.Groups["v"]} downloaden en installeren? De HidHide-installatie verwijdert eerst de oude versie en vraagt om Windows opnieuw op te starten – volg de aanwijzingen. Windows vraagt daarbij om beheerdersrechten. Daarna verbergt N-Connect de controllers automatisch opnieuw."),
-        (Re(@"^Version (?<v>.+) herunterladen und installieren\? N-Connect wird dafür kurz beendet und danach wieder gestartet\.(?<a> Windows fragt dabei nach Administratorrechten\.)?$"),
-            m => $"Versie {m.Groups["v"]} downloaden en installeren? N-Connect wordt daarvoor kort afgesloten en daarna opnieuw gestart." +
+        (Re(@"^HidHide (?<v>.+) herunterladen und installieren\? Das HidHide-Setup entfernt zuerst die alte Version und verlangt einen Neustart von Windows – bitte seinen Anweisungen folgen\. Windows fragt dabei nach Administratorrechten\. Danach versteckt SKZ Connect die Controller automatisch neu\.$"),
+            m => $"HidHide {m.Groups["v"]} downloaden en installeren? De HidHide-installatie verwijdert eerst de oude versie en vraagt om Windows opnieuw op te starten – volg de aanwijzingen. Windows vraagt daarbij om beheerdersrechten. Daarna verbergt SKZ Connect de controllers automatisch opnieuw."),
+        (Re(@"^Version (?<v>.+) herunterladen und installieren\? SKZ Connect wird dafür kurz beendet und danach wieder gestartet\.(?<a> Windows fragt dabei nach Administratorrechten\.)?$"),
+            m => $"Versie {m.Groups["v"]} downloaden en installeren? SKZ Connect wordt daarvoor kort afgesloten en daarna opnieuw gestart." +
                  (m.Groups["a"].Success ? " Windows vraagt daarbij om beheerdersrechten." : "")),
         (Re(@"^(?<t>.+) · (?<r>\d+) Berichte/s$"), m => $"{T(m.Groups["t"].Value)} · {m.Groups["r"]} rapporten/s"),
         (Re(@"^(?<p>\d+ %)(?<v>  \(.*\))?  ⚡ lädt$"), m => $"{m.Groups["p"]}{m.Groups["v"]}  ⚡ aan het laden"),
@@ -990,7 +993,7 @@ internal static partial class Tr
         // Tooltip „P1 Pro 2 57 %“: Namen bleiben, wie sie sind.
         (Re(@"^P(?<n>\d+) (?<k>.+)$"), m => m.Value),
         (Re(@"^Bluetooth nicht verfügbar: (?<e>.*)$"), m => $"Bluetooth niet beschikbaar: {m.Groups["e"]}"),
-        (Re(@"^N-Connect: (?<p>.+)$"), m => $"N-Connect: {T(m.Groups["p"].Value)}"),
+        (Re(@"^SKZ Connect: (?<p>.+)$"), m => $"SKZ Connect: {T(m.Groups["p"].Value)}"),
         (Re(@"^(?<k>.+) per USB ist von einem anderen Programm belegt \(z\. B\. Steam\)\.$"),
             m => $"{N(m, "k")} via USB is in gebruik door een ander programma (bijv. Steam)."),
         (Re(@"^Schon (?<n>\d+) Controller verbunden – (?<k>.+) wird nicht verwendet\.$"),

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Erzeugt die Kodi-Sprachdateien (strings.po) von service.nconnect aus resource.language.en_gb (Quelle) und den
-Übersetzungen in tr_a.py/tr_b.py, dazu die des Bundle-Installers aus tr_bundle.py. Gleiche Sprachen wie N-Connect für
+Übersetzungen in tr_a.py/tr_b.py, dazu die des Bundle-Installers aus tr_bundle.py. Gleiche Sprachen wie SKZ Connect für
 Windows. Aufruf: python linux/kodi/i18n/generate.py
 service.nconnect: Englisch und Deutsch werden von Hand gepflegt; hier werden dort nur fehlende Einträge aus EXTRA
 ergänzt. script.nconnect.bundle: alle Sprachdateien kommen aus tr_bundle.py.
@@ -61,18 +61,18 @@ EXTRA = {
         'zh': '持续搜索手柄', 'ko': '항상 컨트롤러 찾기',
     },
     30335: {
-        'en': 'N-Connect keeps searching in the background, so any controller can be paired with SYNC at any time and Switch 2 controllers reconnect with a button press. When off, it only searches after "Search for controllers now"; paired Xbox/PlayStation controllers still reconnect on their own.',
-        'de': 'N-Connect sucht ständig im Hintergrund – so lässt sich jederzeit jeder Controller per SYNC koppeln, und Switch-2-Controller verbinden sich per Tastendruck neu. Aus: Gesucht wird nur nach „Jetzt nach Controllern suchen“; gekoppelte Xbox-/PlayStation-Controller verbinden sich trotzdem selbst.',
-        'es': 'N-Connect busca continuamente en segundo plano: cualquier mando se puede emparejar con SYNC en cualquier momento y los mandos de Switch 2 se reconectan con un botón. Desactivado: solo busca tras «Buscar mandos ahora»; los mandos de Xbox/PlayStation emparejados se reconectan solos.',
-        'fr': "N-Connect recherche en permanence en arrière-plan : toute manette peut être associée avec SYNC à tout moment et les manettes Switch 2 se reconnectent d'une pression. Désactivé : recherche uniquement après « Rechercher des manettes maintenant » ; les manettes Xbox/PlayStation associées se reconnectent seules.",
-        'it': 'N-Connect cerca di continuo in background: qualsiasi controller può essere associato con SYNC in ogni momento e i controller Switch 2 si ricollegano con un tasto. Disattivato: cerca solo dopo «Cerca controller ora»; i controller Xbox/PlayStation associati si ricollegano da soli.',
-        'pt': 'O N-Connect procura continuamente em segundo plano: qualquer comando pode ser emparelhado com SYNC a qualquer momento e os comandos Switch 2 voltam a ligar-se com um botão. Desativado: só procura após «Procurar comandos agora»; comandos Xbox/PlayStation emparelhados voltam a ligar-se sozinhos.',
-        'nl': 'N-Connect zoekt continu op de achtergrond: elke controller kan op elk moment met SYNC worden gekoppeld en Switch 2-controllers verbinden met één knop opnieuw. Uit: alleen zoeken na „Nu naar controllers zoeken”; gekoppelde Xbox-/PlayStation-controllers verbinden zichzelf.',
-        'pl': 'N-Connect stale wyszukuje w tle – każdy kontroler można w dowolnej chwili sparować przez SYNC, a kontrolery Switch 2 łączą się ponownie jednym przyciskiem. Wyłączone: wyszukiwanie tylko po „Wyszukaj kontrolery teraz”; sparowane kontrolery Xbox/PlayStation łączą się same.',
-        'ru': 'N-Connect постоянно ищет в фоне: любой контроллер можно в любой момент подключить через SYNC, а контроллеры Switch 2 переподключаются нажатием кнопки. Выкл.: поиск только после «Искать контроллеры сейчас»; сопряжённые контроллеры Xbox/PlayStation подключаются сами.',
-        'ja': 'N-Connect はバックグラウンドで常に探します – いつでも SYNC でコントローラーをペアリングでき、Switch 2 コントローラーはボタンひとつで再接続します。オフ: 「今すぐコントローラーを探す」の後だけ探します。ペアリング済みの Xbox/PlayStation コントローラーは自動で再接続します。',
-        'zh': 'N-Connect 在后台持续搜索 – 随时可通过 SYNC 配对任何手柄，Switch 2 手柄按一下即可重新连接。关闭：仅在“立即搜索手柄”后搜索；已配对的 Xbox/PlayStation 手柄仍会自动重新连接。',
-        'ko': 'N-Connect가 백그라운드에서 항상 찾습니다 – 언제든 SYNC로 컨트롤러를 페어링할 수 있고 Switch 2 컨트롤러는 버튼 하나로 다시 연결됩니다. 끄면: "지금 컨트롤러 찾기" 후에만 찾습니다. 페어링된 Xbox/PlayStation 컨트롤러는 스스로 다시 연결됩니다.',
+        'en': 'SKZ Connect keeps searching in the background, so any controller can be paired with SYNC at any time and Switch 2 controllers reconnect with a button press. When off, it only searches after "Search for controllers now"; paired Xbox/PlayStation controllers still reconnect on their own.',
+        'de': 'SKZ Connect sucht ständig im Hintergrund – so lässt sich jederzeit jeder Controller per SYNC koppeln, und Switch-2-Controller verbinden sich per Tastendruck neu. Aus: Gesucht wird nur nach „Jetzt nach Controllern suchen“; gekoppelte Xbox-/PlayStation-Controller verbinden sich trotzdem selbst.',
+        'es': 'SKZ Connect busca continuamente en segundo plano: cualquier mando se puede emparejar con SYNC en cualquier momento y los mandos de Switch 2 se reconectan con un botón. Desactivado: solo busca tras «Buscar mandos ahora»; los mandos de Xbox/PlayStation emparejados se reconectan solos.',
+        'fr': "SKZ Connect recherche en permanence en arrière-plan : toute manette peut être associée avec SYNC à tout moment et les manettes Switch 2 se reconnectent d'une pression. Désactivé : recherche uniquement après « Rechercher des manettes maintenant » ; les manettes Xbox/PlayStation associées se reconnectent seules.",
+        'it': 'SKZ Connect cerca di continuo in background: qualsiasi controller può essere associato con SYNC in ogni momento e i controller Switch 2 si ricollegano con un tasto. Disattivato: cerca solo dopo «Cerca controller ora»; i controller Xbox/PlayStation associati si ricollegano da soli.',
+        'pt': 'O SKZ Connect procura continuamente em segundo plano: qualquer comando pode ser emparelhado com SYNC a qualquer momento e os comandos Switch 2 voltam a ligar-se com um botão. Desativado: só procura após «Procurar comandos agora»; comandos Xbox/PlayStation emparelhados voltam a ligar-se sozinhos.',
+        'nl': 'SKZ Connect zoekt continu op de achtergrond: elke controller kan op elk moment met SYNC worden gekoppeld en Switch 2-controllers verbinden met één knop opnieuw. Uit: alleen zoeken na „Nu naar controllers zoeken”; gekoppelde Xbox-/PlayStation-controllers verbinden zichzelf.',
+        'pl': 'SKZ Connect stale wyszukuje w tle – każdy kontroler można w dowolnej chwili sparować przez SYNC, a kontrolery Switch 2 łączą się ponownie jednym przyciskiem. Wyłączone: wyszukiwanie tylko po „Wyszukaj kontrolery teraz”; sparowane kontrolery Xbox/PlayStation łączą się same.',
+        'ru': 'SKZ Connect постоянно ищет в фоне: любой контроллер можно в любой момент подключить через SYNC, а контроллеры Switch 2 переподключаются нажатием кнопки. Выкл.: поиск только после «Искать контроллеры сейчас»; сопряжённые контроллеры Xbox/PlayStation подключаются сами.',
+        'ja': 'SKZ Connect はバックグラウンドで常に探します – いつでも SYNC でコントローラーをペアリングでき、Switch 2 コントローラーはボタンひとつで再接続します。オフ: 「今すぐコントローラーを探す」の後だけ探します。ペアリング済みの Xbox/PlayStation コントローラーは自動で再接続します。',
+        'zh': 'SKZ Connect 在后台持续搜索 – 随时可通过 SYNC 配对任何手柄，Switch 2 手柄按一下即可重新连接。关闭：仅在“立即搜索手柄”后搜索；已配对的 Xbox/PlayStation 手柄仍会自动重新连接。',
+        'ko': 'SKZ Connect가 백그라운드에서 항상 찾습니다 – 언제든 SYNC로 컨트롤러를 페어링할 수 있고 Switch 2 컨트롤러는 버튼 하나로 다시 연결됩니다. 끄면: "지금 컨트롤러 찾기" 후에만 찾습니다. 페어링된 Xbox/PlayStation 컨트롤러는 스스로 다시 연결됩니다.',
     },
     30632: {
         'en': 'Search for controllers now', 'de': 'Jetzt nach Controllern suchen', 'es': 'Buscar mandos ahora',
@@ -81,25 +81,25 @@ EXTRA = {
         'ja': '今すぐコントローラーを探す', 'zh': '立即搜索手柄', 'ko': '지금 컨트롤러 찾기',
     },
     30660: {
-        'en': 'N-Connect app is not running', 'de': 'N-Connect-App läuft nicht', 'es': 'La app N-Connect no está en marcha',
-        'fr': "L'application N-Connect n'est pas lancée", 'it': "L'app N-Connect non è in esecuzione",
-        'pt': 'A aplicação N-Connect não está em execução', 'nl': 'De N-Connect-app draait niet',
-        'pl': 'Aplikacja N-Connect nie jest uruchomiona', 'ru': 'Приложение N-Connect не запущено',
-        'ja': 'N-Connect アプリが起動していません', 'zh': 'N-Connect 应用未在运行', 'ko': 'N-Connect 앱이 실행 중이 아닙니다',
+        'en': 'SKZ Connect app is not running', 'de': 'SKZ-Connect-App läuft nicht', 'es': 'La app SKZ Connect no está en marcha',
+        'fr': "L'application SKZ Connect n'est pas lancée", 'it': "L'app SKZ Connect non è in esecuzione",
+        'pt': 'A aplicação SKZ Connect não está em execução', 'nl': 'De SKZ-Connect-app draait niet',
+        'pl': 'Aplikacja SKZ Connect nie jest uruchomiona', 'ru': 'Приложение SKZ Connect не запущено',
+        'ja': 'SKZ Connect アプリが起動していません', 'zh': 'SKZ Connect 应用未在运行', 'ko': 'SKZ Connect 앱이 실행 중이 아닙니다',
     },
     30661: {
-        'en': 'Start N-Connect on this PC – it reports the status here',
-        'de': 'N-Connect auf diesem PC starten – die App meldet den Status hierher',
-        'es': 'Inicia la app N-Connect en este PC; envía el estado aquí',
-        'fr': 'Démarrez l’application N-Connect sur ce PC – elle transmet l’état ici',
-        'it': 'Avvia l’app N-Connect su questo PC: riporta qui lo stato',
-        'pt': 'Inicia a aplicação N-Connect neste PC – ela envia o estado para aqui',
-        'nl': 'Start de N-Connect-app op deze pc – die meldt de status hier',
-        'pl': 'Uruchom aplikację N-Connect na tym komputerze – ona przesyła tu stan',
-        'ru': 'Запустите приложение N-Connect на этом ПК – оно передаёт сюда состояние',
-        'ja': 'この PC で N-Connect アプリを起動してください – ここに状態を送ります',
-        'zh': '请在此电脑上启动 N-Connect 应用——它会将状态发送到这里',
-        'ko': '이 PC에서 N-Connect 앱을 실행하세요 – 여기로 상태를 보냅니다',
+        'en': 'Start SKZ Connect on this PC – it reports the status here',
+        'de': 'SKZ Connect auf diesem PC starten – die App meldet den Status hierher',
+        'es': 'Inicia la app SKZ Connect en este PC; envía el estado aquí',
+        'fr': 'Démarrez l’application SKZ Connect sur ce PC – elle transmet l’état ici',
+        'it': 'Avvia l’app SKZ Connect su questo PC: riporta qui lo stato',
+        'pt': 'Inicia a aplicação SKZ Connect neste PC – ela envia o estado para aqui',
+        'nl': 'Start de SKZ-Connect-app op deze pc – die meldt de status hier',
+        'pl': 'Uruchom aplikację SKZ Connect na tym komputerze – ona przesyła tu stan',
+        'ru': 'Запустите приложение SKZ Connect на этом ПК – оно передаёт сюда состояние',
+        'ja': 'この PC で SKZ Connect アプリを起動してください – ここに状態を送ります',
+        'zh': '请在此电脑上启动 SKZ Connect 应用——它会将状态发送到这里',
+        'ko': '이 PC에서 SKZ Connect 앱을 실행하세요 – 여기로 상태를 보냅니다',
     },
     30633: {
         'en': 'Background search is off – searches for 2 minutes', 'de': 'Hintergrundsuche ist aus – sucht 2 Minuten lang',
@@ -192,9 +192,9 @@ EXTRA.update({
     30438: {'en': 'Power menu', 'de': 'Ausschaltmenü', 'es': 'Menú de apagado', 'fr': "Menu d'arrêt", 'it': 'Menu di spegnimento',
             'pt': 'Menu de energia', 'nl': 'Afsluitmenu', 'pl': 'Menu zasilania', 'ru': 'Меню выключения', 'ja': '電源メニュー',
             'zh': '电源菜单', 'ko': '전원 메뉴'},
-    30439: {'en': 'N-Connect menu', 'de': 'N-Connect-Menü', 'es': 'Menú de N-Connect', 'fr': 'Menu N-Connect', 'it': 'Menu N-Connect',
-            'pt': 'Menu do N-Connect', 'nl': 'N-Connect-menu', 'pl': 'Menu N-Connect', 'ru': 'Меню N-Connect', 'ja': 'N-Connect メニュー',
-            'zh': 'N-Connect 菜单', 'ko': 'N-Connect 메뉴'},
+    30439: {'en': 'SKZ Connect menu', 'de': 'SKZ-Connect-Menü', 'es': 'Menú de SKZ Connect', 'fr': 'Menu SKZ Connect', 'it': 'Menu SKZ Connect',
+            'pt': 'Menu do SKZ Connect', 'nl': 'SKZ-Connect-menu', 'pl': 'Menu SKZ Connect', 'ru': 'Меню SKZ Connect', 'ja': 'SKZ Connect メニュー',
+            'zh': 'SKZ Connect 菜单', 'ko': 'SKZ Connect 메뉴'},
     30440: {'en': 'Fullscreen', 'de': 'Vollbild', 'es': 'Pantalla completa', 'fr': 'Plein écran', 'it': 'Schermo intero',
             'pt': 'Ecrã inteiro', 'nl': 'Volledig scherm', 'pl': 'Pełny ekran', 'ru': 'Полный экран', 'ja': '全画面', 'zh': '全屏',
             'ko': '전체 화면'},
@@ -260,18 +260,18 @@ EXTRA.update({
             'nl': 'Deze instellingen gelden alleen op LibreELEC/Linux', 'pl': 'Te ustawienia działają tylko w LibreELEC/Linux',
             'ru': 'Эти настройки действуют только в LibreELEC/Linux', 'ja': 'これらの設定は LibreELEC/Linux でのみ有効です',
             'zh': '这些设置仅在 LibreELEC/Linux 上生效', 'ko': '이 설정은 LibreELEC/Linux에서만 적용됩니다'},
-    30521: {'en': 'On Windows and Android the N-Connect app connects the controllers – change these settings in the app. On macOS the add-on only displays the status. Select to open the guide.',
-            'de': 'Unter Windows und Android verbindet die N-Connect-App die Controller – diese Einstellungen dort in der App ändern. Unter macOS zeigt das Add-on nur den Status an. Auswählen öffnet die Anleitung.',
-            'es': 'En Windows y Android, la app N-Connect conecta los mandos: cambia estos ajustes en la app. En macOS el add-on solo muestra el estado. Selecciónalo para abrir la guía.',
-            'fr': "Sous Windows et Android, l'application N-Connect connecte les manettes : modifiez ces paramètres dans l'application. Sous macOS, l'add-on affiche seulement l'état. Sélectionnez pour ouvrir le guide.",
-            'it': "Su Windows e Android è l'app N-Connect a collegare i controller: modifica queste impostazioni nell'app. Su macOS l'add-on mostra solo lo stato. Seleziona per aprire la guida.",
-            'pt': 'No Windows e no Android é a aplicação N-Connect que liga os comandos – altere estas definições na aplicação. No macOS o add-on só mostra o estado. Selecione para abrir o guia.',
-            'nl': 'Op Windows en Android verbindt de N-Connect-app de controllers – wijzig deze instellingen in de app. Op macOS toont de add-on alleen de status. Selecteer om de handleiding te openen.',
-            'pl': 'W Windows i Androidzie kontrolery łączy aplikacja N-Connect – zmień te ustawienia w aplikacji. W macOS dodatek tylko pokazuje stan. Wybierz, aby otworzyć instrukcję.',
-            'ru': 'В Windows и Android контроллеры подключает приложение N-Connect – меняйте эти настройки в приложении. В macOS дополнение только показывает состояние. Выберите, чтобы открыть инструкцию.',
-            'ja': 'Windows と Android では N-Connect アプリがコントローラーを接続します – これらの設定はアプリで変更してください。macOS ではアドオンは状態を表示するだけです。選ぶとガイドを開きます。',
-            'zh': '在 Windows 和 Android 上由 N-Connect 应用连接手柄 – 请在应用中更改这些设置。在 macOS 上此插件仅显示状态。选择以打开指南。',
-            'ko': 'Windows와 Android에서는 N-Connect 앱이 컨트롤러를 연결합니다 – 이 설정은 앱에서 바꾸세요. macOS에서는 애드온이 상태만 표시합니다. 선택하면 안내를 엽니다.'},
+    30521: {'en': 'On Windows and Android the SKZ Connect app connects the controllers – change these settings in the app. On macOS the add-on only displays the status. Select to open the guide.',
+            'de': 'Unter Windows und Android verbindet die SKZ-Connect-App die Controller – diese Einstellungen dort in der App ändern. Unter macOS zeigt das Add-on nur den Status an. Auswählen öffnet die Anleitung.',
+            'es': 'En Windows y Android, la app SKZ Connect conecta los mandos: cambia estos ajustes en la app. En macOS el add-on solo muestra el estado. Selecciónalo para abrir la guía.',
+            'fr': "Sous Windows et Android, l'application SKZ Connect connecte les manettes : modifiez ces paramètres dans l'application. Sous macOS, l'add-on affiche seulement l'état. Sélectionnez pour ouvrir le guide.",
+            'it': "Su Windows e Android è l'app SKZ Connect a collegare i controller: modifica queste impostazioni nell'app. Su macOS l'add-on mostra solo lo stato. Seleziona per aprire la guida.",
+            'pt': 'No Windows e no Android é a aplicação SKZ Connect que liga os comandos – altere estas definições na aplicação. No macOS o add-on só mostra o estado. Selecione para abrir o guia.',
+            'nl': 'Op Windows en Android verbindt de SKZ-Connect-app de controllers – wijzig deze instellingen in de app. Op macOS toont de add-on alleen de status. Selecteer om de handleiding te openen.',
+            'pl': 'W Windows i Androidzie kontrolery łączy aplikacja SKZ Connect – zmień te ustawienia w aplikacji. W macOS dodatek tylko pokazuje stan. Wybierz, aby otworzyć instrukcję.',
+            'ru': 'В Windows и Android контроллеры подключает приложение SKZ Connect – меняйте эти настройки в приложении. В macOS дополнение только показывает состояние. Выберите, чтобы открыть инструкцию.',
+            'ja': 'Windows と Android では SKZ Connect アプリがコントローラーを接続します – これらの設定はアプリで変更してください。macOS ではアドオンは状態を表示するだけです。選ぶとガイドを開きます。',
+            'zh': '在 Windows 和 Android 上由 SKZ Connect 应用连接手柄 – 请在应用中更改这些设置。在 macOS 上此插件仅显示状态。选择以打开指南。',
+            'ko': 'Windows와 Android에서는 SKZ Connect 앱이 컨트롤러를 연결합니다 – 이 설정은 앱에서 바꾸세요. macOS에서는 애드온이 상태만 표시합니다. 선택하면 안내를 엽니다.'},
     30634: {'en': 'Bluetooth without LE', 'de': 'Bluetooth ohne LE', 'es': 'Bluetooth sin LE', 'fr': 'Bluetooth sans LE',
             'it': 'Bluetooth senza LE', 'pt': 'Bluetooth sem LE', 'nl': 'Bluetooth zonder LE', 'pl': 'Bluetooth bez LE',
             'ru': 'Bluetooth без LE', 'ja': 'Bluetooth LE 非対応', 'zh': '蓝牙不支持 LE', 'ko': '블루투스 LE 미지원'},
@@ -312,30 +312,30 @@ EXTRA.update({
             'ru': 'Подключите адаптер Bluetooth или включите Bluetooth в параметрах Windows',
             'ja': 'Bluetooth アダプターを接続するか、Windows の設定で Bluetooth をオンにしてください',
             'zh': '插入蓝牙适配器，或在 Windows 设置中开启蓝牙', 'ko': '블루투스 어댑터를 연결하거나 Windows 설정에서 블루투스를 켜세요'},
-    30666: {'en': 'No N-Connect app for this system', 'de': 'Keine N-Connect-App für dieses System',
-            'es': 'No hay app N-Connect para este sistema', 'fr': "Pas d'application N-Connect pour ce système",
-            'it': 'Nessuna app N-Connect per questo sistema', 'pt': 'Não há aplicação N-Connect para este sistema',
-            'nl': 'Geen N-Connect-app voor dit systeem', 'pl': 'Brak aplikacji N-Connect dla tego systemu',
-            'ru': 'Нет приложения N-Connect для этой системы', 'ja': 'このシステム用の N-Connect アプリはありません',
-            'zh': '此系统没有 N-Connect 应用', 'ko': '이 시스템용 N-Connect 앱이 없습니다'},
-    30667: {'en': 'Display only – N-Connect is not available for {0}', 'de': 'Nur Anzeige – N-Connect gibt es für {0} nicht',
-            'es': 'Solo visualización – N-Connect no está disponible para {0}', 'fr': "Affichage seul – N-Connect n'existe pas pour {0}",
-            'it': 'Solo visualizzazione – N-Connect non è disponibile per {0}', 'pt': 'Só visualização – o N-Connect não está disponível para {0}',
-            'nl': 'Alleen weergave – N-Connect is niet beschikbaar voor {0}', 'pl': 'Tylko podgląd – N-Connect nie jest dostępny dla {0}',
-            'ru': 'Только просмотр – N-Connect для {0} нет', 'ja': '表示のみ – N-Connect は {0} に対応していません',
-            'zh': '仅显示 – N-Connect 不支持 {0}', 'ko': '표시 전용 – N-Connect는 {0}용이 없습니다'},
-    30668: {'en': 'Start N-Connect for Android (0.9.1 or newer) on this device – it reports the status here',
-            'de': 'N-Connect für Android (ab 0.9.1) auf diesem Gerät starten – die App meldet den Status hierher',
-            'es': 'Inicia N-Connect para Android (0.9.1 o posterior) en este dispositivo; envía el estado aquí',
-            'fr': 'Démarrez l’application N-Connect pour Android (0.9.1 ou plus récente) sur cet appareil – elle transmet l’état ici',
-            'it': 'Avvia l’app N-Connect per Android (0.9.1 o successiva) su questo dispositivo: riporta qui lo stato',
-            'pt': 'Inicia a aplicação N-Connect para Android (0.9.1 ou mais recente) neste dispositivo – ela envia o estado para aqui',
-            'nl': 'Start de N-Connect-app voor Android (0.9.1 of nieuwer) op dit apparaat – die meldt de status hier',
-            'pl': 'Uruchom aplikację N-Connect dla Androida (0.9.1 lub nowszą) na tym urządzeniu – ona przesyła tu stan',
-            'ru': 'Запустите приложение N-Connect для Android (0.9.1 или новее) на этом устройстве – оно передаёт сюда состояние',
-            'ja': 'この端末で N-Connect for Android（0.9.1 以降）を起動してください – ここに状態を送ります',
-            'zh': '请在此设备上启动 N-Connect for Android（0.9.1 或更高版本）——它会将状态发送到这里',
-            'ko': '이 기기에서 N-Connect for Android(0.9.1 이상)를 실행하세요 – 여기로 상태를 보냅니다'},
+    30666: {'en': 'No SKZ Connect app for this system', 'de': 'Keine SKZ-Connect-App für dieses System',
+            'es': 'No hay app SKZ Connect para este sistema', 'fr': "Pas d'application SKZ Connect pour ce système",
+            'it': 'Nessuna app SKZ Connect per questo sistema', 'pt': 'Não há aplicação SKZ Connect para este sistema',
+            'nl': 'Geen SKZ-Connect-app voor dit systeem', 'pl': 'Brak aplikacji SKZ Connect dla tego systemu',
+            'ru': 'Нет приложения SKZ Connect для этой системы', 'ja': 'このシステム用の SKZ Connect アプリはありません',
+            'zh': '此系统没有 SKZ Connect 应用', 'ko': '이 시스템용 SKZ Connect 앱이 없습니다'},
+    30667: {'en': 'Display only – SKZ Connect is not available for {0}', 'de': 'Nur Anzeige – SKZ Connect gibt es für {0} nicht',
+            'es': 'Solo visualización – SKZ Connect no está disponible para {0}', 'fr': "Affichage seul – SKZ Connect n'existe pas pour {0}",
+            'it': 'Solo visualizzazione – SKZ Connect non è disponibile per {0}', 'pt': 'Só visualização – o SKZ Connect não está disponível para {0}',
+            'nl': 'Alleen weergave – SKZ Connect is niet beschikbaar voor {0}', 'pl': 'Tylko podgląd – SKZ Connect nie jest dostępny dla {0}',
+            'ru': 'Только просмотр – SKZ Connect для {0} нет', 'ja': '表示のみ – SKZ Connect は {0} に対応していません',
+            'zh': '仅显示 – SKZ Connect 不支持 {0}', 'ko': '표시 전용 – SKZ Connect는 {0}용이 없습니다'},
+    30668: {'en': 'Start SKZ Connect for Android (0.9.1 or newer) on this device – it reports the status here',
+            'de': 'SKZ Connect für Android (ab 0.9.1) auf diesem Gerät starten – die App meldet den Status hierher',
+            'es': 'Inicia SKZ Connect para Android (0.9.1 o posterior) en este dispositivo; envía el estado aquí',
+            'fr': 'Démarrez l’application SKZ Connect pour Android (0.9.1 ou plus récente) sur cet appareil – elle transmet l’état ici',
+            'it': 'Avvia l’app SKZ Connect per Android (0.9.1 o successiva) su questo dispositivo: riporta qui lo stato',
+            'pt': 'Inicia a aplicação SKZ Connect para Android (0.9.1 ou mais recente) neste dispositivo – ela envia o estado para aqui',
+            'nl': 'Start de SKZ-Connect-app voor Android (0.9.1 of nieuwer) op dit apparaat – die meldt de status hier',
+            'pl': 'Uruchom aplikację SKZ Connect dla Androida (0.9.1 lub nowszą) na tym urządzeniu – ona przesyła tu stan',
+            'ru': 'Запустите приложение SKZ Connect для Android (0.9.1 или новее) на этом устройстве – оно передаёт сюда состояние',
+            'ja': 'この端末で SKZ Connect for Android（0.9.1 以降）を起動してください – ここに状態を送ります',
+            'zh': '请在此设备上启动 SKZ Connect for Android（0.9.1 或更高版本）——它会将状态发送到这里',
+            'ko': '이 기기에서 SKZ Connect for Android(0.9.1 이상)를 실행하세요 – 여기로 상태를 보냅니다'},
 })
 
 TARGETS = [
@@ -370,7 +370,7 @@ def header(name, addon_id, folder):
         '# Kodi Media Center language file', '# Addon Name: ' + name, '# Addon id: ' + addon_id,
         '# Addon Provider: devcatskz', '# Generated by linux/kodi/i18n/generate.py – do not edit by hand.',
         'msgid ""', 'msgstr ""', '"Project-Id-Version: {0}\\n"'.format(addon_id),
-        '"Report-Msgid-Bugs-To: https://github.com/DevCatSKZ/N-Connect/issues\\n"', '"MIME-Version: 1.0\\n"',
+        '"Report-Msgid-Bugs-To: https://github.com/DevCatSKZ/SKZ-Connect/issues\\n"', '"MIME-Version: 1.0\\n"',
         '"Content-Type: text/plain; charset=UTF-8\\n"', '"Content-Transfer-Encoding: 8bit\\n"',
         '"Language: {0}\\n"'.format(folder), '',
     ]
@@ -379,7 +379,7 @@ def header(name, addon_id, folder):
 def write_bundle():
     """Alle Sprachdateien von script.nconnect.bundle (en_gb mit leerem msgstr = Quelle)."""
     for folder, code in [('en_gb', 'en'), ('de_de', 'de')] + [(f, c) for f, c, _ in TARGETS]:
-        lines = header('N-Connect Bundle Installer', 'script.nconnect.bundle', folder)
+        lines = header('SKZ Connect Bundle Installer', 'script.nconnect.bundle', folder)
         lines += [entry(i, t['en'], '' if code == 'en' else t[code]) for i, t in sorted(BUNDLE.items())]
         out = BUNDLE_LANG_DIR / ('resource.language.' + folder)
         out.mkdir(parents=True, exist_ok=True)
@@ -393,7 +393,7 @@ def main():
     append_missing(LANG_DIR / 'resource.language.de_de' / 'strings.po', 'de')
     source = [(int(m.group(1)), m.group(2)) for m in ENTRY.finditer(en_path.read_text(encoding='utf-8'))]
     for folder, code, table in TARGETS:
-        lines = header('N-Connect', 'service.nconnect', folder)
+        lines = header('SKZ Connect', 'service.nconnect', folder)
         missing = []
         for i, msgid in source:
             msgid = msgid.replace('\\"', '"').replace('\\\\', '\\')

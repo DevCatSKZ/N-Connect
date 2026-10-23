@@ -10,7 +10,7 @@ namespace Switch2Pro.Bridge;
 /// </summary>
 internal static class HiddenDesktop
 {
-    private const string Name = "N-Connect-Pruefhilfe";
+    private const string Name = "SKZ-Connect-Pruefhilfe";
     private const string Marker = "NCONNECT_PRUEFHILFE_DESKTOP";
 
     /// <summary>Läuft dieser Prozess bereits auf dem unsichtbaren Desktop?</summary>

@@ -6,7 +6,7 @@ namespace Switch2Pro.Bridge;
 
 /// <summary>
 /// „Diagnose exportieren“: Protokoll, Einstellungen und Systeminfos als ZIP – zum Anhängen an eine Fehlermeldung.
-/// Kopplungsschlüssel speichert N-Connect nicht in den Einstellungen; es landen also keine Geheimnisse in der Datei.
+/// Kopplungsschlüssel speichert SKZ Connect nicht in den Einstellungen; es landen also keine Geheimnisse in der Datei.
 /// </summary>
 internal static class Diagnostics
 {
@@ -24,7 +24,7 @@ internal static class Diagnostics
         writer.Write(SystemInfo(manager));
     }
 
-    /// <summary>Datei kopieren, auch wenn N-Connect sie gerade offen hat (Protokoll).</summary>
+    /// <summary>Datei kopieren, auch wenn SKZ Connect sie gerade offen hat (Protokoll).</summary>
     private static void AddFile(ZipArchive zip, string path, string name)
     {
         if (!File.Exists(path))
@@ -44,7 +44,7 @@ internal static class Diagnostics
     private static string SystemInfo(ControllerManager? manager)
     {
         var sb = new StringBuilder();
-        sb.AppendLine($"N-Connect {UpdateCheck.Label} ({(Paths.IsPortable ? "portabel" : "installiert")})");
+        sb.AppendLine($"SKZ Connect {UpdateCheck.Label} ({(Paths.IsPortable ? "portabel" : "installiert")})");
         sb.AppendLine($"Windows {Environment.OSVersion.Version} · {(Environment.Is64BitOperatingSystem ? "64 Bit" : "32 Bit")}");
         sb.AppendLine($"Sprache {Tr.Lang} · Windows-Sprache {System.Globalization.CultureInfo.CurrentUICulture.Name}");
         sb.AppendLine($"Skalierung {UiScale.Factor * 100:0} % · Darstellung {(Theme.Dark ? "dunkel" : "hell")}, Schema {Theme.ActiveScheme.Name}");

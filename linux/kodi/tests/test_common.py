@@ -198,7 +198,7 @@ class ReadStatusTest(unittest.TestCase):
         self.assertEqual(list(common._status_candidates()), [common.STATUS_JSON])
         STATE.conditions = {ANDROID}
         candidates = list(common._status_candidates())
-        self.assertIn('/sdcard/Documents/N-Connect/status.json', candidates)
+        self.assertIn('/sdcard/Documents/SKZ-Connect/status.json', candidates)
 
     def test_frischeste_datei_gewinnt(self):
         old = self.write({'state': 'running', 'platform': 'linux'}, age=10,
@@ -212,7 +212,7 @@ class ReadStatusTest(unittest.TestCase):
 
 
 class PidFileTest(unittest.TestCase):
-    """Rest einer abgestürzten Kodi-Sitzung: nur ein echtes N-Connect mit diesem Datenordner wird beendet."""
+    """Rest einer abgestürzten Kodi-Sitzung: nur ein echtes SKZ Connect mit diesem Datenordner wird beendet."""
 
     def setUp(self):
         kodi_stubs.reset()
@@ -239,7 +239,7 @@ class PidFileTest(unittest.TestCase):
         with self.cmdline('/usr/bin/kodi.bin', '--data', common.DATA_DIR):
             self.assertFalse(common._is_nconnect(1234))  # PID inzwischen an ein anderes Programm vergeben
         with self.cmdline('/opt/nconnect/nconnect', '--data', '/var/lib/nconnect'):
-            self.assertFalse(common._is_nconnect(1234))  # anderes N-Connect (z. B. systemd) – nicht unseres
+            self.assertFalse(common._is_nconnect(1234))  # anderes SKZ Connect (z. B. systemd) – nicht unseres
         with mock.patch.object(common, 'open', mock.Mock(side_effect=OSError(2, 'No such file')), create=True):
             self.assertFalse(common._is_nconnect(1234))  # läuft nicht mehr
 

@@ -4,7 +4,7 @@ using NConnect.Android.Profiles;
 
 namespace NConnect.Android.Tests;
 
-/// <summary>App im Vordergrund (ohne N-Connect und Startbildschirm) und status.json-Vertrag mit dem Kodi-Add-on.</summary>
+/// <summary>App im Vordergrund (ohne SKZ Connect und Startbildschirm) und status.json-Vertrag mit dem Kodi-Add-on.</summary>
 public class ForegroundAndStatusTests
 {
     private const string Own = "com.devcatskz.nconnect";
@@ -13,7 +13,7 @@ public class ForegroundAndStatusTests
     [Fact]
     public void Vordergrund_IgnoriertEigeneAppUndStartbildschirm()
     {
-        // Spiel → N-Connect → Startbildschirm: das Spiel bleibt die erkannte App (vorher sprang das Profil um).
+        // Spiel → SKZ Connect → Startbildschirm: das Spiel bleibt die erkannte App (vorher sprang das Profil um).
         (long, string)[] events = [(1000, "com.mojang.minecraftpe"), (2000, Own), (3000, "com.google.android.apps.nexuslauncher")];
         Assert.Equal("com.mojang.minecraftpe", GameProfileWatcher.Pick(events, Own, Launchers));
     }

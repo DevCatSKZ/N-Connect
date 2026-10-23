@@ -1,6 +1,6 @@
 # Switch-Identität: Switch-1-Controller am PC ohne neues Koppeln
 
-Projektdokumentation und Arbeitsprotokoll. Gemeinsame Funktion von **N-Connect** (dieses Repo) und
+Projektdokumentation und Arbeitsprotokoll. Gemeinsame Funktion von **SKZ Connect** (dieses Repo) und
 **Bluepick_RCM** (RCM-Payload, `C:\Coding\Bluepick_RCM\Bluepick_RCM Project`).
 
 > Datenschutz: Diese Datei enthält bewusst **keine echten Adressen oder Schlüssel**. Beispiele nutzen
@@ -27,10 +27,10 @@ bleiben als Alternativen dokumentiert.
 |---|---|
 | Switch-Daten per USB/MTP lesen | ✅ funktioniert (nur lesend getestet) |
 | Format BT-Save / `bluetooth_devices.db` | ✅ ermittelt und gegengeprüft (§3.1, §5d) |
-| Bluepick 1.0.6 „N-Connect-Modus“ | ✅ gebaut, Einträge offline Byte für Byte gegen HOS geprüft · ❌ **noch nicht auf der Switch getestet** |
+| Bluepick 1.0.6 „SKZ-Connect-Modus“ | ✅ gebaut, Einträge offline Byte für Byte gegen HOS geprüft · ❌ **noch nicht auf der Switch getestet** |
 | Neue `Bluepick_RCM.bin` auf der Switch | ❌ **noch nicht aufgespielt** – auf der SD liegt weiterhin 1.0.5 (siehe Protokoll „Aufspielen“) |
 | Backup der alten Version | ✅ `Bluepick_RCM Project\archive\old_deployments\Switch-Backup_2026-10-04\` |
-| N-Connect-Seite (MTP-Erkennung, Anzeige des Modus) | ⏳ noch nicht begonnen |
+| SKZ-Connect-Seite (MTP-Erkennung, Anzeige des Modus) | ⏳ noch nicht begonnen |
 | Pro Controller | ⏳ offen (Schlüssel nur aus der Windows-Registry, §6) |
 
 **Nächster Schritt:** `output\Bluepick_RCM.bin` (1.0.6) auf die SD kopieren (Explorer: alte Datei löschen, neue
@@ -41,7 +41,7 @@ Testdaten von der Switch des Nutzers (echte Schlüssel, nicht veröffentlichen):
 `C:\Coding\Bluepick_RCM\Bluepick_RCM Project\archive\testdaten_switch_2026-10-04\`.
 
 **Dateien:**
-- N-Connect: am 06.10.2026 als Arbeitsstand committet (`11515915`) und damit öffentlich auf `main`:
+- SKZ Connect: am 06.10.2026 als Arbeitsstand committet (`11515915`) und damit öffentlich auf `main`:
   `docs/SWITCH-IDENTITAET.md`, `docs/UEBERGABE-SWITCH-IDENTITAET.md`, `src/Switch2Pro.Protocol/SwitchBtSave.cs`,
   `tools/Switch2Pro.BtIdentityProbe/` (`Program.cs`, `BtRadio.cs`, `ChipCommands.cs`, `.csproj`); Tests seit
   17.10.2026 in `tests/Switch2Pro.Protocol.Tests/SwitchBtSaveTests.cs`.
@@ -59,13 +59,13 @@ So soll es funktionieren:
 1. Controller ganz normal an der Switch koppeln.
 2. **Bluepick_RCM** exportiert die Kopplungsdaten (Adresse der Switch, Adressen und Schlüssel der Controller)
    auf die SD-Karte.
-3. **N-Connect** liest die Daten von der SD-Karte (Kartenleser, hekate-UMS oder die Switch per USB/MTP).
-4. In N-Connect lässt sich **„Switch-Identität verwenden“** ein- und ausschalten. Solange sie aktiv ist,
+3. **SKZ Connect** liest die Daten von der SD-Karte (Kartenleser, hekate-UMS oder die Switch per USB/MTP).
+4. In SKZ Connect lässt sich **„Switch-Identität verwenden“** ein- und ausschalten. Solange sie aktiv ist,
    tritt der Bluetooth-Adapter des PCs mit der Adresse der Switch auf und kennt die Schlüssel. Der Controller
    verbindet sich auf Tastendruck mit dem PC, weil er ihn für seine Switch hält.
-5. Beim Ausschalten bzw. Beenden stellt N-Connect den Adapter und Windows wieder her.
+5. Beim Ausschalten bzw. Beenden stellt SKZ Connect den Adapter und Windows wieder her.
 
-Zielgruppe: **alle N-Connect-Nutzer**, also möglichst viele Bluetooth-Adapter.
+Zielgruppe: **alle SKZ-Connect-Nutzer**, also möglichst viele Bluetooth-Adapter.
 
 ## 2. Funktionsweise (technisch)
 
@@ -139,12 +139,12 @@ Ob Windows die Adresse nach dem Befehl übernimmt (der Stack liest sie beim Star
 | Switch | Switch V1 per USB, unter Horizon als MTP-Gerät „Nintendo Switch“ (`057E:201D`, DBI-Art); Speicher „microSD card“ |
 
 **Schritte und Ergebnisse:**
-1. **Bestehenden Code geprüft.** N-Connect liest `joycon_mac.ini/.bin` und `switch.cal` bereits
+1. **Bestehenden Code geprüft.** SKZ Connect liest `joycon_mac.ini/.bin` und `switch.cal` bereits
    (`SwitchPairingData.cs`, `PairingDataForm.cs`), erkennt Switch-SD-Karten nur als **Laufwerk**
    (`SwitchCardWatcher.cs`) und nutzt die Schlüssel bewusst nicht.
 2. **Switch per MTP gelesen** (Windows-Shell, nur lesend): `switchroot/joycon_mac.*`, `switchroot/switch.cal`,
    `switch/Bluepick_RCM/8000000000000050.bin`, `…053.bin` kopiert. → **MTP-Zugriff funktioniert.**
-   N-Connect erkennt MTP-Geräte noch nicht (kein Laufwerksbuchstabe).
+   SKZ Connect erkennt MTP-Geräte noch nicht (kein Laufwerksbuchstabe).
 3. **Kopplungsdaten ausgewertet:** Konsolenadresse in `switch.cal` = Host-Adresse beider Joy-Con. ✓
 4. **BT-Save-Layout ermittelt** (§3.1) und gegen `joycon_mac.ini` geprüft. ✓
 5. **Barrot-Treiber untersucht:** liest den Registry-Wert `BRExtPatchPath` (externer Firmware-Patch) –
@@ -193,7 +193,7 @@ Bluetooth-Geräte des PCs (hier u. a. Tastatur und Maus) bis zum Abstecken des A
 
 ## 5a. Warum keine reine Software-Übersetzung der Adresse („Emulator im Programm“)
 
-Wunsch (04.10.2026): N-Connect soll die Adresse während der Laufzeit nur in Software übersetzen, ohne den
+Wunsch (04.10.2026): SKZ Connect soll die Adresse während der Laufzeit nur in Software übersetzen, ohne den
 Adapter zu verändern. Das ist mit keinem Standard-Bluetooth-Adapter möglich:
 
 1. **Der Anruf erreicht Windows nie.** Der Joy-Con ruft beim Aufwecken gezielt die Adresse der Switch an
@@ -210,42 +210,42 @@ Folge: Die Adresse muss **im Funkchip** stimmen. Möglich ist das nur auf Chips,
 ## 5b. Option „Switch-Identitäts-Adapter“ (Hardware-Emulator)
 
 Ein kleines programmierbares Bluetooth-Modul übernimmt die Rolle der Switch und reicht die Eingaben per USB an
-N-Connect weiter. Unabhängig vom Bluetooth-Adapter des PCs, damit für alle Nutzer gleich.
+SKZ Connect weiter. Unabhängig vom Bluetooth-Adapter des PCs, damit für alle Nutzer gleich.
 
 - **ESP32 (klassisch, nicht S2/S3/C3)**: kann Bluetooth Classic (BR/EDR) und eine frei wählbare Adresse
   (`esp_base_mac_addr_set`). Kosten ca. 5–10 €.
 - Alternative **Raspberry Pi Pico W** (CYW43439, BTstack; Adresse über Broadcom-Herstellerbefehl).
-- Ablauf: N-Connect überträgt Konsolenadresse und Schlüssel per USB an das Modul → Modul startet mit der
-  Switch-Adresse → Joy-Con verbindet sich → Modul leitet HID-Berichte per USB an N-Connect → bestehende
+- Ablauf: SKZ Connect überträgt Konsolenadresse und Schlüssel per USB an das Modul → Modul startet mit der
+  Switch-Adresse → Joy-Con verbindet sich → Modul leitet HID-Berichte per USB an SKZ Connect → bestehende
   Joy-Con-Auswertung (`Switch1.cs`). Ausschalten = Modul trennen/zurücksetzen.
 - Vorteile: kein Eingriff in Windows (keine Registry, kein Adminrecht, PC-Adapter bleibt unverändert, Tastatur
   und Maus bleiben verbunden).
-- Aufwand: Firmware für das Modul (HID-Host mit gespeichertem Schlüssel) + USB-Anbindung in N-Connect.
+- Aufwand: Firmware für das Modul (HID-Host mit gespeichertem Schlüssel) + USB-Anbindung in SKZ-Connect.
 
 ## 5c. Lösungswege im Vergleich (Stand 04.10.2026, nach dem Barrot-Ergebnis)
 
 | Weg | Hardware | Für alle Nutzer? | Eingriff in Windows | Bewertung |
 |---|---|---|---|---|
 | PC-Adapter umadressieren (§4) | vorhandener Adapter | nur bestimmte Chips | Adminrechte, Registry, Neustart des Adapters; trennt andere BT-Geräte | riskant, Barrot nicht möglich |
-| **Eigener N-Connect-Stick** (Pico W / ESP32) | ca. 7–10 € | ja, immer gleich | keiner | **empfohlen** |
+| **Eigener SKZ-Connect-Stick** (Pico W / ESP32) | ca. 7–10 € | ja, immer gleich | keiner | **empfohlen** |
 | Switch als Brücke (Sysmodule) | keine | nur mit CFW | keiner | Switch muss laufen; siehe unten |
 
 **Eigener Stick, bevorzugt Raspberry Pi Pico W / Pico 2 W:**
 - Funkchip CYW43439 (Broadcom-Familie): Bluetooth Classic, Adresse per Herstellerbefehl setzbar (in BTstack
   vorgesehen, auf dem Pico W noch zu bestätigen).
-- Eigener USB-Anschluss (TinyUSB): Der Stick meldet sich als eigenes Gerät bei N-Connect; optional zusätzlich als
-  normaler Gamepad, damit er auch ohne N-Connect funktioniert.
-- Firmware-Update per Drag-and-drop (UF2-Datei) – auch für Nutzer ohne Entwicklungswerkzeuge; N-Connect kann die
+- Eigener USB-Anschluss (TinyUSB): Der Stick meldet sich als eigenes Gerät bei SKZ Connect; optional zusätzlich als
+  normaler Gamepad, damit er auch ohne SKZ Connect funktioniert.
+- Firmware-Update per Drag-and-drop (UF2-Datei) – auch für Nutzer ohne Entwicklungswerkzeuge; SKZ Connect kann die
   Datei mitliefern.
 - Firmware auf Basis von **BTstack** (im Pico-SDK enthalten): HID-Host für Bluetooth Classic, eigene
-  Schlüsselablage – N-Connect überträgt Konsolenadresse und Schlüssel, der Stick speichert sie.
+  Schlüsselablage – SKZ Connect überträgt Konsolenadresse und Schlüssel, der Stick speichert sie.
 - Klassischer ESP32 (nicht S2/S3/C3) als Alternative; Flashen dort aber umständlicher (esptool).
 
 **Switch als Brücke (ohne zusätzliche Hardware):** Die Controller bleiben ganz normal mit der eingeschalteten
-Switch verbunden. Ein Homebrew-Programm auf der Switch liest die Eingaben und schickt sie an N-Connect, das daraus
+Switch verbunden. Ein Homebrew-Programm auf der Switch liest die Eingaben und schickt sie an SKZ Connect, das daraus
 wie bisher einen virtuellen Xbox-/DS4-Controller macht. Keine Adresse, keine Schlüssel, kein Eingriff am PC.
 
-- Stufe 1 – **App „N-Connect Bridge“ (NRO)**, im Vordergrund im hbmenu gestartet: liest alle Controller
+- Stufe 1 – **App „SKZ Connect Bridge“ (NRO)**, im Vordergrund im hbmenu gestartet: liest alle Controller
   (libnx `padUpdate`, inkl. Bewegungssensoren), sendet per WLAN/LAN (UDP) an den PC; Bildschirm zeigt Status.
   Im Vordergrund gibt es keinen Konflikt mit Spielen.
 - Stufe 2 – optional **USB statt WLAN** (libnx `usb:ds`, geringere Verzögerung; nicht gleichzeitig mit
@@ -253,7 +253,7 @@ wie bisher einen virtuellen Xbox-/DS4-Controller macht. Keine Adresse, keine Sch
 - Stufe 3 – optional **Sysmodule** im Hintergrund (Eingaben lesen ist auch neben Spielen möglich, wie
   Overlay-Lader zeigen); dann sehen allerdings Spiel und PC dieselben Eingaben.
 - Rückkanal: Vibration vom PC zur Switch und weiter an den Joy-Con ist über libnx möglich.
-- PC-Seite: neue Verbindungsart in N-Connect (z. B. `SwitchBridgeLink` neben `Switch1HidLink`), Suche der
+- PC-Seite: neue Verbindungsart in SKZ Connect (z. B. `SwitchBridgeLink` neben `Switch1HidLink`), Suche der
   Switch im Netzwerk, Weitergabe an die vorhandene Ausgabe (ViGEm, DSU).
 - Grenzen: Switch muss an sein (nicht im Ruhemodus), CFW nötig, zusätzliche Verzögerung (Joy-Con → Switch → PC,
   per WLAN einige Millisekunden). Funktioniert für alle Controller, die an der Switch hängen – auch Pro Controller,
@@ -276,9 +276,9 @@ Funkchip lässt sich unter Atmosphère steuern, und dafür gibt es ein fertiges 
 **Ablauf:**
 1. Joy-Con (oder Pro Controller) **ganz normal mit Windows koppeln** (einmalig, SYNC-Taste). Jeder Bluetooth-
    Adapter geht, keine Herstellerbefehle.
-2. N-Connect liest Adresse des PC-Adapters und den Kopplungsschlüssel aus Windows
+2. SKZ Connect liest Adresse des PC-Adapters und den Kopplungsschlüssel aus Windows
    (`BTHPORT\Parameters\Keys`, nur mit SYSTEM-Rechten lesbar → einmalig mit Adminbestätigung, nur lesend).
-3. N-Connect schreibt auf die Switch-SD-Karte (Kartenleser, hekate-UMS oder MTP): `host_address` für
+3. SKZ Connect schreibt auf die Switch-SD-Karte (Kartenleser, hekate-UMS oder MTP): `host_address` für
    MissionControl, `enable_external_bluetooth_db` für Atmosphère und den Controller-Eintrag mit Schlüssel in
    `bluetooth_devices.db`.
 4. Switch (CFW) neu starten → Sie meldet sich mit der Adresse des PCs, kennt den Schlüssel, der Controller
@@ -304,9 +304,9 @@ Gefundene Fakten:
   (SPI 0x2000) die **PC-Adresse als Host** und der **PC-Schlüssel**. Bluepicks Joy-Con-Dump liest genau das
   (an den Schienen, im RCM – dabei koppelt HOS nichts neu). Für Pro Controller bleibt nur die Windows-Registry.
 
-Ablauf mit Bluepick („N-Connect-Modus“):
+Ablauf mit Bluepick („SKZ-Connect-Modus“):
 1. Joy-Con in Windows koppeln (SYNC).
-2. Joy-Con an die Switch stecken, Bluepick starten → „N-Connect: PC-Kopplung übernehmen“:
+2. Joy-Con an die Switch stecken, Bluepick starten → „SKZ Connect: PC-Kopplung übernehmen“:
    - Joy-Con-Speicher lesen → Host = PC-Adresse, Schlüssel.
    - `/atmosphere/bluetooth_devices.db` schreiben: vorhandene Einträge aus dem Save übernehmen, Einträge der
      Joy-Con mit dem PC-Schlüssel ersetzen bzw. ergänzen (Vorlage: vorhandener Joy-Con-Eintrag gleicher Seite).
@@ -315,7 +315,7 @@ Ablauf mit Bluepick („N-Connect-Modus“):
 3. Joy-Con abziehen (zu prüfen, ob nötig), CFW starten → Joy-Con verbindet sich drahtlos mit der Switch.
 
 **Konflikt mit bestehender Bluepick-Logik:** FULL AUTO und „Atmosphere fixes“ kommentieren
-`enable_external_bluetooth_db` aus und löschen `bluetooth_devices.db`. Im N-Connect-Modus würde das die
+`enable_external_bluetooth_db` aus und löschen `bluetooth_devices.db`. Im SKZ-Connect-Modus würde das die
 Einrichtung zerstören → FULL AUTO muss den Modus erkennen und auslassen.
 
 **Grenzen / zu prüfen:**
@@ -329,15 +329,15 @@ Einrichtung zerstören → FULL AUTO muss den Modus erkennen und auslassen.
 - Format von `bluetooth_devices.db` noch aus dem Atmosphère-Quelltext zu bestätigen.
 - Einträge der Switch-Struktur (§3.1) und Windows-Schlüsselformat (Byte-Reihenfolge) abgleichen.
 
-### 04.10.2026 – Umsetzung in Bluepick_RCM 1.0.6 („N-Connect-Modus“)
+### 04.10.2026 – Umsetzung in Bluepick_RCM 1.0.6 („SKZ-Connect-Modus“)
 
 Warum über Bluepick und die externe Datenbank: Bluepick kopiert System-Saves nur **als Ganzes**
 (Export/Import/Sync). Das bleibt gültig, weil Signatur (CMAC) und Prüfsummen (IVFC) mitkopiert werden. Einen
 einzelnen Eintrag im Save zu ändern, würde beides zerstören. Deshalb schreibt Bluepick die PC-Kopplung nicht ins
 Save, sondern in Atmosphères **`bluetooth_devices.db`** (unsignierte Datei, gleiches Eintragsformat).
 
-Neue Menüpunkte (Abschnitt „-- N-Connect (PC) --“):
-- **„N-Connect: use PC pairing on Switch“** (`bt_nconnect_enable`):
+Neue Menüpunkte (Abschnitt „-- SKZ Connect (PC) --“):
+- **„SKZ Connect: use PC pairing on Switch“** (`bt_nconnect_enable`):
   1. Joy-Con-Dump von den Schienen (vorhandene Routine). Ein Joy-Con gilt als „mit dem PC gekoppelt“, wenn
      Adresse, Host und Schlüssel gesetzt sind und der Host **nicht** die Konsolenadresse aus CAL0 ist.
   2. `sd:/atmosphere/bluetooth_devices.db` = `u64` Anzahl + je Joy-Con ein 0x200-Eintrag. Eine vorhandene
@@ -345,12 +345,12 @@ Neue Menüpunkte (Abschnitt „-- N-Connect (PC) --“):
   3. `sd:/config/MissionControl/missioncontrol.ini` (bei Bedarf aus `.template` angelegt): `[bluetooth]`
      `host_address=<PC-Adresse>`.
   4. `sd:/atmosphere/config/system_settings.ini`: `[atmosphere] enable_external_bluetooth_db = u8!0x1`.
-  5. Status für N-Connect: `sd:/switch/Bluepick_RCM/nconnect.ini` (Adressen, **keine** Schlüssel).
+  5. Status für SKZ Connect: `sd:/switch/Bluepick_RCM/nconnect.ini` (Adressen, **keine** Schlüssel).
   Voraussetzung: MissionControl installiert (`atmosphere/contents/010000000000BD00/exefs.nsp`).
-- **„N-Connect: restore Switch identity“** (`bt_nconnect_disable`): `host_address` auskommentieren, externe
+- **„SKZ Connect: restore Switch identity“** (`bt_nconnect_disable`): `host_address` auskommentieren, externe
   Datenbank abschalten, `bluetooth_devices.db` nach `.nconnect.bak` verschieben.
 - **Schutz:** FULL AUTO, „Disable external BT db override“ und „Delete bluetooth_devices.db“ erkennen den
-  aktiven N-Connect-Modus und lassen die externe Datenbank in Ruhe. Die Statusanzeige zeigt den Modus an.
+  aktiven SKZ-Connect-Modus und lassen die externe Datenbank in Ruhe. Die Statusanzeige zeigt den Modus an.
 
 Datenbankeintrag je Joy-Con (Werte wie HOS sie selbst speichert):
 `+0x00` Adresse · `+0x26` Klasse `00 25 08` · `+0x29` Schlüssel (umgekehrt zu `joycon_mac.bin`) ·
@@ -367,7 +367,7 @@ getestet**.
 **Testablauf (Hardware):**
 1. Neue `Bluepick_RCM.bin` auf die SD-Karte (`switch/Bluepick_RCM/`).
 2. Joy-Con L und R in Windows koppeln (Einstellungen → Bluetooth → Gerät hinzufügen, SYNC halten).
-3. Switch → hekate → Bluepick, Joy-Con an die Schienen → „N-Connect: use PC pairing on Switch“.
+3. Switch → hekate → Bluepick, Joy-Con an die Schienen → „SKZ Connect: use PC pairing on Switch“.
 4. Joy-Con abziehen, CFW (emuMMC) starten. **PC-Bluetooth während des Tests aus** (sonst nimmt der PC die
    Verbindung an – gleiche Adresse).
 5. Taste am Joy-Con → verbindet er sich mit der Switch?
@@ -393,7 +393,7 @@ Adresswechsel ohnehin ungültig), Vorlage sind feste Werte statt eines vorhanden
    nicht neu kopiert). Stattdessen: Nutzer kopiert im Explorer, oder SD per hekate-UMS als Laufwerk; danach
    Prüfung durch Rücklesen.
 
-Für N-Connect relevant (spätere MTP-Erkennung): Gerätenamen und Speichernamen variieren je nach MTP-Programm;
+Für SKZ Connect relevant (spätere MTP-Erkennung): Gerätenamen und Speichernamen variieren je nach MTP-Programm;
 Erkennung muss über VID `057E` / Ordnerstruktur erfolgen, nicht über feste Namen. Überschreiben braucht Löschen.
 
 ## 6. Offene Punkte / Risiken
@@ -408,7 +408,7 @@ Erkennung muss über VID `057E` / Ordnerstruktur erfolgen, nicht über feste Nam
   Connections, daher erwartet `0x04`.)
 - Start ohne CFW (OFW) nutzt die echte Adresse der Switch → Joy-Con verbindet dort nicht.
 - Pro Controller: Schlüssel nur aus der Windows-Registry (`BTHPORT\Parameters\Keys`, SYSTEM-Rechte, nur lesen).
-- N-Connect: MTP-Erkennung der Switch, Anzeige von `switch/Bluepick_RCM/nconnect.ini`, Hinweis „Switch aus“.
+- SKZ Connect: MTP-Erkennung der Switch, Anzeige von `switch/Bluepick_RCM/nconnect.ini`, Hinweis „Switch aus“.
 - MTP: Überschreiben nur nach Löschen; instabile Verbindungen abfangen.
 
 **Nur für die verworfenen bzw. alternativen Wege (§4, §5b, §5c):**

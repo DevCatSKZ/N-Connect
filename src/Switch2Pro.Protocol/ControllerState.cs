@@ -126,7 +126,7 @@ public static class ControllerKinds
         k is ControllerKind.DualShock4 or ControllerKind.DualSense;
 
     /// <summary>Xbox-Controller über XInput (Bluetooth, USB oder Microsoft-Adapter). Wird von Windows schon
-    /// als Xbox-Controller geführt – N-Connect erzeugt keinen virtuellen Controller, um Doppeleingaben zu vermeiden.</summary>
+    /// als Xbox-Controller geführt – SKZ Connect erzeugt keinen virtuellen Controller, um Doppeleingaben zu vermeiden.</summary>
     public static bool IsXbox(this ControllerKind k) => k == ControllerKind.XboxController;
 
     /// <summary>

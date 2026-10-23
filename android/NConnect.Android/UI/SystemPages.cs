@@ -12,13 +12,13 @@ namespace NConnect.Android.UI;
 /// </summary>
 public static class SystemPages
 {
-    /// <summary>Benachrichtigungs-Einstellungen von N-Connect.</summary>
+    /// <summary>Benachrichtigungs-Einstellungen von SKZ-Connect.</summary>
     public static void Notifications(Context ctx) => Open(ctx,
         new Intent(Settings.ActionAppNotificationSettings).PutExtra(Settings.ExtraAppPackage, ctx.PackageName),
         AppDetails(ctx));
 
     /// <summary>
-    /// Direkt die Schalterseite „N-Connect Touch-Steuerung“ in den Bedienungshilfen (ab Android 11),
+    /// Direkt die Schalterseite „SKZ Connect Touch-Steuerung“ in den Bedienungshilfen (ab Android 11),
     /// sonst die Liste der Bedienungshilfen.
     /// </summary>
     public static void TouchService(Context ctx)
@@ -38,7 +38,7 @@ public static class SystemPages
     }
 
     /// <summary>
-    /// Fragt direkt im System-Dialog, ob N-Connect im Hintergrund uneingeschränkt laufen darf (verhindert Abbrüche beim
+    /// Fragt direkt im System-Dialog, ob SKZ Connect im Hintergrund uneingeschränkt laufen darf (verhindert Abbrüche beim
     /// Spielen). Sonst die Liste der Akku-Optimierungen.
     /// </summary>
     public static void BatteryUnrestricted(Context ctx) => Open(ctx,
@@ -53,7 +53,7 @@ public static class SystemPages
         new Intent(Settings.ActionApplicationDevelopmentSettings),
         new Intent(Settings.ActionDeviceInfoSettings));
 
-    /// <summary>App-Info von N-Connect (dort unter „Berechtigungen“).</summary>
+    /// <summary>App-Info von SKZ Connect (dort unter „Berechtigungen“).</summary>
     public static Intent AppDetails(Context ctx) =>
         new(Settings.ActionApplicationDetailsSettings, Uri.FromParts("package", ctx.PackageName, null));
 

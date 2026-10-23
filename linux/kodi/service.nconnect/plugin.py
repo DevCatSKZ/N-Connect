@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 """
 plugin://service.nconnect/ – zeigt den aktuellen Controller-Stand als Liste (für das Kodi-Widget im Home-Menü:
-Skin-Einstellungen > Home > Widgets > Add-ons > N-Connect). Liest status.json bei jedem Aufruf frisch.
+Skin-Einstellungen > Home > Widgets > Add-ons > SKZ Connect). Liest status.json bei jedem Aufruf frisch.
 
 Aktualisierung: Der Dienst setzt bei jeder sichtbaren Änderung die Home-Eigenschaft NConnect.Reload. Skins, die
 den Widget-Pfad mit  ?reload=$INFO[Window(Home).Property(NConnect.Reload)]  anlegen, laden das Widget dann von
 selbst neu – auch wenn es nicht fokussiert ist. Bei anderen Skins lädt der Dienst die Liste neu, sobald sie fokussiert ist.
 
 Angezeigt werden verbundene Controller (farbig) und bekannte, aber gerade nicht verbundene (ausgegraut) – immer,
-auch wenn Bluetooth aus ist (dann steht ein Hinweis davor). Auswahl eines Eintrags öffnet das N-Connect-Menü.
+auch wenn Bluetooth aus ist (dann steht ein Hinweis davor). Auswahl eines Eintrags öffnet das SKZ-Connect-Menü.
 """
 
 import sys
@@ -101,7 +101,7 @@ def main():
         common.send_command('disconnect-all')
         return
     if action != 'list':
-        # Einträge im Widget öffnen immer das N-Connect-Menü.
+        # Einträge im Widget öffnen immer das SKZ-Connect-Menü.
         import xbmc
         xbmc.executebuiltin('RunScript(service.nconnect)')
         return

@@ -62,11 +62,11 @@ public enum GyroSource { Right, Left }
 /// <summary>Wer meldet, wenn ein Controller verbunden oder getrennt wird.</summary>
 public enum ConnectNotifications
 {
-    /// <summary>N-Connect zeigt die Meldung (mit dem echten Controller-Namen); Gerätemeldungen von Windows aus.</summary>
+    /// <summary>SKZ Connect zeigt die Meldung (mit dem echten Controller-Namen); Gerätemeldungen von Windows aus.</summary>
     NConnect,
-    /// <summary>Nur die Gerätemeldung von Windows; N-Connect meldet beim Verbinden/Trennen nichts.</summary>
+    /// <summary>Nur die Gerätemeldung von Windows; SKZ Connect meldet beim Verbinden/Trennen nichts.</summary>
     Windows,
-    /// <summary>Beide Meldungen (N-Connect und Windows).</summary>
+    /// <summary>Beide Meldungen (SKZ Connect und Windows).</summary>
     Both,
     /// <summary>Keine Meldung beim Verbinden/Trennen.</summary>
     None,
@@ -300,7 +300,7 @@ public sealed class Settings
     /// <summary>Kurz „Klick“ vibrieren, wenn der Controller verbunden ist.</summary>
     public bool ConnectFeedback { get; set; } = true;
     /// <summary>
-    /// Meldung beim Verbinden/Trennen: N-Connect (Standard, zeigt den echten Controller-Namen und schaltet die
+    /// Meldung beim Verbinden/Trennen: SKZ Connect (Standard, zeigt den echten Controller-Namen und schaltet die
     /// Gerätemeldungen von Windows ab), nur Windows, beide oder keine.
     /// </summary>
     public ConnectNotifications ConnectNotify { get; set; } = ConnectNotifications.NConnect;
@@ -855,7 +855,7 @@ public sealed class Settings
     }
 }
 
-/// <summary>Ein übernommener Kopplungseintrag: Controller-Adresse, Name, Host-Adresse, Herkunft ("Switch"/"N-Connect").</summary>
+/// <summary>Ein übernommener Kopplungseintrag: Controller-Adresse, Name, Host-Adresse, Herkunft ("Switch"/"SKZ Connect").</summary>
 public sealed record PairingNote(string Address, string? Name, string? HostAddress, string? Source);
 
 /// <summary>Für jedes Enum einen <see cref="TolerantEnumConverter{T}"/> (Werte und Wörterbuch-Schlüssel).</summary>

@@ -8,7 +8,7 @@ namespace Switch2Pro.Bridge;
 /// – gleiches Format wie der Linux-Dienst, damit das Kodi-Add-on (Menü und Home-Widget) auf jeder Plattform
 /// dieselbe Anzeige hat. Auf Windows verbindet die App die Controller selbst; das Add-on zeigt nur an.
 /// Geschrieben wird nur in Kodi-Installationen, in denen das Add-on service.nconnect installiert ist; das wird alle
-/// 30 s neu geprüft, damit ein später installiertes Kodi bzw. Add-on ohne Neustart von N-Connect erkannt wird.
+/// 30 s neu geprüft, damit ein später installiertes Kodi bzw. Add-on ohne Neustart von SKZ Connect erkannt wird.
 /// </summary>
 internal sealed class KodiStatusWriter : IDisposable
 {
@@ -128,7 +128,7 @@ internal sealed class KodiStatusWriter : IDisposable
                     _dirs = dirs;
                 }
                 if (_dirs.Count == 0)
-                    return; // kein Kodi mit N-Connect-Add-on – nichts zu tun
+                    return; // kein Kodi mit SKZ-Connect-Add-on – nichts zu tun
                 string compare = JsonSerializer.Serialize(BuildStatus(withRate: false), JsonOptions);
                 if (compare == _lastCompare && DateTime.UtcNow - _lastWrite < Heartbeat)
                     return;

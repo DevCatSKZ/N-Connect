@@ -29,12 +29,14 @@ internal static class Paths
         }
     }
 
-    /// <summary>Ordner „N-Connect“; der Ordner der Vorversion („Switch2ProBridge“) wird einmalig übernommen.</summary>
+    /// <summary>Ordner „SKZ-Connect“; die Ordner der Vorversionen („N-Connect“, davor „Switch2ProBridge“) werden einmalig übernommen.</summary>
     private static string Folder(Environment.SpecialFolder root)
     {
         string baseDir = Environment.GetFolderPath(root);
-        string dir = Path.Combine(baseDir, "N-Connect");
-        string legacy = Path.Combine(baseDir, "Switch2ProBridge");
+        string dir = Path.Combine(baseDir, "SKZ-Connect");
+        string legacy = new[] { "N-Connect", "Switch2ProBridge" }
+            .Select(name => Path.Combine(baseDir, name))
+            .FirstOrDefault(Directory.Exists) ?? Path.Combine(baseDir, "_");
         try
         {
             if (!Directory.Exists(dir) && Directory.Exists(legacy))

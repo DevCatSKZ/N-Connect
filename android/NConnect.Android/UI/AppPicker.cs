@@ -12,7 +12,7 @@ namespace NConnect.Android.UI;
 
 /// <summary>
 /// Auswahl einer installierten App für „Profile je Spiel“: alle startbaren Apps (auch Fernseher-Apps) mit Name und
-/// Symbol – ohne N-Connect selbst und ohne Startbildschirme. Die Liste wird im Hintergrund gelesen, ein Suchfeld
+/// Symbol – ohne SKZ Connect selbst und ohne Startbildschirme. Die Liste wird im Hintergrund gelesen, ein Suchfeld
 /// filtert nach Name oder Paketname.
 /// </summary>
 public static class AppPicker

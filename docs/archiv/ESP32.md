@@ -1,27 +1,27 @@
 # ESP32 als zweiter „Bluetooth-Stick“ – Controller ohne neues SYNC
 
 > **Verworfen am 10.10.2026** – Grund: Der nRF52840 kann kein Bluetooth-Adapter für Windows sein (er beherrscht nur
-> Bluetooth LE), der Relais-Weg (Platine verbindet die Controller und reicht sie per USB an N-Connect weiter) blieb in
+> Bluetooth LE), der Relais-Weg (Platine verbindet die Controller und reicht sie per USB an SKZ Connect weiter) blieb in
 > den Tests ohne Ergebnis, und jeder Test kostete ein erneutes Koppeln der Controller. Mit einem ESP32 wurde nie
-> getestet. Export und Funkadapter sind aus N-Connect entfernt (ausgeblendet seit 1.0.19, Code entfernt in 1.0.22).
+> getestet. Export und Funkadapter sind aus SKZ Connect entfernt (ausgeblendet seit 1.0.19, Code entfernt in 1.0.22).
 > Archiv: Der Text unten beschreibt den damaligen Plan und gilt nicht mehr.
 
 Ziel: Deine Switch-2-Controller funktionieren **am PC mit dem Bluetooth-Stick** und **an einem anderen PC mit einem
-ESP32-S3**, ohne jedes Mal neu zu koppeln. N-Connect exportiert dafür alles, was der ESP32 braucht
+ESP32-S3**, ohne jedes Mal neu zu koppeln. SKZ Connect exportiert dafür alles, was der ESP32 braucht
 (*Kopplungsdaten → Für ESP32 exportieren*). Diese Seite erklärt das Prinzip, den Export und wie eine
 ESP32-Firmware die Controller annimmt.
 
-> Stand 10.10.2026: Der Export in N-Connect ist fertig und getestet. Die ESP32-Seite ist beschrieben, aber noch
+> Stand 10.10.2026: Der Export in SKZ Connect ist fertig und getestet. Die ESP32-Seite ist beschrieben, aber noch
 > nicht mit echter Hardware erprobt (keine Firmware im Repo).
 
 ---
 
 ## 1. Prinzip in drei Sätzen
 
-1. Drückst du an einem Switch-2-Controller **SYNC**, koppelt N-Connect ihn mit dem PC und schreibt dabei die
+1. Drückst du an einem Switch-2-Controller **SYNC**, koppelt SKZ Connect ihn mit dem PC und schreibt dabei die
    **Bluetooth-Adresse deines Sticks** in den Controller (Befehl `0x15`, [PROTOKOLLE 1.6](../PROTOKOLLE.md)).
 2. Danach wirbt der Controller nach jedem Tastendruck nur noch für diese Adresse und nimmt die Verbindung nur von
-   ihr an. Ein fremder Host wird abgelehnt (in N-Connect gemessen). Die Verbindung selbst ist **unverschlüsselt**;
+   ihr an. Ein fremder Host wird abgelehnt (in SKZ Connect gemessen). Die Verbindung selbst ist **unverschlüsselt**;
    es gibt keinen geheimen Schlüssel.
 3. Übernimmt ein ESP32 genau diese Adresse als seine eigene Bluetooth-Adresse, hält der Controller ihn für deinen
    PC und verbindet sich ohne SYNC. Zurück am PC verbindet er sich wieder dort.
@@ -38,10 +38,10 @@ Der Export führt alle bekannten Controller auf und markiert, welche übernehmba
 
 ## 3. So benutzt du es
 
-1. **Controller einmal mit N-Connect koppeln:** am PC mit dem Stick SYNC drücken (das hast du für deine
+1. **Controller einmal mit SKZ Connect koppeln:** am PC mit dem Stick SYNC drücken (das hast du für deine
    Controller schon getan). Wichtig: Danach **nicht** an einer Konsole oder einem anderen Gerät neu koppeln – sonst
    merkt sich der Controller dessen Adresse.
-2. **Exportieren:** N-Connect → *Joy-Con & Wii* → *Kopplungsdaten* → **Für ESP32 exportieren** → ZIP speichern.
+2. **Exportieren:** SKZ Connect → *Joy-Con & Wii* → *Kopplungsdaten* → **Für ESP32 exportieren** → ZIP speichern.
    Das Fenster zeigt danach die Adresse und welche Controller übernehmbar sind. Der Export braucht keine
    Administratorrechte und enthält keine Schlüssel.
 3. **ESP32 einrichten:** `nconnect_pairing.h` aus dem ZIP in das ESP-IDF-Projekt kopieren und die Firmware bauen
@@ -50,7 +50,7 @@ Der Export führt alle bekannten Controller auf und markiert, welche übernehmba
    Zurück am ersten PC: Taste drücken → er verbindet sich wieder mit dem Stick.
 
 **Nicht gleichzeitig:** Stick und ESP32 haben dieselbe Adresse. Sind beide in Reichweite und aktiv, verbindet sich
-der Controller mit dem, der schneller antwortet. Am ersten PC dann N-Connect beenden oder Bluetooth ausschalten. In
+der Controller mit dem, der schneller antwortet. Am ersten PC dann SKZ Connect beenden oder Bluetooth ausschalten. In
 verschiedenen Räumen ist das kein Problem.
 
 **Neuer Controller dazugekommen?** Erst am PC mit SYNC koppeln, dann neu exportieren. Eigentlich braucht der ESP32
@@ -58,7 +58,7 @@ nur die Host-Adresse; die Controllertabelle (Namen, Spielerplätze, Kalibrierung
 
 ## 4. Inhalt des Exports
 
-ZIP `N-Connect-ESP32-<PC>.zip`:
+ZIP `SKZ-Connect-ESP32-<PC>.zip`:
 
 | Datei | Inhalt |
 |---|---|
@@ -96,9 +96,9 @@ ZIP `N-Connect-ESP32-<PC>.zip`:
 ```
 
 - Adressen immer `AA:BB:CC:DD:EE:FF`, höchstes Byte zuerst (wie Windows sie anzeigt).
-- Aufgenommen werden alle Controller, die N-Connect kennt **oder** die in Windows gekoppelt sind und deren Name auf
+- Aufgenommen werden alle Controller, die SKZ Connect kennt **oder** die in Windows gekoppelt sind und deren Name auf
   einen Controller schließen lässt (`WindowsBtDevices` liest nur Adresse und Name aus der Registrierung, keine
-  Schlüssel). So erscheinen auch Controller, die N-Connect noch nie verbunden hat.
+  Schlüssel). So erscheinen auch Controller, die SKZ Connect noch nie verbunden hat.
 - `kind` = Name aus `ControllerKind`; `Unknown`, wenn die Art weder bekannt (`Settings.ControllerKinds`, beim
   Verbinden gemerkt) noch aus dem Windows-Namen (`BtDeviceNames.KindFromName`) ableitbar ist.
 - `transport` = `BLE` oder `Classic`; `supportedBle` nur bei Switch-2-Controllern (BLE, unverschlüsselt).
@@ -131,7 +131,7 @@ Erzeugt von `Esp32Export.ToHeader` (`src/Switch2Pro.Protocol/Esp32Export.cs`, Te
 ## 5. Leitfaden für die ESP32-Firmware (ESP-IDF 6.x, NimBLE)
 
 Getestet ist hier nur, dass die ESP-IDF-Funktionen existieren (ESP-IDF v6.1). Der Ablauf entspricht dem, was
-N-Connect unter Windows tut (`ControllerManager.OnAdvertisement`, `Switch2BleLink`).
+SKZ Connect unter Windows tut (`ControllerManager.OnAdvertisement`, `Switch2BleLink`).
 
 ### 5.1 Konfiguration
 - `CONFIG_BT_ENABLED=y`, `CONFIG_BT_NIMBLE_ENABLED=y`, Rolle **Central** und **Observer** an.
@@ -166,7 +166,7 @@ Kennung 0x0553 (LE: 53 05) | 01 00 03 | 7E xx | PID (LE) | … | Byte 10–15: H
 - **Byte 10–15 == `NCONNECT_HOST_ADDR_LE`** → der Controller sucht „deinen PC“ → verbinden.
 - Byte 10–15 alle 0 → SYNC-Modus. Der ESP32 könnte hier selbst koppeln (Befehl 0x15 mit seiner Adresse, PROTOKOLLE
   1.6). Er sollte es aber **nicht** tun, damit die Kopplung mit dem Stick erhalten bleibt.
-- Nach dem Trennen wirbt der Controller noch kurz weiter. N-Connect wartet 3 s und verbindet erst nach einer Pause
+- Nach dem Trennen wirbt der Controller noch kurz weiter. SKZ Connect wartet 3 s und verbindet erst nach einer Pause
   und einem neuen Tastendruck (sonst verbindet man ungewollt sofort wieder).
 
 ### 5.4 Verbinden und starten
@@ -192,7 +192,7 @@ Der ESP32-S3 hat einen nativen USB-Anschluss (Buchse „USB“, nicht „UART“
 
 | Weg | Was der ESP32 tut | Am zweiten PC |
 |---|---|---|
-| **A – ESP32 als Funkadapter für N-Connect** (empfohlen) | reicht die Rohberichte per USB (CDC/serielle Schnittstelle) durch und nimmt Befehle/Vibration entgegen | N-Connect wie gewohnt (Tastenbelegung, Xbox/DS4, Gyro, Profile). Braucht eine **neue Verbindungsart in N-Connect** („ESP32-Adapter“) – noch nicht gebaut |
+| **A – ESP32 als Funkadapter für SKZ Connect** (empfohlen) | reicht die Rohberichte per USB (CDC/serielle Schnittstelle) durch und nimmt Befehle/Vibration entgegen | SKZ Connect wie gewohnt (Tastenbelegung, Xbox/DS4, Gyro, Profile). Braucht eine **neue Verbindungsart in SKZ Connect** („ESP32-Adapter“) – noch nicht gebaut |
 | **B – ESP32 als eigenständiges Gamepad** | wandelt selbst in ein USB-HID-Gamepad (TinyUSB) um | nichts zu installieren, aber Belegung, Gyro und Xbox-Kompatibilität muss die Firmware selbst leisten (generisches HID-Gamepad ≠ XInput) |
 
 Weg A verhält sich am zweiten PC genauso wie dein Stick am ersten. Weg B kommt ohne Software aus.
@@ -202,7 +202,7 @@ Weg A verhält sich am zweiten PC genauso wie dein Stick am ersten. Weg B kommt 
 | Beobachtung | Ursache / Abhilfe |
 |---|---|
 | ESP32 sieht Werbung, Verbindung scheitert sofort | Adresse nicht übernommen (Log „Bluetooth MAC“ prüfen) oder eigene Verbindung mit Zufallsadresse aufgebaut |
-| Controller verbindet sich mit dem ersten PC statt mit dem ESP32 | beide in Reichweite – N-Connect am ersten PC beenden oder Bluetooth aus |
+| Controller verbindet sich mit dem ersten PC statt mit dem ESP32 | beide in Reichweite – SKZ Connect am ersten PC beenden oder Bluetooth aus |
 | Byte 10–15 enthalten eine andere Adresse | Controller wurde inzwischen an einer Konsole/einem anderen Gerät gekoppelt → am PC neu SYNC, neu exportieren |
 | Byte 10–15 alle 0 | Controller ist im SYNC-Modus (SYNC-Taste gedrückt) |
 | Nur ~33 Berichte/s | Verbindungsintervall nicht verkürzt (5.4 Schritt 2) |
@@ -213,4 +213,4 @@ Weg A verhält sich am zweiten PC genauso wie dein Stick am ersten. Weg B kommt 
 Der Export enthält keine Schlüssel, nur Adressen. Die Adresse eines Bluetooth-Adapters ist ohnehin für jeden in
 Funkreichweite sichtbar. Trotzdem gilt: Wer die Adresse kennt und einen ESP32 damit betreibt, kann sich mit deinen
 Switch-2-Controllern verbinden, wenn sie für deinen PC werben. Das ist eine Eigenschaft der Controller, nicht von
-N-Connect.
+SKZ-Connect.

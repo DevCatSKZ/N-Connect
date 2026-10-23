@@ -33,7 +33,7 @@ internal static class HidHideUpdate
         try
         {
             using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(15) };
-            http.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("N-Connect", UpdateCheck.Current.ToString()));
+            http.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("SKZ-Connect", UpdateCheck.Current.ToString()));
             http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
             using var response = await http.GetAsync(Latest, ct);
             if (!response.IsSuccessStatusCode)

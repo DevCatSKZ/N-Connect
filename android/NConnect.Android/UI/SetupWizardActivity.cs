@@ -45,7 +45,7 @@ public sealed class SetupWizardActivity : AppCompatActivity
         base.OnCreate(savedInstanceState);
         WindowCompat.SetDecorFitsSystemWindows(Window!, false);
         var root = Ui.Column(this);
-        _toolbar = new MaterialToolbar(this) { Title = L.T("N-Connect einrichten") };
+        _toolbar = new MaterialToolbar(this) { Title = L.T("SKZ Connect einrichten") };
         root.AddView(_toolbar);
         _progress = new LinearProgressIndicator(this) { Max = StepCount };
         root.AddView(_progress, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
@@ -148,7 +148,7 @@ public sealed class SetupWizardActivity : AppCompatActivity
 
     private void Welcome(LinearLayout col)
     {
-        col.AddView(Ui.Headline(this, "Willkommen bei N-Connect"));
+        col.AddView(Ui.Headline(this, "Willkommen bei SKZ Connect"));
         col.AddView(Ui.Body(this, "Spiele mit deinen Nintendo-Switch-2-Controllern auf diesem Gerät – in Android-Spielen, " +
                                   "Emulatoren und beim Cloud-Gaming."));
         col.AddView(Ui.Card(this,
@@ -160,7 +160,7 @@ public sealed class SetupWizardActivity : AppCompatActivity
             Ui.Space(this, 4),
             Ui.Body(this, "In wenigen Schritten erlaubst du Bluetooth, wählst aus, wie Spiele deine Controller sehen sollen, " +
                           "und verbindest deinen ersten Controller. Das dauert etwa zwei Minuten.")));
-        col.AddView(Ui.Caption(this, "N-Connect unterstützt nur Switch-2-Controller. Xbox- und PlayStation-Controller laufen " +
+        col.AddView(Ui.Caption(this, "SKZ Connect unterstützt nur Switch-2-Controller. Xbox- und PlayStation-Controller laufen " +
                                      "direkt über die Bluetooth-Einstellungen von Android. Ältere Switch-Controller (Switch 1, " +
                                      "Nachbauten) koppelst du ebenfalls dort – meist nur mit Tasten und Sticks, ohne " +
                                      "Bewegungssteuerung und Vibration."));
@@ -176,7 +176,7 @@ public sealed class SetupWizardActivity : AppCompatActivity
         bool battery = SystemPages.IsBatteryUnrestricted(this);
         col.AddView(Ui.Card(this,
             Ui.StatusRow(this, bt ? PathState.Ready : PathState.NeedsAction, "Geräte in der Nähe (Bluetooth)",
-                bt ? "Erlaubt." : "Nötig, um Controller zu finden und zu verbinden. N-Connect fragt nicht nach deinem Standort.",
+                bt ? "Erlaubt." : "Nötig, um Controller zu finden und zu verbinden. SKZ Connect fragt nicht nach deinem Standort.",
                 bt ? null : "Erlauben", AskBluetooth),
             Ui.Divider(this),
             Ui.StatusRow(this, notify ? PathState.Ready : PathState.NeedsAction, "Benachrichtigungen",
@@ -185,7 +185,7 @@ public sealed class SetupWizardActivity : AppCompatActivity
             Ui.Divider(this),
             Ui.StatusRow(this, battery ? PathState.Ready : PathState.NeedsAction, "Im Hintergrund weiterlaufen (empfohlen)",
                 battery ? "Nicht eingeschränkt – die Verbindung bleibt beim Spielen stabil."
-                    : "Verhindert, dass Android N-Connect beim Spielen beendet und die Controller trennt.",
+                    : "Verhindert, dass Android SKZ Connect beim Spielen beendet und die Controller trennt.",
                 battery ? null : "Nicht einschränken", () => SystemPages.BatteryUnrestricted(this))));
     }
 
@@ -267,7 +267,7 @@ public sealed class SetupWizardActivity : AppCompatActivity
     private void SetupShizuku(LinearLayout col)
     {
         col.AddView(Ui.Headline(this, "Shizuku einrichten"));
-        col.AddView(Ui.Body(this, "Shizuku erlaubt N-Connect, einen virtuellen Xbox-Controller anzulegen. Drei Schritte:"));
+        col.AddView(Ui.Body(this, "Shizuku erlaubt SKZ Connect, einen virtuellen Xbox-Controller anzulegen. Drei Schritte:"));
         bool installed = ShizukuShell.IsInstalled();
         bool running = installed && ShizukuShell.Instance.IsAvailable();
         bool granted = running && ShizukuShell.Instance.HasPermission();
@@ -280,8 +280,8 @@ public sealed class SetupWizardActivity : AppCompatActivity
                 running ? "Läuft." : "In Shizuku: „Über kabelloses Debugging starten“ → Kopplung → Starten. Nach jedem Neustart einmal „Starten“.",
                 running || !installed ? null : "Shizuku öffnen", () => HelpPage.OpenShizuku(this)),
             Ui.Divider(this),
-            Ui.StatusRow(this, granted ? PathState.Ready : running ? PathState.NeedsAction : PathState.Missing, "3. N-Connect den Zugriff erlauben",
-                granted ? "Erlaubt." : "Shizuku fragt einmal, ob N-Connect es nutzen darf.",
+            Ui.StatusRow(this, granted ? PathState.Ready : running ? PathState.NeedsAction : PathState.Missing, "3. SKZ Connect den Zugriff erlauben",
+                granted ? "Erlaubt." : "Shizuku fragt einmal, ob SKZ Connect es nutzen darf.",
                 granted || !running ? null : "Zugriff erlauben", () => _ = GrantAndTest(ShizukuShell.Instance)));
         if (installed && !running)
             Ui.Inner(card).AddView(Ui.Button(this, "Ausführliche Anleitung", ShowShizukuGuide, Ui.ButtonStyle.Text));
@@ -294,11 +294,11 @@ public sealed class SetupWizardActivity : AppCompatActivity
     {
         col.AddView(Ui.Headline(this, "Root-Zugriff"));
         var state = OutputRouter.RootState();
-        col.AddView(Ui.Card(this, Ui.StatusRow(this, state, "Root-Zugriff für N-Connect",
+        col.AddView(Ui.Card(this, Ui.StatusRow(this, state, "Root-Zugriff für SKZ Connect",
             state switch
             {
                 PathState.Ready => "Erlaubt.",
-                PathState.NeedsAction => "Tippe auf „Zugriff anfragen“ und erlaube N-Connect im Root-Dialog (z. B. Magisk).",
+                PathState.NeedsAction => "Tippe auf „Zugriff anfragen“ und erlaube SKZ Connect im Root-Dialog (z. B. Magisk).",
                 _ => "Auf diesem Gerät wurde kein Root gefunden. Wähle stattdessen Shizuku.",
             },
             state == PathState.NeedsAction ? "Zugriff anfragen" : null, () => _ = GrantAndTest(RootShell.Instance))));
@@ -319,9 +319,9 @@ public sealed class SetupWizardActivity : AppCompatActivity
         }
         bool on = TouchService.Instance is not null;
         var card = Ui.Card(this,
-            Ui.StatusRow(this, on ? PathState.Ready : PathState.NeedsAction, "Bedienungshilfe „N-Connect Touch-Steuerung“",
+            Ui.StatusRow(this, on ? PathState.Ready : PathState.NeedsAction, "Bedienungshilfe „SKZ Connect Touch-Steuerung“",
                 on ? "Eingeschaltet. Das Touch-Layout legst du später direkt im Spiel fest."
-                    : "Der Knopf öffnet direkt den Schalter für „N-Connect Touch-Steuerung“ – einschalten und zurückkehren.",
+                    : "Der Knopf öffnet direkt den Schalter für „SKZ Connect Touch-Steuerung“ – einschalten und zurückkehren.",
                 on ? null : "Einschalten", () => TouchService.OpenSystemSettings(this)));
         if (!on && OperatingSystem.IsAndroidVersionAtLeast(33))
         {
@@ -377,7 +377,7 @@ public sealed class SetupWizardActivity : AppCompatActivity
     private void Done(LinearLayout col)
     {
         col.AddView(Ui.Headline(this, "Fertig!"));
-        col.AddView(Ui.Body(this, "N-Connect läuft jetzt im Hintergrund, solange die Benachrichtigung zu sehen ist. " +
+        col.AddView(Ui.Body(this, "SKZ Connect läuft jetzt im Hintergrund, solange die Benachrichtigung zu sehen ist. " +
                                   "Starte einfach dein Spiel."));
         col.AddView(Ui.Card(this,
             Ui.Title(this, "Gut zu wissen"),
@@ -385,7 +385,7 @@ public sealed class SetupWizardActivity : AppCompatActivity
             Ui.Body(this, string.Join("\n", new[]
             {
                 "• Gekoppelte Controller verbinden sich per Tastendruck von selbst wieder.",
-                "• Im Spiel heißt der Controller „N-Connect Spieler 1“.",
+                "• Im Spiel heißt der Controller „SKZ Connect Spieler 1“.",
                 AppPrefs.Mode == OutputPath.Shizuku ? "• Nach einem Neustart: Shizuku einmal öffnen und „Starten“ tippen." : "",
                 AppPrefs.TouchEnabled || AppPrefs.Mode == OutputPath.Touch
                     ? "• Touch-Layout: im Spiel die Benachrichtigung herunterziehen → „Touch-Layout bearbeiten“." : "",
@@ -433,14 +433,14 @@ public sealed class SetupWizardActivity : AppCompatActivity
             }
             else
             {
-                using var pad = UhidPad.Create(shell, 7, "N-Connect Test");
+                using var pad = UhidPad.Create(shell, 7, "SKZ Connect Test");
                 bool found = false;
                 for (int i = 0; i < 20 && !found; i++)
                 {
                     await Task.Delay(150);
                     found = global::Android.Views.InputDevice.GetDeviceIds()!
                         .Select(global::Android.Views.InputDevice.GetDevice)
-                        .Any(d => d?.Name == "N-Connect Test");
+                        .Any(d => d?.Name == "SKZ Connect Test");
                 }
                 message = found ? "Funktioniert! Android hat den virtuellen Xbox-Controller erkannt."
                     : "Android hat den virtuellen Controller nicht gemeldet. Siehe Hilfe → Probleme lösen.";
@@ -474,7 +474,7 @@ public sealed class SetupWizardActivity : AppCompatActivity
                         "zum Eingeben des Kopplungscodes.\n\n" +
                         "4. In den Entwickleroptionen unter „Kabelloses Debugging“ → „Gerät über Kopplungscode koppeln“ tippen und " +
                         "den Code in die Shizuku-Benachrichtigung eintippen.\n\n" +
-                        "5. In Shizuku auf „Starten“ tippen. Fertig – zurück zu N-Connect."))!
+                        "5. In Shizuku auf „Starten“ tippen. Fertig – zurück zu SKZ-Connect."))!
             .SetPositiveButton(L.T("Shizuku öffnen"), (_, _) => HelpPage.OpenShizuku(this))!
             .SetNeutralButton(L.T("Entwickleroptionen"), (_, _) => SystemPages.DeveloperOptions(this))!
             .SetNegativeButton(L.T("Schließen"), (_, _) => { })!

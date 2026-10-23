@@ -6,13 +6,14 @@ namespace NConnect.Android.Core;
 /// <summary>
 /// Auswertung der GitHub-Release-Liste (ohne Android-Abhängigkeiten, damit sie sich ohne Gerät testen lässt –
 /// android/NConnect.Android.Tests). Die APKs hängen an den gemeinsamen Releases (Tag = Windows-Version „v1.0.x“),
-/// deshalb zählt nicht der Tag, sondern die Version im Dateinamen „N-Connect-Android-0.9.1.apk“; Releases ohne APK
+/// deshalb zählt nicht der Tag, sondern die Version im Dateinamen „SKZ-Connect-Android-0.9.1.apk“; Releases ohne APK
 /// werden übersprungen.
 /// </summary>
 internal static partial class UpdateCheck
 {
-    /// <summary>„N-Connect-Android-0.9.1.apk“ → 0.9.1 (Groß-/Kleinschreibung egal).</summary>
-    [GeneratedRegex(@"^N-Connect-Android-(\d+(?:\.\d+){1,3})\.apk$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
+    /// <summary>„SKZ-Connect-Android-0.9.1.apk“ → 0.9.1 (Groß-/Kleinschreibung egal).</summary>
+    // Übergangsweise beide Asset-Namen: die letzten Releases hießen noch N-Connect-Android-…
+    [GeneratedRegex(@"^(?:SKZ-Connect|N-Connect)-Android-(\d+(?:\.\d+){1,3})\.apk$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
     private static partial Regex ApkName();
 
     /// <summary>Gefundene APK eines Releases (Name, Version, Download-Adresse, Größe, SHA-256 als Hex – falls GitHub sie liefert).</summary>
@@ -44,7 +45,7 @@ internal static partial class UpdateCheck
     /// <summary>Gibt es ein Update? Nur eine echt höhere Version zählt (1.2 und 1.2.0 sind gleich).</summary>
     internal static bool IsNewer(Version available, Version installed) => Normalize(available) > Normalize(installed);
 
-    /// <summary>„N-Connect-Android-&lt;Version&gt;.apk“ unter den Dateien eines Releases suchen (höchste Version, falls mehrere).</summary>
+    /// <summary>„SKZ-Connect-Android-&lt;Version&gt;.apk“ unter den Dateien eines Releases suchen (höchste Version, falls mehrere).</summary>
     private static Apk? FindApk(JsonElement release)
     {
         if (!release.TryGetProperty("assets", out var assets) || assets.ValueKind != JsonValueKind.Array)

@@ -13,7 +13,7 @@ namespace NConnect.Android.Kodi;
 /// gleiches Format wie der Linux-Dienst und der Windows-KodiStatusWriter (Vertrag siehe KodiStatusWriter.Contract.cs),
 /// damit das Kodi-Add-on (Menü und Home-Widget) auf Android denselben Stand anzeigt.
 /// Ab Android 10 (Scoped Storage) kommt die App nicht an Kodis Datenordner – darum liegt die Datei im
-/// gemeinsamen Dokumente-Ordner /sdcard/Documents/N-Connect (über MediaStore). Das Add-on liest dort mit.
+/// gemeinsamen Dokumente-Ordner /sdcard/Documents/SKZ Connect (über MediaStore). Das Add-on liest dort mit.
 /// Auf Android 8/9 genügt der App-eigene externe Ordner, den Kodi noch lesen darf.
 /// </summary>
 public sealed partial class KodiStatusWriter : IDisposable
@@ -22,7 +22,7 @@ public sealed partial class KodiStatusWriter : IDisposable
     private static readonly TimeSpan Heartbeat = TimeSpan.FromSeconds(10);
     private static readonly TimeSpan Interval = TimeSpan.FromSeconds(3);
 
-    private const string DocumentsDir = "Documents/N-Connect/";
+    private const string DocumentsDir = "Documents/SKZ-Connect/";
     private const string FileName = "status.json";
     /// <summary>Zwischendatei früherer Entwicklungsstände (Schreiben über Umbenennen) – wird entfernt.</summary>
     private const string OldTempName = "status.json.app.tmp";
@@ -246,8 +246,8 @@ public sealed partial class KodiStatusWriter : IDisposable
 
     private global::Android.Net.Uri UseFallback(global::Android.Net.Uri uri, string name)
     {
-        Log.Warn($"Kodi-status.json: „{FileName}“ gehört einer früheren Installation von N-Connect – schreibe „{name}“. " +
-                 "Die alte Datei im Ordner Documents/N-Connect löschen, dann nimmt N-Connect beim nächsten Start wieder „status.json“.");
+        Log.Warn($"Kodi-status.json: „{FileName}“ gehört einer früheren Installation von SKZ Connect – schreibe „{name}“. " +
+                 "Die alte Datei im Ordner Documents/SKZ Connect löschen, dann nimmt SKZ Connect beim nächsten Start wieder „status.json“.");
         _fallbackName = name;
         return uri;
     }
@@ -263,7 +263,7 @@ public sealed partial class KodiStatusWriter : IDisposable
         }
     }
 
-    /// <summary>Eigene Dateien im Ordner Documents/N-Connect, deren Name auf <paramref name="pattern"/> passt (SQL LIKE).</summary>
+    /// <summary>Eigene Dateien im Ordner Documents/SKZ Connect, deren Name auf <paramref name="pattern"/> passt (SQL LIKE).</summary>
     [System.Runtime.Versioning.SupportedOSPlatform("android29.0")]
     private List<(global::Android.Net.Uri Uri, string Name)> OwnFiles(ContentResolver resolver, string pattern)
     {

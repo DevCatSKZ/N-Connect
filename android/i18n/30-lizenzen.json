@@ -38,18 +38,18 @@
   "zh": "许可证文本",
   "ko": "라이선스 텍스트"
  },
- "N-Connect enthält Software, Quellcode und Daten Dritter. Die Rechte daran verbleiben bei ihren Inhabern.": {
-  "en": "N-Connect includes third-party software, source code and data. All rights remain with their respective owners.",
-  "es": "N-Connect incluye software, código fuente y datos de terceros. Los derechos siguen perteneciendo a sus titulares.",
-  "fr": "N-Connect contient des logiciels, du code source et des données de tiers. Les droits restent la propriété de leurs titulaires.",
-  "it": "N-Connect contiene software, codice sorgente e dati di terze parti. I diritti restano dei rispettivi titolari.",
-  "pt": "O N-Connect inclui software, código-fonte e dados de terceiros. Os direitos continuam a pertencer aos respetivos titulares.",
-  "nl": "N-Connect bevat software, broncode en gegevens van derden. De rechten blijven bij de respectieve eigenaars.",
-  "pl": "N-Connect zawiera oprogramowanie, kod źródłowy i dane stron trzecich. Prawa do nich pozostają przy ich właścicielach.",
-  "ru": "N-Connect содержит программы, исходный код и данные сторонних разработчиков. Права на них остаются за их владельцами.",
-  "ja": "N-Connect にはサードパーティのソフトウェア、ソースコード、データが含まれています。これらの権利は各権利者に帰属します。",
-  "zh": "N-Connect 包含第三方软件、源代码和数据。相关权利归各自的权利人所有。",
-  "ko": "N-Connect에는 타사 소프트웨어, 소스 코드 및 데이터가 포함되어 있습니다. 이에 대한 권리는 각 소유자에게 있습니다."
+ "SKZ Connect enthält Software, Quellcode und Daten Dritter. Die Rechte daran verbleiben bei ihren Inhabern.": {
+  "en": "SKZ Connect includes third-party software, source code and data. All rights remain with their respective owners.",
+  "es": "SKZ Connect incluye software, código fuente y datos de terceros. Los derechos siguen perteneciendo a sus titulares.",
+  "fr": "SKZ Connect contient des logiciels, du code source et des données de tiers. Les droits restent la propriété de leurs titulaires.",
+  "it": "SKZ Connect contiene software, codice sorgente e dati di terze parti. I diritti restano dei rispettivi titolari.",
+  "pt": "O SKZ Connect inclui software, código-fonte e dados de terceiros. Os direitos continuam a pertencer aos respetivos titulares.",
+  "nl": "SKZ Connect bevat software, broncode en gegevens van derden. De rechten blijven bij de respectieve eigenaars.",
+  "pl": "SKZ Connect zawiera oprogramowanie, kod źródłowy i dane stron trzecich. Prawa do nich pozostają przy ich właścicielach.",
+  "ru": "SKZ Connect содержит программы, исходный код и данные сторонних разработчиков. Права на них остаются за их владельцами.",
+  "ja": "SKZ Connect にはサードパーティのソフトウェア、ソースコード、データが含まれています。これらの権利は各権利者に帰属します。",
+  "zh": "SKZ Connect 包含第三方软件、源代码和数据。相关权利归各自的权利人所有。",
+  "ko": "SKZ Connect에는 타사 소프트웨어, 소스 코드 및 데이터가 포함되어 있습니다. 이에 대한 권리는 각 소유자에게 있습니다."
  },
  "Laufzeit": {
   "en": "Runtime",
@@ -207,18 +207,18 @@
   "zh": "Xbox One S 控制器的 HID 描述符",
   "ko": "Xbox One S 컨트롤러의 HID 디스크립터"
  },
- "Nintendo, Nintendo Switch, Joy-Con, Wii, Xbox, PlayStation, DualShock und DualSense sind Marken ihrer jeweiligen Inhaber. N-Connect ist ein unabhängiges Projekt.": {
-  "en": "Nintendo, Nintendo Switch, Joy-Con, Wii, Xbox, PlayStation, DualShock and DualSense are trademarks of their respective owners. N-Connect is an independent project.",
-  "es": "Nintendo, Nintendo Switch, Joy-Con, Wii, Xbox, PlayStation, DualShock y DualSense son marcas de sus respectivos titulares. N-Connect es un proyecto independiente.",
-  "fr": "Nintendo, Nintendo Switch, Joy-Con, Wii, Xbox, PlayStation, DualShock et DualSense sont des marques de leurs titulaires respectifs. N-Connect est un projet indépendant.",
-  "it": "Nintendo, Nintendo Switch, Joy-Con, Wii, Xbox, PlayStation, DualShock e DualSense sono marchi dei rispettivi titolari. N-Connect è un progetto indipendente.",
-  "pt": "Nintendo, Nintendo Switch, Joy-Con, Wii, Xbox, PlayStation, DualShock e DualSense são marcas dos respetivos titulares. O N-Connect é um projeto independente.",
-  "nl": "Nintendo, Nintendo Switch, Joy-Con, Wii, Xbox, PlayStation, DualShock en DualSense zijn merken van hun respectieve eigenaars. N-Connect is een onafhankelijk project.",
-  "pl": "Nintendo, Nintendo Switch, Joy-Con, Wii, Xbox, PlayStation, DualShock i DualSense są znakami towarowymi ich właścicieli. N-Connect jest niezależnym projektem.",
-  "ru": "Nintendo, Nintendo Switch, Joy-Con, Wii, Xbox, PlayStation, DualShock и DualSense являются товарными знаками их владельцев. N-Connect – независимый проект.",
-  "ja": "Nintendo、Nintendo Switch、Joy-Con、Wii、Xbox、PlayStation、DualShock、DualSense は各権利者の商標です。N-Connect は独立したプロジェクトです。",
-  "zh": "Nintendo、Nintendo Switch、Joy-Con、Wii、Xbox、PlayStation、DualShock 和 DualSense 是其各自所有者的商标。N-Connect 是一个独立项目。",
-  "ko": "Nintendo, Nintendo Switch, Joy-Con, Wii, Xbox, PlayStation, DualShock 및 DualSense는 각 소유자의 상표입니다. N-Connect는 독립 프로젝트입니다."
+ "Nintendo, Nintendo Switch, Joy-Con, Wii, Xbox, PlayStation, DualShock und DualSense sind Marken ihrer jeweiligen Inhaber. SKZ Connect ist ein unabhängiges Projekt.": {
+  "en": "Nintendo, Nintendo Switch, Joy-Con, Wii, Xbox, PlayStation, DualShock and DualSense are trademarks of their respective owners. SKZ Connect is an independent project.",
+  "es": "Nintendo, Nintendo Switch, Joy-Con, Wii, Xbox, PlayStation, DualShock y DualSense son marcas de sus respectivos titulares. SKZ Connect es un proyecto independiente.",
+  "fr": "Nintendo, Nintendo Switch, Joy-Con, Wii, Xbox, PlayStation, DualShock et DualSense sont des marques de leurs titulaires respectifs. SKZ Connect est un projet indépendant.",
+  "it": "Nintendo, Nintendo Switch, Joy-Con, Wii, Xbox, PlayStation, DualShock e DualSense sono marchi dei rispettivi titolari. SKZ Connect è un progetto indipendente.",
+  "pt": "Nintendo, Nintendo Switch, Joy-Con, Wii, Xbox, PlayStation, DualShock e DualSense são marcas dos respetivos titulares. O SKZ Connect é um projeto independente.",
+  "nl": "Nintendo, Nintendo Switch, Joy-Con, Wii, Xbox, PlayStation, DualShock en DualSense zijn merken van hun respectieve eigenaars. SKZ Connect is een onafhankelijk project.",
+  "pl": "Nintendo, Nintendo Switch, Joy-Con, Wii, Xbox, PlayStation, DualShock i DualSense są znakami towarowymi ich właścicieli. SKZ Connect jest niezależnym projektem.",
+  "ru": "Nintendo, Nintendo Switch, Joy-Con, Wii, Xbox, PlayStation, DualShock и DualSense являются товарными знаками их владельцев. SKZ Connect – независимый проект.",
+  "ja": "Nintendo、Nintendo Switch、Joy-Con、Wii、Xbox、PlayStation、DualShock、DualSense は各権利者の商標です。SKZ Connect は独立したプロジェクトです。",
+  "zh": "Nintendo、Nintendo Switch、Joy-Con、Wii、Xbox、PlayStation、DualShock 和 DualSense 是其各自所有者的商标。SKZ Connect 是一个独立项目。",
+  "ko": "Nintendo, Nintendo Switch, Joy-Con, Wii, Xbox, PlayStation, DualShock 및 DualSense는 각 소유자의 상표입니다. SKZ Connect는 독립 프로젝트입니다."
  },
  "Einstellungen wiederhergestellt": {
   "en": "Settings restored",
@@ -260,17 +260,17 @@
   "ko": "설정이 손상되어 마지막 백업에서 복원했습니다. 최근 변경 내용이 없을 수 있으니 확인해 주세요."
  },
  "Die Einstellungen konnten nicht gelesen werden – es gelten die Standardwerte. Die beschädigte Datei bleibt als „settings.json.unlesbar-…“ im Speicher der App erhalten.": {
-  "en": "The settings could not be read – defaults apply. The damaged file is kept in N-Connect’s storage as “settings.json.unlesbar-…”.",
-  "es": "No se pudieron leer los ajustes; se aplican los valores predeterminados. El archivo dañado se conserva en el almacenamiento de N-Connect como «settings.json.unlesbar-…».",
-  "fr": "Les paramètres n'ont pas pu être lus – les valeurs par défaut s'appliquent. Le fichier endommagé est conservé dans le stockage de N-Connect sous « settings.json.unlesbar-… ».",
-  "it": "Impossibile leggere le impostazioni – si applicano i valori predefiniti. Il file danneggiato viene conservato nella memoria di N-Connect come «settings.json.unlesbar-…».",
-  "pt": "Não foi possível ler as definições – aplicam-se os valores predefinidos. O ficheiro danificado é guardado no armazenamento do N-Connect como «settings.json.unlesbar-…».",
-  "nl": "De instellingen konden niet worden gelezen – de standaardwaarden gelden. Het beschadigde bestand blijft als ‘settings.json.unlesbar-…’ in de opslag van N-Connect bewaard.",
-  "pl": "Nie można odczytać ustawień – obowiązują wartości domyślne. Uszkodzony plik zostaje zachowany w pamięci N-Connect jako „settings.json.unlesbar-…”.",
-  "ru": "Не удалось прочитать настройки – действуют значения по умолчанию. Повреждённый файл сохранён в памяти N-Connect как «settings.json.unlesbar-…».",
-  "ja": "設定を読み取れませんでした – デフォルト値が適用されます。破損したファイルは N-Connect のストレージに「settings.json.unlesbar-…」として保管されます。",
-  "zh": "无法读取设置 – 使用默认值。损坏的文件会以“settings.json.unlesbar-…”保留在 N-Connect 的存储中。",
-  "ko": "설정을 읽을 수 없습니다 – 기본값이 적용됩니다. 손상된 파일은 N-Connect 저장소에 'settings.json.unlesbar-…' 이름으로 보관됩니다."
+  "en": "The settings could not be read – defaults apply. The damaged file is kept in SKZ Connect’s storage as “settings.json.unlesbar-…”.",
+  "es": "No se pudieron leer los ajustes; se aplican los valores predeterminados. El archivo dañado se conserva en el almacenamiento de SKZ Connect como «settings.json.unlesbar-…».",
+  "fr": "Les paramètres n'ont pas pu être lus – les valeurs par défaut s'appliquent. Le fichier endommagé est conservé dans le stockage de SKZ Connect sous « settings.json.unlesbar-… ».",
+  "it": "Impossibile leggere le impostazioni – si applicano i valori predefiniti. Il file danneggiato viene conservato nella memoria di SKZ Connect come «settings.json.unlesbar-…».",
+  "pt": "Não foi possível ler as definições – aplicam-se os valores predefinidos. O ficheiro danificado é guardado no armazenamento do SKZ Connect como «settings.json.unlesbar-…».",
+  "nl": "De instellingen konden niet worden gelezen – de standaardwaarden gelden. Het beschadigde bestand blijft als ‘settings.json.unlesbar-…’ in de opslag van SKZ Connect bewaard.",
+  "pl": "Nie można odczytać ustawień – obowiązują wartości domyślne. Uszkodzony plik zostaje zachowany w pamięci SKZ Connect jako „settings.json.unlesbar-…”.",
+  "ru": "Не удалось прочитать настройки – действуют значения по умолчанию. Повреждённый файл сохранён в памяти SKZ Connect как «settings.json.unlesbar-…».",
+  "ja": "設定を読み取れませんでした – デフォルト値が適用されます。破損したファイルは SKZ Connect のストレージに「settings.json.unlesbar-…」として保管されます。",
+  "zh": "无法读取设置 – 使用默认值。损坏的文件会以“settings.json.unlesbar-…”保留在 SKZ Connect 的存储中。",
+  "ko": "설정을 읽을 수 없습니다 – 기본값이 적용됩니다. 손상된 파일은 SKZ Connect 저장소에 'settings.json.unlesbar-…' 이름으로 보관됩니다."
  },
  "Die Lizenztexte fehlen in dieser Installation. Du findest sie unter {0}": {
   "en": "The licence texts are missing from this installation. You can find them at {0}",

@@ -1,4 +1,4 @@
-# Prüft und baut die Kodi-Add-ons von N-Connect (service.nconnect für LibreELEC/Linux samt Begleitmodus,
+# Prüft und baut die Kodi-Add-ons von SKZ Connect (service.nconnect für LibreELEC/Linux samt Begleitmodus,
 # plugin.nconnect.status, script.nconnect.bundle, repository.devcatskz).
 # - Jeder Lauf: Tests (Linux-Dienst und Add-on-Logik, Sprachdateien aktuell), dann alle ZIPs als Artefakt „Kodi-Plugin“.
 # - Tag „v1.2.3“: Die service.nconnect-ZIPs zusätzlich ans GitHub-Release.
@@ -6,7 +6,7 @@
 # Organisation abgeschaltet. Beim Release von Hand (siehe docs/LINUX-KODI.md):
 #   powershell -File linux/build-kodi-addon.ps1 -Repo -RepoDir <kodi-repo>, dort committen (devcatskz) und pushen.
 # Eine Version, die im kodi-repo schon liegt, überschreibt das Skript nie (dann vorher in der addon.xml hochzählen).
-name: N-Connect – Kodi-Plugin
+name: SKZ Connect – Kodi-Plugin
 on:
   workflow_dispatch:
   push:
@@ -83,7 +83,7 @@ jobs:
           if (-not (gh release view $tag 2>$null)) {
             # Selbst anlegen – mit demselben Text, den der Windows-Workflow nähme.
             $notes = "docs/release-notes/$tag.md"
-            if (Test-Path $notes) { gh release create $tag --title "N-Connect $tag" --notes-file $notes }
-            else { gh release create $tag --title "N-Connect $tag" --generate-notes }
+            if (Test-Path $notes) { gh release create $tag --title "SKZ Connect $tag" --notes-file $notes }
+            else { gh release create $tag --title "SKZ Connect $tag" --generate-notes }
           }
-          gh release upload $tag (Get-ChildItem out/kodi -Filter 'N-Connect-Kodi-*.zip').FullName --clobber
+          gh release upload $tag (Get-ChildItem out/kodi -Filter 'SKZ-Connect-Kodi-*.zip').FullName --clobber

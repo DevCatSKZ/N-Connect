@@ -1,17 +1,17 @@
 [B]Mode compagnon[/B]
-Sur ce système, ce n'est pas l'add-on qui connecte les manettes, mais l'application N-Connect. L'add-on affiche seulement ce que l'application transmet : le menu (Programmes > N-Connect) et le widget d'accueil avec les manettes connectées et connues et leur batterie.
+Sur ce système, ce n'est pas l'add-on qui connecte les manettes, mais l'application SKZ-Connect. L'add-on affiche seulement ce que l'application transmet : le menu (Programmes > SKZ Connect) et le widget d'accueil avec les manettes connectées et connues et leur batterie.
 
 [B]Windows[/B]
-Installez et démarrez N-Connect pour Windows (github.com/DevCatSKZ/N-Connect). L'application connecte les manettes comme manettes Xbox : Kodi les reconnaît sans configuration. Elle écrit son état dans le dossier de données de Kodi ; si elle n'est pas lancée, « L'application N-Connect n'est pas lancée » s'affiche ici. Kodi installé après N-Connect : redémarrez N-Connect une fois.
+Installez et démarrez SKZ Connect pour Windows (github.com/DevCatSKZ/SKZ-Connect). L'application connecte les manettes comme manettes Xbox : Kodi les reconnaît sans configuration. Elle écrit son état dans le dossier de données de Kodi ; si elle n'est pas lancée, « L'application SKZ Connect n'est pas lancée » s'affiche ici. Kodi installé après SKZ Connect : redémarrez SKZ Connect une fois.
 
 [B]Android[/B]
-Installez et démarrez N-Connect pour Android 0.9.1 ou plus récent. L'application enregistre son état dans le dossier Documents/N-Connect, où l'add-on le lit. Si Kodi n'affiche toujours rien, Android bloque peut-être l'accès : autorisez Kodi à accéder aux fichiers (stockage) dans les paramètres Android. Kodi installé après N-Connect : redémarrez N-Connect une fois.
+Installez et démarrez SKZ Connect pour Android 0.9.1 ou plus récent. L'application enregistre son état dans le dossier Documents/SKZ Connect, où l'add-on le lit. Si Kodi n'affiche toujours rien, Android bloque peut-être l'accès : autorisez Kodi à accéder aux fichiers (stockage) dans les paramètres Android. Kodi installé après SKZ Connect : redémarrez SKZ Connect une fois.
 
 [B]macOS[/B]
-N-Connect n'existe pas pour macOS : ici, l'add-on peut seulement afficher et reste vide.
+SKZ Connect n'existe pas pour macOS : ici, l'add-on peut seulement afficher et reste vide.
 
 [B]Paramètres[/B]
-La disposition des boutons, le gyroscope, la vibration, l'association, etc. se règlent dans l'application N-Connect. Les paramètres de cet add-on ne s'appliquent que sous LibreELEC/Linux.
+La disposition des boutons, le gyroscope, la vibration, l'association, etc. se règlent dans l'application SKZ-Connect. Les paramètres de cet add-on ne s'appliquent que sous LibreELEC/Linux.
 
 [B]Widget sur l'écran d'accueil[/B]
-Selon le skin : Paramètres du skin > Accueil > Widgets > Add-ons > N-Connect.
+Selon le skin : Paramètres du skin > Accueil > Widgets > Add-ons > SKZ-Connect.

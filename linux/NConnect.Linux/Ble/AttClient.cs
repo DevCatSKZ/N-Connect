@@ -7,7 +7,7 @@ namespace NConnect.Linux.Ble;
 /// GATT-Client direkt über einen L2CAP-ATT-Socket (Kanal 4) – an BlueZs GATT-Dienst vorbei.
 /// Grund: BlueZ fragt nach dem Verbinden auch „Secondary Services“ ab; darauf antworten Switch-2-Controller nie,
 /// die Diensteabfrage hängt bis zum ATT-Timeout und die Verbindung ist verloren. Ein eigener ATT-Client-Socket hat
-/// beim Kernel Vorrang vor dem von bluetoothd (wie früher gatttool) und fragt nur ab, was N-Connect braucht.
+/// beim Kernel Vorrang vor dem von bluetoothd (wie früher gatttool) und fragt nur ab, was SKZ Connect braucht.
 /// Außerdem kann so das Verbindungsintervall per HCI-Befehl verkürzt werden (BlueZ wählt ~50 ms).
 /// </summary>
 public sealed class AttClient : IDisposable

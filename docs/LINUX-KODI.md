@@ -1,4 +1,4 @@
-# N-Connect für Linux / LibreELEC (Kodi-Add-ons)
+# SKZ Connect für Linux / LibreELEC (Kodi-Add-ons)
 
 Stand: 17.10.2026 – `service.nconnect` 0.4.4 (Programm `nconnect` 0.4.4), `plugin.nconnect.status` 1.1.1,
 `script.nconnect.bundle` 1.0.2, `repository.devcatskz` 1.0.2.
@@ -77,12 +77,12 @@ Xbox/PlayStation/Switch 1/Wii ──► BlueZ (bluetoothd, D-Bus) ◄───�
   Einrichtung wird nach dem Anlegen des Spielers noch einmal geprüft – kein Geist-Controller.
 - **Andere Controller** ([GamepadManager.cs](../linux/NConnect.Linux/Ble/GamepadManager.cs)): Die Kernel-Treiber
   (xpad, hid-microsoft, hid-playstation, hid-sony, hid-nintendo, hid-wiimote, hid-steam) übernehmen Eingaben, Vibration
-  und Akku; N-Connect koppelt nur.
+  und Akku; SKZ Connect koppelt nur.
   - Erkennen an Geräteklasse (Peripherie/Joystick/Gamepad), LE-Erscheinungsbild 0x03C3/0x03C4 oder bekanntem Namen.
   - Koppeln, als vertrauenswürdig markieren, verbinden – danach verbindet sich das Gamepad per Tastendruck selbst.
   - [PairingAgent.cs](../linux/NConnect.Linux/Ble/PairingAgent.cs): „NoInputNoOutput“ mit eigener D-Bus-Verbindung,
     nicht als Standard-Agent angemeldet. Koppelt gerade die LibreELEC-Seite („InProgress“/„AlreadyExists“), hält sich
-    N-Connect heraus. Nicht-Gamepads und der Adapter-Strom werden nie angefasst.
+    SKZ Connect heraus. Nicht-Gamepads und der Adapter-Strom werden nie angefasst.
   - Wii-Fernbedienung / Wii U Pro: Die feste Wii-PIN setzt BlueZ selbst (Modul „wiimote“, in LibreELEC enthalten).
 - **Virtueller Controller** ([UInputPad.cs](../linux/NConnect.Linux/Output/UInputPad.cs)):
   - Name, Kennung und Belegung wie beim Kernel-Treiber xpad: „Microsoft X-Box 360 pad“, USB 045E:028E, Version 0x0114.
@@ -97,7 +97,7 @@ Xbox/PlayStation/Switch 1/Wii ──► BlueZ (bluetoothd, D-Bus) ◄───�
   Sendepuffer in `write` hängt, kehrt sofort zurück, statt das Trennen bis zum Supervision-Timeout aufzuhalten.
 - **DSU/Cemuhook-Server** ([DsuServer.cs](../src/Switch2Pro.Protocol/DsuServer.cs), derselbe wie unter Windows und Android): Port 26760,
   standardmäßig nur lokal; `DsuNetwork` öffnet ihn fürs Heimnetz. Ist der Port beim Start belegt (meist ein gerade
-  endendes N-Connect), versucht der Daemon es nach 2, 5, 10, 20 und 30 s erneut.
+  endendes SKZ Connect), versucht der Daemon es nach 2, 5, 10, 20 und 30 s erneut.
 - **Feste Spielerplätze** (`slots.json`), **bekannte Controller** (`known.json`, für das ausgegraute Widget),
   **Akku-Warnung** (`battery-low` bei 20 % und 10 %), **Trennen nach Inaktivität** (`InactivityMinutes`), nach einem
   Trennen von Hand werden Controller 15 s ignoriert; fällt der Adapter weg, beginnt eine neue Sitzung.
@@ -138,14 +138,14 @@ Xbox/PlayStation/Switch 1/Wii ──► BlueZ (bluetoothd, D-Bus) ◄───�
 
 - **Einstiegspunkte** (`addon.xml`, `<platform>all</platform>`):
   - `xbmc.service` → `service.py` (startet mit Kodi),
-  - `xbmc.python.script` → `default.py` (Programme → N-Connect; Argumente `help`, `selftest`, `log`, `disconnect-all`),
+  - `xbmc.python.script` → `default.py` (Programme → SKZ Connect; Argumente `help`, `selftest`, `log`, `disconnect-all`),
   - `xbmc.python.pluginsource` → `plugin.py` (`plugin://service.nconnect/` als Home-Widget).
 - **`service.py`:**
   - Wählt das Programm nach der Bitbreite des Python-Prozesses (`struct.calcsize('P')`), nicht nach dem Kernel: ein
     64-Bit-Kernel mit 32-Bit-System (z. B. Raspberry Pi OS 32 Bit) bekommt `linux-arm`. Scheitert der Start (OSError,
     z. B. „Exec format error“), wird die andere ARM-Variante versucht; passt keine, erscheint Meldung 30022 statt eines
     Absturzes. Das Ausführungsrecht (geht beim Entpacken verloren) wird abgesichert gesetzt.
-  - Vor dem Start: `modprobe uinput`; ein N-Connect aus einer früheren, abgestürzten Kodi-Sitzung wird über
+  - Vor dem Start: `modprobe uinput`; ein SKZ Connect aus einer früheren, abgestürzten Kodi-Sitzung wird über
     `nconnect.pid` erkannt (Prüfung von `/proc/<pid>/cmdline`) und beendet.
   - Startet `nconnect --data <Datenordner> --kodi [--adapter …]`, überträgt die Kodi-Einstellungen in `settings.json`
     (fremde Einträge bleiben stehen), zeigt Meldungen beim Verbinden und Trennen (abschaltbar; Fehler immer).
@@ -182,28 +182,28 @@ Xbox/PlayStation/Switch 1/Wii ──► BlueZ (bluetoothd, D-Bus) ◄───�
 
 - **Batocera / sonstiges Linux:** wie LibreELEC – das Add-on enthält das Programm für x86_64, aarch64 und arm und läuft
   dort, wenn alles als root läuft und BlueZ/uinput vorhanden sind. Auf Batocera koppelt bereits das System
-  Bluetooth-Controller; N-Connect ist für Switch-2-Controller gedacht. Die Bluetooth-Einstellungen liegen dort im
+  Bluetooth-Controller; SKZ Connect ist für Switch-2-Controller gedacht. Die Bluetooth-Einstellungen liegen dort im
   Systemmenü, nicht bei `service.libreelec.settings` (das Menü prüft, ob das Add-on existiert). **Ungetestet.**
 - **Desktop-Linux** (Ubuntu & Co., Kodi als normaler Benutzer): Das Programm braucht root für HCI-Rohzugriff und
   /dev/uinput – als Benutzer gestartet schlägt es fehl (der Selbsttest zeigt das an). Dafür fehlen noch ein
   systemd-Dienst bzw. eine udev-Regel. **Ungetestet.**
 - **Begleitmodus** (kein Linux-Dienst; `common.has_daemon()` ist falsch – auf Android meldet Python „Linux“, darum wird
-  Kodi gefragt): Das Add-on zeigt nur an, was eine N-Connect-App in die status.json schreibt. Trennen, Koppeln,
+  Kodi gefragt): Das Add-on zeigt nur an, was eine SKZ-Connect-App in die status.json schreibt. Trennen, Koppeln,
   Selbsttest und Dienst-Protokoll gibt es dort nicht. Die Einstellungen der Kategorien Controller, Emulatoren,
   Vibration, Verbindung und Kodi sind gesperrt (InfoBool-Bedingung `System.Platform.Linux + !System.Platform.Android`),
   je Kategorie steht ein Hinweis-Knopf „Diese Einstellungen gelten nur unter LibreELEC/Linux“, der die
   Begleitmodus-Anleitung öffnet.
-  - **Windows:** Die installierte N-Connect-App verbindet die Controller (als XInput), und
+  - **Windows:** Die installierte SKZ-Connect-App verbindet die Controller (als XInput), und
     [KodiStatusWriter.cs](../src/Switch2Pro.Bridge/KodiStatusWriter.cs) schreibt die status.json in Kodis
     `userdata/addon_data/service.nconnect/` (normale Installation und Microsoft-Store-Variante, siehe
     [KodiIntegration.cs](../src/Switch2Pro.Bridge/KodiIntegration.cs)). Wird Kodi erst danach installiert, die App
     einmal neu starten.
-  - **Android:** Die App darf nicht in Kodis Datenordner schreiben (Scoped Storage). Sie legt die Datei ab N-Connect
-    für Android **0.9.1** über MediaStore in `/sdcard/Documents/N-Connect/status.json` ab (Android 8/9: externer
+  - **Android:** Die App darf nicht in Kodis Datenordner schreiben (Scoped Storage). Sie legt die Datei ab SKZ Connect
+    für Android **0.9.1** über MediaStore in `/sdcard/Documents/SKZ-Connect/status.json` ab (Android 8/9: externer
     App-Ordner); das Add-on liest dort mit
     ([KodiStatusWriter.cs](../android/NConnect.Android/Kodi/KodiStatusWriter.cs)). Ob Kodi ab Android 11 die Datei ohne
     „Zugriff auf alle Dateien“ lesen darf, ist **ungeprüft**.
-  - **macOS** (und iOS/tvOS): Es gibt keine N-Connect-App – das Add-on zeigt „Nur Anzeige – N-Connect gibt es für macOS
+  - **macOS** (und iOS/tvOS): Es gibt keine SKZ-Connect-App – das Add-on zeigt „Nur Anzeige – SKZ Connect gibt es für macOS
     nicht“.
 
 ## Weitere Add-ons
@@ -222,21 +222,21 @@ Xbox/PlayStation/Switch 1/Wii ──► BlueZ (bluetoothd, D-Bus) ◄───�
 powershell -File linux/build-kodi-addon.ps1                          # alle drei Prozessoren → out/kodi/
 powershell -File linux/build-kodi-addon.ps1 -Rids linux-x64           # nur einer (schneller)
 powershell -File linux/build-kodi-addon.ps1 -Out C:\Temp\kodi        # anderer Ausgabeordner
-powershell -File linux/build-kodi-addon.ps1 -Repo                     # zusätzlich ins kodi-repo neben N-Connect
+powershell -File linux/build-kodi-addon.ps1 -Repo                     # zusätzlich ins kodi-repo neben SKZ Connect
 powershell -File linux/build-kodi-addon.ps1 -Repo -NoBuild -RepoDir … # nur ablegen, vorhandene ZIPs aus -Out
 ```
 
-Vor einem neuen Lauf entfernt das Skript im Ausgabeordner nur seine eigenen ZIPs (`N-Connect-Kodi-LibreELEC-*`,
+Vor einem neuen Lauf entfernt das Skript im Ausgabeordner nur seine eigenen ZIPs (`SKZ-Connect-Kodi-LibreELEC-*`,
 `plugin.nconnect.status-*`, `script.nconnect.bundle-*`, `repository.devcatskz-*`) – andere Dateien in `-Out` bleiben.
 
 Ergebnis (Größen mit allen drei Prozessoren):
 
 | Datei | Größe | Inhalt |
 |---|---|---|
-| `N-Connect-Kodi-LibreELEC-<V>-alle-Geraete.zip` | ca. 18 MB | `service.nconnect`, universell: x64 + arm64 + arm (empfohlen) |
-| `N-Connect-Kodi-LibreELEC-<V>-RPi4-RPi5-arm64.zip` | ca. 6,4 MB | nur arm64 (Pi 4/5 mit LibreELEC 12, 64-Bit-Boxen) |
-| `N-Connect-Kodi-LibreELEC-<V>-RPi2-RPi3-arm.zip` | ca. 5,6 MB | nur arm (Pi 2/3, 32 Bit) |
-| `N-Connect-Kodi-LibreELEC-<V>-PC-x86_64.zip` | ca. 6,7 MB | nur x64 (PC, LibreELEC Generic) |
+| `SKZ-Connect-Kodi-LibreELEC-<V>-alle-Geraete.zip` | ca. 18 MB | `service.nconnect`, universell: x64 + arm64 + arm (empfohlen) |
+| `SKZ-Connect-Kodi-LibreELEC-<V>-RPi4-RPi5-arm64.zip` | ca. 6,4 MB | nur arm64 (Pi 4/5 mit LibreELEC 12, 64-Bit-Boxen) |
+| `SKZ-Connect-Kodi-LibreELEC-<V>-RPi2-RPi3-arm.zip` | ca. 5,6 MB | nur arm (Pi 2/3, 32 Bit) |
+| `SKZ-Connect-Kodi-LibreELEC-<V>-PC-x86_64.zip` | ca. 6,7 MB | nur x64 (PC, LibreELEC Generic) |
 | `plugin.nconnect.status-<V>.zip` | < 0,1 MB | Widget-Weiterleitung |
 | `script.nconnect.bundle-<V>.zip` | ca. 18 MB | Bundle mit der universellen `service.nconnect`- und der Plugin-ZIP |
 | `repository.devcatskz-<V>.zip` | < 0,1 MB | Repository-Add-on |
@@ -268,10 +268,10 @@ Kodi aktualisiert nur Installationen aus dem Repository und nur, wenn die Versio
   - Jeder Push auf `linux/**`, `src/Switch2Pro.Protocol/**`, `tests/NConnect.Linux.Tests/**`,
     `THIRD-PARTY-NOTICES.md` oder die Workflow-Datei führt die [Tests](#tests) aus, prüft, dass `generate.py` keine
     Sprachdatei ändert, und erzeugt das Artefakt „Kodi-Plugin“ (alle ZIPs).
-  - Ein Tag `v…` hängt zusätzlich die `N-Connect-Kodi-*.zip` ans GitHub-Release.
+  - Ein Tag `v…` hängt zusätzlich die `SKZ-Connect-Kodi-*.zip` ans GitHub-Release.
   - Ins kodi-repo schreibt die CI bewusst **nicht** (kein automatischer Zugang; Deploy-Keys sind in der Organisation
     DevCatSKZ ohnehin abgeschaltet).
-- **Release von Hand** (nach dem Tag, aus einer Arbeitskopie von N-Connect auf dem Release-Stand):
+- **Release von Hand** (nach dem Tag, aus einer Arbeitskopie von SKZ Connect auf dem Release-Stand):
   1. kodi-repo aktuell holen: `git -C <kodi-repo> pull`.
   2. `powershell -File linux/build-kodi-addon.ps1 -Repo -RepoDir <kodi-repo>` – baut alle ZIPs, legt neue Versionen
      samt `downloads/` und `repository.devcatskz.zip` ab und ruft dort das Index-Werkzeug `tools/build_repo.py` auf
@@ -357,8 +357,8 @@ Damals (0.1/0.2) geprüft und bestanden:
   Bluetooth) laufen unter Linux vermutlich über `hid-nintendo` – ungeprüft.
 - **Batocera** auf echter Hardware prüfen.
 - **Desktop-Linux:** systemd-Dienst oder udev-Regel, damit `nconnect` ohne root-Kodi läuft.
-- **Kodi unter Android:** prüfen, ob Kodi ab Android 11 `/sdcard/Documents/N-Connect/status.json` lesen darf
-  (Scoped Storage), mit N-Connect für Android 0.9.1.
+- **Kodi unter Android:** prüfen, ob Kodi ab Android 11 `/sdcard/Documents/SKZ-Connect/status.json` lesen darf
+  (Scoped Storage), mit SKZ Connect für Android 0.9.1.
 - **Settings im Begleitmodus:** Die Sperre nutzt InfoBool-Bedingungen in `settings.xml`; auf Kodi für Windows/Android
   einmal ansehen, ob Sperre und Hinweis-Knopf wie gedacht erscheinen.
 - **Kodi-Repository per Dateimanager:** Weg über GitHub Pages (`https://devcatskz.github.io/kodi-repo/`) einmal in Kodi

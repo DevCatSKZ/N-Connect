@@ -9,7 +9,7 @@ namespace NConnect.Android.Touch;
 /// <summary>
 /// Bedienungshilfe für den Touch-Modus: führt Tasten des Controllers als Bildschirmberührungen aus und zeigt den
 /// Layout-Editor über dem laufenden Spiel. Liest keine Fensterinhalte (siehe res/xml/touch_service.xml).
-/// Der Nutzer schaltet sie einmalig unter Einstellungen → Bedienungshilfen → N-Connect ein.
+/// Der Nutzer schaltet sie einmalig unter Einstellungen → Bedienungshilfen → SKZ Connect ein.
 /// </summary>
 [Service(Label = "@string/touch_service_label", Permission = "android.permission.BIND_ACCESSIBILITY_SERVICE", Exported = true)]
 [IntentFilter(["android.accessibilityservice.AccessibilityService"])]

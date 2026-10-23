@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Erzeugt von android/i18n/generate.py -->
 <resources>
-    <string name="touch_service_description">Permet à N-Connect d\'exécuter les boutons de votre manette comme des appuis sur l\'écran (mode tactile). Aucun contenu n\'est lu ni enregistré.</string>
-    <string name="touch_service_label">Commandes tactiles N-Connect</string>
-    <string name="setup_title">Configurer N-Connect</string>
+    <string name="touch_service_description">Permet à SKZ Connect d\'exécuter les boutons de votre manette comme des appuis sur l\'écran (mode tactile). Aucun contenu n\'est lu ni enregistré.</string>
+    <string name="touch_service_label">Commandes tactiles SKZ Connect</string>
+    <string name="setup_title">Configurer SKZ Connect</string>
 </resources>

@@ -25,7 +25,7 @@ RES_KEYS = ['touch_service_description', 'touch_service_label', 'setup_title']
 # Eigene Methoden, die ihre Text-Argumente an Ui.* weiterreichen (HelpPage.Topic, SetupWizardActivity.Option)
 WRAPPERS = {'Topic', 'Option'}
 # Texte, die bewusst in allen Sprachen gleich bleiben (Eigennamen, Kürzel)
-SAME_EVERYWHERE = {'OK', 'Test', 'Root', 'Shizuku', 'N-Connect', 'Pro Controller 2', 'Joy-Con 2 (L)', 'Joy-Con 2 (R)'}
+SAME_EVERYWHERE = {'OK', 'Test', 'Root', 'Shizuku', 'SKZ Connect', 'Pro Controller 2', 'Joy-Con 2 (L)', 'Joy-Con 2 (R)'}
 CHECK = '--check' in sys.argv[1:]
 
 errors = []

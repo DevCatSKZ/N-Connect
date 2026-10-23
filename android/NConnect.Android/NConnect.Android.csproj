@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <!-- Release-Signatur (Schlüssel und Passwort liegen nur lokal in %USERPROFILE%\.nconnect, nie im Repository). -->
   <Import Project="$(USERPROFILE)\.nconnect\signing.props" Condition="Exists('$(USERPROFILE)\.nconnect\signing.props')" />
-  <!-- N-Connect für Android. Teilt sich die Protokoll-Bibliothek mit der Windows-Version. -->
+  <!-- SKZ Connect für Android. Teilt sich die Protokoll-Bibliothek mit der Windows-Version. -->
   <PropertyGroup>
     <TargetFramework>net10.0-android</TargetFramework>
     <SupportedOSPlatformVersion>26</SupportedOSPlatformVersion>
@@ -10,7 +10,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>NConnect.Android</RootNamespace>
     <ApplicationId>com.devcatskz.nconnect</ApplicationId>
-    <ApplicationTitle>N-Connect</ApplicationTitle>
+    <ApplicationTitle>SKZ Connect</ApplicationTitle>
     <ApplicationVersion>10</ApplicationVersion>
     <ApplicationDisplayVersion>0.9.1</ApplicationDisplayVersion>
     <!-- Shizuku wird per Reflection angesprochen, Einstellungen per JSON: nicht voll trimmen. -->

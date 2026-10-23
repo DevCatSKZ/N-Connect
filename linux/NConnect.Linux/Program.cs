@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
 using NConnect.Linux;
 
-// N-Connect für Linux – Aufruf:
+// SKZ Connect für Linux – Aufruf:
 //   nconnect [--data <Ordner>] [--adapter hci0] [--kodi]
 //   nconnect --selftest [--data <Ordner>]   (Diagnose ohne Controller)
 // <Ordner> enthält settings.json (gleiche Einstellungsdatei wie Windows/Android), status.json und nconnect.log.
@@ -20,7 +20,7 @@ if (args.Contains("--version"))
     return 0;
 }
 Log.UseFile(Path.Combine(data, "nconnect.log"));
-Log.Info($"N-Connect für Linux {typeof(Daemon).Assembly.GetName().Version?.ToString(3)} startet ({RuntimeInformation.OSArchitecture}, Daten: {data})");
+Log.Info($"SKZ Connect für Linux {typeof(Daemon).Assembly.GetName().Version?.ToString(3)} startet ({RuntimeInformation.OSArchitecture}, Daten: {data})");
 
 using var stop = new CancellationTokenSource();
 using var sigterm = PosixSignalRegistration.Create(PosixSignal.SIGTERM, c => { c.Cancel = true; stop.Cancel(); });
@@ -39,7 +39,7 @@ catch (Exception e)
     Log.Error("Dienst beendet", e);
     return 1;
 }
-Log.Info("N-Connect beendet");
+Log.Info("SKZ Connect beendet");
 return 0;
 
 string? Arg(string name)

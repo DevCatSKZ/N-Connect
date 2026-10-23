@@ -92,7 +92,7 @@ class BundleTest(unittest.TestCase):
                 self.assertIn('<label2>Manettes</label2>', f.read())
             with open(installer.PROPS_FILE, encoding='utf-8') as f:
                 props = {p[2]: p[3] for p in json.load(f)}
-        self.assertEqual(props['widgetName'], 'N-Connect - Manettes')
+        self.assertEqual(props['widgetName'], 'SKZ Connect - Manettes')
         self.assertIn('NConnect.Reload', props['widgetPath'])
 
     def test_alle_texte_in_allen_sprachen(self):

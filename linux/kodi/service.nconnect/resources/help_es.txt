@@ -7,20 +7,20 @@ El Bluetooth debe estar activado: ajustes de LibreELEC > Bluetooth > activar. Un
    • Joy-Con 2: en el lateral plano interior, entre SL y SR
    • Mando de GameCube (Switch 2): en la parte superior
 2. A los pocos segundos aparece «Jugador 1: … conectado». El mando funciona ahora como mando de Xbox en Kodi y en los juegos.
-3. N-Connect empareja a la vez el mando con este dispositivo.
+3. SKZ Connect empareja a la vez el mando con este dispositivo.
 
 [B]Volver a conectar[/B]
 Basta con pulsar cualquier botón (p. ej. HOME), sin SYNC. Funciona mientras el mando no se haya emparejado con otro dispositivo mediante SYNC.
 
 [B]Otros mandos (Xbox, PlayStation, Switch 1, 8BitDo …)[/B]
-N-Connect los empareja automáticamente; solo tienes que ponerlos en modo de emparejamiento:
+SKZ Connect los empareja automáticamente; solo tienes que ponerlos en modo de emparejamiento:
    • Xbox: pulsa el botón de emparejamiento superior hasta que el logotipo parpadee rápido
    • PlayStation 4: mantén SHARE + PS hasta que la barra de luz parpadee
    • PlayStation 5: mantén CREAR + PS hasta que la luz parpadee
    • Pro Controller / Joy-Con de Switch 1: pulsa el botón SYNC
    • 8BitDo: botón de emparejamiento o según su manual (modo Switch o X-input)
    • Wiimote / Wii U Pro Controller: pulsa el botón rojo SYNC (en el compartimento de las pilas o detrás)
-Después, basta con pulsar un botón para reconectarlos. En el menú de N-Connect puedes desconectarlos u olvidarlos.
+Después, basta con pulsar un botón para reconectarlos. En el menú de SKZ Connect puedes desconectarlos u olvidarlos.
 
 [B]Joy-Con[/B]
 Un Joy-Con izquierdo y uno derecho se combinan automáticamente en un mando. Para dos jugadores con un Joy-Con en horizontal cada uno: Ajustes > Mando > desactivar «Combinar».
@@ -33,7 +33,7 @@ Cruceta/stick: mover · botón inferior: seleccionar · botón derecho: atrás (
 Para cambiar la asignación: ajustes de Kodi > Sistema > Entrada > Configurar mandos conectados.
 
 [B]Botones del mando en Kodi[/B]
-Captura hace una captura de pantalla y el botón C abre el menú de N-Connect. Se cambia en Ajustes > Kodi > Botones del mando en Kodi (también para los botones traseros GL/GR del Pro Controller 2). Si una batería se agota, N-Connect muestra un aviso.
+Captura hace una captura de pantalla y el botón C abre el menú de SKZ-Connect. Se cambia en Ajustes > Kodi > Botones del mando en Kodi (también para los botones traseros GL/GR del Pro Controller 2). Si una batería se agota, SKZ Connect muestra un aviso.
 
 [B]Puestos de jugador y giroscopio para emuladores[/B]
 Cada mando recupera su puesto de jugador al volver a conectarse. Emuladores como Dolphin, Cemu o Citra reciben el movimiento por DSU/Cemuhook (puerto 26760): elige «DSU» o «Cemuhook» con 127.0.0.1 como fuente de movimiento. Ajustes > Emuladores.
@@ -46,4 +46,4 @@ El mando aparece en todas partes como «Xbox 360 Controller» y no necesita conf
 • Mensaje «emparejado con otro dispositivo»: pulsa SYNC para emparejarlo de nuevo aquí.
 • Retraso en la respuesta: acércate al adaptador Bluetooth; un alargador USB para la llave ayuda contra interferencias de USB 3.
 • La conexión se rechaza al instante (errno 38): el WiFi interfiere con el Bluetooth – desactívalo si no lo usas (Ajustes de LibreELEC > Conexiones).
-• Muestra el registro y adjúntalo al informar de un problema: github.com/DevCatSKZ/N-Connect/issues
+• Muestra el registro y adjúntalo al informar de un problema: github.com/DevCatSKZ/SKZ-Connect/issues

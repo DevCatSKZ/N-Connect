@@ -3,7 +3,7 @@ namespace Switch2Pro.Protocol;
 /// <summary>
 /// Ein in Windows gekoppeltes Bluetooth-Gerät – Adresse und gespeicherter Name. Der Name ist für jeden lesbar
 /// (<c>BTHPORT\Parameters\Devices</c>) und reicht, um einen Controller zu erkennen und seine Adresse in den Export
-/// aufzunehmen, auch wenn N-Connect ihn selbst noch nicht verbunden hatte. Kopplungsschlüssel liest N-Connect
+/// aufzunehmen, auch wenn SKZ Connect ihn selbst noch nicht verbunden hatte. Kopplungsschlüssel liest SKZ Connect
 /// bewusst nicht aus.
 /// </summary>
 public sealed record WindowsBtDevice

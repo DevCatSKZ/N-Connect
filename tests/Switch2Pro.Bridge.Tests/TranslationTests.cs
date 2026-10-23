@@ -182,7 +182,7 @@ public sealed partial class TranslationTests : IDisposable
         "Qk62  (verbunden)",
         "P63 Qk63 57 %",
         "Bluetooth nicht verfügbar: Qe64",
-        "N-Connect: Qp65",
+        "SKZ Connect: Qp65",
         "Qk66 per USB ist von einem anderen Programm belegt (z. B. Steam).",
         "Schon 8 Controller verbunden – Qk67 wird nicht verwendet.",
         "Qk68: schwache Bluetooth-Verbindung (14 statt 33–60 Berichte/s).",
@@ -226,15 +226,15 @@ public sealed partial class TranslationTests : IDisposable
 
     public static TheoryData<string> Samples() =>
     [
-        "N-Connect – Willkommen",
+        "SKZ Connect – Willkommen",
         .. WelcomeForm.Paragraphs,
         UpdateQuestion("1.0.22", portable: true),
         UpdateQuestion("1.0.22", portable: false),
         HidHideQuestion("1.5.230"),
         "Xbox · Platz 2 · nativ",
         "Xbox · nativ",
-        "N-Connect: Bluetooth ist ausgeschaltet.",
-        "N-Connect: ViGEmBus fehlt",
+        "SKZ Connect: Bluetooth ist ausgeschaltet.",
+        "SKZ Connect: ViGEmBus fehlt",
         "Gekoppelt: Pro Controller\nDer Controller erscheint gleich in der Übersicht.",
         "Mitte 2048 / 2048 · Abweichung vom Kreis: vorher 12 %, neu 3 %",
         "320 × 240 · 12,5 Bilder/s",
@@ -250,8 +250,8 @@ public sealed partial class TranslationTests : IDisposable
         "Kein Bluetooth-Adapter gefunden.",
         "Bluetooth-Suche konnte nicht starten.",
         "Bluetooth nicht verfügbar: Zugriff verweigert",
-        "N-Connect: warte auf Controller (SYNC drücken)",
-        "N-Connect: Bluetooth-Suche konnte nicht starten.",
+        "SKZ Connect: warte auf Controller (SYNC drücken)",
+        "SKZ Connect: Bluetooth-Suche konnte nicht starten.",
         // Zusammengesetzt aus Muster und festem Tipp (ControllerManager) bzw. Kurznamen gedrückter Tasten (Karte).
         "Pro Controller 2: schwache Bluetooth-Verbindung (14 statt 33–60 Berichte/s). Tipp: Bluetooth-Stick per Verlängerung " +
         "näher an den Controller, weg von USB-3-Anschlüssen und Funkkopfhörern.",
@@ -261,7 +261,7 @@ public sealed partial class TranslationTests : IDisposable
         "R-Stick",
         // Lizenzen Dritter (Allgemein → Erweitert) und Hinweise beim Start auf unlesbare bzw. wiederhergestellte Einstellungen.
         "Lizenzen Dritter",
-        "Open-Source-Software und übernommener Code in N-Connect – mit Lizenzen und Copyright-Vermerken.",
+        "Open-Source-Software und übernommener Code in SKZ Connect – mit Lizenzen und Copyright-Vermerken.",
         "Einstellungen wiederhergestellt",
         "settings.json konnte nicht gelesen werden – es gelten die Standardwerte. Die beschädigte Datei wird als " +
         "„settings.json.unlesbar-…“ aufbewahrt (Klicken öffnet den Ordner).",
@@ -322,9 +322,9 @@ public sealed partial class TranslationTests : IDisposable
             Tr.SetLanguage(lang);
             foreach (var problem in new[] { "Bluetooth ist ausgeschaltet.", "Kein Bluetooth-Adapter gefunden.", "Dieser Bluetooth-Adapter unterstützt kein Bluetooth LE." })
             {
-                string tooltip = Tr.T($"N-Connect: {problem}");
+                string tooltip = Tr.T($"SKZ Connect: {problem}");
                 Assert.Contains(Tr.Table(lang)![problem], tooltip);
-                Assert.StartsWith("N-Connect", tooltip, StringComparison.Ordinal);
+                Assert.StartsWith("SKZ Connect", tooltip, StringComparison.Ordinal);
             }
         }
     }
@@ -392,14 +392,14 @@ public sealed partial class TranslationTests : IDisposable
 
     /// <summary>Rückfrage vor dem Update, wie TrayApp.InstallUpdateAsync sie baut (portable: ohne Admin-Satz).</summary>
     private static string UpdateQuestion(string version, bool portable) =>
-        $"Version {version} herunterladen und installieren? N-Connect wird dafür kurz beendet und " +
+        $"Version {version} herunterladen und installieren? SKZ Connect wird dafür kurz beendet und " +
         "danach wieder gestartet." + (portable ? "" : " Windows fragt dabei nach Administratorrechten.");
 
     /// <summary>Rückfrage vor dem HidHide-Update, wie TrayApp.InstallHidHideUpdateAsync sie baut.</summary>
     private static string HidHideQuestion(string version) =>
         $"HidHide {version} herunterladen und installieren? Das HidHide-Setup entfernt zuerst die alte " +
         "Version und verlangt einen Neustart von Windows – bitte seinen Anweisungen folgen. Windows fragt dabei " +
-        "nach Administratorrechten. Danach versteckt N-Connect die Controller automatisch neu.";
+        "nach Administratorrechten. Danach versteckt SKZ Connect die Controller automatisch neu.";
 
     /// <summary>Platzhalter, der wörtlich übernommen werden muss: Zahl/Version/Prozent oder ein „Q“-Name.</summary>
     private static bool IsPlaceholder(string value) => value.Contains('Q') || NumberLike().IsMatch(value);

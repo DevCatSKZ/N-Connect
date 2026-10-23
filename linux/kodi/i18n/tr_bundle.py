@@ -33,7 +33,7 @@ BUNDLE = {
             'fr': 'Redémarrer Kodi maintenant ?', 'it': 'Riavviare Kodi adesso?', 'pt': 'Reiniciar o Kodi agora?',
             'nl': 'Kodi nu opnieuw starten?', 'pl': 'Uruchomić ponownie Kodi teraz?', 'ru': 'Перезапустить Kodi сейчас?',
             'ja': '今すぐ Kodi を再起動しますか？', 'zh': '现在重启 Kodi？', 'ko': '지금 Kodi를 다시 시작할까요?'},
-    # Untertitel des Menüpunkts und Name des Widgets in Aeon Nox Silvo („N-Connect – Controller“)
+    # Untertitel des Menüpunkts und Name des Widgets in Aeon Nox Silvo („SKZ Connect – Controller“)
     32005: {'en': 'Controllers', 'de': 'Controller', 'es': 'Mandos', 'fr': 'Manettes', 'it': 'Controller',
             'pt': 'Comandos', 'nl': 'Controllers', 'pl': 'Kontrolery', 'ru': 'Контроллеры', 'ja': 'コントローラー',
             'zh': '手柄', 'ko': '컨트롤러'},

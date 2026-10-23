@@ -26,7 +26,7 @@ def main():
         f.write('done')
     if installed:
         dialog = xbmcgui.Dialog()
-        if dialog.yesno('N-Connect Bundle',
+        if dialog.yesno('SKZ Connect Bundle',
                         installer.text(32000, ', '.join(installed)) + '\n' + installer.text(32004)):
             import xbmc
             xbmc.executebuiltin('RestartApp')

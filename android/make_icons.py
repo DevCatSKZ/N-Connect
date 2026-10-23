@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Erzeugt die Android-App-Icons aus dem Windows-App-Icon (src/Switch2Pro.Bridge/N-Connect.png), damit alle Versionen
+Erzeugt die Android-App-Icons aus dem Windows-App-Icon (src/Switch2Pro.Bridge/SKZ-Connect.png), damit alle Versionen
 gleich aussehen. Adaptives Icon: die blaue Fläche des Windows-Icons füllt die ganze Android-Form (Kreis, Squircle …),
 das Gamepad liegt in der sicheren Zone; der Vordergrund bleibt leer. Aufruf: python android/make_icons.py
 """
@@ -9,7 +9,7 @@ import pathlib
 from PIL import Image
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-SOURCE = ROOT / 'src' / 'Switch2Pro.Bridge' / 'N-Connect.png'
+SOURCE = ROOT / 'src' / 'Switch2Pro.Bridge' / 'SKZ-Connect.png'
 RES = ROOT / 'android' / 'NConnect.Android' / 'Resources'
 DENSITIES = {'mdpi': 1, 'hdpi': 1.5, 'xhdpi': 2, 'xxhdpi': 3, 'xxxhdpi': 4}
 BORDER = 16  # heller Rand des Windows-Icons wird abgeschnitten

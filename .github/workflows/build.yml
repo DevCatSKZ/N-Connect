@@ -1,11 +1,11 @@
-# Baut den Windows-Installer von N-Connect, prüft alle Projekte der Projektmappe und kompiliert die Android-App.
-# Download: GitHub → Actions → „N-Connect – Windows-Installer“ → letzter Lauf → Artifacts.
+# Baut den Windows-Installer von SKZ Connect, prüft alle Projekte der Projektmappe und kompiliert die Android-App.
+# Download: GitHub → Actions → „SKZ Connect – Windows-Installer“ → letzter Lauf → Artifacts.
 # Ein Tag „v1.2.3“ erzeugt zusätzlich ein GitHub-Release mit Setup.exe und Portable-ZIP. Den Text liefert
 # docs/release-notes/v1.2.3.md, falls vorhanden – sonst erzeugt GitHub ihn aus den Commits.
 # Versionen: Release = Tag. Ohne Tag „<Version aus Switch2Pro.Bridge.csproj>-ci.<Lauf>“, eine Vorabversion des nächsten
 # Releases, die nie neuer aussieht als dieses (die Update-Prüfung bietet es an). Datei- und Installer-Version bleiben
 # numerisch.
-name: N-Connect – Windows-Installer
+name: SKZ Connect – Windows-Installer
 on:
   workflow_dispatch:
   push:
@@ -68,7 +68,7 @@ jobs:
         run: |
           [IO.File]::WriteAllBytes("$env:RUNNER_TEMP\sign.pfx", [Convert]::FromBase64String($env:SIGNING_CERT_PFX))
           $signtool = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin\*\x64\signtool.exe" | Sort-Object FullName -Descending | Select-Object -First 1
-          & $signtool.FullName sign /f "$env:RUNNER_TEMP\sign.pfx" /p $env:SIGNING_CERT_PASSWORD /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 /d "N-Connect" out/publish/win-x64/N-Connect.exe
+          & $signtool.FullName sign /f "$env:RUNNER_TEMP\sign.pfx" /p $env:SIGNING_CERT_PASSWORD /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 /d "SKZ Connect" out/publish/win-x64/SKZ-Connect.exe
           if ($LASTEXITCODE -ne 0) { throw "Signieren fehlgeschlagen" }
 
       # Automatische Bildprüfung: Oberfläche in mehreren Varianten rendern (unsichtbarer Desktop). Stürzt die Oberfläche
@@ -76,7 +76,7 @@ jobs:
       - name: Oberfläche prüfen (Bilder rendern)
         continue-on-error: true
         run: |
-          $exe = "out/publish/win-x64/N-Connect.exe"
+          $exe = "out/publish/win-x64/SKZ-Connect.exe"
           $runs = @(
             @{ Dir = "de-100"; Args = "--demo-all --wide" },
             @{ Dir = "ru-150"; Args = "--demo-all --scale=1.5 --lang=ru" },
@@ -135,7 +135,7 @@ jobs:
       # Das Skript leitet die numerische Dateiversion des Setups selbst aus AppVersion ab (1.2.3-ci.7 → 1.2.3).
       - name: Installer bauen
         run: |
-          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DAppVersion=${{ steps.version.outputs.version }}" installer/N-Connect.iss
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DAppVersion=${{ steps.version.outputs.version }}" installer/SKZ-Connect.iss
           if ($LASTEXITCODE -ne 0) { throw "Inno Setup fehlgeschlagen" }
           Get-ChildItem out/*.exe
 
@@ -143,8 +143,8 @@ jobs:
         if: env.SIGNING_CERT_PFX != ''
         run: |
           $signtool = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin\*\x64\signtool.exe" | Sort-Object FullName -Descending | Select-Object -First 1
-          Get-ChildItem out/N-Connect-Setup-*.exe | ForEach-Object {
-            & $signtool.FullName sign /f "$env:RUNNER_TEMP\sign.pfx" /p $env:SIGNING_CERT_PASSWORD /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 /d "N-Connect Setup" $_.FullName
+          Get-ChildItem out/SKZ-Connect-Setup-*.exe | ForEach-Object {
+            & $signtool.FullName sign /f "$env:RUNNER_TEMP\sign.pfx" /p $env:SIGNING_CERT_PASSWORD /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 /d "SKZ Connect Setup" $_.FullName
             if ($LASTEXITCODE -ne 0) { throw "Signieren fehlgeschlagen" }
           }
           Remove-Item "$env:RUNNER_TEMP\sign.pfx" -Force
@@ -152,17 +152,17 @@ jobs:
       - name: Portable-Variante packen (ZIP mit EXE, portable.txt, Lizenz und Drittanbieter-Hinweisen)
         run: |
           New-Item -ItemType Directory -Force out/portable | Out-Null
-          Copy-Item out/publish/win-x64/N-Connect.exe, LICENSE, THIRD-PARTY-NOTICES.md out/portable/
-          Set-Content out/portable/portable.txt "N-Connect portable: Diese Datei sorgt dafür, dass Einstellungen und Protokoll im Unterordner 'data' neben der EXE liegen statt in %APPDATA%. ViGEmBus/HidHide müssen trotzdem pro PC installiert werden (sonst keine virtuellen Controller)."
-          Compress-Archive -Force out/portable/* "out/N-Connect-Portable-${{ steps.version.outputs.version }}.zip"
+          Copy-Item out/publish/win-x64/SKZ-Connect.exe, LICENSE, THIRD-PARTY-NOTICES.md out/portable/
+          Set-Content out/portable/portable.txt "SKZ Connect portable: Diese Datei sorgt dafür, dass Einstellungen und Protokoll im Unterordner 'data' neben der EXE liegen statt in %APPDATA%. ViGEmBus/HidHide müssen trotzdem pro PC installiert werden (sonst keine virtuellen Controller)."
+          Compress-Archive -Force out/portable/* "out/SKZ-Connect-Portable-${{ steps.version.outputs.version }}.zip"
           Get-ChildItem out/*.zip
 
       - uses: actions/upload-artifact@v7
         with:
-          name: N-Connect-Setup
+          name: SKZ-Connect-Setup
           path: |
-            out/N-Connect-Setup-*.exe
-            out/N-Connect-Portable-*.zip
+            out/SKZ-Connect-Setup-*.exe
+            out/SKZ-Connect-Portable-*.zip
           if-no-files-found: error
 
       - name: Release-Text wählen (nur bei Tag v*)
@@ -180,8 +180,8 @@ jobs:
           body_path: ${{ steps.notes.outputs.path }}
           generate_release_notes: ${{ steps.notes.outputs.path == '' }}
           files: |
-            out/N-Connect-Setup-*.exe
-            out/N-Connect-Portable-*.zip
+            out/SKZ-Connect-Setup-*.exe
+            out/SKZ-Connect-Portable-*.zip
 
   # Kompiliert die Android-App (Debug, ohne Signatur – das signierte APK entsteht lokal, siehe docs/ANDROID.md).
   # Eigener Job: Das Release im Job „installer“ wartet nicht darauf, ein Fehler hier bleibt trotzdem sichtbar.

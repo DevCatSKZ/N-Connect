@@ -1,17 +1,17 @@
 <div align="center">
 
-<img src="installer/art/N-Connect.png" width="112" alt="N-Connect-Logo">
+<img src="installer/art/SKZ-Connect.png" width="112" alt="SKZ-Connect-Logo">
 
-# N-Connect
+# SKZ Connect
 
 **Switch-2-Controller und weitere Controller unter Windows als Xbox- oder DualShock-4-Controller –
 für Spiele, Steam und Emulatoren.**
 
-Dazu N-Connect für Android (Beta) und ein Add-on für Kodi/LibreELEC.
+Dazu SKZ Connect für Android (Beta) und ein Add-on für Kodi/LibreELEC.
 
-**Deutsch** · [English](README.en.md) · [Webseite](https://devcatskz.github.io/N-Connect/)
+**Deutsch** · [English](README.en.md) · [Webseite](https://devcatskz.github.io/SKZ-Connect/)
 
-<img src="https://devcatskz.github.io/N-Connect/screenshots/uebersicht.png" width="820" alt="N-Connect unter Windows: Übersicht mit verbundenen Controllern, Akkustand und Live-Anzeige der Tasten">
+<img src="https://devcatskz.github.io/SKZ-Connect/screenshots/uebersicht.png" width="820" alt="SKZ Connect unter Windows: Übersicht mit verbundenen Controllern, Akkustand und Live-Anzeige der Tasten">
 
 </div>
 
@@ -19,8 +19,8 @@ Dazu N-Connect für Android (Beta) und ein Add-on für Kodi/LibreELEC.
 
 | Plattform | Version | Download | Anleitung |
 |---|---|---|---|
-| Windows 10 (ab 2004) und 11, 64 Bit | 1.0.22 | [Setup oder Portable-ZIP](https://github.com/DevCatSKZ/N-Connect/releases/latest) | [Windows](docs/anleitung/windows.md) |
-| Android 8 oder neuer | 0.9.1 Beta | [N-Connect-Android-0.9.1.apk](https://github.com/DevCatSKZ/N-Connect/releases/download/v1.0.22/N-Connect-Android-0.9.1.apk) | [Android](docs/anleitung/android.md) |
+| Windows 10 (ab 2004) und 11, 64 Bit | 1.0.22 | [Setup oder Portable-ZIP](https://github.com/DevCatSKZ/SKZ-Connect/releases/latest) | [Windows](docs/anleitung/windows.md) |
+| Android 8 oder neuer | 0.9.1 Beta | [SKZ-Connect-Android-0.9.1.apk](https://github.com/DevCatSKZ/SKZ-Connect/releases/download/v1.0.22/SKZ-Connect-Android-0.9.1.apk) | [Android](docs/anleitung/android.md) |
 | Kodi unter LibreELEC | 0.4.4 | [DevCatSKZ Repository](https://github.com/DevCatSKZ/kodi-repo) | [Kodi](docs/anleitung/kodi.md) |
 
 Das Windows-Setup installiert die benötigten Treiber ViGEmBus und HidHide mit. Setup und Programm sind nicht
@@ -38,9 +38,9 @@ code-signiert, daher zeigt Windows SmartScreen beim ersten Start eine Warnung.
 | Xbox-Controller | nativ² | – | Kopplung¹ |
 | Kabel-Controller von HORI, PowerA, PDP | ✓¹ | – | – |
 
-¹ Noch nicht mit echter Hardware geprüft – [Rückmeldungen](https://github.com/DevCatSKZ/N-Connect/issues) helfen.
-² Windows erkennt Xbox-Controller selbst; N-Connect ergänzt Akkuanzeige und Belegungen.
-**Kopplung:** N-Connect koppelt den Controller, die Eingaben übernimmt Linux. Unter Android verbinden sich andere
+¹ Noch nicht mit echter Hardware geprüft – [Rückmeldungen](https://github.com/DevCatSKZ/SKZ-Connect/issues) helfen.
+² Windows erkennt Xbox-Controller selbst; SKZ Connect ergänzt Akkuanzeige und Belegungen.
+**Kopplung:** SKZ Connect koppelt den Controller, die Eingaben übernimmt Linux. Unter Android verbinden sich andere
 Controller direkt mit dem System.
 
 ## Funktionen
@@ -63,7 +63,7 @@ festen Spielerplätzen, DSU und Home-Widget.
 
 Windows ist die Hauptplattform. Android ist eine Beta. Das Kodi-Add-on ist auf einem Raspberry Pi 4 mit
 LibreELEC 12.2 geprüft, andere Geräte noch nicht. Der Treiber ViGEmBus wird seit 2023 nicht mehr weiterentwickelt;
-N-Connect nutzt die letzte Version 1.22.0.
+SKZ Connect nutzt die letzte Version 1.22.0.
 
 ## Datenschutz
 
@@ -75,7 +75,7 @@ Start auf GitHub nach Updates (abschaltbar).
 - Anleitungen: [Windows](docs/anleitung/windows.md) · [Android](docs/anleitung/android.md) ·
   [Kodi](docs/anleitung/kodi.md) · [Hilfe bei Problemen](docs/anleitung/hilfe.md)
 - [Technische Dokumentation](docs/README.md)
-- Fehler bitte als [Issue](https://github.com/DevCatSKZ/N-Connect/issues) melden, möglichst mit Diagnose
+- Fehler bitte als [Issue](https://github.com/DevCatSKZ/SKZ-Connect/issues) melden, möglichst mit Diagnose
   (Windows: *Allgemein › Erweitert › Diagnose exportieren*).
 
 ## Selbst bauen

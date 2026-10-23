@@ -3,13 +3,13 @@ using System.Text;
 namespace NConnect.Android;
 
 /// <summary>
-/// Protokoll: Android-Logcat (Tag „N-Connect“), die letzten Zeilen im Speicher (Anzeige/Teilen unter „Diagnose“) und
+/// Protokoll: Android-Logcat (Tag „SKZ Connect“), die letzten Zeilen im Speicher (Anzeige/Teilen unter „Diagnose“) und
 /// eine Datei im App-Speicher (<c>files/nconnect.log</c>, wird ab 512 KB neu begonnen) – Logcat ist auf vielen Geräten so
 /// voll, dass ältere Zeilen nach Minuten verschwinden.
 /// </summary>
 public static class Log
 {
-    private const string Tag = "N-Connect";
+    private const string Tag = "SKZ Connect";
     private const int Keep = 600;
     private const long MaxFileBytes = 512 * 1024;
     private static readonly LinkedList<string> Lines = new();

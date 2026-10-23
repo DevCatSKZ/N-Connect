@@ -7,9 +7,9 @@ Stand: 1.0.22 (Windows), 0.9.1 (Android), 0.4.4 (Kodi). Alle .NET-Projekte ziele
 ```
 src/Switch2Pro.Protocol           Bibliothek ohne Betriebssystem-Abhängigkeit (net10.0): das Wissen über die Controller,
                                   Belegung, Einstellungen, DSU – genutzt von Windows, Android und Linux
-src/Switch2Pro.Bridge             Windows-App „N-Connect“ (WinForms, net10.0-windows10.0.22621.0): Verbindungen,
+src/Switch2Pro.Bridge             Windows-App „SKZ Connect“ (WinForms, net10.0-windows10.0.22621.0): Verbindungen,
                                   virtuelle Controller über ViGEmBus, Oberfläche
-android/NConnect.Android          N-Connect für Android (net10.0-android, minSdk 26) – siehe ANDROID.md
+android/NConnect.Android          SKZ Connect für Android (net10.0-android, minSdk 26) – siehe ANDROID.md
 android/NConnect.Android.Tests    xUnit-Tests für die Android-freien Teile (net10.0, ohne Android-Workload)
 android/i18n                      Übersetzungstabellen der Android-App und generate.py
 linux/NConnect.Linux              Linux-Dienst „nconnect“ (net10.0, BlueZ über D-Bus, uinput) – siehe LINUX-KODI.md
@@ -23,8 +23,8 @@ tests/NConnect.Linux.Tests        xUnit-Tests des Linux-Dienstes (net10.0, laufe
 tools/Switch2Pro.BleProbe         Diagnose: Switch-2-Controller per BLE suchen, verbinden, Berichte ausgeben
 tools/Switch2Pro.UsbProbe         Diagnose: Switch-2-Controller am USB-Kabel (bindet Usb/UsbNative.cs der App ein)
 tools/Switch2Pro.BtIdentityProbe  Diagnose zum ruhenden Vorhaben „Switch-Identität“ (Herstellerbefehle nur mit Freigabe)
-installer/N-Connect.iss           Inno Setup 6: installiert ViGEmBus und HidHide, gibt N-Connect in HidHide frei, legt die
-                                  Aufgabe „N-Connect HidHide“ an (Verstecken ohne UAC), übergibt Sprache/Darstellung
+installer/SKZ-Connect.iss           Inno Setup 6: installiert ViGEmBus und HidHide, gibt SKZ Connect in HidHide frei, legt die
+                                  Aufgabe „SKZ Connect HidHide“ an (Verstecken ohne UAC), übergibt Sprache/Darstellung
 .github/workflows/build.yml       Windows: alle Projekte der Projektmappe bauen und testen, Oberfläche rendern, Setup und
                                   Portable-ZIP; Job „Android kompilieren“; Tag „v*“ → GitHub-Release
 .github/workflows/kodi.yml        Linux-Dienst und Kodi-Add-ons: Tests, ZIPs als Artefakt, bei Tags am Release
@@ -195,9 +195,9 @@ Kopplung entfernen → Wii: `PairWii` (binäre PIN), sonst `PairJustWorks` (WinR
 
 | Datei | Inhalt |
 |---|---|
-| `%APPDATA%\N-Connect\settings.json` | `Settings` als JSON (Enums als Text), siehe `Settings.cs`; daneben `settings.json.bak` und ggf. `settings.json.unlesbar-<Zeit>` |
-| `%LOCALAPPDATA%\N-Connect\bridge.log` | Protokoll (ab 1 MB einmal rotiert) |
-| `%LOCALAPPDATA%\N-Connect\battery.json` | Gemessener Spannungssprung beim Laden je Seriennummer |
+| `%APPDATA%\SKZ-Connect\settings.json` | `Settings` als JSON (Enums als Text), siehe `Settings.cs`; daneben `settings.json.bak` und ggf. `settings.json.unlesbar-<Zeit>` |
+| `%LOCALAPPDATA%\SKZ-Connect\bridge.log` | Protokoll (ab 1 MB einmal rotiert) |
+| `%LOCALAPPDATA%\SKZ-Connect\battery.json` | Gemessener Spannungssprung beim Laden je Seriennummer |
 | `<Kodi>\userdata\addon_data\service.nconnect\status.json` | Status für das Kodi-Add-on (nur, wenn es installiert ist) |
 | `*.ncprofile.json` | Exportiertes Profil (`NamedProfile`) |
 | `*.ncpair` | Kopplungsdaten PC → PC (`PairingTransfer`) |
@@ -238,7 +238,7 @@ Gestaltungsregeln:
 | Abhängigkeit | Wofür | Stand |
 |---|---|---|
 | ViGEmBus 1.22.0 + Nefarius.ViGEm.Client | virtuelle Xbox-360-/DS4-Controller unter Windows | seit 02.11.2023 archiviert, keine Updates mehr; Bewertung und Alternativen in [HANDOVER.md](../HANDOVER.md#vigembus-ist-archiviert) |
-| HidHide 1.5 | Original-Controller vor Spielen verstecken | gepflegt; N-Connect sucht auf Wunsch nach Updates (`HidHideUpdate`) |
+| HidHide 1.5 | Original-Controller vor Spielen verstecken | gepflegt; SKZ Connect sucht auf Wunsch nach Updates (`HidHideUpdate`) |
 | .NET 10 (LTS) | alle Projekte; Windows-App bringt die Laufzeit mit | aktuell |
 | Linux.Bluetooth, Tmds.DBus | BlueZ-Anbindung des Linux-Dienstes | Linux.Bluetooth bewusst als Vorabversion 6.0.0-pre3 (5.x hängt an Tmds.DBus 0.20 mit bekannter Sicherheitslücke), Tmds.DBus fest auf 0.95.1 |
 | Shizuku | virtueller Controller unter Android ohne Root | per Reflection angesprochen |

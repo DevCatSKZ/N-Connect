@@ -7,20 +7,20 @@ Le Bluetooth doit être activé : paramètres LibreELEC > Bluetooth > activer. U
    • Joy-Con 2 : sur la face plate intérieure, entre SL et SR
    • Manette GameCube (Switch 2) : sur le dessus
 2. Après quelques secondes, « Joueur 1 : … connectée » s'affiche. La manette fonctionne maintenant comme une manette Xbox dans Kodi et les jeux.
-3. N-Connect associe en même temps la manette à cet appareil.
+3. SKZ Connect associe en même temps la manette à cet appareil.
 
 [B]Reconnexion[/B]
 Appuyez simplement sur n'importe quel bouton (p. ex. HOME), sans SYNC. Cela fonctionne tant que la manette n'a pas été associée à un autre appareil avec SYNC.
 
 [B]Autres manettes (Xbox, PlayStation, Switch 1, 8BitDo …)[/B]
-N-Connect les associe automatiquement ; il suffit de les mettre en mode association :
+SKZ Connect les associe automatiquement ; il suffit de les mettre en mode association :
    • Xbox : appuyez sur le bouton d'association en haut jusqu'à ce que le logo clignote rapidement
    • PlayStation 4 : maintenez SHARE + PS jusqu'à ce que la barre lumineuse clignote
    • PlayStation 5 : maintenez CRÉER + PS jusqu'à ce que le voyant clignote
    • Pro Controller / Joy-Con Switch 1 : appuyez sur le bouton SYNC
    • 8BitDo : bouton d'association ou selon le manuel (mode Switch ou X-input)
    • Wiimote / Manette Pro Wii U : appuyez sur le bouton rouge SYNC (dans le compartiment à piles ou au dos)
-Ensuite, une simple pression les reconnecte. Dans le menu N-Connect, vous pouvez les déconnecter ou les oublier.
+Ensuite, une simple pression les reconnecte. Dans le menu SKZ Connect, vous pouvez les déconnecter ou les oublier.
 
 [B]Joy-Con[/B]
 Un Joy-Con gauche et un droit sont combinés automatiquement en une manette. Pour deux joueurs avec un Joy-Con à l'horizontale chacun : Paramètres > Manette > désactiver « Combiner ».
@@ -33,7 +33,7 @@ Croix/stick : se déplacer · bouton du bas : sélectionner · bouton de droite 
 Pour modifier l'attribution : paramètres Kodi > Système > Entrée > Configurer les manettes connectées.
 
 [B]Boutons de la manette dans Kodi[/B]
-Capture prend une capture d'écran, le bouton C ouvre le menu N-Connect. Modifiable dans Paramètres > Kodi > Boutons de la manette dans Kodi (aussi pour les boutons arrière GL/GR du Pro Controller 2). Quand une batterie faiblit, N-Connect affiche une alerte.
+Capture prend une capture d'écran, le bouton C ouvre le menu SKZ-Connect. Modifiable dans Paramètres > Kodi > Boutons de la manette dans Kodi (aussi pour les boutons arrière GL/GR du Pro Controller 2). Quand une batterie faiblit, SKZ Connect affiche une alerte.
 
 [B]Places des joueurs et gyroscope pour émulateurs[/B]
 Chaque manette retrouve sa place de joueur à la reconnexion. Les émulateurs comme Dolphin, Cemu ou Citra reçoivent les mouvements via DSU/Cemuhook (port 26760) : choisissez « DSU » ou « Cemuhook » avec 127.0.0.1 comme source de mouvement. Paramètres > Émulateurs.
@@ -46,4 +46,4 @@ La manette apparaît partout comme « Xbox 360 Controller » et ne nécessite au
 • Message « associée à un autre appareil » : appuyez sur SYNC pour l'associer à nouveau ici.
 • Latence : rapprochez-vous de l'adaptateur Bluetooth ; une rallonge USB pour la clé aide contre les interférences USB 3.
 • La connexion est refusée aussitôt (errno 38) : le Wi-Fi perturbe le Bluetooth – désactivez-le s'il est inutile (Paramètres LibreELEC > Connexions).
-• Affichez le journal et joignez-le pour signaler un problème : github.com/DevCatSKZ/N-Connect/issues
+• Affichez le journal et joignez-le pour signaler un problème : github.com/DevCatSKZ/SKZ-Connect/issues

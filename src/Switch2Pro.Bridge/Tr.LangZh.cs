@@ -16,12 +16,15 @@ internal static partial class Tr
         ["Einrichten fehlgeschlagen – der Kodi-Ordner ist nicht beschreibbar. Nutze „Repository herunterladen“."] = "设置失败 – Kodi 文件夹不可写。请使用“下载存储库”。",
         ["Herunterladen …"] = "下载 …",
         ["DevCatSKZ Repository in Kodi einrichten"] = "在 Kodi 中设置 DevCatSKZ Repository",
-        ["Legt das Repository direkt in Kodi ab. Darüber kommen unsere Kodi-Plugins mit automatischen Updates. Danach in Kodi: Add-ons → Meine Add-ons → Add-on-Repository → DevCatSKZ Repository → Aktivieren."] = "将存储库直接放入 Kodi。我们的 Kodi 插件将通过它自动更新。然后在 Kodi 中：附加组件 → 我的附加组件 → 附加组件库 → DevCatSKZ Repository → 启用。",
+                ["Kodi ist auf diesem PC installiert. Legt das Repository direkt in Kodi ab. Darüber kommen unsere Kodi-Plugins mit automatischen Updates. Danach in Kodi: Add-ons → Meine Add-ons → Add-on-Repository → DevCatSKZ Repository → Aktivieren."] = "此电脑已安装 Kodi。将存储库直接放入 Kodi。我们的 Kodi 插件可通过它自动更新。然后在 Kodi 中：插件 → 我的插件 → 插件库 → DevCatSKZ Repository → 启用。",
         ["Kodi ist auf diesem PC nicht installiert. Mit Kodi für Windows funktionieren deine Controller auch ohne Plugin – sie erscheinen dort als Xbox-Controller."] = "此电脑未安装 Kodi。在 Windows 版 Kodi 中，即使没有插件，你的手柄也能作为 Xbox 手柄使用。",
         ["Repository herunterladen"] = "下载存储库",
         ["Speichert repository.devcatskz.zip im Download-Ordner – zum Installieren auf einem anderen Gerät über „Aus ZIP-Datei installieren“."] = "将 repository.devcatskz.zip 保存到下载文件夹 – 以便在其他设备上通过“从 zip 文件安装”进行安装。",
         ["Kodi-Plugin für LibreELEC"] = "LibreELEC 的 Kodi 插件",
-        ["Für Raspberry Pi und andere Geräte mit LibreELEC: N-Connect als Kodi-Plugin (alle Geräte). Am einfachsten über das DevCatSKZ Repository."] = "适用于运行 LibreELEC 的 Raspberry Pi 及其他设备：N-Connect Kodi 插件（所有设备）。最简单的方式是通过 DevCatSKZ Repository。",
+                ["Braucht Kodi ein Plugin?"] = "Kodi 需要插件吗？",
+                ["Nur auf anderen Geräten: Kodi für Windows braucht keins – deine Controller erscheinen dort als Xbox-Controller. Auf Raspberry Pi, LibreELEC und anderen Kodi-Geräten zeigt das Plugin verbundene Controller und Akkustand."] = "仅其他设备需要：Windows 版 Kodi 无需插件 – 你的手柄会显示为 Xbox 手柄。在 Raspberry Pi、LibreELEC 和其他 Kodi 设备上，插件会显示已连接的手柄和电量。",
+                ["Kodi-Plugin für LibreELEC (installiert)"] = "LibreELEC 版 Kodi 插件（已安装）",
+        ["Für Raspberry Pi und andere Geräte mit LibreELEC: SKZ Connect als Kodi-Plugin (alle Geräte). Am einfachsten über das DevCatSKZ Repository."] = "适用于运行 LibreELEC 的 Raspberry Pi 及其他设备：SKZ Connect Kodi 插件（所有设备）。最简单的方式是通过 DevCatSKZ Repository。",
         // ---------- Fenster, Reiter, Abschnitte ----------
         ["Controller"] = "控制器",
         // ---------- Desktop-Modus, Testseite, Vorlagen, Diagnose ----------
@@ -55,7 +58,7 @@ internal static partial class Tr
         ["Protokoll, Einstellungen und Systeminfos als ZIP-Datei – zum Anhängen an eine Fehlermeldung. Enthält keine Kopplungsschlüssel."] = "将日志、设置和系统信息打包为 ZIP 文件，便于附在问题报告中。不包含配对密钥。",
         // ---------- Desktop-Widget ----------
         ["Desktop-Widget"] = "桌面小组件",
-        ["Kleines Kärtchen auf dem Desktop: verbundene Controller, Akku, Verbindung und Ausgabe auf einen Blick. Mit der Maus verschieben, Rechtsklick für Optionen, Doppelklick öffnet N-Connect."] = "桌面上的小卡片：已连接的控制器、电量、连接方式和输出一目了然。用鼠标拖动，右键打开选项，双击打开 N-Connect。",
+        ["Kleines Kärtchen auf dem Desktop: verbundene Controller, Akku, Verbindung und Ausgabe auf einen Blick. Mit der Maus verschieben, Rechtsklick für Optionen, Doppelklick öffnet SKZ Connect."] = "桌面上的小卡片：已连接的控制器、电量、连接方式和输出一目了然。用鼠标拖动，右键打开选项，双击打开 SKZ Connect。",
         ["Immer im Vordergrund"] = "始终置顶",
         ["Widget bleibt über allen Fenstern sichtbar (sonst nur auf dem Desktop)."] = "小组件始终显示在所有窗口之上（否则仅显示在桌面上）。",
         ["Kompakte Ansicht"] = "紧凑视图",
@@ -64,7 +67,7 @@ internal static partial class Tr
         ["nativ"] = "原生",
         ["Xbox · nativ"] = "Xbox · 原生",
         ["Controller einschalten oder SYNC drücken"] = "打开控制器或按 SYNC 键",
-        ["N-Connect öffnen"] = "打开 N-Connect",
+        ["SKZ Connect öffnen"] = "打开 SKZ Connect",
         ["Position zurücksetzen"] = "重置位置",
         ["Widget ausblenden"] = "隐藏小组件",
         // ---------- Status-Kopfzeile, Ansicht ----------
@@ -105,9 +108,9 @@ internal static partial class Tr
         ["Beim Verbinden kurz vibrieren"] = "连接时短暂振动",
         ["Meldung bei Verbinden"] = "连接通知",
         ["Wer meldet, wenn ein Controller verbunden oder getrennt wird."] = "选择在控制器连接或断开时由谁通知。",
-        ["„N-Connect“ zeigt den echten Controller-Namen und schaltet die Gerätemeldungen von Windows ab."] = "\"N-Connect\" 显示真实的控制器名称，并关闭 Windows 设备通知。",
-        ["N-Connect (empfohlen)"] = "N-Connect（推荐）",
-        ["N-Connect und Windows"] = "N-Connect 和 Windows",
+        ["„SKZ Connect“ zeigt den echten Controller-Namen und schaltet die Gerätemeldungen von Windows ab."] = "\"SKZ Connect\" 显示真实的控制器名称，并关闭 Windows 设备通知。",
+        ["SKZ Connect (empfohlen)"] = "SKZ Connect（推荐）",
+        ["SKZ Connect und Windows"] = "SKZ Connect 和 Windows",
         ["Keine"] = "无",
         ["Gekoppelte Controller per Tastendruck verbinden (ohne SYNC)"] = "已配对的控制器按任意键连接（无需 SYNC）",
         ["Automatisch mit Windows starten"] = "随 Windows 自动启动",
@@ -320,8 +323,8 @@ internal static partial class Tr
         ["Kurzanleitung"] = "快速指南",
         ["Protokoll öffnen"] = "打开日志",
         ["Beenden"] = "退出",
-        ["N-Connect: warte auf Controller (SYNC drücken)"] = "N-Connect：等待控制器（请按 SYNC）",
-        ["N-Connect: ViGEmBus fehlt"] = "N-Connect：缺少 ViGEmBus",
+        ["SKZ Connect: warte auf Controller (SYNC drücken)"] = "SKZ Connect：等待控制器（请按 SYNC）",
+        ["SKZ Connect: ViGEmBus fehlt"] = "SKZ Connect：缺少 ViGEmBus",
         ["Neue Version verfügbar"] = "有新版本可用",
         ["Einstellungen fehlerhaft"] = "设置损坏",
         ["settings.json konnte nicht gelesen werden – es gelten die Standardwerte. Die beschädigte Datei wird als „settings.json.unlesbar-…“ aufbewahrt (Klicken öffnet den Ordner)."] =
@@ -378,7 +381,7 @@ internal static partial class Tr
         ["Profil exportieren"] = "导出配置文件",
         ["Profil importieren"] = "导入配置文件",
         // ---------- Kurzanleitung (WelcomeForm, je Absatz ein Schlüssel) ----------
-        ["N-Connect – Willkommen"] = "N-Connect – 欢迎",
+        ["SKZ Connect – Willkommen"] = "SKZ Connect – 欢迎",
         ["So verbindest du deine Controller:"] = "如何连接控制器：",
         ["Switch 2 (Pro Controller, Joy-Con 2, GameCube):\n" +
          "   Kurz die kleine SYNC-Taste drücken – nach ein paar Sekunden vibriert der Controller.\n" +
@@ -389,10 +392,10 @@ internal static partial class Tr
             "   之后按任意键即可连接。Pro Controller 和 GameCube 也可以用 USB 线连接。\n" +
             "   重要：不要通过“蓝牙 → 添加设备”配对 – 这会干扰连接。",
         ["Switch 1 (Pro Controller, Joy-Con, NES/SNES/N64/Mega Drive), Wii-Fernbedienung, Wii U Pro Controller:\n" +
-         "   SYNC-Taste drücken – N-Connect koppelt den Controller selbst (kein Umweg über die Windows-Einstellungen).\n" +
+         "   SYNC-Taste drücken – SKZ Connect koppelt den Controller selbst (kein Umweg über die Windows-Einstellungen).\n" +
          "   Danach verbindet er sich per Tastendruck. Gezielt suchen: Rechtsklick auf das Symbol → „Controller koppeln …“."] =
             "Switch 1（Pro Controller、Joy-Con、NES/SNES/N64/Mega Drive）、Wii 遥控器、Wii U Pro Controller：\n" +
-            "   按 SYNC 键 – N-Connect 会自动配对控制器（无需经过 Windows 设置）。\n" +
+            "   按 SYNC 键 – SKZ Connect 会自动配对控制器（无需经过 Windows 设置）。\n" +
             "   之后按任意键即可连接。手动搜索：右键点击图标 → “配对控制器 …”。",
         ["Windows, Steam und Spiele sehen jeden Controller als Xbox-Controller.\n" +
          "Das Programm läuft unten rechts im Infobereich – ein Klick öffnet die Übersicht."] =
@@ -496,8 +499,8 @@ internal static partial class Tr
             "Xbox 360 兼容几乎所有游戏和 Steam。DualShock 4 额外提供体感控制（Steam、模拟器）。适用于所有无单独设置的控制器（卡片 → 设置 → 按键）。",
         ["Original-Controller verstecken"] = "隐藏原始控制器",
         ["Controller verbinden"] = "连接控制器",
-        ["SYNC-Taste am Controller drücken – N-Connect findet und koppelt ihn selbst. Danach reicht künftig ein Tastendruck."] =
-            "按控制器上的 SYNC 键 – N-Connect 会自动找到并配对。以后只需按任意键即可连接。",
+        ["SYNC-Taste am Controller drücken – SKZ Connect findet und koppelt ihn selbst. Danach reicht künftig ein Tastendruck."] =
+            "按控制器上的 SYNC 键 – SKZ Connect 会自动找到并配对。以后只需按任意键即可连接。",
         ["So kommt der Controller in den Kopplungsmodus"] = "如何让控制器进入配对模式",
         ["Switch 2: Pro Controller, Joy-Con 2, GameCube"] = "Switch 2：Pro Controller、Joy-Con 2、GameCube",
         ["Kurz die kleine SYNC-Taste drücken."] = "短按小的 SYNC 键。",
@@ -550,8 +553,8 @@ internal static partial class Tr
         ["HidHide installieren …"] = "安装 HidHide …",
         ["Empfohlen: Steam und viele Spiele kennen Switch-1-, NSO- und USB-Controller selbst und sähen sie sonst doppelt. Läuft nach der Installation ohne Rückfrage (sonst fragt Windows nach Adminrechten)."] =
             "推荐：Steam 和许多游戏本身能识别 Switch 1、NSO 和 USB 控制器，否则会显示重复。安装后无需确认即可运行（否则 Windows 会要求管理员权限）。",
-        ["Steam und viele Spiele sehen Switch-1-, NSO- und USB-Controller sonst doppelt. Dafür wird das kostenlose HidHide gebraucht (bei der N-Connect-Installation dabei, hier nachträglich)."] =
-            "否则 Steam 和许多游戏会重复显示 Switch 1、NSO 和 USB 控制器。这需要免费的 HidHide（随 N-Connect 安装包附带，可在此补装）。",
+        ["Steam und viele Spiele sehen Switch-1-, NSO- und USB-Controller sonst doppelt. Dafür wird das kostenlose HidHide gebraucht (bei der SKZ-Connect-Installation dabei, hier nachträglich)."] =
+            "否则 Steam 和许多游戏会重复显示 Switch 1、NSO 和 USB 控制器。这需要免费的 HidHide（随 SKZ Connect 安装包附带，可在此补装）。",
         ["Erscheint als"] = "显示为",
         ["Wie allgemein"] = "同常规设置",
         ["Nur für diesen Controller. Xbox 360 läuft überall; DualShock 4 bringt zusätzlich Gyro nach Steam und in Emulatoren. „Wie allgemein“ folgt der Seite „Allgemein“."] =
@@ -568,8 +571,8 @@ internal static partial class Tr
             "未隐藏原始控制器（已取消询问）。后续操作：控制器 → 设置 → 其他 →“显示重复？”。",
         ["Original-Controller nicht versteckt (Fehler, Details im Protokoll). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."] =
             "未隐藏原始控制器（出错，详见日志）。后续操作：控制器 → 设置 → 其他 →“显示重复？”。",
-        ["Eine ältere N-Connect-Version hat das eigene virtuelle DualShock 4 vor Spielen versteckt. Freigeben hat nicht geklappt – bitte im HidHide Configuration Client den Haken beim virtuellen DualShock 4 entfernen."] =
-            "旧版 N-Connect 曾将自身的虚拟 DualShock 4 对游戏隐藏。未能恢复显示 – 请在 HidHide Configuration Client 中取消勾选该虚拟 DualShock 4。",
+        ["Eine ältere SKZ-Connect-Version hat das eigene virtuelle DualShock 4 vor Spielen versteckt. Freigeben hat nicht geklappt – bitte im HidHide Configuration Client den Haken beim virtuellen DualShock 4 entfernen."] =
+            "旧版 SKZ Connect 曾将自身的虚拟 DualShock 4 对游戏隐藏。未能恢复显示 – 请在 HidHide Configuration Client 中取消勾选该虚拟 DualShock 4。",
         ["Tastenanordnung A/B/X/Y"] = "按键布局 A/B/X/Y",
         ["Xbox: nach Position (untere Taste = A). Nintendo: nach Beschriftung (A bleibt A)."] = "Xbox：按位置（下方按键 = A）。Nintendo：按标识（A 仍是 A）。",
         ["Verbinden"] = "连接",
@@ -577,14 +580,14 @@ internal static partial class Tr
         ["Gekoppelte Controller verbinden sich ohne SYNC-Taste."] = "已配对的控制器无需 SYNC 键即可连接。",
         ["Ohne Eingabe trennen nach"] = "无操作后断开",
         ["Spart Akku, wenn ein Controller liegen bleibt."] = "控制器闲置时节省电量。",
-        ["N-Connect startet unsichtbar im Infobereich."] = "N-Connect 在通知区域静默启动。",
+        ["SKZ Connect startet unsichtbar im Infobereich."] = "SKZ Connect 在通知区域静默启动。",
         ["Darstellung und Sprache"] = "外观与语言",
         ["Farbmodus"] = "颜色模式",
         ["Mica-Effekt"] = "云母效果",
         ["Durchscheinende Titelleiste (ab Windows 11)."] = "半透明标题栏（Windows 11 及以上）。",
         ["Erweitert"] = "高级",
         ["Gyro für Emulatoren (DSU)"] = "模拟器陀螺仪（DSU）",
-        ["Cemuhook-Server auf Port 26760 – wirkt nach einem Neustart von N-Connect."] = "端口 26760 的 Cemuhook 服务器 – 重启 N-Connect 后生效。",
+        ["Cemuhook-Server auf Port 26760 – wirkt nach einem Neustart von SKZ Connect."] = "端口 26760 的 Cemuhook 服务器 – 重启 SKZ Connect 后生效。",
         ["Nach Updates suchen"] = "检查更新",
         ["Beim Start auf GitHub nach einer neuen Version suchen."] = "启动时在 GitHub 上检查新版本。",
         ["Tastenbelegungen und Werte zurücksetzen. Gekoppelte Controller bleiben erhalten."] = "重置按键映射和各项数值。已配对的控制器保留。",
@@ -645,11 +648,11 @@ internal static partial class Tr
         ["Programme (*.exe)|*.exe"] = "程序 (*.exe)|*.exe",
         ["Kein Controller verbunden\n\n" +
          "Switch-2-Controller: kurz die SYNC-Taste drücken – danach reicht ein beliebiger Tastendruck.\n" +
-         "Switch-1-, NSO- und Wii-Controller: SYNC-Taste drücken – N-Connect koppelt sie selbst.\n" +
+         "Switch-1-, NSO- und Wii-Controller: SYNC-Taste drücken – SKZ Connect koppelt sie selbst.\n" +
          "Oder hier gezielt suchen und koppeln:"] =
             "未连接控制器\n\n" +
             "Switch 2 控制器：短按 SYNC 键 – 之后按任意键即可。\n" +
-            "Switch 1、NSO 和 Wii 控制器：按 SYNC 键 – N-Connect 自动配对。\n" +
+            "Switch 1、NSO 和 Wii 控制器：按 SYNC 键 – SKZ Connect 自动配对。\n" +
             "或在此定向搜索并配对：",
         ["Controller suchen …"] = "搜索控制器 …",
         ["Kein Controller verbunden"] = "未连接控制器",
@@ -668,21 +671,21 @@ internal static partial class Tr
         ["Rechten Joy-Con umbenennen …"] = "重命名右 Joy-Con …",
         ["Controller umbenennen"] = "重命名控制器",
         ["Spielerplatz"] = "玩家位置",
-        ["N-Connect aktualisieren"] = "更新 N-Connect",
+        ["SKZ Connect aktualisieren"] = "更新 SKZ Connect",
         ["HidHide aktualisieren"] = "更新 HidHide",
         ["HidHide-Update verfügbar"] = "有 HidHide 更新可用",
         ["HidHide aktuell halten"] = "保持 HidHide 最新",
         ["Beim Start nach einer neuen HidHide-Version suchen. Installiert wird nur nach Rückfrage (geprüfter Download vom Hersteller, Neustart nötig)."] =
             "启动时检查 HidHide 新版本。仅经确认后安装（厂商验证下载，需要重启）。",
         ["Lizenzen Dritter"] = "第三方许可证",
-        ["Open-Source-Software und übernommener Code in N-Connect – mit Lizenzen und Copyright-Vermerken."] = "N-Connect 中的开源软件和改编代码 – 附带许可证和版权声明。",
+        ["Open-Source-Software und übernommener Code in SKZ Connect – mit Lizenzen und Copyright-Vermerken."] = "SKZ Connect 中的开源软件和改编代码 – 附带许可证和版权声明。",
         ["Der Download hat nicht geklappt oder die Datei war fehlerhaft. Die Release-Seite im Browser öffnen?"] =
             "下载失败或文件损坏。在浏览器中打开发布页面？",
         ["Alle Controller trennen"] = "断开所有控制器",
         ["Sticks kalibrieren"] = "校准摇杆",
         ["Kalibrieren …"] = "校准 …",
-        ["Gegen Drift oder zu kleinen Ausschlag: Mitte und Rand neu messen. Wird nur in N-Connect gespeichert, der Controller bleibt unverändert."] =
-            "针对漂移或行程过小：重新测量中心和边缘。仅保存在 N-Connect 中，控制器本身不变。",
+        ["Gegen Drift oder zu kleinen Ausschlag: Mitte und Rand neu messen. Wird nur in SKZ Connect gespeichert, der Controller bleibt unverändert."] =
+            "针对漂移或行程过小：重新测量中心和边缘。仅保存在 SKZ Connect 中，控制器本身不变。",
         ["Linker Stick"] = "左摇杆",
         ["Rechter Stick"] = "右摇杆",
         ["Stick"] = "摇杆",
@@ -788,14 +791,14 @@ internal static partial class Tr
         ["Von der Switch-SD-Karte (Bluepick_RCM/hekate) oder von einem anderen PC übernehmen, oder für einen anderen PC exportieren."] =
             "从 Switch 的 SD 卡（Bluepick_RCM/hekate）或另一台电脑导入，或为另一台电脑导出。",
         ["Bei Switch-SD-Karte nachfragen"] = "检测到 Switch SD 卡时询问",
-        ["Steckt eine SD-Karte der Switch im PC (Kartenleser oder hekate „USB Tools“), bietet N-Connect die Übernahme an. Die Karte wird nur gelesen."] =
-            "当 Switch 的 SD 卡插入电脑时（读卡器或 hekate“USB Tools”），N-Connect 会提供导入选项。存储卡仅被读取。",
+        ["Steckt eine SD-Karte der Switch im PC (Kartenleser oder hekate „USB Tools“), bietet SKZ Connect die Übernahme an. Die Karte wird nur gelesen."] =
+            "当 Switch 的 SD 卡插入电脑时（读卡器或 hekate“USB Tools”），SKZ Connect 会提供导入选项。存储卡仅被读取。",
         ["Switch-SD-Karte erkannt"] = "检测到 Switch SD 卡",
         ["Kopplungsdaten der Controller gefunden – klicken, um sie anzusehen und zu übernehmen."] =
             "找到控制器配对数据 – 点击查看并导入。",
         ["Klicken, um Kopplungsdaten der Controller zu übernehmen."] = "点击以导入控制器配对数据。",
-        ["Controller-Kopplungen von der Switch-SD-Karte oder von einem anderen PC übernehmen – oder für einen anderen PC exportieren. Es werden nur Einstellungen von N-Connect geändert; Windows und der Bluetooth-Adapter bleiben unverändert."] =
-            "从 Switch 的 SD 卡或另一台电脑导入控制器配对信息 – 或为另一台电脑导出。仅更改 N-Connect 的设置；Windows 和蓝牙适配器保持不变。",
+        ["Controller-Kopplungen von der Switch-SD-Karte oder von einem anderen PC übernehmen – oder für einen anderen PC exportieren. Es werden nur Einstellungen von SKZ Connect geändert; Windows und der Bluetooth-Adapter bleiben unverändert."] =
+            "从 Switch 的 SD 卡或另一台电脑导入控制器配对信息 – 或为另一台电脑导出。仅更改 SKZ Connect 的设置；Windows 和蓝牙适配器保持不变。",
         ["Spieler-Reihenfolge – Spieler 1 ist für Windows, Steam und Spiele der erste Controller. Mit ‹ › umsortieren."] =
             "玩家顺序 – 玩家 1 是 Windows、Steam 和游戏中的第一个控制器。用 ‹ › 调整顺序。",
         ["Von der Switch-SD-Karte"] = "从 Switch 的 SD 卡",
@@ -803,7 +806,7 @@ internal static partial class Tr
             "由 Bluepick_RCM 或 hekate 创建的配对数据（switchroot/joycon_mac.ini）",
         ["Einlesen …"] = "读取 …",
         ["Von einem anderen PC"] = "从另一台电脑",
-        ["Mit N-Connect exportierte Datei (*.ncpair)"] = "N-Connect 导出的文件（*.ncpair）",
+        ["Mit SKZ Connect exportierte Datei (*.ncpair)"] = "SKZ Connect 导出的文件（*.ncpair）",
         ["Datei öffnen …"] = "打开文件 …",
         ["Inhalt"] = "内容",
         ["Weitergeben und sichern"] = "分享与备份",
@@ -835,26 +838,26 @@ internal static partial class Tr
         ["Joy-Con (R)"] = "Joy-Con（右）",
         ["HORI-Controller (links)"] = "HORI 控制器（左）",
         ["HORI-Controller (rechts)"] = "HORI 控制器（右）",
-        ["Hinweis: Pro Controller stehen nur im Bluetooth-Speicher der Switch (8000000000000050.bin); dieses Speicherabbild kann N-Connect nicht auswerten."] =
-            "注意：Pro 手柄仅记录在 Switch 的蓝牙存储中（8000000000000050.bin）；N-Connect 无法解析此内存镜像。",
+        ["Hinweis: Pro Controller stehen nur im Bluetooth-Speicher der Switch (8000000000000050.bin); dieses Speicherabbild kann SKZ Connect nicht auswerten."] =
+            "注意：Pro 手柄仅记录在 Switch 的蓝牙存储中（8000000000000050.bin）；SKZ Connect 无法解析此内存镜像。",
         ["Was diese Daten können – und was nicht:"] = "这些数据能做什么 – 不能做什么：",
         ["Die Daten zeigen, welche Controller mit deiner Switch gekoppelt sind und an welche Bluetooth-Adresse sie gebunden sind."] =
             "数据显示哪些控制器与你的 Switch 配对，以及它们绑定的蓝牙地址。",
         ["Ein Switch-1-Controller verbindet sich auf Tastendruck nur mit dem Gerät, dessen Adresse er gespeichert hat – hier mit der Switch. Der Bluetooth-Adapter des PCs hat eine andere Adresse, deshalb kann Windows diese Kopplung nicht einfach weiterverwenden."] =
             "Switch 1 控制器按键连接时只会连接它记住地址的设备 – 此处是 Switch。电脑的蓝牙适配器有不同地址，因此 Windows 无法直接复用这个配对。",
-        ["Die Adresse des PC-Adapters zu ändern, unterstützt N-Connect bewusst nicht (herstellerabhängig, riskant und nicht vorgesehen)."] =
-            "N-Connect 有意不支持修改电脑适配器地址（因厂商而异、有风险且非预期用途）。",
-        ["Windows bietet keinen offiziellen Weg, fremde Kopplungsschlüssel einzutragen: Sie liegen in einem Teil der Registrierung, auf den nur das System zugreifen darf. N-Connect ändert dort nichts."] =
-            "Windows 没有官方途径写入外来的配对密钥：它们存储在注册表中仅系统可访问的部分。N-Connect 不会修改那里。",
+        ["Die Adresse des PC-Adapters zu ändern, unterstützt SKZ Connect bewusst nicht (herstellerabhängig, riskant und nicht vorgesehen)."] =
+            "SKZ Connect 有意不支持修改电脑适配器地址（因厂商而异、有风险且非预期用途）。",
+        ["Windows bietet keinen offiziellen Weg, fremde Kopplungsschlüssel einzutragen: Sie liegen in einem Teil der Registrierung, auf den nur das System zugreifen darf. SKZ Connect ändert dort nichts."] =
+            "Windows 没有官方途径写入外来的配对密钥：它们存储在注册表中仅系统可访问的部分。SKZ Connect 不会修改那里。",
         ["So klappt der Wechsel am einfachsten: am PC den Controller einmal per SYNC-Taste in den Windows-Bluetooth-Einstellungen koppeln. Zurück an der Switch die Joy-Con an die Konsole stecken bzw. den Pro Controller per USB-Kabel anschließen – dann sind sie ohne Menü wieder mit der Switch gekoppelt."] =
             "最简单的切换方法：在电脑上通过 Windows 蓝牙设置用 SYNC 键配对一次控制器。回到 Switch 时，将 Joy-Con 插入主机或用 USB 线连接 Pro 手柄 – 无需菜单即可重新与 Switch 配对。",
-        ["„Übernehmen“ merkt sich diese Controller in N-Connect (Liste bekannter Controller, Zuordnung zur Switch). Kopplungsschlüssel werden nicht gespeichert."] =
-            "“应用”会将这些控制器记入 N-Connect（已知控制器列表、与 Switch 的关联）。配对密钥不会被保存。",
-        ["N-Connect-Kopplungsdaten"] = "N-Connect 配对数据",
+        ["„Übernehmen“ merkt sich diese Controller in SKZ Connect (Liste bekannter Controller, Zuordnung zur Switch). Kopplungsschlüssel werden nicht gespeichert."] =
+            "“应用”会将这些控制器记入 SKZ Connect（已知控制器列表、与 Switch 的关联）。配对密钥不会被保存。",
+        ["SKZ-Connect-Kopplungsdaten"] = "SKZ Connect 配对数据",
         ["Kopplungsdaten von einem anderen PC öffnen"] = "打开来自另一台电脑的配对数据",
         ["Die Datei ist zu groß."] = "文件过大。",
         ["Keine Kopplungsdaten-Datei."] = "不是配对数据文件。",
-        ["Die Datei stammt von einer neueren N-Connect-Version."] = "该文件由更新版本的 N-Connect 创建。",
+        ["Die Datei stammt von einer neueren SKZ-Connect-Version."] = "该文件由更新版本的 SKZ Connect 创建。",
         ["Die Datei ist mit einem Passwort geschützt."] = "该文件受密码保护。",
         ["Falsches Passwort oder die Datei wurde verändert."] = "密码错误或文件已被修改。",
         ["Die Datei ist beschädigt."] = "文件已损坏。",
@@ -867,20 +870,20 @@ internal static partial class Tr
         ["Was du erwarten kannst:"] = "预期效果：",
         ["Gleiche Adapter-Adresse (z. B. derselbe USB-Bluetooth-Stick umgesteckt): Switch-2-Controller verbinden sich hier auf Tastendruck wie am anderen PC."] =
             "相同适配器地址（例如同一个 USB 蓝牙适配器换插到这台电脑）：Switch 2 控制器在此按键即连，与在另一台电脑上一样。",
-        ["Switch-1-Controller (Pro Controller, Joy-Con) brauchen zusätzlich die Kopplung in Windows. Die kann N-Connect nicht übertragen – einmal per SYNC-Taste koppeln."] =
-            "Switch 1 控制器（Pro 手柄、Joy-Con）还需要在 Windows 中配对。N-Connect 无法传输 – 请用 SYNC 键配对一次。",
+        ["Switch-1-Controller (Pro Controller, Joy-Con) brauchen zusätzlich die Kopplung in Windows. Die kann SKZ Connect nicht übertragen – einmal per SYNC-Taste koppeln."] =
+            "Switch 1 控制器（Pro 手柄、Joy-Con）还需要在 Windows 中配对。SKZ Connect 无法传输 – 请用 SYNC 键配对一次。",
         ["Anderer Bluetooth-Adapter: Controller verbinden sich auf Tastendruck nur mit dem Gerät, mit dem sie zuletzt gekoppelt wurden. Hier einmal SYNC drücken – danach verbinden sie sich mit diesem PC (am anderen PC dann wieder per SYNC)."] =
             "不同的蓝牙适配器：控制器按键连接时只会连接最后配对的设备。在此按一次 SYNC – 之后它们会连接这台电脑（在另一台电脑上则需再次按 SYNC）。",
         ["Tipp: Wer denselben USB-Bluetooth-Stick zwischen den PCs umsteckt, nimmt die Adresse mit – Switch-2-Controller verbinden sich dann an beiden PCs ohne SYNC."] =
             "提示：在电脑间换插同一个 USB 蓝牙适配器会带走地址 – Switch 2 控制器在两台电脑上都能免 SYNC 连接。",
         ["Übernommen werden die Einstellungen je Controller (Joy-Con einzeln/hochkant, Gyro-Kalibrierung) und die Liste bekannter Controller."] =
             "导入的内容为每个控制器的设置（Joy-Con 单个/竖握、陀螺仪校准）和已知控制器列表。",
-        ["Die Datei enthält Kopplungsschlüssel. Windows bietet keinen offiziellen Weg, sie einzutragen – N-Connect übernimmt sie deshalb nicht."] =
-            "该文件包含配对密钥。Windows 没有官方途径写入 – 因此 N-Connect 不会导入它们。",
-        ["„Übernehmen“ ergänzt die Controller-Listen und Einstellungen von N-Connect (nichts wird gelöscht). Vorher wird eine Sicherung angelegt."] =
-            "“应用”会补充 N-Connect 的控制器列表和设置（不会删除任何内容）。此前会创建备份。",
-        ["Kopplungsdaten in N-Connect übernehmen? Vorher wird eine Sicherung der Einstellungen angelegt."] =
-            "将配对数据导入 N-Connect？此前会创建设置备份。",
+        ["Die Datei enthält Kopplungsschlüssel. Windows bietet keinen offiziellen Weg, sie einzutragen – SKZ Connect übernimmt sie deshalb nicht."] =
+            "该文件包含配对密钥。Windows 没有官方途径写入 – 因此 SKZ Connect 不会导入它们。",
+        ["„Übernehmen“ ergänzt die Controller-Listen und Einstellungen von SKZ Connect (nichts wird gelöscht). Vorher wird eine Sicherung angelegt."] =
+            "“应用”会补充 SKZ Connect 的控制器列表和设置（不会删除任何内容）。此前会创建备份。",
+        ["Kopplungsdaten in SKZ Connect übernehmen? Vorher wird eine Sicherung der Einstellungen angelegt."] =
+            "将配对数据导入 SKZ Connect？此前会创建设置备份。",
         ["Nichts zu ändern – diese Daten sind schon übernommen."] = "无需更改 – 这些数据已导入。",
         ["Übernommen. Die Sicherung lässt sich hier über „Sicherung wiederherstellen“ zurückholen."] =
             "已导入。可通过此处的“恢复备份”还原。",
@@ -889,8 +892,8 @@ internal static partial class Tr
         ["Alle Einstellungen durch diese Sicherung ersetzen?"] = "用此备份替换所有设置？",
         ["Sicherung wiederhergestellt."] = "备份已恢复。",
         ["Kopplungsdaten für einen anderen PC speichern"] = "为另一台电脑保存配对数据",
-        ["Gespeichert. Die Datei am anderen PC in N-Connect unter „Joy-Con & Wii“ → „Kopplungsdaten“ → „Von einem anderen PC“ öffnen."] =
-            "已保存。在另一台电脑的 N-Connect 中，于“Joy-Con 与 Wii”→“配对数据”→“从另一台电脑”打开该文件。",
+        ["Gespeichert. Die Datei am anderen PC in SKZ Connect unter „Joy-Con & Wii“ → „Kopplungsdaten“ → „Von einem anderen PC“ öffnen."] =
+            "已保存。在另一台电脑的 SKZ Connect 中，于“Joy-Con 与 Wii”→“配对数据”→“从另一台电脑”打开该文件。",
         ["Kopplungsdaten exportieren"] = "导出配对数据",
         ["Passwort eingeben"] = "输入密码",
         ["Passwort (optional). Ohne Passwort steht der Inhalt lesbar in der Datei. Mit Kopplungsschlüsseln ist ein Passwort Pflicht."] =
@@ -952,10 +955,10 @@ internal static partial class Tr
         (Re(@"^HidHide (?<v>.+) ist erschienen \(installiert: (?<i>.+)\)\. Klicken zum Installieren\.$"),
             m => $"HidHide {m.Groups["v"]} 已发布（当前安装：{m.Groups["i"]}）。点击安装。"),
         (Re(@"^Lade HidHide (?<v>.+) herunter …$"), m => $"正在下载 HidHide {m.Groups["v"]} …"),
-        (Re(@"^HidHide (?<v>.+) herunterladen und installieren\? Das HidHide-Setup entfernt zuerst die alte Version und verlangt einen Neustart von Windows – bitte seinen Anweisungen folgen\. Windows fragt dabei nach Administratorrechten\. Danach versteckt N-Connect die Controller automatisch neu\.$"),
-            m => $"下载并安装 HidHide {m.Groups["v"]}？HidHide 安装程序会先卸载旧版本，并需要重启 Windows – 请按照其提示操作。Windows 会请求管理员权限。之后 N-Connect 会自动重新隐藏控制器。"),
-        (Re(@"^Version (?<v>.+) herunterladen und installieren\? N-Connect wird dafür kurz beendet und danach wieder gestartet\.(?<a> Windows fragt dabei nach Administratorrechten\.)?$"),
-            m => $"下载并安装版本 {m.Groups["v"]}？N-Connect 会短暂退出，然后重新启动。" +
+        (Re(@"^HidHide (?<v>.+) herunterladen und installieren\? Das HidHide-Setup entfernt zuerst die alte Version und verlangt einen Neustart von Windows – bitte seinen Anweisungen folgen\. Windows fragt dabei nach Administratorrechten\. Danach versteckt SKZ Connect die Controller automatisch neu\.$"),
+            m => $"下载并安装 HidHide {m.Groups["v"]}？HidHide 安装程序会先卸载旧版本，并需要重启 Windows – 请按照其提示操作。Windows 会请求管理员权限。之后 SKZ Connect 会自动重新隐藏控制器。"),
+        (Re(@"^Version (?<v>.+) herunterladen und installieren\? SKZ Connect wird dafür kurz beendet und danach wieder gestartet\.(?<a> Windows fragt dabei nach Administratorrechten\.)?$"),
+            m => $"下载并安装版本 {m.Groups["v"]}？SKZ Connect 会短暂退出，然后重新启动。" +
                  (m.Groups["a"].Success ? "Windows 会请求管理员权限。" : "")),
         (Re(@"^(?<t>.+) · (?<r>\d+) Berichte/s$"), m => $"{T(m.Groups["t"].Value)} · {m.Groups["r"]} 报告/秒"),
         (Re(@"^(?<p>\d+ %)(?<v>  \(.*\))?  ⚡ lädt$"), m => $"{m.Groups["p"]}{m.Groups["v"]}  ⚡ 充电中"),
@@ -989,7 +992,7 @@ internal static partial class Tr
         // Tooltip „P1 Pro 2 57 %“: Namen bleiben, wie sie sind.
         (Re(@"^P(?<n>\d+) (?<k>.+)$"), m => m.Value),
         (Re(@"^Bluetooth nicht verfügbar: (?<e>.*)$"), m => $"蓝牙不可用：{m.Groups["e"]}"),
-        (Re(@"^N-Connect: (?<p>.+)$"), m => $"N-Connect：{T(m.Groups["p"].Value)}"),
+        (Re(@"^SKZ Connect: (?<p>.+)$"), m => $"SKZ Connect：{T(m.Groups["p"].Value)}"),
         (Re(@"^(?<k>.+) per USB ist von einem anderen Programm belegt \(z\. B\. Steam\)\.$"),
             m => $"{N(m, "k")} 的 USB 被其他程序占用（例如 Steam）。"),
         (Re(@"^Schon (?<n>\d+) Controller verbunden – (?<k>.+) wird nicht verwendet\.$"),

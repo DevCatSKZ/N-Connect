@@ -42,7 +42,7 @@ public static class Texts
 
     public const string PairHowTo =
         "Halte am Controller die kleine runde SYNC-Taste gedrückt, bis die Lichter hin- und herlaufen. " +
-        "N-Connect verbindet ihn dann automatisch.";
+        "SKZ Connect verbindet ihn dann automatisch.";
 
     public const string ReconnectHowTo =
         "Bereits gekoppelte Controller verbinden sich nach einem Tastendruck von selbst – SYNC ist nur beim ersten Mal nötig.";

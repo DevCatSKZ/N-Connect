@@ -78,8 +78,8 @@ public class XboxBtReportTests
     [Fact]
     public void HidJson_RegisterUndReport()
     {
-        string reg = UhidCommand.RegisterXbox(1, "N-Connect \"Pro\"");
-        Assert.StartsWith("{\"id\":1,\"command\":\"register\",\"name\":\"N-Connect \\\"Pro\\\"\"", reg);
+        string reg = UhidCommand.RegisterXbox(1, "SKZ Connect \"Pro\"");
+        Assert.StartsWith("{\"id\":1,\"command\":\"register\",\"name\":\"SKZ Connect \\\"Pro\\\"\"", reg);
         Assert.Contains("\"vid\":1118,\"pid\":765,\"bus\":\"bluetooth\",\"descriptor\":[5,1,9,5,", reg);
         Assert.EndsWith("]}", reg);
         Assert.Equal("{\"id\":1,\"command\":\"report\",\"report\":[1,255,127,255,127,255,127,255,127,0,0,0,0,0,0,0,0]}",

@@ -8,7 +8,7 @@ namespace Switch2Pro.Bridge;
 /// <summary>
 /// Fenster „Kopplungsdaten“: von der Switch-SD-Karte übernehmen (Bluepick_RCM/hekate-Export), von einem anderen
 /// PC übernehmen (Datei *.ncpair) und für einen anderen PC exportieren. Übernommen wird nur in die Einstellungen
-/// von N-Connect – vorher wird eine Sicherung angelegt, die sich hier wiederherstellen lässt. Windows-Registrierung
+/// von SKZ Connect – vorher wird eine Sicherung angelegt, die sich hier wiederherstellen lässt. Windows-Registrierung
 /// und Bluetooth-Adapter bleiben unverändert, deshalb ist kein Adminrecht (UAC) nötig.
 /// </summary>
 internal sealed class PairingDataForm : UiForm
@@ -50,11 +50,11 @@ internal sealed class PairingDataForm : UiForm
         var content = _page.Content;
         content.Controls.Add(new Heading("Kopplungsdaten", page: true,
             subtitle: "Controller-Kopplungen von der Switch-SD-Karte oder von einem anderen PC übernehmen – oder für einen anderen " +
-                      "PC exportieren. Es werden nur Einstellungen von N-Connect geändert; Windows und der Bluetooth-Adapter bleiben unverändert."));
+                      "PC exportieren. Es werden nur Einstellungen von SKZ Connect geändert; Windows und der Bluetooth-Adapter bleiben unverändert."));
         _page.AddGroup("Übernehmen",
             new SettingRow("Von der Switch-SD-Karte", "Mit Bluepick_RCM oder hekate erstellte Kopplungsdaten (switchroot/joycon_mac.ini)",
                 Action("Einlesen …", Glyph.Folder, () => LoadFromSwitch(null)), Glyph.Gamepad),
-            new SettingRow("Von einem anderen PC", $"Mit N-Connect exportierte Datei (*{PairingTransfer.FileExtension})",
+            new SettingRow("Von einem anderen PC", $"Mit SKZ Connect exportierte Datei (*{PairingTransfer.FileExtension})",
                 Action("Datei öffnen …", Glyph.Import, LoadFromFile), Glyph.Device));
         _page.AddGroup("Inhalt", _preview);
         _page.AddGroup("Weitergeben und sichern",
@@ -274,13 +274,13 @@ internal sealed class PairingDataForm : UiForm
             sb.AppendLine($"  •  {NameOf(c.DisplayName)}  {c.ControllerAddress}  →  {c.HostAddress}  ({state})");
         }
         if (card.HasSaveBackup)
-            sb.AppendLine(Tr.T("Hinweis: Pro Controller stehen nur im Bluetooth-Speicher der Switch (8000000000000050.bin); dieses Speicherabbild kann N-Connect nicht auswerten."));
+            sb.AppendLine(Tr.T("Hinweis: Pro Controller stehen nur im Bluetooth-Speicher der Switch (8000000000000050.bin); dieses Speicherabbild kann SKZ Connect nicht auswerten."));
         sb.AppendLine();
         sb.AppendLine(Tr.T("Was diese Daten können – und was nicht:"));
         foreach (var line in SwitchExplanation)
             sb.AppendLine("  •  " + Tr.T(line));
         sb.AppendLine();
-        sb.AppendLine(Tr.T("„Übernehmen“ merkt sich diese Controller in N-Connect (Liste bekannter Controller, Zuordnung zur Switch). Kopplungsschlüssel werden nicht gespeichert."));
+        sb.AppendLine(Tr.T("„Übernehmen“ merkt sich diese Controller in SKZ Connect (Liste bekannter Controller, Zuordnung zur Switch). Kopplungsschlüssel werden nicht gespeichert."));
         return sb.ToString();
     }
 
@@ -288,8 +288,8 @@ internal sealed class PairingDataForm : UiForm
     [
         "Die Daten zeigen, welche Controller mit deiner Switch gekoppelt sind und an welche Bluetooth-Adresse sie gebunden sind.",
         "Ein Switch-1-Controller verbindet sich auf Tastendruck nur mit dem Gerät, dessen Adresse er gespeichert hat – hier mit der Switch. Der Bluetooth-Adapter des PCs hat eine andere Adresse, deshalb kann Windows diese Kopplung nicht einfach weiterverwenden.",
-        "Die Adresse des PC-Adapters zu ändern, unterstützt N-Connect bewusst nicht (herstellerabhängig, riskant und nicht vorgesehen).",
-        "Windows bietet keinen offiziellen Weg, fremde Kopplungsschlüssel einzutragen: Sie liegen in einem Teil der Registrierung, auf den nur das System zugreifen darf. N-Connect ändert dort nichts.",
+        "Die Adresse des PC-Adapters zu ändern, unterstützt SKZ Connect bewusst nicht (herstellerabhängig, riskant und nicht vorgesehen).",
+        "Windows bietet keinen offiziellen Weg, fremde Kopplungsschlüssel einzutragen: Sie liegen in einem Teil der Registrierung, auf den nur das System zugreifen darf. SKZ Connect ändert dort nichts.",
         "So klappt der Wechsel am einfachsten: am PC den Controller einmal per SYNC-Taste in den Windows-Bluetooth-Einstellungen koppeln. Zurück an der Switch die Joy-Con an die Konsole stecken bzw. den Pro Controller per USB-Kabel anschließen – dann sind sie ohne Menü wieder mit der Switch gekoppelt.",
     ];
 
@@ -299,7 +299,7 @@ internal sealed class PairingDataForm : UiForm
     {
         using var open = new OpenFileDialog
         {
-            Filter = Tr.T("N-Connect-Kopplungsdaten") + $" (*{PairingTransfer.FileExtension})|*{PairingTransfer.FileExtension}",
+            Filter = Tr.T("SKZ-Connect-Kopplungsdaten") + $" (*{PairingTransfer.FileExtension})|*{PairingTransfer.FileExtension}",
             Title = Tr.T("Kopplungsdaten von einem anderen PC öffnen"),
         };
         if (open.ShowDialog(this) != DialogResult.OK)
@@ -361,16 +361,16 @@ internal sealed class PairingDataForm : UiForm
         foreach (var line in sameAdapter ? SameAdapterExplanation : OtherAdapterExplanation)
             sb.AppendLine("  •  " + Tr.T(line));
         if (data.HasKeys)
-            sb.AppendLine("  •  " + Tr.T("Die Datei enthält Kopplungsschlüssel. Windows bietet keinen offiziellen Weg, sie einzutragen – N-Connect übernimmt sie deshalb nicht."));
+            sb.AppendLine("  •  " + Tr.T("Die Datei enthält Kopplungsschlüssel. Windows bietet keinen offiziellen Weg, sie einzutragen – SKZ Connect übernimmt sie deshalb nicht."));
         sb.AppendLine();
-        sb.AppendLine(Tr.T("„Übernehmen“ ergänzt die Controller-Listen und Einstellungen von N-Connect (nichts wird gelöscht). Vorher wird eine Sicherung angelegt."));
+        sb.AppendLine(Tr.T("„Übernehmen“ ergänzt die Controller-Listen und Einstellungen von SKZ Connect (nichts wird gelöscht). Vorher wird eine Sicherung angelegt."));
         return sb.ToString();
     }
 
     private static readonly string[] SameAdapterExplanation =
     [
         "Gleiche Adapter-Adresse (z. B. derselbe USB-Bluetooth-Stick umgesteckt): Switch-2-Controller verbinden sich hier auf Tastendruck wie am anderen PC.",
-        "Switch-1-Controller (Pro Controller, Joy-Con) brauchen zusätzlich die Kopplung in Windows. Die kann N-Connect nicht übertragen – einmal per SYNC-Taste koppeln.",
+        "Switch-1-Controller (Pro Controller, Joy-Con) brauchen zusätzlich die Kopplung in Windows. Die kann SKZ Connect nicht übertragen – einmal per SYNC-Taste koppeln.",
     ];
 
     private static readonly string[] OtherAdapterExplanation =
@@ -386,7 +386,7 @@ internal sealed class PairingDataForm : UiForm
     {
         if (_pending is not { } data)
             return;
-        if (Tr.Show(this, "Kopplungsdaten in N-Connect übernehmen? Vorher wird eine Sicherung der Einstellungen angelegt.",
+        if (Tr.Show(this, "Kopplungsdaten in SKZ Connect übernehmen? Vorher wird eine Sicherung der Einstellungen angelegt.",
                 "Kopplungsdaten", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) != DialogResult.OK)
             return;
         string backup;
@@ -459,8 +459,8 @@ internal sealed class PairingDataForm : UiForm
         var data = PairingTransfer.FromSettings(_settings, _adapterAddress, Environment.MachineName, extra);
         using var save = new SaveFileDialog
         {
-            Filter = Tr.T("N-Connect-Kopplungsdaten") + $" (*{PairingTransfer.FileExtension})|*{PairingTransfer.FileExtension}",
-            FileName = $"N-Connect-Kopplungsdaten-{Environment.MachineName}{PairingTransfer.FileExtension}",
+            Filter = Tr.T("SKZ-Connect-Kopplungsdaten") + $" (*{PairingTransfer.FileExtension})|*{PairingTransfer.FileExtension}",
+            FileName = $"SKZ-Connect-Kopplungsdaten-{Environment.MachineName}{PairingTransfer.FileExtension}",
             Title = Tr.T("Kopplungsdaten für einen anderen PC speichern"),
         };
         if (save.ShowDialog(this) != DialogResult.OK)
@@ -475,7 +475,7 @@ internal sealed class PairingDataForm : UiForm
             return;
         }
         Log.Info($"Kopplungsdaten exportiert: {data.Controllers.Count} Controller, Schlüssel: {data.HasKeys}");
-        Tr.Show(this, "Gespeichert. Die Datei am anderen PC in N-Connect unter „Joy-Con & Wii“ → „Kopplungsdaten“ → „Von einem anderen PC“ öffnen.",
+        Tr.Show(this, "Gespeichert. Die Datei am anderen PC in SKZ Connect unter „Joy-Con & Wii“ → „Kopplungsdaten“ → „Von einem anderen PC“ öffnen.",
             "Kopplungsdaten", MessageBoxButtons.OK, MessageBoxIcon.Information);
     }
 

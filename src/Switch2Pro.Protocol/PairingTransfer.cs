@@ -14,8 +14,8 @@ public sealed record TransferController
     public string? Name { get; init; }
     /// <summary>Adresse des Hosts (PC-Adapter oder Switch), an den der Controller gebunden ist.</summary>
     public string? HostAddress { get; init; }
-    /// <summary>Herkunft: "N-Connect" (dieser PC) oder "Switch" (SD-Karte).</summary>
-    public string Source { get; init; } = "N-Connect";
+    /// <summary>Herkunft: "SKZ Connect" (dieser PC) oder "Switch" (SD-Karte).</summary>
+    public string Source { get; init; } = "SKZ Connect";
     /// <summary>Kopplungsschlüssel (16 Byte, Hex) – nur, wenn er beim Export ausdrücklich mitgenommen wurde.</summary>
     public string? LinkKey { get; init; }
 }
@@ -125,7 +125,7 @@ public static class PairingTransfer
             if (root["format"]?.GetValue<string>() != FormatId)
                 throw new PairingFileException(PairingFileError.NotAPairingFile, "Keine Kopplungsdaten-Datei.");
             if ((root["version"]?.GetValue<int>() ?? 0) > Version)
-                throw new PairingFileException(PairingFileError.NewerVersion, "Die Datei stammt von einer neueren N-Connect-Version.");
+                throw new PairingFileException(PairingFileError.NewerVersion, "Die Datei stammt von einer neueren SKZ-Connect-Version.");
             JsonNode? payload;
             if (root["encrypted"]?.GetValue<bool>() == true)
             {
@@ -165,7 +165,7 @@ public static class PairingTransfer
         }
     }
 
-    /// <summary>Was N-Connect auf diesem PC über Controller weiß (ohne Schlüssel – die kennt N-Connect nicht).</summary>
+    /// <summary>Was SKZ Connect auf diesem PC über Controller weiß (ohne Schlüssel – die kennt SKZ Connect nicht).</summary>
     public static PairingExport FromSettings(Settings settings, string? adapterAddress, string? pcName, IEnumerable<TransferController>? extra = null)
     {
         var controllers = new List<TransferController>();
@@ -179,7 +179,7 @@ public static class PairingTransfer
                 Address = a,
                 Name = note?.Name,
                 HostAddress = note?.HostAddress ?? adapterAddress,
-                Source = note?.Source ?? "N-Connect",
+                Source = note?.Source ?? "SKZ Connect",
             });
         }
         foreach (var c in extra ?? [])
@@ -277,7 +277,7 @@ public static class PairingTransfer
                 {
                     Address = BtAddress.TryNormalize(c.Address, out var a) ? a : c.Address,
                     LinkKey = c.LinkKey is { Length: 32 } k && k.All(Uri.IsHexDigit) ? k.ToUpperInvariant() : null,
-                    Source = c.Source ?? "N-Connect",
+                    Source = c.Source ?? "SKZ Connect",
                 }).ToList(),
             KnownControllers = Clean(data.KnownControllers),
             AllowedControllers = Clean(data.AllowedControllers),

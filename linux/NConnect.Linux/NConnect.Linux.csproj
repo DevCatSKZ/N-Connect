@@ -1,5 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <!-- N-Connect für Linux (LibreELEC/Kodi, Raspberry Pi OS, Steam Deck …): Dienst ohne Oberfläche.
+  <!-- SKZ Connect für Linux (LibreELEC/Kodi, Raspberry Pi OS, Steam Deck …): Dienst ohne Oberfläche.
        Switch-2-Controller über BlueZ (D-Bus), Ausgabe als virtueller Xbox-360-Controller über /dev/uinput.
        Teilt sich die Protokoll-Bibliothek mit Windows und Android. -->
   <PropertyGroup>

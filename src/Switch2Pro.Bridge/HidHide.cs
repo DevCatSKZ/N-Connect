@@ -38,7 +38,7 @@ internal static partial class HidHide
     public static bool IsInstalled => CliPath is not null;
 
     /// <summary>Geplante Aufgabe (vom Installer angelegt, läuft als SYSTEM), die ohne UAC-Abfrage versteckt bzw. freigibt.</summary>
-    public const string TaskName = "N-Connect HidHide";
+    public const string TaskName = "SKZ Connect HidHide";
 
     /// <summary>Erstes Feld im Argument der Aufgabe, wenn freigegeben statt versteckt werden soll: „unhide|id1|id2“.</summary>
     internal const string UnhideVerb = "unhide";
@@ -61,7 +61,7 @@ internal static partial class HidHide
     /// </summary>
     public static async Task<Outcome> HideAsync(IEnumerable<string> instanceIds)
     {
-        // Virtuelle Geräte (eigene ViGEm-Pads) nie verstecken – Spiele sähen sonst die Ausgabe von N-Connect nicht.
+        // Virtuelle Geräte (eigene ViGEm-Pads) nie verstecken – Spiele sähen sonst die Ausgabe von SKZ Connect nicht.
         var ids = instanceIds.Where(id =>
         {
             if (Usb.DeviceTree.IsPhysicalInstance(id))
@@ -75,7 +75,7 @@ internal static partial class HidHide
     }
 
     /// <summary>
-    /// Gibt eigene virtuelle Pads in HidHide wieder frei. Bis 1.0.21 hielt N-Connect sein ViGEm-DualShock-4 für einen
+    /// Gibt eigene virtuelle Pads in HidHide wieder frei. Bis 1.0.21 hielt SKZ Connect sein ViGEm-DualShock-4 für einen
     /// echten Controller und konnte es verstecken (Issue #1); der Eintrag bleibt in HidHide stehen, und ViGEm vergibt
     /// dieselbe Instanz-ID wieder – Steam und Spiele sähen die DS4-Ausgabe nie. Nur nachweislich virtuelle IDs
     /// (<see cref="IsVirtualPad"/>); Weg wie beim Verstecken (Aufgabe, sonst UAC).
@@ -105,7 +105,7 @@ internal static partial class HidHide
     /// <summary>
     /// Startet die geplante Aufgabe mit dem Argument für den Helfer und wartet auf ihr Ergebnis. null, wenn die Aufgabe
     /// fehlt (portable Variante, Registrierung im Setup gescheitert, Installation außerhalb von „Programme“) oder für eine
-    /// andere N-Connect.exe eingerichtet ist (z. B. Entwicklerversion) – dann der UAC-Weg.
+    /// andere SKZ-Connect.exe eingerichtet ist (z. B. Entwicklerversion) – dann der UAC-Weg.
     /// </summary>
     private static async Task<Outcome?> RunViaTaskAsync(string argument)
     {

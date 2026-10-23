@@ -1,6 +1,6 @@
 # Controller-Protokolle
 
-Alles, was N-Connect über die Controller weiß, auf Byte-Ebene. Umgesetzt im plattformunabhängigen Projekt
+Alles, was SKZ Connect über die Controller weiß, auf Byte-Ebene. Umgesetzt im plattformunabhängigen Projekt
 `Switch2Pro.Protocol` – eine Portierung kann es unverändert übernehmen (C#/.NET) oder danach neu schreiben.
 Zahlen hexadezimal, „LE“ = niedrigstes Byte zuerst. Quellen: ndeadly/switch2_controller_research, SDL
 (`SDL_hidapi_switch2.c`, `SDL_hidapi_switch.c`), dekuNukem/Nintendo_Switch_Reverse_Engineering, Linux
@@ -40,7 +40,7 @@ Herstellerdaten Kennung **0x0553**; Inhalt (ohne die 2 Kennungs-Bytes):
 | `cc483f51-9258-427d-a939-630c31f72b05` | Vibration Pro/GameCube |
 | `289326cb-a471-485d-a8f4-240c14f18241` / `fa19b0fb-cd1f-46a7-84a1-bbb09e00c149` | Vibration Joy-Con 2 L / R |
 
-Verbindungsintervall: der Controller wählt 30 ms (~33 Berichte/s); N-Connect fordert „ThroughputOptimized“
+Verbindungsintervall: der Controller wählt 30 ms (~33 Berichte/s); SKZ Connect fordert „ThroughputOptimized“
 (7,5 ms, ~60 Berichte/s) an und fragt höchstens dreimal nach, wenn der Controller zurückschaltet.
 
 ### 1.3 Befehle
@@ -49,7 +49,7 @@ dann Daten. Antworten: `Befehl | 01 | … | Unterbefehl …`, Daten ab Byte 8.
 
 | Befehl/Unter | Daten | Zweck |
 |---|---|---|
-| 0C/02, 0C/04 | Maske, 0, 0, 0 | Feature-Maske setzen / einschalten. Bits: 01 Tasten, 02 Sticks, 04 Bewegung, 10 Maus (Joy-Con), 20 Vibration. N-Connect: Pro/GameCube **0x2F**, Joy-Con 2 **0x37** (andere Bits erzeugen Phantom-ZL/ZR) |
+| 0C/02, 0C/04 | Maske, 0, 0, 0 | Feature-Maske setzen / einschalten. Bits: 01 Tasten, 02 Sticks, 04 Bewegung, 10 Maus (Joy-Con), 20 Vibration. SKZ Connect: Pro/GameCube **0x2F**, Joy-Con 2 **0x37** (andere Bits erzeugen Phantom-ZL/ZR) |
 | 02/04 | Länge, 7E, 0, 0, Adresse (LE, 4) | Speicher lesen (≤ 0x4F Byte). Antwort-Daten: Länge, 3×0, Adresse, Daten |
 | 09/07 | Maske, 7×0 | Spieler-LEDs; Muster je Spieler 1–8: `1 3 7 F 9 5 D 6` |
 | 0A/02 | 03, 0, 0, 0 | eingebautes Vibrationsmuster („Verbunden“-Klick) |
@@ -92,7 +92,7 @@ Akku aus Spannung siehe FUNKTIONEN 11 (`InputReports.BatteryPercentFromMillivolt
 
 ### 1.5 Vibration (HD-Rumble 2)
 Frame 5 Byte (40 Bit LE): hohe Frequenz (Bit 0–9), hohe Amplitude (10–19), tiefe Frequenz (20–29), tiefe
-Amplitude (30–39). N-Connect: hoch 0x187, tief 0x112, Amplitude ≤ 453 (= 29000 ≫ 6 wie SDL).
+Amplitude (30–39). SKZ Connect: hoch 0x187, tief 0x112, Amplitude ≤ 453 (= 29000 ≫ 6 wie SDL).
 - Pro/GameCube BLE: 33 Byte, Byte 0 = 0, ab Byte 1 und 0x11 je `50|Zähler` + Frame.
 - Joy-Con 2 BLE: 17 Byte, Byte 1 = `50|Zähler`, Frame ab Byte 2.
 - USB: HID-Ausgabebericht 0x02 (64 Byte) wie BLE-Paket mit Report-ID statt der 0.
@@ -122,7 +122,7 @@ ab 0x08 Einträge à 0x28: Host-Adresse (6, höchstes Byte zuerst), 12×0, LTK (
 - **Antwort 0x21**: Byte 13 Bit 7 = Bestätigung, Byte 14 = Unterbefehl, Daten ab 15.
 - Unterbefehle: 02 Geräteinfo (Firmware Byte 0–1, Typ Byte 2, MAC Byte 4–9), 03 Eingabemodus (30 = Vollbericht),
   06 HCI-Zustand (00 = schlafen), 10 SPI lesen (Adresse LE 4 Byte, Länge ≤ 0x1D; Antwort: Adresse, Länge,
-  Daten), 30 Spieler-LEDs, 40 IMU ein, 48 Vibration ein. N-Connect: 3 Versuche à 300 ms.
+  Daten), 30 Spieler-LEDs, 40 IMU ein, 48 Vibration ein. SKZ Connect: 3 Versuche à 300 ms.
 - SPI: 0x603D/0x6046 Werks-Stickkalibrierung L/R, 0x8010/0x801B Benutzer (Kennung `B2 A1`), 0x6020/0x8026 IMU,
   0x6050 Farben (Gehäuse, Tasten, Griff L/R je 3 Byte). Stick-Kalibrierung L: Max, Mitte, Min; R: Mitte, Min, Max.
 - **Vollbericht 0x30**: Byte 2 Akku (Stufe Bit 5–7: 0, 2, 4, 6, 8; Bit 4 Laden); Byte 3 rechts (Y 01, X 02, B 04,
@@ -146,7 +146,7 @@ ab 0x08 Einträge à 0x28: Host-Adresse (6, höchstes Byte zuerst), 12×0, LTK (
 - VID 057E, PID 0x0306 (Fernbedienung), 0x0330 (Plus und Wii U Pro). Bit 0 des 2. Bytes jedes Ausgabeberichts =
   Vibration.
 - Ausgaben: 11 LEDs (Bit 4–7; Spieler 5–8 als Muster), 12 Berichtsmodus (`[12, 04|Rumble, Modus]`, 04 = dauernd;
-  N-Connect sendet **ohne** 04 = nur bei Änderung), 13/1A IR-Kamera an, 15 Status, 16 Register schreiben (≤ 16 Byte),
+  SKZ Connect sendet **ohne** 04 = nur bei Änderung), 13/1A IR-Kamera an, 15 Status, 16 Register schreiben (≤ 16 Byte),
   17 Register lesen.
 - Eingaben: 20 Status (Byte 3 Bit 1 = Erweiterung gesteckt, Byte 6 Akku 0–200), 21 Leseantwort (Byte 3: Größe−1
   und Fehler, Byte 4–5 Adresse low, Daten ab 6), 22 Bestätigung, 30–3D Daten. **Nach jedem Statusbericht muss
@@ -177,7 +177,7 @@ Bericht ohne Report-ID, 7 Byte (+ herstellerspezifisch):
 **Y nach unten**). Kein Gyro, keine Vibration. Mit echter Hardware noch nicht geprüft.
 
 ## 6. Bluetooth-Kopplung klassischer Controller (Windows-API)
-`BluetoothFindFirstDevice` mit Suche (Inquiry, Dauer `cTimeoutMultiplier` × 1,28 s; N-Connect: 1) liefert auch
+`BluetoothFindFirstDevice` mit Suche (Inquiry, Dauer `cTimeoutMultiplier` × 1,28 s; SKZ Connect: 1) liefert auch
 bekannte Geräte. **SYNC-Erkennung bei bekannten Geräten:** `stLastSeen` vor und nach der Suche vergleichen – nur
 ein Gerät im Kopplungsmodus antwortet und bekommt einen neuen Wert. Switch 1/NSO: `BluetoothAuthenticateDeviceEx`
 (MITM nicht nötig, Bonding) mit `BluetoothRegisterForAuthenticationEx`-Rückruf, der per

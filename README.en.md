@@ -1,17 +1,17 @@
 <div align="center">
 
-<img src="installer/art/N-Connect.png" width="112" alt="N-Connect logo">
+<img src="installer/art/SKZ-Connect.png" width="112" alt="SKZ Connect logo">
 
-# N-Connect
+# SKZ Connect
 
 **Use Switch 2 controllers and many others on Windows as Xbox or DualShock 4 controllers –
 in games, Steam and emulators.**
 
-Also available: N-Connect for Android (beta) and an add-on for Kodi/LibreELEC.
+Also available: SKZ Connect for Android (beta) and an add-on for Kodi/LibreELEC.
 
-[Deutsch](README.md) · **English** · [Website](https://devcatskz.github.io/N-Connect/)
+[Deutsch](README.md) · **English** · [Website](https://devcatskz.github.io/SKZ-Connect/)
 
-<img src="https://devcatskz.github.io/N-Connect/screenshots/uebersicht.png" width="820" alt="N-Connect on Windows: overview of connected controllers with battery level and live button display">
+<img src="https://devcatskz.github.io/SKZ-Connect/screenshots/uebersicht.png" width="820" alt="SKZ Connect on Windows: overview of connected controllers with battery level and live button display">
 
 </div>
 
@@ -19,8 +19,8 @@ Also available: N-Connect for Android (beta) and an add-on for Kodi/LibreELEC.
 
 | Platform | Version | Download | Guide |
 |---|---|---|---|
-| Windows 10 (2004 or later) and 11, 64-bit | 1.0.22 | [Setup or portable ZIP](https://github.com/DevCatSKZ/N-Connect/releases/latest) | [Windows](docs/guide/windows.md) |
-| Android 8 or later | 0.9.1 beta | [N-Connect-Android-0.9.1.apk](https://github.com/DevCatSKZ/N-Connect/releases/download/v1.0.22/N-Connect-Android-0.9.1.apk) | [Android](docs/guide/android.md) |
+| Windows 10 (2004 or later) and 11, 64-bit | 1.0.22 | [Setup or portable ZIP](https://github.com/DevCatSKZ/SKZ-Connect/releases/latest) | [Windows](docs/guide/windows.md) |
+| Android 8 or later | 0.9.1 beta | [SKZ-Connect-Android-0.9.1.apk](https://github.com/DevCatSKZ/SKZ-Connect/releases/download/v1.0.22/SKZ-Connect-Android-0.9.1.apk) | [Android](docs/guide/android.md) |
 | Kodi on LibreELEC | 0.4.4 | [DevCatSKZ Repository](https://github.com/DevCatSKZ/kodi-repo) | [Kodi](docs/guide/kodi.md) |
 
 The Windows setup installs the required drivers ViGEmBus and HidHide. Setup and app are not code-signed, so Windows
@@ -38,9 +38,9 @@ SmartScreen shows a warning on first launch.
 | Xbox controllers | native² | – | Pairing¹ |
 | Wired controllers by HORI, PowerA, PDP | ✓¹ | – | – |
 
-¹ Not yet tested with real hardware – [feedback](https://github.com/DevCatSKZ/N-Connect/issues) is welcome.
-² Windows supports Xbox controllers natively; N-Connect adds battery display and remapping.
-**Pairing:** N-Connect pairs the controller, Linux handles the input. On Android, other controllers connect directly
+¹ Not yet tested with real hardware – [feedback](https://github.com/DevCatSKZ/SKZ-Connect/issues) is welcome.
+² Windows supports Xbox controllers natively; SKZ Connect adds battery display and remapping.
+**Pairing:** SKZ Connect pairs the controller, Linux handles the input. On Android, other controllers connect directly
 to the system.
 
 ## Features
@@ -62,7 +62,7 @@ fixed player slots, DSU and a home screen widget.
 ## Status
 
 Windows is the main platform. Android is in beta. The Kodi add-on is tested on a Raspberry Pi 4 with LibreELEC 12.2,
-other devices are not tested yet. The ViGEmBus driver is no longer developed since 2023; N-Connect uses its final
+other devices are not tested yet. The ViGEmBus driver is no longer developed since 2023; SKZ Connect uses its final
 version 1.22.0.
 
 ## Privacy
@@ -75,7 +75,7 @@ startup (can be turned off).
 - Guides: [Windows](docs/guide/windows.md) · [Android](docs/guide/android.md) · [Kodi](docs/guide/kodi.md) ·
   [Troubleshooting](docs/guide/troubleshooting.md)
 - [Technical documentation](docs/README.md) (German)
-- Please report bugs as an [issue](https://github.com/DevCatSKZ/N-Connect/issues), ideally with a diagnostics file
+- Please report bugs as an [issue](https://github.com/DevCatSKZ/SKZ-Connect/issues), ideally with a diagnostics file
   (Windows: *General › Advanced › Export diagnostics*).
 
 ## Building

@@ -13,8 +13,8 @@ für Nutzer geändert hat, steht in [release-notes/](release-notes/); den aktuel
 | 06.10. | Darstellung bei 125/150 % korrigiert (fehlende DPI-Basis, zu knappe feste Breiten). Erste Tags v1.0.0/v1.0.1. |
 | 07.10. | 1.0.2: zwölf Sprachen, Logo, Sprach- und Darstellungsauswahl im Setup. 1.0.4: zusätzliche Xbox-Controller durch eigene ViGEm-Pads behoben. 1.0.5: portable Variante. 1.0.6: Update auch für die portable Variante, Akku-Warnung, winget-Manifeste. 1.0.7: MIT-Lizenz, Joy-Con-Paar-Knopf in der Karte. Einen Linux-Port der Windows-App verworfen (WinForms, WinRT, ViGEmBus). |
 | 10.10. | Fehlerkorrekturen, Statusleiste, Kompakt-Ansicht, Animationen; Windows-Design als Standard mit vier weiteren Farbschemata, neues Icon, eigene Skalierung (`UiScale`), Prüfhilfen auf unsichtbarem Desktop. 1.0.16: Desktop-Modus, Testseite, Einblendung beim Verbinden, Diagnose-Export, CI rendert die Oberfläche. 1.0.17: Desktop-Widget. 1.0.18: Export für ESP32/nRF52840. Am selben Tag Funkadapter-Weg verworfen, 1.0.19 blendet den Export aus. |
-| 11.10. | 1.0.20: N-Connect für Android (Beta 0.9.0, eigener Signaturschlüssel) und Linux-Dienst mit Kodi-Add-on (0.3.0) für LibreELEC, Kodi-Bereich in der Windows-App. |
-| 12.10. | Entwicklung direkt in `N-Connect`; `sfm` ist seitdem eingefroren. |
+| 11.10. | 1.0.20: SKZ Connect für Android (Beta 0.9.0, eigener Signaturschlüssel) und Linux-Dienst mit Kodi-Add-on (0.3.0) für LibreELEC, Kodi-Bereich in der Windows-App. |
+| 12.10. | Entwicklung direkt in `SKZ Connect`; `sfm` ist seitdem eingefroren. |
 | 12.–15.10. | Android: DSU, Profile je Spiel, Kachel, Autostart, Update-Prüfung, Kodi-Status (erst mit 0.9.1 veröffentlicht). Kodi-Add-on 0.4.0–0.4.3: Widget, Begleitmodus für Kodi unter Windows/Android/macOS, Batocera. 1.0.21 (15.10.): Windows meldet Controller an Kodi auf demselben PC. |
 | 17.10. | Analyse aller Teile, danach Überarbeitung in getrennten Strängen: Windows 1.0.22, Android 0.9.1, Kodi 0.4.4 (Einzelheiten in [release-notes/v1.0.22.md](release-notes/v1.0.22.md)). Dazu .NET 10, ein gemeinsamer DSU-Server, vollständige Lizenzhinweise, Funkadapter-Code entfernt, CI mit allen Tests und Android-Compile-Job. |
 
@@ -46,12 +46,12 @@ für Nutzer geändert hat, steht in [release-notes/](release-notes/); den aktuel
 ### Funkadapter (verworfen am 10.10.2026)
 
 Ziel war, Switch-2-Controller ohne neues SYNC auch an einem zweiten PC zu nutzen: Eine Platine übernimmt die Adresse
-des PC-Adapters und reicht die Controller per USB an N-Connect weiter. Gründe für das Aus: Der nRF52840 kann kein
+des PC-Adapters und reicht die Controller per USB an SKZ Connect weiter. Gründe für das Aus: Der nRF52840 kann kein
 Bluetooth-Adapter für Windows sein (nur Bluetooth LE), der Relais-Weg blieb ergebnislos (der Dongle empfing die
 Werbung der Controller nicht, mit nur einem nRF-Gerät ließ sich der eigene Versuch nicht mitschneiden), und jeder Test
 kostete ein Neu-Koppeln. Ein ESP32-S3 wurde nie eingesetzt. Export (1.0.18) und Einstellung sind seit 1.0.19
 ausgeblendet, der Code ist in 1.0.22 entfernt. Unterlagen: [archiv/](archiv/), Referenz-Firmware
-[`firmware/nrf52840/`](../firmware/nrf52840/). Stattdessen: N-Connect auf jedem PC installieren und dort einmal koppeln.
+[`firmware/nrf52840/`](../firmware/nrf52840/). Stattdessen: SKZ Connect auf jedem PC installieren und dort einmal koppeln.
 
 ### Bewusst nicht umgesetzt
 
@@ -74,7 +74,7 @@ ausgeblendet, der Code ist in 1.0.22 entfernt. Unterlagen: [archiv/](archiv/), R
 - Joy-Con-Paare trennen nur noch quer gehalten mit SL/SR: Ein Nutzer hatte mit „SL + SR 1 s“ versehentlich getrennt,
   der Joy-Con lief dann einzeln mit gedrehter Belegung („im Spiel falsch“).
 - Steam sah Switch-1- und NSO-Controller doppelt (Steam unterstützt sie selbst, HidHide griff damals nur bei USB und
-  von Hand); seitdem versteckt N-Connect sie automatisch über HidHide.
+  von Hand); seitdem versteckt SKZ Connect sie automatisch über HidHide.
 - Akzentfarbe ist bewusst nicht die Windows-Akzentfarbe des Nutzers (war bei ihm pink).
 
 ### Android und Linux

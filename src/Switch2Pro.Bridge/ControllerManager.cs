@@ -49,7 +49,7 @@ internal sealed class ControllerManager : IAsyncDisposable
     /// <summary>Aktuelle Einstellungen (Namen, Plätze …) – nur lesen.</summary>
     public Settings Settings => _settings();
     public event Action<string>? Notify;
-    /// <summary>Verbinden/Trennen eines Controllers – je nach Einstellung meldet N-Connect oder Windows.</summary>
+    /// <summary>Verbinden/Trennen eines Controllers – je nach Einstellung meldet SKZ Connect oder Windows.</summary>
     public event Action<string>? ConnectionNotify;
     /// <summary>Controller wurde verbunden (gleichzeitig mit der Verbindungsmeldung) – für die Einblendung am Bildschirmrand.</summary>
     public event Action<IControllerLink>? LinkConnected;
@@ -791,7 +791,7 @@ internal sealed class ControllerManager : IAsyncDisposable
     /// <summary>
     /// Steam und viele Spiele (SDL) unterstützen Switch-1-, NSO- und USB-Controller selbst und sähen sie doppelt
     /// (Original + virtueller Controller) – dann kommen Eingaben doppelt oder vermischt an. Deshalb jeden solchen
-    /// Controller automatisch per HidHide verstecken (N-Connect bleibt freigegeben). Mehrere Controller (Joy-Con-Paar)
+    /// Controller automatisch per HidHide verstecken (SKZ Connect bleibt freigegeben). Mehrere Controller (Joy-Con-Paar)
     /// werden gesammelt und mit einer einzigen Windows-Abfrage (Adminrechte) versteckt.
     /// </summary>
     private void QueueHide(IControllerLink link)
@@ -800,7 +800,7 @@ internal sealed class ControllerManager : IAsyncDisposable
         if (!settings.HideFromGames || link.HidInstanceId is not { } id || settings.IsHidden(id) || _disposed)
             return;
         // Doppelter Schutz: ein virtuelles Pad (eigenes ViGEm-Pad o. Ä.) nie verstecken – sonst sähen Spiele
-        // die eigene Ausgabe von N-Connect nicht mehr.
+        // die eigene Ausgabe von SKZ Connect nicht mehr.
         if (!DeviceTree.IsPhysicalInstance(id))
         {
             Log.Warn($"{link.Id}: virtuelles Gerät – wird nicht versteckt");
@@ -901,9 +901,9 @@ internal sealed class ControllerManager : IAsyncDisposable
     }
 
     /// <summary>
-    /// Bis 1.0.21 hielt N-Connect sein eigenes ViGEm-DualShock-4 für einen echten Controller und konnte es per HidHide
+    /// Bis 1.0.21 hielt SKZ Connect sein eigenes ViGEm-DualShock-4 für einen echten Controller und konnte es per HidHide
     /// verstecken (Issue #1). Der Eintrag bleibt in HidHide auch nach dem Update stehen, und ViGEm vergibt dieselbe
-    /// Instanz-ID wieder – Steam und Spiele sähen die DS4-Ausgabe von N-Connect nie. Deshalb beim Start solche Einträge der
+    /// Instanz-ID wieder – Steam und Spiele sähen die DS4-Ausgabe von SKZ Connect nie. Deshalb beim Start solche Einträge der
     /// eigenen Liste versteckter Geräte freigeben (über die Aufgabe, sonst per UAC) und aus der Liste nehmen. Das geschieht
     /// nur einmal, auch wenn es scheitert – dann erklärt eine Meldung, wie es von Hand geht.
     /// </summary>
@@ -922,7 +922,7 @@ internal sealed class ControllerManager : IAsyncDisposable
             if (result == HidHide.Outcome.Done)
                 Log.Info("HidHide: virtuelles Pad wieder freigegeben");
             else if (!_disposed)
-                Notify?.Invoke("Eine ältere N-Connect-Version hat das eigene virtuelle DualShock 4 vor Spielen versteckt. Freigeben " +
+                Notify?.Invoke("Eine ältere SKZ-Connect-Version hat das eigene virtuelle DualShock 4 vor Spielen versteckt. Freigeben " +
                                "hat nicht geklappt – bitte im HidHide Configuration Client den Haken beim virtuellen DualShock 4 entfernen.");
         }
         catch (Exception e) when (e is not OutOfMemoryException)

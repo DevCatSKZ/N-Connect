@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Erzeugt von android/i18n/generate.py -->
 <resources>
-    <string name="touch_service_description">Permite a N-Connect ejecutar los botones de tu mando como toques en pantalla (modo táctil). No se lee ni se guarda ningún contenido.</string>
-    <string name="touch_service_label">Control táctil de N-Connect</string>
-    <string name="setup_title">Configurar N-Connect</string>
+    <string name="touch_service_description">Permite a SKZ Connect ejecutar los botones de tu mando como toques en pantalla (modo táctil). No se lee ni se guarda ningún contenido.</string>
+    <string name="touch_service_label">Control táctil de SKZ Connect</string>
+    <string name="setup_title">Configurar SKZ Connect</string>
 </resources>

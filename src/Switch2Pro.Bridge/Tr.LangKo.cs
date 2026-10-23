@@ -16,12 +16,15 @@ internal static partial class Tr
         ["Einrichten fehlgeschlagen – der Kodi-Ordner ist nicht beschreibbar. Nutze „Repository herunterladen“."] = "설정 실패 – Kodi 폴더에 쓸 수 없습니다. \"저장소 다운로드\"를 사용하세요.",
         ["Herunterladen …"] = "다운로드 …",
         ["DevCatSKZ Repository in Kodi einrichten"] = "Kodi에 DevCatSKZ Repository 설정",
-        ["Legt das Repository direkt in Kodi ab. Darüber kommen unsere Kodi-Plugins mit automatischen Updates. Danach in Kodi: Add-ons → Meine Add-ons → Add-on-Repository → DevCatSKZ Repository → Aktivieren."] = "저장소를 Kodi에 바로 넣습니다. 이를 통해 Kodi 플러그인이 자동 업데이트와 함께 제공됩니다. 그런 다음 Kodi에서: 애드온 → 내 애드온 → 애드온 저장소 → DevCatSKZ Repository → 사용.",
+        ["Kodi ist auf diesem PC installiert. Legt das Repository direkt in Kodi ab. Darüber kommen unsere Kodi-Plugins mit automatischen Updates. Danach in Kodi: Add-ons → Meine Add-ons → Add-on-Repository → DevCatSKZ Repository → Aktivieren."] = "이 PC에 Kodi가 설치되어 있습니다. 리포지토리를 Kodi에 직접 넣습니다. 이를 통해 우리의 Kodi 플러그인이 자동 업데이트됩니다. 그다음 Kodi에서: 애드온 → 내 애드온 → 애드온 리포지토리 → DevCatSKZ Repository → 활성화.",
         ["Kodi ist auf diesem PC nicht installiert. Mit Kodi für Windows funktionieren deine Controller auch ohne Plugin – sie erscheinen dort als Xbox-Controller."] = "이 PC에는 Kodi가 설치되어 있지 않습니다. Windows용 Kodi에서는 플러그인 없이도 컨트롤러가 Xbox 컨트롤러로 표시됩니다.",
         ["Repository herunterladen"] = "저장소 다운로드",
         ["Speichert repository.devcatskz.zip im Download-Ordner – zum Installieren auf einem anderen Gerät über „Aus ZIP-Datei installieren“."] = "repository.devcatskz.zip을 다운로드 폴더에 저장합니다 – 다른 기기에서 \"zip 파일에서 설치\"로 설치할 수 있습니다.",
         ["Kodi-Plugin für LibreELEC"] = "LibreELEC용 Kodi 플러그인",
-        ["Für Raspberry Pi und andere Geräte mit LibreELEC: N-Connect als Kodi-Plugin (alle Geräte). Am einfachsten über das DevCatSKZ Repository."] = "LibreELEC를 쓰는 Raspberry Pi 등 기기용: Kodi 플러그인 N-Connect(모든 기기). DevCatSKZ Repository를 쓰는 것이 가장 쉽습니다.",
+        ["Braucht Kodi ein Plugin?"] = "Kodi에 플러그인이 필요한가요?",
+        ["Nur auf anderen Geräten: Kodi für Windows braucht keins – deine Controller erscheinen dort als Xbox-Controller. Auf Raspberry Pi, LibreELEC und anderen Kodi-Geräten zeigt das Plugin verbundene Controller und Akkustand."] = "다른 기기에서만 필요합니다: Windows용 Kodi는 필요하지 않습니다 – 컨트롤러가 Xbox 컨트롤러로 표시됩니다. Raspberry Pi, LibreELEC 및 기타 Kodi 기기에서는 플러그인이 연결된 컨트롤러와 배터리 잔량을 표시합니다.",
+        ["Kodi-Plugin für LibreELEC (installiert)"] = "LibreELEC용 Kodi 플러그인(설치됨)",
+        ["Für Raspberry Pi und andere Geräte mit LibreELEC: SKZ Connect als Kodi-Plugin (alle Geräte). Am einfachsten über das DevCatSKZ Repository."] = "LibreELEC를 쓰는 Raspberry Pi 등 기기용: Kodi 플러그인 SKZ Connect(모든 기기). DevCatSKZ Repository를 쓰는 것이 가장 쉽습니다.",
         // ---------- Fenster, Reiter, Abschnitte ----------
         ["Controller"] = "컨트롤러",
         // ---------- Desktop-Modus, Testseite, Vorlagen, Diagnose ----------
@@ -55,7 +58,7 @@ internal static partial class Tr
         ["Protokoll, Einstellungen und Systeminfos als ZIP-Datei – zum Anhängen an eine Fehlermeldung. Enthält keine Kopplungsschlüssel."] = "로그, 설정, 시스템 정보를 ZIP 파일로 저장합니다. 문제 신고에 첨부하세요. 페어링 키는 포함되지 않습니다.",
         // ---------- Desktop-Widget ----------
         ["Desktop-Widget"] = "바탕 화면 위젯",
-        ["Kleines Kärtchen auf dem Desktop: verbundene Controller, Akku, Verbindung und Ausgabe auf einen Blick. Mit der Maus verschieben, Rechtsklick für Optionen, Doppelklick öffnet N-Connect."] = "바탕 화면의 작은 카드: 연결된 컨트롤러, 배터리, 연결 방식과 출력을 한눈에 볼 수 있습니다. 마우스로 끌어 옮기고, 오른쪽 클릭으로 옵션, 두 번 클릭하면 N-Connect가 열립니다.",
+        ["Kleines Kärtchen auf dem Desktop: verbundene Controller, Akku, Verbindung und Ausgabe auf einen Blick. Mit der Maus verschieben, Rechtsklick für Optionen, Doppelklick öffnet SKZ Connect."] = "바탕 화면의 작은 카드: 연결된 컨트롤러, 배터리, 연결 방식과 출력을 한눈에 볼 수 있습니다. 마우스로 끌어 옮기고, 오른쪽 클릭으로 옵션, 두 번 클릭하면 SKZ Connect가 열립니다.",
         ["Immer im Vordergrund"] = "항상 위에 표시",
         ["Widget bleibt über allen Fenstern sichtbar (sonst nur auf dem Desktop)."] = "위젯이 모든 창 위에 표시됩니다(끄면 바탕 화면에만 표시).",
         ["Kompakte Ansicht"] = "간단히 보기",
@@ -64,7 +67,7 @@ internal static partial class Tr
         ["nativ"] = "네이티브",
         ["Xbox · nativ"] = "Xbox · 네이티브",
         ["Controller einschalten oder SYNC drücken"] = "컨트롤러를 켜거나 SYNC를 누르세요",
-        ["N-Connect öffnen"] = "N-Connect 열기",
+        ["SKZ Connect öffnen"] = "SKZ Connect 열기",
         ["Position zurücksetzen"] = "위치 초기화",
         ["Widget ausblenden"] = "위젯 숨기기",
         // ---------- Status-Kopfzeile, Ansicht ----------
@@ -105,9 +108,9 @@ internal static partial class Tr
         ["Beim Verbinden kurz vibrieren"] = "연결 시 짧게 진동",
         ["Meldung bei Verbinden"] = "연결 알림",
         ["Wer meldet, wenn ein Controller verbunden oder getrennt wird."] = "컨트롤러가 연결되거나 끊길 때 알릴 대상을 선택합니다.",
-        ["„N-Connect“ zeigt den echten Controller-Namen und schaltet die Gerätemeldungen von Windows ab."] = "\"N-Connect\"는 실제 컨트롤러 이름을 표시하고 Windows 장치 알림을 끕니다.",
-        ["N-Connect (empfohlen)"] = "N-Connect(권장)",
-        ["N-Connect und Windows"] = "N-Connect 및 Windows",
+        ["„SKZ Connect“ zeigt den echten Controller-Namen und schaltet die Gerätemeldungen von Windows ab."] = "\"SKZ Connect\"는 실제 컨트롤러 이름을 표시하고 Windows 장치 알림을 끕니다.",
+        ["SKZ Connect (empfohlen)"] = "SKZ Connect(권장)",
+        ["SKZ Connect und Windows"] = "SKZ Connect 및 Windows",
         ["Keine"] = "없음",
         ["Gekoppelte Controller per Tastendruck verbinden (ohne SYNC)"] = "페어링된 컨트롤러를 버튼 하나로 연결(SYNC 불필요)",
         ["Automatisch mit Windows starten"] = "Windows 시작 시 자동 실행",
@@ -320,8 +323,8 @@ internal static partial class Tr
         ["Kurzanleitung"] = "빠른 시작 가이드",
         ["Protokoll öffnen"] = "로그 열기",
         ["Beenden"] = "종료",
-        ["N-Connect: warte auf Controller (SYNC drücken)"] = "N-Connect: 컨트롤러 대기 중(SYNC를 누르세요)",
-        ["N-Connect: ViGEmBus fehlt"] = "N-Connect: ViGEmBus 없음",
+        ["SKZ Connect: warte auf Controller (SYNC drücken)"] = "SKZ Connect: 컨트롤러 대기 중(SYNC를 누르세요)",
+        ["SKZ Connect: ViGEmBus fehlt"] = "SKZ Connect: ViGEmBus 없음",
         ["Neue Version verfügbar"] = "새 버전 사용 가능",
         ["Einstellungen fehlerhaft"] = "설정이 손상됨",
         ["settings.json konnte nicht gelesen werden – es gelten die Standardwerte. Die beschädigte Datei wird als „settings.json.unlesbar-…“ aufbewahrt (Klicken öffnet den Ordner)."] =
@@ -378,7 +381,7 @@ internal static partial class Tr
         ["Profil exportieren"] = "프로필보내기",
         ["Profil importieren"] = "프로필 가져오기",
         // ---------- Kurzanleitung (WelcomeForm, je Absatz ein Schlüssel) ----------
-        ["N-Connect – Willkommen"] = "N-Connect – 환영합니다",
+        ["SKZ Connect – Willkommen"] = "SKZ Connect – 환영합니다",
         ["So verbindest du deine Controller:"] = "컨트롤러 연결 방법:",
         ["Switch 2 (Pro Controller, Joy-Con 2, GameCube):\n" +
          "   Kurz die kleine SYNC-Taste drücken – nach ein paar Sekunden vibriert der Controller.\n" +
@@ -389,10 +392,10 @@ internal static partial class Tr
             "   이후에는 버튼 하나로 연결됩니다. Pro Controller와 GameCube는 USB 케이블로도 사용할 수 있습니다.\n" +
             "   중요: „Bluetooth → 장치 추가“로 페어링하지 마세요 – 연결이 불안정해집니다.",
         ["Switch 1 (Pro Controller, Joy-Con, NES/SNES/N64/Mega Drive), Wii-Fernbedienung, Wii U Pro Controller:\n" +
-         "   SYNC-Taste drücken – N-Connect koppelt den Controller selbst (kein Umweg über die Windows-Einstellungen).\n" +
+         "   SYNC-Taste drücken – SKZ Connect koppelt den Controller selbst (kein Umweg über die Windows-Einstellungen).\n" +
          "   Danach verbindet er sich per Tastendruck. Gezielt suchen: Rechtsklick auf das Symbol → „Controller koppeln …“."] =
             "Switch 1(Pro Controller, Joy-Con, NES/SNES/N64/Mega Drive), Wii 리모컨, Wii U Pro Controller:\n" +
-            "   SYNC 버튼을 누르세요 – N-Connect가 컨트롤러를 직접 페어링합니다(Windows 설정을 거치지 않음).\n" +
+            "   SYNC 버튼을 누르세요 – SKZ Connect가 컨트롤러를 직접 페어링합니다(Windows 설정을 거치지 않음).\n" +
             "   이후에는 버튼 하나로 연결됩니다. 직접 검색: 아이콘 우클릭 → „컨트롤러 페어링 …“.",
         ["Windows, Steam und Spiele sehen jeden Controller als Xbox-Controller.\n" +
          "Das Programm läuft unten rechts im Infobereich – ein Klick öffnet die Übersicht."] =
@@ -496,8 +499,8 @@ internal static partial class Tr
             "Xbox 360은 거의 모든 게임과 Steam에서 작동합니다. DualShock 4는 모션 컨트롤을 추가로 제공합니다(Steam, 에뮬레이터). 개별 설정이 없는 모든 컨트롤러에 적용됩니다(카드 → 설정 → 버튼).",
         ["Original-Controller verstecken"] = "원본 컨트롤러 숨기기",
         ["Controller verbinden"] = "컨트롤러 연결",
-        ["SYNC-Taste am Controller drücken – N-Connect findet und koppelt ihn selbst. Danach reicht künftig ein Tastendruck."] =
-            "컨트롤러의 SYNC 버튼을 누르세요 – N-Connect가 자동으로 찾아 페어링합니다. 이후에는 버튼 하나로 연결됩니다.",
+        ["SYNC-Taste am Controller drücken – SKZ Connect findet und koppelt ihn selbst. Danach reicht künftig ein Tastendruck."] =
+            "컨트롤러의 SYNC 버튼을 누르세요 – SKZ Connect가 자동으로 찾아 페어링합니다. 이후에는 버튼 하나로 연결됩니다.",
         ["So kommt der Controller in den Kopplungsmodus"] = "컨트롤러를 페어링 모드로 만드는 방법",
         ["Switch 2: Pro Controller, Joy-Con 2, GameCube"] = "Switch 2: Pro Controller, Joy-Con 2, GameCube",
         ["Kurz die kleine SYNC-Taste drücken."] = "작은 SYNC 버튼을 짧게 누릅니다.",
@@ -550,8 +553,8 @@ internal static partial class Tr
         ["HidHide installieren …"] = "HidHide 설치 …",
         ["Empfohlen: Steam und viele Spiele kennen Switch-1-, NSO- und USB-Controller selbst und sähen sie sonst doppelt. Läuft nach der Installation ohne Rückfrage (sonst fragt Windows nach Adminrechten)."] =
             "권장: Steam과 많은 게임이 Switch 1, NSO, USB 컨트롤러를 자체 인식해 이중으로 표시합니다. 설치 후에는 확인 없이 작동합니다(그렇지 않으면 Windows가 관리자 권한을 요청합니다).",
-        ["Steam und viele Spiele sehen Switch-1-, NSO- und USB-Controller sonst doppelt. Dafür wird das kostenlose HidHide gebraucht (bei der N-Connect-Installation dabei, hier nachträglich)."] =
-            "이것이 없으면 Steam과 많은 게임에서 Switch 1, NSO, USB 컨트롤러가 이중으로 표시됩니다. 무료 HidHide가 필요합니다(N-Connect 설치에 포함, 여기서 나중에 설치 가능).",
+        ["Steam und viele Spiele sehen Switch-1-, NSO- und USB-Controller sonst doppelt. Dafür wird das kostenlose HidHide gebraucht (bei der SKZ-Connect-Installation dabei, hier nachträglich)."] =
+            "이것이 없으면 Steam과 많은 게임에서 Switch 1, NSO, USB 컨트롤러가 이중으로 표시됩니다. 무료 HidHide가 필요합니다(SKZ Connect 설치에 포함, 여기서 나중에 설치 가능).",
         ["Erscheint als"] = "표시 형태",
         ["Wie allgemein"] = "일반 설정과 동일",
         ["Nur für diesen Controller. Xbox 360 läuft überall; DualShock 4 bringt zusätzlich Gyro nach Steam und in Emulatoren. „Wie allgemein“ folgt der Seite „Allgemein“."] =
@@ -568,8 +571,8 @@ internal static partial class Tr
             "원본 컨트롤러가 숨겨지지 않았습니다(확인 취소됨). 나중에: 컨트롤러 → 설정 → 기타 → „중복 표시?“.",
         ["Original-Controller nicht versteckt (Fehler, Details im Protokoll). Nachholen: Controller → Einstellungen → Extras → „Doppelt angezeigt?“."] =
             "원본 컨트롤러가 숨겨지지 않았습니다(오류, 자세한 내용은 로그 참조). 나중에: 컨트롤러 → 설정 → 기타 → „중복 표시?“.",
-        ["Eine ältere N-Connect-Version hat das eigene virtuelle DualShock 4 vor Spielen versteckt. Freigeben hat nicht geklappt – bitte im HidHide Configuration Client den Haken beim virtuellen DualShock 4 entfernen."] =
-            "이전 버전의 N-Connect가 자체 가상 DualShock 4를 게임에서 숨겼습니다. 다시 표시하지 못했습니다 – HidHide Configuration Client에서 가상 DualShock 4의 체크를 해제하세요.",
+        ["Eine ältere SKZ-Connect-Version hat das eigene virtuelle DualShock 4 vor Spielen versteckt. Freigeben hat nicht geklappt – bitte im HidHide Configuration Client den Haken beim virtuellen DualShock 4 entfernen."] =
+            "이전 버전의 SKZ Connect가 자체 가상 DualShock 4를 게임에서 숨겼습니다. 다시 표시하지 못했습니다 – HidHide Configuration Client에서 가상 DualShock 4의 체크를 해제하세요.",
         ["Tastenanordnung A/B/X/Y"] = "버튼 배열 A/B/X/Y",
         ["Xbox: nach Position (untere Taste = A). Nintendo: nach Beschriftung (A bleibt A)."] = "Xbox: 위치 기준(아래 버튼 = A). Nintendo: 표기 기준(A는 그대로 A).",
         ["Verbinden"] = "연결",
@@ -577,14 +580,14 @@ internal static partial class Tr
         ["Gekoppelte Controller verbinden sich ohne SYNC-Taste."] = "페어링된 컨트롤러는 SYNC 버튼 없이 연결됩니다.",
         ["Ohne Eingabe trennen nach"] = "입력이 없으면 연결 해제",
         ["Spart Akku, wenn ein Controller liegen bleibt."] = "컨트롤러를 놓아두면 배터리를 절약합니다.",
-        ["N-Connect startet unsichtbar im Infobereich."] = "N-Connect가 알림 영역에서 조용히 시작됩니다.",
+        ["SKZ Connect startet unsichtbar im Infobereich."] = "SKZ Connect가 알림 영역에서 조용히 시작됩니다.",
         ["Darstellung und Sprache"] = "디자인 및 언어",
         ["Farbmodus"] = "색상 모드",
         ["Mica-Effekt"] = "Mica 효과",
         ["Durchscheinende Titelleiste (ab Windows 11)."] = "반투명 제목 표시줄(Windows 11 이상).",
         ["Erweitert"] = "고급",
         ["Gyro für Emulatoren (DSU)"] = "에뮬레이터용 자이로(DSU)",
-        ["Cemuhook-Server auf Port 26760 – wirkt nach einem Neustart von N-Connect."] = "포트 26760의 Cemuhook 서버 – N-Connect 재시작 후 적용됩니다.",
+        ["Cemuhook-Server auf Port 26760 – wirkt nach einem Neustart von SKZ Connect."] = "포트 26760의 Cemuhook 서버 – SKZ Connect 재시작 후 적용됩니다.",
         ["Nach Updates suchen"] = "업데이트 확인",
         ["Beim Start auf GitHub nach einer neuen Version suchen."] = "시작 시 GitHub에서 새 버전을 확인합니다.",
         ["Tastenbelegungen und Werte zurücksetzen. Gekoppelte Controller bleiben erhalten."] = "버튼 매핑과 값을 초기화합니다. 페어링된 컨트롤러는 유지됩니다.",
@@ -645,11 +648,11 @@ internal static partial class Tr
         ["Programme (*.exe)|*.exe"] = "프로그램 (*.exe)|*.exe",
         ["Kein Controller verbunden\n\n" +
          "Switch-2-Controller: kurz die SYNC-Taste drücken – danach reicht ein beliebiger Tastendruck.\n" +
-         "Switch-1-, NSO- und Wii-Controller: SYNC-Taste drücken – N-Connect koppelt sie selbst.\n" +
+         "Switch-1-, NSO- und Wii-Controller: SYNC-Taste drücken – SKZ Connect koppelt sie selbst.\n" +
          "Oder hier gezielt suchen und koppeln:"] =
             "연결된 컨트롤러가 없습니다\n\n" +
             "Switch 2 컨트롤러: SYNC 버튼을 짧게 누르세요 – 이후 아무 버튼이나 누르면 됩니다.\n" +
-            "Switch 1, NSO 및 Wii 컨트롤러: SYNC 버튼을 누르세요 – N-Connect가 자동으로 페어링합니다.\n" +
+            "Switch 1, NSO 및 Wii 컨트롤러: SYNC 버튼을 누르세요 – SKZ Connect가 자동으로 페어링합니다.\n" +
             "또는 여기에서 직접 검색 및 페어링:",
         ["Controller suchen …"] = "컨트롤러 검색 …",
         ["Kein Controller verbunden"] = "연결된 컨트롤러 없음",
@@ -668,22 +671,22 @@ internal static partial class Tr
         ["Rechten Joy-Con umbenennen …"] = "오른쪽 Joy-Con 이름 바꾸기 …",
         ["Controller umbenennen"] = "컨트롤러 이름 바꾸기",
         ["Spielerplatz"] = "플레이어 위치",
-        ["N-Connect aktualisieren"] = "N-Connect 업데이트",
+        ["SKZ Connect aktualisieren"] = "SKZ Connect 업데이트",
         ["HidHide aktualisieren"] = "HidHide 업데이트",
         ["HidHide-Update verfügbar"] = "HidHide 업데이트 사용 가능",
         ["HidHide aktuell halten"] = "HidHide 최신 상태 유지",
         ["Beim Start nach einer neuen HidHide-Version suchen. Installiert wird nur nach Rückfrage (geprüfter Download vom Hersteller, Neustart nötig)."] =
             "시작 시 새 HidHide 버전을 확인합니다. 확인 후에만 설치됩니다(제조사의 검증된 다운로드, 재시작 필요).",
         ["Lizenzen Dritter"] = "타사 라이선스",
-        ["Open-Source-Software und übernommener Code in N-Connect – mit Lizenzen und Copyright-Vermerken."] =
-            "N-Connect에 포함된 오픈 소스 소프트웨어와 가져온 코드 – 라이선스 및 저작권 고지 포함.",
+        ["Open-Source-Software und übernommener Code in SKZ Connect – mit Lizenzen und Copyright-Vermerken."] =
+            "SKZ Connect에 포함된 오픈 소스 소프트웨어와 가져온 코드 – 라이선스 및 저작권 고지 포함.",
         ["Der Download hat nicht geklappt oder die Datei war fehlerhaft. Die Release-Seite im Browser öffnen?"] =
             "다운로드에 실패했거나 파일이 손상되었습니다. 브라우저에서 릴리스 페이지를 여시겠습니까?",
         ["Alle Controller trennen"] = "모든 컨트롤러 연결 해제",
         ["Sticks kalibrieren"] = "스틱 보정",
         ["Kalibrieren …"] = "보정 …",
-        ["Gegen Drift oder zu kleinen Ausschlag: Mitte und Rand neu messen. Wird nur in N-Connect gespeichert, der Controller bleibt unverändert."] =
-            "드리프트나 너무 작은 가동 범위에 대응: 중심과 가장자리를 다시 측정합니다. N-Connect에만 저장되며 컨트롤러는 변경되지 않습니다.",
+        ["Gegen Drift oder zu kleinen Ausschlag: Mitte und Rand neu messen. Wird nur in SKZ Connect gespeichert, der Controller bleibt unverändert."] =
+            "드리프트나 너무 작은 가동 범위에 대응: 중심과 가장자리를 다시 측정합니다. SKZ Connect에만 저장되며 컨트롤러는 변경되지 않습니다.",
         ["Linker Stick"] = "왼쪽 스틱",
         ["Rechter Stick"] = "오른쪽 스틱",
         ["Stick"] = "스틱",
@@ -789,14 +792,14 @@ internal static partial class Tr
         ["Von der Switch-SD-Karte (Bluepick_RCM/hekate) oder von einem anderen PC übernehmen, oder für einen anderen PC exportieren."] =
             "Switch의 SD 카드(Bluepick_RCM/hekate)나 다른 PC에서 가져오거나, 다른 PC용으로보냅니다.",
         ["Bei Switch-SD-Karte nachfragen"] = "Switch SD 카드가 있으면 확인",
-        ["Steckt eine SD-Karte der Switch im PC (Kartenleser oder hekate „USB Tools“), bietet N-Connect die Übernahme an. Die Karte wird nur gelesen."] =
-            "Switch의 SD 카드가 PC에 삽입되어 있으면(카드 리더 또는 hekate „USB Tools“), N-Connect가 가져오기를 제안합니다. 카드는 읽기만 합니다.",
+        ["Steckt eine SD-Karte der Switch im PC (Kartenleser oder hekate „USB Tools“), bietet SKZ Connect die Übernahme an. Die Karte wird nur gelesen."] =
+            "Switch의 SD 카드가 PC에 삽입되어 있으면(카드 리더 또는 hekate „USB Tools“), SKZ Connect가 가져오기를 제안합니다. 카드는 읽기만 합니다.",
         ["Switch-SD-Karte erkannt"] = "Switch SD 카드 감지됨",
         ["Kopplungsdaten der Controller gefunden – klicken, um sie anzusehen und zu übernehmen."] =
             "컨트롤러의 페어링 데이터를 찾았습니다 – 클릭하여 확인하고 가져옵니다.",
         ["Klicken, um Kopplungsdaten der Controller zu übernehmen."] = "클릭하여 컨트롤러의 페어링 데이터를 가져옵니다.",
-        ["Controller-Kopplungen von der Switch-SD-Karte oder von einem anderen PC übernehmen – oder für einen anderen PC exportieren. Es werden nur Einstellungen von N-Connect geändert; Windows und der Bluetooth-Adapter bleiben unverändert."] =
-            "Switch의 SD 카드나 다른 PC에서 컨트롤러 페어링을 가져오거나, 다른 PC용으로보냅니다. N-Connect의 설정만 변경되며 Windows와 Bluetooth 어댑터는 변경되지 않습니다.",
+        ["Controller-Kopplungen von der Switch-SD-Karte oder von einem anderen PC übernehmen – oder für einen anderen PC exportieren. Es werden nur Einstellungen von SKZ Connect geändert; Windows und der Bluetooth-Adapter bleiben unverändert."] =
+            "Switch의 SD 카드나 다른 PC에서 컨트롤러 페어링을 가져오거나, 다른 PC용으로보냅니다. SKZ Connect의 설정만 변경되며 Windows와 Bluetooth 어댑터는 변경되지 않습니다.",
         ["Spieler-Reihenfolge – Spieler 1 ist für Windows, Steam und Spiele der erste Controller. Mit ‹ › umsortieren."] =
             "플레이어 순서 – 플레이어 1은 Windows, Steam 및 게임에서 첫 번째 컨트롤러입니다. ‹ ›로 순서를 변경합니다.",
         ["Von der Switch-SD-Karte"] = "Switch의 SD 카드에서",
@@ -804,7 +807,7 @@ internal static partial class Tr
             "Bluepick_RCM 또는 hekate로 생성된 페어링 데이터(switchroot/joycon_mac.ini)",
         ["Einlesen …"] = "읽어오기 …",
         ["Von einem anderen PC"] = "다른 PC에서",
-        ["Mit N-Connect exportierte Datei (*.ncpair)"] = "N-Connect로보낸 파일(*.ncpair)",
+        ["Mit SKZ Connect exportierte Datei (*.ncpair)"] = "SKZ Connect로보낸 파일(*.ncpair)",
         ["Datei öffnen …"] = "파일 열기 …",
         ["Inhalt"] = "내용",
         ["Weitergeben und sichern"] = "공유 및 백업",
@@ -836,26 +839,26 @@ internal static partial class Tr
         ["Joy-Con (R)"] = "Joy-Con(오른쪽)",
         ["HORI-Controller (links)"] = "HORI 컨트롤러(왼쪽)",
         ["HORI-Controller (rechts)"] = "HORI 컨트롤러(오른쪽)",
-        ["Hinweis: Pro Controller stehen nur im Bluetooth-Speicher der Switch (8000000000000050.bin); dieses Speicherabbild kann N-Connect nicht auswerten."] =
-            "참고: Pro Controller는 Switch의 Bluetooth 메모리(8000000000000050.bin)에만 기록됩니다. N-Connect는 이 메모리 이미지를 분석할 수 없습니다.",
+        ["Hinweis: Pro Controller stehen nur im Bluetooth-Speicher der Switch (8000000000000050.bin); dieses Speicherabbild kann SKZ Connect nicht auswerten."] =
+            "참고: Pro Controller는 Switch의 Bluetooth 메모리(8000000000000050.bin)에만 기록됩니다. SKZ Connect는 이 메모리 이미지를 분석할 수 없습니다.",
         ["Was diese Daten können – und was nicht:"] = "이 데이터로 가능한 것 – 불가능한 것:",
         ["Die Daten zeigen, welche Controller mit deiner Switch gekoppelt sind und an welche Bluetooth-Adresse sie gebunden sind."] =
             "데이터는 어떤 컨트롤러가 Switch와 페어링되어 있는지, 어떤 Bluetooth 주소에 연결되어 있는지 보여줍니다.",
         ["Ein Switch-1-Controller verbindet sich auf Tastendruck nur mit dem Gerät, dessen Adresse er gespeichert hat – hier mit der Switch. Der Bluetooth-Adapter des PCs hat eine andere Adresse, deshalb kann Windows diese Kopplung nicht einfach weiterverwenden."] =
             "Switch 1 컨트롤러는 버튼 입력 시 저장된 주소의 기기(여기서는 Switch)에만 연결됩니다. PC의 Bluetooth 어댑터는 다른 주소를 가지므로 Windows가 이 페어링을 그대로 재사용할 수 없습니다.",
-        ["Die Adresse des PC-Adapters zu ändern, unterstützt N-Connect bewusst nicht (herstellerabhängig, riskant und nicht vorgesehen)."] =
-            "N-Connect는 PC 어댑터의 주소 변경을 의도적으로 지원하지 않습니다(제조사마다 다르고 위험하며 권장되지 않음).",
-        ["Windows bietet keinen offiziellen Weg, fremde Kopplungsschlüssel einzutragen: Sie liegen in einem Teil der Registrierung, auf den nur das System zugreifen darf. N-Connect ändert dort nichts."] =
-            "Windows는 외부 페어링 키를 등록하는 공식적인 방법을 제공하지 않습니다. 레지스트리의 시스템 전용 영역에 저장되므로 N-Connect는 이를 변경하지 않습니다.",
+        ["Die Adresse des PC-Adapters zu ändern, unterstützt SKZ Connect bewusst nicht (herstellerabhängig, riskant und nicht vorgesehen)."] =
+            "SKZ Connect는 PC 어댑터의 주소 변경을 의도적으로 지원하지 않습니다(제조사마다 다르고 위험하며 권장되지 않음).",
+        ["Windows bietet keinen offiziellen Weg, fremde Kopplungsschlüssel einzutragen: Sie liegen in einem Teil der Registrierung, auf den nur das System zugreifen darf. SKZ Connect ändert dort nichts."] =
+            "Windows는 외부 페어링 키를 등록하는 공식적인 방법을 제공하지 않습니다. 레지스트리의 시스템 전용 영역에 저장되므로 SKZ Connect는 이를 변경하지 않습니다.",
         ["So klappt der Wechsel am einfachsten: am PC den Controller einmal per SYNC-Taste in den Windows-Bluetooth-Einstellungen koppeln. Zurück an der Switch die Joy-Con an die Konsole stecken bzw. den Pro Controller per USB-Kabel anschließen – dann sind sie ohne Menü wieder mit der Switch gekoppelt."] =
             "가장 쉬운 전환 방법: PC에서 Windows Bluetooth 설정으로 SYNC 버튼을 사용해 한 번 페어링합니다. Switch로 돌아갈 때 Joy-Con을 본체에 끼우거나 Pro Controller를 USB 케이블로 연결하면 – 메뉴 없이 다시 Switch와 페어링됩니다.",
-        ["„Übernehmen“ merkt sich diese Controller in N-Connect (Liste bekannter Controller, Zuordnung zur Switch). Kopplungsschlüssel werden nicht gespeichert."] =
-            "„적용“은 이 컨트롤러들을 N-Connect에 기억합니다(알려진 컨트롤러 목록, Switch와의 연결). 페어링 키는 저장되지 않습니다.",
-        ["N-Connect-Kopplungsdaten"] = "N-Connect 페어링 데이터",
+        ["„Übernehmen“ merkt sich diese Controller in SKZ Connect (Liste bekannter Controller, Zuordnung zur Switch). Kopplungsschlüssel werden nicht gespeichert."] =
+            "„적용“은 이 컨트롤러들을 SKZ Connect에 기억합니다(알려진 컨트롤러 목록, Switch와의 연결). 페어링 키는 저장되지 않습니다.",
+        ["SKZ-Connect-Kopplungsdaten"] = "SKZ Connect 페어링 데이터",
         ["Kopplungsdaten von einem anderen PC öffnen"] = "다른 PC의 페어링 데이터 열기",
         ["Die Datei ist zu groß."] = "파일이 너무 큽니다.",
         ["Keine Kopplungsdaten-Datei."] = "페어링 데이터 파일이 아닙니다.",
-        ["Die Datei stammt von einer neueren N-Connect-Version."] = "파일이 더 새로운 버전의 N-Connect에서 생성되었습니다.",
+        ["Die Datei stammt von einer neueren SKZ-Connect-Version."] = "파일이 더 새로운 버전의 SKZ Connect에서 생성되었습니다.",
         ["Die Datei ist mit einem Passwort geschützt."] = "파일이 비밀번호로 보호되어 있습니다.",
         ["Falsches Passwort oder die Datei wurde verändert."] = "비밀번호가 틀렸거나 파일이 변경되었습니다.",
         ["Die Datei ist beschädigt."] = "파일이 손상되었습니다.",
@@ -868,20 +871,20 @@ internal static partial class Tr
         ["Was du erwarten kannst:"] = "예상 결과:",
         ["Gleiche Adapter-Adresse (z. B. derselbe USB-Bluetooth-Stick umgesteckt): Switch-2-Controller verbinden sich hier auf Tastendruck wie am anderen PC."] =
             "동일한 어댑터 주소(예: 같은 USB Bluetooth 동글을 옮겨 꽂음): Switch 2 컨트롤러는 여기서도 다른 PC처럼 버튼 하나로 연결됩니다.",
-        ["Switch-1-Controller (Pro Controller, Joy-Con) brauchen zusätzlich die Kopplung in Windows. Die kann N-Connect nicht übertragen – einmal per SYNC-Taste koppeln."] =
-            "Switch 1 컨트롤러(Pro Controller, Joy-Con)는 추가로 Windows에서의 페어링이 필요합니다. N-Connect는 이를 전송할 수 없습니다 – SYNC 버튼으로 한 번 페어링하세요.",
+        ["Switch-1-Controller (Pro Controller, Joy-Con) brauchen zusätzlich die Kopplung in Windows. Die kann SKZ Connect nicht übertragen – einmal per SYNC-Taste koppeln."] =
+            "Switch 1 컨트롤러(Pro Controller, Joy-Con)는 추가로 Windows에서의 페어링이 필요합니다. SKZ Connect는 이를 전송할 수 없습니다 – SYNC 버튼으로 한 번 페어링하세요.",
         ["Anderer Bluetooth-Adapter: Controller verbinden sich auf Tastendruck nur mit dem Gerät, mit dem sie zuletzt gekoppelt wurden. Hier einmal SYNC drücken – danach verbinden sie sich mit diesem PC (am anderen PC dann wieder per SYNC)."] =
             "다른 Bluetooth 어댑터의 경우: 컨트롤러는 버튼 입력 시 마지막으로 페어링된 기기에만 연결됩니다. 여기서 한 번 SYNC를 누르세요 – 이후 이 PC에 연결됩니다(다른 PC에서는 다시 SYNC).",
         ["Tipp: Wer denselben USB-Bluetooth-Stick zwischen den PCs umsteckt, nimmt die Adresse mit – Switch-2-Controller verbinden sich dann an beiden PCs ohne SYNC."] =
             "팁: 같은 USB Bluetooth 동글을 PC 간에 옮겨 꽂으면 주소가 함께 이동합니다 – Switch 2 컨트롤러는 양쪽 PC에서 SYNC 없이 연결됩니다.",
         ["Übernommen werden die Einstellungen je Controller (Joy-Con einzeln/hochkant, Gyro-Kalibrierung) und die Liste bekannter Controller."] =
             "가져오는 항목은 컨트롤러별 설정(Joy-Con 단독/세로, 자이로 보정)과 알려진 컨트롤러 목록입니다.",
-        ["Die Datei enthält Kopplungsschlüssel. Windows bietet keinen offiziellen Weg, sie einzutragen – N-Connect übernimmt sie deshalb nicht."] =
-            "파일에 페어링 키가 포함되어 있습니다. Windows는 이를 등록하는 공식적인 방법을 제공하지 않으므로 N-Connect는 이를 가져오지 않습니다.",
-        ["„Übernehmen“ ergänzt die Controller-Listen und Einstellungen von N-Connect (nichts wird gelöscht). Vorher wird eine Sicherung angelegt."] =
-            "„적용“은 N-Connect의 컨트롤러 목록과 설정을 보완합니다(삭제되는 것은 없음). 사전에 백업이 생성됩니다.",
-        ["Kopplungsdaten in N-Connect übernehmen? Vorher wird eine Sicherung der Einstellungen angelegt."] =
-            "페어링 데이터를 N-Connect에 가져오시겠습니까? 사전에 설정 백업이 생성됩니다.",
+        ["Die Datei enthält Kopplungsschlüssel. Windows bietet keinen offiziellen Weg, sie einzutragen – SKZ Connect übernimmt sie deshalb nicht."] =
+            "파일에 페어링 키가 포함되어 있습니다. Windows는 이를 등록하는 공식적인 방법을 제공하지 않으므로 SKZ Connect는 이를 가져오지 않습니다.",
+        ["„Übernehmen“ ergänzt die Controller-Listen und Einstellungen von SKZ Connect (nichts wird gelöscht). Vorher wird eine Sicherung angelegt."] =
+            "„적용“은 SKZ Connect의 컨트롤러 목록과 설정을 보완합니다(삭제되는 것은 없음). 사전에 백업이 생성됩니다.",
+        ["Kopplungsdaten in SKZ Connect übernehmen? Vorher wird eine Sicherung der Einstellungen angelegt."] =
+            "페어링 데이터를 SKZ Connect에 가져오시겠습니까? 사전에 설정 백업이 생성됩니다.",
         ["Nichts zu ändern – diese Daten sind schon übernommen."] = "변경할 내용이 없습니다 – 이 데이터는 이미 가져왔습니다.",
         ["Übernommen. Die Sicherung lässt sich hier über „Sicherung wiederherstellen“ zurückholen."] =
             "완료되었습니다. 백업은 여기서 „백업 복원“으로 되돌릴 수 있습니다.",
@@ -890,8 +893,8 @@ internal static partial class Tr
         ["Alle Einstellungen durch diese Sicherung ersetzen?"] = "모든 설정을 이 백업으로 교체하시겠습니까?",
         ["Sicherung wiederhergestellt."] = "백업이 복원되었습니다.",
         ["Kopplungsdaten für einen anderen PC speichern"] = "다른 PC용으로 페어링 데이터 저장",
-        ["Gespeichert. Die Datei am anderen PC in N-Connect unter „Joy-Con & Wii“ → „Kopplungsdaten“ → „Von einem anderen PC“ öffnen."] =
-            "저장되었습니다. 다른 PC의 N-Connect에서 „Joy-Con 및 Wii“ → „페어링 데이터“ → „다른 PC에서“로 파일을 여세요.",
+        ["Gespeichert. Die Datei am anderen PC in SKZ Connect unter „Joy-Con & Wii“ → „Kopplungsdaten“ → „Von einem anderen PC“ öffnen."] =
+            "저장되었습니다. 다른 PC의 SKZ Connect에서 „Joy-Con 및 Wii“ → „페어링 데이터“ → „다른 PC에서“로 파일을 여세요.",
         ["Kopplungsdaten exportieren"] = "페어링 데이터보내기",
         ["Passwort eingeben"] = "비밀번호 입력",
         ["Passwort (optional). Ohne Passwort steht der Inhalt lesbar in der Datei. Mit Kopplungsschlüsseln ist ein Passwort Pflicht."] =
@@ -953,10 +956,10 @@ internal static partial class Tr
         (Re(@"^HidHide (?<v>.+) ist erschienen \(installiert: (?<i>.+)\)\. Klicken zum Installieren\.$"),
             m => $"HidHide {m.Groups["v"]}이(가) 출시되었습니다(설치됨: {m.Groups["i"]}). 클릭하여 설치."),
         (Re(@"^Lade HidHide (?<v>.+) herunter …$"), m => $"HidHide {m.Groups["v"]} 다운로드 중 …"),
-        (Re(@"^HidHide (?<v>.+) herunterladen und installieren\? Das HidHide-Setup entfernt zuerst die alte Version und verlangt einen Neustart von Windows – bitte seinen Anweisungen folgen\. Windows fragt dabei nach Administratorrechten\. Danach versteckt N-Connect die Controller automatisch neu\.$"),
-            m => $"HidHide {m.Groups["v"]}을(를) 다운로드하여 설치할까요? HidHide 설치 프로그램은 먼저 이전 버전을 제거하고 Windows를 다시 시작해야 합니다 – 안내에 따라 주세요. Windows가 관리자 권한을 요청합니다. 그 후 N-Connect가 컨트롤러를 자동으로 다시 숨깁니다."),
-        (Re(@"^Version (?<v>.+) herunterladen und installieren\? N-Connect wird dafür kurz beendet und danach wieder gestartet\.(?<a> Windows fragt dabei nach Administratorrechten\.)?$"),
-            m => $"버전 {m.Groups["v"]}을(를) 다운로드하여 설치할까요? N-Connect가 잠시 종료된 후 다시 시작됩니다." +
+        (Re(@"^HidHide (?<v>.+) herunterladen und installieren\? Das HidHide-Setup entfernt zuerst die alte Version und verlangt einen Neustart von Windows – bitte seinen Anweisungen folgen\. Windows fragt dabei nach Administratorrechten\. Danach versteckt SKZ Connect die Controller automatisch neu\.$"),
+            m => $"HidHide {m.Groups["v"]}을(를) 다운로드하여 설치할까요? HidHide 설치 프로그램은 먼저 이전 버전을 제거하고 Windows를 다시 시작해야 합니다 – 안내에 따라 주세요. Windows가 관리자 권한을 요청합니다. 그 후 SKZ Connect가 컨트롤러를 자동으로 다시 숨깁니다."),
+        (Re(@"^Version (?<v>.+) herunterladen und installieren\? SKZ Connect wird dafür kurz beendet und danach wieder gestartet\.(?<a> Windows fragt dabei nach Administratorrechten\.)?$"),
+            m => $"버전 {m.Groups["v"]}을(를) 다운로드하여 설치할까요? SKZ Connect가 잠시 종료된 후 다시 시작됩니다." +
                  (m.Groups["a"].Success ? " Windows가 관리자 권한을 요청합니다." : "")),
         (Re(@"^(?<t>.+) · (?<r>\d+) Berichte/s$"), m => $"{T(m.Groups["t"].Value)} · {m.Groups["r"]} 리포트/초"),
         (Re(@"^(?<p>\d+ %)(?<v>  \(.*\))?  ⚡ lädt$"), m => $"{m.Groups["p"]}{m.Groups["v"]}  ⚡ 충전 중"),
@@ -990,7 +993,7 @@ internal static partial class Tr
         // Tooltip „P1 Pro 2 57 %“: Namen bleiben, wie sie sind.
         (Re(@"^P(?<n>\d+) (?<k>.+)$"), m => m.Value),
         (Re(@"^Bluetooth nicht verfügbar: (?<e>.*)$"), m => $"Bluetooth 사용 불가: {m.Groups["e"]}"),
-        (Re(@"^N-Connect: (?<p>.+)$"), m => $"N-Connect: {T(m.Groups["p"].Value)}"),
+        (Re(@"^SKZ Connect: (?<p>.+)$"), m => $"SKZ Connect: {T(m.Groups["p"].Value)}"),
         (Re(@"^(?<k>.+) per USB ist von einem anderen Programm belegt \(z\. B\. Steam\)\.$"),
             m => $"{N(m, "k")}의 USB가 다른 프로그램(예: Steam)에서 사용 중입니다."),
         (Re(@"^Schon (?<n>\d+) Controller verbunden – (?<k>.+) wird nicht verwendet\.$"),

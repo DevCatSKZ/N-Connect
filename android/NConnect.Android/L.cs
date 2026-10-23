@@ -1,7 +1,7 @@
 namespace NConnect.Android;
 
 /// <summary>
-/// Übersetzung der Oberfläche – wie in N-Connect für Windows: Die App ist auf Deutsch geschrieben, sichtbare Texte
+/// Übersetzung der Oberfläche – wie in SKZ Connect für Windows: Die App ist auf Deutsch geschrieben, sichtbare Texte
 /// werden über Tabellen in die Sprache des Geräts übersetzt (12 Sprachen). Fehlt ein Text, greift Englisch, zuletzt
 /// Deutsch. Feste Texte über <see cref="T"/>, Texte mit Werten über Vorlagen und <see cref="F"/>.
 /// Die Tabellen (L.Texts.*.cs) erzeugt android/i18n/generate.py – nicht von Hand bearbeiten.

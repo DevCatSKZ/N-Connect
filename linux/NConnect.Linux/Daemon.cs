@@ -191,7 +191,7 @@ public sealed class Daemon : IAsyncDisposable
     /// <summary>Den Dienst von innen beenden (Kodi weg) – wie SIGTERM: Controller trennen, Pads entfernen.</summary>
     private void StopRunning(string reason)
     {
-        Log.Info($"{reason} – N-Connect beendet sich");
+        Log.Info($"{reason} – SKZ Connect beendet sich");
         try
         {
             _run?.Cancel();
@@ -431,7 +431,7 @@ public sealed class Daemon : IAsyncDisposable
     }
 
     /// <summary>
-    /// Port beim Start belegt – meist von einem N-Connect, das sich gerade noch beendet (Neustart über das Menü oder
+    /// Port beim Start belegt – meist von einem SKZ Connect, das sich gerade noch beendet (Neustart über das Menü oder
     /// nach Adapterwechsel). Einige Male nachfassen; danach erst wieder bei einer Einstellungsänderung.
     /// </summary>
     private async Task RetryDsuAsync(CancellationToken stop)

@@ -18,7 +18,7 @@ public enum OutputPath
 
 /// <summary>
 /// Einstellungen der Android-App (SharedPreferences). Belegung, Sticks, Gyro usw. stehen wie unter Windows in
-/// <see cref="Settings"/> (JSON-Datei, gleiche Klasse wie in N-Connect für Windows).
+/// <see cref="Settings"/> (JSON-Datei, gleiche Klasse wie in SKZ Connect für Windows).
 /// </summary>
 public static class AppPrefs
 {
@@ -54,7 +54,7 @@ public static class AppPrefs
 
     /// <summary>
     /// Bluetooth-Adresse dieses Geräts (z. B. „04:C8:B0:F5:B2:27“). Normale Apps dürfen sie nicht lesen; mit Root/Shizuku
-    /// liest N-Connect sie einmal aus, oder der Nutzer trägt sie ein. Nötig, damit Controller sich ohne SYNC wiederverbinden.
+    /// liest SKZ Connect sie einmal aus, oder der Nutzer trägt sie ein. Nötig, damit Controller sich ohne SYNC wiederverbinden.
     /// </summary>
     public static string? HostAddress
     {

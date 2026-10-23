@@ -10,7 +10,7 @@ namespace Switch2Pro.Bridge;
 /// Koppelt klassische Bluetooth-Controller selbst mit Windows – ohne Umweg über die Windows-Bluetooth-Einstellungen:
 /// <list type="bullet">
 /// <item>Switch 1 (Joy-Con, Pro Controller) und Nintendo-Switch-Online-Controller (NES, SNES, N64, Mega Drive):
-/// einfache Kopplung ohne PIN („Just Works“); N-Connect bestätigt die Anfrage selbst.</item>
+/// einfache Kopplung ohne PIN („Just Works“); SKZ Connect bestätigt die Anfrage selbst.</item>
 /// <item>Wii-Fernbedienung und Wii U Pro Controller: binäre PIN = Bluetooth-Adresse des PCs (rote SYNC-Taste) bzw.
 /// die eigene (1+2), Byte für Byte – über „Gerät hinzufügen“ klappt das oft nicht (Vorgehen wie in Dolphin).</item>
 /// <item>PlayStation (DualShock 4, DualSense): klassisches Bluetooth, Name „Wireless Controller“, ohne PIN –
@@ -18,7 +18,7 @@ namespace Switch2Pro.Bridge;
 /// <item>Xbox über Bluetooth (One S und neuer): Bluetooth LE – nicht in der klassischen Suche, darum ein eigener
 /// LE-Watcher während des Koppelfensters; Kopplung ohne PIN über WinRT. Nur im Fenster, nicht im Hintergrund.</item>
 /// </list>
-/// Danach den HID-Dienst einschalten (klassisch); LE-Geräte richtet Windows selbst ein. N-Connect findet den
+/// Danach den HID-Dienst einschalten (klassisch); LE-Geräte richtet Windows selbst ein. SKZ Connect findet den
 /// Controller dann wie jeden gekoppelten.
 /// Windows-Bluetooth-API (BluetoothApis.dll / bthprops.cpl). Switch-2-Controller (Bluetooth LE) brauchen das nicht.
 /// </summary>
@@ -689,7 +689,7 @@ internal static class ControllerPairing
                 bthAddressRemote = request.deviceInfo.Address,
                 authMethod = request.authenticationMethod,
                 numericValue = request.numericValue,
-                // Alte PIN-Kopplung kennt N-Connect für diese Controller nicht: ablehnen statt mit leerer PIN zu antworten.
+                // Alte PIN-Kopplung kennt SKZ Connect für diese Controller nicht: ablehnen statt mit leerer PIN zu antworten.
                 negativeResponse = (byte)(request.authenticationMethod == BLUETOOTH_AUTHENTICATION_METHOD_LEGACY ? 1 : 0),
             };
             uint result = BluetoothSendAuthenticationResponseEx(_callbackRadio, ref response);

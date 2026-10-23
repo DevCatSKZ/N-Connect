@@ -4,8 +4,8 @@ namespace NConnect.Android.Profiles;
 public static partial class GameProfileWatcher
 {
     /// <summary>
-    /// Zuletzt fortgesetzte App aus den ActivityResumed-Ereignissen – ohne N-Connect selbst (<paramref name="own"/>) und
-    /// ohne Startbildschirme: Wer kurz in N-Connect oder auf den Startbildschirm wechselt, behält sein Profil.
+    /// Zuletzt fortgesetzte App aus den ActivityResumed-Ereignissen – ohne SKZ Connect selbst (<paramref name="own"/>) und
+    /// ohne Startbildschirme: Wer kurz in SKZ Connect oder auf den Startbildschirm wechselt, behält sein Profil.
     /// </summary>
     internal static string? Pick(IEnumerable<(long Time, string Package)> resumed, string own, IReadOnlySet<string> launchers)
     {

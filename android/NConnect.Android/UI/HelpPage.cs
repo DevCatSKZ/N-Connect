@@ -19,21 +19,21 @@ public sealed class HelpPage(MainActivity host) : IPage
     {
         var (scroll, col) = Ui.Page(host);
 
-        col.AddView(Topic("So funktioniert N-Connect",
-            "N-Connect verbindet deine <b>Switch-2-Controller</b> (Pro Controller 2, Joy-Con 2, GameCube-Controller) " +
+        col.AddView(Topic("So funktioniert SKZ Connect",
+            "SKZ Connect verbindet deine <b>Switch-2-Controller</b> (Pro Controller 2, Joy-Con 2, GameCube-Controller) " +
             "per Bluetooth mit deinem Handy oder Tablet und gibt sie an Spiele weiter.<br><br>" +
-            "Android kann diese Controller nicht von selbst nutzen – N-Connect übersetzt sie in einen ganz normalen " +
+            "Android kann diese Controller nicht von selbst nutzen – SKZ Connect übersetzt sie in einen ganz normalen " +
             "<b>Xbox-Controller</b>, den praktisch jedes Spiel und jeder Emulator versteht. Für Spiele ohne " +
             "Controller-Unterstützung gibt es zusätzlich die <b>Touch-Steuerung</b>.<br><br>" +
-            "<b>Andere Controller:</b> N-Connect für Android unterstützt nur Switch-2-Controller (über Bluetooth LE). " +
+            "<b>Andere Controller:</b> SKZ Connect für Android unterstützt nur Switch-2-Controller (über Bluetooth LE). " +
             "<b>Xbox- und PlayStation-Controller</b> laufen unter Android direkt – einfach in den Bluetooth-Einstellungen " +
             "von Android koppeln. <b>Ältere Switch-Controller</b> (Pro Controller der Switch 1, Joy-Con der ersten Generation, " +
-            "Nachbauten) verbindest du dort ebenfalls direkt mit Android – N-Connect erkennt sie nicht. Dann gehen in der " +
+            "Nachbauten) verbindest du dort ebenfalls direkt mit Android – SKZ Connect erkennt sie nicht. Dann gehen in der " +
             "Regel nur Tasten und Sticks; Bewegungssteuerung und Vibration je nach Gerät nicht."));
 
         col.AddView(Topic("Controller verbinden",
             "<b>Beim ersten Mal:</b> Halte die kleine runde <b>SYNC-Taste</b> am Controller gedrückt, bis die Lichter " +
-            "hin- und herlaufen. N-Connect findet ihn automatisch – du musst nichts antippen.<br><br>" +
+            "hin- und herlaufen. SKZ Connect findet ihn automatisch – du musst nichts antippen.<br><br>" +
             "<b>Danach:</b> Einfach eine Taste drücken – der Controller verbindet sich von selbst wieder.<br><br>" +
             "<b>Joy-Con:</b> Verbinde beide nacheinander. Sie werden automatisch zu einem Controller zusammengefasst " +
             "(abschaltbar in den Einstellungen).<br><br>" +
@@ -41,13 +41,13 @@ public sealed class HelpPage(MainActivity host) : IPage
             "nutzen, drücke dort erneut SYNC – danach am Handy ebenfalls."));
 
         var shizuku = Topic("Shizuku einrichten (ohne Root)",
-            "Shizuku gibt N-Connect die Rechte, einen virtuellen Xbox-Controller anzulegen – ganz ohne Root.<br><br>" +
+            "Shizuku gibt SKZ Connect die Rechte, einen virtuellen Xbox-Controller anzulegen – ganz ohne Root.<br><br>" +
             "<b>1.</b> Installiere <b>Shizuku</b> aus dem Play Store.<br>" +
             "<b>2.</b> Aktiviere die <b>Entwickleroptionen</b>: Einstellungen → Über das Telefon → 7× auf <i>Build-Nummer</i> tippen.<br>" +
             "<b>3.</b> Verbinde dich mit einem <b>WLAN</b> und schalte in den Entwickleroptionen <b>Kabelloses Debugging</b> ein.<br>" +
             "<b>4.</b> Öffne Shizuku und tippe bei „Über kabelloses Debugging starten“ auf <b>Kopplung</b>. Folge der " +
             "Anleitung (Kopplungscode in den Benachrichtigungen eingeben), danach auf <b>Starten</b>.<br>" +
-            "<b>5.</b> Zurück in N-Connect: Einrichtung öffnen und <b>Zugriff erlauben</b>.<br><br>" +
+            "<b>5.</b> Zurück in SKZ Connect: Einrichtung öffnen und <b>Zugriff erlauben</b>.<br><br>" +
             "<b>Nach jedem Neustart</b> des Handys musst du in Shizuku einmal auf „Starten“ tippen (WLAN nötig). " +
             "Die Kopplung bleibt erhalten.",
             Ui.Buttons(host,
@@ -58,13 +58,13 @@ public sealed class HelpPage(MainActivity host) : IPage
 
         col.AddView(Topic("Mit Root nutzen",
             "Ist dein Gerät gerootet (z. B. Magisk, KernelSU oder APatch), wähle in der Einrichtung <b>Root</b> und erlaube " +
-            "N-Connect den Zugriff im Root-Dialog. Root funktioniert dauerhaft – auch nach einem Neustart, ohne WLAN."));
+            "SKZ Connect den Zugriff im Root-Dialog. Root funktioniert dauerhaft – auch nach einem Neustart, ohne WLAN."));
 
         col.AddView(Topic("Touch-Steuerung einrichten",
-            "Für Spiele, die keinen Controller unterstützen, tippt N-Connect die Bildschirmknöpfe für dich.<br><br>" +
-            "<b>1.</b> Einstellungen → Bedienungshilfen → <b>N-Connect Touch-Steuerung</b> einschalten.<br>" +
-            "<b>2.</b> In N-Connect „Touch-Steuerung“ als Weg wählen oder zusätzlich einschalten.<br>" +
-            "<b>3.</b> Spiel öffnen, Benachrichtigungsleiste herunterziehen und bei N-Connect auf " +
+            "Für Spiele, die keinen Controller unterstützen, tippt SKZ Connect die Bildschirmknöpfe für dich.<br><br>" +
+            "<b>1.</b> Einstellungen → Bedienungshilfen → <b>SKZ Connect Touch-Steuerung</b> einschalten.<br>" +
+            "<b>2.</b> In SKZ Connect „Touch-Steuerung“ als Weg wählen oder zusätzlich einschalten.<br>" +
+            "<b>3.</b> Spiel öffnen, Benachrichtigungsleiste herunterziehen und bei SKZ Connect auf " +
             "<b>Touch-Layout bearbeiten</b> tippen.<br>" +
             "<b>4.</b> Mit „Taste hinzufügen“ Tasten und Sticks anlegen und auf die Knöpfe des Spiels ziehen. " +
             "Gedrückt halten entfernt eine Taste. <b>Speichern</b> – fertig.<br><br>" +
@@ -72,16 +72,16 @@ public sealed class HelpPage(MainActivity host) : IPage
             Ui.Button(host, "Bedienungshilfen öffnen", () => TouchService.OpenSystemSettings(host), Ui.ButtonStyle.Outlined)));
 
         col.AddView(Topic("In Spielen und Emulatoren",
-            "Spiele sehen einen <b>Xbox-Controller</b> (Name „N-Connect Spieler 1“ usw.).<br><br>" +
+            "Spiele sehen einen <b>Xbox-Controller</b> (Name „SKZ Connect Spieler 1“ usw.).<br><br>" +
             "• <b>Emulatoren</b> (z. B. Dolphin, PPSSPP, RetroArch, Eden): In den Controller-Einstellungen des Emulators " +
-            "„N-Connect Spieler 1“ auswählen und ggf. die Tasten zuweisen.<br>" +
+            "„SKZ Connect Spieler 1“ auswählen und ggf. die Tasten zuweisen.<br>" +
             "• <b>Cloud-Gaming</b> (Xbox Cloud, GeForce NOW, Steam Link): funktioniert direkt.<br>" +
             "• <b>Tastenlayout:</b> Unter Einstellungen → Tastenbelegung wählst du, ob A/B nach Position (Xbox) oder " +
             "nach Beschriftung (Switch) zugeordnet wird.<br>" +
             "• <b>Bewegungssteuerung:</b> Unter „Gyro-Zielen“ steuert das Neigen des Controllers den rechten Stick."));
 
         col.AddView(Topic("Gyro für Emulatoren (DSU)",
-            "Emulatoren mit <b>DSU-/Cemuhook-Client</b> bekommen von N-Connect die Bewegungsdaten (und Tasten) direkt.<br><br>" +
+            "Emulatoren mit <b>DSU-/Cemuhook-Client</b> bekommen von SKZ Connect die Bewegungsdaten (und Tasten) direkt.<br><br>" +
             "<b>1.</b> Einstellungen → Bewegungssteuerung → <b>Gyro an Emulatoren senden (DSU)</b> einschalten.<br>" +
             "<b>2.</b> Im Emulator bei DSU, Cemuhook oder „UDP-Server“ als Adresse <b>127.0.0.1</b> und als Port " +
             "<b>26760</b> eintragen.<br><br>" +
@@ -90,7 +90,7 @@ public sealed class HelpPage(MainActivity host) : IPage
 
         col.AddView(Topic("Profile je Spiel",
             "Unter Einstellungen → <b>Profile je Spiel verwalten</b> bekommt jedes Spiel seine eigene Tastenbelegung.<br><br>" +
-            "<b>1.</b> Einmal „Zugriff auf Nutzungsdaten“ erlauben – daran erkennt N-Connect, welche App im Vordergrund " +
+            "<b>1.</b> Einmal „Zugriff auf Nutzungsdaten“ erlauben – daran erkennt SKZ Connect, welche App im Vordergrund " +
             "läuft (nur den Namen, keine Inhalte).<br>" +
             "<b>2.</b> <b>Neues Profil</b> antippen und das Spiel aus der Liste wählen. Das Profil startet mit einer Kopie " +
             "der Standardbelegung.<br>" +
@@ -100,8 +100,8 @@ public sealed class HelpPage(MainActivity host) : IPage
 
         col.AddView(Topic("Ohne App starten: Kachel und Autostart",
             "<b>Schnelleinstellungen:</b> Benachrichtigungsleiste ganz herunterziehen, auf den Stift (Bearbeiten) tippen und " +
-            "die Kachel <b>N-Connect</b> in den aktiven Bereich ziehen. Ein Tippen startet oder beendet die " +
-            "Controller-Verbindung. Fehlt noch eine Berechtigung, öffnet die Kachel N-Connect.<br><br>" +
+            "die Kachel <b>SKZ Connect</b> in den aktiven Bereich ziehen. Ein Tippen startet oder beendet die " +
+            "Controller-Verbindung. Fehlt noch eine Berechtigung, öffnet die Kachel SKZ-Connect.<br><br>" +
             "<b>Mit Android starten:</b> Unter Einstellungen → Verbindung einschalten – nach dem Einschalten des Geräts " +
             "verbinden sich deine Controller dann von selbst."));
 
@@ -112,8 +112,8 @@ public sealed class HelpPage(MainActivity host) : IPage
             "Ist er gerade mit der Switch oder einem PC verbunden, schalte dort zuerst Bluetooth aus.<br><br>" +
             "<b>Verbunden, aber das Spiel reagiert nicht:</b> Auf der Controller-Startseite muss oben „Bereit“ stehen. " +
             "Steht dort „Shizuku ist nicht gestartet“, öffne Shizuku und tippe auf Starten.<br><br>" +
-            "<b>Verbindung bricht beim Spielen ab:</b> Nimm N-Connect in den Akku-Einstellungen von der Optimierung aus " +
-            "(Einstellungen → Apps → N-Connect → Akku → <i>Nicht eingeschränkt</i>).<br><br>" +
+            "<b>Verbindung bricht beim Spielen ab:</b> Nimm SKZ Connect in den Akku-Einstellungen von der Optimierung aus " +
+            "(Einstellungen → Apps → SKZ Connect → Akku → <i>Nicht eingeschränkt</i>).<br><br>" +
             "<b>Doppelte Eingaben:</b> Ist Touch-Steuerung zusätzlich an und das Spiel unterstützt Controller, schalte " +
             "Touch aus.<br><br>" +
             "<b>Controller verbindet sich nicht mehr von selbst:</b> Einmal SYNC drücken – dann merkt er sich dieses Gerät neu.",
@@ -164,13 +164,13 @@ public sealed class HelpPage(MainActivity host) : IPage
     {
         bool kodi = KodiRepository.IsKodiInstalled(host);
         bool direct = OutputRouter.Shell is { } s && s.HasPermission();
-        // Nach einer Neuinstallation schreibt N-Connect womöglich in eine Ausweichdatei (KodiStatusWriter.FallbackName).
+        // Nach einer Neuinstallation schreibt SKZ Connect womöglich in eine Ausweichdatei (KodiStatusWriter.FallbackName).
         string? fallback = kodi ? Core.ControllerService.Instance?.KodiStatusFallback : null;
         string html =
             (fallback is not null
-                ? L.F("<b>Kodi findet den Status womöglich nicht:</b> Im Ordner Documents/N-Connect liegt noch eine " +
-                      "status.json einer früheren Installation, die N-Connect nicht ändern darf – N-Connect schreibt " +
-                      "deshalb in <i>{0}</i>. Lösche die alte status.json mit einem Dateimanager, beende N-Connect " +
+                ? L.F("<b>Kodi findet den Status womöglich nicht:</b> Im Ordner Documents/SKZ Connect liegt noch eine " +
+                      "status.json einer früheren Installation, die SKZ Connect nicht ändern darf – SKZ Connect schreibt " +
+                      "deshalb in <i>{0}</i>. Lösche die alte status.json mit einem Dateimanager, beende SKZ Connect " +
                       "(Benachrichtigung → Beenden) und öffne es wieder.<br><br>", fallback)
                 : "") +
             L.T("Über das <b>DevCatSKZ Repository</b> bekommst du unsere Kodi-Plugins – mit automatischen Updates.<br><br>") +
@@ -203,7 +203,7 @@ public sealed class HelpPage(MainActivity host) : IPage
 
     /// <summary>Asset aus THIRD-PARTY-NOTICES.md im Repository-Wurzelordner (siehe NConnect.Android.csproj).</summary>
     private const string NoticesAsset = "THIRD-PARTY-NOTICES.md";
-    private const string NoticesUrl = "https://github.com/DevCatSKZ/N-Connect/blob/main/THIRD-PARTY-NOTICES.md";
+    private const string NoticesUrl = "https://github.com/DevCatSKZ/SKZ-Connect/blob/main/THIRD-PARTY-NOTICES.md";
 
     /// <summary>
     /// Kurzliste der Komponenten Dritter im APK mit Lizenz und Copyright-Vermerk (Namen und Vermerke bleiben wörtlich);
@@ -220,7 +220,7 @@ public sealed class HelpPage(MainActivity host) : IPage
                              "The Guava Authors (Apache-2.0); ThreeTen-BP, Copyright (c) 2007-present, Stephen Colebourne & " +
                              "Michael Nascimento Santos (BSD-3-Clause); Boost Math, Copyright Eric Ford & Hubert Holin 2001 (BSL-1.0)";
         string html =
-            E(L.T("N-Connect enthält Software, Quellcode und Daten Dritter. Die Rechte daran verbleiben bei ihren Inhabern.")) + "<br>" +
+            E(L.T("SKZ Connect enthält Software, Quellcode und Daten Dritter. Die Rechte daran verbleiben bei ihren Inhabern.")) + "<br>" +
             Group(L.T("Laufzeit")) +
             Item(L.T(".NET für Android 36.1 und .NET-Laufzeit 10 (Mono)"), "MIT", "Copyright (c) .NET Foundation and Contributors") +
             Item(L.T(".NET-for-Android-Bindungen (Xamarin.*-Pakete)"), "MIT", "Copyright (c) .NET Foundation Contributors") +
@@ -260,7 +260,7 @@ public sealed class HelpPage(MainActivity host) : IPage
               "hid-wiimote, hid-playstation), WiiBrew, Dolphin, yuzu/Citron, Switch2Connect, Cemuhook/DSU, DS4Windows, " +
               "AOSP frameworks/base/cmds/hid") + "<br><br>" +
             E(L.T("Nintendo, Nintendo Switch, Joy-Con, Wii, Xbox, PlayStation, DualShock und DualSense sind Marken ihrer " +
-                  "jeweiligen Inhaber. N-Connect ist ein unabhängiges Projekt."));
+                  "jeweiligen Inhaber. SKZ Connect ist ein unabhängiges Projekt."));
         return Topic("Lizenzen", html, Ui.Button(host, "Vollständige Lizenztexte anzeigen", ShowNotices, Ui.ButtonStyle.Outlined));
     }
 
@@ -395,8 +395,8 @@ public sealed class HelpPage(MainActivity host) : IPage
     {
         var intent = new Intent(Intent.ActionSend);
         intent.SetType("text/plain");
-        intent.PutExtra(Intent.ExtraSubject, "N-Connect Protokoll");
-        intent.PutExtra(Intent.ExtraText, "N-Connect für Android – Protokoll\nAndroid " + global::Android.OS.Build.VERSION.Release + ", " +
+        intent.PutExtra(Intent.ExtraSubject, "SKZ Connect Protokoll");
+        intent.PutExtra(Intent.ExtraText, "SKZ Connect für Android – Protokoll\nAndroid " + global::Android.OS.Build.VERSION.Release + ", " +
                                           global::Android.OS.Build.Manufacturer + " " + global::Android.OS.Build.Model + "\n" +
                                           $"Ausgabe: {OutputRouter.Describe()}\n\n{LogText()}");
         host.StartActivity(Intent.CreateChooser(intent, L.T("Protokoll teilen")));

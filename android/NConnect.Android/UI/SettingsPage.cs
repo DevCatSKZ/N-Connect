@@ -42,7 +42,7 @@ public sealed class SettingsPage(MainActivity host) : IPage
         if (AppPrefs.TouchEnabled || AppPrefs.Mode == OutputPath.Touch)
         {
             col.AddView(Ui.ClickRow(host, "Touch-Layout bearbeiten",
-                TouchService.Instance is null ? "Erst die Bedienungshilfe „N-Connect Touch-Steuerung“ einschalten."
+                TouchService.Instance is null ? "Erst die Bedienungshilfe „SKZ Connect Touch-Steuerung“ einschalten."
                     : "Legt fest, wohin welche Taste tippt. Am besten direkt im Spiel über die Benachrichtigung.",
                 () =>
                 {
@@ -106,7 +106,7 @@ public sealed class SettingsPage(MainActivity host) : IPage
         // ---- Verbindung ----
         col.AddView(Ui.Section(host, "VERBINDUNG"));
         col.AddView(Ui.SwitchRow(host, "Beim Öffnen automatisch suchen",
-            "N-Connect startet die Controller-Suche, sobald du die App öffnest.", AppPrefs.AutoStart,
+            "SKZ Connect startet die Controller-Suche, sobald du die App öffnest.", AppPrefs.AutoStart,
             on => AppPrefs.AutoStart = on));
         col.AddView(Ui.SwitchRow(host, "Mit Android starten",
             "Nach dem Einschalten des Geräts verbinden sich deine Controller von selbst – ohne die App zu öffnen.",
@@ -116,10 +116,10 @@ public sealed class SettingsPage(MainActivity host) : IPage
             address.Length > 0 ? L.F("{0} – Controller verbinden sich ohne SYNC neu", address)
                 : "Unbekannt – ohne sie muss bei jeder Verbindung SYNC gedrückt werden", EditAddress));
 
-        // ---- Darstellung (wie N-Connect für Windows) ----
+        // ---- Darstellung (wie SKZ Connect für Windows) ----
         col.AddView(Ui.Section(host, "DARSTELLUNG"));
         col.AddView(Ui.ClickRow(host, "Farbschema",
-            L.F("{0} – dieselben Schemata wie in N-Connect für Windows", Look.Scheme.Name), ChooseScheme));
+            L.F("{0} – dieselben Schemata wie in SKZ Connect für Windows", Look.Scheme.Name), ChooseScheme));
         col.AddView(Ui.ClickRow(host, "Hell oder dunkel",
             Look.Modes.First(m => m.Id == Look.Mode).Label, ChooseMode));
 
@@ -130,8 +130,8 @@ public sealed class SettingsPage(MainActivity host) : IPage
         col.AddView(Ui.ClickRow(host, "Belegung zurücksetzen", "Alle Controller-Einstellungen auf die Standardwerte.", ResetSettings));
         col.AddView(Ui.ClickRow(host, "Nach Updates suchen", "Prüft auf GitHub, ob es eine neuere Version gibt.", CheckUpdate));
         string version = host.PackageManager!.GetPackageInfo(host.PackageName!, 0)!.VersionName ?? "?";
-        col.AddView(Ui.ClickRow(host, "Über N-Connect", L.F("Version {0} · Open Source (MIT) · von devcatskz", version),
-            () => host.StartActivity(new Intent(Intent.ActionView, global::Android.Net.Uri.Parse("https://github.com/DevCatSKZ/N-Connect")))));
+        col.AddView(Ui.ClickRow(host, "Über SKZ Connect", L.F("Version {0} · Open Source (MIT) · von devcatskz", version),
+            () => host.StartActivity(new Intent(Intent.ActionView, global::Android.Net.Uri.Parse("https://github.com/DevCatSKZ/SKZ-Connect")))));
         return scroll;
     }
 
@@ -262,10 +262,10 @@ public sealed class SettingsPage(MainActivity host) : IPage
     {
         if (!Profiles.GameProfileWatcher.HasAccess(host))
         {
-            // Ohne „Zugriff auf Nutzungsdaten“ kann N-Connect nicht sehen, welches Spiel läuft.
+            // Ohne „Zugriff auf Nutzungsdaten“ kann SKZ Connect nicht sehen, welches Spiel läuft.
             new MaterialAlertDialogBuilder(host)
                 .SetTitle(L.T("Profile je Spiel"))!
-                .SetMessage(L.T("Damit N-Connect erkennt, welches Spiel gerade läuft, erlaube einmal „Zugriff auf " +
+                .SetMessage(L.T("Damit SKZ Connect erkennt, welches Spiel gerade läuft, erlaube einmal „Zugriff auf " +
                             "Nutzungsdaten“. Die App liest damit nur den Namen der App im Vordergrund – keine Inhalte."))!
                 .SetPositiveButton(L.T("Einstellungen öffnen"), (_, _) => Profiles.GameProfileWatcher.OpenAccessSettings(host))!
                 .SetNegativeButton(L.T("Später"), (_, _) => { })!
@@ -290,7 +290,7 @@ public sealed class SettingsPage(MainActivity host) : IPage
                 if (result is { Status: UpdateCheck.CheckStatus.Available, Update: { } update })
                     OfferUpdate(update);
                 else if (result.Status == UpdateCheck.CheckStatus.UpToDate)
-                    Ui.Toast(host, L.T("N-Connect ist auf dem neuesten Stand"));
+                    Ui.Toast(host, L.T("SKZ Connect ist auf dem neuesten Stand"));
                 else
                     Ui.Toast(host, L.T("Update-Prüfung fehlgeschlagen – bitte später erneut versuchen"));
             });
@@ -360,7 +360,7 @@ public sealed class SettingsPage(MainActivity host) : IPage
         // Erst jetzt, wo wirklich installiert wird, nach der Freigabe fragen. Danach spielt Refresh die Datei ein.
         new MaterialAlertDialogBuilder(host)
             .SetTitle(L.T("Installieren erlauben?"))!
-            .SetMessage(L.T("Android fragt einmal, ob N-Connect Aktualisierungen einspielen darf."))!
+            .SetMessage(L.T("Android fragt einmal, ob SKZ Connect Aktualisierungen einspielen darf."))!
             .SetPositiveButton(L.T("Einstellungen öffnen"), (_, _) =>
             {
                 _pendingApk = file;
@@ -379,7 +379,7 @@ public sealed class SettingsPage(MainActivity host) : IPage
         var box = Ui.Column(host);
         int pad = Ui.Dp(host, 24);
         box.SetPadding(pad, Ui.Dp(host, 8), pad, 0);
-        box.AddView(Ui.Caption(host, "Mit Shizuku oder Root liest N-Connect die Adresse selbst aus. Sonst findest du sie unter " +
+        box.AddView(Ui.Caption(host, "Mit Shizuku oder Root liest SKZ Connect die Adresse selbst aus. Sonst findest du sie unter " +
                                      "Einstellungen → Über das Telefon → Bluetooth-Adresse."));
         box.AddView(layout);
         new MaterialAlertDialogBuilder(host)
@@ -424,8 +424,8 @@ public sealed class SettingsPage(MainActivity host) : IPage
     {
         new MaterialAlertDialogBuilder(host)
             .SetTitle(L.T("Touch-Steuerung einschalten"))!
-            .SetMessage(L.T("Tippe in der folgenden Liste auf „N-Connect Touch-Steuerung“ (ggf. unter „Installierte Apps“) " +
-                        "und schalte sie ein. N-Connect führt damit nur Berührungen aus und liest keine Inhalte."))!
+            .SetMessage(L.T("Tippe in der folgenden Liste auf „SKZ Connect Touch-Steuerung“ (ggf. unter „Installierte Apps“) " +
+                        "und schalte sie ein. SKZ Connect führt damit nur Berührungen aus und liest keine Inhalte."))!
             .SetPositiveButton(L.T("Zu den Bedienungshilfen"), (_, _) => TouchService.OpenSystemSettings(host))!
             .SetNegativeButton(L.T("Später"), (_, _) => { })!
             .Show();

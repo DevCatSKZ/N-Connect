@@ -1,11 +1,11 @@
-# Übergabe: N-Connect
+# Übergabe: SKZ Connect
 
 Stand: 17.10.2026. Release 1.0.22 ist vorbereitet, aber noch nicht veröffentlicht.
 
-N-Connect lässt Nintendo-Switch-2-Controller (Pro Controller 2, Joy-Con 2, GameCube-Controller) und weitere
+SKZ Connect lässt Nintendo-Switch-2-Controller (Pro Controller 2, Joy-Con 2, GameCube-Controller) und weitere
 Controller (Switch 1 und NSO, Wii und Wii U, PlayStation, Xbox, lizenzierte Kabel-Pads) unter Windows als
-Xbox-360- oder DualShock-4-Controller erscheinen. Dazu gibt es N-Connect für Android (Beta, nur Switch-2-Controller
-über Bluetooth LE, virtueller Xbox-Controller per Shizuku oder Root, Touch-Steuerung) und N-Connect für
+Xbox-360- oder DualShock-4-Controller erscheinen. Dazu gibt es SKZ Connect für Android (Beta, nur Switch-2-Controller
+über Bluetooth LE, virtueller Xbox-Controller per Shizuku oder Root, Touch-Steuerung) und SKZ Connect für
 Kodi/LibreELEC (Linux-Dienst und Kodi-Add-on, Begleitmodus unter Kodi für Windows, Android und macOS).
 
 - Regeln für alle Agenten: [AGENTS.md](AGENTS.md)
@@ -26,8 +26,8 @@ Kodi/LibreELEC (Linux-Dienst und Kodi-Add-on, Begleitmodus unter Kodi für Windo
 
 | Ort | Zweck |
 |---|---|
-| [DevCatSKZ/N-Connect](https://github.com/DevCatSKZ/N-Connect) (öffentlich) | Führendes Repo, Branch `main`. Releases entstehen über Tags `v<Version>`. |
-| Branch `gh-pages` im selben Repo | Webseite <https://devcatskz.github.io/N-Connect/>; lokal als Arbeitskopie `..\N-Connect-pages`. |
+| [DevCatSKZ/SKZ-Connect](https://github.com/DevCatSKZ/SKZ-Connect) (öffentlich) | Führendes Repo, Branch `main`. Releases entstehen über Tags `v<Version>`. |
+| Branch `gh-pages` im selben Repo | Webseite <https://devcatskz.github.io/SKZ-Connect/>; lokal als Arbeitskopie `..\SKZ-Connect-pages`. |
 | [DevCatSKZ/kodi-repo](https://github.com/DevCatSKZ/kodi-repo) (öffentlich) | „DevCatSKZ Repository“ für Kodi (auch über <https://devcatskz.github.io/kodi-repo/>). Wird beim Release von Hand aktualisiert, keine CI-Automatik. Lokal: `..\kodi-repo`. Eigene `AGENTS.md`. |
 | `sfm` (lokal `..\sfm`) | Frühere Entwicklungsquelle (Ordner `switch2-pro-windows/`), seit 12.10.2026 eingefroren auf 1.0.20. Nicht mehr benutzen, nichts daraus übernehmen. |
 | `..\.wt\<Name>` | Worktrees für parallele Arbeitsstränge (siehe AGENTS.md). |
@@ -48,7 +48,7 @@ dotnet build android/NConnect.Android -c Debug          # Android-App (braucht d
 dotnet publish src/Switch2Pro.Bridge -c Release -r win-x64 --self-contained -p:PublishSingleFile=true `
   -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -p:DebugType=none `
   -o out\publish\win-x64
-ISCC.exe installer\N-Connect.iss                        # Setup nach out\ (ViGEmBus-/HidHide-Installer in installer\redist\)
+ISCC.exe installer\SKZ-Connect.iss                        # Setup nach out\ (ViGEmBus-/HidHide-Installer in installer\redist\)
 powershell -File linux/build-kodi-addon.ps1             # Kodi-ZIPs nach out\kodi
 ```
 
@@ -56,7 +56,7 @@ Die Zahl der Tests steht bewusst nirgends fest; maßgeblich ist die Ausgabe von 
 (`.github/workflows/build.yml`, `kodi.yml`) führt dieselben Schritte aus, baut die Android-App ohne Signatur und
 benennt Builds ohne Tag als Vorabversion `<Version>-ci.<Lauf>`.
 
-Wichtigste Quelle bei Hardwareproblemen ist das Protokoll `%LOCALAPPDATA%\N-Connect\bridge.log` (Android: Hilfe ›
+Wichtigste Quelle bei Hardwareproblemen ist das Protokoll `%LOCALAPPDATA%\SKZ Connect\bridge.log` (Android: Hilfe ›
 Diagnose › Teilen; Linux: siehe docs/LINUX-KODI.md). Die Prüfhilfen `--render`, `--render-ui` und `--dump-ui` öffnen
 Fenster und schreiben in dasselbe Protokoll – nur nach Rückfrage beim Nutzer starten.
 
@@ -74,10 +74,10 @@ Freigabe des Nutzers.
    „Neu“ und „Behoben“. Die CI übernimmt ihn als Beschreibung des Releases.
 3. **Prüfen:** Bauen und alle Tests wie oben, Commit auf `main`, Push.
 4. **Tag:** `git tag v<Version>` und `git push origin v<Version>`. `build.yml` baut Setup und Portable-ZIP und legt
-   das Release an; `kodi.yml` hängt die `N-Connect-Kodi-*.zip` an.
+   das Release an; `kodi.yml` hängt die `SKZ-Connect-Kodi-*.zip` an.
 5. **APK (nur lokal):** `dotnet publish android/NConnect.Android -c Release` signiert mit dem Schlüssel aus
    `%USERPROFILE%\.nconnect` (über `signing.props`); prüfen mit `apksigner verify --print-certs`. Die Datei
-   `bin/Release/net10.0-android/publish/com.devcatskz.nconnect-Signed.apk` als `N-Connect-Android-<Version>.apk`
+   `bin/Release/net10.0-android/publish/com.devcatskz.nconnect-Signed.apk` als `SKZ-Connect-Android-<Version>.apk`
    anhängen (`gh release upload v<Version> …`) – der Name ist Pflicht, die Update-Prüfung der App liest die Version
    daraus. SHA-256 und Signatur der APK in die Release-Beschreibung aufnehmen (wie bei 1.0.20).
 6. **kodi-repo von Hand:** `git -C ..\kodi-repo status` (keine offenen Altlasten), `git -C ..\kodi-repo pull`, dann
@@ -105,15 +105,15 @@ Code-Signatur ist auch Voraussetzung für ein echtes Windows-11-Widget und für 
 
 ViGEmBus, der Kerneltreiber für die virtuellen Controller unter Windows, ist seit dem 02.11.2023 archiviert (Ende
 des Projekts nach einem Markenstreit, keine Updates mehr). Laut Abschluss-Erklärung des Autors laufen bestehende
-Installationen weiter. N-Connect installiert das letzte signierte Release 1.22.0 (die CI prüft die Signatur);
+Installationen weiter. SKZ Connect installiert das letzte signierte Release 1.22.0 (die CI prüft die Signatur);
 Startprotokoll und Diagnose nennen die installierte Treiberversion. HidHide wird weiter gepflegt.
 
 - **Risiko:** keine Fehler- oder Sicherheitskorrekturen mehr. Lädt Windows den Treiber nach einem Update oder einer
-  geänderten Treiberrichtlinie nicht mehr, erzeugt N-Connect unter Windows keine virtuellen Controller; Android und
+  geänderten Treiberrichtlinie nicht mehr, erzeugt SKZ Connect unter Windows keine virtuellen Controller; Android und
   Kodi sind nicht betroffen.
 - **Nachfolger und Alternativen** (Websuche 17.10.2026):
   - Nefarius VirtualPad, das Folgeprojekt des ViGEm-Autors, ist kommerziell und nur für Geschäftspartner – für
-    N-Connect nicht nutzbar.
+    SKZ Connect nicht nutzbar.
   - Ein eigener Treiber über das Virtual HID Framework (VHF, Teil von Windows, User-Mode) kann HID-Gamepads anlegen,
     etwa einen DualShock 4 oder einen Xbox-One-/Series-Controller als HID, aber keinen Xbox-360-Controller (XUSB). Ob
     XInput-Spiele einen solchen Xbox-HID-Controller zuverlässig sehen, ist ungeprüft. Ein Treiberpaket muss signiert

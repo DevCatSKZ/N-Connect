@@ -33,7 +33,7 @@ internal static class Program
         }
         catch (Exception e)
         {
-            File.AppendAllText(Path.Combine(Path.GetTempPath(), "N-Connect-Pruefhilfe-Fehler.txt"), "Elternprozess: " + e + Environment.NewLine);
+            File.AppendAllText(Path.Combine(Path.GetTempPath(), "SKZ-Connect-Pruefhilfe-Fehler.txt"), "Elternprozess: " + e + Environment.NewLine);
         }
         if (exitCode is { } code)
         {
@@ -44,7 +44,7 @@ internal static class Program
         {
             // Auf dem unsichtbaren Desktop sieht niemand eine Fehlermeldung: Fehler in eine Datei schreiben.
             static void Report(object? error) =>
-                File.AppendAllText(Path.Combine(Path.GetTempPath(), "N-Connect-Pruefhilfe-Fehler.txt"), error + Environment.NewLine);
+                File.AppendAllText(Path.Combine(Path.GetTempPath(), "SKZ-Connect-Pruefhilfe-Fehler.txt"), error + Environment.NewLine);
             AppDomain.CurrentDomain.UnhandledException += (_, e) => Report(e.ExceptionObject);
             Application.SetUnhandledExceptionMode(UnhandledExceptionMode.ThrowException);
         }
@@ -90,8 +90,8 @@ internal static class Program
         }
 
         // Nur eine Instanz pro Benutzer: zwei Programme würden um denselben Controller streiten.
-        using var mutex = new Mutex(true, @"Local\N-Connect", out bool first);
-        using var showSignal = new EventWaitHandle(false, EventResetMode.AutoReset, @"Local\N-Connect.Show");
+        using var mutex = new Mutex(true, @"Local\SKZ Connect", out bool first);
+        using var showSignal = new EventWaitHandle(false, EventResetMode.AutoReset, @"Local\SKZ-Connect.Show");
         if (!first)
         {
             // Läuft schon: dort das Fenster öffnen, statt still zu beenden.

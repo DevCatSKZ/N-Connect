@@ -9,7 +9,7 @@ namespace Switch2Pro.Bridge;
 /// <summary>
 /// Geführte Stick-Kalibrierung eines Controllers: Live-Anzeige (wo steht der Stick, wie rund läuft er), Messen von
 /// Mitte und Rand (<see cref="StickCalibrator"/>), Übernehmen oder zurück zu den Werkswerten. Gespeichert wird nur in
-/// N-Connect (Einstellungen), nicht im Controller.
+/// SKZ Connect (Einstellungen), nicht im Controller.
 /// </summary>
 internal sealed class StickCalibrationForm : UiForm
 {

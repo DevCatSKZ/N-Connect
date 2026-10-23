@@ -32,7 +32,7 @@ erneut versucht – ebenso, wenn ViGEm keinen virtuellen Controller anlegen kann
 ## 2. Verbinden und Koppeln
 
 ### 2.1 Switch-2-Controller (Bluetooth LE)
-- N-Connect sucht dauerhaft **aktiv** nach BLE-Werbung mit Herstellerkennung **0x0553** (Nintendo) und erkennt
+- SKZ Connect sucht dauerhaft **aktiv** nach BLE-Werbung mit Herstellerkennung **0x0553** (Nintendo) und erkennt
   die Art an der Produkt-ID in der Werbung (`Advertisement.Kind`).
 - **SYNC** (Host-Adresse in der Werbung leer): Controller wird immer verbunden und danach **mit dem PC gekoppelt**
   (Nintendo-Verfahren, Befehl 0x15 – nur wenn „Per Tastendruck verbinden“ an ist und er nicht schon mit diesem PC
@@ -54,7 +54,7 @@ erneut versucht – ebenso, wenn ViGEm keinen virtuellen Controller anlegen kann
 - Spiele sehen den USB-Controller zusätzlich direkt → **„Doppelt angezeigt? Verstecken“** (HidHide, Abschnitt 9).
 
 ### 2.3 Switch 1, NSO, Wii – selbst koppeln
-- Diese Controller nutzen Bluetooth Classic. N-Connect koppelt sie **selbst** mit Windows (`ControllerPairing`):
+- Diese Controller nutzen Bluetooth Classic. SKZ Connect koppelt sie **selbst** mit Windows (`ControllerPairing`):
   - Switch 1/NSO: Kopplung ohne PIN („Just Works“) über WinRT (`DeviceInformationCustomPairing.PairAsync`,
     `ConfirmOnly | ConfirmPinMatch`, Anfrage wird sofort bestätigt, höchstens 20 s). Nur wenn WinRT das Gerät gar
     nicht öffnen kann: Win32 (`BluetoothAuthenticateDeviceEx` + `BluetoothRegisterForAuthenticationEx`) – dort kam
@@ -108,9 +108,9 @@ erneut versucht – ebenso, wenn ViGEm keinen virtuellen Controller anlegen kann
   Original außerdem eigene Startbefehle. Wii-Controller sind nicht betroffen.
 - Einstellung **„Original-Controller verstecken“** (`HideFromGames`, Standard an): Jeder solche Controller wird nach
   dem Verbinden automatisch per HidHide versteckt (`ControllerManager.QueueHide`): 3 s sammeln (Joy-Con-Paar), dann
-  `HidHideCLI --app-reg <N-Connect> --dev-hide … --cloak-on` – **ohne Rückfrage** über die geplante Aufgabe
-  „N-Connect HidHide“ (vom Installer angelegt, läuft als SYSTEM, Benutzer dürfen sie nur starten; `HidHide.HideViaTaskAsync`
-  startet sie mit den IDs als `$(Arg0)`, der Helfer `N-Connect.exe --hidhide-helper` versteckt nur gerade angeschlossene
+  `HidHideCLI --app-reg <SKZ Connect> --dev-hide … --cloak-on` – **ohne Rückfrage** über die geplante Aufgabe
+  „SKZ Connect HidHide“ (vom Installer angelegt, läuft als SYSTEM, Benutzer dürfen sie nur starten; `HidHide.HideViaTaskAsync`
+  startet sie mit den IDs als `$(Arg0)`, der Helfer `SKZ-Connect.exe --hidhide-helper` versteckt nur gerade angeschlossene
   Nintendo-/Sony-Controller und Kabel-Pads und gibt nur sich selbst frei, schreibt keine Dateien). Fehlt die Aufgabe
   (portable Variante, Registrierung im Setup gescheitert – die Aufgabenplanung meldet das als `FileNotFoundException`
   0x80070002), ist sie nicht lesbar oder gehört sie zu einer anderen EXE (Entwicklerversion): **eine** UAC-Abfrage.
@@ -123,15 +123,15 @@ erneut versucht – ebenso, wenn ViGEm keinen virtuellen Controller anlegen kann
   angezeigt?“ (Fehler dort: Meldung „HidHide konnte nicht eingerichtet werden …“) oder Einstellung aus/ein.
 - **Nie versteckt werden virtuelle Geräte** (eigene ViGEm-Pads und die anderer Programme): `QueueHide`,
   `HidHide.HideAsync` und der Aufgaben-Helfer prüfen jede ID mit `DeviceTree.IsPhysicalInstance` (siehe 2.5) –
-  sonst sähen Spiele die Ausgabe von N-Connect nicht mehr.
+  sonst sähen Spiele die Ausgabe von SKZ Connect nicht mehr.
 - Bluetooth-Instanz-IDs ändern sich nach jedem Neukoppeln → dann wird erneut versteckt (mit Aufgabe ohne Abfrage).
 - HidHide fehlt → einmalige Meldung, auf „Allgemein“ Knopf „HidHide installieren …“. Der Installer installiert
   HidHide **immer** still mit, wenn es fehlt (keine Auswahl; danach fragt das Setup nach einem Neustart), trägt
-  N-Connect als erlaubtes Programm ein und schaltet das Verstecken ein (`--app-reg … --cloak-on`; schlägt das vor dem
+  SKZ Connect als erlaubtes Programm ein und schaltet das Verstecken ein (`--app-reg … --cloak-on`; schlägt das vor dem
   Neustart fehl, holt die App es beim ersten Verstecken nach). Deinstallieren trägt die Freigabe wieder aus
   (`--app-unreg`), HidHide selbst bleibt.
 - **HidHide-Update** (`HidHideUpdate`, Einstellung „HidHide aktuell halten“ = `CheckHidHideUpdates`, Standard an): beim
-  Start (nach der N-Connect-Prüfung, nur wenn es kein N-Connect-Update gibt) neueste Version von
+  Start (nach der SKZ-Connect-Prüfung, nur wenn es kein SKZ-Connect-Update gibt) neueste Version von
   `nefarius/HidHide/releases/latest` gegen die Dateiversion von `HidHideCLI.exe`. Neuer → Einblendung, Klick → Rückfrage →
   Download nur von `github.com/nefarius/HidHide/` (Größe geprüft) → **Authenticode-Prüfung** (`WinVerifyTrust`,
   Unterzeichner „Nefarius Software Solutions e.U.“) → offizielles Setup **mit Oberfläche** starten (es deinstalliert die
@@ -143,7 +143,7 @@ erneut versucht – ebenso, wenn ViGEm keinen virtuellen Controller anlegen kann
 ### 2.4 Kabel-Pads und Nachbauten
 - HORI/PowerA/PDP-Kabel-Pads werden an Hersteller-/Produktkennung erkannt (`WiredSwitchPad.Known`) und laufen als
   „Switch Pro Controller“ (gleiche Tasten, Grafik, Belegung) unter eigenem Namen – ohne Gyro/Vibration/LEDs.
-- Nachbauten im Switch-Modus: Beantworten sie Speicher-Lesebefehle nicht, nutzt N-Connect nach der ersten
+- Nachbauten im Switch-Modus: Beantworten sie Speicher-Lesebefehle nicht, nutzt SKZ Connect nach der ersten
   ausbleibenden Antwort Standardwerte (keine weiteren Wartezeiten). Melden sie keine Bluetooth-Adresse
   (00:… bzw. FF:…), dient die Geräte-Instanz als Kennung.
 
@@ -159,7 +159,7 @@ erneut versucht – ebenso, wenn ViGEm keinen virtuellen Controller anlegen kann
   „Im Spiel: Xbox · Platz n · nativ“ und statt „Erscheint als“ einen Hinweis. Belegung wirkt nur auf
   Sonderaktionen (Tastatur, Makros, Gyro), nicht auf den Controller selbst.
 - **Eigene virtuelle Pads nie als echt melden:** ViGEm-Xbox-360-Controller melden sich ebenfalls über XInput.
-  `XInput.SetVirtualSlot` markiert die von N-Connect angelegten Plätze (`Xbox360Pad` registriert seinen
+  `XInput.SetVirtualSlot` markiert die von SKZ Connect angelegten Plätze (`Xbox360Pad` registriert seinen
   `UserIndex`, `IsVirtual` filtert sie) – ein virtueller Controller wird nie als physischer Xbox-Controller
   angezeigt.
 - **Sony über HID** (`PlayStationHidLink`, Protokoll `PlayStationPad`): Sony-HID-Pfade (054C:05C4/09CC/0BA0/0CE6/
@@ -178,7 +178,7 @@ erneut versucht – ebenso, wenn ViGEm keinen virtuellen Controller anlegen kann
   und Bluetooth erweitert (0x31, CRC32) – jeweils Tasten, D-Pad, analoge Trigger, Sticks, Touchpad-Klick, PS-Taste,
   DS5-Mikro und Edge-Tasten (Byte 10), Gyro/Beschl. (auf die internen Switch-2-Achsen gedreht), Akku.
   Ungültige Bluetooth-CRCs werden verworfen.
-- **DualSense Bluetooth:** startet im einfachen Modus – N-Connect schickt einmalig einen Effekt-Bericht (0xA2 mit
+- **DualSense Bluetooth:** startet im einfachen Modus – SKZ Connect schickt einmalig einen Effekt-Bericht (0xA2 mit
   CRC), womit der Controller in den erweiterten Modus wechselt (Gyro, Akku, Touchpad).
 - **Ausgaben an den Sony-Controller:** Vibration (DS4 0x05/0x11, DS5 0x02/0x31 inkl. Trigger-Effekte-Felder),
   Lichtleiste (vom virtuellen DS4-Ausgang des Spiels durchgereicht, `IControllerLink.SetLightbarAsync`),
@@ -304,7 +304,7 @@ erneut versucht – ebenso, wenn ViGEm keinen virtuellen Controller anlegen kann
 - **Stick-Kalibrierung** (geführt, je Controller und Stick): 1. Stick loslassen, bis 1,5 s ruhig (Streuung ≤ 60
   Rohschritte); 2. am Rand kreisen, bis 24 Richtungen (≥ 700 Rohschritte von der Mitte) erfasst sind. Ergebnis:
   Mitte und Ausschlag je Richtung × 0,95 (Rand sicher erreichbar), mindestens 400 je Richtung. Anzeige der
-  Abweichung vom Kreis vorher/nachher. **Nur in N-Connect gespeichert**, der Controller bleibt unverändert;
+  Abweichung vom Kreis vorher/nachher. **Nur in SKZ Connect gespeichert**, der Controller bleibt unverändert;
   „Werkswerte“ entfernt sie. (Nicht für Wii-Sticks.)
 
 ## 7. Bewegungssteuerung (Gyro)
@@ -319,7 +319,7 @@ erneut versucht – ebenso, wenn ViGEm keinen virtuellen Controller anlegen kann
 - **DualShock 4**: Bewegungsdaten gehen an Spiele/Steam.
 - **Cemuhook/DSU** (Standard an): UDP 127.0.0.1:26760 für Emulatoren (Cemu, Dolphin, Yuzu-Nachfolger …), Spieler 1–4.
   Derselbe Server wie unter Android und Linux (`Switch2Pro.Protocol.DsuServer`); ist der Port belegt (etwa durch
-  DS4Windows), läuft N-Connect ohne DSU weiter und vermerkt das im Protokoll.
+  DS4Windows), läuft SKZ Connect ohne DSU weiter und vermerkt das im Protokoll.
 
 ### 7.1 Extras nach JoyShockMapper (Referenz: JSM-Dokumentation, gleiche Begriffe)
 - **Gyro-Beschleunigung** (`GyroAcceleration` 1–4, 1 = aus; `GyroAccelSlow` 20 °/s, `GyroAccelFast` 120 °/s – wie
@@ -433,8 +433,8 @@ erneut versucht – ebenso, wenn ViGEm keinen virtuellen Controller anlegen kann
   Akku (leerster Akku des Spielers, Blitz beim Laden); Kopf zeigt Anzahl bzw. aktives Profil (im Infobereich fest
   „Standard“ gewählt: „Profil: Standard“, `ControllerWidget.ProfileStatus`). Ohne Fokus, nicht in
   der Taskleiste; mit der Maus verschiebbar (`WidgetX`/`WidgetY`, ungültige Position → oben rechts), Rechtsklick:
-  N-Connect öffnen, Immer im Vordergrund (`WidgetOnTop`), Kompakte Ansicht (`WidgetCompact`), Deckkraft
-  (`WidgetOpacity` 40–100 %), Position zurücksetzen, ausblenden. Doppelklick öffnet N-Connect. Aktualisiert sich
+  SKZ Connect öffnen, Immer im Vordergrund (`WidgetOnTop`), Kompakte Ansicht (`WidgetCompact`), Deckkraft
+  (`WidgetOpacity` 40–100 %), Position zurücksetzen, ausblenden. Doppelklick öffnet SKZ-Connect. Aktualisiert sich
   jede Sekunde, zeichnet nur bei Änderungen neu (`TrayApp.SyncWidget`).
 
 ## 12. Infobereich (Taskleiste)
@@ -445,8 +445,8 @@ erneut versucht – ebenso, wenn ViGEm keinen virtuellen Controller anlegen kann
   Bluetooth-Problem steht es als erste Zeile darüber; die Spieler bleiben trotzdem aufgeführt (USB, XInput und ohne
   Bluetooth LE auch die klassischen Controller laufen weiter).
 - Symbol zeigt den niedrigsten Akkustand; Tooltip je Spieler „P1 Name 57 %“ (max. 127 Zeichen), ohne Controller
-  „N-Connect: warte auf Controller (SYNC drücken)“, bei einem Bluetooth-Problem bzw. fehlendem ViGEmBus
-  „N-Connect: <Problem>“ – alles in der Sprache der Oberfläche.
+  „SKZ Connect: warte auf Controller (SYNC drücken)“, bei einem Bluetooth-Problem bzw. fehlendem ViGEmBus
+  „SKZ Connect: <Problem>“ – alles in der Sprache der Oberfläche.
 - Einblendungen: Verbunden/Getrennt, Kopplung, Akku, schwache Verbindung, Bluetooth-Probleme, Update.
 
 ## 13. Kopplungsdaten (Switch 1)
@@ -456,7 +456,7 @@ erneut versucht – ebenso, wenn ViGEm keinen virtuellen Controller anlegen kann
   eine Sicherung der Einstellungen an.
 - **PC → PC**: Datei `*.ncpair` (JSON; optional mit Passwort: AES-256-GCM, Schlüssel per PBKDF2-SHA256). Schlüssel
   nur auf ausdrücklichen Wunsch. Übernahme ergänzt, löscht nichts.
-- N-Connect ändert dabei **weder** die Bluetooth-Adresse des Adapters **noch** Windows-Kopplungen.
+- SKZ Connect ändert dabei **weder** die Bluetooth-Adresse des Adapters **noch** Windows-Kopplungen.
 - Fenster `PairingDataForm` im Windows-11-Stil (Gruppen „Übernehmen“, „Inhalt“, „Weitergeben und sichern“, Fußleiste
   mit Akzent-Knopf „Übernehmen“); Inhalt wird selbst gezeichnet (`Report`: Zeilen mit „:“ am Ende = Zwischenüberschrift,
   „  •  “ = Aufzählung). Passwort-Dialog (`PasswordDialog`) ebenso, Eingabefelder als `TextField`.
@@ -510,8 +510,8 @@ erneut versucht – ebenso, wenn ViGEm keinen virtuellen Controller anlegen kann
   (`WelcomeForm`, beim ersten Start und im Infobereich) wird absatzweise übersetzt, das Fenster wächst mit dem Text.
   Vollständigkeit sichern die Unit-Tests `TranslationTests` (`tests/Switch2Pro.Bridge.Tests`): alle Tabellen mit
   denselben Schlüsseln, keine doppelten, gleiche Muster, Zahlen/Namen bleiben erhalten, Stichproben bisheriger Lücken.
-- **Installer → App** (`installer/N-Connect.iss`, `InstallerChoices`): Das Setup läuft mit Adminrechten und schreibt
-  deshalb keine Benutzereinstellungen (kein HKCU). Es startet N-Connect nach der Installation als angemeldeter Benutzer
+- **Installer → App** (`installer/SKZ-Connect.iss`, `InstallerChoices`): Das Setup läuft mit Adminrechten und schreibt
+  deshalb keine Benutzereinstellungen (kein HKCU). Es startet SKZ Connect nach der Installation als angemeldeter Benutzer
   mit `--setup-theme=dark|light|system` und `--setup-lang=xx` – die Sprache nur, wenn sie im Setup bewusst gewählt
   wurde (`ChosenLangCode`): Das Setup schlägt die Windows-Sprache vor, wenn es sie anbietet, sonst Englisch (erster
   Eintrag unter `[Languages]`). Weicht die Setup-Sprache davon ab, obwohl der Vorschlag der Sprache der App unter
@@ -528,7 +528,7 @@ erneut versucht – ebenso, wenn ViGEm keinen virtuellen Controller anlegen kann
   sonst `README.md` (englisch). Die Deinstallation entfernt den Autostart in allen angemeldeten Benutzerprofilen
   (nur Einträge, die auf diese Installation zeigen).
 - **Kodi auf diesem PC** (`KodiStatusWriter`): Ist in einer Kodi-Installation (normal oder Microsoft Store) das
-  Add-on `service.nconnect` installiert, schreibt N-Connect alle 3 s bei Änderung, sonst alle 10 s als Herzschlag
+  Add-on `service.nconnect` installiert, schreibt SKZ Connect alle 3 s bei Änderung, sonst alle 10 s als Herzschlag
   `userdata/addon_data/service.nconnect/status.json` (gleiches Format wie der Linux-Dienst; die Berichtsrate zählt
   nicht als Änderung). Ohne Add-on wird nichts geschrieben und kein Ordner angelegt; ob Kodi/Add-on da sind, wird alle
   30 s neu geprüft (kein Neustart nötig). Felder u. a. `"platform": "windows"` und `"bluetooth"` aus dem
@@ -542,10 +542,10 @@ erneut versucht – ebenso, wenn ViGEm keinen virtuellen Controller anlegen kann
   Administratorrechte. Builds der CI ohne Tag tragen die Vorabversion `<Version>-ci.<Lauf>` (`UpdateCheck.Label`,
   angezeigt in den Einstellungen, der Diagnose und im Startprotokoll); für sie gilt das Release mit derselben Nummer
   als neuer (`UpdateCheck.IsNewer`). Datei- und Setup-Version bleiben numerisch.
-- **Protokoll**: `%LOCALAPPDATA%\N-Connect\bridge.log` (ab 1 MB einmal rotiert). Einstellungen:
-  `%APPDATA%\N-Connect\settings.json` (bei Änderung von außen neu geladen, 300 ms entprellt).
+- **Protokoll**: `%LOCALAPPDATA%\SKZ-Connect\bridge.log` (ab 1 MB einmal rotiert). Einstellungen:
+  `%APPDATA%\SKZ-Connect\settings.json` (bei Änderung von außen neu geladen, 300 ms entprellt).
 - **Einstellungsdatei unlesbar** (`Settings.Load`/`Save`): Gespeichert wird über eine Zwischendatei, die vorige Fassung
-  bleibt als `settings.json.bak`. Ist `settings.json` beim Start unlesbar, lädt N-Connect die `.bak`
+  bleibt als `settings.json.bak`. Ist `settings.json` beim Start unlesbar, lädt SKZ Connect die `.bak`
   (`RestoredFromBackup`, Meldung „Einstellungen wiederhergestellt“) oder die Standardwerte (`LoadError`, Meldung
   „Einstellungen fehlerhaft“); ein Klick auf die Meldung zeigt die Datei im Explorer. Vor dem ersten Überschreiben
   wird die unlesbare Datei einmalig als `settings.json.unlesbar-<yyyyMMdd-HHmmss>` aufbewahrt (`UnreadableCopy`), eine

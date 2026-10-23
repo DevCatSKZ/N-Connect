@@ -5,7 +5,7 @@ namespace Switch2Pro.Bridge;
 
 /// <summary>
 /// Kodi auf diesem PC: das „DevCatSKZ Repository“ (github.com/DevCatSKZ/kodi-repo) direkt in Kodis Add-on-Ordner legen
-/// oder Repository/Plugin herunterladen. Unter Windows darf N-Connect in Kodis Benutzerordner schreiben – keine
+/// oder Repository/Plugin herunterladen. Unter Windows darf SKZ Connect in Kodis Benutzerordner schreiben – keine
 /// Adminrechte nötig. Kodi aus dem Microsoft Store hat seinen Ordner unter %LOCALAPPDATA%\Packages.
 /// </summary>
 internal static class KodiIntegration
@@ -14,9 +14,9 @@ internal static class KodiIntegration
     /// <summary>Add-on, dessen status.json das Kodi-Menü und das Home-Widget anzeigen.</summary>
     public const string ServiceAddonId = "service.nconnect";
     public const string RepositoryZipName = "repository.devcatskz.zip";
-    public const string PluginZipName = "N-Connect-Kodi-LibreELEC-alle-Geraete.zip";
+    public const string PluginZipName = "SKZ-Connect-Kodi-LibreELEC-alle-Geraete.zip";
     private const string RepositoryUrl = "https://github.com/DevCatSKZ/kodi-repo/raw/main/repository.devcatskz.zip";
-    private const string PluginUrl = "https://github.com/DevCatSKZ/kodi-repo/raw/main/downloads/N-Connect-Kodi-LibreELEC-alle-Geraete.zip";
+    private const string PluginUrl = "https://github.com/DevCatSKZ/kodi-repo/raw/main/downloads/SKZ-Connect-Kodi-LibreELEC-alle-Geraete.zip";
     public const string RepositoryPage = "https://github.com/DevCatSKZ/kodi-repo";
     public const string KodiDownloadPage = "https://kodi.tv/download/windows/";
 

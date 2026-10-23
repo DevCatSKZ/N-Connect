@@ -39,7 +39,7 @@ def text(string_id, *args):
 
 
 def log(message, level=xbmc.LOGINFO):
-    xbmc.log('[N-Connect] ' + message, level)
+    xbmc.log('[SKZ Connect] ' + message, level)
 
 
 def machine():
@@ -47,14 +47,14 @@ def machine():
 
 
 def is_windows():
-    """Kodi läuft unter Windows: Dort verbindet die N-Connect-App die Controller selbst und schreibt
+    """Kodi läuft unter Windows: Dort verbindet die SKZ-Connect-App die Controller selbst und schreibt
     status.json in diesen Datenordner – das Add-on startet keinen Dienst, sondern zeigt den Stand nur an."""
     return os.name == 'nt'
 
 
 def has_daemon():
-    """Der N-Connect-Dienst (BlueZ/uinput) gibt es nur unter echtem Linux. Auf anderen Systemen läuft das Add-on
-    im Begleitmodus: Es zeigt eine status.json an, die eine N-Connect-App schreibt. Achtung: platform.system()
+    """Der SKZ-Connect-Dienst (BlueZ/uinput) gibt es nur unter echtem Linux. Auf anderen Systemen läuft das Add-on
+    im Begleitmodus: Es zeigt eine status.json an, die eine SKZ-Connect-App schreibt. Achtung: platform.system()
     meldet auf Android 'Linux' – darum wird Kodi gezielt gefragt."""
     if xbmc.getCondVisibility('System.Platform.Android'):
         return False
@@ -82,7 +82,7 @@ def status_platform(status):
 
 
 def system_name():
-    """Anzeigename eines Systems ohne N-Connect (für „nur Anzeige“)."""
+    """Anzeigename eines Systems ohne SKZ Connect (für „nur Anzeige“)."""
     return {'osx': 'macOS', 'ios': 'iOS', 'tvos': 'tvOS'}.get(kodi_platform()) or platform.system() or '?'
 
 
@@ -111,7 +111,7 @@ def companion_hint():
         return text(30660), text(30661)
     if system == 'android':
         return text(30660), text(30668)
-    return text(30666), text(30667, system_name())  # macOS & Co.: N-Connect gibt es dort nicht – nur Anzeige
+    return text(30666), text(30667, system_name())  # macOS & Co.: SKZ Connect gibt es dort nicht – nur Anzeige
 
 
 def runtime_ids():
@@ -127,7 +127,7 @@ def runtime_ids():
 
 
 def binary_candidates():
-    """Mitgelieferte N-Connect-Programme für diesen Prozessor in Prüf-Reihenfolge (leer = keins). Setzt das
+    """Mitgelieferte SKZ-Connect-Programme für diesen Prozessor in Prüf-Reihenfolge (leer = keins). Setzt das
     Ausführungsrecht, das beim Entpacken des Add-on-Archivs verloren geht."""
     if not has_daemon():
         return []  # anderes System (Windows, Android, macOS) – kein mitgeliefertes Programm dafür
@@ -165,7 +165,7 @@ def clear_pid():
 
 
 def _is_nconnect(pid):
-    """Gehört die PID wirklich zu N-Connect mit diesem Datenordner? (PIDs werden wiederverwendet.)"""
+    """Gehört die PID wirklich zu SKZ Connect mit diesem Datenordner? (PIDs werden wiederverwendet.)"""
     try:
         with open('/proc/{0}/cmdline'.format(pid), 'rb') as f:
             args = f.read().decode('utf-8', 'replace').split('\0')
@@ -175,7 +175,7 @@ def _is_nconnect(pid):
 
 
 def stop_leftover():
-    """Läuft noch ein N-Connect-Programm aus einer früheren Kodi-Sitzung (Kodi abgestürzt), es vor dem Start
+    """Läuft noch ein SKZ-Connect-Programm aus einer früheren Kodi-Sitzung (Kodi abgestürzt), es vor dem Start
     beenden – sonst halten zwei Programme dieselben Controller und den DSU-Port, und beide schreiben status.json."""
     try:
         with open(PID_FILE, 'r') as f:
@@ -183,7 +183,7 @@ def stop_leftover():
     except (OSError, ValueError):
         return
     if pid > 1 and _is_nconnect(pid):
-        log('altes N-Connect-Programm (PID {0}) läuft noch – wird beendet'.format(pid), xbmc.LOGWARNING)
+        log('altes SKZ-Connect-Programm (PID {0}) läuft noch – wird beendet'.format(pid), xbmc.LOGWARNING)
         try:
             os.kill(pid, signal.SIGTERM)  # trennt die Controller sauber und entfernt die virtuellen Controller
             for _ in range(40):
@@ -193,7 +193,7 @@ def stop_leftover():
             else:
                 os.kill(pid, signal.SIGKILL)
         except OSError as e:
-            log('altes N-Connect-Programm: {0}'.format(e), xbmc.LOGWARNING)
+            log('altes SKZ-Connect-Programm: {0}'.format(e), xbmc.LOGWARNING)
     clear_pid()
 
 
@@ -317,12 +317,12 @@ def notifications_enabled():
 # ---------- Status ----------
 
 def _status_candidates():
-    """Alle Orte, an denen eine status.json liegen kann. Unter Android darf die N-Connect-App nicht in
+    """Alle Orte, an denen eine status.json liegen kann. Unter Android darf die SKZ-Connect-App nicht in
     Kodis Datenordner schreiben – sie legt die Datei im gemeinsamen Dokumente-Ordner ab (bis Android 10
     alternativ in ihrem externen App-Ordner)."""
     yield STATUS_JSON
     if xbmc.getCondVisibility('System.Platform.Android'):
-        yield '/sdcard/Documents/N-Connect/status.json'
+        yield '/sdcard/Documents/SKZ-Connect/status.json'
         yield '/sdcard/Android/data/com.devcatskz.nconnect/files/status.json'
 
 
@@ -358,7 +358,7 @@ def mark_starting():
 
 
 def send_command(command):
-    """Befehl an den laufenden Dienst (über Kodis Benachrichtigungen, der Dienst leitet ihn an N-Connect weiter)."""
+    """Befehl an den laufenden Dienst (über Kodis Benachrichtigungen, der Dienst leitet ihn an SKZ Connect weiter)."""
     xbmc.executebuiltin('NotifyAll({0},{1})'.format(ADDON_ID, command))
 
 

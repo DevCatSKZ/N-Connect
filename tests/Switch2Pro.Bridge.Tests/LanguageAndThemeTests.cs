@@ -72,10 +72,10 @@ public sealed class LanguageAndThemeTests : IDisposable
     [Fact]
     public void ArgumenteDesInstallersWerdenGelesen()
     {
-        string[] args = [@"C:\Program Files\N-Connect\N-Connect.exe", "--setup-lang=fr", "--setup-theme=light"];
+        string[] args = [@"C:\Program Files\SKZ-Connect\SKZ-Connect.exe", "--setup-lang=fr", "--setup-theme=light"];
         Assert.Equal("fr", InstallerChoices.Arg(args, "--setup-lang="));
         Assert.Equal("light", InstallerChoices.Arg(args, "--setup-theme="));
-        Assert.Null(InstallerChoices.Arg([@"C:\Program Files\N-Connect\N-Connect.exe", "--autostart"], "--setup-lang="));
+        Assert.Null(InstallerChoices.Arg([@"C:\Program Files\SKZ-Connect\SKZ-Connect.exe", "--autostart"], "--setup-lang="));
     }
 
     [Fact]
@@ -205,7 +205,7 @@ public sealed class LanguageAndThemeTests : IDisposable
     [Fact]
     public void InstallerSkriptPasstZurApp()
     {
-        string iss = File.ReadAllText(Path.Combine(Repo.Root(), "installer", "N-Connect.iss"));
+        string iss = File.ReadAllText(Path.Combine(Repo.Root(), "installer", "SKZ-Connect.iss"));
         Assert.Contains("Result := '--setup-theme=' + ThemeValue;", iss);
         Assert.Contains("Result := '--setup-lang=' + ChosenLangCode + ' ' + Result;", iss);
         Assert.DoesNotContain("'--setup-lang=' + InstallerLangCode", iss);
@@ -233,7 +233,7 @@ public sealed class LanguageAndThemeTests : IDisposable
     public void InstallerKenntSeineSprachenWieDieApp()
     {
         // Zeilenenden vereinheitlichen (Checkout mit core.autocrlf, z. B. auf dem Windows-Runner der CI).
-        string iss = File.ReadAllText(Path.Combine(Repo.Root(), "installer", "N-Connect.iss")).Replace("\r\n", "\n");
+        string iss = File.ReadAllText(Path.Combine(Repo.Root(), "installer", "SKZ-Connect.iss")).Replace("\r\n", "\n");
 
         string windows = Regex.Match(iss, @"function WindowsLangCode: String;.*?\nend;", RegexOptions.Singleline).Value;
         var lcids = Regex.Matches(windows, @"\$([0-9A-F]{2}): Result := '([a-z]+)'").ToList();
@@ -272,7 +272,7 @@ public sealed class LanguageAndThemeTests : IDisposable
     [Fact]
     public void InstallerVerwirftNurDenEigenenVorschlag()
     {
-        string iss = File.ReadAllText(Path.Combine(Repo.Root(), "installer", "N-Connect.iss")).Replace("\r\n", "\n");
+        string iss = File.ReadAllText(Path.Combine(Repo.Root(), "installer", "SKZ-Connect.iss")).Replace("\r\n", "\n");
         string chosen = Regex.Match(iss, @"function ChosenLangCode: String;.*?\nend;", RegexOptions.Singleline).Value;
         Assert.NotEqual("", chosen);
         var proposal = Regex.Match(chosen,

@@ -14,7 +14,7 @@ namespace NConnect.Android.Core;
 /// </summary>
 internal static partial class UpdateCheck
 {
-    private const string Releases = "https://api.github.com/repos/DevCatSKZ/N-Connect/releases?per_page=30";
+    private const string Releases = "https://api.github.com/repos/DevCatSKZ/SKZ-Connect/releases?per_page=30";
 
     public enum CheckStatus { UpToDate, Available, Failed }
 
@@ -133,7 +133,7 @@ internal static partial class UpdateCheck
     {
         var http = handler is null ? new HttpClient() : new HttpClient(handler, disposeHandler: false);
         http.Timeout = timeout;
-        http.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("N-Connect", installed.ToString()));
+        http.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("SKZ-Connect", installed.ToString()));
         return http;
     }
 }

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-N-Connect-Menü (Programme → N-Connect): verbundene Controller mit Akku, Trennen, Anleitung, Diagnose, Protokoll.
+SKZ-Connect-Menü (Programme → SKZ Connect): verbundene Controller mit Akku, Trennen, Anleitung, Diagnose, Protokoll.
 Aufruf mit Argument: RunScript(service.nconnect,help|selftest|log|disconnect-all).
 """
 
@@ -160,7 +160,7 @@ def menu():
             entries.append((item(text(30617)), ('log', None)))
             entries.append((item(text(30618)), ('settings', None)))
 
-        choice = dialog.select('N-Connect', [e[0] for e in entries], useDetails=True)
+        choice = dialog.select('SKZ Connect', [e[0] for e in entries], useDetails=True)
         if choice < 0:
             return
         action, data = entries[choice][1]

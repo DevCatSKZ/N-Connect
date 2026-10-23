@@ -10,7 +10,7 @@
 ### Der Switch-2-Controller verbindet sich nicht
 
 - Die SYNC-Taste nur kurz drücken, nicht halten.
-- Steht der Controller in den Bluetooth-Einstellungen von Windows, dort entfernen. N-Connect entfernt eine solche
+- Steht der Controller in den Bluetooth-Einstellungen von Windows, dort entfernen. SKZ Connect entfernt eine solche
   Kopplung zwar selbst, sie stört aber, solange sie besteht.
 - Eine Switch 2 in der Nähe in den Ruhemodus versetzen, damit sie den Controller nicht übernimmt.
 - Ohne Bluetooth LE am Adapter gehen Switch-2-Controller nur per USB-Kabel (Pro Controller 2, GameCube-Controller).
@@ -40,7 +40,7 @@ weiterentwickelt. Lädt Windows den Treiber nach einem Update nicht mehr, bitte 
 
 ### Verbindung schwach oder viele Controller gleichzeitig
 
-- Liefert ein Controller dauerhaft weniger als 20 Berichte pro Sekunde, blendet N-Connect einen Hinweis ein. Abstand
+- Liefert ein Controller dauerhaft weniger als 20 Berichte pro Sekunde, blendet SKZ Connect einen Hinweis ein. Abstand
   zum Adapter verringern; einen USB-Bluetooth-Stick nicht direkt neben USB-3-Geräten betreiben (ein
   Verlängerungskabel hilft).
 - Einfache Bluetooth-Sticks schaffen oft nur zwei bis drei Controller gleichzeitig. Für mehr hilft ein
@@ -49,12 +49,12 @@ weiterentwickelt. Lädt Windows den Treiber nach einem Update nicht mehr, bitte 
 ### Emulatoren bekommen keine Bewegungsdaten
 
 *Allgemein › Erweitert › Gyro für Emulatoren (DSU)* muss an sein; eine Änderung wirkt nach einem Neustart von
-N-Connect. Belegt ein anderes Programm den Port 26760 (etwa DS4Windows), läuft N-Connect ohne DSU und vermerkt das im
+SKZ-Connect. Belegt ein anderes Programm den Port 26760 (etwa DS4Windows), läuft SKZ Connect ohne DSU und vermerkt das im
 Protokoll.
 
 ### Meldung „Einstellungen wiederhergestellt“ oder „Einstellungen fehlerhaft“
 
-Die Datei `settings.json` war nicht lesbar. N-Connect hat die letzte Sicherung (`settings.json.bak`) bzw. die
+Die Datei `settings.json` war nicht lesbar. SKZ Connect hat die letzte Sicherung (`settings.json.bak`) bzw. die
 Standardwerte geladen und die unlesbare Datei als `settings.json.unlesbar-<Datum>` aufbewahrt. Ein Klick auf die
 Meldung zeigt die Datei im Explorer.
 
@@ -82,7 +82,7 @@ Auf der Controller-Seite muss oben „Bereit“ stehen. Steht dort, dass Shizuku
 
 ### Die Verbindung bricht beim Spielen ab
 
-N-Connect von der Akku-Optimierung ausnehmen: *Einstellungen › Apps › N-Connect › Akku › Nicht eingeschränkt*.
+SKZ Connect von der Akku-Optimierung ausnehmen: *Einstellungen › Apps › SKZ Connect › Akku › Nicht eingeschränkt*.
 
 ### Doppelte Eingaben
 
@@ -95,13 +95,13 @@ eingetragene Bluetooth-Adresse des Geräts (*Einstellungen › Verbindung*).
 
 ### Die Touch-Steuerung lässt sich nicht einschalten
 
-Ab Android 13 sind Bedienungshilfen von Apps außerhalb des Play Store zunächst gesperrt: App-Info von N-Connect ›
+Ab Android 13 sind Bedienungshilfen von Apps außerhalb des Play Store zunächst gesperrt: App-Info von SKZ Connect ›
 Menü (⋮) › „Eingeschränkte Einstellungen zulassen“.
 
-### Kodi zeigt den Stand von N-Connect nicht an
+### Kodi zeigt den Stand von SKZ Connect nicht an
 
-Nach einer Neuinstallation von N-Connect kann noch eine alte `status.json` in `Documents/N-Connect` liegen, die die
-App nicht ändern darf; *Hilfe › Kodi* weist dann darauf hin. Die alte Datei mit einem Dateimanager löschen, N-Connect
+Nach einer Neuinstallation von SKZ Connect kann noch eine alte `status.json` in `Documents/SKZ Connect` liegen, die die
+App nicht ändern darf; *Hilfe › Kodi* weist dann darauf hin. Die alte Datei mit einem Dateimanager löschen, SKZ Connect
 beenden und wieder öffnen. Außerdem Kodi den Zugriff auf Dateien erlauben.
 
 ## Kodi
@@ -124,21 +124,21 @@ wird (*LibreELEC-Einstellungen › Verbindungen*), oder per Kabel ins Netz gehen
 
 Abstand zum Bluetooth-Adapter verringern; ein USB-Verlängerungskabel für den Stick hilft gegen Störungen durch USB 3.
 
-### Meldung „N-Connect beendet sich immer wieder“
+### Meldung „SKZ Connect beendet sich immer wieder“
 
 Im Menü *Protokoll anzeigen* und den Fehler mit dem Protokoll melden. Unter Desktop-Linux startet der Dienst ohne
 root-Rechte nicht.
 
 ### Im Begleitmodus bleibt die Anzeige leer
 
-Die N-Connect-App auf demselben Gerät muss laufen (Android ab 0.9.1). Wurde Kodi erst nach N-Connect installiert,
-N-Connect einmal neu starten. Unter macOS gibt es keine App, dort bleibt die Anzeige leer.
+Die SKZ-Connect-App auf demselben Gerät muss laufen (Android ab 0.9.1). Wurde Kodi erst nach SKZ Connect installiert,
+SKZ Connect einmal neu starten. Unter macOS gibt es keine App, dort bleibt die Anzeige leer.
 
 ## Portable Version
 
-- Auf der [Release-Seite](https://github.com/DevCatSKZ/N-Connect/releases/latest) liegt
-  `N-Connect-Portable-<Version>.zip` mit `N-Connect.exe`, `portable.txt`, `LICENSE` und `THIRD-PARTY-NOTICES.md`. In
-  einen Ordner entpacken und `N-Connect.exe` starten.
+- Auf der [Release-Seite](https://github.com/DevCatSKZ/SKZ-Connect/releases/latest) liegt
+  `SKZ-Connect-Portable-<Version>.zip` mit `SKZ-Connect.exe`, `portable.txt`, `LICENSE` und `THIRD-PARTY-NOTICES.md`. In
+  einen Ordner entpacken und `SKZ-Connect.exe` starten.
 - Einstellungen und Protokoll liegen im Unterordner `data` neben der EXE statt in `%APPDATA%` und `%LOCALAPPDATA%`.
 - Die Treiber [ViGEmBus](https://github.com/nefarius/ViGEmBus/releases) und
   [HidHide](https://github.com/nefarius/HidHide/releases) müssen auf jedem PC einmal installiert sein.
@@ -147,7 +147,7 @@ N-Connect einmal neu starten. Unter macOS gibt es keine App, dort bleibt die Anz
 
 ## Diagnose und Fehler melden
 
-Fehler bitte als [Issue](https://github.com/DevCatSKZ/N-Connect/issues) melden: was passiert ist, welcher Controller,
+Fehler bitte als [Issue](https://github.com/DevCatSKZ/SKZ-Connect/issues) melden: was passiert ist, welcher Controller,
 welches System – und möglichst mit Diagnose.
 
 - **Windows:** *Allgemein › Erweitert › Diagnose exportieren* erstellt eine ZIP-Datei mit Protokoll, Einstellungen und

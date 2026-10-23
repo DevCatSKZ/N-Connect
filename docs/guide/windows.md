@@ -1,8 +1,8 @@
-# N-Connect for Windows
+# SKZ Connect for Windows
 
 [Deutsch](../anleitung/windows.md) · **English** · As of version 1.0.22
 
-N-Connect connects Nintendo, PlayStation and Xbox controllers to Windows and passes them on to games, Steam and
+SKZ Connect connects Nintendo, PlayStation and Xbox controllers to Windows and passes them on to games, Steam and
 emulators as a virtual Xbox 360 or DualShock 4 controller. Problems and solutions:
 [Troubleshooting](troubleshooting.md).
 
@@ -15,17 +15,17 @@ emulators as a virtual Xbox 360 or DualShock 4 controller. Problems and solution
 
 ## Installation
 
-1. Download `N-Connect-Setup-<version>.exe` from the
-   [release page](https://github.com/DevCatSKZ/N-Connect/releases/latest) and run it.
+1. Download `SKZ-Connect-Setup-<version>.exe` from the
+   [release page](https://github.com/DevCatSKZ/SKZ-Connect/releases/latest) and run it.
 2. Setup and app are not code-signed, so Windows SmartScreen shows “Windows protected your PC”: “More info” ›
    “Run anyway”.
 3. If the drivers are missing, setup installs their official, signed installers:
    [ViGEmBus](https://github.com/nefarius/ViGEmBus) 1.22.0 creates the virtual controllers,
    [HidHide](https://github.com/nefarius/HidHide) 1.5.230.0 hides the original controllers from games. After installing
    HidHide, setup asks for a restart.
-4. N-Connect starts in the notification area of the taskbar (system tray). Click the icon to open the window.
+4. SKZ Connect starts in the notification area of the taskbar (system tray). Click the icon to open the window.
 
-Setup also creates the scheduled task “N-Connect HidHide” so that hiding works without a prompt (see
+Setup also creates the scheduled task “SKZ Connect HidHide” so that hiding works without a prompt (see
 [Duplicate controllers](#avoiding-duplicate-controllers)). Uninstalling removes the task, the autostart entry and the
 HidHide permission; ViGEmBus and HidHide themselves stay installed because other programs may use them.
 
@@ -36,24 +36,24 @@ Without installing: [portable version](troubleshooting.md#portable-version).
 | Controller | How to |
 |---|---|
 | Switch 2: Pro Controller 2, Joy-Con 2, GameCube controller | Briefly press the small SYNC button. After a few seconds the controller vibrates. Pro Controller 2 and GameCube controller also work via USB cable. |
-| Switch 1: Pro Controller, Joy-Con, NES, SNES, N64, Mega Drive | Press the SYNC button until the lights run. N-Connect pairs the controller itself. |
+| Switch 1: Pro Controller, Joy-Con, NES, SNES, N64, Mega Drive | Press the SYNC button until the lights run. SKZ Connect pairs the controller itself. |
 | Wii Remote | Open the battery compartment and press the red SYNC button. |
 | Wii U Pro Controller | Press the SYNC button on the bottom. |
-| DualShock 4, DualSense | Hold PS + Share or PS + Create until the light bar blinks quickly; N-Connect pairs it itself. Alternatively via USB cable or the Windows Bluetooth settings. |
+| DualShock 4, DualSense | Hold PS + Share or PS + Create until the light bar blinks quickly; SKZ Connect pairs it itself. Alternatively via USB cable or the Windows Bluetooth settings. |
 | Xbox | As usual via USB, Bluetooth or the Xbox Wireless Adapter. Over Bluetooth, “Pair controller …” can also pair the controller (hold the pairing button on top). |
 | Wired controllers by HORI, PowerA, PDP | Plug in the USB cable. |
 
 After that, a single button press is enough next time. Up to 8 controllers work at the same time.
 
 - Do not pair Switch 2 controllers via “Bluetooth › Add device”. Such a Windows pairing disturbs the connection;
-  N-Connect removes it itself.
+  SKZ Connect removes it itself.
 - A Switch 2 controller remembers exactly one device. To use it on the Switch 2 again, pair it there once with SYNC;
   afterwards press SYNC on the PC again.
-- N-Connect looks for new controllers in the background, but not while someone is playing. For a targeted search, use
+- SKZ Connect looks for new controllers in the background, but not while someone is playing. For a targeted search, use
   “Search for controllers …” on the Controllers page or “Pair controller …” in the notification area menu (for one
   minute).
 - PlayStation and Xbox controllers via Bluetooth, Joy-Con in the charging grip and wired controllers have not yet been
-  tested with real hardware. Please send feedback as an [issue](https://github.com/DevCatSKZ/N-Connect/issues).
+  tested with real hardware. Please send feedback as an [issue](https://github.com/DevCatSKZ/SKZ-Connect/issues).
 
 ## Window and notification area
 
@@ -71,7 +71,7 @@ After that, a single button press is enough next time. Up to 8 controllers work 
   **DualShock 4** (with motion data for Steam and emulators). Per controller: card › Settings › Buttons ›
   *Appears as*.
 - *A/B/X/Y layout*: Xbox (by position, the bottom button is A) or Nintendo (by label).
-- Xbox controllers do not get a virtual controller; games see them directly. N-Connect shows battery and player slot
+- Xbox controllers do not get a virtual controller; games see them directly. SKZ Connect shows battery and player slot
   and adds keyboard, mouse, macro and gyro mappings.
 
 ## Buttons and profiles
@@ -88,7 +88,7 @@ After that, a single button press is enough next time. Up to 8 controllers work 
 - *Sticks & vibration* page: dead zone, response curve, trigger thresholds (GameCube), vibration and strength, turbo
   speed; separate values per controller type are possible.
 - **Calibrate sticks:** card › Settings › Fine-tuning › *Calibrate …*. It measures center and edge; the values are
-  stored only in N-Connect, the controller itself stays unchanged.
+  stored only in SKZ Connect, the controller itself stays unchanged.
 - **Test page:** the card's *Test* tab – sticks with roundness display, triggers, motion sensors, buttons, report rate
   and rumble test.
 
@@ -98,7 +98,7 @@ After that, a single button press is enough next time. Up to 8 controllers work 
   and flick stick. Set it up with a preview: card › Settings › Gyro › *Set up …*.
 - **Gyro for emulators (DSU):** *General › Advanced* (on by default). In the emulator, such as Cemu or Dolphin, enter
   `127.0.0.1` and port `26760` as the DSU/Cemuhook source; players 1 to 4 take the slots. A change takes effect after
-  restarting N-Connect. If another program already uses the port (such as DS4Windows), N-Connect runs without DSU.
+  restarting SKZ-Connect. If another program already uses the port (such as DS4Windows), SKZ Connect runs without DSU.
 
 ## Joy-Con and Wii
 
@@ -132,24 +132,24 @@ would otherwise see them twice.
   back/forward, Start Enter, Back Esc, HOME Start menu, hold RT for a precise pointer. Hold Back + Start for one
   second to pause it; it is off in full-screen games and in programs with their own profile.
 - **Desktop widget** (*General*, off by default): small card on the desktop with controllers, battery and connection.
-  Right-click for options, double-click opens N-Connect.
+  Right-click for options, double-click opens SKZ-Connect.
 
 ## Kodi on this PC
 
 *General › Kodi › Set up the DevCatSKZ Repository in Kodi* places the repository directly in Kodi. Then in Kodi:
-Add-ons › My add-ons › Add-on repository › DevCatSKZ Repository › Enable, then install N-Connect from it.
+Add-ons › My add-ons › Add-on repository › DevCatSKZ Repository › Enable, then install SKZ Connect from it.
 Kodi sees the controllers as Xbox controllers even without the add-on; the add-on additionally shows status and widget
 (companion mode). *Download repository* saves the ZIP for another device. More: [Kodi](kodi.md).
 
 ## App and files
 
-- **Updates:** At startup, N-Connect checks GitHub for a new version (can be turned off under *General › Advanced ›
+- **Updates:** At startup, SKZ Connect checks GitHub for a new version (can be turned off under *General › Advanced ›
   Check for updates*). After you confirm, it downloads the update from GitHub only, checks its size and – if GitHub
   provides it – the SHA-256 checksum, and installs it.
 - **Appearance and language:** Dark, Light or Like Windows, five color schemes, 12 languages (“Automatic (like
   Windows)” follows the Windows display language).
 - **Start with Windows** (*General › Connecting*, on after the first start).
-- **Files:** settings `%APPDATA%\N-Connect\settings.json`, log `%LOCALAPPDATA%\N-Connect\bridge.log`;
+- **Files:** settings `%APPDATA%\SKZ-Connect\settings.json`, log `%LOCALAPPDATA%\SKZ-Connect\bridge.log`;
   in the portable version in the `data` folder next to the EXE.
 - **Third-party licences:** *General › Advanced* opens `THIRD-PARTY-NOTICES.md` from the program folder.
 - **Drivers:** ViGEmBus has been archived since 2023 and no longer receives fixes; existing installations keep

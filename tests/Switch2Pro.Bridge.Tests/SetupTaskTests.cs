@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 namespace Switch2Pro.Bridge.Tests;
 
 /// <summary>
-/// Geplante Aufgabe „N-Connect HidHide“ im Setup: läuft als SYSTEM und darf von jedem angemeldeten Benutzer gestartet
+/// Geplante Aufgabe „SKZ Connect HidHide“ im Setup: läuft als SYSTEM und darf von jedem angemeldeten Benutzer gestartet
 /// werden – deshalb nur für eine EXE, die Benutzer ohne Adminrechte nicht austauschen können.
 /// </summary>
 public sealed class SetupTaskTests
@@ -17,8 +17,8 @@ public sealed class SetupTaskTests
     }
 
     /// <summary>
-    /// Die SYSTEM-Aufgabe startet {app}\N-Connect.exe, und jeder Benutzer darf sie starten. In einem frei gewählten Ordner
-    /// (z. B. C:\N-Connect erbt „Ändern“ für alle) könnte jeder die EXE tauschen – deshalb nur unter „Programme“, und eine
+    /// Die SYSTEM-Aufgabe startet {app}\SKZ-Connect.exe, und jeder Benutzer darf sie starten. In einem frei gewählten Ordner
+    /// (z. B. C:\SKZ Connect erbt „Ändern“ für alle) könnte jeder die EXE tauschen – deshalb nur unter „Programme“, und eine
     /// Aufgabe einer früheren Installation an anderem Ort wird entfernt.
     /// </summary>
     [Fact]
@@ -40,7 +40,7 @@ public sealed class SetupTaskTests
     }
 
     private static string Iss() =>
-        File.ReadAllText(Path.Combine(Repo.Root(), "installer", "N-Connect.iss")).Replace("\r\n", "\n");
+        File.ReadAllText(Path.Combine(Repo.Root(), "installer", "SKZ-Connect.iss")).Replace("\r\n", "\n");
 
     private static string Function(string iss, string header)
     {

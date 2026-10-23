@@ -6,7 +6,7 @@ using System.Drawing.Text;
 namespace Switch2Pro.Bridge;
 
 /// <summary>
-/// Logo von N-Connect in der DevCat-Bildsprache (wie SKZ Monitor und SKZ Remote): Gamepad mit Katzenohren und
+/// Logo von SKZ Connect in der DevCat-Bildsprache (wie SKZ Monitor und SKZ Remote): Gamepad mit Katzenohren und
 /// leuchtenden Cyan-Augen auf dunkler Navy-Kachel, Iris-Verlauf (Teal-Blau-Violett) am Rahmen, amber Nase und
 /// Wi-Fi-Bögen als Connect-Signatur. Wird als Vektor gezeichnet (Fenster, Infobereich) und per
 /// <c>--render-brand</c> als Programm-Icon und Installer-Grafiken gespeichert (ohne Fenster).
@@ -24,7 +24,7 @@ internal static class Branding
         try
         {
             // Nicht ExtractAssociatedIcon: das liefert nur 32 px, verkleinert auf die Titelleiste wirkt der Rand pixelig.
-            using var stream = typeof(Branding).Assembly.GetManifestResourceStream("N-Connect.ico");
+            using var stream = typeof(Branding).Assembly.GetManifestResourceStream("SKZ-Connect.ico");
             if (stream is not null)
                 return new Icon(stream);
         }
@@ -222,7 +222,7 @@ internal static class Branding
     {
         Directory.CreateDirectory(folder);
         // ICO: nur das Glyph mit transparentem Grund – wie bei SKZ, im Tray soll kein Kasten kleben.
-        WriteIco(Path.Combine(folder, "N-Connect.ico"), [16, 20, 24, 32, 40, 48, 64, 96, 128, 256]);
+        WriteIco(Path.Combine(folder, "SKZ-Connect.ico"), [16, 20, 24, 32, 40, 48, 64, 96, 128, 256]);
         // PNG-Master (Android, Kodi, Installer, Website): Navy-Fläche wie bei den SKZ-Icons, Glyph ~94 %.
         using (var png = new Bitmap(512, 512, PixelFormat.Format32bppArgb))
         {
@@ -235,7 +235,7 @@ internal static class Branding
                 float m = 512 * 0.03f;
                 DrawLogo(g, new RectangleF(m, m, 512 - 2 * m, 512 - 2 * m), tile: false);
             }
-            png.Save(Path.Combine(folder, "N-Connect.png"), ImageFormat.Png);
+            png.Save(Path.Combine(folder, "SKZ-Connect.png"), ImageFormat.Png);
         }
         // Inno Setup wählt je nach Bildschirmskalierung die passende Größe (100 %, 150 %, 200 %).
         foreach (var (w, h, tag) in new[] { (164, 314, "100"), (246, 471, "150"), (328, 628, "200") })
@@ -264,7 +264,7 @@ internal static class Branding
         using var sub = new Font("Segoe UI", 10.5f * k, GraphicsUnit.Pixel);
         using var center = new StringFormat { Alignment = StringAlignment.Center };
         float y = h * 0.20f + logo + 18 * k;
-        g.DrawString("N-Connect", title, Brushes.White, new RectangleF(0, y, w, 30 * k), center);
+        g.DrawString("SKZ Connect", title, Brushes.White, new RectangleF(0, y, w, 30 * k), center);
         using (var muted = new SolidBrush(Color.FromArgb(0xC5, 0xC5, 0xC5)))
             g.DrawString("Switch · Switch 2 · Wii · Wii U\nController für Windows", sub, muted,
                 new RectangleF(6 * k, y + 30 * k, w - 12 * k, 40 * k), center);

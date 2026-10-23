@@ -77,16 +77,16 @@ internal static class RenderCheck
             "Spieler 2: nach 15 min ohne Eingabe getrennt",
             "Profil „Zelda“ aktiv", "Bluetooth LE · 33 Berichte/s", "60 %  (3,70 V)  ⚡ lädt",
             $"Spieler 1  ·  {pro}  ·  Gyro-Maus", "Erst den Ring-Con ausschalten (Ring-Con und IR-Kamera nutzen denselben Zusatzprozessor).",
-            "Xbox · Platz 1 · nativ", "Xbox · nativ", "N-Connect: Bluetooth ist ausgeschaltet.", "N-Connect: ViGEmBus fehlt",
+            "Xbox · Platz 1 · nativ", "Xbox · nativ", "SKZ Connect: Bluetooth ist ausgeschaltet.", "SKZ Connect: ViGEmBus fehlt",
             $"Gekoppelt: {pro}\nDer Controller erscheint gleich in der Übersicht.",
             "Mitte 2048 / 2048 · Abweichung vom Kreis: vorher 12 %, neu 3 %", "320 × 240 · 12,5 Bilder/s",
             "Beim Drücken von „A“ wird diese Folge einmal abgespielt. Schritte durch Komma trennen …",
-            "Version 1.0.22 herunterladen und installieren? N-Connect wird dafür kurz beendet und danach wieder gestartet.",
-            "Version 1.0.22 herunterladen und installieren? N-Connect wird dafür kurz beendet und danach wieder gestartet. " +
+            "Version 1.0.22 herunterladen und installieren? SKZ Connect wird dafür kurz beendet und danach wieder gestartet.",
+            "Version 1.0.22 herunterladen und installieren? SKZ Connect wird dafür kurz beendet und danach wieder gestartet. " +
             "Windows fragt dabei nach Administratorrechten.",
             "HidHide 1.5.230 herunterladen und installieren? Das HidHide-Setup entfernt zuerst die alte Version und verlangt einen " +
             "Neustart von Windows – bitte seinen Anweisungen folgen. Windows fragt dabei nach Administratorrechten. Danach " +
-            "versteckt N-Connect die Controller automatisch neu.",
+            "versteckt SKZ Connect die Controller automatisch neu.",
         ]);
 
         Tr.SetLanguage(language);
@@ -121,7 +121,7 @@ internal static class RenderCheck
             return false;
         string[] sameInEnglish =
         [
-            "N-Connect", "Xbox", "Nintendo", "linear", "Bluetooth", "Joy-Con", "DualShock", "Normal", "Charging Grip", "Version",
+            "SKZ Connect", "Xbox", "Nintendo", "linear", "Bluetooth", "Joy-Con", "DualShock", "Normal", "Charging Grip", "Version",
             "PlayStation", "English", "Deutsch", "Wii", "amiibo", "Ring-Con", "HOME", "Gyro", "Turbo", "Firmware", "Controller",
         ];
         return !sameInEnglish.Any(w => t.Equals(w, StringComparison.Ordinal))
@@ -328,7 +328,7 @@ internal static class RenderCheck
                 message.Close();
             };
             shot.Start();
-            Tr.Show(form, "Alle Einstellungen und Tastenbelegungen auf Standard zurücksetzen?", "N-Connect", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            Tr.Show(form, "Alle Einstellungen und Tastenbelegungen auf Standard zurücksetzen?", "SKZ Connect", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             shot.Dispose();
             form.Close();
         }

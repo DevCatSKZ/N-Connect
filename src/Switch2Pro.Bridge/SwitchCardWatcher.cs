@@ -33,7 +33,7 @@ internal sealed class SwitchCardWatcher : NativeWindow, IDisposable
     {
         _ui = SynchronizationContext.Current ?? new WindowsFormsSynchronizationContext();
         // Unsichtbares Fenster der obersten Ebene (ohne WS_VISIBLE, nicht in der Taskleiste).
-        CreateHandle(new CreateParams { Caption = "N-Connect SD", ExStyle = 0x80 /* WS_EX_TOOLWINDOW */ });
+        CreateHandle(new CreateParams { Caption = "SKZ Connect SD", ExStyle = 0x80 /* WS_EX_TOOLWINDOW */ });
     }
 
     protected override void WndProc(ref Message m)

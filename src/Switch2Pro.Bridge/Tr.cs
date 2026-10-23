@@ -242,11 +242,11 @@ internal static partial class Tr
         (Re(@"^HidHide (?<v>.+) ist erschienen \(installiert: (?<i>.+)\)\. Klicken zum Installieren\.$"),
             m => $"HidHide {m.Groups["v"]} is available (installed: {m.Groups["i"]}). Click to install."),
         (Re(@"^Lade HidHide (?<v>.+) herunter …$"), m => $"Downloading HidHide {m.Groups["v"]} …"),
-        (Re(@"^HidHide (?<v>.+) herunterladen und installieren\? Das HidHide-Setup entfernt zuerst die alte Version und verlangt einen Neustart von Windows – bitte seinen Anweisungen folgen\. Windows fragt dabei nach Administratorrechten\. Danach versteckt N-Connect die Controller automatisch neu\.$"),
-            m => $"Download and install HidHide {m.Groups["v"]}? The HidHide setup first removes the old version and requires a Windows restart – please follow its instructions. Windows will ask for administrator rights. Afterwards N-Connect hides the controllers again automatically."),
+        (Re(@"^HidHide (?<v>.+) herunterladen und installieren\? Das HidHide-Setup entfernt zuerst die alte Version und verlangt einen Neustart von Windows – bitte seinen Anweisungen folgen\. Windows fragt dabei nach Administratorrechten\. Danach versteckt SKZ Connect die Controller automatisch neu\.$"),
+            m => $"Download and install HidHide {m.Groups["v"]}? The HidHide setup first removes the old version and requires a Windows restart – please follow its instructions. Windows will ask for administrator rights. Afterwards SKZ Connect hides the controllers again automatically."),
         // Ohne Admin-Satz: portable Variante (ZIP), die kein Setup startet.
-        (Re(@"^Version (?<v>.+) herunterladen und installieren\? N-Connect wird dafür kurz beendet und danach wieder gestartet\.(?<a> Windows fragt dabei nach Administratorrechten\.)?$"),
-            m => $"Download and install version {m.Groups["v"]}? N-Connect closes briefly and starts again afterwards." +
+        (Re(@"^Version (?<v>.+) herunterladen und installieren\? SKZ Connect wird dafür kurz beendet und danach wieder gestartet\.(?<a> Windows fragt dabei nach Administratorrechten\.)?$"),
+            m => $"Download and install version {m.Groups["v"]}? SKZ Connect closes briefly and starts again afterwards." +
                  (m.Groups["a"].Success ? " Windows will ask for administrator rights." : "")),
         (Re(@"^(?<t>.+) · (?<r>\d+) Berichte/s$"), m => $"{T(m.Groups["t"].Value)} · {m.Groups["r"]} reports/s"),
         (Re(@"^(?<p>\d+ %)(?<v>  \(.*\))?  ⚡ lädt$"), m => $"{m.Groups["p"]}{m.Groups["v"]}  ⚡ charging"),
@@ -280,8 +280,8 @@ internal static partial class Tr
         // Tooltip „P1 Pro 2 57 %“: Namen bleiben, wie sie sind (nicht über spätere Muster zerlegen).
         (Re(@"^P(?<n>\d+) (?<k>.+)$"), m => m.Value),
         (Re(@"^Bluetooth nicht verfügbar: (?<e>.*)$"), m => $"Bluetooth not available: {m.Groups["e"]}"),
-        // Tooltip des Symbols „N-Connect: <Bluetooth-Problem>“.
-        (Re(@"^N-Connect: (?<p>.+)$"), m => $"N-Connect: {T(m.Groups["p"].Value)}"),
+        // Tooltip des Symbols „SKZ Connect: <Bluetooth-Problem>“.
+        (Re(@"^SKZ Connect: (?<p>.+)$"), m => $"SKZ Connect: {T(m.Groups["p"].Value)}"),
         (Re(@"^(?<k>.+) per USB ist von einem anderen Programm belegt \(z\. B\. Steam\)\.$"),
             m => $"{N(m, "k")} via USB is in use by another program (e.g. Steam)."),
         (Re(@"^Schon (?<n>\d+) Controller verbunden – (?<k>.+) wird nicht verwendet\.$"),

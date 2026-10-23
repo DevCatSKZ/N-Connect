@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Erzeugt von android/i18n/generate.py -->
 <resources>
-    <string name="touch_service_description">Pozwala N-Connect wykonywać przyciski twojego kontrolera jako dotknięcia ekranu (tryb dotykowy). Żadne treści nie są odczytywane ani zapisywane.</string>
-    <string name="touch_service_label">Sterowanie dotykowe N-Connect</string>
-    <string name="setup_title">Konfiguracja N-Connect</string>
+    <string name="touch_service_description">Pozwala SKZ Connect wykonywać przyciski twojego kontrolera jako dotknięcia ekranu (tryb dotykowy). Żadne treści nie są odczytywane ani zapisywane.</string>
+    <string name="touch_service_label">Sterowanie dotykowe SKZ Connect</string>
+    <string name="setup_title">Konfiguracja SKZ Connect</string>
 </resources>

@@ -60,7 +60,7 @@ public sealed class DsuServer : IDisposable
 
     /// <summary>
     /// Server der App starten und als <see cref="Instance"/> merken; läuft er schon mit derselben Einstellung, bleibt
-    /// es bei ihm. null, wenn der Port belegt ist (z. B. DS4Windows oder ein N-Connect, das sich gerade beendet) –
+    /// es bei ihm. null, wenn der Port belegt ist (z. B. DS4Windows oder ein SKZ Connect, das sich gerade beendet) –
     /// ein späterer Aufruf versucht es erneut.
     /// </summary>
     public static DsuServer? Start(bool network, Action<string> info, Action<string> warn) =>

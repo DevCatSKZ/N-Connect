@@ -81,14 +81,14 @@ public sealed class HidHideTests
     [Fact]
     public void Verstecken_GibtNurDieseExeFrei()
     {
-        Assert.Equal("--app-reg \"C:\\Program Files\\N-Connect\\N-Connect.exe\" --dev-hide \"HID\\A\\1\" --cloak-on",
-            HidHide.HideArguments(@"C:\Program Files\N-Connect\N-Connect.exe", [@"HID\A\1"]));
+        Assert.Equal("--app-reg \"C:\\Program Files\\SKZ-Connect\\SKZ-Connect.exe\" --dev-hide \"HID\\A\\1\" --cloak-on",
+            HidHide.HideArguments(@"C:\Program Files\SKZ-Connect\SKZ-Connect.exe", [@"HID\A\1"]));
     }
 
     [Fact]
     public async Task Freigeben_OhneVirtuellesPad_RuftNichtsAuf()
     {
-        // Echte bzw. nicht angeschlossene Geräte gibt N-Connect nie frei – ohne Aufgabe und ohne UAC-Abfrage.
+        // Echte bzw. nicht angeschlossene Geräte gibt SKZ Connect nie frei – ohne Aufgabe und ohne UAC-Abfrage.
         var result = await HidHide.UnhideAsync([@"HID\VID_057E&PID_2009&REV_0200\9&3a&0&0000", @"HID\VID_054C&PID_05C4&MI_03\8&2a1b3c4d&0&0000"]);
         Assert.Equal(HidHide.Outcome.Failed, result);
         Assert.Equal(HidHide.Outcome.Failed, await HidHide.UnhideAsync([]));

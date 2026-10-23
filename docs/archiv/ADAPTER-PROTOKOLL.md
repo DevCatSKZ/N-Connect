@@ -1,24 +1,24 @@
-# USB-Protokoll: Funkadapter ⇄ N-Connect
+# USB-Protokoll: Funkadapter ⇄ SKZ Connect
 
 > **Verworfen am 10.10.2026** – Grund: Der nRF52840 kann kein Bluetooth-Adapter für Windows sein (er beherrscht nur
 > Bluetooth LE), der Relais-Weg, für den dieses Protokoll gedacht war, blieb in den Tests ohne Ergebnis, und jeder Test
 > kostete ein erneutes Koppeln der Controller. `AdapterProtocol.cs`, `AdapterProtocolTests` und die Anbindung in
-> N-Connect sind in 1.0.22 entfernt. Archiv: Der Text unten beschreibt den damaligen Stand und gilt nicht mehr.
+> SKZ Connect sind in 1.0.22 entfernt. Archiv: Der Text unten beschreibt den damaligen Stand und gilt nicht mehr.
 
 Für **Weg A** (siehe [ESP32.md §5.6](ESP32.md) / [NRF52840.md](NRF52840.md)): Ein ESP32-S3 oder nRF52840 verbindet
 sich per Bluetooth LE mit den Switch-2-Controllern (er gibt sich als der PC-Bluetooth-Adapter aus) und reicht sie über
-USB an N-Connect weiter. N-Connect zeigt sie dann wie an einem normalen Stick an – mit voller Belegung, Gyro,
+USB an SKZ Connect weiter. SKZ Connect zeigt sie dann wie an einem normalen Stick an – mit voller Belegung, Gyro,
 Xbox-/DS4-Ausgabe.
 
 Der Adapter muss die Controller **nicht** selbst verstehen: Er leitet den rohen Switch-2-Eingabebericht 0x05 durch,
-den N-Connect ohnehin schon parst (`InputReports.TryParseReport05`). Umgekehrt schickt N-Connect nur einfache
+den SKZ Connect ohnehin schon parst (`InputReports.TryParseReport05`). Umgekehrt schickt SKZ Connect nur einfache
 Vibrations- und LED-Befehle; die HD-Rumble-Frames baut der Adapter daraus selbst.
 
 Gemeinsame Umsetzung: `src/Switch2Pro.Protocol/AdapterProtocol.cs` (Rahmen, CRC, Nachrichten), Tests in
 `AdapterProtocolTests`. Diese Datei ist die Referenz für die Firmware.
 
 ## 1. Transport
-USB-CDC (virtueller COM-Port), 8N1, Baudrate egal (USB-CDC ignoriert sie). N-Connect erkennt den Adapter an seiner
+USB-CDC (virtueller COM-Port), 8N1, Baudrate egal (USB-CDC ignoriert sie). SKZ Connect erkennt den Adapter an seiner
 Begrüßung (`Hello`), nicht an VID/PID – so geht jeder Nachbau.
 
 ## 2. Rahmen (SLIP + CRC16)
@@ -50,7 +50,7 @@ Art (1) | Slot (1) | Nutzdaten (0..n) | CRC16 (2, großes Byte zuerst)
 | `0x10` | `Connected` | PID (2, LE) + Controller-Adresse (6, höchstes Byte zuerst). `slot` = Platz. |
 | `0x11` | `Disconnected` | – |
 | `0x12` | `Input` | roher Bericht 0x05 (wie über BLE, ohne Report-ID). `slot` = Platz. |
-| `0x1F` | `Log` | UTF-8-Text (nur Fehlersuche; N-Connect schreibt ihn ins Protokoll). |
+| `0x1F` | `Log` | UTF-8-Text (nur Fehlersuche; SKZ Connect schreibt ihn ins Protokoll). |
 
 PID: `0x2069` Pro Controller 2, `0x2067` Joy-Con 2 L, `0x2066` Joy-Con 2 R, `0x2073` GameCube.
 
@@ -63,15 +63,15 @@ PID: `0x2069` Pro Controller 2, `0x2067` Joy-Con 2 L, `0x2066` Joy-Con 2 R, `0x2
 | `0x21` | `PlayerLed` | Muster (1, Bitmaske wie Switch: Spieler 1–8 → `01 03 07 0F 09 05 0D 06`). `slot` = Platz. |
 
 ## 4. Ablauf
-1. N-Connect öffnet den Port, schickt `Ping`, erwartet `Hello` mit passender Version.
-2. N-Connect schickt `SetHost` mit der Adresse, als die der Adapter auftreten soll (aus dem ESP32-/nRF52840-Export).
+1. SKZ Connect öffnet den Port, schickt `Ping`, erwartet `Hello` mit passender Version.
+2. SKZ Connect schickt `SetHost` mit der Adresse, als die der Adapter auftreten soll (aus dem ESP32-/nRF52840-Export).
 3. Der Adapter sucht nach Werbung `0x0553`, deren Byte 10–15 diese Adresse ist, verbindet sich (BLE, ohne Pairing),
    startet den Controller (Feature-Maske setzen/einschalten, siehe [PROTOKOLLE §1.3](../PROTOKOLLE.md)) und meldet
    `Connected`.
-4. Laufend: Adapter → `Input` je Bericht; N-Connect → `Rumble`/`PlayerLed` bei Bedarf.
-5. Beim Abbruch meldet der Adapter `Disconnected`; N-Connect entfernt den Spieler.
+4. Laufend: Adapter → `Input` je Bericht; SKZ Connect → `Rumble`/`PlayerLed` bei Bedarf.
+5. Beim Abbruch meldet der Adapter `Disconnected`; SKZ Connect entfernt den Spieler.
 
-## 5. N-Connect-Seite
+## 5. SKZ-Connect-Seite
 Eine neue Verbindungsart (`IControllerLink` über den COM-Port) macht aus jedem `Connected`/`Input` einen normalen
 Spieler. Vibration/LED gehen als `Rumble`/`PlayerLed` zurück. Status: **noch nicht umgesetzt** – das Rahmenprotokoll
-(diese Seite) steht und ist getestet; Firmware und die N-Connect-Verbindungsart folgen.
+(diese Seite) steht und ist getestet; Firmware und die SKZ-Connect-Verbindungsart folgen.

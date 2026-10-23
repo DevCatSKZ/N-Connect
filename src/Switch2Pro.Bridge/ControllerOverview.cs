@@ -35,7 +35,7 @@ internal sealed class ControllerOverview : Panel
         ForeColor = MutedColor, BackColor = Background, Font = UiFonts.Body,
         Text = "Kein Controller verbunden\n\n" +
                "Switch-2-Controller: kurz die SYNC-Taste drücken – danach reicht ein beliebiger Tastendruck.\n" +
-               "Switch-1-, NSO- und Wii-Controller: SYNC-Taste drücken – N-Connect koppelt sie selbst.\n" +
+               "Switch-1-, NSO- und Wii-Controller: SYNC-Taste drücken – SKZ Connect koppelt sie selbst.\n" +
                "Oder hier gezielt suchen und koppeln:",
     };
     /// <summary>Suche/Kopplung (Fenster „Controller koppeln“) – Knopf in der Übersicht und Leiste unten.</summary>
@@ -498,7 +498,7 @@ internal sealed class ControllerOverview : Panel
                     form.ShowDialog(FindForm());
                 };
                 var group = Group(Row("Sticks kalibrieren", "Gegen Drift oder zu kleinen Ausschlag: Mitte und Rand neu messen. " +
-                    "Wird nur in N-Connect gespeichert, der Controller bleibt unverändert.", calibrate, Glyph.Stick));
+                    "Wird nur in SKZ Connect gespeichert, der Controller bleibt unverändert.", calibrate, Glyph.Stick));
                 column.Controls.Add(group);
                 column.Controls.SetChildIndex(group, 0);
             }

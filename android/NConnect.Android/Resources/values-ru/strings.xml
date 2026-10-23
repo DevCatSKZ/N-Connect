@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Erzeugt von android/i18n/generate.py -->
 <resources>
-    <string name="touch_service_description">Позволяет N-Connect выполнять кнопки вашего контроллера как касания экрана (сенсорный режим). Никакое содержимое не читается и не сохраняется.</string>
-    <string name="touch_service_label">Сенсорное управление N-Connect</string>
-    <string name="setup_title">Настройка N-Connect</string>
+    <string name="touch_service_description">Позволяет SKZ Connect выполнять кнопки вашего контроллера как касания экрана (сенсорный режим). Никакое содержимое не читается и не сохраняется.</string>
+    <string name="touch_service_label">Сенсорное управление SKZ Connect</string>
+    <string name="setup_title">Настройка SKZ Connect</string>
 </resources>

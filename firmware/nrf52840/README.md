@@ -1,8 +1,8 @@
 # nRF52840-Firmware (verworfen, nur Referenz)
 
 > **Verworfen am 10.10.2026** – Grund: Der nRF52840 kann kein Bluetooth-Adapter für Windows sein (er beherrscht nur
-> Bluetooth LE), der Relais-Weg (Dongle verbindet die Controller und reicht sie per USB an N-Connect weiter) blieb in
-> den Tests ohne Ergebnis, und jeder Test kostete ein erneutes Koppeln der Controller. N-Connect enthält seit 1.0.22
+> Bluetooth LE), der Relais-Weg (Dongle verbindet die Controller und reicht sie per USB an SKZ Connect weiter) blieb in
+> den Tests ohne Ergebnis, und jeder Test kostete ein erneutes Koppeln der Controller. SKZ Connect enthält seit 1.0.22
 > weder die Gegenstelle noch einen Export der Kopplungsdaten für diese Firmware. Der Code wird nicht weiterentwickelt.
 
 Der Code bleibt als Referenz für den BLE-Ablauf eines Switch-2-Controllers aus Sicht eines eigenen Hosts: Werbung
@@ -12,7 +12,7 @@ GATT-Verbindung aufbauen, Bericht 0x05 abonnieren. Der GATT-Teil wurde nie mit e
 
 - Controller-Protokoll (GATT, Befehle, Bericht 0x05): [../../docs/PROTOKOLLE.md](../../docs/PROTOKOLLE.md)
 - Damaliger Plan und Grenzen: [../../docs/archiv/NRF52840.md](../../docs/archiv/NRF52840.md)
-- USB-Protokoll zur früheren Gegenstelle in N-Connect: [../../docs/archiv/ADAPTER-PROTOKOLL.md](../../docs/archiv/ADAPTER-PROTOKOLL.md)
+- USB-Protokoll zur früheren Gegenstelle in SKZ Connect: [../../docs/archiv/ADAPTER-PROTOKOLL.md](../../docs/archiv/ADAPTER-PROTOKOLL.md)
 
 ## BLE-Referenz aus dem Mitschnitt
 
@@ -29,7 +29,7 @@ Festgehalten:
 ## Bauen und Flashen
 
 Nur für Versuche mit der Referenz. `src/main.c` erwartet eine Datei `nconnect_pairing.h` neben sich, die
-`NCONNECT_HOST_ADDR_LE[6]` definiert (Adresse des PC-Adapters, niedrigstes Byte zuerst). N-Connect erzeugt diese
+`NCONNECT_HOST_ADDR_LE[6]` definiert (Adresse des PC-Adapters, niedrigstes Byte zuerst). SKZ Connect erzeugt diese
 Datei nicht mehr; sie muss von Hand angelegt werden.
 
 Voraussetzungen: nRF Connect SDK (Zephyr) ab v2.6 mit Toolchain (`west`, arm-none-eabi-gcc) und `nrfutil` oder

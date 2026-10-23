@@ -46,7 +46,7 @@ internal sealed class PairForm : UiForm
 
         var content = _page.Content;
         content.Controls.Add(new Heading("Controller verbinden", page: true,
-            subtitle: "SYNC-Taste am Controller drücken – N-Connect findet und koppelt ihn selbst. Danach reicht künftig ein Tastendruck."));
+            subtitle: "SYNC-Taste am Controller drücken – SKZ Connect findet und koppelt ihn selbst. Danach reicht künftig ein Tastendruck."));
         // Oben, was gerade passiert und was schon verbunden ist – darunter die Anleitung.
         _page.AddGroup("Status", _status);
         content.Controls.Add(_connectedHeading);

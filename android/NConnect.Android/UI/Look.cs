@@ -7,7 +7,7 @@ using Color = Android.Graphics.Color;
 namespace NConnect.Android.UI;
 
 /// <summary>
-/// Aussehen wie in N-Connect für Windows: dieselben Farbschemata (Windows, Neon, Aurora, Sunset, Joy-Con, aus
+/// Aussehen wie in SKZ Connect für Windows: dieselben Farbschemata (Windows, Neon, Aurora, Sunset, Joy-Con, aus
 /// <see cref="ColorSchemes"/>) und dieselbe Wahl Dunkel/Hell/Wie System (<see cref="Settings.Theme"/>,
 /// <see cref="Settings.ColorScheme"/> – gleiche Einstellungsdatei).
 /// </summary>

@@ -18,7 +18,7 @@ public sealed partial class ThirdPartyNoticesTests
         Assert.Equal("THIRD-PARTY-NOTICES.md", SettingsForm.NoticesFile);
         Assert.True(File.Exists(RepoFile(SettingsForm.NoticesFile)));
         // Das Setup legt sie neben die EXE – dort sucht „Lizenzen Dritter“ (Allgemein → Erweitert).
-        string iss = File.ReadAllText(RepoFile("installer", "N-Connect.iss"));
+        string iss = File.ReadAllText(RepoFile("installer", "SKZ-Connect.iss"));
         Assert.Contains($"Source: \"..\\{SettingsForm.NoticesFile}\"; DestDir: \"{{app}}\"", iss);
         // Android: dieselbe Datei als Asset (Hilfe → Lizenzen), nicht als zweite Kopie im Projekt.
         string android = File.ReadAllText(RepoFile("android", "NConnect.Android", "NConnect.Android.csproj"));
@@ -26,7 +26,7 @@ public sealed partial class ThirdPartyNoticesTests
         Assert.False(File.Exists(RepoFile("android", "NConnect.Android", "Assets", SettingsForm.NoticesFile)));
     }
 
-    /// <summary>Projekte, deren Pakete mit N-Connect weitergegeben werden (ohne Tests und Prüfwerkzeuge).</summary>
+    /// <summary>Projekte, deren Pakete mit SKZ Connect weitergegeben werden (ohne Tests und Prüfwerkzeuge).</summary>
     public static TheoryData<string> ShippedProjects() =>
     [
         "src/Switch2Pro.Bridge/Switch2Pro.Bridge.csproj",

@@ -63,7 +63,7 @@ public sealed class ControllersPage(MainActivity host) : IPage
         {
             col.AddView(Ui.Card(host,
                 Ui.StatusRow(host, PathState.NeedsAction, "Bluetooth-Zugriff fehlt",
-                    "N-Connect braucht die Berechtigung „Geräte in der Nähe“, um deine Controller zu finden.",
+                    "SKZ Connect braucht die Berechtigung „Geräte in der Nähe“, um deine Controller zu finden.",
                     "Erlauben", () =>
                     {
                         if (Permissions.PermanentlyDenied(host))
@@ -75,7 +75,7 @@ public sealed class ControllersPage(MainActivity host) : IPage
         else if (service is null)
         {
             col.AddView(Ui.Card(host,
-                Ui.StatusRow(host, PathState.NeedsAction, "N-Connect ist pausiert",
+                Ui.StatusRow(host, PathState.NeedsAction, "SKZ Connect ist pausiert",
                     "Starte die Suche, damit sich deine Controller verbinden können.", "Suche starten",
                     host.EnsureServiceRunning)));
         }
@@ -83,7 +83,7 @@ public sealed class ControllersPage(MainActivity host) : IPage
         {
             col.AddView(Ui.Card(host,
                 Ui.StatusRow(host, PathState.NeedsAction, "Bluetooth ist aus",
-                    "Schalte Bluetooth ein – N-Connect sucht dann sofort nach Controllern.", "Einschalten",
+                    "Schalte Bluetooth ein – SKZ Connect sucht dann sofort nach Controllern.", "Einschalten",
                     () => host.StartActivity(new Intent(BluetoothAdapter.ActionRequestEnable)))));
         }
 
@@ -247,18 +247,18 @@ public sealed class ControllersPage(MainActivity host) : IPage
                 return (PathState.Ready, "Bereit: Touch-Steuerung", "Tasten werden zu Bildschirmberührungen.");
             case OutputPath.Touch:
                 return (PathState.NeedsAction, "Touch-Steuerung ist ausgeschaltet",
-                    "Schalte „N-Connect Touch-Steuerung“ in den Bedienungshilfen ein.");
+                    "Schalte „SKZ Connect Touch-Steuerung“ in den Bedienungshilfen ein.");
             case OutputPath.Shizuku when !ShizukuShell.IsInstalled():
-                return (PathState.NeedsAction, "Shizuku ist nicht installiert", "Ohne Shizuku kann N-Connect keinen Xbox-Controller anlegen.");
+                return (PathState.NeedsAction, "Shizuku ist nicht installiert", "Ohne Shizuku kann SKZ Connect keinen Xbox-Controller anlegen.");
             case OutputPath.Shizuku when !ShizukuShell.Instance.IsAvailable():
                 return (PathState.NeedsAction, "Shizuku ist nicht gestartet",
                     "Nach jedem Neustart einmal in der Shizuku-App auf „Starten“ tippen.");
             case OutputPath.Shizuku when ShizukuShell.Instance.HasPermission():
-                return (PathState.NeedsAction, "Shizuku wird verbunden …", "Einen Moment – N-Connect übernimmt den Zugriff automatisch.");
+                return (PathState.NeedsAction, "Shizuku wird verbunden …", "Einen Moment – SKZ Connect übernimmt den Zugriff automatisch.");
             case OutputPath.Shizuku:
-                return (PathState.NeedsAction, "N-Connect hat noch keinen Shizuku-Zugriff", "Tippe auf „Beheben“ und erlaube den Zugriff.");
+                return (PathState.NeedsAction, "SKZ Connect hat noch keinen Shizuku-Zugriff", "Tippe auf „Beheben“ und erlaube den Zugriff.");
             case OutputPath.Root:
-                return (PathState.NeedsAction, "Kein Root-Zugriff", "Erlaube N-Connect den Root-Zugriff (z. B. in Magisk).");
+                return (PathState.NeedsAction, "Kein Root-Zugriff", "Erlaube SKZ Connect den Root-Zugriff (z. B. in Magisk).");
             default:
                 return (PathState.NeedsAction, "Noch kein Ausgabeweg eingerichtet",
                     "Richte Shizuku, Root oder die Touch-Steuerung ein, damit Spiele deine Controller sehen.");

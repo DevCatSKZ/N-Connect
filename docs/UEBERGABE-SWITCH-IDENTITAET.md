@@ -1,4 +1,4 @@
-# Übergabe: Funktion „Switch-Identität“ (N-Connect + Bluepick_RCM)
+# Übergabe: Funktion „Switch-Identität“ (SKZ Connect + Bluepick_RCM)
 
 Stand: 04.10.2026, ca. 09:40. Für den nächsten Agenten, der an dieser Funktion weiterarbeitet.
 
@@ -15,35 +15,35 @@ Nächstes zu tun ist.
 Der Nutzer will Switch-1-Joy-Con (später auch Pro Controller) abwechselnd an der Switch und am PC nutzen, **ohne
 neu zu koppeln**. Gewählte Lösung: Der Joy-Con wird normal mit Windows gekoppelt; **Bluepick_RCM** (RCM-Payload)
 liest PC-Adresse und Schlüssel aus dem Joy-Con und richtet die Switch so ein, dass sie sich als dieser PC ausgibt
-(Atmosphère-Datei `bluetooth_devices.db` + MissionControl `host_address`). **N-Connect** (Windows-App) soll das
+(Atmosphère-Datei `bluetooth_devices.db` + MissionControl `host_address`). **SKZ Connect** (Windows-App) soll das
 später erkennen, anzeigen und unterstützen.
 
 ## 2. Projekte und Pfade
 
 | Was | Pfad | Versionskontrolle |
 |---|---|---|
-| N-Connect (maßgebliche Kopie) | `C:\Coding\Switch 2 Pro Controler Bluetooth Treiber\N-Connect` | Git, Branch `main` |
-| N-Connect (alte Doppelkopie, **nicht** benutzen) | `…\Switch 2 Pro Controler Bluetooth Treiber\sfm\switch2-pro-windows` | eigenes Git |
+| SKZ Connect (maßgebliche Kopie) | `C:\Coding\Switch 2 Pro Controler Bluetooth Treiber\SKZ Connect` | Git, Branch `main` |
+| SKZ Connect (alte Doppelkopie, **nicht** benutzen) | `…\Switch 2 Pro Controler Bluetooth Treiber\sfm\switch2-pro-windows` | eigenes Git |
 | Bluepick_RCM | `C:\Coding\Bluepick_RCM\Bluepick_RCM Project` | **kein Git** |
 | Bluepick-Agentendoku | `Bluepick_RCM Project\AGENTS.md` (Menü-Indizes, Rezepte, Fallstricke) | – |
 | Neue Payload 1.0.6 | `Bluepick_RCM Project\output\Bluepick_RCM.bin` (102 357 B) | – |
 | Backup alte Payload 1.0.5 von der Switch | `Bluepick_RCM Project\archive\old_deployments\Switch-Backup_2026-10-04\` | – |
 | Testdaten von der Switch des Nutzers | `Bluepick_RCM Project\archive\testdaten_switch_2026-10-04\` | – |
 
-**Achtung, parallele Arbeit am N-Connect-Repo:** Während dieser Sitzung hat eine andere Sitzung weiter
+**Achtung, parallele Arbeit am SKZ-Connect-Repo:** Während dieser Sitzung hat eine andere Sitzung weiter
 committet (04.10.2026 11:48–12:37, zuletzt `898100a`; u. a. `bb48a21` „Kopplungsdaten im Windows-11-Stil,
-Joy-Con-1-Kopplung über WinRT“ – betrifft `PairingDataForm.cs`). Laut `HANDOVER.md` wird N-Connect als
-**öffentliches** Repo `DevCatSKZ/N-Connect` veröffentlicht. Die Dateien dieser Funktion sind seit dem 06.10.2026
+Joy-Con-1-Kopplung über WinRT“ – betrifft `PairingDataForm.cs`). Laut `HANDOVER.md` wird SKZ Connect als
+**öffentliches** Repo `DevCatSKZ/SKZ-Connect` veröffentlicht. Die Dateien dieser Funktion sind seit dem 06.10.2026
 als Arbeitsstand committet (`11515915`) und damit öffentlich auf `main`.
 
 **Achtung Testdaten:** enthalten echte Bluetooth-Adressen und Kopplungsschlüssel des Nutzers. Nie ins
-N-Connect-Repo kopieren, nie in Doku oder Chat im Klartext ausgeben (Schlüssel maskieren, wie das Prüfwerkzeug
+SKZ-Connect-Repo kopieren, nie in Doku oder Chat im Klartext ausgeben (Schlüssel maskieren, wie das Prüfwerkzeug
 es tut). Die Doku verwendet Platzhalter.
 
 ## 3. Was fertig ist
 
 **Bluepick_RCM 1.0.6** (gebaut, offline geprüft, **nicht auf der Switch getestet**):
-- `source/keys/keys.c`, Abschnitt „N-Connect: the Switch takes over the PC's Bluetooth identity“:
+- `source/keys/keys.c`, Abschnitt „SKZ Connect: the Switch takes over the PC's Bluetooth identity“:
   `bt_nconnect_enable`, `bt_nconnect_disable`, Hilfsfunktionen `_nc_*` (INI setzen, Datenbank schreiben,
   `_nc_active()`).
 - Schutz: `bt_full_auto`, `bt_atmo_disable`, `bt_atmo_purge_db` lassen die externe Datenbank in Ruhe, solange
@@ -53,7 +53,7 @@ es tut). Die Doku verwendet Platzhalter.
 - Offline-Prüfung: Ein aus `joycon_mac.bin` erzeugter Datenbankeintrag ist Byte für Byte identisch mit dem
   Eintrag, den HOS selbst im Save speichert (Testdaten, Joy-Con damals mit der Switch gekoppelt).
 
-**N-Connect** (committet am 06.10.2026, `11515915`, Arbeitsstand):
+**SKZ Connect** (committet am 06.10.2026, `11515915`, Arbeitsstand):
 - `src/Switch2Pro.Protocol/SwitchBtSave.cs` – liest Geräteeinträge aus `8000000000000050.bin`.
   Gerechnet wird im 0x200-Raster ab Dateianfang (0x70/0x99/0x146); der Kommentar im Code beschreibt seit
   17.10.2026 die Struktur ab `0x58070` (Adresse +0x00, Schlüssel +0x29, Name +0xD6), das Ergebnis ist gleich.
@@ -81,7 +81,7 @@ es tut). Die Doku verwendet Platzhalter.
 ## 5. Danach (Reihenfolge nach Absprache mit dem Nutzer)
 
 - Testbefund „Joy-Con unter HOS an die Schiene stecken“ auswerten (neue Kopplung? → ggf. Rückweg nötig).
-- N-Connect: Switch per MTP erkennen (VID `057E`, nicht über Namen), `switch/Bluepick_RCM/nconnect.ini`
+- SKZ Connect: Switch per MTP erkennen (VID `057E`, nicht über Namen), `switch/Bluepick_RCM/nconnect.ini`
   anzeigen, Hinweis „Switch aus, wenn am PC gespielt wird“. Vorhandene Bausteine: `SwitchCardWatcher.cs`
   (nur Laufwerke), `SwitchPairingData.cs`, `PairingDataForm.cs` (dort stehen Texte, die den neuen Weg noch
   ausschließen – Stand Commit `898100a` Zeilen 287–288 und 360 – anpassen).
@@ -89,7 +89,7 @@ es tut). Die Doku verwendet Platzhalter.
   nur SYSTEM, nur lesend) und an Bluepick übergeben (z. B. Datei auf der SD, die Bluepick in die Datenbank
   übernimmt). Byte-Reihenfolge des Windows-Schlüssels erst prüfen.
 - `SwitchBtSave.Current` im Hardwaretest bestätigen (welche Tabellenkopie gilt, wenn sich die beiden unterscheiden).
-- Commits (N-Connect) erst nach Rücksprache.
+- Commits (SKZ Connect) erst nach Rücksprache.
 
 ## 6. Bauen
 
@@ -99,8 +99,8 @@ cd "C:\Coding\Bluepick_RCM\Bluepick_RCM Project"
 c:\devkitPro\msys2\usr\bin\make.exe -j4
 # Erwartet: Payload < 126 296 B, unkomprimiert < 140 288 B. Warnung „_derive_keys defined but not used“ ist alt.
 
-# N-Connect (.NET 10, SDK 10 installiert)
-cd "C:\Coding\Switch 2 Pro Controler Bluetooth Treiber\N-Connect"
+# SKZ Connect (.NET 10, SDK 10 installiert)
+cd "C:\Coding\Switch 2 Pro Controler Bluetooth Treiber\SKZ Connect"
 dotnet build tools\Switch2Pro.BtIdentityProbe -c Release
 dotnet test tests\Switch2Pro.Protocol.Tests
 ```

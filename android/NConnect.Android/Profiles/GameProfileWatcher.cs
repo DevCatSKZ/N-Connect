@@ -29,7 +29,7 @@ public static partial class GameProfileWatcher
         return mode == AppOpsManagerMode.Allowed;
     }
 
-    /// <summary>Systemliste „Apps mit Zugriff auf Nutzungsdaten“ öffnen (dort N-Connect einschalten).</summary>
+    /// <summary>Systemliste „Apps mit Zugriff auf Nutzungsdaten“ öffnen (dort SKZ Connect einschalten).</summary>
     public static void OpenAccessSettings(Context ctx)
     {
         var intent = new Intent(Settings.ActionUsageAccessSettings).AddFlags(ActivityFlags.NewTask);
@@ -57,7 +57,7 @@ public static partial class GameProfileWatcher
     }
 
     /// <summary>
-    /// Paketname der App, die zuletzt in den Vordergrund kam – ohne N-Connect selbst und ohne Startbildschirm
+    /// Paketname der App, die zuletzt in den Vordergrund kam – ohne SKZ Connect selbst und ohne Startbildschirm
     /// (null ohne Zugriff oder ohne Treffer in den letzten 15 s).
     /// </summary>
     public static string? ForegroundPackage(Context ctx)
