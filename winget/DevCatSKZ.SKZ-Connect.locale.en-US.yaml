@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.6.0.schema.json
 PackageIdentifier: DevCatSKZ.SKZ-Connect
-PackageVersion: 1.0.22
+PackageVersion: 1.0.23
 PackageLocale: en-US
 Publisher: devcatskz
 PublisherUrl: https://github.com/DevCatSKZ
@@ -26,7 +26,7 @@ Tags:
   - xinput
   - vigem
   - bluetooth
-ReleaseNotesUrl: https://github.com/DevCatSKZ/SKZ-Connect/releases/tag/v1.0.22
+ReleaseNotesUrl: https://github.com/DevCatSKZ/SKZ-Connect/releases/tag/v1.0.23
 Documentations:
   - DocumentLabel: README
     DocumentUrl: https://github.com/DevCatSKZ/SKZ-Connect/blob/main/README.en.md
