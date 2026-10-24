@@ -3,7 +3,7 @@
 Die vier YAML-Dateien beschreiben SKZ Connect für den Windows Package Manager (Paket `DevCatSKZ.SKZ-Connect`, Setup und
 portable ZIP). `winget install DevCatSKZ.SKZ-Connect` funktioniert erst, wenn die Manifeste bei
 [microsoft/winget-pkgs](https://github.com/microsoft/winget-pkgs) eingereicht und dort angenommen sind (Stand
-17.10.2026: noch nicht eingereicht). Eingereicht wird je Version unter
+24.10.2026: nicht eingereicht – die Einreichung von 1.0.22 wurde zurückgezogen). Eingereicht wird je Version unter
 `manifests/d/DevCatSKZ/SKZ-Connect/<Version>/`, mit dem GitHub-Konto des Nutzers.
 
 ## Bei jedem Release aktualisieren

@@ -208,8 +208,9 @@ Startprotokoll und Diagnose nennen die installierte Treiberversion. HidHide wird
   sind geschätzt.
 - **Mit echtem Gerät ungeprüft (Android 0.9.1):** Root- und Touch-Weg vollständig, Samsung-Geräte, Kachel ab
   Android 12, Autostart, echtes Update, DSU mit Emulatoren. Liste: [docs/ANDROID.md](docs/ANDROID.md).
-- **winget:** Manifest `DevCatSKZ.SKZ-Connect` 1.0.22 ist bei `microsoft/winget-pkgs` eingereicht
-  (PR #460289, Ersteinreichung als neues Paket – CLA-Klick ggf. nur durch den Kontoinhaber).
+- **winget:** nicht eingereicht. Die Einreichung von 1.0.22 (PR #460289) hat der Nutzer am 24.10.2026 zurückgezogen
+  (PR geschlossen, Zweig im Fork gelöscht). Die Manifeste in `winget/` stehen auf 1.0.23; einreichen nur, wenn der
+  Nutzer es ausdrücklich will.
 - **Webseite:** Screenshots zeigen noch den Stand 1.0.14.
 - **Toter Code:** `src/Switch2Pro.Protocol/WindowsBtDevice.cs` (`WindowsBtDevice`, `BtDeviceNames`) nutzen seit dem
   Entfernen des ESP32-Exports nur noch Tests.
