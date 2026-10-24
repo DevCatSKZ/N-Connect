@@ -22,7 +22,7 @@ Kodi/LibreELEC (Linux-Dienst und Kodi-Add-on, Begleitmodus unter Kodi für Windo
 | Windows-App | 1.0.24 (`src/Switch2Pro.Bridge/Switch2Pro.Bridge.csproj`) | 1.0.24 (24.10.2026) |
 | Android | 0.9.3 Beta, versionCode 12, Paket `com.devcatskz.skzconnect` (`android/SkzConnect.Android/SkzConnect.Android.csproj`) | 0.9.3 (APK an v1.0.24) |
 | Kodi `service.skzconnect` mit Dienst `skzconnect` | 0.4.8 (`linux/kodi/service.skzconnect/addon.xml`, `linux/SkzConnect.Linux/SkzConnect.Linux.csproj`) | 0.4.8 |
-| Kodi `plugin.skzconnect.status` / `script.skzconnect.bundle` / `repository.devcatskz` | 1.1.4 / 1.0.6 / 1.0.6 | 1.1.4 / 1.0.6 / 1.0.6 |
+| Kodi `plugin.skzconnect.status` / `script.skzconnect.bundle` / `repository.devcatskz` | 1.1.4 / 1.0.6 / 1.0.7 | 1.1.4 / 1.0.6 / 1.0.7 |
 
 ## Repositories und Ordner
 

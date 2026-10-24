@@ -55,33 +55,28 @@ def main():
     fill = mask()                 # dunkle Flächen (Kopf, Kiste)
     dl, df = ImageDraw.Draw(line), ImageDraw.Draw(fill)
 
-    # Kopf (wird unten von der Kiste verdeckt) und Ohren wie beim Monitor-Icon: Dreiecke, deren Basis auf der
-    # geraden Oberkante liegt, Spitze leicht nach außen, innen offen.
-    hx0, hy0, hx1, hy1 = px(.30), px(.30), px(.70), px(.60)
+    # Kopf (unten von der Kiste verdeckt) und Ohren wie beim Monitor-Icon: zwei Schenkel, die auf der geraden
+    # Oberkante stehen – die Kopflinie schließt das Dreieck, nichts liegt doppelt übereinander.
+    hx0, hy0, hx1, hy1 = px(.31), px(.29), px(.69), px(.58)
     for sgn in (-1, 1):
-        bcx = .5 + sgn * .115
-        ear = [(px(bcx - .06), hy0), (px(bcx + sgn * .022), px(.205)), (px(bcx + .06), hy0)]
-        dl.line(ear + [ear[0]], fill=255, width=LW, joint='curve')
+        bcx = .5 + sgn * .11
+        dl.line([(px(bcx - .055), hy0), (px(bcx + sgn * .02), px(.19)), (px(bcx + .055), hy0)],
+                fill=255, width=LW, joint='curve')
     dl.rounded_rectangle([hx0, hy0, hx1, hy1], radius=px(.07), outline=255, width=LW)
     df.rounded_rectangle([hx0 + LW // 2, hy0 + LW // 2, hx1 - LW // 2, hy1], radius=px(.06), fill=255)
 
-    # Kiste: Vorderseite deckt den Kopf ab, zwei Klappen schräg nach außen
-    bx0, by0, bx1, by1 = px(.25), px(.53), px(.75), px(.80)
+    # Kiste: Vorderseite deckt den Kopf ab; Klappen als kurze Striche schräg nach außen, weg vom Kopf.
+    bx0, by0, bx1, by1 = px(.24), px(.52), px(.76), px(.80)
     cover = mask()
     ImageDraw.Draw(cover).rounded_rectangle([bx0 - LW, by0 - LW // 2, bx1 + LW, by1 + LW], radius=px(.05), fill=255)
     line.paste(0, (0, 0), cover)
     fill.paste(0, (0, 0), cover)
     dl.rounded_rectangle([bx0, by0, bx1, by1], radius=px(.04), outline=255, width=LW)
     df.rounded_rectangle([bx0, by0, bx1, by1], radius=px(.04), fill=255)
-    for sgn, x_in in ((-1, bx0), (1, bx1)):
-        flap = [(x_in, by0), (x_in + sgn * px(.085), by0 - px(.075)), (x_in - sgn * px(.075), by0 - px(.075))]
-        dl.line(flap, fill=255, width=LW, joint='curve')
-    # Pfoten auf dem Rand
-    for cx in (.42, .58):
-        r = px(.035)
-        c = (px(cx), by0)
-        df.ellipse([c[0] - r, c[1] - r, c[0] + r, c[1] + r], fill=255)
-        dl.ellipse([c[0] - r, c[1] - r, c[0] + r, c[1] + r], outline=255, width=int(LW * .8))
+    for sgn, x_in in ((-1, bx0 + px(.02)), (1, bx1 - px(.02))):
+        end = (x_in + sgn * px(.09), by0 - px(.075))
+        dl.line([(x_in, by0), end], fill=255, width=LW)
+        dl.ellipse([end[0] - LW // 2, end[1] - LW // 2, end[0] + LW // 2, end[1] + LW // 2], fill=255)
 
     bbox = line.getbbox()
     img = Image.alpha_composite(img, layer(FACE, fill))
@@ -91,22 +86,22 @@ def main():
 
     # Augen mit Leuchten (Mandelform aus zwei Kreisen), Schlitzpupille; Nase
     eyes, pupils = mask(), mask()
-    ey, rx, ry = .43, .058, .03
+    ey, rx, ry = .395, .052, .027
     for sgn in (-1, 1):
-        ex = .5 + sgn * .085
+        ex = .5 + sgn * .083
         R = (rx ** 2 + ry ** 2) / (2 * ry)          # Kreis durch beide Augenwinkel und die Scheitel
         a, b = mask(), mask()
         ImageDraw.Draw(a).ellipse([px(ex - R), px(ey + ry - 2 * R), px(ex + R), px(ey + ry)], fill=255)
         ImageDraw.Draw(b).ellipse([px(ex - R), px(ey - ry), px(ex + R), px(ey - ry + 2 * R)], fill=255)
         eyes.paste(255, (0, 0), Image.composite(a, mask(), b))
-        ImageDraw.Draw(pupils).rounded_rectangle([px(ex - .009), px(ey - .026), px(ex + .009), px(ey + .026)],
-                                                  radius=px(.009), fill=255)
-    halo = eyes.filter(ImageFilter.GaussianBlur(S * .03)).point(lambda v: int(v * .6))
+        ImageDraw.Draw(pupils).rounded_rectangle([px(ex - .008), px(ey - .023), px(ex + .008), px(ey + .023)],
+                                                  radius=px(.008), fill=255)
+    halo = eyes.filter(ImageFilter.GaussianBlur(S * .02)).point(lambda v: int(v * .5))
     img = Image.alpha_composite(img, layer(EYE, halo))
     img = Image.alpha_composite(img, layer(EYE, eyes))
     img = Image.alpha_composite(img, layer(FACE, pupils))
     nose = mask()
-    ImageDraw.Draw(nose).polygon([(px(.475), px(.485)), (px(.525), px(.485)), (px(.5), px(.51))], fill=255)
+    ImageDraw.Draw(nose).polygon([(px(.478), px(.448)), (px(.522), px(.448)), (px(.5), px(.47))], fill=255)
     img = Image.alpha_composite(img, layer(AMBER, nose))
 
     # Download-Pfeil auf der Kiste (Amber)
