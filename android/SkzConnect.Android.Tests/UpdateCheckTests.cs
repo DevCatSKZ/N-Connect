@@ -30,7 +30,7 @@ public class UpdateCheckTests
 
     [Theory]
     [InlineData("SKZ-Connect-Android-0.9.1.apk", "0.9.1")]
-    [InlineData("n-connect-android-1.2.apk", "1.2")]
+    [InlineData("skz-connect-android-1.2.apk", "1.2")]
     [InlineData("SKZ-Connect-Android-0.10.0.1.apk", "0.10.0.1")]
     public void VersionOf_LiestVersionAusDemDateinamen(string name, string expected) =>
         Assert.Equal(Version.Parse(expected), UpdateCheck.VersionOf(name));

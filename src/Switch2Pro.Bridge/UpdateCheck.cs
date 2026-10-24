@@ -28,9 +28,7 @@ internal static class UpdateCheck
     /// <summary>Paket unter den Dateien eines Releases: Setup-EXE, in der portablen Variante das ZIP.</summary>
     private static Installer? FindInstaller(JsonElement release)
     {
-        // Übergangsweise beide Asset-Namen: die letzten Releases hießen noch N-Connect-…
-        string[] prefixes = Paths.IsPortable ? ["SKZ-Connect-Portable", "N-Connect-Portable"]
-                                             : ["SKZ-Connect-Setup", "N-Connect-Setup"];
+        string[] prefixes = Paths.IsPortable ? ["SKZ-Connect-Portable"] : ["SKZ-Connect-Setup"];
         string extension = Paths.IsPortable ? ".zip" : ".exe";
         if (!release.TryGetProperty("assets", out var assets) || assets.ValueKind != JsonValueKind.Array)
             return null;

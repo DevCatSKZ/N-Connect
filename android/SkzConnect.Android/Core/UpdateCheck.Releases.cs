@@ -12,8 +12,7 @@ namespace SkzConnect.Android.Core;
 internal static partial class UpdateCheck
 {
     /// <summary>„SKZ-Connect-Android-0.9.1.apk“ → 0.9.1 (Groß-/Kleinschreibung egal).</summary>
-    // Übergangsweise beide Asset-Namen: die letzten Releases hießen noch N-Connect-Android-…
-    [GeneratedRegex(@"^(?:SKZ-Connect|N-Connect)-Android-(\d+(?:\.\d+){1,3})\.apk$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
+    [GeneratedRegex(@"^SKZ-Connect-Android-(\d+(?:\.\d+){1,3})\.apk$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
     private static partial Regex ApkName();
 
     /// <summary>Gefundene APK eines Releases (Name, Version, Download-Adresse, Größe, SHA-256 als Hex – falls GitHub sie liefert).</summary>

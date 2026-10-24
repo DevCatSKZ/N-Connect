@@ -110,8 +110,8 @@ Freigabe des Nutzers.
    `%USERPROFILE%\.skzconnect` (über `signing.props`); prüfen mit `apksigner verify --print-certs`. Die Datei
    `bin/Release/net10.0-android/publish/com.devcatskz.nconnect-Signed.apk` als `SKZ-Connect-Android-<Version>.apk`
    anhängen (`gh release upload v<Version> …`) – der Name ist Pflicht, die Update-Prüfung der App liest die Version
-   daraus. Übergangsweise zusätzlich eine Kopie als `N-Connect-Android-<Version>.apk` anhängen: App-Versionen bis
-   0.9.1 suchen nur nach dem alten Namen. SHA-256 und Signatur der APK in die Release-Beschreibung aufnehmen
+   daraus. Keine Kopien unter dem alten Namen mehr (Entscheidung des Nutzers 24.10.2026). SHA-256 und Signatur der
+   APK in die Release-Beschreibung aufnehmen
    (wie bei 1.0.20).
 6. **kodi-repo von Hand:** `git -C ..\kodi-repo status` (keine offenen Altlasten), `git -C ..\kodi-repo pull`, dann
    `powershell -File linux/build-kodi-addon.ps1 -Repo -RepoDir ..\kodi-repo`. Für byte-gleiche ZIPs wie am Release das
@@ -132,15 +132,16 @@ Alle „nconnect"-Kennungen wurden auf „skzconnect" umgestellt: Kodi-Add-ons (
 `plugin.skzconnect.status`, `script.skzconnect.bundle`), .NET-Projekte (`SkzConnect.*`), das
 Linux-Binärprogramm `skzconnect`, der Datenordner `~/.config/skzconnect` (wird einmalig aus
 `~/.config/nconnect` übernommen) und die Android-Einstellungsdatei (wird einmalig migriert).
-Auf GitHub steht kein „nconnect" mehr in Pfaden, Repos, Releases (Titel+Texte) oder der Webseite.
+Auf GitHub steht kein „nconnect" mehr in Pfaden, Repos, Releases (Titel+Texte) oder der Webseite. Seit 24.10.2026
+(Wunsch des Nutzers: auf GitHub nur noch SKZ Connect) heißen auch alle Release-Dateien `SKZ-Connect-…` – die alten
+Releases 1.0.0–1.0.21 wurden umbenannt, die doppelten `N-Connect-…`-Kopien an 1.0.22/1.0.23 gelöscht, CI und
+Update-Prüfung kennen nur noch den neuen Namen. Folge: Windows bis 1.0.22 und Android bis 0.9.1 finden in der App
+kein Update mehr; Nutzer dieser Versionen müssen 1.0.23 einmal selbst herunterladen.
 
 Bewusst **behalten** (brechen sonst bestehende Installationen):
 
 - `applicationId com.devcatskz.nconnect` samt Provider-Authorities – die Paketkennung der
   installierten Android-App; ändern bedeutet: keine Updates, Datenverlust.
-- Update-Check liest weiter die alten Asset-Namen `N-Connect-*` (Windows + Android); `build.yml`
-  legt Release-Dateien unter beiden Namen ab. Kann entfallen, sobald keine Installation < 1.0.23
-  mehr im Umlauf ist.
 - `PairingTransfer.FormatId`/`FileExtension` („n-connect-pairings"/“.ncpair") – Wire- und
   Dateiformat; Exporte und Geräte alter Versionen müssen kompatibel bleiben.
 - Legacy-Zeichenfolgen für Migration: Registry `N-Connect`, Autostart-Eintrag und Datenordner
