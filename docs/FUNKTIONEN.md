@@ -493,11 +493,13 @@ erneut versucht – ebenso, wenn ViGEm keinen virtuellen Controller anlegen kann
 - **Animationen** (`Anim`): weiche Übergänge für Hover, Schalter (Knopf gleitet), Segmente (Marke gleitet),
   Akkubalken, Aufleuchten/Glühen der Karten. Ein gemeinsamer Takt läuft nur, solange sich etwas bewegt. Aus, wenn
   Windows-Animationseffekte abgeschaltet sind und bei den Prüfhilfen `--render…` (Endzustände).
-- **Logo/Icon**: Vektor im Stil von Windows 11 (`Branding.DrawLogo`): blaue Kachel, weiße Controller-Silhouette,
-  Verbindungssignal; vereinfacht sich bei kleinen Größen (16 px nur Kachel + Silhouette, ab 24 px Steuerkreuz/Tasten,
-  ab 32 px Signal, ab 48 px Lichtkante/Schatten). Fenstersymbol aus der eingebetteten ICO-Datei mit allen Größen
-  (nicht `ExtractAssociatedIcon` – nur 32 px). `--render-brand` erzeugt ICO (kleine Größen als 32-Bit-Bitmap, 256 px
-  als PNG), PNG und Installer-Grafiken, ohne ein Fenster zu öffnen.
+- **Logo/Icon**: Vektor in der DevCat-Bildsprache (`Branding.DrawLogo`), wie SKZ Monitor und SKZ Remote: Gamepad mit
+  Katzenohren und leuchtenden Cyan-Mandelaugen (Schlitzpupille) auf dunkler Navy-Fläche, Iris-Verlauf
+  (Teal→Blau→Violett) am Rand, Amber-Nase, Tasten als Raute, Wi-Fi-Signal zwischen den Ohren als Connect-Signatur;
+  vereinfacht sich bei kleinen Größen (ab 24 px Steuerkreuz/Tasten, ab 32 px Signal, ab 48 px Lichtkante/Schatten).
+  Fenstersymbol aus der eingebetteten ICO-Datei mit allen Größen (nicht `ExtractAssociatedIcon` – nur 32 px).
+  `--render-brand` erzeugt ICO (kleine Größen als 32-Bit-Bitmap, 256 px als PNG), PNG und Installer-Grafiken, ohne
+  ein Fenster zu öffnen – Ablauf und Zielorte der Dateien stehen in [../HANDOVER.md](../HANDOVER.md#icon-und-branding).
 - **Grafiken**: Pfeile (▲▼◀▶) zeichnet `InputView.Caption` als gleich große Dreiecke, die bei gedrehtem Controller
   (quer gehaltener Joy-Con) mitdrehen; alle anderen Beschriftungen bleiben waagerecht lesbar.
 - **Sprache**: 12 Sprachen (de, en, es, fr, it, pt, nl, pl, ru, ja, zh, ko). „Automatisch (wie Windows)“ (Standard)

@@ -1,6 +1,8 @@
 # Übergabe: SKZ Connect
 
-Stand: 17.10.2026. Release 1.0.22 ist vorbereitet, aber noch nicht veröffentlicht.
+Stand: 24.10.2026. Release 1.0.22 ist veröffentlicht; die Umbenennung von N-Connect zu SKZ Connect ist überall
+abgeschlossen (Repos, Releases, Add-ons, Webseite, lokale Ordner) und das Icon trägt jetzt die DevCat-Katze
+(siehe „Icon und Branding“).
 
 SKZ Connect lässt Nintendo-Switch-2-Controller (Pro Controller 2, Joy-Con 2, GameCube-Controller) und weitere
 Controller (Switch 1 und NSO, Wii und Wii U, PlayStation, Xbox, lizenzierte Kabel-Pads) unter Windows als
@@ -17,10 +19,10 @@ Kodi/LibreELEC (Linux-Dienst und Kodi-Add-on, Begleitmodus unter Kodi für Windo
 
 | Teil | Version im Code | Zuletzt veröffentlicht |
 |---|---|---|
-| Windows-App | 1.0.22 (`src/Switch2Pro.Bridge/Switch2Pro.Bridge.csproj`) | 1.0.21 (15.10.2026) |
-| Android | 0.9.1 Beta, versionCode 10 (`android/SkzConnect.Android/SkzConnect.Android.csproj`) | 0.9.0 (APK an v1.0.20) |
-| Kodi `service.skzconnect` mit Dienst `skzconnect` | 0.4.4 (`linux/kodi/service.skzconnect/addon.xml`, `linux/SkzConnect.Linux/SkzConnect.Linux.csproj`) | 0.4.3 |
-| Kodi `plugin.skzconnect.status` / `script.skzconnect.bundle` / `repository.devcatskz` | 1.1.1 / 1.0.2 / 1.0.2 | 1.1.0 / 1.0.1 / 1.0.2 |
+| Windows-App | 1.0.22 (`src/Switch2Pro.Bridge/Switch2Pro.Bridge.csproj`) | 1.0.22 (17.10.2026) |
+| Android | 0.9.1 Beta, versionCode 10 (`android/SkzConnect.Android/SkzConnect.Android.csproj`) | 0.9.1 (APK an v1.0.22) |
+| Kodi `service.skzconnect` mit Dienst `skzconnect` | 0.4.6 (`linux/kodi/service.skzconnect/addon.xml`, `linux/SkzConnect.Linux/SkzConnect.Linux.csproj`) | 0.4.6 |
+| Kodi `plugin.skzconnect.status` / `script.skzconnect.bundle` / `repository.devcatskz` | 1.1.3 / 1.0.4 / 1.0.4 | 1.1.3 / 1.0.4 / 1.0.4 |
 
 ## Repositories und Ordner
 
@@ -59,6 +61,30 @@ benennt Builds ohne Tag als Vorabversion `<Version>-ci.<Lauf>`.
 Wichtigste Quelle bei Hardwareproblemen ist das Protokoll `%LOCALAPPDATA%\SKZ Connect\bridge.log` (Android: Hilfe ›
 Diagnose › Teilen; Linux: siehe docs/LINUX-KODI.md). Die Prüfhilfen `--render`, `--render-ui` und `--dump-ui` öffnen
 Fenster und schreiben in dasselbe Protokoll – nur nach Rückfrage beim Nutzer starten.
+
+## Icon und Branding
+
+Einzige Quelle für das Logo ist `src/Switch2Pro.Bridge/Branding.cs` (`DrawLogo` zeichnet es als Vektor – deshalb
+bitte keine Pixeldateien von Hand nachbearbeiten). Fenster, Infobereich und die UI zeichnen das Logo zur Laufzeit
+direkt daraus; die eingebettete ICO ist nur die Rückfallebene.
+
+Nach einer Änderung am Logo alle Dateien neu erzeugen und verteilen:
+
+```powershell
+dotnet build src/Switch2Pro.Bridge -c Release
+src\Switch2Pro.Bridge\bin\Release\net10.0-windows*\SKZ-Connect.exe --render-brand installer\art  # kein Fenster
+copy installer\art\SKZ-Connect.png installer\art\SKZ-Connect.ico src\Switch2Pro.Bridge\
+py -3 android\make_icons.py                                     # Android-Mipmaps aus src\...\SKZ-Connect.png
+copy installer\art\SKZ-Connect.png ..\kodi-repo\service.skzconnect\icon.png       # ebenso
+copy installer\art\SKZ-Connect.png ..\kodi-repo\plugin.skzconnect.status\icon.png # plugin… und
+copy installer\art\SKZ-Connect.png ..\kodi-repo\script.skzconnect.bundle\icon.png # script…
+copy installer\art\SKZ-Connect.png ..\SKZ-Connect-pages\logo.png                  # Webseite
+```
+
+`--render-brand` schreibt `SKZ-Connect.png`/`.ico` und die sechs `wizard-*.bmp` (Inno Setup wählt je Skalierung).
+README und `addon.xml` der Add-ons verweisen bereits auf diese Dateien; Kodi-ZIPs ziehen das Icon beim Bauen aus
+`installer/art` mit (`build-kodi-addon.ps1`). Die Add-on-ZIPs im kodi-repo behalten ihr altes Icon bis zum nächsten
+Add-on-Build – die Ordner-`icon.png` (Repo-Ansicht) sofort mitziehen.
 
 ## Release-Ablauf
 
@@ -177,7 +203,8 @@ Startprotokoll und Diagnose nennen die installierte Treiberversion. HidHide wird
   sind geschätzt.
 - **Mit echtem Gerät ungeprüft (Android 0.9.1):** Root- und Touch-Weg vollständig, Samsung-Geräte, Kachel ab
   Android 12, Autostart, echtes Update, DSU mit Emulatoren. Liste: [docs/ANDROID.md](docs/ANDROID.md).
-- **winget:** Manifeste gepflegt, aber nie bei `microsoft/winget-pkgs` eingereicht.
+- **winget:** Manifest `DevCatSKZ.SKZ-Connect` 1.0.22 ist bei `microsoft/winget-pkgs` eingereicht
+  (PR #460289, Ersteinreichung als neues Paket – CLA-Klick ggf. nur durch den Kontoinhaber).
 - **Webseite:** Screenshots zeigen noch den Stand 1.0.14.
 - **Toter Code:** `src/Switch2Pro.Protocol/WindowsBtDevice.cs` (`WindowsBtDevice`, `BtDeviceNames`) nutzen seit dem
   Entfernen des ESP32-Exports nur noch Tests.
