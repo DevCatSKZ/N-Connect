@@ -55,7 +55,7 @@ class AddonXmlTest(unittest.TestCase):
         for addon_id in ADDONS:
             self.assertEqual(addon_xml(addon_id).get('provider-name'), 'devcatskz', addon_id)
         self.assertEqual(versions, {'service.skzconnect': '0.4.8', 'plugin.skzconnect.status': '1.1.4',
-                                    'script.skzconnect.bundle': '1.0.6', 'repository.devcatskz': '1.0.8'})
+                                    'script.skzconnect.bundle': '1.0.6', 'repository.devcatskz': '1.0.9'})
         # Programmversion im csproj = service.skzconnect-Version (das Build-Skript setzt sie beim Veröffentlichen)
         with open(os.path.join(KODI_DIR, '..', 'SkzConnect.Linux', 'SkzConnect.Linux.csproj'), encoding='utf-8') as f:
             self.assertIn('<Version>{0}</Version>'.format(versions['service.skzconnect']), f.read())

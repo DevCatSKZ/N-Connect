@@ -69,13 +69,14 @@ def layer(color, m):
 
 
 def main():
-    # Kopf mit Ohren als eine Fläche (unten von der Kiste verdeckt)
+    # Kopf als eine Silhouette: die Ohren wachsen aus den Kopfseiten heraus (klassischer Katzenkopf), dazwischen die
+    # gerade Stirn. Die Kontur folgt diesem Umriss als Linie mit runden Gelenken – spitze Ohren, keine Stoßstellen.
+    head_path = [P(.31, .62), P(.31, .34), P(.34, .185), P(.445, .30), P(.555, .30), P(.66, .185), P(.69, .34),
+                 P(.69, .62)]
     head = mask()
-    dh = ImageDraw.Draw(head)
-    dh.rounded_rectangle([*P(.31, .30), *P(.69, .60)], radius=px(.075), fill=255)
-    for sgn in (-1, 1):
-        c = .5 + sgn * .115
-        dh.polygon([P(c - .07, .33), P(c + sgn * .025, .185), P(c + .065, .33)], fill=255)
+    ImageDraw.Draw(head).polygon(head_path, fill=255)
+    head_outline = mask()
+    ImageDraw.Draw(head_outline).line(head_path + [head_path[0]], fill=255, width=LW, joint='curve')
 
     # Kiste mit zwei aufgeklappten Klappen als eine Fläche; die Klappen hängen an den äußeren Ecken und zeigen vom
     # Kopf weg nach außen.
@@ -93,7 +94,7 @@ def main():
     # Kopf nur, wo die Kiste ihn nicht verdeckt (mit Abstand der halben Konturbreite, damit die Kistenkontur frei steht)
     box_cover = grow(box, LW // 2)
     head_vis = ImageChops.subtract(head, box_cover)
-    head_line = ImageChops.subtract(band(head, LW), box_cover)
+    head_line = ImageChops.subtract(head_outline, box_cover)
     box_line = band(box, LW)
     line = ImageChops.lighter(head_line, box_line)
     fill = ImageChops.lighter(head_vis, box)
