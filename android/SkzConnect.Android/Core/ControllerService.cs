@@ -21,8 +21,8 @@ namespace SkzConnect.Android.Core;
 [Service(Exported = false, ForegroundServiceType = ForegroundService.TypeConnectedDevice)]
 public sealed class ControllerService : Service
 {
-    public const string ActionStop = "com.devcatskz.nconnect.STOP";
-    public const string ActionEditTouch = "com.devcatskz.nconnect.EDIT_TOUCH";
+    public const string ActionStop = "com.devcatskz.skzconnect.STOP";
+    public const string ActionEditTouch = "com.devcatskz.skzconnect.EDIT_TOUCH";
     private const string Channel = "controller";
     private const string ChannelAlerts = "hinweise";
     private const int NotificationId = 1;

@@ -11,7 +11,7 @@ namespace SkzConnect.Android.Core;
 /// </summary>
 internal static partial class UpdateCheck
 {
-    public const string ProviderAuthority = "com.devcatskz.nconnect.fileprovider";
+    public const string ProviderAuthority = "com.devcatskz.skzconnect.fileprovider";
 
     /// <summary>Installierte Version (VersionName aus dem Paket, z. B. „0.9.1“).</summary>
     public static Version Current(Context ctx)

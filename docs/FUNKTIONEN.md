@@ -454,7 +454,7 @@ erneut versucht – ebenso, wenn ViGEm keinen virtuellen Controller anlegen kann
 - **Von der Switch-SD-Karte** (Bluepick_RCM/hekate: `switchroot/joycon_mac.ini` bzw. `.bin`, `switch.cal`): wird
   beim Einstecken erkannt (Kartenleser oder hekate „USB Tools“), nur gelesen; Übernahme fragt nach und legt vorher
   eine Sicherung der Einstellungen an.
-- **PC → PC**: Datei `*.ncpair` (JSON; optional mit Passwort: AES-256-GCM, Schlüssel per PBKDF2-SHA256). Schlüssel
+- **PC → PC**: Datei `*.skzpair` (JSON; optional mit Passwort: AES-256-GCM, Schlüssel per PBKDF2-SHA256). Schlüssel
   nur auf ausdrücklichen Wunsch. Übernahme ergänzt, löscht nichts.
 - SKZ Connect ändert dabei **weder** die Bluetooth-Adresse des Adapters **noch** Windows-Kopplungen.
 - Fenster `PairingDataForm` im Windows-11-Stil (Gruppen „Übernehmen“, „Inhalt“, „Weitergeben und sichern“, Fußleiste

@@ -9,13 +9,6 @@ using SkzConnect.Linux;
 // --kodi: vom Kodi-Add-on gestartet – endet mit Kodi (stdin geschlossen oder Elternprozess weg), auch nach einem Absturz.
 
 string data = Arg("--data") ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config", "skzconnect");
-// Datenordner der Vorversion („nconnect") einmalig uebernehmen.
-if (Arg("--data") == null && !Directory.Exists(data))
-{
-    string alt = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config", "nconnect");
-    if (Directory.Exists(alt))
-        Directory.Move(alt, data);
-}
 Directory.CreateDirectory(data);
 if (args.Contains("--selftest"))
     return await SelfTest.RunAsync(data);

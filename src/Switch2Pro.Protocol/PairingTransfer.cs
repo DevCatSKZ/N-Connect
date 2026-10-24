@@ -47,18 +47,15 @@ public sealed class PairingFileException(PairingFileError error, string message)
 }
 
 /// <summary>
-/// Datei „*.ncpair“: JSON mit Kennung und Version. Ohne Passwort steht der Inhalt lesbar darin; mit Passwort ist er
+/// Datei „*.skzpair“: JSON mit Kennung und Version. Ohne Passwort steht der Inhalt lesbar darin; mit Passwort ist er
 /// mit AES-256-GCM verschlüsselt, der Schlüssel per PBKDF2-SHA256 aus dem Passwort abgeleitet (eigenes Salz je Datei).
 /// GCM erkennt dabei auch jede Veränderung der Datei.
 /// </summary>
 public static class PairingTransfer
 {
-    // Format-Kennung und Dateiendung bleiben aus Kompatibilitätsgründen die der Vorversion
-    // (hieß „N-Connect"): Bestehende Exporte müssen sich weiter einlesen lassen, und Geräte mit
-    // älteren Versionen erkennen die Dateien sonst nicht mehr.
-    public const string FormatId = "n-connect-pairings";
+    public const string FormatId = "skz-connect-pairings";
     public const int Version = 1;
-    public const string FileExtension = ".ncpair";
+    public const string FileExtension = ".skzpair";
     private const int Iterations = 200_000;
 
     private static readonly JsonSerializerOptions Json = new()

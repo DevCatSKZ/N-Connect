@@ -29,25 +29,9 @@ internal static class Paths
         }
     }
 
-    /// <summary>Ordner „SKZ-Connect“; die Ordner der Vorversionen („N-Connect“, davor „Switch2ProBridge“) werden einmalig übernommen.</summary>
-    private static string Folder(Environment.SpecialFolder root)
-    {
-        string baseDir = Environment.GetFolderPath(root);
-        string dir = Path.Combine(baseDir, "SKZ-Connect");
-        string legacy = new[] { "N-Connect", "Switch2ProBridge" }
-            .Select(name => Path.Combine(baseDir, name))
-            .FirstOrDefault(Directory.Exists) ?? Path.Combine(baseDir, "_");
-        try
-        {
-            if (!Directory.Exists(dir) && Directory.Exists(legacy))
-                Directory.Move(legacy, dir);
-        }
-        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
-        {
-            // Alter Ordner gesperrt: dann eben mit Standardwerten im neuen Ordner beginnen.
-        }
-        return dir;
-    }
+    /// <summary>Ordner „SKZ-Connect“ unter <paramref name="root"/>.</summary>
+    private static string Folder(Environment.SpecialFolder root) =>
+        Path.Combine(Environment.GetFolderPath(root), "SKZ-Connect");
     public static string LogFile { get; } = Path.Combine(LogDir, "bridge.log");
 }
 

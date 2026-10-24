@@ -807,7 +807,7 @@ internal static partial class Tr
             "Koppelgegevens gemaakt met Bluepick_RCM of hekate (switchroot/joycon_mac.ini)",
         ["Einlesen …"] = "Inlezen …",
         ["Von einem anderen PC"] = "Van een andere pc",
-        ["Mit SKZ Connect exportierte Datei (*.ncpair)"] = "Door SKZ Connect geëxporteerd bestand (*.ncpair)",
+        ["Mit SKZ Connect exportierte Datei (*.skzpair)"] = "Door SKZ Connect geëxporteerd bestand (*.skzpair)",
         ["Datei öffnen …"] = "Bestand openen …",
         ["Inhalt"] = "Inhoud",
         ["Weitergeben und sichern"] = "Delen en beveiligen",

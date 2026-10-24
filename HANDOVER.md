@@ -1,8 +1,8 @@
 # Übergabe: SKZ Connect
 
-Stand: 24.10.2026. Release 1.0.23 ist veröffentlicht (Android 0.9.2, Kodi 0.4.7); die Umbenennung von N-Connect zu SKZ Connect ist überall
-abgeschlossen (Repos, Releases, Add-ons, Webseite, lokale Ordner) und das Icon trägt jetzt die DevCat-Katze
-(siehe „Icon und Branding“).
+Stand: 24.10.2026. Release 1.0.24 ist veröffentlicht (Android 0.9.3, Kodi 0.4.8). Die App heißt überall SKZ Connect,
+auch in allen technischen Kennungen; Reste des alten Namens gibt es nicht mehr (siehe „Name und Kennungen“). Das Icon
+trägt die DevCat-Katze (siehe „Icon und Branding“).
 
 SKZ Connect lässt Nintendo-Switch-2-Controller (Pro Controller 2, Joy-Con 2, GameCube-Controller) und weitere
 Controller (Switch 1 und NSO, Wii und Wii U, PlayStation, Xbox, lizenzierte Kabel-Pads) unter Windows als
@@ -19,10 +19,10 @@ Kodi/LibreELEC (Linux-Dienst und Kodi-Add-on, Begleitmodus unter Kodi für Windo
 
 | Teil | Version im Code | Zuletzt veröffentlicht |
 |---|---|---|
-| Windows-App | 1.0.23 (`src/Switch2Pro.Bridge/Switch2Pro.Bridge.csproj`) | 1.0.23 (24.10.2026) |
-| Android | 0.9.2 Beta, versionCode 11 (`android/SkzConnect.Android/SkzConnect.Android.csproj`) | 0.9.2 (APK an v1.0.23) |
-| Kodi `service.skzconnect` mit Dienst `skzconnect` | 0.4.7 (`linux/kodi/service.skzconnect/addon.xml`, `linux/SkzConnect.Linux/SkzConnect.Linux.csproj`) | 0.4.7 |
-| Kodi `plugin.skzconnect.status` / `script.skzconnect.bundle` / `repository.devcatskz` | 1.1.4 / 1.0.5 / 1.0.6 | 1.1.4 / 1.0.5 / 1.0.6 |
+| Windows-App | 1.0.24 (`src/Switch2Pro.Bridge/Switch2Pro.Bridge.csproj`) | 1.0.24 (24.10.2026) |
+| Android | 0.9.3 Beta, versionCode 12, Paket `com.devcatskz.skzconnect` (`android/SkzConnect.Android/SkzConnect.Android.csproj`) | 0.9.3 (APK an v1.0.24) |
+| Kodi `service.skzconnect` mit Dienst `skzconnect` | 0.4.8 (`linux/kodi/service.skzconnect/addon.xml`, `linux/SkzConnect.Linux/SkzConnect.Linux.csproj`) | 0.4.8 |
+| Kodi `plugin.skzconnect.status` / `script.skzconnect.bundle` / `repository.devcatskz` | 1.1.4 / 1.0.6 / 1.0.6 | 1.1.4 / 1.0.6 / 1.0.6 |
 
 ## Repositories und Ordner
 
@@ -108,11 +108,9 @@ Freigabe des Nutzers.
    das Release an; `kodi.yml` hängt die `SKZ-Connect-Kodi-*.zip` an.
 5. **APK (nur lokal):** `dotnet publish android/SkzConnect.Android -c Release` signiert mit dem Schlüssel aus
    `%USERPROFILE%\.skzconnect` (über `signing.props`); prüfen mit `apksigner verify --print-certs`. Die Datei
-   `bin/Release/net10.0-android/publish/com.devcatskz.nconnect-Signed.apk` als `SKZ-Connect-Android-<Version>.apk`
+   `bin/Release/net10.0-android/publish/com.devcatskz.skzconnect-Signed.apk` als `SKZ-Connect-Android-<Version>.apk`
    anhängen (`gh release upload v<Version> …`) – der Name ist Pflicht, die Update-Prüfung der App liest die Version
-   daraus. Keine Kopien unter dem alten Namen mehr (Entscheidung des Nutzers 24.10.2026). SHA-256 und Signatur der
-   APK in die Release-Beschreibung aufnehmen
-   (wie bei 1.0.20).
+   daraus. SHA-256 und Signatur der APK in die Release-Beschreibung aufnehmen (wie bei 1.0.20).
 6. **kodi-repo von Hand:** `git -C ..\kodi-repo status` (keine offenen Altlasten), `git -C ..\kodi-repo pull`, dann
    `powershell -File linux/build-kodi-addon.ps1 -Repo -RepoDir ..\kodi-repo`. Für byte-gleiche ZIPs wie am Release das
    CI-Artefakt „Kodi-Plugin“ entpacken und `-Repo -NoBuild -Out <Ordner> -RepoDir ..\kodi-repo` nehmen. Das Skript ruft
@@ -126,32 +124,20 @@ Freigabe des Nutzers.
 
 ## Bekannte Grenzen und offene Punkte
 
-### Umbenannte Kennungen (seit 23.10.)
+### Name und Kennungen
 
-Alle „nconnect"-Kennungen wurden auf „skzconnect" umgestellt: Kodi-Add-ons (`service.skzconnect`,
-`plugin.skzconnect.status`, `script.skzconnect.bundle`), .NET-Projekte (`SkzConnect.*`), das
-Linux-Binärprogramm `skzconnect`, der Datenordner `~/.config/skzconnect` (wird einmalig aus
-`~/.config/nconnect` übernommen) und die Android-Einstellungsdatei (wird einmalig migriert).
-Auf GitHub steht kein „nconnect" mehr in Pfaden, Repos, Releases (Titel+Texte) oder der Webseite. Seit 24.10.2026
-(Wunsch des Nutzers: auf GitHub nur noch SKZ Connect) heißen auch alle Release-Dateien `SKZ-Connect-…` – die alten
-Releases 1.0.0–1.0.21 wurden umbenannt, die doppelten `N-Connect-…`-Kopien an 1.0.22/1.0.23 gelöscht, CI und
-Update-Prüfung kennen nur noch den neuen Namen. Folge: Windows bis 1.0.22 und Android bis 0.9.1 finden in der App
-kein Update mehr; Nutzer dieser Versionen müssen 1.0.23 einmal selbst herunterladen.
+Die App hieß bis 1.0.22 „N-Connect“. Seit 24.10.2026 gibt es auf Wunsch des Nutzers keine Spur des alten Namens
+mehr – er ist der einzige Nutzer, Kompatibilität mit alten Installationen ist ausdrücklich nicht nötig:
 
-Bewusst **behalten** (brechen sonst bestehende Installationen):
-
-- `applicationId com.devcatskz.nconnect` samt Provider-Authorities – die Paketkennung der
-  installierten Android-App; ändern bedeutet: keine Updates, Datenverlust.
-- `PairingTransfer.FormatId`/`FileExtension` („n-connect-pairings"/“.ncpair") – Wire- und
-  Dateiformat; Exporte und Geräte alter Versionen müssen kompatibel bleiben.
-- Legacy-Zeichenfolgen für Migration: Registry `N-Connect`, Autostart-Eintrag und Datenordner
-  der Vorversion (Dialogs.cs, Log.cs).
-- `service.nconnect` als alte Add-on-Kennung: `KodiIntegration.FindDataDirs` schreibt
-  die status.json auch in `addon_data/service.nconnect`, solange das alte Add-on noch
-  installiert ist. Alter Kodi-Installationen bekommen keine Add-on-Updates mehr – Umstieg
-  über das neue Bundle (`script.skzconnect.bundle`) oder das LibreELEC-Zip.
-- Signatur-Alias im Android-Keystore heißt intern `nconnect` (liegt nur lokal unter
-  `%USERPROFILE%\.skzconnect`, nicht im Repository).
+- Android-Paket `com.devcatskz.skzconnect` (ab 0.9.3; vorher `com.devcatskz.nconnect` – die alte App wird nicht
+  aktualisiert, sondern deinstalliert und die neue installiert). Signatur unverändert, Keystore-Alias `skzconnect`.
+- Kodi-Add-ons `service.skzconnect`, `plugin.skzconnect.status`, `script.skzconnect.bundle`; Linux-Programm und
+  Datenordner `skzconnect`.
+- Kopplungs-Export `*.skzpair` mit Kennung `skz-connect-pairings` (alte `*.ncpair`-Dateien lassen sich nicht mehr
+  einlesen).
+- Release-Dateien nur `SKZ-Connect-…` (alte Releases umbenannt); die Update-Prüfung kennt nur diesen Namen.
+- Kein Übernahme- oder Aufräumcode für Ordner, Registry, Autostart, Einstellungen oder Add-ons der Vorversion
+  (Windows, Android, Linux, Setup). Wer noch etwas mit altem Namen installiert hat, deinstalliert es von Hand.
 
 
 ### Code-Signatur fehlt

@@ -7,7 +7,7 @@ namespace SkzConnect.Android.Tests;
 /// <summary>App im Vordergrund (ohne SKZ Connect und Startbildschirm) und status.json-Vertrag mit dem Kodi-Add-on.</summary>
 public class ForegroundAndStatusTests
 {
-    private const string Own = "com.devcatskz.nconnect";
+    private const string Own = "com.devcatskz.skzconnect";
     private static readonly HashSet<string> Launchers = ["com.google.android.apps.nexuslauncher", "com.android.settings"];
 
     [Fact]

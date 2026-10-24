@@ -296,7 +296,7 @@ App-Sprache aus den Android-Einstellungen), unbekannte Sprachen fallen auf Engli
 - `00-windows.json` enthält die aus der Windows-App übernommenen Texte (bei Doppelungen gilt deren Wortwahl), z. B.
   Tastennamen aus `ControllerButtons.Label` und die Ziele des Belegungs-Editors. Texte, die erst zur Laufzeit durch
   `L.T` laufen, prüft `TranslationTests` (Unit-Test).
-- Testen ohne Systemsprache zu ändern: `adb shell cmd locale set-app-locales com.devcatskz.nconnect --locales fr-FR`,
+- Testen ohne Systemsprache zu ändern: `adb shell cmd locale set-app-locales com.devcatskz.skzconnect --locales fr-FR`,
   App neu starten.
 - Der Name des virtuellen Controllers ist übersetzt („SKZ Connect Player 1“, „SKZ Connect Joueur 1“ …); für ru/ja/zh/ko
   bewusst englisch, damit Emulatoren keine Probleme mit nicht-lateinischen Gerätenamen haben.
@@ -307,7 +307,7 @@ App-Sprache aus den Android-Einstellungen), unbekannte Sprachen fallen auf Engli
   veröffentlichten APK erhöhen.
 - Signatur: `%USERPROFILE%\.skzconnect\skzconnect-release.jks` + `signing.props` (wird von der csproj importiert, falls
   vorhanden). **Nie ins Repository oder in die CI** – deshalb baut die CI keine APK.
-- `dotnet publish -c Release` → `bin/Release/net10.0-android/publish/com.devcatskz.nconnect-Signed.apk`, als
+- `dotnet publish -c Release` → `bin/Release/net10.0-android/publish/com.devcatskz.skzconnect-Signed.apk`, als
   **`SKZ-Connect-Android-<Version>.apk`** an das GitHub-Release hängen (`gh release upload v1.0.x …`). Der Dateiname ist
   Pflicht: Die Update-Prüfung liest die Version daraus (Releases ohne passend benannte APK sieht sie nicht).
   README/Webseite verlinken die APK mit fester Versionsnummer – Links bei einer neuen APK anpassen.
@@ -329,11 +329,11 @@ dotnet build -t:Install -c Debug "-p:AdbTarget=-s adb-R5CRA1GQW0Z-ECDAJk._adb-tl
   App als Debug-Build ohne Signatur; das signierte APK entsteht weiterhin nur lokal (siehe oben).
 - **Shizuku vom PC starten** (spart die Kopplung per kabellosem Debugging beim Testen):
   `adb shell <APK-Ordner>/lib/arm64/libshizuku.so` (Ordner über `adb shell pm path moe.shizuku.privileged.api`).
-- **Protokoll lesen:** `adb shell "run-as com.devcatskz.nconnect cat files/skzconnect.log"` (Logcat ist auf dem Pixel
+- **Protokoll lesen:** `adb shell "run-as com.devcatskz.skzconnect cat files/skzconnect.log"` (Logcat ist auf dem Pixel
   nach wenigen Minuten überschrieben).
 - Screenshots: `adb shell screencap -p /sdcard/x.png` + `adb pull` (PowerShell-Umleitung verfälscht Binärdaten).
   **Nur wenn SKZ Connect im Vordergrund ist** – der Nutzer verwendet das Gerät nebenbei.
-- `pm clear com.devcatskz.nconnect` simuliert den Erststart.
+- `pm clear com.devcatskz.skzconnect` simuliert den Erststart.
 
 ### Tests ohne Gerät
 

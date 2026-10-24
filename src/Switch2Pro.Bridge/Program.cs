@@ -99,7 +99,7 @@ internal static class Program
             return;
         }
         ShowSignal = showSignal;
-        Autostart.MigrateLegacy();
+        Autostart.Repair();
 
         Log.Info($"Start, Version {UpdateCheck.Label}, Windows {Environment.OSVersion.Version}");
         Application.ThreadException += (_, e) => Log.Error("Unbehandelter Fehler (UI)", e.Exception);

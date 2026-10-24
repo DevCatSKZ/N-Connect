@@ -9,13 +9,10 @@ namespace Switch2Pro.Bridge;
 /// Vorschlag des Setups gewählt wurde (ChosenLangCode), „--setup-lang=xx“ (beim stillen Update ohne Argumente). Übernommen
 /// wird nur, was in settings.json noch nicht gewählt ist – danach entscheidet allein die App, spätere Setups
 /// überschreiben nichts. Beim allerersten Start ohne diese Argumente (im Setup „Jetzt starten“ abgewählt, weiteres
-/// Benutzerkonto) gilt die Wahl, die das Setup in seinem Deinstallationsschlüssel (HKLM) merkt. Ältere Installer
-/// schrieben die Wahl im Admin-Kontext nach HKCU\Software\SKZ Connect: diese Werte einmalig übernehmen und löschen.
+/// Benutzerkonto) gilt die Wahl, die das Setup in seinem Deinstallationsschlüssel (HKLM) merkt.
 /// </summary>
 internal static class InstallerChoices
 {
-    private const string LegacyKey = @"Software\SKZ Connect";
-
     /// <summary>
     /// Deinstallationsschlüssel des Setups (AppId aus installer/SKZ-Connect.iss). Inno Setup legt dort die Werte aus
     /// SetPreviousData als „Inno Setup CodeFile: Name“ ab (RegisterPreviousData im Setup: Language, Theme).
@@ -24,7 +21,7 @@ internal static class InstallerChoices
 
     /// <summary>
     /// Befehlszeile, beim ersten Start (<paramref name="firstRun"/>: noch keine settings.json) die gemerkte Wahl des
-    /// Setups und alte Registry-Werte übernehmen; <paramref name="save"/> nur, wenn sich etwas geändert hat.
+    /// Setups übernehmen; <paramref name="save"/> nur, wenn sich etwas geändert hat.
     /// </summary>
     public static void Apply(Settings settings, IReadOnlyList<string> args, bool firstRun, Action save)
     {
@@ -37,15 +34,11 @@ internal static class InstallerChoices
             var setup = ReadSetup();
             changed |= Adopt(settings, setup.Language, setup.Theme, windows);
         }
-        var legacy = Paths.IsPortable ? default : ReadLegacy();
-        changed |= Adopt(settings, legacy.Language, legacy.Theme, windows);
         if (changed)
         {
             Log.Info($"Sprache/Darstellung aus dem Installer übernommen: {settings.Language ?? "wie Windows"}, {settings.Theme ?? "dark"}");
             save();
         }
-        if (legacy.Found)
-            DeleteLegacy();
     }
 
     /// <summary>Wert eines Arguments „--name=wert“ (null = nicht angegeben).</summary>
@@ -77,7 +70,7 @@ internal static class InstallerChoices
         return changed;
     }
 
-    /// <summary>Wahl der letzten Installation aus dem Deinstallationsschlüssel (nur lesen; fehlt bei Setups bis 1.0.21).</summary>
+    /// <summary>Wahl der letzten Installation aus dem Deinstallationsschlüssel (nur lesen).</summary>
     private static (string? Language, string? Theme) ReadSetup()
     {
         try
@@ -88,46 +81,6 @@ internal static class InstallerChoices
         catch (Exception e) when (e is System.Security.SecurityException or UnauthorizedAccessException or IOException)
         {
             return default;
-        }
-    }
-
-    private static (string? Language, string? Theme, bool Found) ReadLegacy()
-    {
-        try
-        {
-            using var key = Registry.CurrentUser.OpenSubKey(LegacyKey);
-            if (key is null)
-                return default;
-            var language = key.GetValue("Language") as string;
-            var theme = key.GetValue("Theme") as string;
-            return (language, theme, language is not null || theme is not null);
-        }
-        catch (Exception e) when (e is System.Security.SecurityException or UnauthorizedAccessException or IOException)
-        {
-            return default;
-        }
-    }
-
-    /// <summary>Alte Installer-Werte löschen; den Schlüssel nur, wenn danach nichts mehr darin steht.</summary>
-    private static void DeleteLegacy()
-    {
-        try
-        {
-            using (var key = Registry.CurrentUser.OpenSubKey(LegacyKey, writable: true))
-            {
-                if (key is null)
-                    return;
-                key.DeleteValue("Language", throwOnMissingValue: false);
-                key.DeleteValue("Theme", throwOnMissingValue: false);
-                if (key.ValueCount > 0 || key.SubKeyCount > 0)
-                    return;
-            }
-            Registry.CurrentUser.DeleteSubKey(LegacyKey, throwOnMissingSubKey: false);
-        }
-        catch (Exception e) when (e is System.Security.SecurityException or UnauthorizedAccessException or IOException
-                                      or InvalidOperationException)
-        {
-            Log.Warn($"Alte Installer-Werte nicht gelöscht: {Log.Reason(e)}");
         }
     }
 }

@@ -58,7 +58,7 @@ braucht deshalb keine Android-Workload.
 | `ColorSchemes.cs` | Die fünf Farbschemata, gemeinsame Quelle für Windows und Android |
 | `BatteryEstimator.cs`, `StickCalibrator.cs` | Akku aus Spannung, geführte Stick-Kalibrierung |
 | `Dsu.cs`, `DsuServer.cs` | Cemuhook/DSU-Pakete und der UDP-Server (Port 26760, nur lokal oder im Heimnetz) für alle drei Apps |
-| `SwitchPairingData.cs`, `PairingTransfer.cs` | Kopplungsdaten von der Switch-SD-Karte, `.ncpair`-Datei |
+| `SwitchPairingData.cs`, `PairingTransfer.cs` | Kopplungsdaten von der Switch-SD-Karte, `.skzpair`-Datei |
 | `SwitchBtSave.cs` | Bluetooth-Speicher der Switch (`8000000000000050.bin`) – ruhendes Vorhaben „Switch-Identität“ |
 | `WindowsBtDevice.cs` | In Windows gekoppelte Geräte und Art aus dem Namen; seit dem Entfernen des ESP32-Exports nur noch von Tests genutzt |
 
@@ -200,7 +200,7 @@ Kopplung entfernen → Wii: `PairWii` (binäre PIN), sonst `PairJustWorks` (WinR
 | `%LOCALAPPDATA%\SKZ-Connect\battery.json` | Gemessener Spannungssprung beim Laden je Seriennummer |
 | `<Kodi>\userdata\addon_data\service.skzconnect\status.json` | Status für das Kodi-Add-on (nur, wenn es installiert ist) |
 | `*.ncprofile.json` | Exportiertes Profil (`NamedProfile`) |
-| `*.ncpair` | Kopplungsdaten PC → PC (`PairingTransfer`) |
+| `*.skzpair` | Kopplungsdaten PC → PC (`PairingTransfer`) |
 
 Portabel (neben der EXE liegt `portable.txt` oder ein Ordner `data`): Einstellungen, Protokoll und Sicherungen liegen
 in `data\`.

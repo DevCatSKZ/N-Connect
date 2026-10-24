@@ -25,37 +25,8 @@ public static class AppPrefs
     private static ISharedPreferences? _prefs;
     private static ISharedPreferences P => _prefs ??= OpenPrefs();
 
-    /// <summary>Fruehere Versionen speicherten unter „nconnect" – einmalig uebernehmen, dann loeschen.</summary>
-    private static ISharedPreferences OpenPrefs()
-    {
-        var ctx = global::Android.App.Application.Context;
-        var p = ctx.GetSharedPreferences("skzconnect", FileCreationMode.Private)!;
-        var old = ctx.GetSharedPreferences("nconnect", FileCreationMode.Private)!;
-        var all = old.All;
-        if (all is null || all.Count == 0)
-            return p;
-        var e = p.Edit()!;
-        foreach (var kv in all)
-        {
-            // Je nach Laufzeit kommen die Werte als Java-Hüllen oder schon als .NET-Typen an.
-            switch (kv.Value)
-            {
-                case bool b: e.PutBoolean(kv.Key, b); break;
-                case int i: e.PutInt(kv.Key, i); break;
-                case long l: e.PutLong(kv.Key, l); break;
-                case float f: e.PutFloat(kv.Key, f); break;
-                case string str: e.PutString(kv.Key, str); break;
-                case Java.Lang.Boolean b: e.PutBoolean(kv.Key, b.BooleanValue()); break;
-                case Java.Lang.Integer i: e.PutInt(kv.Key, i.IntValue()); break;
-                case Java.Lang.Long l: e.PutLong(kv.Key, l.LongValue()); break;
-                case Java.Lang.Float f: e.PutFloat(kv.Key, f.FloatValue()); break;
-                case Java.Lang.String str: e.PutString(kv.Key, str.ToString()); break;
-            }
-        }
-        e.Apply();
-        ctx.DeleteSharedPreferences("nconnect");
-        return p;
-    }
+    private static ISharedPreferences OpenPrefs() =>
+        global::Android.App.Application.Context.GetSharedPreferences("skzconnect", FileCreationMode.Private)!;
 
     /// <summary>Einrichtungs-Assistent abgeschlossen.</summary>
     public static bool SetupDone

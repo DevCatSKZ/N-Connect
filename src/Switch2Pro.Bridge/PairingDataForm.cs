@@ -7,7 +7,7 @@ namespace Switch2Pro.Bridge;
 
 /// <summary>
 /// Fenster „Kopplungsdaten“: von der Switch-SD-Karte übernehmen (Bluepick_RCM/hekate-Export), von einem anderen
-/// PC übernehmen (Datei *.ncpair) und für einen anderen PC exportieren. Übernommen wird nur in die Einstellungen
+/// PC übernehmen (Datei *.skzpair) und für einen anderen PC exportieren. Übernommen wird nur in die Einstellungen
 /// von SKZ Connect – vorher wird eine Sicherung angelegt, die sich hier wiederherstellen lässt. Windows-Registrierung
 /// und Bluetooth-Adapter bleiben unverändert, deshalb ist kein Adminrecht (UAC) nötig.
 /// </summary>

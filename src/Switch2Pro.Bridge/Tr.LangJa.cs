@@ -807,7 +807,7 @@ internal static partial class Tr
             "Bluepick_RCM または hekate で作成されたペアリングデータ（switchroot/joycon_mac.ini）",
         ["Einlesen …"] = "読み込む …",
         ["Von einem anderen PC"] = "別の PC から",
-        ["Mit SKZ Connect exportierte Datei (*.ncpair)"] = "SKZ Connect でエクスポートされたファイル（*.ncpair）",
+        ["Mit SKZ Connect exportierte Datei (*.skzpair)"] = "SKZ Connect でエクスポートされたファイル（*.skzpair）",
         ["Datei öffnen …"] = "ファイルを開く …",
         ["Inhalt"] = "内容",
         ["Weitergeben und sichern"] = "共有とバックアップ",

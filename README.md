@@ -19,9 +19,9 @@ Dazu SKZ Connect für Android (Beta) und ein Add-on für Kodi/LibreELEC.
 
 | Plattform | Version | Download | Anleitung |
 |---|---|---|---|
-| Windows 10 (ab 2004) und 11, 64 Bit | 1.0.23 | [Setup oder Portable-ZIP](https://github.com/DevCatSKZ/SKZ-Connect/releases/latest) | [Windows](docs/anleitung/windows.md) |
-| Android 8 oder neuer | 0.9.2 Beta | [SKZ-Connect-Android-0.9.2.apk](https://github.com/DevCatSKZ/SKZ-Connect/releases/download/v1.0.23/SKZ-Connect-Android-0.9.2.apk) | [Android](docs/anleitung/android.md) |
-| Kodi unter LibreELEC | 0.4.7 | [DevCatSKZ Repository](https://github.com/DevCatSKZ/kodi-repo) | [Kodi](docs/anleitung/kodi.md) |
+| Windows 10 (ab 2004) und 11, 64 Bit | 1.0.24 | [Setup oder Portable-ZIP](https://github.com/DevCatSKZ/SKZ-Connect/releases/latest) | [Windows](docs/anleitung/windows.md) |
+| Android 8 oder neuer | 0.9.3 Beta | [SKZ-Connect-Android-0.9.3.apk](https://github.com/DevCatSKZ/SKZ-Connect/releases/download/v1.0.24/SKZ-Connect-Android-0.9.3.apk) | [Android](docs/anleitung/android.md) |
+| Kodi unter LibreELEC | 0.4.8 | [DevCatSKZ Repository](https://github.com/DevCatSKZ/kodi-repo) | [Kodi](docs/anleitung/kodi.md) |
 
 Das Windows-Setup installiert die benötigten Treiber ViGEmBus und HidHide mit. Setup und Programm sind nicht
 code-signiert, daher zeigt Windows SmartScreen beim ersten Start eine Warnung.

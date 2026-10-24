@@ -283,8 +283,6 @@ internal static class Autostart
 {
     private const string RunKey = @"Software\Microsoft\Windows\CurrentVersion\Run";
     private const string RunValue = "SKZ Connect";
-    /// <summary>Einträge der Vorversionen (vor den Umbenennungen in N-Connect bzw. SKZ Connect).</summary>
-    private static readonly string[] LegacyRunValues = ["N-Connect", "Switch2ProBridge"];
 
     /// <summary>Autostart für den angemeldeten Benutzer (von der App gesetzt).</summary>
     public static bool IsEnabled
@@ -329,30 +327,20 @@ internal static class Autostart
     }
 
     /// <summary>
-    /// Autostart der Vorversionen auf den neuen Namen und die neue EXE umstellen. Zeigt der eigene Eintrag auf eine EXE,
-    /// die es nicht mehr gibt (Ordner umbenannt oder verschoben), auf diese EXE umstellen – sonst startet nichts.
+    /// Zeigt der eigene Eintrag auf eine EXE, die es nicht mehr gibt (Ordner umbenannt oder verschoben), auf diese EXE
+    /// umstellen – sonst startet nichts.
     /// </summary>
-    public static void MigrateLegacy()
+    public static void Repair()
     {
         try
         {
-            using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(RunKey, writable: true);
-            bool found = false;
-            foreach (string legacy in LegacyRunValues)
-                if (key?.GetValue(legacy) is string)
-                {
-                    key.DeleteValue(legacy, throwOnMissingValue: false);
-                    found = true;
-                }
+            using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(RunKey);
             if (key?.GetValue(RunValue) is string current && ExePath(current) is { } exe && !File.Exists(exe))
-                found = true;
-            if (!found)
-                return;
-            Set(true);
+                Set(true);
         }
         catch (Exception e) when (e is UnauthorizedAccessException or System.Security.SecurityException or IOException)
         {
-            Log.Warn($"Alter Autostart-Eintrag nicht umgestellt: {e.Message}");
+            Log.Warn($"Autostart-Eintrag nicht umgestellt: {e.Message}");
         }
     }
 }

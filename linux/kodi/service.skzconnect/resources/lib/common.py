@@ -323,7 +323,7 @@ def _status_candidates():
     yield STATUS_JSON
     if xbmc.getCondVisibility('System.Platform.Android'):
         yield '/sdcard/Documents/SKZ-Connect/status.json'
-        yield '/sdcard/Android/data/com.devcatskz.nconnect/files/status.json'
+        yield '/sdcard/Android/data/com.devcatskz.skzconnect/files/status.json'
 
 
 def read_status():

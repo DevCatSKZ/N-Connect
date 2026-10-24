@@ -59,7 +59,7 @@
 
     <!-- Shizuku liefert über diesen Provider seine Schnittstelle an die App (Shell-Rechte ohne Root). -->
     <provider android:name="rikka.shizuku.ShizukuProvider"
-              android:authorities="com.devcatskz.nconnect.shizuku"
+              android:authorities="com.devcatskz.skzconnect.shizuku"
               android:multiprocess="false"
               android:enabled="true"
               android:exported="true"
@@ -67,7 +67,7 @@
 
     <!-- Reicht geladene Update-APKs sicher an den System-Installer durch (statt sie „auszuliefern“). -->
     <provider android:name="androidx.core.content.FileProvider"
-              android:authorities="com.devcatskz.nconnect.fileprovider"
+              android:authorities="com.devcatskz.skzconnect.fileprovider"
               android:exported="false"
               android:grantUriPermissions="true">
       <meta-data android:name="android.support.FILE_PROVIDER_PATHS"
