@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="repository.devcatskz" name="DevCatSKZ Repository" version="1.0.5" provider-name="devcatskz">
+<addon id="repository.devcatskz" name="DevCatSKZ Repository" version="1.0.6" provider-name="devcatskz">
   <!-- Add-on-Quelle für alle Kodi-Plugins von DevCatSKZ (SKZ Connect und künftige). Inhalt: GitHub-Repo
        DevCatSKZ/kodi-repo (addons.xml, Prüfsummen, ZIPs), erzeugt mit repo-tools/build_repo.py. -->
   <extension point="xbmc.addon.repository" name="DevCatSKZ Repository">
