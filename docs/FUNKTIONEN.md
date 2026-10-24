@@ -494,9 +494,11 @@ erneut versucht – ebenso, wenn ViGEm keinen virtuellen Controller anlegen kann
   Akkubalken, Aufleuchten/Glühen der Karten. Ein gemeinsamer Takt läuft nur, solange sich etwas bewegt. Aus, wenn
   Windows-Animationseffekte abgeschaltet sind und bei den Prüfhilfen `--render…` (Endzustände).
 - **Logo/Icon**: Vektor in der DevCat-Bildsprache (`Branding.DrawLogo`), wie SKZ Monitor und SKZ Remote: Gamepad mit
-  Katzenohren und leuchtenden Cyan-Mandelaugen (Schlitzpupille) auf dunkler Navy-Fläche, Iris-Verlauf
-  (Teal→Blau→Violett) am Rand, Amber-Nase, Tasten als Raute, Wi-Fi-Signal zwischen den Ohren als Connect-Signatur;
-  vereinfacht sich bei kleinen Größen (ab 24 px Steuerkreuz/Tasten, ab 32 px Signal, ab 48 px Lichtkante/Schatten).
+  offenen Katzenohren und kleinen leuchtenden Cyan-Mandelaugen (Schlitzpupille), dünne Kontur im Iris-Verlauf
+  (Teal→Blau→Violett) nur um die Gesamtform, dunkles Gesicht, Amber-Nase, Tasten als Raute, Wi-Fi-Signal zwischen den
+  Ohren als Connect-Signatur. Grund überall derselbe Navy-Verlauf wie bei den SKZ-Icons (`TileTop`/`TileBottom`);
+  Motiv mit Abstand zum Rand (~65 % Breite). Vereinfacht sich bei kleinen Größen (ab 24 px Steuerkreuz/Tasten, ab
+  32 px Augen-Leuchten, ab 40 px Signal).
   Fenstersymbol aus der eingebetteten ICO-Datei mit allen Größen (nicht `ExtractAssociatedIcon` – nur 32 px).
   `--render-brand` erzeugt ICO (kleine Größen als 32-Bit-Bitmap, 256 px als PNG), PNG und Installer-Grafiken, ohne
   ein Fenster zu öffnen – Ablauf und Zielorte der Dateien stehen in [../HANDOVER.md](../HANDOVER.md#icon-und-branding).

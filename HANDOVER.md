@@ -74,14 +74,16 @@ Nach einer Änderung am Logo alle Dateien neu erzeugen und verteilen:
 dotnet build src/Switch2Pro.Bridge -c Release
 src\Switch2Pro.Bridge\bin\Release\net10.0-windows*\SKZ-Connect.exe --render-brand installer\art  # kein Fenster
 copy installer\art\SKZ-Connect.png installer\art\SKZ-Connect.ico src\Switch2Pro.Bridge\
-py -3 android\make_icons.py                                     # Android-Mipmaps aus src\...\SKZ-Connect.png
+py -3 android\make_icons.py                                     # Android-Mipmaps aus installer\art
 copy installer\art\SKZ-Connect.png ..\kodi-repo\service.skzconnect\icon.png       # ebenso
 copy installer\art\SKZ-Connect.png ..\kodi-repo\plugin.skzconnect.status\icon.png # plugin… und
 copy installer\art\SKZ-Connect.png ..\kodi-repo\script.skzconnect.bundle\icon.png # script…
 copy installer\art\SKZ-Connect.png ..\SKZ-Connect-pages\logo.png                  # Webseite
 ```
 
-`--render-brand` schreibt `SKZ-Connect.png`/`.ico` und die sechs `wizard-*.bmp` (Inno Setup wählt je Skalierung).
+`--render-brand` schreibt `SKZ-Connect.png`/`.ico`, `SKZ-Connect-glyph.png` (Glyph ohne Grund) und die sechs
+`wizard-*.bmp` (Inno Setup wählt je Skalierung). Android-Icon wie bei SKZ Monitor/Remote: Hintergrund-Ebene nur der
+Navy-Verlauf, das Glyph als Vordergrund-Ebene (~46 % der 108-dp-Fläche, bleibt unter jeder Maske ganz sichtbar).
 README und `addon.xml` der Add-ons verweisen bereits auf diese Dateien; Kodi-ZIPs ziehen das Icon beim Bauen aus
 `installer/art` mit (`build-kodi-addon.ps1`). Die Add-on-ZIPs im kodi-repo behalten ihr altes Icon bis zum nächsten
 Add-on-Build – die Ordner-`icon.png` (Repo-Ansicht) sofort mitziehen.

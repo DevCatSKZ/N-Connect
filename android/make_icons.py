@@ -1,50 +1,49 @@
 # -*- coding: utf-8 -*-
 """
-Erzeugt die Android-App-Icons aus dem Windows-App-Icon (src/Switch2Pro.Bridge/SKZ-Connect.png), damit alle Versionen
-gleich aussehen. Adaptives Icon: die blaue Fläche des Windows-Icons füllt die ganze Android-Form (Kreis, Squircle …),
-das Gamepad liegt in der sicheren Zone; der Vordergrund bleibt leer. Aufruf: python android/make_icons.py
+Erzeugt die Android-App-Icons aus den Dateien von --render-brand (installer/art), damit alle Versionen gleich aussehen.
+Adaptives Icon wie bei SKZ Monitor und SKZ Remote: der Hintergrund ist nur der Navy-Verlauf, das Glyph liegt als
+eigener Vordergrund in der sicheren Zone. Die Altform (appicon.png) ist das PNG-Master-Icon.
+Aufruf: python android/make_icons.py
 """
 import pathlib
 
 from PIL import Image
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-SOURCE = ROOT / 'src' / 'Switch2Pro.Bridge' / 'SKZ-Connect.png'
+ART = ROOT / 'installer' / 'art'
 RES = ROOT / 'android' / 'SkzConnect.Android' / 'Resources'
 DENSITIES = {'mdpi': 1, 'hdpi': 1.5, 'xhdpi': 2, 'xxhdpi': 3, 'xxxhdpi': 4}
-BORDER = 16  # heller Rand des Windows-Icons wird abgeschnitten
+# Navy-Verlauf identisch zu Branding.TileTop/TileBottom und den SKZ-Icons.
+TOP, BOTTOM = (6, 13, 20), (10, 18, 27)
+GLYPH_WIDTH = 0.46  # Anteil der 108-dp-Fläche – wie das Monitor-Glyph (~43 %), auch unter der Kreismaske ganz sichtbar
 
 
-def full_bleed(src):
-    """Transparente Ecken zeilenweise mit der Blaufarbe der Bildmitte füllen und den Rand abschneiden."""
-    rgba = src.convert('RGBA')
-    w, h = rgba.size
-    filled = Image.new('RGBA', (w, h))
-    px_src, px = rgba.load(), filled.load()
-    for y in range(h):
-        row = px_src[w // 2, min(max(y, BORDER + 4), h - BORDER - 5)]
-        for x in range(w):
-            r, g, b, a = px_src[x, y]
-            k = a / 255
-            px[x, y] = (round(r * k + row[0] * (1 - k)), round(g * k + row[1] * (1 - k)),
-                        round(b * k + row[2] * (1 - k)), 255)
-    return filled.crop((BORDER, BORDER, w - BORDER, h - BORDER))
+def navy(size):
+    img = Image.new('RGBA', (size, size))
+    px = img.load()
+    for y in range(size):
+        t = y / max(1, size - 1)
+        c = tuple(round(a + (b - a) * t) for a, b in zip(TOP, BOTTOM)) + (255,)
+        for x in range(size):
+            px[x, y] = c
+    return img
 
 
 def main():
-    src = Image.open(SOURCE)
-    bleed = full_bleed(src)
+    master = Image.open(ART / 'SKZ-Connect.png').convert('RGBA')
+    glyph = Image.open(ART / 'SKZ-Connect-glyph.png').convert('RGBA')
+    glyph = glyph.crop(glyph.getbbox())
     for name, scale in DENSITIES.items():
         folder = RES / ('mipmap-' + name)
         adaptive = round(108 * scale)
-        # Android zeigt nur die inneren 72 dp der 108-dp-Fläche: Motiv auf 76 dp, außen dieselbe Fläche vergrößert.
-        canvas = bleed.resize((adaptive, adaptive), Image.LANCZOS)
-        inner = round(76 * scale)
-        canvas.paste(bleed.resize((inner, inner), Image.LANCZOS), ((adaptive - inner) // 2, (adaptive - inner) // 2))
-        canvas.save(folder / 'appicon_background.png')
-        Image.new('RGBA', (adaptive, adaptive), (0, 0, 0, 0)).save(folder / 'appicon_foreground.png')
+        navy(adaptive).save(folder / 'appicon_background.png')
+        w = round(adaptive * GLYPH_WIDTH)
+        h = round(glyph.height * w / glyph.width)
+        fg = Image.new('RGBA', (adaptive, adaptive), (0, 0, 0, 0))
+        fg.alpha_composite(glyph.resize((w, h), Image.LANCZOS), ((adaptive - w) // 2, (adaptive - h) // 2))
+        fg.save(folder / 'appicon_foreground.png')
         legacy = round(48 * scale)
-        src.convert('RGBA').resize((legacy, legacy), Image.LANCZOS).save(folder / 'appicon.png')
+        master.resize((legacy, legacy), Image.LANCZOS).save(folder / 'appicon.png')
         print(name, adaptive, legacy)
 
 

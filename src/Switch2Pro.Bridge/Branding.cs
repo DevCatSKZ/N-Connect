@@ -60,26 +60,26 @@ internal static class Branding
         },
     };
 
-    /// <summary>Gamepad-Silhouette: Kapsel-Körper und zwei leicht auswärts gekippte Griffe als eine Fläche.</summary>
+    /// <summary>Gamepad-Silhouette: Körper mit runden Ecken und zwei leicht auswärts gekippte Griffe als eine Fläche.</summary>
     private static GraphicsPath PadPath(RectangleF r, float s)
     {
         var pad = new GraphicsPath(FillMode.Winding);
         RectangleF R(float x, float y, float w, float h) => new(r.X + x * s, r.Y + y * s, w * s, h * s);
-        using (var body = Theme.RoundedRect(R(0.20f, 0.35f, 0.60f, 0.40f), s * 0.13f))
+        using (var body = Theme.RoundedRect(R(0.21f, 0.35f, 0.58f, 0.33f), s * 0.12f))
             pad.AddPath(body, false); // AddPath kopiert – den Hilfspfad gleich freigeben
         // Griffe: gedrehte Ellipsen unter den Ecken – liest sich wie die Handauflagen eines Pro-Controllers.
         void Grip(float cx, float angle)
         {
             using var grip = new GraphicsPath();
-            grip.AddEllipse(new RectangleF(-0.075f * s, -0.135f * s, 0.15f * s, 0.27f * s));
+            grip.AddEllipse(new RectangleF(-0.072f * s, -0.125f * s, 0.144f * s, 0.25f * s));
             using var m = new System.Drawing.Drawing2D.Matrix();
             m.RotateAt(angle, PointF.Empty);
-            m.Translate(r.X + cx * s, r.Y + 0.735f * s, MatrixOrder.Append);
+            m.Translate(r.X + cx * s, r.Y + 0.70f * s, MatrixOrder.Append);
             grip.Transform(m);
             pad.AddPath(grip, false);
         }
-        Grip(0.5f - 0.265f, 20f);
-        Grip(0.5f + 0.265f, -20f);
+        Grip(0.5f - 0.245f, 20f);
+        Grip(0.5f + 0.245f, -20f);
         return pad;
     }
 
@@ -97,92 +97,90 @@ internal static class Branding
     }
 
     /// <summary>
-    /// App-Icon: Gamepad-Katze im DevCat-Stil auf Navy-Kachel. Vektor – in jeder Größe scharf; kleine Größen lassen
-    /// Details weg (ab 24 px Steuerkreuz und Tasten, ab 32 px Wi-Fi-Signal, ab 48 px Lichtkante).
+    /// App-Icon: Gamepad-Katze im DevCat-Stil wie SKZ Monitor (Monitor-Katze) und SKZ Remote (Handy-Katze): dünne
+    /// Iris-Kontur, offene Ohren, dunkles Gesicht mit kleinen leuchtenden Augen. Vektor – in jeder Größe scharf; kleine
+    /// Größen lassen Details weg (ab 24 px Steuerkreuz und Tasten, ab 32 px Augen-Leuchten, ab 40 px Wi-Fi-Signal).
+    /// <paramref name="tile"/> false = nur das Glyph, etwas größer, damit es im Infobereich die Fläche füllt.
     /// </summary>
     public static void DrawLogo(Graphics g, RectangleF r, bool tile = true)
     {
         g.SmoothingMode = SmoothingMode.AntiAlias;
         g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-        float s = r.Width;
-        PointF P(float x, float y) => new(r.X + x * s, r.Y + y * s);
-        RectangleF R(float x, float y, float w, float h) => new(r.X + x * s, r.Y + y * s, w * s, h * s);
 
         if (tile)
         {
-            using var tilePath = Theme.RoundedRect(r, s * 0.23f);
+            float t = r.Width;
+            using var tilePath = Theme.RoundedRect(r, t * 0.23f);
             using (var back = new LinearGradientBrush(r, TileTop, TileBottom, LinearGradientMode.Vertical))
                 g.FillPath(back, tilePath);
-            if (s >= 48)
-            {
-                // Lichtkante oben und dunklerer Rand – gibt der Kachel Tiefe wie bei Windows-11-Icons.
-                using var edge = new Pen(Color.FromArgb(60, 0, 10, 20), Math.Max(1f, s / 96f));
-                g.DrawPath(edge, tilePath);
-                using var shine = new LinearGradientBrush(r, Color.FromArgb(22, 255, 255, 255), Color.FromArgb(0, 255, 255, 255),
-                    LinearGradientMode.Vertical);
-                using var upper = Theme.RoundedRect(R(0.02f, 0.02f, 0.96f, 0.5f), s * 0.21f);
-                g.FillPath(shine, upper);
-            }
+        }
+        else
+        {
+            // Glyph reicht im Einheitsquadrat von 0.15 bis 0.85 – ohne Kachel um diesen Bereich vergrößern.
+            const float zoom = 1.2f;
+            r = new RectangleF(r.X + r.Width * (1 - zoom) / 2, r.Y + r.Height * (1 - zoom) / 2 + r.Height * 0.01f,
+                r.Width * zoom, r.Height * zoom);
         }
 
-        // Gesichtsfläche des Pads dunkel füllen (Glas-Look), Rahmen im Iris-Verlauf.
-        // Ohne Kachel (Tray/ICO) fast deckend: dunkles Glyph mit leuchtenden Augen bleibt auf hellem
-        // und dunklem Grund lesbar.
-        float rim = Math.Max(1.4f, s * 0.033f);
-        using (var pad = PadPath(r, s))
-        {
-            using var face = new SolidBrush(Color.FromArgb(tile ? 200 : 235, Face));
-            g.FillPath(face, pad);
-            using var iris = Iris(r);
-            using var rimPen = new Pen(iris, rim);
-            g.DrawPath(rimPen, pad);
-        }
+        float s = r.Width;
+        PointF P(float x, float y) => new(r.X + x * s, r.Y + y * s);
+        RectangleF R(float x, float y, float w, float h) => new(r.X + x * s, r.Y + y * s, w * s, h * s);
+        float rim = Math.Max(1.2f, s * 0.03f);
 
-        // Katzenohren auf der Oberkante: Iris-Dreieck mit dunklem Kern, spitz und weit genug
-        // auseinander, dass in der Mitte Platz für das Wi-Fi-Signal bleibt.
-        using (var iris = Iris(r))
+        using (var iris = Iris(R(0.15f, 0.2f, 0.7f, 0.65f)))
         {
-            foreach (int sgn in new[] { -1, 1 })
+            // Katzenohren als offene Iris-Konturen – die Basis verschwindet unter der Gesichtsfläche.
+            using (var earPen = new Pen(iris, rim) { LineJoin = LineJoin.Miter, MiterLimit = 6f })
             {
-                float bcx = 0.5f + sgn * 0.180f;
-                float bh = 0.105f;
-                float ax = bcx + sgn * 0.014f;
-                var outer = new[] { P(ax, 0.232f), P(bcx - bh, 0.372f), P(bcx + bh, 0.372f) };
-                using var earPath = new GraphicsPath();
-                earPath.AddPolygon(outer);
-                // gleicher Verlauf wie der Pad-Rahmen: links Teal, rechts Violett
-                g.FillPath(iris, earPath);
-                using var innerPath = new GraphicsPath();
-                innerPath.AddPolygon(new[]
+                foreach (int sgn in new[] { -1, 1 })
                 {
-                    P(ax + (bcx - ax) * 0.20f, 0.232f + 0.115f * 0.36f),
-                    P(bcx - bh * 0.52f, 0.372f), P(bcx + bh * 0.52f, 0.372f),
-                });
-                using var dark = new SolidBrush(Face);
-                g.FillPath(dark, innerPath);
+                    float bcx = 0.5f + sgn * 0.175f;
+                    g.DrawLines(earPen, new[]
+                    {
+                        P(bcx - 0.075f, 0.38f), P(bcx + sgn * 0.012f, 0.245f), P(bcx + 0.075f, 0.38f),
+                    });
+                }
             }
+
+            // Pad-Kontur: doppelt so breit zeichnen und danach die Fläche deckend füllen – übrig bleibt nur der
+            // äußere Rand der Gesamtform, ohne Linien, wo sich Körper und Griffe überlappen.
+            using var pad = PadPath(r, s);
+            using (var rimPen = new Pen(iris, rim * 2) { LineJoin = LineJoin.Round })
+                g.DrawPath(rimPen, pad);
+            using var face = new SolidBrush(Face);
+            g.FillPath(face, pad);
         }
 
-        // Katzenaugen: leuchtende Cyan-Mandeln mit dunkler Schlitzpupille – weit genug nach außen
-        // und hoch genug, damit das Gesicht katzig bleibt.
-        float er = 0.098f;
-        float ey = 0.500f;
-        using var eyeBrush = new SolidBrush(EyeCyan);
-        using var pupilBrush = new SolidBrush(Face);
+        // Katzenaugen: kleine Cyan-Mandeln mit Leuchten und dunkler Schlitzpupille.
+        float er = 0.068f, ey = 0.475f;
         foreach (int sgn in new[] { -1, 1 })
         {
-            float ecx = 0.5f + sgn * 0.125f;
-            using var eye = LeafEye(ecx, ey, er, er * 0.42f, s, r);
+            float ecx = 0.5f + sgn * 0.12f;
+            if (s >= 32)
+            {
+                var c = P(ecx, ey);
+                float gr = er * 1.5f * s;
+                using var glowPath = new GraphicsPath();
+                glowPath.AddEllipse(c.X - gr, c.Y - gr, gr * 2, gr * 2);
+                using var glow = new PathGradientBrush(glowPath)
+                {
+                    CenterColor = Color.FromArgb(110, EyeCyan),
+                    SurroundColors = [Color.FromArgb(0, EyeCyan)],
+                };
+                g.FillPath(glow, glowPath);
+            }
+            using var eyeBrush = new SolidBrush(EyeCyan);
+            using var eye = LeafEye(ecx, ey, er, er * 0.5f, s, r);
             g.FillPath(eyeBrush, eye);
-            // vertikale Pupille (läuft über den Blattrand hinaus und verschmilzt mit dem Dunkel)
-            float pw = er * 0.30f, ph = er * 0.62f;
+            float pw = er * 0.3f, ph = er * 0.78f;
+            using var pupilBrush = new SolidBrush(Face);
             using var pupil = Theme.RoundedRect(R(ecx - pw / 2, ey - ph / 2, pw, ph), pw / 2);
             g.FillPath(pupilBrush, pupil);
         }
 
-        // Nase (Amber-Dreieck) unter den Augen.
+        // Nase (kleines Amber-Dreieck) unter den Augen.
         using (var nose = new SolidBrush(Amber))
-            g.FillPolygon(nose, new[] { P(0.455f, 0.575f), P(0.545f, 0.575f), P(0.5f, 0.618f) });
+            g.FillPolygon(nose, new[] { P(0.474f, 0.535f), P(0.526f, 0.535f), P(0.5f, 0.562f) });
 
         if (s >= 24)
         {
@@ -190,27 +188,27 @@ internal static class Branding
             using var dim = new SolidBrush(DimTeal);
             using (var dpad = new GraphicsPath(FillMode.Winding))
             {
-                using (var across = Theme.RoundedRect(R(0.245f, 0.604f, 0.11f, 0.032f), s * 0.016f))
+                using (var across = Theme.RoundedRect(R(0.263f, 0.597f, 0.09f, 0.026f), s * 0.013f))
                     dpad.AddPath(across, false);
-                using (var down = Theme.RoundedRect(R(0.284f, 0.565f, 0.032f, 0.11f), s * 0.016f))
+                using (var down = Theme.RoundedRect(R(0.295f, 0.565f, 0.026f, 0.09f), s * 0.013f))
                     dpad.AddPath(down, false);
                 g.FillPath(dim, dpad);
             }
-            float b = 0.034f;
-            foreach (var (x, y) in new[] { (0.715f, 0.565f), (0.765f, 0.615f), (0.715f, 0.665f), (0.665f, 0.615f) })
+            float b = 0.026f;
+            foreach (var (x, y) in new[] { (0.692f, 0.574f), (0.730f, 0.610f), (0.692f, 0.646f), (0.654f, 0.610f) })
                 g.FillEllipse(dim, R(x - b / 2, y - b / 2, b, b));
         }
 
-        if (s >= 32)
+        if (s >= 44)
         {
             // Wi-Fi-Bögen oben mittig zwischen den Ohren (Connect-Signatur), Amber wie die Nase.
-            float w = Math.Max(1.5f, s * 0.018f);
+            float w = Math.Max(1.5f, s * 0.02f);
             using var pen = new Pen(Amber, w) { StartCap = LineCap.Round, EndCap = LineCap.Round };
-            var center = P(0.5f, 0.236f);
-            foreach (float radius in new[] { 0.042f, 0.078f })
+            var center = P(0.5f, 0.275f);
+            foreach (float radius in new[] { 0.04f, 0.075f })
             {
                 float rr = radius * s;
-                g.DrawArc(pen, center.X - rr, center.Y - rr, rr * 2, rr * 2, 208, 124);
+                g.DrawArc(pen, center.X - rr, center.Y - rr, rr * 2, rr * 2, 225, 90);
             }
             float d = s * 0.026f;
             using var dot = new SolidBrush(Amber);
@@ -218,7 +216,7 @@ internal static class Branding
         }
     }
 
-    /// <summary>Logo als quadratisches Bild. <paramref name="tile"/> false = nur das Glyph (Tray, ICO, Navy-Fläche).</summary>
+    /// <summary>Logo als quadratisches Bild. <paramref name="tile"/> false = nur das Glyph (Tray, ICO).</summary>
     /// <remarks>In der Oberfläche direkt mit <see cref="DrawLogo"/> in Zielgröße zeichnen – ein verkleinertes Bild wird an den Kanten pixelig.</remarks>
     public static Bitmap Render(int size, bool tile = true)
     {
@@ -236,20 +234,23 @@ internal static class Branding
         Directory.CreateDirectory(folder);
         // ICO: nur das Glyph mit transparentem Grund – wie bei SKZ, im Tray soll kein Kasten kleben.
         WriteIco(Path.Combine(folder, "SKZ-Connect.ico"), [16, 20, 24, 32, 40, 48, 64, 96, 128, 256]);
-        // PNG-Master (Android, Kodi, Installer, Website): Navy-Fläche wie bei den SKZ-Icons, Glyph ~94 %.
+        // PNG-Master (Kodi, Website, Android-Altform): volle Navy-Fläche wie bei SKZ Monitor/Remote, das Glyph mit
+        // demselben Abstand zum Rand (~65 % Breite).
         using (var png = new Bitmap(512, 512, PixelFormat.Format32bppArgb))
         {
             using (var g = Graphics.FromImage(png))
             {
-                g.SmoothingMode = SmoothingMode.AntiAlias;
                 var all = new Rectangle(0, 0, 512, 512);
                 using (var back = new LinearGradientBrush(all, TileTop, TileBottom, LinearGradientMode.Vertical))
                     g.FillRectangle(back, all);
-                float m = 512 * 0.03f;
+                float m = 512 * 0.115f;
                 DrawLogo(g, new RectangleF(m, m, 512 - 2 * m, 512 - 2 * m), tile: false);
             }
             png.Save(Path.Combine(folder, "SKZ-Connect.png"), ImageFormat.Png);
         }
+        // Glyph ohne Grund für den Vordergrund des adaptiven Android-Icons (android/make_icons.py).
+        using (var glyph = Render(1024, tile: false))
+            glyph.Save(Path.Combine(folder, "SKZ-Connect-glyph.png"), ImageFormat.Png);
         // Inno Setup wählt je nach Bildschirmskalierung die passende Größe (100 %, 150 %, 200 %).
         foreach (var (w, h, tag) in new[] { (164, 314, "100"), (246, 471, "150"), (328, 628, "200") })
             SaveBmp(WizardImage(w, h), Path.Combine(folder, $"wizard-{tag}.bmp"));
