@@ -169,8 +169,8 @@ Source: "redist\HidHide_Setup.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall;
 ; Reste der Vorversion („Nintendo Controller für Windows“, Switch2ProBridge.exe) beim Update entfernen.
 Type: files; Name: "{app}\Switch2ProBridge.exe"
 Type: files; Name: "{autoprograms}\Nintendo Controller für Windows.lnk"
-; Installationsordner der Vorversion „SKZ Connect“ (das Update legt unter SKZ-Connect an).
-Type: filesandordirs; Name: "{autopf}\SKZ Connect"
+; Installationsordner der Vorversion „N-Connect“ (das Update legt unter SKZ-Connect an).
+Type: filesandordirs; Name: "{autopf}\N-Connect"
 ; Anleitung der anderen Sprache aus einer früheren Installation.
 Type: files; Name: "{app}\README.md"; Languages: german
 Type: files; Name: "{app}\Anleitung.md"; Languages: not german
@@ -180,7 +180,7 @@ Root: HKLM; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: 
 ; Autostart richtet SKZ Connect beim ersten Start selbst ein (für den Benutzer, HKCU\…\Run, in der App abschaltbar;
 ; beim Deinstallieren entfernt RemoveAutostartEntries ihn). Einträge älterer Versionen für alle Benutzer entfernen –
 ; sie ließen sich in der App nicht abschalten.
-Root: HKLM; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: none; ValueName: "SKZ Connect"; Flags: deletevalue
+Root: HKLM; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: none; ValueName: "N-Connect"; Flags: deletevalue
 
 [Icons]
 Name: "{autoprograms}\{#AppName}"; Filename: "{app}\{#AppExe}"
@@ -204,8 +204,8 @@ Filename: "{code:HidHideCli}"; Parameters: "--app-reg ""{app}\{#AppExe}"" --cloa
 ; Sprache und Darstellung des Setups mitgeben (beim stillen Update nicht, siehe SetupArgs). Läuft auch still, damit
 ; SKZ Connect nach dem Ein-Klick-Update wieder startet.
 Filename: "{app}\{#AppExe}"; Parameters: "{code:SetupArgs}"; Description: "{cm:LaunchNow}"; Flags: nowait postinstall runasoriginaluser
-; Geplante Aufgabe der Vorversion entfernen (hieß „SKZ Connect HidHide“).
-Filename: "{sys}\schtasks.exe"; Parameters: "/Delete /TN ""SKZ Connect HidHide"" /F"; Flags: runhidden skipifdoesntexist
+; Geplante Aufgabe der Vorversion entfernen (hieß „N-Connect HidHide“).
+Filename: "{sys}\schtasks.exe"; Parameters: "/Delete /TN ""N-Connect HidHide"" /F"; Flags: runhidden skipifdoesntexist
 
 [UninstallRun]
 Filename: "{cmd}"; Parameters: "/C taskkill /IM {#AppExe} /F"; Flags: runhidden; RunOnceId: "KillBridge"
@@ -269,7 +269,7 @@ end;
 // Eigene Seite „Darstellung“: Die Wahl bekommt die App beim Start nach der Installation als „--setup-theme=…“
 // (SetupArgs) und übernimmt sie nur, solange in ihren Einstellungen noch keine Darstellung steht. Vorausgewählt ist
 // die Wahl der letzten Installation (GetPreviousData, im Deinstallationsschlüssel), sonst Dunkel. Installationen bis
-// 1.0.21 hatten sie nur nach HKCU\Software\SKZ Connect geschrieben – dort nur lesen, damit ein Durchklicken beim Update
+// 1.0.21 hatten sie nur nach HKCU\Software\N-Connect geschrieben – dort nur lesen, damit ein Durchklicken beim Update
 // die damalige Wahl nicht durch „Dunkel“ ersetzt.
 procedure InitializeWizard;
 var
@@ -283,7 +283,7 @@ begin
   ThemePage.Add(CustomMessage('ThemeSystem'));
   Previous := GetPreviousData('Theme', '');
   if Previous = '' then
-    if not RegQueryStringValue(HKCU, 'Software\SKZ Connect', 'Theme', Previous) then
+    if not RegQueryStringValue(HKCU, 'Software\N-Connect', 'Theme', Previous) then
       Previous := 'dark';
   if Previous = 'light' then
     ThemePage.SelectedValueIndex := 1
@@ -484,6 +484,17 @@ end;
 // geladenen Benutzerprofilen (HKEY_USERS = alle angemeldeten Benutzer) nur Einträge entfernen, die auf diese
 // Installation zeigen; dazu dort Reste älterer Installer (Software\SKZ Connect: Language, Theme). Profile nicht
 // angemeldeter Benutzer behalten einen toten Eintrag, den Windows beim Anmelden übergeht.
+// Sprache/Darstellung, die ältere Installer unter Software\<Name> abgelegt haben.
+procedure RemoveOldSetupChoices(Key: String);
+begin
+  if RegKeyExists(HKU, Key) then
+  begin
+    RegDeleteValue(HKU, Key, 'Language');
+    RegDeleteValue(HKU, Key, 'Theme');
+    RegDeleteKeyIfEmpty(HKU, Key);
+  end;
+end;
+
 procedure RemoveAutostartEntries;
 var
   Users: TArrayOfString;
@@ -503,17 +514,9 @@ begin
       else
         Log('Autostart nicht entfernt: HKU\' + Key);
     end;
-    RegDeleteValue(HKU, Key, 'SKZ Connect'); // Autostart-Eintrag der Vorversion miträumen
-    for Command in TArrayOfString(['SKZ Connect', 'SKZ Connect']) do
-    begin
-      Key := Users[I] + '\Software\' + Command;
-      if RegKeyExists(HKU, Key) then
-      begin
-        RegDeleteValue(HKU, Key, 'Language');
-        RegDeleteValue(HKU, Key, 'Theme');
-        RegDeleteKeyIfEmpty(HKU, Key);
-      end;
-    end;
+    RegDeleteValue(HKU, Key, 'N-Connect'); // Autostart-Eintrag der Vorversion miträumen
+    RemoveOldSetupChoices(Users[I] + '\Software\SKZ Connect');
+    RemoveOldSetupChoices(Users[I] + '\Software\N-Connect');
   end;
 end;
 
