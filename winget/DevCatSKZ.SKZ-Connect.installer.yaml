@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.6.0.schema.json
 PackageIdentifier: DevCatSKZ.SKZ-Connect
-PackageVersion: 1.0.23
+PackageVersion: 1.0.24
 InstallerLocale: en-US
 Platform:
   - Windows.Desktop
@@ -15,8 +15,8 @@ Installers:
   - Architecture: x64
     InstallerType: inno
     Scope: machine
-    InstallerUrl: https://github.com/DevCatSKZ/SKZ-Connect/releases/download/v1.0.23/SKZ-Connect-Setup-1.0.23.exe
-    InstallerSha256: DC32AC9A5B4AEE98A8DCE037FD8820F632FE755F1BC46EC7BF3199C5489B87A0
+    InstallerUrl: https://github.com/DevCatSKZ/SKZ-Connect/releases/download/v1.0.24/SKZ-Connect-Setup-1.0.24.exe
+    InstallerSha256: C62E6DBF4C3DAEE8FCF5D5B11E3CBD779E4164FE151889F9547C772805AF9FC1
     InstallerSwitches:
       Silent: /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
       SilentWithProgress: /SILENT /SUPPRESSMSGBOXES /NORESTART
@@ -30,7 +30,7 @@ Installers:
     NestedInstallerFiles:
       - RelativeFilePath: SKZ-Connect.exe
         PortableCommandAlias: SKZ-Connect
-    InstallerUrl: https://github.com/DevCatSKZ/SKZ-Connect/releases/download/v1.0.23/SKZ-Connect-Portable-1.0.23.zip
-    InstallerSha256: F684DF3F690059D51D1CFCD6525E052DB2F92A01CC4076E33F6AE4039BBC1668
+    InstallerUrl: https://github.com/DevCatSKZ/SKZ-Connect/releases/download/v1.0.24/SKZ-Connect-Portable-1.0.24.zip
+    InstallerSha256: 109449FABF9C53931466CE6BC21F68DFC7989C459E613E2464B0852F0E1E3A96
 ManifestType: installer
 ManifestVersion: 1.6.0
