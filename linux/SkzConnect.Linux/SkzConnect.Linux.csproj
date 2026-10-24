@@ -9,7 +9,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>skzconnect</AssemblyName>
     <RootNamespace>SkzConnect.Linux</RootNamespace>
-    <Version>0.4.6</Version>
+    <Version>0.4.7</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <!-- LibreELEC hat kein ICU: Kulturdaten werden nicht gebraucht. -->

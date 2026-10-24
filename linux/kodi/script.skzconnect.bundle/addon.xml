@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="script.skzconnect.bundle" name="SKZ Connect Bundle Installer" version="1.0.4" provider-name="devcatskz">
+<addon id="script.skzconnect.bundle" name="SKZ Connect Bundle Installer" version="1.0.5" provider-name="devcatskz">
     <!-- Offline-Installer: bringt service.skzconnect und plugin.skzconnect.status als ZIPs mit (resources/data). Die ZIPs
          und das Symbol legt linux/build-kodi-addon.ps1 beim Packen hinein – jeweils die aktuelle Version. Bei jeder
          neuen service.skzconnect- oder Plugin-Version auch hier die Version erhöhen (das Build-Skript prüft das).
@@ -39,7 +39,7 @@
         <description lang="zh_CN">一步安装 SKZ Connect（手柄服务）和状态小部件（plugin.skzconnect.status）。在 Aeon Nox Silvo 中还会自动添加菜单项及其小部件。之后请重启 Kodi。</description>
         <description lang="ko_KR">SKZ Connect(컨트롤러 서비스)와 상태 위젯(plugin.skzconnect.status)을 한 번에 설치합니다. Aeon Nox Silvo에서는 메뉴 항목과 위젯도 자동으로 추가합니다. 그런 다음 Kodi를 다시 시작하세요.</description>
         <platform>all</platform>
-        <news>1.0.2: Enthält service.skzconnect 0.4.4 und plugin.skzconnect.status 1.1.1 – wird jetzt mit jeder neuen SKZ-Connect-Version neu gebaut; Meldungen und Beschreibung in 12 Sprachen[CR]1.0.1: Enthält service.skzconnect 0.4.2 (alle Plattformen: LibreELEC, Batocera, Windows) und plugin.skzconnect.status 1.1.0; Widget-Pfad mit SkzConnect.Reload-Token (aktualisiert sich selbst)[CR]1.0.0: Erste Version</news>
+        <news>1.0.5: Enthält service.skzconnect 0.4.7 und plugin.skzconnect.status 1.1.4 (neues Icon)[CR]1.0.3–1.0.4: Heißt jetzt SKZ Connect Bundle Installer, enthält die umbenannten Add-ons[CR]1.0.2: Enthält service.skzconnect 0.4.4 und plugin.skzconnect.status 1.1.1 – wird jetzt mit jeder neuen SKZ-Connect-Version neu gebaut; Meldungen und Beschreibung in 12 Sprachen[CR]1.0.1: Enthält service.skzconnect 0.4.2 (alle Plattformen: LibreELEC, Batocera, Windows) und plugin.skzconnect.status 1.1.0; Widget-Pfad mit SkzConnect.Reload-Token (aktualisiert sich selbst)[CR]1.0.0: Erste Version</news>
         <license>MIT</license>
         <source>https://github.com/DevCatSKZ/SKZ-Connect</source>
         <website>https://github.com/DevCatSKZ/SKZ-Connect</website>

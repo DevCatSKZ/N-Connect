@@ -31,13 +31,20 @@ public static class AppPrefs
         var ctx = global::Android.App.Application.Context;
         var p = ctx.GetSharedPreferences("skzconnect", FileCreationMode.Private)!;
         var old = ctx.GetSharedPreferences("nconnect", FileCreationMode.Private)!;
-        if (old.All.Count == 0)
+        var all = old.All;
+        if (all is null || all.Count == 0)
             return p;
         var e = p.Edit()!;
-        foreach (var kv in old.All)
+        foreach (var kv in all)
         {
+            // Je nach Laufzeit kommen die Werte als Java-Hüllen oder schon als .NET-Typen an.
             switch (kv.Value)
             {
+                case bool b: e.PutBoolean(kv.Key, b); break;
+                case int i: e.PutInt(kv.Key, i); break;
+                case long l: e.PutLong(kv.Key, l); break;
+                case float f: e.PutFloat(kv.Key, f); break;
+                case string str: e.PutString(kv.Key, str); break;
                 case Java.Lang.Boolean b: e.PutBoolean(kv.Key, b.BooleanValue()); break;
                 case Java.Lang.Integer i: e.PutInt(kv.Key, i.IntValue()); break;
                 case Java.Lang.Long l: e.PutLong(kv.Key, l.LongValue()); break;

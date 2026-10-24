@@ -11,8 +11,8 @@
     <RootNamespace>SkzConnect.Android</RootNamespace>
     <ApplicationId>com.devcatskz.nconnect</ApplicationId>
     <ApplicationTitle>SKZ Connect</ApplicationTitle>
-    <ApplicationVersion>10</ApplicationVersion>
-    <ApplicationDisplayVersion>0.9.1</ApplicationDisplayVersion>
+    <ApplicationVersion>11</ApplicationVersion>
+    <ApplicationDisplayVersion>0.9.2</ApplicationDisplayVersion>
     <!-- Shizuku wird per Reflection angesprochen, Einstellungen per JSON: nicht voll trimmen. -->
     <TrimMode>partial</TrimMode>
   </PropertyGroup>

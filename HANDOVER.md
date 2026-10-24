@@ -1,6 +1,6 @@
 # Übergabe: SKZ Connect
 
-Stand: 24.10.2026. Release 1.0.22 ist veröffentlicht; die Umbenennung von N-Connect zu SKZ Connect ist überall
+Stand: 24.10.2026. Release 1.0.23 ist veröffentlicht (Android 0.9.2, Kodi 0.4.7); die Umbenennung von N-Connect zu SKZ Connect ist überall
 abgeschlossen (Repos, Releases, Add-ons, Webseite, lokale Ordner) und das Icon trägt jetzt die DevCat-Katze
 (siehe „Icon und Branding“).
 
@@ -19,10 +19,10 @@ Kodi/LibreELEC (Linux-Dienst und Kodi-Add-on, Begleitmodus unter Kodi für Windo
 
 | Teil | Version im Code | Zuletzt veröffentlicht |
 |---|---|---|
-| Windows-App | 1.0.22 (`src/Switch2Pro.Bridge/Switch2Pro.Bridge.csproj`) | 1.0.22 (17.10.2026) |
-| Android | 0.9.1 Beta, versionCode 10 (`android/SkzConnect.Android/SkzConnect.Android.csproj`) | 0.9.1 (APK an v1.0.22) |
-| Kodi `service.skzconnect` mit Dienst `skzconnect` | 0.4.6 (`linux/kodi/service.skzconnect/addon.xml`, `linux/SkzConnect.Linux/SkzConnect.Linux.csproj`) | 0.4.6 |
-| Kodi `plugin.skzconnect.status` / `script.skzconnect.bundle` / `repository.devcatskz` | 1.1.3 / 1.0.4 / 1.0.4 | 1.1.3 / 1.0.4 / 1.0.4 |
+| Windows-App | 1.0.23 (`src/Switch2Pro.Bridge/Switch2Pro.Bridge.csproj`) | 1.0.23 (24.10.2026) |
+| Android | 0.9.2 Beta, versionCode 11 (`android/SkzConnect.Android/SkzConnect.Android.csproj`) | 0.9.2 (APK an v1.0.23) |
+| Kodi `service.skzconnect` mit Dienst `skzconnect` | 0.4.7 (`linux/kodi/service.skzconnect/addon.xml`, `linux/SkzConnect.Linux/SkzConnect.Linux.csproj`) | 0.4.7 |
+| Kodi `plugin.skzconnect.status` / `script.skzconnect.bundle` / `repository.devcatskz` | 1.1.4 / 1.0.5 / 1.0.5 | 1.1.4 / 1.0.5 / 1.0.5 |
 
 ## Repositories und Ordner
 

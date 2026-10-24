@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.skzconnect.status" name="SKZ Connect Status" version="1.1.3" provider-name="devcatskz">
+<addon id="plugin.skzconnect.status" name="SKZ Connect Status" version="1.1.4" provider-name="devcatskz">
     <!-- Ältere Widget-Quelle für Skins (plugin://plugin.skzconnect.status/). Die Anzeige liegt in service.skzconnect
          (plugin.py) – dieses Add-on leitet nur weiter, damit bestehende Widget-Einstellungen weiter funktionieren.
          Das Symbol (resources/icon.png) legt linux/build-kodi-addon.ps1 beim Packen hinein. -->
@@ -41,7 +41,7 @@
         <license>MIT</license>
         <source>https://github.com/DevCatSKZ/SKZ-Connect</source>
         <website>https://github.com/DevCatSKZ/SKZ-Connect</website>
-        <news>1.1.1: Quellcode im SKZ-Connect-Repository, Anbieter devcatskz, Beschreibung in 12 Sprachen – Anzeige unverändert (kommt aus service.skzconnect)[CR]1.1.0: Widget zeigt auch bekannte, gerade nicht verbundene Controller und lädt sich bei Änderungen selbst neu</news>
+        <news>1.1.4: Neues Icon[CR]1.1.2–1.1.3: Heißt jetzt SKZ Connect Status, neue Kennung plugin.skzconnect.status[CR]1.1.1: Quellcode im SKZ-Connect-Repository, Anbieter devcatskz, Beschreibung in 12 Sprachen – Anzeige unverändert (kommt aus service.skzconnect)[CR]1.1.0: Widget zeigt auch bekannte, gerade nicht verbundene Controller und lädt sich bei Änderungen selbst neu</news>
         <assets>
             <icon>resources/icon.png</icon>
         </assets>
