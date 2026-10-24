@@ -306,6 +306,19 @@ internal static class Autostart
         }
     }
 
+    /// <summary>EXE-Pfad aus einem Run-Eintrag (<c>"C:\…\SKZ-Connect.exe" --autostart</c>); null, wenn nicht lesbar.</summary>
+    internal static string? ExePath(string command)
+    {
+        command = command.Trim();
+        if (command.StartsWith('"'))
+        {
+            int end = command.IndexOf('"', 1);
+            return end > 1 ? command[1..end] : null;
+        }
+        int space = command.IndexOf(' ');
+        return command.Length == 0 ? null : space < 0 ? command : command[..space];
+    }
+
     public static void Set(bool enabled)
     {
         using var key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(RunKey);
@@ -315,7 +328,10 @@ internal static class Autostart
             key.DeleteValue(RunValue, throwOnMissingValue: false);
     }
 
-    /// <summary>Autostart der Vorversionen auf den neuen Namen und die neue EXE umstellen.</summary>
+    /// <summary>
+    /// Autostart der Vorversionen auf den neuen Namen und die neue EXE umstellen. Zeigt der eigene Eintrag auf eine EXE,
+    /// die es nicht mehr gibt (Ordner umbenannt oder verschoben), auf diese EXE umstellen – sonst startet nichts.
+    /// </summary>
     public static void MigrateLegacy()
     {
         try
@@ -328,6 +344,8 @@ internal static class Autostart
                     key.DeleteValue(legacy, throwOnMissingValue: false);
                     found = true;
                 }
+            if (key?.GetValue(RunValue) is string current && ExePath(current) is { } exe && !File.Exists(exe))
+                found = true;
             if (!found)
                 return;
             Set(true);
