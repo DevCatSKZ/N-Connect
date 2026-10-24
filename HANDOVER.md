@@ -31,7 +31,7 @@ Kodi/LibreELEC (Linux-Dienst und Kodi-Add-on, Begleitmodus unter Kodi für Windo
 | [DevCatSKZ/SKZ-Connect](https://github.com/DevCatSKZ/SKZ-Connect) (öffentlich) | Führendes Repo, Branch `main`. Releases entstehen über Tags `v<Version>`. |
 | Branch `gh-pages` im selben Repo | Webseite <https://devcatskz.github.io/SKZ-Connect/>; lokal als Arbeitskopie `..\SKZ-Connect-pages`. |
 | [DevCatSKZ/kodi-repo](https://github.com/DevCatSKZ/kodi-repo) (öffentlich) | „DevCatSKZ Repository“ für Kodi (auch über <https://devcatskz.github.io/kodi-repo/>). Wird beim Release von Hand aktualisiert, keine CI-Automatik. Lokal: `..\kodi-repo`. Eigene `AGENTS.md`. |
-| `sfm` (lokal `..\sfm`) | Frühere Entwicklungsquelle (Ordner `switch2-pro-windows/`), seit 12.10.2026 eingefroren auf 1.0.20. Nicht mehr benutzen, nichts daraus übernehmen. |
+| (früher `sfm`) | Frühere Entwicklungsquelle bis 12.10.2026. Am 24.10.2026 aufgelöst: das Repo heißt jetzt `DevCatSKZ-0815/Schnurrstadt-Z` und enthält nur noch das Spiel; die alten Branches mit dem Windows-Code liegen nur noch als Sicherung `C:\Coding\Bak\GitHub-Sicherung-2026-10-24\sfm-alle-branches.bundle`. Nichts daraus übernehmen. |
 | `..\.wt\<Name>` | Worktrees für parallele Arbeitsstränge (siehe AGENTS.md). |
 | `..\vm` | LibreELEC-Abbilder für QEMU-Tests ohne Installation (siehe docs/LINUX-KODI.md). |
 

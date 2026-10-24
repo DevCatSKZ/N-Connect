@@ -23,7 +23,7 @@ später erkennen, anzeigen und unterstützen.
 | Was | Pfad | Versionskontrolle |
 |---|---|---|
 | SKZ Connect (maßgebliche Kopie) | `C:\Coding\Switch 2 Pro Controler Bluetooth Treiber\SKZ Connect` | Git, Branch `main` |
-| SKZ Connect (alte Doppelkopie, **nicht** benutzen) | `…\Switch 2 Pro Controler Bluetooth Treiber\sfm\switch2-pro-windows` | eigenes Git |
+| SKZ Connect (alte Doppelkopie, seit 24.10.2026 aufgelöst) | nur noch Sicherung `C:\Coding\Bak\GitHub-Sicherung-2026-10-24\sfm-alle-branches.bundle` | – |
 | Bluepick_RCM | `C:\Coding\Bluepick_RCM\Bluepick_RCM Project` | **kein Git** |
 | Bluepick-Agentendoku | `Bluepick_RCM Project\AGENTS.md` (Menü-Indizes, Rezepte, Fallstricke) | – |
 | Neue Payload 1.0.6 | `Bluepick_RCM Project\output\Bluepick_RCM.bin` (102 357 B) | – |
