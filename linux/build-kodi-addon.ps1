@@ -61,7 +61,8 @@ $bundleZip = Join-Path $out "script.skzconnect.bundle-$bundleVersion.zip"
 $repoZip = Join-Path $out "repository.devcatskz-$repoVersion.zip"
 
 # Dateien eines Add-ons aus linux/kodi/<id> (ohne __pycache__/.pyc), dazu das Logo aus dem Installer an der Stelle,
-# die <assets><icon> der addon.xml nennt (damit alles gleich aussieht), die Lizenz und die Drittanbieter-Hinweise.
+# die <assets><icon> der addon.xml nennt (damit alles gleich aussieht – außer das Add-on bringt dort ein eigenes Icon
+# mit, wie repository.devcatskz aus make_repo_icon.py), die Lizenz und die Drittanbieter-Hinweise.
 # -NoLicense: Repository-Add-on – enthält keinen fremden Code und bleibt so, wie es veröffentlicht ist.
 function Get-AddonFiles([string]$id, [switch]$NoLicense) {
     $src = Join-Path $kodiSrc $id
@@ -74,7 +75,10 @@ function Get-AddonFiles([string]$id, [switch]$NoLicense) {
     }
     $iconPath = (Get-AddonXml $id).addon.extension | Where-Object { $_.point -eq 'xbmc.addon.metadata' } |
         ForEach-Object { $_.assets.icon }
-    if ($iconPath) { $files += [pscustomobject]@{ Source = $icon; Path = "$id/$iconPath"; Mode = 0 } }
+    # Ein Add-on mit eigenem Icon an dieser Stelle (das Repository-Add-on) behält es; die anderen bekommen das Logo.
+    if ($iconPath -and -not ($files | Where-Object { $_.Path -eq "$id/$iconPath" })) {
+        $files += [pscustomobject]@{ Source = $icon; Path = "$id/$iconPath"; Mode = 0 }
+    }
     if (-not $NoLicense) {
         $files += [pscustomobject]@{ Source = $license; Path = "$id/LICENSE.txt"; Mode = 0 }
         $files += [pscustomobject]@{ Source = $notices; Path = "$id/THIRD-PARTY-NOTICES.md"; Mode = 0 }
