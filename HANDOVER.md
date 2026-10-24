@@ -84,6 +84,9 @@ copy installer\art\SKZ-Connect.png ..\SKZ-Connect-pages\logo.png                
 `--render-brand` schreibt `SKZ-Connect.png`/`.ico`, `SKZ-Connect-glyph.png` (Glyph ohne Grund) und die sechs
 `wizard-*.bmp` (Inno Setup wählt je Skalierung). Android-Icon wie bei SKZ Monitor/Remote: Hintergrund-Ebene nur der
 Navy-Verlauf, das Glyph als Vordergrund-Ebene (~46 % der 108-dp-Fläche, bleibt unter jeder Maske ganz sichtbar).
+Das „DevCatSKZ Repository“ hat ein eigenes Icon in derselben Bildsprache (Katze in einer offenen Kiste mit
+Download-Pfeil): `py -3 linux/kodi/make_repo_icon.py` schreibt `linux/kodi/repository.devcatskz/icon.png`;
+`build-kodi-addon.ps1` nimmt für Add-ons mit eigenem Icon dieses statt des SKZ-Connect-Logos.
 README und `addon.xml` der Add-ons verweisen bereits auf diese Dateien; Kodi-ZIPs ziehen das Icon beim Bauen aus
 `installer/art` mit (`build-kodi-addon.ps1`). Die Add-on-ZIPs im kodi-repo behalten ihr altes Icon bis zum nächsten
 Add-on-Build – die Ordner-`icon.png` (Repo-Ansicht) sofort mitziehen.
